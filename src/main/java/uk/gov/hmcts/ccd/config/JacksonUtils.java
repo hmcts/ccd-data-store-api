@@ -2,12 +2,15 @@ package uk.gov.hmcts.ccd.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,6 +56,15 @@ public final class JacksonUtils {
     public static Map<String, Object> convertJsonNode(Object from) {
         return MAPPER.convertValue(from, new TypeReference<HashMap<String, Object>>() {
         });
+    }
+
+    public static Map<String, JsonNode> convertJsonNode(String from) throws JsonProcessingException {
+        return MAPPER.readValue(from, new TypeReference<HashMap<String, JsonNode>>() {
+        });
+    }
+
+    public static String writeValueAsString(Map<String, JsonNode> caseData) throws JsonProcessingException {
+        return JacksonUtils.MAPPER.writeValueAsString(caseData);
     }
 
     /**

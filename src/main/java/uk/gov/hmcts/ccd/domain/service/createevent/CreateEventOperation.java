@@ -7,7 +7,9 @@ public interface CreateEventOperation {
 
     CaseDetails createCaseEvent(String caseReference, CaseDataContent caseDataContent);
 
-    CaseDetails createCaseSystemEvent(String caseReference, CaseDataContent content, Integer version,
-                                      String attributePath, String categoryId);
+    CaseDetails createCaseSystemEvent(String caseReference,
+                                      Integer version,
+                                      String attributePath,
+                                      String categoryId);
 
 }

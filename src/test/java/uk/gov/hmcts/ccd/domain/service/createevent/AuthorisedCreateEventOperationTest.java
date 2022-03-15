@@ -6,11 +6,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.stream.Collectors;
-
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,15 +27,19 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -53,6 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
@@ -113,6 +113,9 @@ class AuthorisedCreateEventOperationTest {
     @Mock
     private CaseAccessService caseAccessService;
 
+    @Mock
+    private CaseDetailsJsonParser caseDetailsJsonParser;
+
     private AuthorisedCreateEventOperation authorisedCreateEventOperation;
     private CaseDetails classifiedCase;
     private CaseDetails documentFieldsCase;
@@ -132,7 +135,8 @@ class AuthorisedCreateEventOperationTest {
             getCaseOperation,
             caseDefinitionRepository,
             accessControlService,
-            caseAccessService);
+            caseAccessService,
+            caseDetailsJsonParser);
 
         CaseDetails existingCase = new CaseDetails();
         Map<String, JsonNode> existingData = Maps.newHashMap();
@@ -174,6 +178,12 @@ class AuthorisedCreateEventOperationTest {
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean())).thenReturn(authorisedCaseNode);
+        when(caseDetailsJsonParser.read(any(CaseDetails.class), anyString())).thenCallRealMethod();
+        when(caseDetailsJsonParser.containsDocumentUrl(any(CaseDetails.class), anyString())).thenCallRealMethod();
+        doCallRealMethod().when(caseDetailsJsonParser)
+            .updateCaseDocumentData(anyString(), anyString(), any(CaseDetails.class));
+        doCallRealMethod().when(caseDetailsJsonParser).compiledPath(anyString());
+        doCallRealMethod().when(caseDetailsJsonParser).compiledPath(anyString(), anyBoolean());
     }
 
     private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
@@ -369,6 +379,7 @@ class AuthorisedCreateEventOperationTest {
         existingCase.setState(STATE_ID);
         DocumentData document = new DocumentData();
         document.setFilename("filename");
+        document.setUrl("someurl");
         String attributeField = "DocumentField1";
         documentData.put(attributeField, MAPPER.convertValue(document, JsonNode.class));
         existingCase.setData(documentData);
@@ -377,10 +388,10 @@ class AuthorisedCreateEventOperationTest {
         documentFieldsCase = new CaseDetails();
         documentFieldsCase.setVersion(2);
         doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
-            caseDataContent, 1, attributeField, categoryId);
+            1, attributeField, categoryId);
 
         CaseDetails updatedCaseDetails = authorisedCreateEventOperation.createCaseSystemEvent(caseReference,
-            caseDataContent, 1, attributeField, categoryId);
+            1, attributeField, categoryId);
 
         assertEquals(documentFieldsCase, updatedCaseDetails);
     }
@@ -398,6 +409,7 @@ class AuthorisedCreateEventOperationTest {
         existingCase.setState(STATE_ID);
         DocumentData document = new DocumentData();
         document.setFilename("filename");
+        document.setUrl("someurl");
         documentData.put("AnotherField", MAPPER.convertValue(document, JsonNode.class));
         Map<String, JsonNode> map = new HashMap<>();
         map.put("DocumentField1", MAPPER.convertValue(documentData, JsonNode.class));
@@ -408,10 +420,10 @@ class AuthorisedCreateEventOperationTest {
         documentFieldsCase.setVersion(2);
         String attributeField = "DocumentField1.AnotherField";
         doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
-            caseDataContent, 1, attributeField, categoryId);
+            1, attributeField, categoryId);
 
         CaseDetails updatedCaseDetails = authorisedCreateEventOperation.createCaseSystemEvent(caseReference,
-            caseDataContent, 1, attributeField, categoryId);
+            1, attributeField, categoryId);
 
         assertEquals(documentFieldsCase, updatedCaseDetails);
     }
@@ -443,10 +455,10 @@ class AuthorisedCreateEventOperationTest {
         documentFieldsCase.setVersion(2);
         String attributeField = "DocumentField1[12345]";
         doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
-            caseDataContent, 1, attributeField, categoryId);
+            1, attributeField, categoryId);
 
         CaseDetails updatedCaseDetails = authorisedCreateEventOperation.createCaseSystemEvent(caseReference,
-            caseDataContent, 1, attributeField, categoryId);
+            1, attributeField, categoryId);
 
         assertEquals(documentFieldsCase, updatedCaseDetails);
     }
@@ -482,10 +494,10 @@ class AuthorisedCreateEventOperationTest {
         documentFieldsCase.setVersion(2);
         String attributeField = "Complex.DocumentField1[12345].Document";
         doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
-            caseDataContent, 1, attributeField, categoryId);
+            1, attributeField, categoryId);
 
         CaseDetails updatedCaseDetails = authorisedCreateEventOperation.createCaseSystemEvent(caseReference,
-            caseDataContent, 1, attributeField, categoryId);
+            1, attributeField, categoryId);
 
         assertEquals(documentFieldsCase, updatedCaseDetails);
     }
@@ -519,10 +531,10 @@ class AuthorisedCreateEventOperationTest {
         documentFieldsCase.setVersion(2);
         String attributeField = "DocumentField1[12345].Document";
         doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
-            caseDataContent, 1, attributeField, categoryId);
+            1, attributeField, categoryId);
 
         CaseDetails updatedCaseDetails = authorisedCreateEventOperation.createCaseSystemEvent(caseReference,
-            caseDataContent, 1, attributeField, categoryId);
+            1, attributeField, categoryId);
 
         assertEquals(documentFieldsCase, updatedCaseDetails);
     }
@@ -554,10 +566,10 @@ class AuthorisedCreateEventOperationTest {
         documentFieldsCase.setVersion(2);
         String attributeField = "DocumentField1[12345]";
         doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
-            caseDataContent, 1, attributeField, categoryId);
+            1, attributeField, categoryId);
 
         assertThrows(BadRequestException.class, () -> authorisedCreateEventOperation
-            .createCaseSystemEvent(caseReference, caseDataContent, 1, attributeField, categoryId));
+            .createCaseSystemEvent(caseReference, 1, attributeField, categoryId));
     }
 
 }

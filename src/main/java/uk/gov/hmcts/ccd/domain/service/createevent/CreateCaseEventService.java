@@ -1,13 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -33,6 +31,7 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
+import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
@@ -51,10 +50,7 @@ import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 import javax.inject.Inject;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -88,8 +84,7 @@ public class CreateCaseEventService {
     private final CaseDocumentService caseDocumentService;
     private final CaseDataIssueLogger caseDataIssueLogger;
     private final GlobalSearchProcessorService globalSearchProcessorService;
-
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
+    private final CaseDetailsJsonParser caseDetailsJsonParser;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -115,7 +110,8 @@ public class CreateCaseEventService {
                                   @Qualifier("caseEventMessageService") final MessageService messageService,
                                   final CaseDocumentService caseDocumentService,
                                   final CaseDataIssueLogger caseDataIssueLogger,
-                                  final GlobalSearchProcessorService globalSearchProcessorService) {
+                                  final GlobalSearchProcessorService globalSearchProcessorService,
+                                  final CaseDetailsJsonParser jsonPathParser) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -138,6 +134,7 @@ public class CreateCaseEventService {
         this.caseDocumentService = caseDocumentService;
         this.caseDataIssueLogger = caseDataIssueLogger;
         this.globalSearchProcessorService = globalSearchProcessorService;
+        this.caseDetailsJsonParser = jsonPathParser;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -233,115 +230,16 @@ public class CreateCaseEventService {
             .build();
     }
 
-    public CreateCaseEventResult createCaseSystemEvent(final String caseReference, final CaseDataContent content,
-                                                       final String attributePath, final String categoryId) {
+    public CreateCaseEventResult createCaseSystemEvent(final String caseReference,
+                                                       final String attributePath,
+                                                       final String categoryId,
+                                                       Event event) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("DocumentUpdated");
         caseEventDefinition.setName("Update Document Category Id");
         caseDetails.setLastModified(now());
-        Map<String, JsonNode> currentData = caseDetails.getData();
-
-        //merge new categoryId field with existing data
-        if (attributePath.contains(".")) {
-            List<String> paths = Arrays.asList(attributePath.split("\\."));
-            List<Map<String, JsonNode>> listOfMappedData = new ArrayList<>();
-            listOfMappedData.add(currentData);
-            for (int i = 0; i < paths.size(); i++) {
-                if (paths.get(i).contains("[")) {
-                    String path = paths.get(i);
-                    int idStart = path.indexOf("[");
-                    String key = path.substring(0, idStart);
-                    int idEnd = path.indexOf("]");
-                    String id = path.substring(idStart + 1, idEnd);
-                    JsonNode data = listOfMappedData.get(i).get(key);
-                    Iterator<JsonNode> dataElements = data.elements();
-                    while (dataElements.hasNext()) {
-                        JsonNode json = dataElements.next();
-                        if (json.findValue("id").asText().equals(id)) {
-                            JsonNode value = json.findValue("value");
-                            Iterator<Map.Entry<String, JsonNode>> map = value.fields();
-                            Map<String, JsonNode> mappedData = new HashMap<>();
-                            map.forEachRemaining(x -> mappedData.put(x.getKey(), x.getValue()));
-                            listOfMappedData.add(mappedData);
-                        }
-
-                    }
-                } else {
-                    JsonNode data = listOfMappedData.get(i).get(paths.get(i));
-                    Iterator<Map.Entry<String, JsonNode>> map = data.fields();
-                    Map<String, JsonNode> mappedData = new HashMap<>();
-                    map.forEachRemaining(x -> mappedData.put(x.getKey(), x.getValue()));
-                    listOfMappedData.add(mappedData);
-
-                }
-
-            }
-            Map<String, JsonNode> map = listOfMappedData.get(listOfMappedData.size() - 1);
-            map.put("categoryId", MAPPER.convertValue(categoryId, JsonNode.class));
-
-            for (int i = listOfMappedData.size() - 1; i > 0; i--) {
-                if (paths.get(i - 1).contains("[")) {
-                    String path = paths.get(i - 1);
-                    int idStart = path.indexOf("[");
-                    String key = path.substring(0, idStart);
-                    int idEnd = path.indexOf("]");
-                    String id = path.substring(idStart + 1, idEnd);
-                    Map<String, JsonNode> previousData = listOfMappedData.get(i - 1);
-                    Iterator<JsonNode> previousDataElements = previousData.get(key).elements();
-                    List<JsonNode> updatedData = new ArrayList<>();
-                    while (previousDataElements.hasNext()) {
-                        JsonNode elementData = previousDataElements.next();
-                        if (!elementData.get("id").asText().equals(id)) {
-                            updatedData.add(elementData);
-                        }
-                    }
-                    Map<String, JsonNode> collectionData = new HashMap<>();
-                    collectionData.put("id", MAPPER.convertValue(id, JsonNode.class));
-                    collectionData.put("value", MAPPER.convertValue(listOfMappedData.get(i), JsonNode.class));
-                    updatedData.add(MAPPER.convertValue(collectionData, JsonNode.class));
-                    listOfMappedData.get(i - 1).put(key, MAPPER.convertValue(updatedData, JsonNode.class));
-                } else {
-                    listOfMappedData.get(i - 1).put(paths.get(i - 1), MAPPER.convertValue(listOfMappedData.get(i),
-                        JsonNode.class));
-                }
-            }
-            currentData = listOfMappedData.get(0);
-        } else if (attributePath.contains("[")) {
-            int idStart = attributePath.indexOf("[");
-            String key = attributePath.substring(0, idStart);
-            JsonNode topLevelData = currentData.get(key);
-            Iterator<JsonNode> collectionFields = topLevelData.elements();
-            int idEnd = attributePath.indexOf("]");
-            String id = attributePath.substring(idStart + 1, idEnd);
-
-            List<JsonNode> updatedData = new ArrayList<>();
-            while (collectionFields.hasNext()) {
-                JsonNode json = collectionFields.next();
-                JsonNode value = json.findValue("value");
-                Iterator<Map.Entry<String, JsonNode>> dataPair = value.fields();
-                Map<String, String> mappedData = new HashMap<>();
-                dataPair.forEachRemaining(x -> mappedData.put(x.getKey(), x.getValue().textValue()));
-
-                if (json.findValue("id").asText().equals(id)) {
-                    mappedData.put("categoryId", categoryId);
-                }
-                Map<String, JsonNode> collectionData = new HashMap<>();
-                collectionData.put("id", json.findValue("id"));
-                collectionData.put("value", MAPPER.convertValue(mappedData, JsonNode.class));
-                updatedData.add(MAPPER.convertValue(collectionData, JsonNode.class));
-            }
-            currentData.put(key, MAPPER.convertValue(updatedData, JsonNode.class));
-
-        } else {
-            JsonNode topLevelData = currentData.get(attributePath);
-            Iterator<Map.Entry<String, JsonNode>> topLevelDataFields = topLevelData.fields();
-            Map<String, String> mappedData = new HashMap<>();
-            topLevelDataFields.forEachRemaining(x -> mappedData.put(x.getKey(), x.getValue().textValue()));
-            mappedData.put("categoryId", categoryId);
-            currentData.put(attributePath, MAPPER.convertValue(mappedData, JsonNode.class));
-        }
-        caseDetails.setData(currentData);
+        caseDetailsJsonParser.updateCaseDocumentData(attributePath, categoryId, caseDetails);
 
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
 
@@ -358,7 +256,7 @@ public class CreateCaseEventService {
             caseDetailsInDatabase,
             updatedCaseDetailsWithoutHashes,
             caseTypeDefinition,
-            content.getIgnoreWarning()
+            false
         );
 
         final Optional<String> newState = Optional.ofNullable(oldState);
@@ -367,10 +265,11 @@ public class CreateCaseEventService {
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
 
         final LocalDateTime timeNow = now();
+        Map attributePathData = caseDetailsJsonParser.read(caseDetailsInDatabase, attributePath);
 
         final List<DocumentHashToken> documentHashes = caseDocumentService.extractDocumentHashToken(
             caseDetailsInDatabase.getData(),
-            Optional.ofNullable(content.getData()).orElse(emptyMap()),
+            Optional.ofNullable(attributePathData).orElse(emptyMap()),
             Optional.ofNullable(caseDetailsAfterCallback.getData()).orElse(emptyMap())
         );
 
@@ -387,13 +286,13 @@ public class CreateCaseEventService {
         );
         saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
-            content.getEvent(),
+            event,
             caseEventDefinition,
             savedCaseDetails,
             caseTypeDefinition,
             timeNow,
             oldState,
-            content.getOnBehalfOfUserToken(),
+            null,
             SecurityClassification.PUBLIC
         );
 
@@ -411,7 +310,6 @@ public class CreateCaseEventService {
             .build();
 
     }
-
 
     private CaseEventDefinition findAndValidateCaseEvent(final CaseTypeDefinition caseTypeDefinition,
                                                          final Event event) {

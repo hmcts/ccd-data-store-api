@@ -14,4 +14,7 @@ public class DocumentData {
 
     @JsonProperty("document_binary_url")
     private String binaryUrl;
+
+    @JsonProperty("categoryId")
+    private String categoryId;
 }
