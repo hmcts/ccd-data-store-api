@@ -6,12 +6,12 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
-import net.minidev.json.JSONArray;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -33,7 +33,7 @@ public class CaseDetailsJsonParser {
         String existingCaseData = convertToJson(caseDetails);
         String path = compiledPath(attributePath);
         if (isArrayPath(attributePath)) {
-            JSONArray jsonArray = JsonPath.read(existingCaseData, path);
+            List jsonArray = JsonPath.read(existingCaseData, path);
             return jsonArray.size() > 0 ? (Map) jsonArray.get(0) : Maps.newHashMap();
         }
         return JsonPath.read(existingCaseData, path);
