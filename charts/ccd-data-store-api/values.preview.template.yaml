@@ -1,6 +1,8 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  memoryRequests: "2048Mi"
+  cpuRequests: "2000m"
   memoryLimits: "4096Mi"
   cpuLimits: "4000m"
   keyVaults:
