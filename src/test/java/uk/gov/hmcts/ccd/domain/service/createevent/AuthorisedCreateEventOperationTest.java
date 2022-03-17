@@ -389,9 +389,6 @@ class AuthorisedCreateEventOperationTest {
     void shouldSuccessfullyReturnCaseDetailsWhenTopLevelDocumentFieldIdentifiedByAttributePathWithAllCorrectDetails() {
         Event event = new Event();
         event.setEventId("DocumentUpdated");
-        CaseDataContent caseDataContent = new CaseDataContent();
-        caseDataContent.setEvent(event);
-        caseDataContent.setData(NEW_DATA);
         CaseDetails existingCase = new CaseDetails();
         existingCase.setVersion(1);
         existingCase.setCaseTypeId(CASE_TYPE_ID);
@@ -419,9 +416,6 @@ class AuthorisedCreateEventOperationTest {
     void shouldSuccessfullyReturnCaseDetailsWhenComplexDocumentFieldHasMatchingDetails() {
         Event event = new Event();
         event.setEventId("DocumentUpdated");
-        CaseDataContent caseDataContent = new CaseDataContent();
-        caseDataContent.setEvent(event);
-        caseDataContent.setData(NEW_DATA);
         CaseDetails existingCase = new CaseDetails();
         existingCase.setVersion(1);
         existingCase.setCaseTypeId(CASE_TYPE_ID);
@@ -451,9 +445,6 @@ class AuthorisedCreateEventOperationTest {
     void shouldSuccessfullyReturnCaseDetailsWhenCollectionDocumentFieldHasMatchingDetails() {
         Event event = new Event();
         event.setEventId("DocumentUpdated");
-        CaseDataContent caseDataContent = new CaseDataContent();
-        caseDataContent.setEvent(event);
-        caseDataContent.setData(NEW_DATA);
         CaseDetails existingCase = new CaseDetails();
         existingCase.setVersion(1);
         existingCase.setCaseTypeId(CASE_TYPE_ID);
@@ -486,9 +477,6 @@ class AuthorisedCreateEventOperationTest {
     void shouldSuccessfullyReturnCaseDetailsWhenComplexCollectionDocumentFieldHasMatchingDetails() {
         Event event = new Event();
         event.setEventId("DocumentUpdated");
-        CaseDataContent caseDataContent = new CaseDataContent();
-        caseDataContent.setEvent(event);
-        caseDataContent.setData(NEW_DATA);
         CaseDetails existingCase = new CaseDetails();
         existingCase.setVersion(1);
         existingCase.setCaseTypeId(CASE_TYPE_ID);
@@ -525,9 +513,6 @@ class AuthorisedCreateEventOperationTest {
     void shouldSuccessfullyReturnCaseDetailsWhenCollectionComplexDocumentFieldHasMatchingDetails() {
         Event event = new Event();
         event.setEventId("DocumentUpdated");
-        CaseDataContent caseDataContent = new CaseDataContent();
-        caseDataContent.setEvent(event);
-        caseDataContent.setData(NEW_DATA);
         CaseDetails existingCase = new CaseDetails();
         existingCase.setVersion(1);
         existingCase.setCaseTypeId(CASE_TYPE_ID);
@@ -562,9 +547,6 @@ class AuthorisedCreateEventOperationTest {
     void shouldThrowBadRequestExceptionWhenCollectionFieldDoesNotMatchAttributePath() {
         Event event = new Event();
         event.setEventId("DocumentUpdated");
-        CaseDataContent caseDataContent = new CaseDataContent();
-        caseDataContent.setEvent(event);
-        caseDataContent.setData(NEW_DATA);
         CaseDetails existingCase = new CaseDetails();
         existingCase.setVersion(1);
         existingCase.setCaseTypeId(CASE_TYPE_ID);
