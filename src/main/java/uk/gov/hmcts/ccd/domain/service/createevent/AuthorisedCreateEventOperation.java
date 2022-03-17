@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.PathNotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -108,7 +110,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             createCaseEventDetails.getCaseTypeDefinition(),
             createCaseEventDetails.getAccessProfiles());
 
-        checkCaseCategoryId(categoryId);
+        checkCaseCategoryId(createCaseEventDetails.getCaseTypeDefinition(), categoryId);
 
         if (!version.equals(createCaseEventDetails.getCaseDetails().getVersion())) {
             throw new BadRequestException("003 Wrong CaseVersion");
@@ -120,7 +122,15 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             .getAccessProfiles(), caseDetails);
     }
 
-    private void checkCaseCategoryId(String categoryId) {
+    private void checkCaseCategoryId(CaseTypeDefinition caseTypeDefinition, String categoryId) {
+        Boolean validCategoryId = categoryId == null || caseTypeDefinition.getCaseFieldDefinitions()
+            .stream()
+            .map(cfd -> cfd.getCategoryId())
+            .filter(value -> StringUtils.isNotBlank(value))
+            .anyMatch(value ->  value.equals(categoryId));
+        if (!validCategoryId) {
+            throw new BadRequestException("002 Invalid categoryId");
+        }
     }
 
     private void checkCaseDocumentData(String attributePath, CreateCaseEventDetails createCaseEventDetails) {
