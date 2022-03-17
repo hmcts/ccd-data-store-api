@@ -239,7 +239,6 @@ public class CreateCaseEventService {
         caseEventDefinition.setId("DocumentUpdated");
         caseEventDefinition.setName("Update Document Category Id");
         caseDetails.setLastModified(now());
-        caseDetailsJsonParser.updateCaseDocumentData(attributePath, categoryId, caseDetails);
 
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
 
@@ -263,13 +262,13 @@ public class CreateCaseEventService {
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
+        caseDetailsJsonParser.updateCaseDocumentData(attributePath, categoryId, caseDetailsAfterCallback);
 
         final LocalDateTime timeNow = now();
-        Map attributePathData = caseDetailsJsonParser.read(caseDetailsInDatabase, attributePath);
 
         final List<DocumentHashToken> documentHashes = caseDocumentService.extractDocumentHashToken(
             caseDetailsInDatabase.getData(),
-            Optional.ofNullable(attributePathData).orElse(emptyMap()),
+            caseDetailsInDatabase.getData(),
             Optional.ofNullable(caseDetailsAfterCallback.getData()).orElse(emptyMap())
         );
 

@@ -104,13 +104,11 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
         //checks field denoted by attributePath exists and is of type document
         checkCaseDocumentData(attributePath, createCaseEventDetails);
-        Map attributePathData = caseDetailsJsonParser.read(createCaseEventDetails.getCaseDetails(), attributePath);
-        verifyUpsertAccessForCaseSystemEvent(attributePathData,
-            createCaseEventDetails.getCaseDetails(),
+        verifyUpsertAccessForCaseSystemEvent(createCaseEventDetails.getCaseDetails(),
             createCaseEventDetails.getCaseTypeDefinition(),
             createCaseEventDetails.getAccessProfiles());
 
-        //categoryId check needed here
+        checkCaseCategoryId(categoryId);
 
         if (!version.equals(createCaseEventDetails.getCaseDetails().getVersion())) {
             throw new BadRequestException("003 Wrong CaseVersion");
@@ -120,6 +118,9 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             version, attributePath, categoryId);
         return verifyReadAccess(createCaseEventDetails.getCaseTypeDefinition(), createCaseEventDetails
             .getAccessProfiles(), caseDetails);
+    }
+
+    private void checkCaseCategoryId(String categoryId) {
     }
 
     private void checkCaseDocumentData(String attributePath, CreateCaseEventDetails createCaseEventDetails) {
@@ -211,13 +212,12 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         verifyCaseFieldsAccess(newData, existingCaseDetails, caseTypeDefinition, accessProfiles);
     }
 
-    private void verifyUpsertAccessForCaseSystemEvent(Map<String, JsonNode> newData,
-                                                      CaseDetails existingCaseDetails,
+    private void verifyUpsertAccessForCaseSystemEvent(CaseDetails existingCaseDetails,
                                                       CaseTypeDefinition caseTypeDefinition,
                                                       Set<AccessProfile> accessProfiles) {
         verifyCaseTypeAndStateAccess(existingCaseDetails, caseTypeDefinition, accessProfiles);
 
-        verifyCaseFieldsAccess(newData, existingCaseDetails, caseTypeDefinition, accessProfiles);
+        verifyCaseFieldsAccess(existingCaseDetails.getData(), existingCaseDetails, caseTypeDefinition, accessProfiles);
     }
 
     private void verifyCaseTypeAndStateAccess(CaseDetails existingCaseDetails, CaseTypeDefinition caseTypeDefinition,
