@@ -122,7 +122,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     }
 
     private void checkCaseCategoryId(CaseTypeDefinition caseTypeDefinition, String categoryId) {
-        Boolean validCategoryId = categoryId == null || caseTypeDefinition.getCaseFieldDefinitions()
+        Boolean validCategoryId = categoryId == null || caseTypeDefinition.getCategories()
             .stream()
             .map(cfd -> cfd.getCategoryId())
             .filter(value -> StringUtils.isNotBlank(value))

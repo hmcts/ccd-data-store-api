@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -62,7 +63,6 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -157,9 +157,9 @@ class AuthorisedCreateEventOperationTest {
         doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT);
         caseTypeDefinition.setEvents(events);
-        CaseFieldDefinition caseFieldDefinition = mock(CaseFieldDefinition.class);
-        when(caseFieldDefinition.getCategoryId()).thenReturn(categoryId);
-        caseFieldDefinitions.add(caseFieldDefinition);
+        CategoryDefinition categoryDefinition = new CategoryDefinition();
+        categoryDefinition.setCategoryId(categoryId);
+        caseTypeDefinition.setCategories(Lists.newArrayList(categoryDefinition));
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getAccessProfiles(anyString())).thenReturn(USER_ROLES);
