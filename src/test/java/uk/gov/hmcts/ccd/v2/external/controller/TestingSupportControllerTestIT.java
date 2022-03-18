@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,7 +36,6 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
     private CaseLinkRepository caseLinkRepository;
 
     private MockMvc mockMvc;
-    private JdbcTemplate template;
 
     @Before
     public void setUp() {
@@ -47,14 +45,12 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        template = new JdbcTemplate(db);
         wireMockServer.resetAll();
     }
 
     @Test
     public void testGetCaseLinkNoResults() throws Exception {
-        final String caseReference = "9816494993793181";
-        final String url = URL + caseReference;
+        final String url = URL + CASE_21_REFERENCE;
 
         final MvcResult mvcResult = mockMvc.perform(get(url).header("experimental", "true"))
             .andExpect(status().is(200))
@@ -70,8 +66,7 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     @Test
     public void testGetCaseLinkReturnsResult() throws Exception {
-        final String caseReference = "3393027116986763";
-        final String url = URL + caseReference;
+        final String url = URL + CASE_22_REFERENCE;
 
         final MvcResult mvcResult = mockMvc.perform(get(url).header("experimental", "true"))
             .andExpect(status().is(200))
@@ -80,18 +75,20 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
         final CaseLinksResource caseLinksResource = mapper.readValue(mvcResult.getResponse().getContentAsString(),
             CaseLinksResource.class);
 
-        assertEquals(1,caseLinksResource.getCaseLinks().size());
-        assertEquals(1504259907353537L, caseLinksResource.getCaseLinks().get(0).getLinkedCaseReference());
+        assertEquals(1, caseLinksResource.getCaseLinks().size());
+        assertEquals(
+            Long.parseLong(CASE_03_REFERENCE), // pre-existing case link (see classpath:sql/insert_cases.sql)
+            caseLinksResource.getCaseLinks().get(0).getLinkedCaseReference()
+        );
     }
 
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     @Test
     public void testGetCaseLinkReturnsMultipleResults() throws Exception {
-        CaseLinkEntity caseLinkEntity = new CaseLinkEntity(21L, 4L, "Test");
+        CaseLinkEntity caseLinkEntity = new CaseLinkEntity(CASE_22_ID, CASE_04_ID, "Test");
         caseLinkRepository.save(caseLinkEntity);
 
-        final String caseReference = "3393027116986763";
-        final String url = URL + caseReference;
+        final String url = URL + CASE_22_REFERENCE;
 
         final MvcResult mvcResult = mockMvc.perform(get(url).header("experimental", "true"))
             .andExpect(status().is(200))
@@ -105,6 +102,9 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
             .map(CaseLink::getLinkedCaseReference)
             .collect(Collectors.toList());
         assertEquals(2, foundCaseLinks.size());
-        assertTrue(foundCaseLinks.containsAll(List.of(1504259907353537L, 1504259907353552L)));
+        assertTrue(foundCaseLinks.containsAll(List.of(
+                Long.parseLong(CASE_03_REFERENCE), // pre-existing case link (see classpath:sql/insert_cases.sql)
+                Long.parseLong(CASE_04_REFERENCE)  // new case link
+            )));
     }
 }

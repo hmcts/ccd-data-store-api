@@ -3776,7 +3776,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201AndInsertCaseLinksWhenCreateCaseEvent()
         throws Exception {
-        final String reference = "3393027116986763";
+        final String reference = CASE_22_REFERENCE;
         final String URL = "/caseworkers/0/jurisdictions/"
             + JURISDICTION
             + "/case-types/TestAddressBookCaseCaseLinks/cases/"
@@ -3797,10 +3797,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final JsonNode data = mapper.readTree(
             "{"
                 + "\"CaseLink1\": {"
-                + "     \"CaseReference\": \"1504259907353529\""
+                + "     \"CaseReference\": \"" + CASE_01_REFERENCE + "\""
                 + "},"
                 + "\"CaseLink2\": {"
-                + "     \"CaseReference\": \"1504259907353545\""
+                + "     \"CaseReference\": \"" + CASE_02_REFERENCE + "\""
                 + "}"
             + "}");
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
@@ -3810,29 +3810,29 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(201))
             .andReturn();
 
-        long expectedCaseId = 21;
+        Long expectedCaseId = CASE_22_ID;
         String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(1L)
+                .linkedCaseId(CASE_01_ID)
                 .caseTypeId(expectedCaseTypeId)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(2L)
+                .linkedCaseId(CASE_02_ID)
                 .caseTypeId(expectedCaseTypeId)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(3L)
+                .linkedCaseId(CASE_03_ID) // NB: previously added in "classpath:sql/insert_cases.sql"
                 .caseTypeId(expectedCaseTypeId)
                 .build()
         );
 
         List<CaseLink> caseLinks = template.query(
-            String.format("SELECT * FROM case_link where case_id=%s", 21),
+            String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
             new BeanPropertyRowMapper<>(CaseLink.class));
 
         assertTrue(expectedCaseLinks.containsAll(caseLinks));
@@ -3842,7 +3842,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201AndDeleteCaseLinksWhenCreateCaseEvent()
         throws Exception {
-        final String reference = "3393027116986763";
+        final String reference = CASE_22_REFERENCE;
         final String URL = "/caseworkers/0/jurisdictions/"
             + JURISDICTION
             + "/case-types/TestAddressBookCaseCaseLinks/cases/"
@@ -3852,7 +3852,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String callbackData =
               " {\"data\": {"
             + "     \"CaseLink1\": {"
-            + "         \"CaseReference\": \"1504259907353529\""
+            + "         \"CaseReference\": \"" + CASE_01_REFERENCE + "\""
             + "     }"
             + " }"
             + "}";
@@ -3867,27 +3867,30 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             UID, JURISDICTION, CASE_TYPE, reference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
-
-        final MvcResult mvcResult = mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
+        mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(caseDetailsToSave)))
             .andExpect(status().is(201))
             .andReturn();
 
+        Long expectedCaseId = CASE_22_ID;
         String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
-                .caseId(21L)
-                .linkedCaseId(1L)
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_01_ID)
                 .caseTypeId(expectedCaseTypeId)
                 .build()
-        );
+        ); // NB: missing linkedCaseId = CASE_03_ID which is previously added in "classpath:sql/insert_cases.sql"
 
         List<CaseLink> caseLinks = template.query(
-            String.format("SELECT * FROM case_link where case_id=%s", 21),
+            String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
             new BeanPropertyRowMapper<>(CaseLink.class));
 
+        // confirm add of new case link
         assertTrue(caseLinks.containsAll(expectedCaseLinks));
+        // confirm deletion of old case link (i,e. check size is only 1)
+        assertEquals(1, caseLinks.size()); // no extra cases links so confirmed delete of CASE_03_ID link
     }
 
 

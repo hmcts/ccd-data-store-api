@@ -102,8 +102,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private CaseService caseService;
     @Mock
     private UserAuthorisation userAuthorisation;
-    @Mock
-    private TimeToLiveService timeToLiveService;
+
     @Mock
     private FieldProcessorService fieldProcessorService;
     @Mock
@@ -123,6 +122,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     @Mock
     private GlobalSearchProcessorService globalSearchProcessorService;
+
+    @Mock
+    private TimeToLiveService timeToLiveService;
 
     @Mock
     private CaseDataExtractor caseDataExtractor;
