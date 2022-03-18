@@ -5,15 +5,16 @@
   "operationName": "Start event creation as Case worker",
 
   "method": "GET",
-  "uri": "/case-types/FT_CRUD_2/event-triggers/{etid}",
+  "uri": "/case-types/{ctid}/event-triggers/{etid}",
 
   "specs": [
-    "to create a token for case creation"
+    "to create a token for case creation",
+    "As a prerequisite"
   ],
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCaseworker1"
+      "_extends_": "BeftaMasterCaseworker"
     }
   },
 
@@ -23,7 +24,8 @@
       "Experimental" : "true"
     },
     "pathVariables": {
-      "etid": "createCase"
+      "etid": "CREATE",
+      "ctid": "FT_CaseFileView_1"
     }
   },
 
@@ -45,7 +47,7 @@
         "jurisdiction" : "BEFTA_MASTER",
         "state" : null,
         "version" : null,
-        "case_type_id" : "FT_CRUD_2",
+        "case_type_id" : "FT_CaseFileView_1",
         "created_date" : null,
         "last_modified" : null,
         "last_state_modified_date" : null,
@@ -60,7 +62,7 @@
         "delete_draft_response_status" : null,
         "security_classifications" : { }
       },
-      "event_id" : "createCase"
+      "event_id" : "CREATE"
     }
   }
 }

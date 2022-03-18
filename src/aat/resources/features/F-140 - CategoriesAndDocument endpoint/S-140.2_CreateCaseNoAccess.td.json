@@ -10,6 +10,12 @@
     "to create a full case"
   ],
 
+  "prerequisites": [
+    {
+      "Token_Creation": "S-140.2_CreateCase_Token_Creation"
+    }
+  ],
+
   "users": {
     "invokingUser": {
       "_extends_": "BeftaCaseworkerCaa"
@@ -31,7 +37,7 @@
       "event": {
         "id": "createCase"
       },
-      "event_token": "${[scenarioContext][parentContext][childContexts][F-138_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
       "event_data": {
         "TextField": "value1",
         "TextField2": "value2"
