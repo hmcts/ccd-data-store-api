@@ -5,10 +5,6 @@ import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.SearchResult;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,7 +24,11 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 
-import static com.google.common.collect.Lists.newArrayList;
+import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -70,8 +70,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         String caseDetailElastic = create1CaseDetailsElastic("1535450291607660");
 
-
-        stubElasticSearchSearchRequestWillReturn(caseDetailElastic,createCaseDetails("1535450291607660"));
+        stubElasticSearchSearchRequestWillReturn(caseDetailElastic);
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
@@ -85,12 +84,11 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         CaseSearchResult caseSearchResults = mapper.readValue(responseAsString,
                                                               CaseSearchResult.class);
 
-        assertThat(caseSearchResults.getTotal(), is(30L));
         List<CaseDetails> caseDetails = caseSearchResults.getCases();
         assertThat(caseDetails, hasSize(1));
         assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
-        assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("AUTOTEST1"))));
-        assertThat(caseDetails, hasItem(hasProperty("caseTypeId", equalTo("AAT"))));
+        assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("PROBATE"))));
+        assertThat(caseDetails, hasItem(hasProperty("caseTypeId", equalTo("TestAddressBookCase"))));
         assertThat(caseDetails, hasItem(hasProperty("lastModified",
                                                     equalTo(LocalDateTime.parse("2018-08-28T09:58:11.643")))));
         assertThat(caseDetails, hasItem(hasProperty("createdDate",
@@ -107,11 +105,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         String reference2 = "1535450291607670";
         String caseDetailElastic1 = create2CaseDetailsElastic(reference1, reference2);
 
-        stubElasticSearchSearchRequestWillReturn(
-                                                 caseDetailElastic1,
-                                                 createCaseDetails("1535450291607660"),
-                                                 createCaseDetails("1535450291607670")
-                                                 );
+        stubElasticSearchSearchRequestWillReturn(caseDetailElastic1);
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
@@ -145,6 +139,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         return "{\n" +
             "   \"took\":177,\n" +
             "   \"hits\":{\n" +
+            "      \"total\": 2," +
             "      \"hits\":[\n" +
             "         {\n" +
             "            \"_index\":\"TestAddressBookCase_cases-000001\",\n" +
@@ -159,6 +154,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         return "{\n" +
             "   \"took\":177,\n" +
             "   \"hits\":{\n" +
+            "      \"total\": 2," +
             "      \"hits\":[\n" +
             "         {\n" +
             "            \"_index\":\"TestAddressBookCase_cases-000001\",\n" +
@@ -182,29 +178,28 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             + "\"data_classification\": {},\n"
             + "\"id\": 18,\n"
             + "\"security_classification\": \"PUBLIC\",\n"
-            + "\"jurisdiction\": \"AUTOTEST1\",\n"
+            + "\"jurisdiction\": \"PROBATE\",\n"
             + "\"@timestamp\": \"2018-08-28T09:58:13.044Z\",\n"
             + "\"data\": {},\n"
             + "\"created_date\": \"2018-08-28T09:58:11.627Z\",\n"
-            + "\"index_id\": \"autotest1_aat_cases\",\n"
-            + "\"case_type_id\": \"AAT\"\n"
+            + "\"index_id\": \"probate_aat_cases\",\n"
+            + "\"case_type_id\": \"TestAddressBookCase\"\n"
             + "}";
     }
 
-    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic,
-                                                          String... caseDetails) throws java.io.IOException {
-
-        JsonObject convertedObject = new Gson().fromJson(caseDetailElastic, JsonObject.class);
+    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic) throws java.io.IOException {
+        Gson gson = new Gson();
+        JsonObject convertedObject = gson.fromJson(caseDetailElastic, JsonObject.class);
         MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
         when(multiSearchResult.isSucceeded()).thenReturn(true);
-
-        SearchResult searchResult = mock(SearchResult.class);
-        when(searchResult.getTotal()).thenReturn(30L);
-        when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetails));
+        SearchResult searchResult = new SearchResult(gson);
+        searchResult.setSucceeded(true);
+        searchResult.setJsonObject(convertedObject);
+        searchResult.setJsonString(convertedObject.toString());
+        searchResult.setPathToResult("hits/hits/_source");
 
         MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
         when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-        when(searchResult.getJsonObject()).thenReturn(convertedObject);
         Whitebox.setInternalState(response, "searchResult", searchResult);
 
         given(jestClient.execute(any())).willReturn(multiSearchResult);

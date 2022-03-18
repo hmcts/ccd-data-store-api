@@ -17,17 +17,13 @@
         </Class>
         <Class name="uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository">
             <Method name="getCaseTypesForJurisdiction"/>
-            <Method name="getCaseType"/>
             <Method name="getBaseTypes"/>
-            <Method name="getUserRoleClassifications"/>
             <Method name="getClassificationsForUserRoleList"/>
-            <Method name="getLatestVersion"/>
             <Method name="getJurisdictions"/>
         </Class>
         <Class name="uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository">
             <Method name="set"/>
             <Method name="findById"/>
-            <Method name="findByReference"/>
             <Method name="lockCase"/>
             <Method name="findUniqueCase"/>
             <Method name="findByMetaDataAndFieldData"/>
@@ -51,8 +47,6 @@
             <Method name="getUserDefaultSettings"/>
         </Class>
         <Class name="uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository">
-            <Method name="getWorkBasketResult"/>
-            <Method name="getSearchResult"/>
             <Method name="getSearchInputDefinitions"/>
             <Method name="getWorkbasketInputDefinitions"/>
             <Method name="getWizardPageCollection"/>

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,9 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MvcResult;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResponse;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
@@ -16,6 +20,10 @@ import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
 
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
@@ -25,6 +33,10 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentRecord;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentRequestResponse;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentResponse;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
 import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.REMOVE_SUCCESS_MESSAGE;
 
 class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesControllerIT {
@@ -43,6 +55,29 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10001"; // don't need the users to exist in the repository but want unique for each AC
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+
+            // createCaseRoleAssignments will return created RAs
+            RoleAssignmentResource roleAssignment1 =
+                createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_1, CASE_ROLE_1, userId);
+            RoleAssignmentRequestResponse roleAssignmentRequestResponse =
+                createRoleAssignmentRequestResponse(singletonList(roleAssignment1));
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentRequestResponse))
+                    .withStatus(200)));
+
+            RoleAssignmentResponse roleAssignmentResponse =
+                createRoleAssignmentResponse(singletonList(roleAssignment1));
+
+            // stub DELETE /am/role-assignments/query/delete defined in the 'delete_role_assignments_by_query.json'
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentResponse)).withStatus(200)));
+
+            stubIdamRolesForUser(userId);
+            stubUserInfo(userId);
+        }
 
         List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
             new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1)
@@ -60,9 +95,11 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         CaseAssignedUserRolesResponse response = mapper.readValue(content, CaseAssignedUserRolesResponse.class);
         assertEquals("Success message should be returned", REMOVE_SUCCESS_MESSAGE, response.getStatus());
 
-        // check data has been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
-        assertEquals(0, caseRoles.size());
+        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
+            // check data has been saved
+            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            assertEquals(0, caseRoles.size());
+        }
 
         verifyAuditForRemoveCaseUserRoles(HttpStatus.OK, caseUserRoles);
     }
@@ -293,6 +330,32 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "2222"; // don't need the users to exist in the repository but want unique for each test
 
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // createCaseRoleAssignments will return created RAs
+            RoleAssignmentResource roleAssignment1 =
+                createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_1, CASE_ROLE_1, userId);
+            RoleAssignmentResource roleAssignment2 =
+                createRoleAssignmentRecord(ASSIGNMENT_2, CASE_ID_1, CASE_ROLE_1, userId);
+            RoleAssignmentRequestResponse roleAssignmentRequestResponse = createRoleAssignmentRequestResponse(asList(
+                roleAssignment1, roleAssignment2
+            ));
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentRequestResponse))
+                    .withStatus(200)));
+
+            RoleAssignmentResponse roleAssignmentResponse =
+                createRoleAssignmentResponse(singletonList(roleAssignment1));
+
+            // stub DELETE /am/role-assignments/query/delete defined in the 'delete_role_assignments_by_query.json'
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentResponse)).withStatus(200)));
+
+            stubIdamRolesForUser(userId);
+            stubUserInfo(userId);
+        }
+
         addCaseUserRoles(List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1)));
 
         List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
@@ -313,9 +376,11 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         CaseAssignedUserRolesResponse response = mapper.readValue(content, CaseAssignedUserRolesResponse.class);
         assertEquals("Success message should be returned", REMOVE_SUCCESS_MESSAGE, response.getStatus());
 
-        // check data has been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
-        assertEquals(0, caseRoles.size());
+        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
+            // check data has been saved
+            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            assertEquals(0, caseRoles.size());
+        }
 
         verifyAuditForRemoveCaseUserRoles(HttpStatus.OK, caseUserRoles);
     }
@@ -330,6 +395,32 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "3333"; // don't need the users to exist in the repository but want unique for each test
 
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // createCaseRoleAssignments will return created RAs
+            RoleAssignmentResource roleAssignment1 =
+                createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_1, CASE_ROLE_1, userId);
+            RoleAssignmentResource roleAssignment2 =
+                createRoleAssignmentRecord(ASSIGNMENT_2, CASE_ID_1, CASE_ROLE_2, userId);
+            RoleAssignmentRequestResponse roleAssignmentRequestResponse = createRoleAssignmentRequestResponse(asList(
+                roleAssignment1, roleAssignment2
+            ));
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentRequestResponse))
+                    .withStatus(200)));
+
+            RoleAssignmentResponse roleAssignmentResponse =
+                createRoleAssignmentResponse(singletonList(roleAssignment1));
+
+            // stub DELETE /am/role-assignments/query/delete defined in the 'delete_role_assignments_by_query.json'
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentResponse)).withStatus(200)));
+
+            stubIdamRolesForUser(userId);
+            stubUserInfo(userId);
+        }
+
         // override s2s token in HTTP headers to check it also supports S2S token without bearer
         HttpHeaders httpHeaders = createHttpHeaders();
         httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION,
@@ -342,11 +433,13 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         addCaseUserRoles(caseUserRoles);
 
-        // check data has been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
-        assertEquals(2, caseRoles.size());
-        assertThat(caseRoles, hasItems(CASE_ROLE_1));
-        assertThat(caseRoles, hasItems(CASE_ROLE_2));
+        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
+            // check data has been saved
+            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            assertEquals(2, caseRoles.size());
+            assertThat(caseRoles, hasItems(CASE_ROLE_1));
+            assertThat(caseRoles, hasItems(CASE_ROLE_2));
+        }
 
         // ACT
         final MvcResult result = mockMvc.perform(delete(caseAssignedUserRoles)
@@ -361,9 +454,11 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         CaseAssignedUserRolesResponse response = mapper.readValue(content, CaseAssignedUserRolesResponse.class);
         assertEquals("Success message should be returned", REMOVE_SUCCESS_MESSAGE, response.getStatus());
 
-        // check data has been removed
-        caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
-        assertEquals(0, caseRoles.size());
+        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
+            // check data has been removed
+            List<String> caseRoles = caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            assertEquals(0, caseRoles.size());
+        }
 
         verifyAuditForRemoveCaseUserRoles(HttpStatus.OK, caseUserRoles);
     }
@@ -381,9 +476,58 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         String userId1 = "8842-001-1"; // don't need the users to exist in the repository but want unique for each AC
         String userId2 = "8842-001-2";
 
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+
+            // createCaseRoleAssignments will return created RAs
+            RoleAssignmentResource roleAssignment1 =
+                createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_1, CASE_ROLE_1, userId1);
+            RoleAssignmentResource roleAssignment2 =
+                createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_1, CASE_ROLE_1, userId2);
+            RoleAssignmentRequestResponse roleAssignmentRequestResponse = createRoleAssignmentRequestResponse(asList(
+                roleAssignment1, roleAssignment2
+            ));
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentRequestResponse))
+                    .withStatus(200)));
+
+            // no existing roleAssignments
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .inScenario("MultiRoleAssignmentQueryCalls")
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200))
+                .willSetStateTo("FirstAttempt")
+            );
+
+            RoleAssignmentResponse roleAssignmentResponse =
+                createRoleAssignmentResponse(asList(roleAssignment1, roleAssignment2));
+
+            // two role assignments
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .inScenario("MultiRoleAssignmentQueryCalls")
+                .whenScenarioStateIs("FirstAttempt")
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentResponse)).withStatus(200))
+                .willSetStateTo("SecondAttempt")
+            );
+
+            // no existing roleAssignments
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .inScenario("MultiRoleAssignmentQueryCalls")
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200))
+                .whenScenarioStateIs("SecondAttempt")
+                .willSetStateTo("ThirdAttempt")
+            );
+
+            // stub DELETE /am/role-assignments/query/delete defined in the 'delete_role_assignments_by_query.json'
+
+            stubIdamRolesForUser(userId1);
+            stubUserInfo(userId1);
+            stubIdamRolesForUser(userId2);
+            stubUserInfo(userId2);
+        }
+
         final List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = List.of(
             new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId1, CASE_ROLE_1, ORGANISATION_ID_1),
-                new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId2, CASE_ROLE_1, ORGANISATION_ID_1)
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId2, CASE_ROLE_1, ORGANISATION_ID_1)
         );
         final long prerequisiteCounter = getOrgUserCountFromSupData(CASE_ID_1, ORGANISATION_ID_1);
 
@@ -401,9 +545,11 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
             .headers(createHttpHeaders()))
             .andExpect(status().isOk())
             .andReturn();
-        // check data has been removed
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId1);
-        assertEquals(0, caseRoles.size());
+        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
+            // check data has been removed
+            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId1);
+            assertEquals(0, caseRoles.size());
+        }
         // verify counter
         final long verifyCounter1 = getOrgUserCountFromSupData(CASE_ID_1, ORGANISATION_ID_1);
         assertEquals(afterAddCounter - 1L, verifyCounter1); // decremented
@@ -435,11 +581,13 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         assertEquals(verifyCounter2 - 1L, verifyCounter3); // decremented
 
-        // check data has been saved
-        List<String> caseRoles1 = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId1);
-        assertEquals(0, caseRoles1.size());
-        List<String> caseRoles2 = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId2);
-        assertEquals(0, caseRoles2.size());
+        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
+            // check data has been saved
+            List<String> caseRoles1 = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId1);
+            assertEquals(0, caseRoles1.size());
+            List<String> caseRoles2 = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId2);
+            assertEquals(0, caseRoles2.size());
+        }
     }
 
     @Test
@@ -455,6 +603,31 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "8842-002"; // don't need the users to exist in the repository but want unique for each AC
+
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // createCaseRoleAssignments will return created RAs
+            RoleAssignmentResource roleAssignment1 =
+                createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_EXTRA, CASE_ROLE_1, userId);
+            RoleAssignmentResource roleAssignment2 =
+                createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_EXTRA, CASE_ROLE_2, userId);
+            RoleAssignmentRequestResponse roleAssignmentRequestResponse = createRoleAssignmentRequestResponse(asList(
+                roleAssignment1, roleAssignment2
+            ));
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentRequestResponse))
+                    .withStatus(200)));
+
+            // stub DELETE /am/role-assignments/query/delete defined in the 'delete_role_assignments_by_query.json'
+
+            RoleAssignmentResponse roleAssignmentResponse =
+                createRoleAssignmentResponse(singletonList(roleAssignment1));
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentResponse)).withStatus(200)));
+
+            stubIdamRolesForUser(userId);
+            stubUserInfo(userId);
+        }
 
         List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
             new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1, ORGANISATION_ID_1),
@@ -483,10 +656,12 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         // ASSERT
         assertEquals(prerequisiteCounter, verifyCounter); // unchanged
 
-        // check data has been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
-        assertEquals(1, caseRoles.size()); // i.e. 1 + 1: one added + one existing
-        assertThat(caseRoles, hasItems(CASE_ROLE_1));
+        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
+            // check data has been saved
+            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            assertEquals(1, caseRoles.size()); // i.e. 1 + 1: one added + one existing
+            assertThat(caseRoles, hasItems(CASE_ROLE_1));
+        }
     }
 
     @Test
@@ -500,6 +675,29 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "8842-003"; // don't need the users to exist in the repository but want unique for each AC
+
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // createCaseRoleAssignments will return created RAs
+            RoleAssignmentResource roleAssignment1 =
+                createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_EXTRA, CASE_ROLE_1, userId);
+            RoleAssignmentRequestResponse roleAssignmentRequestResponse = createRoleAssignmentRequestResponse(asList(
+                roleAssignment1
+            ));
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentRequestResponse))
+                    .withStatus(200)));
+
+            // stub DELETE /am/role-assignments/query/delete defined in the 'delete_role_assignments_by_query.json'
+
+            RoleAssignmentResponse roleAssignmentResponse =
+                createRoleAssignmentResponse(singletonList(roleAssignment1));
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentResponse)).withStatus(200)));
+
+            stubIdamRolesForUser(userId);
+            stubUserInfo(userId);
+        }
 
         // set a default count for any organisation
         supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2),
@@ -528,9 +726,11 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         // ASSERT
         assertEquals(orgUserCountersBefore, orgUserCountersAfter); // unchanged
 
-        // check data has been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_EXTRA), userId);
-        assertTrue(caseRoles.isEmpty());
+        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
+            // check data has been saved
+            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_EXTRA), userId);
+            assertTrue(caseRoles.isEmpty());
+        }
     }
 
     @Test
@@ -544,6 +744,29 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "8442-004"; // don't need the users to exist in the repository but want unique for each AC
+
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // createCaseRoleAssignments will return created RAs
+            RoleAssignmentResource roleAssignment1 =
+                createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_EXTRA, CASE_ROLE_1, userId);
+            RoleAssignmentRequestResponse roleAssignmentRequestResponse = createRoleAssignmentRequestResponse(asList(
+                roleAssignment1
+            ));
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentRequestResponse))
+                    .withStatus(200)));
+
+            // stub DELETE /am/role-assignments/query/delete defined in the 'delete_role_assignments_by_query.json'
+
+            RoleAssignmentResponse roleAssignmentResponse =
+                createRoleAssignmentResponse(singletonList(roleAssignment1));
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentResponse)).withStatus(200)));
+
+            stubIdamRolesForUser(userId);
+            stubUserInfo(userId);
+        }
 
         // set a default count for any organisation
         supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2),
@@ -575,9 +798,11 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         assertEquals(orgUserCountersBefore, orgUserCountersAfter); // unchanged
 
-        // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
-        assertEquals(0, caseRoles.size());
+        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
+            // check data has not been saved
+            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            assertEquals(0, caseRoles.size());
+        }
     }
 
     private void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) throws Exception  {

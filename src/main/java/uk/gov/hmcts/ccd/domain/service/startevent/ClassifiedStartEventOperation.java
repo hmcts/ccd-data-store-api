@@ -15,7 +15,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
@@ -23,13 +24,13 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 public class ClassifiedStartEventOperation implements StartEventOperation {
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
     private final StartEventOperation startEventOperation;
-    private final SecurityClassificationService classificationService;
+    private final SecurityClassificationServiceImpl classificationService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDataService caseDataService;
     private final DraftGateway draftGateway;
 
     public ClassifiedStartEventOperation(@Qualifier("default") StartEventOperation startEventOperation,
-                                         SecurityClassificationService classificationService,
+                                         SecurityClassificationServiceImpl classificationService,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                          final CaseDefinitionRepository caseDefinitionRepository,
                                          final CaseDataService caseDataService,
@@ -50,16 +51,16 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     @Override
     public StartEventResult triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
-        return applyClassificationIfCaseDetailsExist(startEventOperation.triggerStartForCase(caseReference,
-                                                                                             eventId,
-                                                                                             ignoreWarning));
+        return applyClassificationIfCaseDetailsExist(caseReference, startEventOperation
+            .triggerStartForCase(caseReference, eventId, ignoreWarning));
     }
 
     @Override
     public StartEventResult triggerStartForDraft(String draftReference,
                                                  Boolean ignoreWarning) {
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
-        return applyClassificationIfCaseDetailsExist(deduceDefaultClassificationsForDraft(startEventOperation
+        return applyClassificationIfCaseDetailsExist(draftReference,
+            deduceDefaultClassificationsForDraft(startEventOperation
                 .triggerStartForDraft(draftReference, ignoreWarning), caseDetails.getCaseTypeId()));
     }
 
@@ -83,10 +84,12 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         }
     }
 
-    private StartEventResult applyClassificationIfCaseDetailsExist(StartEventResult startEventResult) {
+    private StartEventResult applyClassificationIfCaseDetailsExist(String caseReference,
+                                                                   StartEventResult startEventResult) {
         CaseDetails caseDetails = startEventResult.getCaseDetails();
         if (null != caseDetails) {
-            startEventResult.setCaseDetails(classificationService.applyClassification(caseDetails).orElse(null));
+            startEventResult.setCaseDetails(classificationService.applyClassification(caseDetails)
+                .orElseThrow(() -> new CaseNotFoundException(caseReference)));
         }
         return startEventResult;
     }

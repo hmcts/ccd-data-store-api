@@ -1,0 +1,39 @@
+{
+  "_guid_": "S-135.3",
+  "_extends_": "F-135_Test_Data_Base",
+  "title": "User getting event trigger for Case with no CaseType U access gets error",
+
+  "specs": [
+    "with no case type U access to update a case",
+    "contains HTTP 404 status code",
+    "attempts to get event trigger for the previously created case"
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-135.3_CreateCase][testData][actualResponse][body][id]}",
+      "etid": "event1"
+    },
+    "event_id" : "event1"
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_404_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message" : "No case type found",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+
+}
+
+
+

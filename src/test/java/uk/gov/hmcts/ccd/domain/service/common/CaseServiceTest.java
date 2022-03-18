@@ -303,13 +303,17 @@ class CaseServiceTest {
                                                              .reference("OrgPolicyCaseAssignedRole")
                                                              .defaultValue("[Claimant]")
                                                              .build())
+                    .build(),
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("TextField0")
+                    .withDefaultValue("Default text")
                     .build()
             );
 
             Map<String, JsonNode> result = caseService.buildJsonFromCaseFieldsWithDefaultValue(caseFields);
 
             assertAll(
-                () -> assertThat(result.size(), is(2)),
+                () -> assertThat(result.size(), is(3)),
 
                 () -> assertTrue(result.containsKey("ChangeOrganisationRequestField")),
                 () -> assertNotNull(result.get("ChangeOrganisationRequestField").get("Reason")),
@@ -324,7 +328,9 @@ class CaseServiceTest {
                 () -> assertTrue(result.containsKey("OrganisationPolicyField")),
                 () -> assertNotNull(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole")),
                 () -> assertThat(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole").asText(),
-                                 is("[Claimant]"))
+                                 is("[Claimant]")),
+                () -> assertTrue(result.containsKey("TextField0")),
+                () -> assertThat(result.get("TextField0").asText(), is("Default text"))
             );
         }
     }

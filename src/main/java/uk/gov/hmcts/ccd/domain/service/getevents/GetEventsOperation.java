@@ -13,5 +13,5 @@ public interface GetEventsOperation {
 
     List<AuditEvent> getEvents(String caseReference);
 
-    Optional<AuditEvent> getEvent(String jurisdiction, String caseTypeId, Long eventId);
+    Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId);
 }

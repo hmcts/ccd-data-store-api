@@ -113,7 +113,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     @Test
     public void shouldGetJurisdictionsDefinition() {
         List<JurisdictionDefinition> allJurisdictionDefinitions =
-            newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
+            newArrayList("probate", "divorce", "sscs").stream()
                 .map(id -> caseDefinitionRepository.getJurisdiction(id)).collect(Collectors.toList());
 
         assertAll(

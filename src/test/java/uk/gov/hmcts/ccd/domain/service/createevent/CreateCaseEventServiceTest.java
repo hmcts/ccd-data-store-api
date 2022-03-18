@@ -30,11 +30,12 @@ import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.CaseEventMessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
@@ -94,7 +95,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private UIDService uidService;
     @Mock
-    private SecurityClassificationService securityClassificationService;
+    private SecurityClassificationServiceImpl securityClassificationService;
     @Mock
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
     @Mock
@@ -119,6 +120,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     @Mock
     private CaseDocumentService caseDocumentService;
+
+    @Mock
+    private GlobalSearchProcessorService globalSearchProcessorService;
 
     @Mock
     private CaseDataExtractor caseDataExtractor;
@@ -231,6 +235,11 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(fixedClock.instant()).when(clock).instant();
         doReturn(fixedClock.getZone()).when(clock).getZone();
 
+        Map<String, JsonNode> clonedData = new HashMap<>(caseDetails.getData());
+        clonedData.putAll(dataUpdate);
+        doReturn(clonedData).when(globalSearchProcessorService)
+            .populateGlobalSearchData(any(CaseTypeDefinition.class), anyMap());
+
         // WHEN
         final CaseDetails updatedCaseDetails = underTest.mergeUpdatedFieldsToCaseDetails(
             emptyMap(),
@@ -304,6 +313,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
             caseDetails,
             caseTypeDefinition,
             IGNORE_WARNING);
+        verify(globalSearchProcessorService).populateGlobalSearchData(any(CaseTypeDefinition.class), anyMap());
     }
 
     @Test
@@ -323,7 +333,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         verify(userRepository).getUser(userToken);
         verify(userRepository).getUser();
-
+        verify(globalSearchProcessorService).populateGlobalSearchData(any(CaseTypeDefinition.class), anyMap());
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
         assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
             .isEqualTo(LAST_MODIFIED);

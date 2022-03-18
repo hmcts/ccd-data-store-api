@@ -1,0 +1,30 @@
+{
+  "_guid_": "F-131_Test_Data_Base_Events",
+
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a start event trigger by ID for dynamic display",
+
+  "method": "GET",
+  "uri": "/internal/cases/{cid}/event-triggers/{etid}",
+
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Supplementary_Data][testData][actualResponse][body][id]}",
+      "etid": "START_PROGRESS"
+    }
+  },
+
+  "expectedResponse": {
+    "headers": {
+      "Content-Type": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

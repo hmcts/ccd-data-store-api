@@ -12,6 +12,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.EventPostStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
+import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
+import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import java.io.BufferedReader;
@@ -27,12 +29,13 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
 public abstract class TestFixtures {
-    private static final Integer VERSION_NUMBER = 1;
-
+    protected static final Integer VERSION_NUMBER = 1;
     protected static final String JURISDICTION_ID = "SSCS";
+    protected static final String JURISDICTION_NAME = "Social Security and Child Support";
     protected static final String CASE_REFERENCE = "1234123412341236";
     protected static final Long REFERENCE = Long.valueOf(CASE_REFERENCE);
     protected static final String CASE_TYPE_ID = "Claim";
+    protected static final String CASE_TYPE_NAME = "Claim Case Type";
     protected static final String STATE = "CreatedState";
     protected static final String POST_STATE = "Updated";
 
@@ -96,6 +99,31 @@ public abstract class TestFixtures {
     protected static final DocumentHashToken HASH_TOKEN_B2 = DocumentHashToken.builder()
         .id("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d")
         .build();
+
+    protected final BuildingLocation location1 = BuildingLocation.builder()
+        .buildingLocationId("321")
+        .buildingLocationName("Location 1")
+        .regionId("R-1")
+        .region("Region 1")
+        .build();
+    protected final BuildingLocation location2 = BuildingLocation.builder()
+        .buildingLocationId("L-2")
+        .buildingLocationName("Location 2")
+        .regionId("123")
+        .region("Region 2")
+        .build();
+
+    protected final ServiceReferenceData service1 = ServiceReferenceData.builder()
+        .serviceCode("SC1")
+        .serviceShortDescription("Service 1")
+        .build();
+    protected final ServiceReferenceData service2 = ServiceReferenceData.builder()
+        .serviceCode("SC2")
+        .serviceShortDescription("Service 2")
+        .build();
+
+    protected final List<BuildingLocation> locationsRefData = List.of(location1, location2);
+    protected final List<ServiceReferenceData> servicesRefData = List.of(service1, service2);
 
     protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
         .registerModule(new JavaTimeModule());
@@ -168,14 +196,22 @@ public abstract class TestFixtures {
         return caseEventDefinition;
     }
 
-    protected CaseTypeDefinition buildCaseTypeDefinition() {
+    protected JurisdictionDefinition buildJurisdictionDefinition() {
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId(JURISDICTION_ID);
+        jurisdictionDefinition.setName(JURISDICTION_NAME);
+
+        return jurisdictionDefinition;
+    }
+
+    protected CaseTypeDefinition buildCaseTypeDefinition() {
+        final JurisdictionDefinition jurisdictionDefinition = buildJurisdictionDefinition();
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
 
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(CASE_TYPE_ID);
+        caseTypeDefinition.setName(CASE_TYPE_NAME);
         caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
         caseTypeDefinition.setVersion(version);
 

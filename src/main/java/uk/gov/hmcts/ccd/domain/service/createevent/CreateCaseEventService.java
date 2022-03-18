@@ -24,20 +24,21 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
-import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseDataExtractor;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
@@ -77,7 +78,7 @@ public class CreateCaseEventService {
     private final CaseSanitiser caseSanitiser;
     private final CallbackInvoker callbackInvoker;
     private final UIDService uidService;
-    private final SecurityClassificationService securityClassificationService;
+    private final SecurityClassificationServiceImpl securityClassificationService;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final UserAuthorisation userAuthorisation;
     private final FieldProcessorService fieldProcessorService;
@@ -86,6 +87,7 @@ public class CreateCaseEventService {
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
     private final CaseDataIssueLogger caseDataIssueLogger;
+    private final GlobalSearchProcessorService globalSearchProcessorService;
     private final TimeToLiveService timeToLiveService;
     private final CaseLinkService caseLinkService;
     private final CaseDataExtractor caseDataExtractor;
@@ -107,7 +109,7 @@ public class CreateCaseEventService {
                                   final CaseSanitiser caseSanitiser,
                                   final CallbackInvoker callbackInvoker,
                                   final UIDService uidService,
-                                  final SecurityClassificationService securityClassificationService,
+                                  final SecurityClassificationServiceImpl securityClassificationService,
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                   final UserAuthorisation userAuthorisation,
                                   final FieldProcessorService fieldProcessorService,
@@ -116,6 +118,7 @@ public class CreateCaseEventService {
                                   @Qualifier("caseEventMessageService") final MessageService messageService,
                                   final CaseDocumentService caseDocumentService,
                                   final CaseDataIssueLogger caseDataIssueLogger,
+                                  final GlobalSearchProcessorService globalSearchProcessorService,
                                   final TimeToLiveService timeToLiveService,
                                   final CaseLinkService caseLinkService,
                                   final CaseDataExtractor caseDataExtractor) {
@@ -140,6 +143,7 @@ public class CreateCaseEventService {
         this.messageService = messageService;
         this.caseDocumentService = caseDocumentService;
         this.caseDataIssueLogger = caseDataIssueLogger;
+        this.globalSearchProcessorService = globalSearchProcessorService;
         this.timeToLiveService = timeToLiveService;
         this.caseLinkService = caseLinkService;
         this.caseDataExtractor = caseDataExtractor;
@@ -340,7 +344,8 @@ public class CreateCaseEventService {
                 final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
                     .orElse(emptyMap()));
                 caseData.putAll(sanitisedData);
-                clonedCaseDetails.setData(caseData);
+                clonedCaseDetails.setData(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
+                    caseData));
 
                 final Map<String, JsonNode> dataClassifications = caseDataService.getDefaultSecurityClassifications(
                     caseTypeDefinition,

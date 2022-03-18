@@ -1,0 +1,61 @@
+{
+  "_guid_": "F-1004_UpdateCaseEventV2",
+  "title": "must submit the event creation successfully for TextField and EmailField inputs",
+
+  "productName": "CCD Data Store",
+  "operationName": "Submit case update event creation as a Caseworker (V2)",
+
+  "method": "POST",
+  "uri": "/cases/{caseId}/events",
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+        "Content-Type": "application/json;charset=UTF-8",
+        "experimental": true
+    },
+    "pathVariables": {
+      "caseId": "OVERRIDE"
+    },
+    "body": {
+      "event": {
+        "id": "UPDATE",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary": "Accept-Encoding"
+    },
+    "body": {
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "data_classification": "[[ANYTHING_PRESENT]]",
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

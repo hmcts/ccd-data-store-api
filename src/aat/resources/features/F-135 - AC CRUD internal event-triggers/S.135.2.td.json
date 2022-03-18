@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-135.2",
+  "_extends_": "F-135_Test_Data_Base",
+  "title": "User getting event trigger for Case with no caseState U access for current case state gets error",
+  "specs": [
+    "with no U access for the current case state",
+    "contains HTTP 404 status code",
+    "attempts to create an event for the previously created case"
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-135_CreateCase][testData][actualResponse][body][id]}",
+      "etid": "event6"
+    },
+    "event_id" : "event6"
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_404_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message" : "Invalid event",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+
+}
+
+
+

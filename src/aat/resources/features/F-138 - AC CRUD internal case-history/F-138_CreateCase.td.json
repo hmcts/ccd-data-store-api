@@ -1,0 +1,82 @@
+{
+  "_guid_": "F-138_CreateCase",
+
+  "productName": "CCD Data Store",
+  "operationName": "external create case",
+  "method": "POST",
+  "uri": "/case-types/{ctid}/cases",
+
+  "specs" : [
+    "to create a full case"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "ctid": "FT_CRUD_2"
+    },
+    "headers": {
+      "experimental": true
+    },
+    "body": {
+      "data": {
+        "TextField": "value1"
+      },
+      "event": {
+        "id": "createCase"
+      },
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-138_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
+      "event_data": {
+        "TextField": "value1",
+        "TextField2": "value2"
+      },
+      "ignore_warning": false
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Length": "[[ANY_NULLABLE]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_CRUD_2",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "CaseCreated",
+      "security_classification": "PUBLIC",
+      "data": {
+        "TextField": "value1"
+      },
+      "data_classification": {
+        "TextField": "PUBLIC"
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+
+}

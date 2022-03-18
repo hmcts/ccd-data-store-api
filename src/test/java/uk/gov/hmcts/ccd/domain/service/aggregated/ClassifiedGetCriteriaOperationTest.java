@@ -19,7 +19,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 class ClassifiedGetCriteriaOperationTest {
     private static final String JURISDICTION_ID = "TEST";
@@ -56,7 +56,7 @@ class ClassifiedGetCriteriaOperationTest {
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
     @Mock
-    private SecurityClassificationService classificationService;
+    private SecurityClassificationServiceImpl classificationService;
 
     private ClassifiedGetCriteriaOperation classUnderTest;
     private CaseTypeDefinition testCaseTypeDefinition;
