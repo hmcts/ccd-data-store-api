@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -63,6 +62,7 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -157,6 +157,9 @@ class AuthorisedCreateEventOperationTest {
         doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT);
         caseTypeDefinition.setEvents(events);
+        CaseFieldDefinition caseFieldDefinition = mock(CaseFieldDefinition.class);
+        when(caseFieldDefinition.getCategoryId()).thenReturn(categoryId);
+        caseFieldDefinitions.add(caseFieldDefinition);
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getAccessProfiles(anyString())).thenReturn(USER_ROLES);
