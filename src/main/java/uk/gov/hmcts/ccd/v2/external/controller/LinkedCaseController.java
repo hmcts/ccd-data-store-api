@@ -6,10 +6,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -55,7 +52,7 @@ public class LinkedCaseController {
     }
 
     @GetMapping(
-        path = "/{caseReference}/startRecordNumber/{startRecordNumber}/maxReturnRecordCount/{maxReturnRecordCount}",
+        path = "/{caseReference}",
         produces = {
             V2.MediaType.CASE
         }
@@ -81,9 +78,9 @@ public class LinkedCaseController {
     })
     /*TODO @LogAudit(operationType = LINKED_CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")*/
-    public ResponseEntity<CaseResource> getLinkedCase(@PathVariable("caseReference") String caseReference,
-                                                      @PathVariable("startRecordNumber") String startRecordNumber,
-                                                      @PathVariable("maxReturnRecordCount") String maxReturnRecordCount) {
+    public ResponseEntity<Void> getLinkedCase(@PathVariable("caseReference") String caseReference,
+                                              @RequestParam(name = "startRecordNumber", defaultValue = "1", required = false) String startRecordNumber,
+                                              @RequestParam(name = "maxReturnRecordCount", required = false) String maxReturnRecordCount) {
         //Validate Case Reference is valid
         validateCaseReference(caseReference);
 
