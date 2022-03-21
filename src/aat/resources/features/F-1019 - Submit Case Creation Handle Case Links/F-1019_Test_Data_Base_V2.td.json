@@ -1,11 +1,11 @@
 {
-	"_guid_": "F-1019_Test_Data_Base_V2",
+  "_guid_": "F-1019_Test_Data_Base_V2",
 
-	"productName": "CCD Data Store",
-	"operationName": "Submit case creation as Case worker",
+  "productName": "CCD Data Store",
+  "operationName": "Submit case creation as Case worker",
 
-	"method": "POST",
-	"uri": "/case-types/{caseTypeId}/cases",
+  "method": "POST",
+  "uri": "/case-types/{caseTypeId}/cases",
 
   "users": {
     "invokingUser": {
@@ -13,16 +13,16 @@
     }
   },
 
-	"request": {
+  "request": {
     "headers": {
       "_extends_": "Common_Request_Headers",
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
       "experimental": true
     },
-		"pathVariables": {
+    "pathVariables": {
       "caseTypeId": "FT_MasterCaseType"
-		}
-	},
+    }
+  },
 
   "expectedResponse": {
     "_extends_": "Common_201_Response",
@@ -40,7 +40,14 @@
       "callback_response_status_code" : null,
       "callback_response_status" : null,
       "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null
+      "delete_draft_response_status" : null,
+
+      "data" : {
+        "SearchCriteria" : { }
+      },
+      "data_classification": {
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+      }
     }
   }
 }

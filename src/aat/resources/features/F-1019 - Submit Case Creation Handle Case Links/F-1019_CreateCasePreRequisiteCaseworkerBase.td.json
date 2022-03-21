@@ -41,14 +41,17 @@
       "state" : "CaseCreated",
       "case_type_id" : "FT_MasterCaseType",
       "case_data" : {
-        "TextField": "This is the case that will be linked to the case being updated"
+        "TextField": "This is the case that will be linked to the case being updated",
+        "SearchCriteria" : { }
       },
       "data_classification" : {
-        "TextField": "PUBLIC"
+        "TextField": "PUBLIC",
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       },
       "supplementary_data" : null,
       "security_classifications" : {
-        "TextField": "PUBLIC"
+        "TextField": "PUBLIC",
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       }
     }
   }

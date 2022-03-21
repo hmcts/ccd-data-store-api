@@ -1,45 +1,48 @@
 {
-	"title": "should retrieve case links for a specified case reference",
-	"_guid_": "F-1019-VerifyCaseLinks",
+  "title": "should retrieve case links for a specified case reference",
+  "_guid_": "F-1019-VerifyCaseLinks",
 
-	"productName": "CCD Data Store",
-	"operationName": "Retrieve case links for an existing case reference",
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve case links for an existing case reference",
 
-	"method": "GET",
-	"uri": "/testing-support/case-link/{cid}",
+  "method": "GET",
+  "uri": "/testing-support/case-link/{cid}",
 
-	"specs": [
-		"to verify that the Case Link has been created in the CASE_LINK table with correct value"
-	],
+  "specs": [
+    "to verify that the Case Link has been created in the CASE_LINK table with correct value"
+  ],
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
+    "_extends_": "BeftaMasterCaseworker"
     }
   },
 
-	"request": {
-		"headers": {
-			"_extends_": "Common_Request_Headers",
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
       "experimental": "true"
-		},
-		"pathVariables": {
-			"cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
-		}
-	},
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+    }
+  },
 
-	"expectedResponse": {
-		"_extends_": "Common_200_Response",
-		"headers": {
-			"Content-Encoding": "gzip",
-			"Content-Length": "[[ANYTHING_PRESENT]]"
-		},
-		"body": {
-      "CaseLinks" : [ {
-        "CaseReference" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
-        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
-        "CaseTypeId" : "FT_MasterCaseType"
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "CaseLinks": [{
+        "__ordering__": "unordered",
+        "__elementId__": "LinkedCaseReference"
+      }, {
+        "CaseReference": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+        "LinkedCaseReference": "${[scenarioContext][parentContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+        "CaseTypeId": "FT_MasterCaseType"
       }]
-		}
-	}
+    }
+  }
 }
