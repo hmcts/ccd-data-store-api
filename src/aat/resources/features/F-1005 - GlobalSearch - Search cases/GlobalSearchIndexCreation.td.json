@@ -1,0 +1,23 @@
+{
+  "_guid_": "GlobalSearchIndexCreation",
+  "productName": "CCD Definition Store",
+  "operationName": "to create the global search index",
+  "method": "POST",
+  "uri": "{{DEFINITION_STORE_HOST}}/elastic-support/global-search/index",
+  "specs": [
+    "to create the global search index"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response"
+  }
+}

@@ -12,6 +12,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 
@@ -29,6 +30,9 @@ import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_PRIVATE;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_PUBLIC;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_TEST_PUBLIC;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponseJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.userRoleAssignmentJson;
 
 public class SearchWithSortIT extends WireMockBaseTest {
 
@@ -140,8 +144,21 @@ public class SearchWithSortIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_search_sort_cases.sql"})
     public void workbasketSearchWithRoleSpecificSortOrder() throws Exception {
-        String roleWithSortOrder = ROLE_TEST_PUBLIC;
-        MockUtils.setSecurityAuthorities(authentication, roleWithSortOrder, ROLE_CASEWORKER_PUBLIC,
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            String userId = "123";
+            String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                userRoleAssignmentJson(userId, ROLE_TEST_PUBLIC, "3504259907353518"),
+                userRoleAssignmentJson(userId, "idam:" + ROLE_CASEWORKER_PUBLIC, ""),
+                userRoleAssignmentJson(userId, "idam:" + ROLE_CASEWORKER_PRIVATE, "3504259907353518"),
+                userRoleAssignmentJson(userId, "idam:" + ROLE_CASEWORKER_PRIVATE, "1504259907353598",
+                    Classification.PRIVATE)
+            );
+
+            stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+                .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+        }
+
+        MockUtils.setSecurityAuthorities(authentication, ROLE_TEST_PUBLIC, ROLE_CASEWORKER_PUBLIC,
             ROLE_CASEWORKER_PRIVATE);
         MvcResult result = mockMvc.perform(get(GET_CASES)
             .contentType(JSON_CONTENT_TYPE)

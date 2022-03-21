@@ -11,7 +11,8 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "OVERRIDE",
       "ctid": "OVERRIDE",
-      "cid": "OVERRIDE"
+      "cid": "OVERRIDE",
+      "etid": "OVERRIDE"
     }
   },
 

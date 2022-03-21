@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
@@ -53,26 +50,17 @@ public class CaseSearchEndpoint {
 
     private final CaseSearchOperation caseSearchOperation;
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
-    private final CaseDefinitionRepository caseDefinitionRepository;
-    private final UserRepository userRepository;
-    private final ApplicationParams applicationParams;
 
     @Autowired
     public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
                                   CaseSearchOperation caseSearchOperation,
-                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                  CaseDefinitionRepository caseDefinitionRepository,
                               @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
                               ElasticsearchQueryHelper elasticsearchQueryHelper,
                               ApplicationParams applicationParams) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
-        this.caseDefinitionRepository = caseDefinitionRepository;
-        this.userRepository = userRepository;
-        this.applicationParams = applicationParams;
     }
 
-    @Transactional
     @PostMapping(value = "/searchCases")
     @ApiOperation("Search cases according to the provided ElasticSearch query. Supports searching across multiple case"
         + " types.")
@@ -119,26 +107,13 @@ public class CaseSearchEndpoint {
 
     private List<String> getCaseTypeIds(List<String> caseTypeIds) {
         if (isAllCaseTypesRequest(caseTypeIds)) {
-            return getCaseTypes();
+            return elasticsearchQueryHelper.getCaseTypesAvailableToUser();
         }
         return caseTypeIds;
     }
 
-    private List<String> getCaseTypes() {
-        if (userRepository.anyRoleEqualsAnyOf(applicationParams.getCcdAccessControlCrossJurisdictionRoles())) {
-            return caseDefinitionRepository.getAllCaseTypesIDs();
-        } else {
-            return getCaseTypesFromIdamRoles();
-        }
-    }
-
-    private List<String> getCaseTypesFromIdamRoles() {
-        List<String> jurisdictions = userRepository.getCaseworkerUserRolesJurisdictions();
-        return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
-    }
-
     private void validateCtid(List<String> caseTypeIds) {
-        if (caseTypeIds == null || caseTypeIds.size() == 0) {
+        if (caseTypeIds == null || caseTypeIds.isEmpty()) {
             throw new BadRequestException("Missing required case type. Please provide a case type or list of case types"
                 + " to search.");
         }

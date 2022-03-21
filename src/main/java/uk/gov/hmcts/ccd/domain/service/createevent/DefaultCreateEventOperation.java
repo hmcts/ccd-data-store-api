@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -39,6 +40,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
+    @Transactional
     @Override
     public CaseDetails createCaseEvent(final String caseReference,
                                        final CaseDataContent content) {

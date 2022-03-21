@@ -16,5 +16,16 @@
     "pathVariables": {
       "cid": "${[scenarioContext][siblingContexts][F-1016_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
     }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "data": {
+        "SearchCriteria" : { }
+      },
+      "data_classification": {
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+      }
+    }
   }
 }

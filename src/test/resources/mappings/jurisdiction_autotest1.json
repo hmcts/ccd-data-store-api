@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/jurisdictions?ids=AUTOTEST1"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "AUTOTEST1",
+        "name": "Auto Test 1",
+        "description": "Content for the Test Jurisdiction.",
+        "live_from": "2017-01-01",
+        "live_until": "2017-01-01"
+      }
+    ]
+  }
+}

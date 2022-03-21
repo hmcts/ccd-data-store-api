@@ -5,7 +5,8 @@ public enum CallbackType {
     ABOUT_TO_START("AboutToStart"),
     ABOUT_TO_SUBMIT("AboutToSubmit"),
     SUBMITTED("Submitted"),
-    MID_EVENT("MidEvent");
+    MID_EVENT("MidEvent"),
+    GET_CASE("GetCase");
 
     private String value;
 

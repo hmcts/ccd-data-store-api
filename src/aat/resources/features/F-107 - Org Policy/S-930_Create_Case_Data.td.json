@@ -45,7 +45,8 @@
             "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
           }
-        }
+        },
+        "SearchCriteria" : { }
       },
       "data_classification": {
         "AddressField": {
@@ -86,6 +87,10 @@
               }
             }
           }
+        },
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
         }
       },
       "supplementary_data": null,

@@ -1,0 +1,39 @@
+{
+  "_guid_": "F-1003-SubmitCaseCreation",
+  "productName": "CCD Data Store",
+  "operationName": "Submit Case Creation With Doc Fields",
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+  "method": "POST",
+  "uri": "case-types/{CaseTypeID}/cases",
+
+  "request": {
+    "headers": {
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+      "Content-Type": "application/json;charset=UTF-8",
+      "experimental": true
+    },
+    "pathVariables": {
+      "CaseTypeID": "BEFTA_CASETYPE_2_1"
+    },
+    "body": {
+      "data": {
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}"
+        }
+      },
+      "event": {
+        "id": "CREATE",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": false
+    }
+  }
+}

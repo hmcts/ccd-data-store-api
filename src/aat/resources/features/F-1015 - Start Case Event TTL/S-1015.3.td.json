@@ -35,13 +35,16 @@
             "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
             "OverrideTTL" : "2021-03-05",
             "Suspended" : "No"
-          }
+          },
+          "SearchCriteria" : { }
         },
         "data_classification": {
-          "_extends_": "TTL_Case_Data_Classifications"
+          "_extends_": "TTL_Case_Data_Classifications",
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
         },
         "security_classifications": {
-          "_extends_": "TTL_Case_Data_Classifications"
+          "_extends_": "TTL_Case_Data_Classifications",
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
         }
       },
       "event_id": "updateCaseTTLInc"
