@@ -363,7 +363,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         data.set(DOCUMENT_URL, NODE_FACTORY.booleanNode(true));
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is empty"));
+        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
 
     @Test
@@ -372,7 +372,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         data.set(DOCUMENT_URL, NODE_FACTORY.objectNode());
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is empty"));
+        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
 
     @Test
@@ -381,7 +381,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         data.set(DOCUMENT_URL, NODE_FACTORY.arrayNode());
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is empty"));
+        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
 
     @Test
@@ -390,7 +390,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         data.set(DOCUMENT_URL, NODE_FACTORY.numberNode(1));
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is empty"));
+        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
 
     @Test
@@ -399,7 +399,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         data.set(DOCUMENT_URL, NODE_FACTORY.pojoNode("text"));
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is empty"));
+        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
 
     @Test
@@ -408,7 +408,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         data.set(DOCUMENT_URL, NODE_FACTORY.binaryNode("n".getBytes()));
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is empty"));
+        assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
 
     @Test
@@ -417,7 +417,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         validDocumentUrlResult = validator.validate(CATEGORY_ID, data, caseFieldDefinition);
         assertThat(validDocumentUrlResult, hasSize(1));
         assertThat(validDocumentUrlResult.get(0).getErrorMessage(),
-            is(CATEGORY_ID + " is not a text value or is empty"));
+            is(CATEGORY_ID + " is not a text value or is null"));
     }
 
     @Test
@@ -427,7 +427,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
         validDocumentUrlResult = validator.validate(CATEGORY_ID, data, caseFieldDefinition);
         assertThat(validDocumentUrlResult, hasSize(1));
-        assertThat(validDocumentUrlResult.get(0).getErrorMessage(), is("boolean is not a string"));
+        assertThat(validDocumentUrlResult.get(0).getErrorMessage(), is("boolean is not a string : " + CATEGORY_ID));
     }
 
     @Test
@@ -447,7 +447,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         validDocumentUrlResult = validator.validate(UPLOAD_TIMESTAMP, data, caseFieldDefinition);
         assertThat(validDocumentUrlResult, hasSize(1));
         assertThat(validDocumentUrlResult.get(0).getErrorMessage(),
-            is(UPLOAD_TIMESTAMP + " is not a text value or is empty"));
+            is(UPLOAD_TIMESTAMP + " is not a text value or is null"));
     }
 
     @Test
@@ -455,7 +455,8 @@ public class DocumentValidatorTest implements IVallidatorTest {
         data = createDoc(UPLOAD_TIMESTAMP, "2001-12-10T00:00:0O");
         validDocumentUrlResult = validator.validate(UPLOAD_TIMESTAMP, data, caseFieldDefinition);
         assertThat(validDocumentUrlResult, hasSize(1));
-        assertThat(validDocumentUrlResult.get(0).getErrorMessage(),is("Date or Time entered is not valid"));
+        assertThat(validDocumentUrlResult.get(0).getErrorMessage(),
+            is("Date or Time entered is not valid : " + UPLOAD_TIMESTAMP));
     }
 
     @Test
