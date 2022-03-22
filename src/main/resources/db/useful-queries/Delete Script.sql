@@ -1,7 +1,6 @@
 -- =================================================================================
 -- This script deletes the records from the tables by last_modified and case_data_id criteria.
 -- The select retrieves the case_data_ids to create the temp table to be used as resource of case_data_ids in delete statements.
--- CaseTypeId array can be modified based on the delete requirement
 -- Either of caseTypeReferences or jurisdictionReferences arrays can be used as per the requirement.
 
 DO $$
@@ -50,7 +49,3 @@ CREATE TEMP TABLE tmp_case_data_ids ON COMMIT DROP AS
     DELETE FROM case_data WHERE id in (select id from tmp_case_data_ids);
 
 END $$;
-
-
-
-
