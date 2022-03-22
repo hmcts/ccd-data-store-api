@@ -1,0 +1,25 @@
+{
+  "_guid_": "F-13010.4_CreateCase",
+  "_extends_" : "F-13010_CreateCaseBase",
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_CaseAccessCategories_2"
+    },
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-13010.4_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
+      "data": {
+        "CaseAccessCategory": "FamilyLaw/Standard"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "case_type" : "FT_CaseAccessCategories_2",
+      "data": {
+        "CaseAccessCategory": "FamilyLaw/Standard"
+      }
+    }
+  }
+}

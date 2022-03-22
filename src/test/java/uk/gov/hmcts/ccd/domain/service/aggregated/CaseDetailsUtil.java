@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-class CaseDetailsUtil extends CaseDetails {
+public class CaseDetailsUtil extends CaseDetails {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
@@ -19,7 +19,7 @@ class CaseDetailsUtil extends CaseDetails {
             this.caseDetails = new CaseDetails();
         }
 
-        static CaseDetailsBuilder caseDetails() {
+        public static CaseDetailsBuilder caseDetails() {
             return new CaseDetailsBuilder();
         }
 

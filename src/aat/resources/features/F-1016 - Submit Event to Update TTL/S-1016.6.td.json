@@ -58,10 +58,12 @@
           "Suspended": "Yes",
           "OverrideTTL" : null,
           "SystemTTL" : null
-        }
+        },
+        "SearchCriteria" : { }
       },
       "data_classification" : {
-        "_extends_": "TTL_Classifications"
+        "_extends_": "TTL_Classifications",
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       },
       "supplementary_data" : null,
       "after_submit_callback_response" : null,
@@ -70,7 +72,8 @@
       "delete_draft_response_status_code" : null,
       "delete_draft_response_status" : null,
       "security_classifications" : {
-        "_extends_": "TTL_Classifications"
+        "_extends_": "TTL_Classifications",
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       }
     }
   }

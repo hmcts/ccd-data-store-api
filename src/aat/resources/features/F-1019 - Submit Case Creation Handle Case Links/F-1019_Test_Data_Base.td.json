@@ -1,5 +1,5 @@
 {
-	"_guid_": "F-1019_Test_Data_Base",
+  "_guid_": "F-1019_Test_Data_Base",
   "_extends_": "Case_Creation_Base",
 
   "users": {
@@ -8,12 +8,12 @@
     }
   },
 
-	"request": {
-		"pathVariables": {
+  "request": {
+    "pathVariables": {
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType"
-		}
-	},
+    }
+  },
 
   "expectedResponse": {
     "_extends_": "Common_201_Response",
@@ -35,7 +35,17 @@
       "callback_response_status_code" : null,
       "callback_response_status" : null,
       "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null
+      "delete_draft_response_status" : null,
+
+      "case_data" : {
+        "SearchCriteria" : { }
+      },
+      "data_classification": {
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+      },
+      "security_classifications": {
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+      }
     }
   }
 }

@@ -1,0 +1,47 @@
+{
+  "SearchCriteria": {
+    "OtherCaseReferences": [
+      {
+        "id": "8bb8319b-7f77-4ba0-8cd0-dcc0f1184e9e",
+        "value": "Ref1"
+      },
+      {
+        "id": "9bb8319b-7f77-4ba0-8cd0-dcc0f1184e9e",
+        "value": "Ref2"
+      }
+    ],
+    "SearchParties": [
+      {
+        "id": "1bb8319b-7f77-4ba0-8cd0-dcc0f1184e9e",
+        "value": {
+          "Name": "Some Name 1",
+          "EmailAddress": "email1@address.com",
+          "AddressLine1": "1 My Street",
+          "PostCode": "PST CD1",
+          "DateOfBirth": "1990-01-01"
+        }
+      },
+      {
+        "id": "9bb8319b-7f77-4ba0-8cd0-dcc0f1184e9e",
+        "value": {
+          "Name": "Some Name 2",
+          "EmailAddress": "email2@address.com",
+          "AddressLine1": "2 My Street",
+          "PostCode": "PST CD2",
+          "DateOfBirth": "1965-12-10"
+        }
+      }
+    ]
+  },
+  "caseManagementLocation": {
+    "region": "123",
+    "baseLocation": "321"
+  },
+  "caseNameHmctsInternal": "Internal case name",
+  "caseManagementCategory": {
+    "value": {
+      "code": "CATEGORY-A",
+      "label": "This is the description for category A."
+    }
+  }
+}

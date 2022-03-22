@@ -1,0 +1,106 @@
+{
+  "title": "Successfully searches for a case that was modified by a callback",
+  "_guid_": "S-1005.10",
+  "_extends_": "F-1005_SearchCaseBase",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains the fields modified by the callback",
+    "contains all the mandatory parameters",
+    "has 200 return code",
+    "contains the case modified by the callback"
+  ],
+
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "stateIds": [
+          "CaseCreated",
+          "CaseUpdated"
+        ],
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1005_CreateCaseWithCallback][testData][actualResponse][body][id]}"
+        ],
+        "CCDCaseTypeIds": [
+          "FT_GlobalSearch"
+        ],
+        "CCDJurisdictionIds": [
+          "BEFTA_MASTER"
+        ],
+        "caseManagementBaseLocationIds": [
+          "1"
+        ],
+        "caseManagementRegionIds": [
+          "3"
+        ],
+        "parties": [
+          {
+            "addressLine1": "Address Value",
+            "dateOfBirth": "2012-04-21",
+            "emailAddress": "e@mail.com",
+            "partyName": "FirstNameValue LastNameValue",
+            "postCode": "SE1 4EE"
+          }
+        ],
+        "otherReferences": [
+          "FirstNameValue"
+        ]
+      },
+      "sortCriteria": [
+        {
+          "sortBy": "caseName",
+          "sortDirection": "descending"
+        },
+        {
+          "sortBy": "caseManagementCategoryName",
+          "sortDirection": "ascending"
+        },
+        {
+          "sortBy": "createdDate",
+          "sortDirection": "ascending"
+        }
+      ],
+      "maxReturnRecordCount": 500,
+      "startRecordNumber": 1
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 1,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "caseReference"
+        },
+        {
+          "stateId": "CaseCreated",
+          "processForAccess" : "NONE",
+          "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCaseWithCallback][testData][actualResponse][body][id]}",
+          "otherReferences": [
+            "FirstNameValue"
+          ],
+          "caseNameHmctsInternal": "Name Internal",
+          "baseLocationId": "1",
+          "baseLocationName": "[[ANY_NULLABLE]]",
+          "caseManagementCategoryId": "987",
+          "caseManagementCategoryName": "Category label",
+          "regionId": "3",
+          "regionName": "[[ANY_NULLABLE]]",
+          "CCDJurisdictionId": "BEFTA_MASTER",
+          "CCDJurisdictionName": "BEFTA Master",
+          "HMCTSServiceId" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}",
+          "HMCTSServiceShortDescription" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_short_description]}",
+          "CCDCaseTypeId": "FT_GlobalSearch",
+          "CCDCaseTypeName": "FT_GlobalSearch"
+        }
+      ]
+    }
+  }
+}
+

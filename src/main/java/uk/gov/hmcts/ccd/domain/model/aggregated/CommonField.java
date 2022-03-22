@@ -21,6 +21,10 @@ public interface CommonField extends CommonDCPModel {
 
     void setDisplayContext(String displayContext);
 
+    void setShowCondition(String showCondition);
+
+    void setRetainHiddenValue(Boolean retainHiddenValue);
+
     void setDisplayContextParameter(String displayContextParameter);
 
     Object getFormattedValue();

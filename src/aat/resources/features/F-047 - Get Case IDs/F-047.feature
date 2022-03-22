@@ -11,6 +11,7 @@ Background: Load test data for the scenario
 Scenario: must return 200 and a list of case ids a user has access to
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
       And a case that has just been created as in [Standard_Full_Case_Creation_Data],
       And a successful call [to grant access on the case just created] as in [F-047_Grant_Access],
 
@@ -26,6 +27,7 @@ Scenario: must return 200 and a list of case ids a user has access to
 Scenario: must return 200 and an empty list if no case is found
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [contains an userId which doesn't have access to the case],
@@ -40,6 +42,7 @@ Scenario: must return 200 and an empty list if no case is found
 Scenario: must return 401 when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [does not provide valid authentication credentials],
@@ -54,6 +57,7 @@ Scenario: must return 401 when request does not provide valid authentication cre
 Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [does not provide authorised access to the operation],
@@ -68,6 +72,7 @@ Scenario: must return 403 when request provides authentic credentials without au
 Scenario: must return negative response HTTP-400 when request contains a malformed user ID
 
     Given a user with [an inactive profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [contains a malformed user ID],
@@ -82,6 +87,7 @@ Scenario: must return negative response HTTP-400 when request contains a malform
 Scenario: must return negative response HTTP-400 when request contains a malformed case type ID
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [contains a malformed case type ID],
@@ -96,6 +102,7 @@ Scenario: must return negative response HTTP-400 when request contains a malform
 Scenario: must return negative response HTTP-400 when request contains a malformed jurisdiction ID
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [contains a malformed jurisdiction ID],
@@ -110,6 +117,7 @@ Scenario: must return negative response HTTP-400 when request contains a malfor
 Scenario: must return negative response HTTP-400 when request contains a non-existing jurisdiction ID
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [contains a non-existing jurisdiction ID],
@@ -124,6 +132,7 @@ Scenario: must return negative response HTTP-400 when request contains a non-ex
 Scenario: must return negative response HTTP-404 when request contains a non-existing case type ID
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [contains a non-existing case type ID],
@@ -138,6 +147,7 @@ Scenario: must return negative response HTTP-404 when request contains a non-exi
 Scenario: must return negative response HTTP-403 when request contains a non-existing user ID
 
     Given a user with [an inactive profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [contains a non-existing user ID],

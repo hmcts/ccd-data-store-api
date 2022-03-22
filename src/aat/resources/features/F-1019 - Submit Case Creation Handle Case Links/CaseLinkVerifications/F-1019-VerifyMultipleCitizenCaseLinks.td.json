@@ -1,10 +1,7 @@
 {
-	"_guid_": "F-1019-VerifyMultipleCitizenCaseLinks",
+  "title": "should retrieve case links for a specified case reference",
+  "_guid_": "F-1019-VerifyMultipleCitizenCaseLinks",
   "_extends_": "Verify_Case_Links_Base",
-
-  "specs": [
-    "to verify that the Case Links have been created in the CASE_LINK table with correct values"
-  ],
 
   "users": {
     "invokingUser": {
@@ -12,32 +9,31 @@
     }
   },
 
-	"request": {
-		"pathVariables": {
-			"cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
-		}
-	},
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+    }
+  },
 
-	"expectedResponse": {
-		"_extends_": "Common_200_Response",
-		"headers": {
-			"Content-Encoding": "gzip",
-			"Content-Length": "[[ANYTHING_PRESENT]]"
-		},
-		"body": {
-      "CaseLinks" : [{
-        "__elementId__": "LinkedCaseId"
-      },
-      {
-        "CaseReference" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
-        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1019_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
-        "CaseTypeId" : "FT_MasterCaseType"
-      },
-      {
-        "CaseReference" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
-        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
-        "CaseTypeId" : "FT_MasterCaseType"
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "CaseLinks": [{
+        "__ordering__": "unordered",
+        "__elementId__": "LinkedCaseReference"
+      }, {
+        "CaseReference": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+        "LinkedCaseReference": "${[scenarioContext][parentContext][childContexts][F-1019_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+        "CaseTypeId": "FT_MasterCaseType"
+      }, {
+        "CaseReference": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+        "LinkedCaseReference": "${[scenarioContext][parentContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+        "CaseTypeId": "FT_MasterCaseType"
       }]
-		}
-	}
+    }
+  }
 }

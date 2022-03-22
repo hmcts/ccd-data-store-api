@@ -3,6 +3,14 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,18 +22,14 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.CoreMatchers.is;
@@ -40,10 +44,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
@@ -58,7 +66,7 @@ public class SecurityClassificationServiceTest {
     private static final String JURISDICTION_ID = "PROBATE";
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
 
-    private SecurityClassificationService securityClassificationService;
+    private SecurityClassificationServiceImpl securityClassificationService;
 
     @Mock
     private Authentication authentication;
@@ -67,16 +75,31 @@ public class SecurityClassificationServiceTest {
     private SecurityContext securityContext;
 
     @Mock
-    private UserRepository userRepository;
+    private CaseDataAccessControl caseDataAccessControl;
+
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
+
+    @Mock
+    private CaseAccessCategoriesService caseAccessCategoriesService;
+
+    private CaseDetails caseDetails;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction(JURISDICTION_ID);
 
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
 
-        securityClassificationService = spy(new SecurityClassificationService(userRepository));
+        securityClassificationService = spy(new SecurityClassificationServiceImpl(caseDataAccessControl,
+            caseDefinitionRepository,
+            caseAccessCategoriesService));
+        Predicate<CaseDetails> predicate = cd -> true;
+        when(caseAccessCategoriesService
+            .caseHasMatchingCaseAccessCategories(anySet(), anyBoolean())).thenReturn(predicate);
     }
 
     @Nested
@@ -100,7 +123,9 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return TRUE when user has enough SC rank")
         void userHasEnoughSecurityClassificationForField() {
-            doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(PUBLIC, PRIVATE));
+
             assertTrue(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
                 testCaseTypeDefinition,
                 CASE_FIELD_ID_1_1));
@@ -109,7 +134,9 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return FALSE when user doesn't have enough SC rank")
         void userDoesNotHaveEnoughSecurityClassificationForField() {
-            doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(PUBLIC, PRIVATE));
+
             assertFalse(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
                 testCaseTypeDefinition,
                 CASE_FIELD_ID_1_2));
@@ -123,20 +150,22 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should retrieve user classifications from user repository")
         public void shouldRetrieveClassificationsFromRepository() {
-            doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(PUBLIC, PRIVATE));
+            securityClassificationService.getUserClassification(new CaseTypeDefinition(), true);
 
-            securityClassificationService.getUserClassification(JURISDICTION_ID);
-
-            verify(userRepository, times(1)).getUserClassifications(JURISDICTION_ID);
+            verify(caseDataAccessControl, times(1))
+                .getUserClassifications(any(CaseTypeDefinition.class), anyBoolean());
         }
 
         @Test
         @DisplayName("should keep highest ranked classification")
         public void shouldRetrieveHigherRankedRole() {
-            doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(PUBLIC, PRIVATE));
 
-            Optional<SecurityClassification> userClassification = securityClassificationService.getUserClassification(
-                JURISDICTION_ID);
+            Optional<SecurityClassification> userClassification = securityClassificationService
+                .getUserClassification(new CaseTypeDefinition(), true);
 
             assertEquals(PRIVATE,
                 userClassification.get(),
@@ -147,10 +176,13 @@ public class SecurityClassificationServiceTest {
         @DisplayName("should retrieve no security classification if empty list of classifications returned by user "
             + "repository")
         public void shouldRetrieveNoSecurityClassificationIfEmptyListOfClassifications() {
-            doReturn(newHashSet()).when(userRepository).getUserClassifications(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet());
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet());
 
             Optional<SecurityClassification> userClassification = securityClassificationService.getUserClassification(
-                JURISDICTION_ID);
+                new CaseTypeDefinition(), true);
 
             assertFalse(userClassification.isPresent(), "Should not have classification");
         }
@@ -170,8 +202,11 @@ public class SecurityClassificationServiceTest {
 
         Optional<CaseDetails> applyClassification(SecurityClassification userClassification,
                                                   SecurityClassification caseClassification) {
-            doReturn(Optional.ofNullable(userClassification)).when(securityClassificationService)
-                .getUserClassification(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(userClassification));
+
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
+                .thenReturn(newHashSet(userClassification));
 
             caseDetails.setSecurityClassification(caseClassification);
 
@@ -205,6 +240,58 @@ public class SecurityClassificationServiceTest {
     }
 
     @Nested
+    @DisplayName("CaseDetails case access categories")
+    class ApplyCaseAccessCategoriesToCaseDetails {
+
+        private CaseDetails caseDetails;
+
+        @BeforeEach
+        void setUp() throws IOException {
+            caseDetails = new CaseDetails();
+
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
+                "{  \"CaseAccessCategory\": \"Civil/Standard\"\n," +
+                    "       \"Note2\": \"note2\"\n" +
+                    "    }\n"
+            ));
+            caseDetails.setData(data);
+            caseDetails.setJurisdiction(JURISDICTION_ID);
+        }
+
+        Optional<CaseDetails> applyClassification(SecurityClassification userClassification,
+                                                  SecurityClassification caseClassification,
+                                                  String caseAccessCategories) {
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(userClassification));
+
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
+                .thenReturn(newHashSet(userClassification));
+
+            AccessProfile accessProfile = new AccessProfile("Test");
+            accessProfile.setCaseAccessCategories(caseAccessCategories);
+            when(caseDataAccessControl.generateAccessProfilesByCaseDetails(any(CaseDetails.class)))
+                .thenReturn(newHashSet(accessProfile));
+
+            caseDetails.setSecurityClassification(caseClassification);
+
+            return securityClassificationService.applyClassification(caseDetails);
+        }
+
+        @Test
+        @DisplayName("should return null when case has no matching case access categories")
+        void shouldReturnNullWhenCaseHasNoCaseAccessCategories() {
+            assertThat(applyClassification(PUBLIC, RESTRICTED, "Civil/Test").isPresent(), is(false));
+        }
+
+        @Test
+        @DisplayName("should return case details when case and access profiles has matching case access categories")
+        void shouldReturnCaseDetailsWhenCaseAndAccessProfileHasSameCategories() {
+            assertThat(applyClassification(PUBLIC, RESTRICTED, "Civil/Standard,Crime/Standard").isPresent(), is(false));
+        }
+
+    }
+
+    @Nested
     @DisplayName("Apply to List of Events")
     class ApplyToEventList {
 
@@ -223,14 +310,15 @@ public class SecurityClassificationServiceTest {
             restrictedEvent = new AuditEvent();
             restrictedEvent.setSecurityClassification(RESTRICTED);
 
-            doReturn(Optional.empty()).when(securityClassificationService).getUserClassification(JURISDICTION_ID);
+            doReturn(Optional.empty()).when(securityClassificationService)
+                .getUserClassification(any(CaseTypeDefinition.class), anyBoolean());
         }
 
         @Test
         @DisplayName("should return empty list when given null")
         void shouldReturnEmptyListInsteadOfNull() {
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID, null);
+                securityClassificationService.applyClassification(caseDetails, null);
 
             assertAll(
                 () -> assertThat(classifiedEvents, is(notNullValue())),
@@ -241,11 +329,11 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return all events when user has higher classification")
         void shouldReturnAllEventsWhenUserHigherClassification() {
-            doReturn(Optional.of(RESTRICTED)).when(securityClassificationService).getUserClassification(
-                JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
+                .thenReturn(newHashSet(RESTRICTED));
 
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID,
+                securityClassificationService.applyClassification(caseDetails,
                                                                 Arrays.asList(publicEvent,
                                                                     privateEvent,
                                                                     restrictedEvent));
@@ -259,10 +347,11 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should filter out events with higher classification")
         void shouldFilterOutEventsHigherClassification() {
-            doReturn(Optional.of(PUBLIC)).when(securityClassificationService).getUserClassification(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
+                .thenReturn(newHashSet(PUBLIC));
 
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID,
+                securityClassificationService.applyClassification(caseDetails,
                                                                     Arrays.asList(publicEvent,
                                                                         privateEvent,
                                                                         restrictedEvent));
@@ -278,7 +367,7 @@ public class SecurityClassificationServiceTest {
         void shouldReturnEmptyListWhenNoUserClassification() {
 
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID,
+                securityClassificationService.applyClassification(caseDetails,
                                                                     Arrays.asList(publicEvent,
                                                                         privateEvent,
                                                                         restrictedEvent));
@@ -347,7 +436,12 @@ public class SecurityClassificationServiceTest {
 
         CaseDetails applyClassification(SecurityClassification userClassification) {
             doReturn(Optional.ofNullable(userClassification)).when(securityClassificationService)
-                .getUserClassification(JURISDICTION_ID);
+                .getUserClassification(any(CaseTypeDefinition.class), anyBoolean());
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean())).thenReturn(
+                Sets.newHashSet(userClassification));
+
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class))).thenReturn(
+                Sets.newHashSet(userClassification));
 
             caseDetails.setSecurityClassification(PRIVATE);
 

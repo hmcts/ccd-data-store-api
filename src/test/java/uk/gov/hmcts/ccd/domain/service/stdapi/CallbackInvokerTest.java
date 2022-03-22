@@ -29,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
+import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
@@ -47,11 +48,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.same;
@@ -61,6 +63,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.GET_CASE;
 import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.SUBMITTED;
 
@@ -69,6 +72,7 @@ class CallbackInvokerTest {
     private static final Boolean IGNORE_WARNING = true;
     private static final String URL_ABOUT_TO_START = "http://about-to-start";
     private static final String URL_ABOUT_TO_SUBMIT = "http://about-to-submit";
+    private static final String URL_GET_CASE = "http://get-case";
     private static final String URL_AFTER_SUBMIT = "http://after-submit";
     private static final String URL_MID_EVENT = "http://mid-event";
     private static final Boolean IGNORE_WARNINGS = FALSE;
@@ -91,6 +95,9 @@ class CallbackInvokerTest {
 
     @Mock
     private SecurityValidationService securityValidationService;
+
+    @Mock
+    private GlobalSearchProcessorService globalSearchProcessorService;
 
     @InjectMocks
     private CallbackInvoker callbackInvoker;
@@ -126,6 +133,7 @@ class CallbackInvokerTest {
 
         inOrder = inOrder(callbackService,
             caseTypeService,
+            globalSearchProcessorService,
             caseDataService,
             securityValidationService,
             caseSanitiser);
@@ -416,6 +424,42 @@ class CallbackInvokerTest {
     }
 
     @Nested
+    @DisplayName("invokeGetCaseCallback()")
+    class GetCase {
+
+        @Test
+        @DisplayName("should send callback")
+        void shouldSendCallback() {
+            caseTypeDefinition.setCallbackGetCaseUrl(URL_GET_CASE);
+
+            callbackInvoker.invokeGetCaseCallback(caseTypeDefinition, caseDetails);
+
+            verify(callbackService).send(eq(URL_GET_CASE), eq(GET_CASE),
+                any(CaseEventDefinition.class),
+                isNull(),
+                eq(caseDetails),
+                any(Class.class));
+            verifyNoMoreInteractions(callbackService);
+        }
+
+        @Test
+        @DisplayName("should disable callback retries")
+        void shouldDisableCallbackRetries() {
+            caseTypeDefinition.setCallbackGetCaseUrl(URL_GET_CASE);
+            caseTypeDefinition.setRetriesGetCaseUrl(RETRIES_DISABLED);
+
+            callbackInvoker.invokeGetCaseCallback(caseTypeDefinition, caseDetails);
+
+            verify(callbackService).sendSingleRequest(eq(URL_GET_CASE), eq(GET_CASE),
+                any(CaseEventDefinition.class),
+                isNull(),
+                eq(caseDetails),
+                any(Class.class));
+            verifyNoMoreInteractions(callbackService);
+        }
+    }
+
+    @Nested
     @DisplayName("invokeMidEventCallback()")
     class MidEvent {
 
@@ -481,6 +525,9 @@ class CallbackInvokerTest {
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
+                    () -> inOrder.verify(globalSearchProcessorService, never())
+                        .populateGlobalSearchData(caseTypeDefinition,
+                        callbackResponse.getData()),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseTypeDefinition,
                         caseDetails.getData(),
@@ -653,13 +700,18 @@ class CallbackInvokerTest {
                 data.put("state", null);
                 callbackResponse.setState(null);
                 caseDetails.setState("caseDetailsState");
+                when(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
+                    data)).thenReturn(callbackResponse.getData());
                 callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, caseDetailsBefore, caseDetails,
                     caseTypeDefinition, TRUE);
+
 
                 assertAll(
                     () -> assertThat(caseDetails.getState(), is("caseDetailsState")),
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
+                    () -> inOrder.verify(globalSearchProcessorService).populateGlobalSearchData(caseTypeDefinition,
+                        callbackResponse.getData()),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService, times(1))
                         .getDefaultSecurityClassifications(eq(caseTypeDefinition),
@@ -788,6 +840,9 @@ class CallbackInvokerTest {
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
+                    () -> inOrder.verify(globalSearchProcessorService, never())
+                        .populateGlobalSearchData(caseTypeDefinition,
+                        callbackResponse.getData()),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseTypeDefinition,
                         caseDetails.getData(),

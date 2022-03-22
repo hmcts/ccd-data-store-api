@@ -1,0 +1,45 @@
+{
+	"_guid_": "F-046_Grant_Access",
+
+	"productName": "CCD Data Store",
+	"operationName": "Grant access to case",
+
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
+
+	"specs": [
+	  "to grant testUser access to the case"
+	],
+
+	"users": {
+		"invokingUser": {
+			"_extends_": "Common_User_For_Request"
+		},
+		"testUser": {
+			"_extends_": "PrivateCaseworker"
+		}
+
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"cid": "${[scenarioContext][siblingContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+			"ctid": "AAT"
+		},
+		"body": {
+			"id": "${[scenarioContext][testData][users][testUser][id]}"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANY_STRING_NULLABLE]]",
+			"Vary": "Accept-Encoding"
+		}
+	}
+}

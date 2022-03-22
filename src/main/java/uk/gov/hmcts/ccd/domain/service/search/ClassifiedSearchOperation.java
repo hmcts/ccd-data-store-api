@@ -7,12 +7,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 @Service
 @Qualifier(ClassifiedSearchOperation.QUALIFIER)
@@ -20,11 +21,11 @@ public class ClassifiedSearchOperation implements SearchOperation {
     public static final String QUALIFIER = "classified";
 
     private final SearchOperation searchOperation;
-    private final SecurityClassificationService classificationService;
+    private final SecurityClassificationServiceImpl classificationService;
 
     @Autowired
     public ClassifiedSearchOperation(@Qualifier(DefaultSearchOperation.QUALIFIER) SearchOperation searchOperation,
-                                     SecurityClassificationService classificationService) {
+                                     SecurityClassificationServiceImpl classificationService) {
 
         this.searchOperation = searchOperation;
         this.classificationService = classificationService;

@@ -2,7 +2,8 @@ package uk.gov.hmcts.ccd.domain.model.common;
 
 public enum DisplayContextParameterCollectionOptions {
     ALLOW_INSERT("allowInsert"),
-    ALLOW_DELETE("allowDelete");
+    ALLOW_DELETE("allowDelete"),
+    ALLOW_UPDATE("allowUpdate");
 
     private final String option;
 

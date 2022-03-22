@@ -49,24 +49,11 @@
     		<vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
   	</suppress>
 
-	<!-- Temporary suppression before fix -->
-	<suppress>
-		<cve>CVE-2021-22147</cve>
-		<cve>CVE-2021-42340</cve>
-		<cve>CVE-2021-22096</cve>
-		<cve>CVE-2021-44832</cve>
-		<cve>CVE-2021-44228</cve>
-		<cve>CVE-2021-45105</cve>
-		<cve>CVE-2021-45046</cve>
-		<cve>CVE-2021-42550</cve>
-		<cve>CVE-2021-22060</cve>
-		<cve>CVE-2022-23181</cve>
-		<cve>CVE-2021-22144</cve>
-	</suppress>
-
-	<suppress>
-		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
-		<vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
+	<suppress until="2022-03-25">
+		<notes>
+			CVE affecting hazelcast-spring-4.0.3.jar and hazelcast-4.0.3.jar
+		</notes>
+		<cve>CVE-2022-0265</cve>
 	</suppress>
 
 </suppressions>

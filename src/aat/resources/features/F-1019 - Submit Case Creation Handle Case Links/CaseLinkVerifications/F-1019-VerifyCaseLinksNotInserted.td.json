@@ -1,10 +1,7 @@
 {
+  "title": "should retrieve empty list of case links for a specified case reference",
   "_guid_": "F-1019-VerifyCaseLinksNotInserted",
   "_extends_": "Verify_Case_Links_Base",
-
-  "specs": [
-    "to verify that no Case Links have been created in the CASE_LINK table"
-  ],
 
   "users": {
     "invokingUser": {

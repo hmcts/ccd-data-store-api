@@ -31,6 +31,9 @@
       "end_button_label" : null,
       "can_save_draft" : false,
       "title_display" : null,
+      "access_granted" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "access_process" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "supplementary_data" : null,
       "_links": {
         "self": {
           "href": "[[ANY_STRING_NOT_NULLABLE]]"
