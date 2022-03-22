@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -41,8 +41,9 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
+import java.util.List;
+
 import static org.springframework.http.ResponseEntity.status;
-import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.*;
 
 @RestController
 @RequestMapping(path = "/")
@@ -102,7 +103,7 @@ public class CaseController {
             message = V2.Error.CASE_NOT_FOUND
         )
     })
-    @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
+    @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
@@ -110,7 +111,7 @@ public class CaseController {
         }
 
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
-                                                             .orElseThrow(() -> new CaseNotFoundException(caseId));
+            .orElseThrow(() -> new CaseNotFoundException(caseId));
 
         return ResponseEntity.ok(new CaseResource(caseDetails));
     }
@@ -161,10 +162,11 @@ public class CaseController {
             message = V2.Error.CALLBACK_EXCEPTION
         )
     })
-    @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId", jurisdiction = "#result.body.jurisdiction",
+    @LogAudit(operationType = AuditOperationType.UPDATE_CASE, caseId = "#caseId",
+        jurisdiction = "#result.body.jurisdiction",
         caseType = "#result.body.caseType", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted",
-                                                    required = true)
+        required = true)
                                                     @PathVariable("caseId") String caseId,
                                                     @ApiParam(value = "Case data content for the event. Note that the "
                                                         + "`data` property "
@@ -300,7 +302,7 @@ public class CaseController {
             message = V2.Error.CALLBACK_EXCEPTION
         )
     })
-    @LogAudit(operationType = CREATE_CASE, caseId = "#result.body.reference",
+    @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseId = "#result.body.reference",
         jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
@@ -408,7 +410,9 @@ public class CaseController {
                 }))
     })
     public ResponseEntity<SupplementaryDataResource> updateCaseSupplementaryData(@PathVariable("caseId") String caseId,
-                                           @RequestBody SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
+                                                                                 @RequestBody
+                                                                                     SupplementaryDataUpdateRequest
+                                                                                     supplementaryDataUpdateRequest) {
 
         this.requestValidator.validate(supplementaryDataUpdateRequest);
         if (!caseReferenceService.validateUID(caseId)) {
@@ -434,61 +438,5 @@ public class CaseController {
 
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
-    }
-
-    @GetMapping(
-        path = "/getLinkedCases/{caseReference}/startRecordNumber/{startRecordNumber}/maxReturnRecordCount/{maxReturnRecordCount}",
-        headers = {
-            V2.EXPERIMENTAL_HEADER
-        },
-        produces = {
-            V2.MediaType.CASE
-        }
-    )
-    @ApiOperation(
-        value = "Retrieve a Linked Case",
-        notes = V2.EXPERIMENTAL_WARNING
-    )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = CaseResource.class
-        ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.CASE_ID_INVALID
-        ),
-        @ApiResponse(
-            code = 404,
-            message = V2.Error.CASE_NOT_FOUND
-        )
-    })
-    @LogAudit(operationType = LINKED_CASE_ACCESSED, caseId = "#caseId",
-        jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
-    public ResponseEntity<CaseResource> getLinkedCase(@PathVariable("caseReference") String caseReference,
-                                                      @PathVariable("startRecordNumber") String startRecordNumber,
-                                                      @PathVariable("maxReturnRecordCount") String maxReturnRecordCount) {
-        if (!caseReferenceService.validateUID(caseReference)) {
-            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
-        }
-
-        final CaseDetails caseDetails = this.getCaseOperation.execute(caseReference)
-            .orElseThrow(() -> new CaseNotFoundException(caseReference));
-
-        validateIsParamNum(startRecordNumber);
-        validateIsParamNum(maxReturnRecordCount);
-
-        return ResponseEntity.ok(new CaseResource(caseDetails));
-    }
-
-    private void validateIsParamNum(String number){
-        if(number != null) {
-            try {
-                Long.parseLong(number);
-            } catch (NumberFormatException nfe) {
-                throw new BadRequestException(V2.Error.PARAM_NOT_NUM);
-            }
-        }
     }
 }

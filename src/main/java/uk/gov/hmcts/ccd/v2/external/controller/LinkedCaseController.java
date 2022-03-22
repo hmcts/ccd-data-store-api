@@ -6,7 +6,11 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -79,8 +83,10 @@ public class LinkedCaseController {
     /*TODO @LogAudit(operationType = LINKED_CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")*/
     public ResponseEntity<Void> getLinkedCase(@PathVariable("caseReference") String caseReference,
-                                              @RequestParam(name = "startRecordNumber", defaultValue = "1", required = false) String startRecordNumber,
-                                              @RequestParam(name = "maxReturnRecordCount", required = false) String maxReturnRecordCount) {
+                                              @RequestParam(name = "startRecordNumber",
+                                                  defaultValue = "1", required = false) String startRecordNumber,
+                                              @RequestParam(name = "maxReturnRecordCount",
+                                                  required = false) String maxReturnRecordCount) {
         //Validate Case Reference is valid
         validateCaseReference(caseReference);
 
@@ -94,8 +100,8 @@ public class LinkedCaseController {
         return ResponseEntity.noContent().build();  // TODO: for now
     }
 
-    private void validateIsParamNum(String number){
-        if(number != null) {
+    private void validateIsParamNum(String number) {
+        if (number != null) {
             try {
                 Long.parseLong(number);
             } catch (NumberFormatException nfe) {

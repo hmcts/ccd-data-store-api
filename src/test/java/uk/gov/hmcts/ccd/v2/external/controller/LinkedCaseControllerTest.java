@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,6 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 @DisplayName("LinkedCaseController")
@@ -73,15 +73,15 @@ public class LinkedCaseControllerTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        when(caseDetails.getReference()).thenReturn(new Long(CASE_REFERENCE));
+        Mockito.when(caseDetails.getReference()).thenReturn(new Long(CASE_REFERENCE));
 
-        when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
-        when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(caseDetails));
-        when(createEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT)).thenReturn(caseDetails);
-        when(createCaseOperation.createCaseDetails(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING))
+        Mockito.when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
+        Mockito.when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(caseDetails));
+        Mockito.when(createEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT)).thenReturn(caseDetails);
+        Mockito.when(createCaseOperation.createCaseDetails(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING))
             .thenReturn(caseDetails);
         List<AuditEvent> auditEvents = Lists.newArrayList(new AuditEvent(), new AuditEvent());
-        when(getEventsOperation.getEvents(CASE_REFERENCE)).thenReturn(auditEvents);
+        Mockito.when(getEventsOperation.getEvents(CASE_REFERENCE)).thenReturn(auditEvents);
     }
 
     @Nested
@@ -92,7 +92,8 @@ public class LinkedCaseControllerTest {
         @DisplayName("should return 200 when case found")
         void linkedCaseFound() {
             // WHEN
-            final ResponseEntity<Void> response = linkedCaseController.getLinkedCase(CASE_REFERENCE, null, null);
+            final ResponseEntity<Void> response = linkedCaseController.getLinkedCase(CASE_REFERENCE,
+                null, null);
 
             // THEN
             assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
@@ -114,10 +115,11 @@ public class LinkedCaseControllerTest {
         @DisplayName("should propagate CaseNotFoundException when case NOT found")
         void linkedCaseNotFound() {
             // GIVEN
-            doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
+            Mockito.doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
             // WHEN
-            final Throwable thrown = catchThrowable(() -> linkedCaseController.getLinkedCase(CASE_REFERENCE, "1", "1"));
+            final Throwable thrown = catchThrowable(() -> linkedCaseController.getLinkedCase(CASE_REFERENCE,
+                "1", "1"));
 
             // THEN
             Assertions.assertThat(thrown)
@@ -129,10 +131,11 @@ public class LinkedCaseControllerTest {
         @DisplayName("should propagate BadRequestException when case reference not valid")
         void linkedCaseReferenceNotValid() {
             // GIVEN
-            doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
+            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
 
             // WHEN
-            final Throwable thrown = catchThrowable(() -> linkedCaseController.getLinkedCase(CASE_REFERENCE, "1", "1"));
+            final Throwable thrown = catchThrowable(() -> linkedCaseController.getLinkedCase(CASE_REFERENCE,
+                "1", "1"));
 
             // THEN
             Assertions.assertThat(thrown)
@@ -144,10 +147,11 @@ public class LinkedCaseControllerTest {
         @DisplayName("should propagate BadRequestException when Start Record Number is Non Numeric")
         void linkedCaseStartRecordNumberIsNonNumeric() {
             // GIVEN
-            doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
+            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
 
             // WHEN
-            final Throwable thrown = catchThrowable(() -> linkedCaseController.getLinkedCase(CASE_REFERENCE, "A", null));
+            final Throwable thrown = catchThrowable(() -> linkedCaseController.getLinkedCase(CASE_REFERENCE,
+                "A", null));
 
             // THEN
             Assertions.assertThat(thrown)
@@ -159,10 +163,11 @@ public class LinkedCaseControllerTest {
         @DisplayName("should propagate BadRequestException when Max Return Record Count is not valid")
         void linkedCaseMaxReturnRecordCountIsNonNumeric() {
             // GIVEN
-            doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
+            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
 
             // WHEN
-            final Throwable thrown = catchThrowable(() -> linkedCaseController.getLinkedCase(CASE_REFERENCE, null, "A"));
+            final Throwable thrown = catchThrowable(() -> linkedCaseController.getLinkedCase(CASE_REFERENCE,
+                null, "A"));
 
             // THEN
             Assertions.assertThat(thrown)
@@ -174,10 +179,11 @@ public class LinkedCaseControllerTest {
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
             // GIVEN
-            doThrow(RuntimeException.class).when(getCaseOperation).execute(CASE_REFERENCE);
+            Mockito.doThrow(RuntimeException.class).when(getCaseOperation).execute(CASE_REFERENCE);
 
             // WHEN
-            final Throwable thrown = catchThrowable(() -> linkedCaseController.getLinkedCase(CASE_REFERENCE, "1", "1"));
+            final Throwable thrown = catchThrowable(() -> linkedCaseController.getLinkedCase(CASE_REFERENCE,
+                "1", "1"));
 
             // THEN
             Assertions.assertThat(thrown)
