@@ -3,7 +3,7 @@
   "_extends_" : "F-130_Test_Data_Base",
 
   "specs" : [
-    "contains an error stating that the case details is marked as non-null but is null"
+    "contains an null values for case details"
   ],
 
   "request": {
@@ -26,17 +26,29 @@
   },
 
   "expectedResponse": {
-    "responseCode": 500,
+    "responseCode": 201,
     "body" : {
-      "exception": "java.lang.NullPointerException",
-      "timestamp": "[[ANYTHING_PRESENT]]",
-      "status": 500,
-      "error": "Unexpected Error",
-      "message": "caseDetails is marked non-null but is null",
-      "path": "/case-types/FT_CRUD_2/cases",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
+      "_links" : {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]",
+          "templated" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id" : null,
+      "jurisdiction" : null,
+      "case_type" : null,
+      "created_on" : null,
+      "last_modified_on" : null,
+      "last_state_modified_on" : null,
+      "state" : null,
+      "security_classification" : null,
+      "data" : null,
+      "data_classification" : null,
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
     }
   }
 }
