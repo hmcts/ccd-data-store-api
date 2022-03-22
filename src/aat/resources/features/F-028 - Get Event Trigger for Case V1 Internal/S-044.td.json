@@ -1600,7 +1600,8 @@
       "can_save_draft": null,
       "access_granted" : "STANDARD",
       "access_process" : "NONE",
-      "title_display": "CUSTOM  TITLE DISPLAY"
+      "title_display": "CUSTOM  TITLE DISPLAY",
+      "supplementary_data" : null
     }
   }
 }

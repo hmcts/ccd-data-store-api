@@ -35,6 +35,8 @@ import static org.mockito.Mockito.doReturn;
 @ExtendWith(MockitoExtension.class)
 class GlobalSearchResponseTransformerTest extends TestFixtures {
 
+    protected static final String JURISDICTION_ID_DIFFERENT = "DIFFERENT";
+
     @Mock
     private CachedCaseDefinitionRepository caseDefinitionRepository;
 
@@ -104,13 +106,16 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     }
 
     @Test
-    void testShouldMapJurisdiction() {
+    void testShouldMapJurisdictionWithName() {
         // GIVEN
         stubAccessMetadata();
         final JurisdictionDefinition jurisdictionDefinition = buildJurisdictionDefinition();
-        doReturn(jurisdictionDefinition).when(caseDefinitionRepository).getJurisdiction(JURISDICTION_ID);
+        final CaseTypeDefinition caseTypeDefinition = buildCaseTypeDefinition();
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withJurisdiction(JURISDICTION_ID)
+            .withCaseTypeId(CASE_TYPE_ID)
             .withData(emptyMap())
             .withSupplementaryData(emptyMap())
             .build();
@@ -125,6 +130,34 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
             .satisfies(result -> {
                 assertThat(result.getCcdJurisdictionId()).isEqualTo(JURISDICTION_ID);
                 assertThat(result.getCcdJurisdictionName()).isEqualTo(JURISDICTION_NAME);
+            });
+    }
+
+    @Test
+    void testShouldMapJurisdictionWithoutNameWhenIDsDoNotMatch() {
+        // GIVEN
+        stubAccessMetadata();
+        final JurisdictionDefinition jurisdictionDefinition = buildJurisdictionDefinition();
+        final CaseTypeDefinition caseTypeDefinition = buildCaseTypeDefinition();
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withJurisdiction(JURISDICTION_ID_DIFFERENT)
+            .withCaseTypeId(CASE_TYPE_ID)
+            .withData(emptyMap())
+            .withSupplementaryData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponsePayload.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> {
+                assertThat(result.getCcdJurisdictionId()).isEqualTo(JURISDICTION_ID_DIFFERENT);
+                assertThat(result.getCcdJurisdictionName()).isNull();  // i.e. not mapped
             });
     }
 
