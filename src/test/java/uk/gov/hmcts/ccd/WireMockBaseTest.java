@@ -14,7 +14,6 @@ import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.apache.http.HttpHeaders;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +30,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,12 +44,6 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @AutoConfigureWireMock(port = 0)
 public abstract class WireMockBaseTest extends BaseTest {
-
-    /*
-     * These UUID values must also be used in wiremock mapping files which are used by other integration tests. see:
-     *   /src/test/resources/mappings/_idam_default_details.json
-     */
-    protected static final UUID IDAM_DEFAULT_DETAILS_STUB_ID = UUID.fromString("13b731bd-e240-468b-96d1-84bb55079220");
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
 
@@ -110,11 +102,6 @@ public abstract class WireMockBaseTest extends BaseTest {
 
     public void stubFor(MappingBuilder mappingBuilder) {
         wireMockServer.stubFor(mappingBuilder);
-    }
-
-    public void removeStub(UUID id) {
-        final Optional<StubMapping> stubMapping = Optional.ofNullable(wireMockServer.getSingleStubMapping(id));
-        stubMapping.ifPresent(mapping -> wireMockServer.removeStub(mapping));
     }
 
     public void verifyWireMock(int count, RequestPatternBuilder postRequestedFor) {

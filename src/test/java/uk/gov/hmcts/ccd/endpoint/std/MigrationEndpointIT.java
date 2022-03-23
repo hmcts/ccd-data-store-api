@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,16 +35,22 @@ import uk.gov.hmcts.ccd.domain.model.migration.MigrationResult;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.MockUtils.VALID_IDAM_TOKEN_CASEWORKER_CAA;
-import static uk.gov.hmcts.ccd.MockUtils.VALID_IDAM_TOKEN_CASEWORKER_PROBATE;
-import static uk.gov.hmcts.ccd.MockUtils.VALID_IDAM_TOKEN_CASEWORKER_SSCS;
+import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER;
+import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_CAA;
+import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_PROBATE;
+import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_SSCS;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink.builder;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
 
 @TestPropertySource(locations = "classpath:test.properties", properties = {"migrations.endpoint.enabled=true"})
 class MigrationEndpointIT extends WireMockBaseTest {
@@ -81,16 +88,16 @@ class MigrationEndpointIT extends WireMockBaseTest {
 
         @ParameterizedTest(name = "Should populate CaseLinks where case has single missing CaseLink - #{index} - `{0}`")
         @CsvSource({
-            VALID_IDAM_TOKEN_CASEWORKER_PROBATE,
-            VALID_IDAM_TOKEN_CASEWORKER_CAA
+            ROLE_CASEWORKER_PROBATE,
+            ROLE_CASEWORKER_CAA
         })
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
             scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
-        void shouldPopulateCaseLinksWhereCaseHasSingleMissingCaseLink(String idamToken) throws Exception {
+        void shouldPopulateCaseLinksWhereCaseHasSingleMissingCaseLink(String caseworkerRole) throws Exception {
             MigrationParameters migrationParameters =
                 new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
 
-            stubIdamRequest(idamToken);
+            stubIdamAndRasRequests(caseworkerRole);
 
             mockMvc.perform(post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -113,16 +120,16 @@ class MigrationEndpointIT extends WireMockBaseTest {
             name = "Should populate CaseLinks where case has multiple missing CaseLinks - #{index} - `{0}`"
         )
         @CsvSource({
-            VALID_IDAM_TOKEN_CASEWORKER_PROBATE,
-            VALID_IDAM_TOKEN_CASEWORKER_CAA
+            ROLE_CASEWORKER_PROBATE,
+            ROLE_CASEWORKER_CAA
         })
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
             scripts = {"classpath:sql/insert_cases_multiple_missing_case_link.sql"})
-        void shouldPopulateCaseLinksWhereCaseHasMultipleMissingCaseLinks(String idamToken) throws Exception {
+        void shouldPopulateCaseLinksWhereCaseHasMultipleMissingCaseLinks(String caseworkerRole) throws Exception {
             MigrationParameters migrationParameters =
                 new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
 
-            stubIdamRequest(idamToken);
+            stubIdamAndRasRequests(caseworkerRole);
 
             mockMvc.perform(post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -151,16 +158,18 @@ class MigrationEndpointIT extends WireMockBaseTest {
             name = "Should populate CaseLinks where multiple cases has multiple missing CaseLinks - #{index} - `{0}`"
         )
         @CsvSource({
-            VALID_IDAM_TOKEN_CASEWORKER_PROBATE,
-            VALID_IDAM_TOKEN_CASEWORKER_CAA
+            ROLE_CASEWORKER_PROBATE,
+            ROLE_CASEWORKER_CAA
         })
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
             scripts = {"classpath:sql/insert_cases_multiple_missing_case_link.sql"})
-        void shouldPopulateCaseLinksWhereMultipleCasesHaveMultipleMissingCaseLinks(String idamToken) throws Exception {
+        void shouldPopulateCaseLinksWhereMultipleCasesHaveMultipleMissingCaseLinks(String caseworkerRole)
+            throws Exception {
+
             MigrationParameters migrationParameters =
                 new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
 
-            stubIdamRequest(idamToken);
+            stubIdamAndRasRequests(caseworkerRole);
 
             mockMvc.perform(post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -202,16 +211,16 @@ class MigrationEndpointIT extends WireMockBaseTest {
 
         @ParameterizedTest(name = "Should populate CaseLinks where case has existing CaseLink - #{index} - `{0}`")
         @CsvSource({
-            VALID_IDAM_TOKEN_CASEWORKER_PROBATE,
-            VALID_IDAM_TOKEN_CASEWORKER_CAA
+            ROLE_CASEWORKER_PROBATE,
+            ROLE_CASEWORKER_CAA
         })
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
             scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
-        void shouldPopulateCaseLinksWhereCaseHasExistingCaseLink(String idamToken) throws Exception {
+        void shouldPopulateCaseLinksWhereCaseHasExistingCaseLink(String caseworkerRole) throws Exception {
             MigrationParameters migrationParameters =
                 new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
 
-            stubIdamRequest(idamToken);
+            stubIdamAndRasRequests(caseworkerRole);
 
             mockMvc.perform(post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -233,16 +242,16 @@ class MigrationEndpointIT extends WireMockBaseTest {
 
         @ParameterizedTest(name = "Should NOT populate CaseLink due to starting ID - #{index} - `{0}`")
         @CsvSource({
-            VALID_IDAM_TOKEN_CASEWORKER_PROBATE,
-            VALID_IDAM_TOKEN_CASEWORKER_CAA
+            ROLE_CASEWORKER_PROBATE,
+            ROLE_CASEWORKER_CAA
         })
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
             scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
-        void shouldNotPopulateMissingCaseLinksDueToStartingID(String idamToken) throws Exception {
+        void shouldNotPopulateMissingCaseLinksDueToStartingID(String caseworkerRole) throws Exception {
             MigrationParameters migrationParameters =
                 new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 2L, 5);
 
-            stubIdamRequest(idamToken);
+            stubIdamAndRasRequests(caseworkerRole);
 
             mockMvc.perform(post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -255,18 +264,18 @@ class MigrationEndpointIT extends WireMockBaseTest {
 
         @ParameterizedTest(name = "Should NOT populate CaseLink with incorrect Jurisdiction - #{index} - `{0}`")
         @CsvSource({
-            VALID_IDAM_TOKEN_CASEWORKER_PROBATE,
-            VALID_IDAM_TOKEN_CASEWORKER_CAA
+            ROLE_CASEWORKER_PROBATE,
+            ROLE_CASEWORKER_CAA
         })
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
             scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
-        void shouldNotPopulateCaseLinksWithIncorrectJurisdiction(String idamToken) throws Exception {
+        void shouldNotPopulateCaseLinksWithIncorrectJurisdiction(String caseworkerRole) throws Exception {
 
             // NB: case type and jurisdiction mismatch
             MigrationParameters migrationParameters =
                 new MigrationParameters(CASE_TYPE_ID, SSCS_JURISDICTION_ID, 1L, 5);
 
-            stubIdamRequest(idamToken);
+            stubIdamAndRasRequests(caseworkerRole);
 
             mockMvc.perform(post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -289,7 +298,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             // NB: IDAM and migration jurisdiction is SSCS but migration case type is for PROBATE
             //     therefore error as case type not permitted.
 
-            stubIdamRequest(VALID_IDAM_TOKEN_CASEWORKER_SSCS);
+            stubIdamAndRasRequests(ROLE_CASEWORKER_SSCS);
 
             mockMvc.perform(post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -310,7 +319,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             MigrationParameters migrationParameters =
                 new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, caseDataId, 5);
 
-            stubIdamRequest(VALID_IDAM_TOKEN_CASEWORKER_PROBATE);
+            stubIdamAndRasRequests(ROLE_CASEWORKER_PROBATE);
 
             mockMvc.perform(post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -335,7 +344,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             MigrationParameters migrationParameters =
                 new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
 
-            stubIdamRequest(VALID_IDAM_TOKEN_CASEWORKER_PROBATE);
+            stubIdamAndRasRequests(ROLE_CASEWORKER_PROBATE);
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -396,10 +405,15 @@ class MigrationEndpointIT extends WireMockBaseTest {
         template = new JdbcTemplate(db);
     }
 
-    private void stubIdamRequest(String token) {
-        MockUtils.setSecurityAuthorities(token, authentication);
+    private void stubIdamAndRasRequests(String caseworkerRole) {
+        String userId = UUID.randomUUID().toString();
 
-        removeStub(IDAM_DEFAULT_DETAILS_STUB_ID);
+        MockUtils.setSecurityAuthorities(authentication, ROLE_CASEWORKER, caseworkerRole);
+
+        stubUserInfo(userId, ROLE_CASEWORKER, caseworkerRole);
+
+        stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+            .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
     }
 
 }

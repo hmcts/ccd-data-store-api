@@ -299,7 +299,43 @@
                 "read": true,
                 "update": true,
                 "delete": false
-              }],
+              }
+            ],
+            "roleToAccessProfiles": [
+              {
+                "case_type_id": "TestAddressBookCaseCaseLinks",
+                "disabled": false,
+                "read_only": false,
+                "authorisations": null,
+                "access_profiles": "caseworker-caa",
+                "live_from": "2017-01-01",
+                "live_to": null,
+                "role_name": "idam:caseworker-caa",
+                "case_access_categories": null
+              },
+              {
+                "case_type_id": "TestAddressBookCaseCaseLinks",
+                "disabled": false,
+                "read_only": false,
+                "authorisations": null,
+                "access_profiles": "caseworker-probate",
+                "live_from": "2017-01-01",
+                "live_to": null,
+                "role_name": "idam:caseworker-probate",
+                "case_access_categories": null
+              },
+              {
+                "case_type_id": "TestAddressBookCaseCaseLinks",
+                "disabled": false,
+                "read_only": false,
+                "authorisations": null,
+                "access_profiles": "caseworker-probate-public",
+                "live_from": "2017-01-01",
+                "live_to": null,
+                "role_name": "idam:caseworker-probate-public",
+                "case_access_categories": null
+              }
+            ],
             "events": [
               {
                 "id": "HAS_PRE_STATES_EVENT",
