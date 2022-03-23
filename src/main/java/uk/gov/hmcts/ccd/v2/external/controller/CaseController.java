@@ -306,8 +306,8 @@ public class CaseController {
         jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
-                                                   @RequestParam(value = "ignore-warning", required = false)
-                                                       final Boolean ignoreWarning) {
+                                                   @RequestParam(value = "ignore-warning", required = false) final
+                                                       Boolean ignoreWarning) {
         return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
     }
 
@@ -438,5 +438,72 @@ public class CaseController {
 
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
+    }
+
+    @GetMapping(
+        path = "getLinkedCases/{caseReference}",
+        produces = {
+            V2.MediaType.CASE
+        }
+    )
+    @ApiOperation(
+        value = "Retrieve a Linked Case",
+        notes = V2.EXPERIMENTAL_WARNING
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Success",
+            response = CaseResource.class
+        ),
+        @ApiResponse(
+            code = 400,
+            message = V2.Error.CASE_ID_INVALID
+        ),
+        @ApiResponse(
+            code = 404,
+            message = V2.Error.CASE_NOT_FOUND
+        )
+    })
+    /*TODO @LogAudit(operationType = LINKED_CASE_ACCESSED, caseId = "#caseId",
+        jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")*/
+    public ResponseEntity<Void> getLinkedCase(@PathVariable("caseReference") String caseReference,
+                                              @RequestParam(name = "startRecordNumber",
+                                                  defaultValue = "1", required = false) String startRecordNumber,
+                                              @RequestParam(name = "maxReturnRecordCount",
+                                                  required = false) String maxReturnRecordCount) {
+
+        //Validate parameters are numeric
+        validateIsParamNum(startRecordNumber);
+        validateIsParamNum(maxReturnRecordCount);
+
+        //Validate Case Reference is valid
+        validateCaseReference(caseReference);
+
+        //Validate Case exists
+        final CaseDetails caseDetails = getCaseDetails(caseReference);
+
+        return ResponseEntity.ok().build();  // TODO: for now
+    }
+
+    private void validateIsParamNum(String number) {
+        if (number != null) {
+            try {
+                Long.parseLong(number);
+            } catch (NumberFormatException nfe) {
+                throw new BadRequestException(V2.Error.PARAM_NOT_NUM);
+            }
+        }
+    }
+
+    private void validateCaseReference(final String caseReference) {
+        if (!caseReferenceService.validateUID(caseReference)) {
+            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
+        }
+    }
+
+    private CaseDetails getCaseDetails(final String caseReference) {
+        return getCaseOperation.execute(caseReference)
+            .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 }

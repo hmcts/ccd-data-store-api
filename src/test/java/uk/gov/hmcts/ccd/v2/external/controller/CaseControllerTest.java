@@ -3,17 +3,21 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +41,14 @@ import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
@@ -55,6 +61,10 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 class CaseControllerTest {
     private static final String CASE_REFERENCE = "1234123412341238";
     private static final String CASE_TYPE_ID = "Grant";
+    private static final String START_RECORD_NUMBER = "2";
+    private static final String INVALID_START_RECORD_NUMBER = "A";
+    private static final String MAX_RETURN_RECORD_COUNT = "1";
+    private static final String INVALID_MAX_RETURN_RECORD_COUNT = "A";
     private static final Boolean IGNORE_WARNING = true;
     private static final CaseDataContent CASE_DATA_CONTENT = newCaseDataContent().build();
 
@@ -188,8 +198,8 @@ class CaseControllerTest {
             when(caseDetails.getLastStateModifiedDate()).thenReturn(stateModified);
 
             final ResponseEntity<CaseResource> response = caseController.createCase(CASE_TYPE_ID,
-                                                                                    CASE_DATA_CONTENT,
-                                                                                    IGNORE_WARNING);
+                CASE_DATA_CONTENT,
+                IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
@@ -366,7 +376,7 @@ class CaseControllerTest {
         }
 
         private void validateResponseData(Map<String, Object> response, String expectedKey, Object expectedValue) {
-            Map<String, Object> childMap = (Map<String, Object> ) response.get("orgs_assigned_users");
+            Map<String, Object> childMap = (Map<String, Object>) response.get("orgs_assigned_users");
             assertTrue(childMap.containsKey(expectedKey));
             assertEquals(expectedValue, childMap.get(expectedKey));
         }
@@ -411,6 +421,115 @@ class CaseControllerTest {
             auditEvent.setUserFirstName("First_Name");
             auditEvent.setUserLastName("Last_Name");
             return auditEvent;
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /getLinkedCases/{caseReference}")
+    class GetLinkedCases {
+
+        @Test
+        @DisplayName("should return 200 when case found")
+        void linkedCaseFound() {
+            // WHEN
+            final ResponseEntity<Void> response = caseController.getLinkedCase(CASE_REFERENCE,
+                null, null);
+
+            // THEN
+            assertThat(response.getStatusCode(), is(HttpStatus.OK));
+            assertNull(response.getBody());
+        }
+
+        @Test
+        @DisplayName("should return 200 when case found")
+        void linkedCaseFoundWithOptionalParameters() {
+            // WHEN
+
+            final ResponseEntity<Void> response = caseController.getLinkedCase(CASE_REFERENCE, START_RECORD_NUMBER,
+                MAX_RETURN_RECORD_COUNT);
+
+            // THEN
+            assertThat(response.getStatusCode(), is(HttpStatus.OK));
+            assertNull(response.getBody());
+        }
+
+        @Test
+        @DisplayName("should propagate CaseNotFoundException when case NOT found")
+        void linkedCaseNotFound() {
+            // GIVEN
+            Mockito.doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
+
+            // WHEN
+            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
+                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
+
+            // THEN
+            Assertions.assertThat(thrown)
+                .isInstanceOf(CaseNotFoundException.class)
+                .hasMessage(String.format("No case found for reference: %s", CASE_REFERENCE));
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when case reference not valid")
+        void linkedCaseReferenceNotValid() {
+            // GIVEN
+            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
+
+            // WHEN
+            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
+                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
+
+            // THEN
+            Assertions.assertThat(thrown)
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Case ID is not valid");
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when Start Record Number is Non Numeric")
+        void linkedCaseStartRecordNumberIsNonNumeric() {
+            // GIVEN
+            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
+
+            // WHEN
+            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
+                INVALID_START_RECORD_NUMBER, null));
+
+            // THEN
+            Assertions.assertThat(thrown)
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Parameter is not numeric");
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when Max Return Record Count is not valid")
+        void linkedCaseMaxReturnRecordCountIsNonNumeric() {
+            // GIVEN
+            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
+
+            // WHEN
+            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
+                null, INVALID_MAX_RETURN_RECORD_COUNT));
+
+            // THEN
+            Assertions.assertThat(thrown)
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Parameter is not numeric");
+        }
+
+        @Test
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            // GIVEN
+            Mockito.doThrow(RuntimeException.class).when(getCaseOperation).execute(CASE_REFERENCE);
+
+            // WHEN
+            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
+                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
+
+            // THEN
+            Assertions.assertThat(thrown)
+                .isInstanceOf(Exception.class);
         }
     }
 }

@@ -281,7 +281,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     public void shouldPopulateSearchCriteriaPostCreateCase() throws Exception {
-        final String URL =  "/case-types/" + CASE_TYPE_WITH_SEARCH_PARTY + "/cases";
+        final String URL = "/case-types/" + CASE_TYPE_WITH_SEARCH_PARTY + "/cases";
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
@@ -328,7 +328,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
             searchCriteriaJsonNode.get("OtherCaseReferences").findValue("value").asText(),
             testFieldValue);
 
-        SearchPartyValue searchPartyValue =  mapper.treeToValue(
+        SearchPartyValue searchPartyValue = mapper.treeToValue(
             searchCriteriaJsonNode.get("SearchParties").findValue("value"),
             SearchPartyValue.class);
         assertAll("Saved case data should contain SearchCriteria with SearchParty populated",
@@ -354,7 +354,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     public void shouldPopulateMultipleSearchCriteriaAndSearchPartiesPostCreateCase() throws Exception {
-        final String URL =  "/case-types/" + CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY + "/cases";
+        final String URL = "/case-types/" + CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY + "/cases";
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
@@ -405,7 +405,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases_global_search.sql"})
     public void shouldPopulateMultipleSearchCriteriaAndSearchPartiesPostCreateEvent() throws Exception {
         String caseId = "1504259907353529";
-        final String URL =  "/cases/" + caseId + "/events";
+        final String URL = "/cases/" + caseId + "/events";
 
         UserInfo userInfo = UserInfo.builder()
             .uid("TestUserId")
@@ -796,6 +796,108 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         Map<String, Map<String, Object>> requestData = mapper.readValue(jsonRequest, Map.class);
         return new SupplementaryDataUpdateRequest(requestData);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void testShouldGetLinkedCases() throws Exception {
+        final String caseId = "1504259907353529";
+        final String URL = "/getLinkedCases/" + caseId;
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+                .header(REQUEST_ID, REQUEST_ID_VALUE)
+                .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
+            .isNotNull()
+            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(200));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void testShouldGetLinkedCasesOptionalParameters() throws Exception {
+        final String caseId = "1504259907353529";
+        final String URL = "/getLinkedCases/" + caseId + "?startRecordNumber=2&?maxReturnRecordCount=1";
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+                .header(REQUEST_ID, REQUEST_ID_VALUE)
+                .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
+            .isNotNull()
+            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(200));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void testShouldGetLinkedCasesNoCaseReferenceShouldReturn400() throws Exception {
+        final String caseId = "abc";
+        final String URL = "/getLinkedCases/" + caseId;
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+                .header(REQUEST_ID, REQUEST_ID_VALUE)
+                .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
+            .isNotNull()
+            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(400));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void testShouldGetLinkedCasesReturn404WhenCaseDoesNotExist() throws Exception {
+        final String caseId = "4259907353529155";
+        final String URL = "/getLinkedCases/" + caseId;
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+                .header(REQUEST_ID, REQUEST_ID_VALUE)
+                .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
+            .isNotNull()
+            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(404));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void testShouldGetLinkedCasesStartRecordNumberNotNumericReturn400() throws Exception {
+        final String caseId = "1504259907353529";
+        final String URL = "/getLinkedCases/" + caseId + "?startRecordNumber=A";
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+                .header(REQUEST_ID, REQUEST_ID_VALUE)
+                .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
+            .isNotNull()
+            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(400));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void testShouldGetLinkedCasesMaxRecordCountNotNumericReturn400() throws Exception {
+        final String caseId = "1504259907353529";
+        final String URL = "/getLinkedCases/" + caseId + "?maxReturnRecordCount=A";
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+                .header(REQUEST_ID, REQUEST_ID_VALUE)
+                .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
+            .isNotNull()
+            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(400));
     }
 
 }
