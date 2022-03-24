@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity.NON_STANDARD_LINK;
 
 @ExtendWith(MockitoExtension.class)
 class CaseLinkServiceTest {
@@ -51,8 +52,8 @@ class CaseLinkServiceTest {
         final List<Long> linkedCaseReferences = List.of(1504259907353545L, 1504259907353552L);
 
         final List<CaseLinkEntity> caseLinkEntities = List.of(
-            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(0), CASE_TYPE_ID),
-            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(1), CASE_TYPE_ID));
+            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(0), CASE_TYPE_ID, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(1), CASE_TYPE_ID, NON_STANDARD_LINK));
 
         final List<CaseLink> caseLinksModels = createCurrentCaseLinks();
 
@@ -76,8 +77,8 @@ class CaseLinkServiceTest {
         final List<Long> linkedCaseReferences = List.of(1504259907353545L, 1504259907353552L);
 
         final List<CaseLinkEntity> caseLinkEntities = List.of(
-            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(0), CASE_TYPE_ID),
-            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(1), CASE_TYPE_ID));
+            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(0), CASE_TYPE_ID, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(1), CASE_TYPE_ID, NON_STANDARD_LINK));
 
         final List<CaseLink> caseLinksModels = createCurrentCaseLinks();
 
@@ -116,8 +117,8 @@ class CaseLinkServiceTest {
         final List<Long> linkedCaseReferences = List.of(1504259907353552L, 1504259907353594L);
 
         final List<CaseLinkEntity> caseLinkEntities = List.of(
-            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(0), CASE_TYPE_ID),
-            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(1), CASE_TYPE_ID));
+            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(0), CASE_TYPE_ID, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(1), CASE_TYPE_ID, NON_STANDARD_LINK));
 
         final List<CaseLink> caseLinksModels = createFinalCaseLinks();
 
@@ -156,9 +157,9 @@ class CaseLinkServiceTest {
         final List<Long> linkedCaseIds = List.of(2L, 3L, 4L);
         final List<Long> linkedCaseReferences = List.of(1504259907353545L, 1504259907353545L, 1504259907353545L);
         final List<CaseLinkEntity> caseLinkEntities = List.of(
-            new CaseLinkEntity(caseId, linkedCaseIds.get(0), caseTypeId),
-            new CaseLinkEntity(caseId, linkedCaseIds.get(1), caseTypeId),
-            new CaseLinkEntity(caseId, linkedCaseIds.get(2), caseTypeId));
+            new CaseLinkEntity(caseId, linkedCaseIds.get(0), caseTypeId, NON_STANDARD_LINK),
+            new CaseLinkEntity(caseId, linkedCaseIds.get(1), caseTypeId, NON_STANDARD_LINK),
+            new CaseLinkEntity(caseId, linkedCaseIds.get(2), caseTypeId, NON_STANDARD_LINK));
 
         final List<CaseLink> caseLinksModels = List.of(
             CaseLink.builder()

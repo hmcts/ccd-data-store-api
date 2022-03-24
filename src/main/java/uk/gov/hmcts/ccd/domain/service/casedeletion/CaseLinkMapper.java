@@ -29,7 +29,8 @@ public class CaseLinkMapper {
         return new CaseLinkEntity(
             caseLink.getCaseId(),
             caseLink.getLinkedCaseId(),
-            caseLink.getCaseTypeId());
+            caseLink.getCaseTypeId(),
+            CaseLinkEntity.NON_STANDARD_LINK);
     }
 }
 
