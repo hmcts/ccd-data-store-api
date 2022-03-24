@@ -1,0 +1,40 @@
+{
+  "_guid_": "S-130.2",
+  "_extends_" : "F-130_Test_Data_Base",
+
+  "specs" : [
+    "contains an error stating that the field cannot be found"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "TextField": "value1",
+        "TextField2": "value2",
+        "TextField3": "value3"
+      },
+      "event": {
+        "id": "createCase"
+      },
+      "event_token": "${[scenarioContext][childContexts][S-130.1_Get_Event_Trigger][testData][actualResponse][body][token]}",
+      "event_data": {
+        "TextField": "value1",
+        "TextField2": "value2",
+        "TextField3": "value3"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_" : "Common_404_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No field found",
+      "path": "/case-types/FT_CRUD/cases",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+
+  }
+}

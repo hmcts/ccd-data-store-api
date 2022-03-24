@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/am/role-assignments/actors/123"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "roleAssignmentResponse": []
+    }
+  }
+}

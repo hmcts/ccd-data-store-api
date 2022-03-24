@@ -1,0 +1,80 @@
+{
+  "_guid_": "S-13010.1",
+  "title": "RoleToAccessProfiles mapping for user’s derived AccessProfile contains category, case contains category value starting with defined pattern, Access is granted.",
+
+  "specs" : [
+    "an active profile in CCD",
+    "the RoleToAccessProfiles tab contains CaseAccessCategory with pattern Civil Standard, Criminal Serious",
+    "the case C1 contains an CaseAccessCategory field value as Civil Standard Legal"
+  ],
+
+  "productName": "CCD Data Store",
+  "operationName": "external get case",
+
+  "method": "GET",
+  "uri": "/cases/{cid}",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-13010.1_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Cache-Control" : "[[ANYTHING_PRESENT]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Type" : "[[ANYTHING_PRESENT]]",
+      "Date" :"[[ANYTHING_PRESENT]]",
+      "Expires" : "[[ANYTHING_PRESENT]]",
+      "Pragma" :"[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security" : "[[ANYTHING_PRESENT]]",
+      "X-Content-Type-Options" : "[[ANYTHING_PRESENT]]",
+      "X-Frame-Options" : "[[ANYTHING_PRESENT]]",
+      "X-Xss-Protection" : "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" :  "[[ANYTHING_PRESENT]]",
+      "case_type" :  "[[ANYTHING_PRESENT]]",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "state" : "CaseCreated",
+      "security_classification" : "PUBLIC",
+      "data" : {
+        "CaseAccessCategory" : "Civil/Standard/Legal",
+        "TextField" : "value1",
+        "SearchCriteria" : { }
+      },
+      "data_classification" : {
+        "CaseAccessCategory" : "PUBLIC",
+        "TextField" : "PUBLIC",
+        "SearchCriteria" : {
+          "value" : { },
+          "classification" : "PUBLIC"
+        }
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+}

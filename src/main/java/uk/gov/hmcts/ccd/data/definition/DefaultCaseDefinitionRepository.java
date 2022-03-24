@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,18 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.inject.Inject;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -36,6 +22,18 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
 @SuppressWarnings("checkstyle:SummaryJavadoc")
 // partial javadoc attributes added prior to checkstyle implementation in module
@@ -81,7 +79,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                         + jurisdictionId + " because of " + e.getMessage());
             } else {
                 throw new ServiceException("Problem getting case types for the Jurisdiction:" + jurisdictionId
-                        + " because of " + e.getMessage());
+                        + " because of " + e.getMessage(), e);
             }
         }
     }
@@ -115,7 +113,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                         + caseTypeId + " because of " + e.getMessage());
             } else {
                 throw new ServiceException(
-                        "Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage());
+                        "Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage(), e);
             }
         }
     }
@@ -134,7 +132,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                         "Problem getting base types definition from definition store because of " + e.getMessage());
             } else {
                 throw new ServiceException(
-                        "Problem getting base types definition from definition store because of " + e.getMessage());
+                        "Problem getting base types definition from definition store because of " + e.getMessage(), e);
             }
         }
     }
@@ -156,7 +154,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             } else {
                 LOG.warn("Error while retrieving classification for user role {} because of ", userRole, e);
                 throw new ServiceException("Error while retrieving classification for user role " + userRole
-                        + " because of " + e.getMessage());
+                        + " because of " + e.getMessage(), e);
             }
         }
     }
@@ -175,7 +173,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
             throw new ServiceException("Error while retrieving classification for user roles " + userRoles
-                    + " because of " + e.getMessage());
+                    + " because of " + e.getMessage(), e);
         }
     }
 
@@ -248,6 +246,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "allJurisdictionsCache")
+    @Override
+    public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore() {
+        return getJurisdictionsFromDefinitionStore(Optional.of(Collections.emptyList()));
+    }
+
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
@@ -255,15 +259,15 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 builder.queryParam("ids", String.join(",", jurisdictionIds.get()));
             }
             LOG.debug("Retrieving jurisdiction object(s) from definition store for Jurisdiction IDs: {}.",
-                    jurisdictionIds.orElse(Collections.emptyList()));
+                jurisdictionIds.orElse(Collections.emptyList()));
             HttpEntity<List<JurisdictionDefinition>> requestEntity = new HttpEntity<>(
-                    securityUtils.authorizationHeaders());
+                securityUtils.authorizationHeaders());
 
             List<JurisdictionDefinition> jurisdictionDefinitionList = restTemplate
-                    .exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity,
-                            new ParameterizedTypeReference<List<JurisdictionDefinition>>() {
-                            })
-                    .getBody();
+                .exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity,
+                    new ParameterizedTypeReference<List<JurisdictionDefinition>>() {
+                    })
+                .getBody();
             if (jurisdictionDefinitionList == null) {
                 jurisdictionDefinitionList = Collections.emptyList();
             }
@@ -272,14 +276,14 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
-                        jurisdictionIds.orElse(Collections.emptyList()));
+                    jurisdictionIds.orElse(Collections.emptyList()));
                 return new ArrayList<>();
             } else {
-                throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
+                throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage(),
+                    e);
             }
         }
     }
-
 }

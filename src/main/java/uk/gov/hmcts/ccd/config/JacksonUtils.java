@@ -84,7 +84,7 @@ public final class JacksonUtils {
 
         for (String key : mergeFrom.keySet()) {
             JsonNode value = mergeFrom.get(key);
-            if (!mergeInto.containsKey(key)) {
+            if (!mergeInto.containsKey(key) || mergeInto.get(key).isNull()) {
                 mergeInto.put(key, value);
             } else {
                 mergeInto.put(key, merge(mergeInto.get(key), value));

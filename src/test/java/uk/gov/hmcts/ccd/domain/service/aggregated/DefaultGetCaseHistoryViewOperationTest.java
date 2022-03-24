@@ -123,12 +123,12 @@ class DefaultGetCaseHistoryViewOperationTest {
         Map<String, JsonNode> dataMap = buildData("dataTestField2");
         caseDetails.setData(dataMap);
         event1.setData(dataMap);
-        doReturn(Optional.of(event1)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(Optional.of(event1)).when(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
 
         CaseHistoryView caseHistoryView = defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
 
         assertAll(
-            () -> verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
+            () -> verify(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID),
             () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(1)),
             () -> assertThat(caseHistoryView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id",
                     equalTo("dataTestField2")))),
@@ -158,7 +158,7 @@ class DefaultGetCaseHistoryViewOperationTest {
     @Test
     @DisplayName("should throw exception when no event found")
     void shouldThrowExceptionWhenNoEventFound() {
-        doReturn(Optional.empty()).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(Optional.empty()).when(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
 
         assertThrows(ResourceNotFoundException.class,
             () -> defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));

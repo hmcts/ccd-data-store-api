@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.powermock.reflect.Whitebox;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -34,6 +35,7 @@ class IdamRepositoryTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+        Whitebox.setInternalState(idamRepository, "selfInstance", idamRepository);
     }
 
     @Test
@@ -53,6 +55,21 @@ class IdamRepositoryTest {
 
         List<String> idamUserRoles = idamRepository.getUserRoles(USER_ID);
         assertThat(idamUserRoles).isSameAs(ROLES);
+    }
+
+    @Test
+    @DisplayName("Get DataStore's SystemUser access token")
+    void shouldGetDataStoreSystemUserAccessToken() {
+
+        // GIVEN
+        mockGetDataStoreSystemUserAccessToken();
+
+        // WHEN
+        String token = idamRepository.getDataStoreSystemUserAccessToken();
+
+        // THEN
+        assertThat(token).isSameAs(TEST_USER_TOKEN);
+
     }
 
     private void mockGetUserByUserId() {

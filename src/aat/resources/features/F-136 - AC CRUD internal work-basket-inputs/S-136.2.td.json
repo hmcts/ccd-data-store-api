@@ -1,0 +1,40 @@
+{
+	"_guid_": "S-136.2",
+	"_extends_": "F-136_Test_Data_Base",
+	"specs": [
+		"contains a CaseType that has a field with no R access",
+		"contains HTTP 200 Ok status code",
+    "does not contain the case field with no R CRUD access"
+	],
+
+	"request": {
+		"_extends_": "Common_Request",
+    "pathVariables": {
+      "ctid": "FT_CRUD"
+    }
+	},
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+    "body" : {
+      "workbasketInputs": [
+        {
+          "label": "Text Field",
+          "order": 1,
+          "field": {
+            "id": "TextField",
+            "elementPath": null,
+            "metadata": false,
+            "field_type": "[[ANYTHING_PRESENT]]",
+            "show_condition": null
+          },
+          "display_context_parameter": null
+        }
+      ],
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+	}
+}

@@ -5,6 +5,7 @@
 
 	"specs": [
 		"an active profile in CCD",
+		"testUser - with an active profile in CCD",
 		"does not provide the numeric case id for the operation",
 		"has the 400 return code"
 	],

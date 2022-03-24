@@ -4,6 +4,7 @@
   "operationName": "Upload a case document",
   "method": "POST",
   "uri": "{{CASE_DOCUMENT_AM_URL}}/cases/documents",
+  "s2sClientId": "xui_webapp",
   "users": {
     "invokingUser": {
       "username": "befta.caseworker.2.solicitor.2@gmail.com",

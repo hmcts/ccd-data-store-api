@@ -1,0 +1,56 @@
+{
+  "_guid_": "Befta_Global_Search_Data_Classifications",
+
+    "dateOfBirth": "PUBLIC",
+    "dateOfDeath": "PUBLIC",
+    "Email": "PUBLIC",
+    "caseManagementCategory" : "PUBLIC",
+    "Address": {
+      "classification": "PUBLIC",
+      "value": {
+        "AddressLine1": "PUBLIC"
+      }
+    },
+    "FirstName": "PUBLIC",
+    "LastName": "PUBLIC",
+    "PostCode": "PUBLIC",
+    "caseManagementLocation" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "baseLocation" : "PUBLIC",
+        "region" : "PUBLIC"
+      }
+    },
+  "caseNameHmctsInternal" : "PUBLIC",
+    "SearchCriteria" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "OtherCaseReferences" : {
+          "classification" : "PUBLIC",
+          "value" : [ {
+            "id" : "[[ANYTHING_PRESENT]]",
+            "classification" : "PUBLIC"
+          } ]
+        },
+        "SearchParties" : {
+          "classification" : "PUBLIC",
+          "value" : [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "value" : {
+                "Name" : "PUBLIC",
+                "EmailAddress" : "PUBLIC",
+                "AddressLine1" : "PUBLIC",
+                "PostCode" : "PUBLIC",
+                "DateOfBirth" : "PUBLIC",
+                "DateOfDeath" : "PUBLIC"
+              },
+              "id" : "[[ANYTHING_PRESENT]]"
+            } ]
+        }
+      }
+    }
+}

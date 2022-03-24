@@ -1,0 +1,19 @@
+{
+  "_guid_" : "S-132.2_Event5_Token_Creation",
+  "_extends_" : "F-131_Token_Creation_Base",
+
+
+  "request": {
+    "pathVariables": {
+      "etid": "moveToStateNoCAccess",
+      "caseId": "${[scenarioContext][parentContext][childContexts][F-132_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "event_id" : "moveToStateNoCAccess"
+    }
+  }
+}

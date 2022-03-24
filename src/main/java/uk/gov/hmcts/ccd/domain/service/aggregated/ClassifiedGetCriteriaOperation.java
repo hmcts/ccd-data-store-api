@@ -8,13 +8,13 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
 import java.util.List;
 import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 @Service
 @Qualifier(ClassifiedGetCriteriaOperation.QUALIFIER)
@@ -22,12 +22,12 @@ public class ClassifiedGetCriteriaOperation implements GetCriteriaOperation {
     public static final String QUALIFIER = "classified";
     private final GetCriteriaOperation getCriteriaOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
-    private final SecurityClassificationService classificationService;
+    private final SecurityClassificationServiceImpl classificationService;
 
     public ClassifiedGetCriteriaOperation(
         @Qualifier(DefaultGetCriteriaOperation.QUALIFIER) final GetCriteriaOperation getCriteriaOperation,
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-        SecurityClassificationService classificationService) {
+        SecurityClassificationServiceImpl classificationService) {
         this.getCriteriaOperation = getCriteriaOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.classificationService = classificationService;

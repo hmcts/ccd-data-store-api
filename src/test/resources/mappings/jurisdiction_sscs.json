@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/data/jurisdictions?ids=SSCS"
+    "url": "/api/data/jurisdictions?ids=sscs"
   },
   "response": {
     "status": 200,

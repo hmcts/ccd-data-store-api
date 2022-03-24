@@ -56,6 +56,7 @@
         "MoneyField" : "008",
         "MarritalStatus" : null,
         "NumberField" : null,
+        "SearchCriteria" : { },
         "MultiSelectField" : [ ],
         "YesNoField" : null,
         "EmailField" : null,
@@ -109,6 +110,10 @@
         "MoneyField" : "PUBLIC",
         "MarritalStatus" : "PUBLIC",
         "NumberField" : "PUBLIC",
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        },
         "MultiSelectField" : "PUBLIC",
         "YesNoField" : "PUBLIC",
         "EmailField" : "PUBLIC",
@@ -186,6 +191,10 @@
         "MoneyField" : "PUBLIC",
         "MarritalStatus" : "PUBLIC",
         "NumberField" : "PUBLIC",
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        },
         "MultiSelectField" : "PUBLIC",
         "YesNoField" : "PUBLIC",
         "EmailField" : "PUBLIC",

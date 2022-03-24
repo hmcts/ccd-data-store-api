@@ -12,6 +12,7 @@
       "fields": [
         {
           "metadata": false,
+          "case_type_id": "AAT",
           "case_field_id": "TextField",
           "case_field_element_path": null,
           "label": "`Text` field",
@@ -22,6 +23,7 @@
         },
         {
           "metadata": false,
+          "case_type_id": "AAT",
           "case_field_id": "EmailField",
           "case_field_element_path": null,
           "label": "`Email` field",
@@ -32,6 +34,7 @@
         },
         {
           "metadata": false,
+          "case_type_id": "AAT",
           "case_field_id": "FixedListField",
           "case_field_element_path": null,
           "label": "Fixed List",
@@ -42,6 +45,7 @@
         },
         {
           "metadata": false,
+          "case_type_id": "AAT",
           "case_field_id": "CollectionField",
           "case_field_element_path": null,
           "label": "`Collection` field",
@@ -52,6 +56,7 @@
         },
         {
           "metadata": false,
+          "case_type_id": "AAT",
           "case_field_id": "ComplexField",
           "case_field_element_path": null,
           "label": "`Complex` field",
@@ -62,6 +67,7 @@
         },
         {
           "metadata": false,
+          "case_type_id": "AAT",
           "case_field_id": "ComplexField",
           "case_field_element_path": "ComplexTextField",
           "label": "`Complex Nested` field",
@@ -75,6 +81,7 @@
         },
         {
           "metadata": true,
+          "case_type_id": "AAT",
           "case_field_id": "[STATE]",
           "case_field_element_path": null,
           "label": "State",
@@ -85,6 +92,7 @@
         },
         {
           "metadata": true,
+          "case_type_id": "AAT",
           "case_field_id": "[CREATED_DATE]",
           "case_field_element_path": null,
           "label": "Created Date",
@@ -95,6 +103,7 @@
         },
         {
           "metadata": false,
+          "case_type_id": "AAT",
           "case_field_id": "DateField",
           "case_field_element_path": null,
           "label": "`Date` field",
@@ -105,6 +114,7 @@
         },
         {
           "metadata": false,
+          "case_type_id": "AAT",
           "case_field_id": "DateTimeField",
           "case_field_element_path": null,
           "label": "`DateTime` field",

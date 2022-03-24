@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -77,7 +76,6 @@ public class CaseController {
         this.requestValidator = requestValidator;
     }
 
-    @Transactional
     @GetMapping(
         path = "/cases/{caseId}",
         headers = {
@@ -119,7 +117,6 @@ public class CaseController {
         return ResponseEntity.ok(new CaseResource(caseDetails));
     }
 
-    @Transactional
     @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping(
         path = "/cases/{caseId}/events",
@@ -232,7 +229,6 @@ public class CaseController {
         return createCaseEvent(caseId, content);
     }
 
-    @Transactional
     @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping(
         path = "/case-types/{caseTypeId}/cases",
@@ -315,7 +311,6 @@ public class CaseController {
         return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
     }
 
-    @Transactional
     @GetMapping(
         path = "/cases/{caseId}/events",
         headers = {
@@ -363,7 +358,6 @@ public class CaseController {
     }
 
 
-    @Transactional
     @PostMapping(
         path = "/cases/{caseId}/supplementary-data"
     )

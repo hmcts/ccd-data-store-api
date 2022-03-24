@@ -7,8 +7,14 @@
 	"method": "GET",
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/ids",
 
-	"user": {
-		"_extends_": "Common_User_For_Request"
+	"users": {
+		"invokingUser": {
+			"_extends_": "Common_User_For_Request"
+		},
+		"testUser": {
+			"_extends_": "PrivateCaseworker"
+		}
+
 	},
 
 	"request": {
@@ -19,7 +25,7 @@
 			"ctid": "AAT"
 		},
 		"queryParams": {
-			"userId": "${[scenarioContext][theInvokingUser][id]}"
+			"userId": "${[scenarioContext][testData][users][testUser][id]}"
 		}
 	},
 

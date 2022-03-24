@@ -1,0 +1,83 @@
+{
+  "title": "Successfully searches across different Case Types",
+  "_guid_": "S-1005.9",
+  "_extends_": "F-1005_SearchCaseBase",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains two different Case Types",
+    "contains all the mandatory parameters",
+    "has 200 return code",
+    "contains both cases"
+  ],
+
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "CCDCaseTypeIds": [
+          "FT_GlobalSearch",
+          "FT_MasterCaseType"
+        ],
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+          "${[scenarioContext][childContexts][F-1005_CreateCaseMasterCaseType][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 2,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "caseReference"
+        },
+        {
+          "stateId": "CaseCreated",
+          "processForAccess" : "NONE",
+          "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+          "otherReferences": [
+            "FirstNameValue"
+          ],
+          "caseNameHmctsInternal": "Name Internal",
+          "baseLocationId": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][building_location_id]}",
+          "baseLocationName": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][building_location_name]}",
+          "caseManagementCategoryId": "987",
+          "caseManagementCategoryName": "Category label",
+          "regionId": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][region_id]}",
+          "regionName": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][region]}",
+          "CCDJurisdictionId": "BEFTA_MASTER",
+          "CCDJurisdictionName": "BEFTA Master",
+          "HMCTSServiceId" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}",
+          "HMCTSServiceShortDescription" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_short_description]}",
+          "CCDCaseTypeId": "FT_GlobalSearch",
+          "CCDCaseTypeName": "FT_GlobalSearch"
+        },
+        {
+          "stateId": "CaseCreated",
+          "processForAccess" : "NONE",
+          "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCaseMasterCaseType][testData][actualResponse][body][id]}",
+          "otherReferences" : [ ],
+          "baseLocationId": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][building_location_id]}",
+          "baseLocationName": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][building_location_name]}",
+          "regionId": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][region_id]}",
+          "regionName": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][region]}",
+          "CCDJurisdictionId" : "BEFTA_MASTER",
+          "CCDJurisdictionName" : "BEFTA Master",
+          "HMCTSServiceId" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}",
+          "HMCTSServiceShortDescription" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_short_description]}",
+          "CCDCaseTypeId" : "FT_MasterCaseType",
+          "CCDCaseTypeName" : "FT-All Field Data Types"
+        }
+      ]
+    }
+  }
+}
+

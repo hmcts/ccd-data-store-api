@@ -1,0 +1,54 @@
+{
+  "_guid_": "S-130.7",
+  "_extends_" : "F-130_Test_Data_Base",
+
+  "specs" : [
+    "contains an null values for case details"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_CRUD_2"
+    },
+    "body": {
+      "data":
+      {
+        "TextField": "value1"
+      },
+      "event": {
+        "id": "createCase"
+      },
+      "event_token": "${[scenarioContext][childContexts][S-130.1_Get_Event_Trigger][testData][actualResponse][body][token]}",
+      "event_data": {
+        "TextField": "value1"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 201,
+    "body" : {
+      "_links" : {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]",
+          "templated" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id" : null,
+      "jurisdiction" : null,
+      "case_type" : null,
+      "created_on" : null,
+      "last_modified_on" : null,
+      "last_state_modified_on" : null,
+      "state" : null,
+      "security_classification" : null,
+      "data" : null,
+      "data_classification" : null,
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+}
