@@ -61,16 +61,11 @@
       "security_classification" : "PUBLIC",
       "data" : {
         "CaseAccessCategory" : "FamilyLaw/Standard",
-        "TextField" : "value1",
-        "SearchCriteria" : { }
+        "TextField" : "value1"
       },
       "data_classification" : {
         "CaseAccessCategory" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "SearchCriteria" : {
-          "value" : { },
-          "classification" : "PUBLIC"
-        }
+        "TextField" : "PUBLIC"
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,

@@ -66,16 +66,11 @@
       "security_classification": "PUBLIC",
       "data": {
         "TextField": "value1",
-        "CaseAccessCategory": null,
-        "SearchCriteria" : { }
+        "CaseAccessCategory": null
       },
       "data_classification": {
         "TextField": "PUBLIC",
-        "CaseAccessCategory": "PUBLIC",
-        "SearchCriteria" : {
-          "classification" : "PUBLIC",
-          "value" : { }
-        }
+        "CaseAccessCategory": "PUBLIC"
       },
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
