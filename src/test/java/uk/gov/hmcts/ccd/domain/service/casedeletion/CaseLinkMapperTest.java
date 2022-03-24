@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity.NON_STANDARD_LINK;
 
 
 class CaseLinkMapperTest {
@@ -30,7 +31,7 @@ class CaseLinkMapperTest {
             .linkedCaseId(LINKED_CASE_ID)
             .caseTypeId(CASE_TYPE_ID)
             .build();
-        caseLinkEntity = new CaseLinkEntity(CASE_ID, LINKED_CASE_ID, CASE_TYPE_ID);
+        caseLinkEntity = new CaseLinkEntity(CASE_ID, LINKED_CASE_ID, CASE_TYPE_ID, NON_STANDARD_LINK);
         caseLinkMapper = new CaseLinkMapper();
     }
 
@@ -62,9 +63,9 @@ class CaseLinkMapperTest {
     @Test
     void testEntitiesToModel() {
 
-        List<CaseLinkEntity> caseLinkEntities = List.of(new CaseLinkEntity(10L, 20L, CASE_TYPE_ID),
-                                                        new CaseLinkEntity(15L, 25L, CASE_TYPE_ID),
-                                                        new CaseLinkEntity(20L, 30L, CASE_TYPE_ID));
+        List<CaseLinkEntity> caseLinkEntities = List.of(new CaseLinkEntity(10L, 20L, CASE_TYPE_ID, NON_STANDARD_LINK),
+                                                        new CaseLinkEntity(15L, 25L, CASE_TYPE_ID, NON_STANDARD_LINK),
+                                                        new CaseLinkEntity(20L, 30L, CASE_TYPE_ID, NON_STANDARD_LINK));
 
         List<CaseLink> expectedCaseLinkModels = List.of(CaseLink.builder()
                                                             .caseId(10L)
