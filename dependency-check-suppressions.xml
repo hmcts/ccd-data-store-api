@@ -69,4 +69,20 @@
 		<vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
 	</suppress>
 
+	<suppress until="2022-04-25">
+		<notes>
+			CVE affecting hazelcast-spring-4.0.3.jar and hazelcast-4.0.3.jar
+		</notes>
+		<cve>CVE-2022-0265</cve>
+	</suppress>
+
+	<suppress until="2022-04-25">
+		<notes><![CDATA[
+   file name: jackson-databind-2.11.4.jar
+   ]]></notes>
+		<packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+		<cve>CVE-2020-36518</cve>
+	</suppress>
+
+
 </suppressions>
