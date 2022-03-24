@@ -157,11 +157,11 @@ public class DocumentValidator implements BaseTypeValidator {
         final List<Category> categoryList =
             caseDefinitionRepository.getCaseType(caseFieldDefinition.getCaseTypeId()).getCategories();
         String categoryIdValue = categoryId.textValue();
-        final boolean caseTypeContainsCategoryId = categoryList.stream()
+        final boolean caseTypeContainsKnownCategoryId = categoryList.stream()
             .anyMatch(category ->
                 category.getCategoryId().contains(categoryIdValue));
 
-        if (!caseTypeContainsCategoryId) {
+        if (!caseTypeContainsKnownCategoryId) {
             LOG.error("{} value not recognised as a valid Case Category", CATEGORY_ID);
             return Collections.singletonList(new ValidationResult(
                 CATEGORY_ID + " value not found", dataFieldId));
