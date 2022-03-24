@@ -65,7 +65,10 @@
       "data_classification" : {
         "CaseAccessCategory" : "PUBLIC",
         "TextField" : "PUBLIC",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        "SearchCriteria" : {
+          "value" : { },
+          "classification" : "PUBLIC"
+        }
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,
