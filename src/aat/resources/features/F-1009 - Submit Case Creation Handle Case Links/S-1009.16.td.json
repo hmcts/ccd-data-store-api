@@ -1,0 +1,29 @@
+{
+  "_guid_": "S-1009.16",
+
+  "title": "test",
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1009_GetCreateToken"
+  }
+  ],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains some invalid case data",
+    "contains collection of correctly configured CaseLink collection field with Case Reference values"
+  ],
+
+  "request": {
+    "body": {
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  }
+}
