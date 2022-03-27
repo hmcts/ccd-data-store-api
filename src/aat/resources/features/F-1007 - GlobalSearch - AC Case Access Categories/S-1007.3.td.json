@@ -1,0 +1,36 @@
+{
+  "title": "Unsuccessful search, Case contains NO category value but RolesToAccessProfiles contains CaseAccessCategories, case should NOT be returned when Global Search invoked for cases",
+  "_guid_": "S-1007.3",
+  "_extends_": "F-1007_SearchCaseBase",
+  "specs": [
+    "an active profile in CCD",
+    "the RoleToAccessProfiles tab contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious",
+    "the case C1 contains an CaseAccessCategory field value as NULL",
+    "contains all the mandatory parameters",
+    "has 200 return code",
+    "returns 0 cases"
+  ],
+
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "caseReferences": [
+          "${[scenarioContext][childContexts][S-1007.3_CreateCase][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "resultInfo" : {
+        "casesReturned" : 0,
+        "caseStartRecord" : 1,
+        "moreResultsToGo" : false
+      },
+      "results" : [ ]
+    }
+  }
+}
+
