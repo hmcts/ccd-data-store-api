@@ -1,0 +1,20 @@
+{
+  "_guid_": "S-1007.1_CreateCase",
+  "_extends_" : "F-1007_CreateCaseBase",
+
+  "request": {
+    "body": {
+      "data": {
+        "CaseAccessCategory": "Civil/Standard/Legal"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "data": {
+        "CaseAccessCategory": "Civil/Standard/Legal"
+      }
+    }
+  }
+}
