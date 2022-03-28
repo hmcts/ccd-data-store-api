@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
@@ -14,6 +15,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
@@ -27,10 +29,14 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.config.JacksonObjectMapperConfig;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
+import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
+import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
@@ -40,7 +46,10 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
 import javax.inject.Inject;
+import java.rmi.server.UID;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +85,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink.builder;
+import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
@@ -96,6 +107,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String CASE_TYPE_NO_UPDATE_FIELD_ACCESS = "TestAddressBookCaseNoUpdateFieldAccess";
     private static final String CASE_TYPE_NO_READ_FIELD_ACCESS = "TestAddressBookCaseNoReadFieldAccess";
     private static final String CASE_TYPE_NO_READ_CASE_TYPE_ACCESS = "TestAddressBookCaseNoReadCaseTypeAccess";
+    private static final String CASE_TYPE_TTL = "TestAddressBookCaseTTL";
+    private static final String CASE_TYPE_CASELINK = "TestAddressBookCaseCaseLinks";
     private static final String CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY
         = "MultipleSearchCriteriaAndSearchParties";
     private static final String JURISDICTION = "PROBATE";
@@ -124,7 +137,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private static final String MID_EVENT_CALL_BACK = "/event-callback/mid-event";
     private static final String MID_EVENT_CALL_BACK_MULTI_PAGE = "/event-callback/multi-page-mid-event";
-
+    public static final int EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED = 5;
+    public static final int EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED = 6;
     @Inject
     private WebApplicationContext wac;
     private MockMvc mockMvc;
@@ -146,6 +160,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
+        wireMockServer.resetAll();
     }
 
     @Test
@@ -176,6 +191,87 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         // we should still have one case in DB
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidDataForCaseworker()
+        throws Exception {
+        shouldReturn201WithTTLWhenPostCreateCaseEventWithValidData("caseworkers");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidDataForCitizen()
+        throws Exception {
+        shouldReturn201WithTTLWhenPostCreateCaseEventWithValidData("citizens");
+    }
+
+    private void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidData(String userRole)
+        throws Exception {
+        final String urlPortionForCaseType = "bookcase-definition-ttl.json";
+        final String caseReference = "9816494993793181";
+        final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + urlPortionForCaseType + "/cases/" + caseReference + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        final String token = generateEventToken(template, UID, JURISDICTION, urlPortionForCaseType, caseReference,
+            TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+        final JsonNode DATA = mapper.readTree("{"
+            + "\"PersonAddress\":{"
+            + "\"Country\":\"_ Wales\","
+            + "\"Postcode\":\"_ WB11DDF\","
+            + "\"AddressLine1\":\"_ Flat 9\","
+            + "\"AddressLine2\":\"_ 2 Hubble Avenue\","
+            + "\"AddressLine3\":\"_ ButtonVillie\"},"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"TTL\":{"
+            + "\"Suspended\":\"No\","
+            + "\"SystemTTL\":\"2021-09-30\","
+            + "\"OverrideTTL\":\"2021-08-30\"}}");
+        caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
+
+        final MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        assertEquals("Incorrect Response Content",
+            DATA.toString(),
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.stream()
+            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(savedCaseDetails);
+        assertEquals("Incorrect Case Type", CASE_TYPE_TTL, savedCaseDetails.getCaseTypeId());
+        assertEquals(
+            "Incorrect Data content: Data should have changed",
+            caseDetailsToSave.getData(),
+            savedCaseDetails.getData());
+        assertEquals("State should have been updated", "state3", savedCaseDetails.getState());
+
+        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("A new event should have been created",
+            EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
+
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        assertEquals("123", caseAuditEvent.getUserId());
+        assertEquals("Strife", caseAuditEvent.getUserLastName());
+        assertEquals("Cloud", caseAuditEvent.getUserFirstName());
+        assertEquals("TEST EVENT NAME", caseAuditEvent.getEventName());
+        assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
+        assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
+        assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue());
+        assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
     }
 
     @Test
@@ -1825,10 +1921,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created", EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -1934,10 +2031,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created", EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2121,13 +2219,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should have been updated", "state3", savedCaseDetails.getState());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created",
+            EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED, caseAuditEventList.size());
 
         final List<MessageQueueCandidate> messageQueueList =
             template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
         assertEquals("Incorrect number of rows in messageQueue", 0, messageQueueList.size());
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2192,10 +2291,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should have been updated", "state3", savedCaseDetails.getState());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created",
+            EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2260,10 +2361,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should have been updated", "CaseCreated", savedCaseDetails.getState());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created",
+            EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2329,10 +2432,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should have been updated", "CaseCreated", savedCaseDetails.getState());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created",
+            EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2455,7 +2560,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(5, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2491,7 +2596,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(5, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2527,7 +2632,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(5, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2573,7 +2678,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(5, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2622,7 +2727,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2659,7 +2764,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2696,7 +2801,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2733,7 +2838,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2769,7 +2874,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2805,7 +2910,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2839,7 +2944,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2873,7 +2978,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2909,7 +3014,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -2934,7 +3039,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -2960,7 +3065,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -2986,7 +3091,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3037,7 +3142,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should NOT have been updated", "CaseCreated", savedCaseDetails.getState());
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3088,7 +3193,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should NOT have been updated", "CaseCreated", savedCaseDetails.getState());
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3116,7 +3221,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3144,7 +3249,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3173,7 +3278,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3202,7 +3307,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3246,6 +3351,20 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCitizen()
         throws Exception {
         shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccess("citizens");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn200WithCaseDataWithTTLWhenGetTokenForStartEventForCaseworker()
+        throws Exception {
+        shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent("caseworkers");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn200WithCaseDataWithTTLWhenGetTokenForStartEventForCitizen()
+        throws Exception {
+        shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent("citizens");
     }
 
     private void shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccess(String userRole)
@@ -3633,6 +3752,210 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         );
     }
 
+    private void shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent(String userRole)
+        throws Exception {
+        final String reference = "9816494993793181";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" +
+            CASE_TYPE_TTL + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
+
+        stubFor(WireMock.post(urlMatching("/callback_about_to_start_ttl"))
+            .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        StartEventResult actualStartEventResult = new JacksonObjectMapperConfig().defaultObjectMapper()
+            .readValue(mvcResult.getResponse().getContentAsString(), StartEventResult.class);
+        CaseDetails caseDetails = actualStartEventResult.getCaseDetails();
+        String expectedSystemTTL = LocalDate.now().plusDays(20).toString();
+        assertAll(
+            () -> assertThat(caseDetails.getData().get(TTL_CASE_FIELD_ID).get("SystemTTL").textValue(),
+                is(expectedSystemTTL))
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn201AndInsertCaseLinksWhenCreateCaseEvent()
+        throws Exception {
+        final String reference = CASE_22_REFERENCE;
+        final String URL = "/caseworkers/0/jurisdictions/"
+            + JURISDICTION
+            + "/case-types/TestAddressBookCaseCaseLinks/cases/"
+            + reference
+            + "/events";
+
+        stubFor(WireMock.post(urlMatching("/callback_about_to_start_caselink"))
+            .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE, reference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final JsonNode data = mapper.readTree(
+            "{"
+                + "\"CaseLink1\": {"
+                + "     \"CaseReference\": \"" + CASE_01_REFERENCE + "\""
+                + "},"
+                + "\"CaseLink2\": {"
+                + "     \"CaseReference\": \"" + CASE_02_REFERENCE + "\""
+                + "}"
+            + "}");
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+
+        mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave)))
+            .andExpect(status().is(201))
+            .andReturn();
+
+        Long expectedCaseId = CASE_22_ID;
+        String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
+
+        List<CaseLink> expectedCaseLinks = List.of(
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_01_ID)
+                .caseTypeId(expectedCaseTypeId)
+                .build(),
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_02_ID)
+                .caseTypeId(expectedCaseTypeId)
+                .build(),
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_03_ID) // NB: previously added in "classpath:sql/insert_cases.sql"
+                .caseTypeId(expectedCaseTypeId)
+                .build()
+        );
+
+        assertCaseLinks(expectedCaseId, expectedCaseLinks);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn201AndDeleteCaseLinksWhenCreateCaseEvent()
+        throws Exception {
+        final String reference = CASE_22_REFERENCE;
+        final String URL = "/caseworkers/0/jurisdictions/"
+            + JURISDICTION
+            + "/case-types/TestAddressBookCaseCaseLinks/cases/"
+            + reference
+            + "/events";
+
+        final String callbackData =
+              " {\"data\": {"
+            + "     \"CaseLink1\": {"
+            + "         \"CaseReference\": \"" + CASE_01_REFERENCE + "\""
+            + "     }"
+            + " }"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback_about_to_start_caselink"))
+            .willReturn(okJson(callbackData).withStatus(201)));
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE, reference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave)))
+            .andExpect(status().is(201))
+            .andReturn();
+
+        Long expectedCaseId = CASE_22_ID;
+        String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
+
+        List<CaseLink> expectedCaseLinks = List.of(
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_01_ID)
+                .caseTypeId(expectedCaseTypeId)
+                .build()
+        ); // NB: missing linkedCaseId = CASE_03_ID which is previously added in "classpath:sql/insert_cases.sql"
+
+        List<CaseLink> caseLinks = template.query(
+            String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
+            new BeanPropertyRowMapper<>(CaseLink.class));
+
+        // confirm add of new case link
+        assertTrue(caseLinks.containsAll(expectedCaseLinks));
+        // confirm deletion of old case link (i,e. check size is only 1)
+        assertEquals(1, caseLinks.size()); // no extra cases links so confirmed delete of CASE_03_ID link
+    }
+
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldErrorIfTriggerStartForCaseDetectsAboutToCallStartCallbackHasModifiedTTL() throws Exception {
+        final String reference = "9816494993793181";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
+            CASE_TYPE_TTL + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
+
+        final ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
+
+        TTL timeToLive = TTL.builder()
+            .systemTTL(LocalDate.now())
+            .build();
+
+        Map<String, JsonNode> ttl = new HashMap<>();
+        ttl.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
+
+        Map<String, JsonNode> caseData = new HashMap<>();
+        caseData.put("data", objectMapper.valueToTree(ttl));
+
+        stubFor(WireMock.post(urlMatching("/callback_about_to_start_ttl"))
+            .willReturn(okJson(objectMapper.writeValueAsString(caseData))
+                .withStatus(200)));
+
+        mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
+            .andExpect(status().is(400))
+            .andReturn();
+
+        verifyWireMock(1, postRequestedFor(urlMatching("/callback_about_to_start_ttl")));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn200WhenTriggerStartForCaseDetectsAboutToCallStartCallbackHasNotModifiedTTL()
+        throws Exception {
+
+        final ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
+        final String reference = "9816494993793181";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
+            CASE_TYPE_TTL + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
+
+        TTL timeToLive = TTL.builder()
+            .systemTTL(LocalDate.now().plusDays(20))
+            .overrideTTL(LocalDate.of(2021,8,30))
+            .suspended("No").build();
+
+        Map<String, JsonNode> ttl = new HashMap<>();
+        ttl.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
+
+        Map<String, JsonNode> caseData = new HashMap<>();
+        caseData.put("data", objectMapper.valueToTree(ttl));
+
+        stubFor(WireMock.post(urlMatching("/callback_about_to_start_ttl"))
+            .willReturn(okJson(objectMapper.writeValueAsString(caseData))
+                .withStatus(200)));
+
+        mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        verifyWireMock(1, postRequestedFor(urlMatching("/callback_about_to_start_ttl")));
+
+    }
+
     private void shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccess(String userRole)
         throws Exception {
         final String reference = "1504259907353628";
@@ -3872,10 +4195,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created", 6, caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -3972,6 +4295,35 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .build();
 
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(200)).andReturn();
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + exampleData() + "}");
+        final String expectedResponseString = mapper.writeValueAsString(expectedResponse);
+        assertEquals("Incorrect Response Content",
+            expectedResponseString,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    @Test
+    public void shouldReturnWhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
+        final JsonNode DATA = mapper.readTree(exampleData());
+
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(SHORT_COMMENT)
+                .withDescription(LONG_COMMENT)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
+            .withData(JacksonUtils.convertValue(DATA))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE + "/validate?pageId=createCaseInfoPage";
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(caseDetailsToValidate))
@@ -4871,6 +5223,59 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    public void shouldReturn400WhenPostValidateCaseDetailsMidEventCallbackChangesDataForCaseworker() throws Exception {
+
+        final JsonNode data = mapper.readTree(exampleCaseData());
+        final JsonNode eventData = mapper.readTree(exampleEventDataTTL());
+
+        String callbackMideventURL = "/event-callback/mid-eventttl";
+
+        WizardPageCollection wizardPageCollection = createWizardPageCollection(callbackMideventURL);
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+            .willReturn(okJson(mapper.writeValueAsString(wizardPageCollection)).withStatus(200)));
+
+        TTL timeToLive = TTL.builder()
+            .suspended("No")
+            .systemTTL(LocalDate.now())
+            .overrideTTL(LocalDate.now())
+            .build();
+
+        Map<String, JsonNode> ttl = new HashMap<>();
+        ttl.put(TTL_CASE_FIELD_ID, mapper.valueToTree(timeToLive));
+
+        Map<String, JsonNode> caseData = new HashMap<>();
+        caseData.put("data", mapper.valueToTree(ttl));
+
+        stubFor(WireMock.post(urlMatching(callbackMideventURL))
+            .willReturn(okJson(mapper.writeValueAsString(caseData))
+                .withStatus(200)));
+
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(summary)
+                .withDescription(description)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_VALIDATE
+            + "/validate?pageId=createCaseInfoPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(400)).andReturn();
+
+        assertEquals("Time to live content has been modified by callback",
+            mvcResult.getResolvedException().getMessage());
+    }
+
+    @Test
     public void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
         final JsonNode data = mapper.readTree(secondPageData());
         final JsonNode eventData = mapper.readTree(exampleEventDataMultiPages());
@@ -4920,6 +5325,164 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Response Content",
             expectedResponseValue,
             mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_case_links.sql"})
+    public void shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidDataForCaseworker()
+        throws Exception {
+
+        shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidData("caseworkers");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_case_links.sql"})
+    public void shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidDataForCitizen()
+        throws Exception {
+
+        shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidData("citizens");
+    }
+
+    private void shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidData(String userRole)
+        throws Exception {
+        final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_CASELINK + "/cases";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+
+        caseDetailsToSave.setToken(token);
+
+        final JsonNode data = mapper.readTree(
+            "{"
+            + "\"CaseLink1\": {"
+            + "     \"CaseReference\": \"1504259907353537\""
+            + "},"
+            + "\"CaseLink2\": {"
+            + "     \"CaseReference\": \"1504259907353545\""
+            + "}"
+            + "}");
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+
+        final MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        assertEquals("Incorrect Response Content",
+            data.toString(),
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: case with case links should be created", 4, caseDetailsList.size());
+
+        Long expectedCaseId = 1L;
+
+        List<CaseLink> expectedCaseLinks = List.of(
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(999L)
+                .caseTypeId(CASE_TYPE_CASELINK)
+                .build(),
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(998L)
+                .caseTypeId(CASE_TYPE_CASELINK)
+                .build()
+        );
+
+        assertCaseLinks(expectedCaseId, expectedCaseLinks);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_case_links.sql"})
+    public void shouldReturn422BadRequestWhenCaseLinksSpecifiedDoesNotExist()
+        throws Exception {
+        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_CASELINK + "/cases";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        caseDetailsToSave.setToken(token);
+
+        final JsonNode data = mapper.readTree(
+            " {"
+            + "    \"CaseLink1\": {"
+            + "        \"CaseReference\": \"3257164579659325\""
+            + "    }"
+            + "}");
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+
+        final MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(422))
+            .andReturn();
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", 3, caseDetailsList.size());
+
+        Long expectedCaseId = 1L;
+
+        List<CaseLink> expectedCaseLinks = List.of(
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(999L)
+                .caseTypeId(CASE_TYPE_CASELINK)
+                .build(),
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(998L)
+                .caseTypeId(CASE_TYPE_CASELINK)
+                .build()
+        );
+
+        assertCaseLinks(expectedCaseId, expectedCaseLinks);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_case_links.sql"})
+    public void shouldReturn201CaseCreatedButNotInsertCaseLinkInDBWhenCaseLinkIsBLank()
+        throws Exception {
+        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_CASELINK + "/cases";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        caseDetailsToSave.setToken(token);
+
+        final JsonNode data = mapper.readTree(
+            " {"
+                + "    \"CaseLink1\": {"
+                + "    }"
+                + "}");
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+
+        final MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", 4, caseDetailsList.size());
+
+        Long expectedCaseId = 1L;
+
+        assertCaseLinks(expectedCaseId, Collections.emptyList());
+    }
+
+    private void assertCaseLinks(Long expectedCaseId, List<CaseLink> expectedCaseLinks) {
+        List<CaseLink> caseLinks = template.query(
+            String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
+            new BeanPropertyRowMapper<>(CaseLink.class));
+
+        assertTrue(expectedCaseLinks.containsAll(caseLinks));
     }
 
     private String requestBodyJsonMultiPage() {
@@ -5065,6 +5628,23 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
             + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
+    }
+
+    private String exampleEventDataTTL() {
+        return "{"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"CaseNumber\":\"_ 1234567\","
+            + "\"TelephoneNumber\":\"_ 07865645667\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "},"
+            + "\"TTL\":{"
+            + "\"Suspended\": \"No\","
+            + "\"OverrideTTL\": \"2020-10-12\","
+            + "\"SystemTTL\": \"2020-10-12\""
             + "}"
             + "}";
     }

@@ -19,7 +19,8 @@ def branchesToSync = ['demo', 'ithc', 'perftest']
 
 // Variables to switch pipeline logic and wiring per type of build
 
-def definitionStoreDevelopPr = "PR-575"  // This doesn't change frequently, but when it does, only change this value.
+// TODO: remove TEMPORARY OVERRIDE FOR CR&D, reinstate: def definitionStoreDevelopPr = "PR-575"
+def definitionStoreDevelopPr = "PR-1089"  // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
 def prsToUseAat              = "PR-1793" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
@@ -95,7 +96,10 @@ env.RD_LOCATION_REF_API_BASE_URL = "http://rd-location-ref-api-aat.service.core-
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.ELASTIC_SEARCH_FTA_ENABLED = "false"
-env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
+env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
+env.PACT_BROKER_PORT = "443"
+env.PACT_BROKER_SCHEME = "https"
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
@@ -163,5 +167,9 @@ withPipeline(type, product, component) {
 
     after('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
+    }
+
+    after('pact-provider-verification') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
 }

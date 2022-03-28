@@ -14,6 +14,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkExtractor;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -55,11 +57,13 @@ public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation 
                                            GlobalSearchProcessorService globalSearchProcessorService,
                                            @Qualifier("default")
                                                SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
-                                           SupplementaryDataUpdateRequestValidator supplementaryDataValidator) {
+                                           SupplementaryDataUpdateRequestValidator supplementaryDataValidator,
+                                           CaseLinkService caseLinkService,
+                                           CaseLinkExtractor caseLinkExtractor) {
         super(userRepository, caseDefinitionRepository, eventTriggerService, eventTokenService, caseDataService,
             submitCaseTransaction, caseSanitiser, caseTypeService, callbackInvoker, validateCaseFieldsOperation,
             casePostStateService, draftGateway, caseDataIssueLogger, globalSearchProcessorService,
-            supplementaryDataUpdateOperation, supplementaryDataValidator);
+            supplementaryDataUpdateOperation, supplementaryDataValidator, caseLinkService, caseLinkExtractor);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
     }
 

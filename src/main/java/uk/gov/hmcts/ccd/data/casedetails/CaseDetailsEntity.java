@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.data.JsonDataConverter;
+
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -14,7 +15,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import uk.gov.hmcts.ccd.data.JsonDataConverter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @SuppressWarnings("checkstyle:OperatorWrap")
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
@@ -77,6 +79,9 @@ public class CaseDetailsEntity {
     public static final String DATA_COL = "data";
     public static final String DATA_CLASSIFICATION_COL = "data_classification";
     public static final String SUPPLEMENTARY_DATA_COL = "supplementary_data";
+    public static final String RESOLVED_TTL_COL = "resolved_ttl";
+
+
     public static final String LOCATION = "data.caseManagementLocation.baseLocation";
     public static final String REGION = "data.caseManagementLocation.region";
     public static final String CASE_ACCESS_CATEGORY = "data.CaseAccessCategory";
@@ -112,6 +117,8 @@ public class CaseDetailsEntity {
     @Column(name = SUPPLEMENTARY_DATA_COL)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode supplementaryData;
+    @Column(name = RESOLVED_TTL_COL)
+    private LocalDate resolvedTTL;
 
     @Version
     private Integer version;
@@ -172,6 +179,10 @@ public class CaseDetailsEntity {
         this.state = state;
     }
 
+    public void setResolvedTTL(LocalDate resolvedTTL) {
+        this.resolvedTTL = resolvedTTL;
+    }
+
     public SecurityClassification getSecurityClassification() {
         return securityClassification;
     }
@@ -218,5 +229,9 @@ public class CaseDetailsEntity {
 
     public void setLastStateModifiedDate(LocalDateTime lastStateModifiedDate) {
         this.lastStateModifiedDate = lastStateModifiedDate;
+    }
+
+    public LocalDate getResolvedTTL() {
+        return resolvedTTL;
     }
 }

@@ -2,17 +2,6 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Maps;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequestEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +28,19 @@ import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataServ
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequestEvent;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -75,6 +77,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final Long REFERENCE = 1504259907353529L;
     private static final Long WRONG_REFERENCE = 9999999999999999L;
+    private static final LocalDate RESOLVED_TTL = LocalDate.now();
 
     private JdbcTemplate template;
     private MockHttpServletRequest request;
@@ -126,6 +129,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         caseDetails.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
         caseDetails.setState("CaseCreated");
         caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
+        caseDetails.setResolvedTTL(RESOLVED_TTL);
         try {
             caseDetails.setData(JacksonUtils.convertValue(
                 mapper.readTree("{\"Alliases\": [], \"HasOtherInfo\": \"Yes\"}")));
@@ -137,6 +141,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         assertThat(caseDetailsPersisted.getReference(), is(caseDetails.getReference()));
         assertThat(caseDetailsPersisted.getJurisdiction(), is(caseDetails.getJurisdiction()));
         assertThat(caseDetailsPersisted.getCaseTypeId(), is(caseDetails.getCaseTypeId()));
+        assertThat(caseDetailsPersisted.getResolvedTTL(), is(caseDetails.getResolvedTTL()));
     }
 
     @Test
