@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -44,6 +43,9 @@ import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 import java.util.List;
 
 import static org.springframework.http.ResponseEntity.status;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CREATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
 
 @RestController
 @RequestMapping(path = "/")
@@ -103,7 +105,7 @@ public class CaseController {
             message = V2.Error.CASE_NOT_FOUND
         )
     })
-    @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#caseId",
+    @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
@@ -162,7 +164,7 @@ public class CaseController {
             message = V2.Error.CALLBACK_EXCEPTION
         )
     })
-    @LogAudit(operationType = AuditOperationType.UPDATE_CASE, caseId = "#caseId",
+    @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction",
         caseType = "#result.body.caseType", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted",
@@ -302,12 +304,12 @@ public class CaseController {
             message = V2.Error.CALLBACK_EXCEPTION
         )
     })
-    @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseId = "#result.body.reference",
+    @LogAudit(operationType = CREATE_CASE, caseId = "#result.body.reference",
         jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
                                                    @RequestParam(value = "ignore-warning", required = false) final
-                                                       Boolean ignoreWarning) {
+                                                   Boolean ignoreWarning) {
         return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
     }
 
@@ -447,27 +449,22 @@ public class CaseController {
         }
     )
     @ApiOperation(
-        value = "Retrieve a Linked Case",
-        notes = V2.EXPERIMENTAL_WARNING
+        value = "Retrieve a Linked Case"
     )
     @ApiResponses({
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = CaseResource.class
-        ),
+            response = CaseResource.class),
         @ApiResponse(
             code = 400,
-            message = V2.Error.CASE_ID_INVALID
-        ),
+            message = V2.Error.CASE_ID_INVALID),
         @ApiResponse(
             code = 404,
-            message = V2.Error.CASE_NOT_FOUND
-        )
+            message = V2.Error.CASE_NOT_FOUND)
     })
-    /*TODO @LogAudit(operationType = LINKED_CASE_ACCESSED, caseId = "#caseId",
-        jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")*/
-    public ResponseEntity<Void> getLinkedCase(@PathVariable("caseReference") String caseReference,
+
+    public ResponseEntity<Void> getLinkedCase(@PathVariable(name = "caseReference") String caseReference,
                                               @RequestParam(name = "startRecordNumber",
                                                   defaultValue = "1", required = false) String startRecordNumber,
                                               @RequestParam(name = "maxReturnRecordCount",
@@ -481,7 +478,7 @@ public class CaseController {
         validateCaseReference(caseReference);
 
         //Validate Case exists
-        final CaseDetails caseDetails = getCaseDetails(caseReference);
+        getCaseDetails(caseReference);
 
         return ResponseEntity.ok().build();  // TODO: for now
     }

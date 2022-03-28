@@ -1,7 +1,7 @@
 {
   "_guid_": "S-140.3",
   "_extends_": "Get_Linked_Cases__Base",
-  "title": "should get 404 when case reference does not exist",
+  "title": "should get 404 when case reference exist but not authorised",
 
   "specs": [
     "an active profile in CCD",

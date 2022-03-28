@@ -13,7 +13,7 @@ public enum AuditOperationType {
     REVOKE_CASE_ACCESS("Revoke case access permissions"),
     VIEW_CASE_HISTORY("View case history"),
     GLOBAL_SEARCH("Global search"),
-    LINKED_CASE_ACCESSED("Get Linked Case");
+    LINKED_CASES_ACCESSED("Get Linked Cases");
 
     private final String label;
 

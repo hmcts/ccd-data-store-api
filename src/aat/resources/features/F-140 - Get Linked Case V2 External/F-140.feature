@@ -95,3 +95,18 @@ Scenario: should retrieve case when the case reference exists
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@S-140.7
+Scenario: should return 404 when case reference is not supplied
+
+    Given a user with [an active profile in CCD],
+
+     When a request is prepared with appropriate values,
+      And the request [contains an invalid case reference],
+      And it is submitted to call the [retrieve a linked case by case reference] operation of [CCD Data Store],
+
+     Then a negative response is received,
+      And the response [contains an HTTP-404 Bad Request],
+      And the response has all other details as expected.
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

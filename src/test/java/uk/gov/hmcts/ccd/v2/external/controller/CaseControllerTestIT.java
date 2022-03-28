@@ -819,7 +819,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testShouldGetLinkedCasesOptionalParameters() throws Exception {
         final String caseId = "1504259907353529";
-        final String URL = "/getLinkedCases/" + caseId + "?startRecordNumber=2&?maxReturnRecordCount=1";
+        final String URL = "/getLinkedCases/" + caseId + "?startRecordNumber=2&maxReturnRecordCount=1";
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
@@ -833,8 +833,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    void testShouldGetLinkedCasesNoCaseReferenceShouldReturn400() throws Exception {
+    void testGetLinkedCasesInvalidCaseReferenceShouldReturn400() throws Exception {
         final String caseId = "abc";
         final String URL = "/getLinkedCases/" + caseId;
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -850,7 +849,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testShouldGetLinkedCasesReturn404WhenCaseDoesNotExist() throws Exception {
         final String caseId = "4259907353529155";
         final String URL = "/getLinkedCases/" + caseId;
@@ -867,7 +865,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testShouldGetLinkedCasesStartRecordNumberNotNumericReturn400() throws Exception {
         final String caseId = "1504259907353529";
         final String URL = "/getLinkedCases/" + caseId + "?startRecordNumber=A";
@@ -884,7 +881,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testShouldGetLinkedCasesMaxRecordCountNotNumericReturn400() throws Exception {
         final String caseId = "1504259907353529";
         final String URL = "/getLinkedCases/" + caseId + "?maxReturnRecordCount=A";

@@ -470,19 +470,17 @@ class CaseControllerTest {
         }
 
         @Test
-        @DisplayName("should propagate BadRequestException when case reference not valid")
+        @DisplayName("should propagate BadRequestException when case reference is not supplied")
         void linkedCaseReferenceNotValid() {
-            // GIVEN
-            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
 
             // WHEN
-            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
-                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
+            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(null,
+                null, null));
 
             // THEN
             Assertions.assertThat(thrown)
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("Case ID is not valid");
+                .hasMessage("Case Reference not Supplied");
         }
 
         @Test
