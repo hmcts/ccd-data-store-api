@@ -23,11 +23,6 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController;
 import uk.gov.hmcts.ccd.v2.external.controller.TestIdamConfiguration;
 
-import java.util.Arrays;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
 @Provider("ccdDataStoreAPI_caseAssignedUserRoles")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
