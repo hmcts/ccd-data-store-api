@@ -449,7 +449,7 @@ public class CaseController {
         }
     )
     @ApiOperation(
-        value = "Retrieve a Linked Case"
+        value = "Retrieve Linked Cases"
     )
     @ApiResponses({
         @ApiResponse(
@@ -461,7 +461,7 @@ public class CaseController {
             message = V2.Error.CASE_ID_INVALID),
         @ApiResponse(
             code = 404,
-            message = V2.Error.CASE_NOT_FOUND)
+            message = V2.Error.CASE_REFERENCE_NOT_FOUND)
     })
 
     public ResponseEntity<Void> getLinkedCase(@PathVariable(name = "caseReference") String caseReference,
@@ -470,11 +470,9 @@ public class CaseController {
                                               @RequestParam(name = "maxReturnRecordCount",
                                                   required = false) String maxReturnRecordCount) {
 
-        //Validate parameters are numeric
-        validateIsParamNum(startRecordNumber);
-        validateIsParamNum(maxReturnRecordCount);
+        validateIsNumericParameter(startRecordNumber);
+        validateIsNumericParameter(maxReturnRecordCount);
 
-        //Validate Case Reference is valid
         validateCaseReference(caseReference);
 
         //Validate Case exists
@@ -483,7 +481,7 @@ public class CaseController {
         return ResponseEntity.ok().build();  // TODO: for now
     }
 
-    private void validateIsParamNum(String number) {
+    private void validateIsNumericParameter(String number) {
         if (number != null) {
             try {
                 Long.parseLong(number);

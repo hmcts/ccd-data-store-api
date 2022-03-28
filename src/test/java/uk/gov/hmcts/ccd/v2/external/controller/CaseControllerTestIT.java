@@ -810,9 +810,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
-            .isNotNull()
-            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(200));
+        assertEquals(200, mvcResult.getResponse().getStatus());
     }
 
     @Test
@@ -827,9 +825,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
-            .isNotNull()
-            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(200));
+        assertEquals(200, mvcResult.getResponse().getStatus());
     }
 
     @Test
@@ -843,9 +839,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
-            .isNotNull()
-            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(400));
+        assertEquals(400, mvcResult.getResponse().getStatus());
     }
 
     @Test
@@ -859,9 +853,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
-            .isNotNull()
-            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(404));
+        assertEquals(404, mvcResult.getResponse().getStatus());
     }
 
     @Test
@@ -875,9 +867,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
-            .isNotNull()
-            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(400));
+        assertEquals(400, mvcResult.getResponse().getStatus());
     }
 
     @Test
@@ -891,9 +881,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        org.assertj.core.api.Assertions.assertThat(mvcResult.getResponse())
-            .isNotNull()
-            .satisfies(response -> org.assertj.core.api.Assertions.assertThat(response.getStatus()).isEqualTo(400));
+        assertEquals(400, mvcResult.getResponse().getStatus());
     }
 
 }

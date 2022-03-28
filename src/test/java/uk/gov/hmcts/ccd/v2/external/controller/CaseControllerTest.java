@@ -3,21 +3,12 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +30,14 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -54,6 +50,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
@@ -441,7 +439,7 @@ class CaseControllerTest {
         }
 
         @Test
-        @DisplayName("should return 200 when case found")
+        @DisplayName("should return 200 when case found with parameters")
         void linkedCaseFoundWithOptionalParameters() {
             // WHEN
 
@@ -457,77 +455,51 @@ class CaseControllerTest {
         @DisplayName("should propagate CaseNotFoundException when case NOT found")
         void linkedCaseNotFound() {
             // GIVEN
-            Mockito.doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
-
-            // WHEN
-            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
-                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
+            doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
             // THEN
-            Assertions.assertThat(thrown)
-                .isInstanceOf(CaseNotFoundException.class)
-                .hasMessage(String.format("No case found for reference: %s", CASE_REFERENCE));
+            assertThrows(CaseNotFoundException.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
+                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT),
+                String.format("No case found for reference: %s", CASE_REFERENCE));
         }
 
         @Test
         @DisplayName("should propagate BadRequestException when case reference is not supplied")
         void linkedCaseReferenceNotValid() {
 
-            // WHEN
-            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(null,
-                null, null));
-
             // THEN
-            Assertions.assertThat(thrown)
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("Case Reference not Supplied");
+            assertThrows(BadRequestException.class, () -> caseController.getLinkedCase(null,
+                null, null), "Case Reference not Supplied");
         }
 
         @Test
         @DisplayName("should propagate BadRequestException when Start Record Number is Non Numeric")
         void linkedCaseStartRecordNumberIsNonNumeric() {
-            // GIVEN
-            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
-
-            // WHEN
-            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
-                INVALID_START_RECORD_NUMBER, null));
-
-            // THEN
-            Assertions.assertThat(thrown)
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("Parameter is not numeric");
+            //THEN
+            assertThrows(BadRequestException.class,() -> caseController.getLinkedCase(CASE_REFERENCE,
+                INVALID_START_RECORD_NUMBER, null),
+                "Parameter is not numeric");
         }
 
         @Test
         @DisplayName("should propagate BadRequestException when Max Return Record Count is not valid")
         void linkedCaseMaxReturnRecordCountIsNonNumeric() {
-            // GIVEN
-            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
-
-            // WHEN
-            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
-                null, INVALID_MAX_RETURN_RECORD_COUNT));
-
             // THEN
-            Assertions.assertThat(thrown)
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("Parameter is not numeric");
+            assertThrows(BadRequestException.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
+                null, INVALID_MAX_RETURN_RECORD_COUNT),
+                "Parameter is not numeric");
         }
 
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
             // GIVEN
-            Mockito.doThrow(RuntimeException.class).when(getCaseOperation).execute(CASE_REFERENCE);
-
-            // WHEN
-            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
-                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
+            doThrow(RuntimeException.class).when(getCaseOperation).execute(CASE_REFERENCE);
 
             // THEN
-            Assertions.assertThat(thrown)
-                .isInstanceOf(Exception.class);
+            assertThrows(Exception.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
+                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
+
         }
     }
 }
