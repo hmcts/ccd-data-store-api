@@ -49,7 +49,7 @@ Feature: F-122: Conditional Event Post States
 
 #-----------------------------------------------------------------------------------------------------------------------
   @S-122.3
-  Scenario: EmailField="*" operator should not match when field is not defined (End state: CaseDeleted)
+  Scenario: EmailField="*" operator should match when field is not defined (End state: CaseAmended)
 
     Given a user with [an active profile in CCD],
     And a successful call [to create a token for case creation] as in [S-122-GetToken_CaseCreate],

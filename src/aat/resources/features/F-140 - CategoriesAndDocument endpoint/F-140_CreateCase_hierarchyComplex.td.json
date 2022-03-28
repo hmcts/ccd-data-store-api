@@ -1,0 +1,136 @@
+{
+  "_guid_": "F-140_CreateCase_hierarchyComplex",
+
+  "productName": "CCD Data Store",
+  "operationName": "external create case",
+  "method": "POST",
+  "uri": "/case-types/{ctid}/cases",
+
+  "specs" : [
+    "to create a full case"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-140_CreateCase_Token_Creation"
+  }
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "ctid": "FT_CaseFileView_1"
+    },
+    "headers": {
+      "experimental": true
+    },
+    "body": {
+      "data": {
+        "nationalityProof": {
+          "typeOfProof": "document",
+          "dateIssued": "2020-01-01",
+
+          "documentEvidence": {
+            "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+            "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+            "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+          }
+        },
+        "Document1": {
+          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+        },
+        "Document2": {
+          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+        },
+        "Document3": {
+          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+        }
+      },
+      "event": {
+        "id": "CREATE"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": false
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_CaseFileView_1",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "CaseCreated",
+      "security_classification": "PUBLIC",
+      "data" : {
+        "Document3" : {
+          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+        },
+        "Document2" : {
+          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+        },
+        "nationalityProof" : {
+          "typeOfProof" : "document",
+          "dateIssued" : "2020-01-01",
+          "documentEvidence" : {
+            "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+            "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+            "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+          }
+        },
+        "Document1" : {
+          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+        }
+      },
+      "data_classification" : {
+        "Document3" : "PUBLIC",
+        "Document2" : "PUBLIC",
+        "nationalityProof" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "typeOfProof" : "PUBLIC",
+            "dateIssued" : "PUBLIC",
+            "documentEvidence" : "PUBLIC"
+          }
+        },
+        "Document1" : "PUBLIC"
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+
+}
