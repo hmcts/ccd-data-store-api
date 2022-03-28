@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -83,7 +82,6 @@ public class DraftsEndpoint {
         return upsertDraftOperation.executeSave(caseTypeId, caseDataContent);
     }
 
-    @Transactional
     @PutMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts/{did}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
@@ -109,7 +107,6 @@ public class DraftsEndpoint {
         return upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent);
     }
 
-    @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}")
     @ApiOperation(value = "Fetch a draft for display")
     @ApiResponses(value = {
@@ -126,7 +123,6 @@ public class DraftsEndpoint {
         return caseView;
     }
 
-    @Transactional
     @DeleteMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}")
     @ApiOperation(value = "Delete a given draft")
     @ApiResponses(value = {

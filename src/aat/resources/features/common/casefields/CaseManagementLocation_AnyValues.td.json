@@ -1,0 +1,6 @@
+{
+  "_guid_": "CaseManagementLocation_AnyValues",
+
+  "baseLocation": "[[ANY_NUMBER_NOT_NULLABLE]]",
+  "region": "[[ANY_NUMBER_NOT_NULLABLE]]"
+}

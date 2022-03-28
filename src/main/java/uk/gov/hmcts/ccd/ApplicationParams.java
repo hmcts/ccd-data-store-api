@@ -51,6 +51,12 @@ public class ApplicationParams {
     @Value("${role.assignment.api.host}")
     private String roleAssignmentServiceHost;
 
+    @Value("${role.assignment.pagination.enabled}")
+    private boolean roleAssignmentPaginationEnabled;
+
+    @Value("${role.assignment.page.size}")
+    private String roleAssignmentPageSize;
+
     @Value("${ccd.draft.host}")
     private String draftHost;
 
@@ -171,9 +177,6 @@ public class ApplicationParams {
     @Value("${enable-pseudo-role-assignments-generation}")
     private boolean enablePseudoRoleAssignmentsGeneration;
 
-    @Value("${enable-pseudo-access-profiles-generation}")
-    private boolean enablePseudoAccessProfilesGeneration;
-
     @Value("${enable-case-users-db-sync}")
     private boolean enableCaseUsersDbSync;
 
@@ -212,6 +215,9 @@ public class ApplicationParams {
 
     @Value("${reference.data.cache.ttl.in.days}")
     private String referenceDataCacheTtlInDays;
+
+    @Value("${system.user.token.cache.ttl.secs}")
+    private Integer systemUserTokenCacheTTLSecs;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -319,8 +325,9 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/base-types";
     }
 
-    public String caseRolesURL() {
-        return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
+    public String caseRolesURL(final String userId, final String jurisdictionId, final String caseTypeId) {
+        return caseDefinitionHost + "/api/data/caseworkers/" + encode(userId)
+            + "/jurisdictions/" + encode(jurisdictionId) + "/case-types/" + encode(caseTypeId) + "/roles";
     }
 
     public String accessProfileRolesURL(String caseTypeId) {
@@ -332,6 +339,14 @@ public class ApplicationParams {
 
     public String roleAssignmentBaseURL() {
         return roleAssignmentServiceHost + "/am/role-assignments";
+    }
+
+    public boolean isRoleAssignmentPaginationEnabled() {
+        return roleAssignmentPaginationEnabled;
+    }
+
+    public String getRoleAssignmentPageSize() {
+        return roleAssignmentPageSize;
     }
 
     public String amDeleteByQueryRoleAssignmentsURL() {
@@ -498,10 +513,6 @@ public class ApplicationParams {
         return enablePseudoRoleAssignmentsGeneration;
     }
 
-    public boolean getEnablePseudoAccessProfilesGeneration() {
-        return enablePseudoAccessProfilesGeneration;
-    }
-
     public boolean getEnableCaseUsersDbSync() {
         return enableCaseUsersDbSync;
     }
@@ -580,5 +591,9 @@ public class ApplicationParams {
 
     public Integer getRequestScopeCachedCaseTypesTillHour() {
         return requestScopeCachedCaseTypesTillHour;
+    }
+
+    public Integer getSystemUserTokenCacheTTLSecs() {
+        return systemUserTokenCacheTTLSecs;
     }
 }
