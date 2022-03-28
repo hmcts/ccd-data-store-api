@@ -5,20 +5,26 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 class JacksonUtilsTest {
+    private static final String NULL_MARKER = "NULL";
+    private static final String UUID_MARKER = "UUID";
 
     @Test
-    public void buildFromDottedPath() {
+    void buildFromDottedPath() {
         JsonNode result = JacksonUtils.buildFromDottedPath("FieldA.FieldB.FieldC", "Test value");
 
         assertThat(result.getNodeType(), is(JsonNodeType.OBJECT));
@@ -31,38 +37,38 @@ class JacksonUtilsTest {
     }
 
     @Test
-    public void shouldMergeIntoEmptyCaseData() throws Exception {
+    void shouldMergeIntoEmptyCaseData() throws Exception {
         Map<String, JsonNode> caseData = Maps.newHashMap();
         Map<String, JsonNode> defaultValueData = organisationPolicyDefaultValue("[Claimant]");
 
         JacksonUtils.merge(defaultValueData, caseData);
 
-        assertEquals("Merged result does not match expected", defaultValueData, caseData);
+        assertEquals(defaultValueData, caseData, "Merged result does not match expected");
     }
 
     @Test
-    public void shouldMergeIntoExistingCaseData() throws Exception {
+    void shouldMergeIntoExistingCaseData() throws Exception {
         Map<String, JsonNode> caseData = organisationPolicyCaseData("[Defendant]");
         Map<String, JsonNode> defaultValueData = organisationPolicyDefaultValue("[Claimant]");
 
         JacksonUtils.merge(defaultValueData, caseData);
 
         Map<String, JsonNode> expectedData = organisationPolicyCaseData("[Claimant]");
-        assertEquals("Merged defaultValue does not match expected", expectedData, caseData);
+        assertEquals(expectedData, caseData, "Merged defaultValue does not match expected");
     }
 
     @Test
-    public void shouldOmitTopLevelCollectionOnMerge() throws Exception {
+    void shouldOmitTopLevelCollectionOnMerge() throws Exception {
         Map<String, JsonNode> caseData = topLevelCollectionCaseData();
         Map<String, JsonNode> defaultValueData = topLevelCollectionDefaultValue();
 
         JacksonUtils.merge(defaultValueData, caseData);
 
-        assertEquals("Merged defaultValue does not match expected", topLevelCollectionCaseData(), caseData);
+        assertEquals(topLevelCollectionCaseData(), caseData, "Merged defaultValue does not match expected");
     }
 
     @Test
-    public void shouldOmitNestedCollectionOnMerge() throws Exception {
+    void shouldOmitNestedCollectionOnMerge() throws Exception {
 
         Map<String, JsonNode> caseData = mySchoolDataWithNestedCollection("Test school name",
             "Class Name 1",
@@ -74,11 +80,12 @@ class JacksonUtilsTest {
         Map<String, JsonNode> expectedData = mySchoolDataWithNestedCollection("Updated name",
             "Class Name 1",
             "Class Name 2");
-        assertEquals("Merged defaultValue does not match expected", expectedData, caseData);
+        assertEquals(expectedData, caseData, "Merged defaultValue does not match expected");
 
     }
 
-    public void shouldMergeNullTopLevelValue() {
+    @Test
+    void shouldMergeNullTopLevelValue() {
         Map<String, JsonNode> mergeFrom = new HashMap<>();
         mergeFrom.put("TextField0", MAPPER.getNodeFactory().textNode("Default text"));
         Map<String, JsonNode> mergeInto = new HashMap<>();
@@ -90,7 +97,7 @@ class JacksonUtilsTest {
     }
 
     @Test
-    public void shouldNotUseDefaultValueWhenTopLevelValueExists() {
+    void shouldNotUseDefaultValueWhenTopLevelValueExists() {
         Map<String, JsonNode> mergeFrom = new HashMap<>();
         mergeFrom.put("TextField0", MAPPER.getNodeFactory().textNode("Default text"));
         Map<String, JsonNode> mergeInto = new HashMap<>();
@@ -102,7 +109,7 @@ class JacksonUtilsTest {
     }
 
     @Test
-    public void shouldOnlyUseDefaultValueWhenTopLevelKeyNotPresent() {
+    void shouldOnlyUseDefaultValueWhenTopLevelKeyNotPresent() {
         Map<String, JsonNode> mergeFrom = new HashMap<>();
         mergeFrom.put("TextField0", MAPPER.getNodeFactory().textNode("Default text"));
         Map<String, JsonNode> mergeInto = new HashMap<>();
@@ -114,9 +121,43 @@ class JacksonUtilsTest {
         assertEquals("Existing text", mergeInto.get("TextField1").asText());
     }
 
-    @Test
-    void testGetValueFromPath() throws JsonProcessingException {
+    @ParameterizedTest(name = "Test getValueFromPath - #{index} - `{0}`")
+    @CsvSource({
+        "Name,NameValue",
 
+        "Class.0.value.ClassName," + "ClassNameValue1",
+        "Class.0.ClassName," + "ClassNameValue1",
+        "Class.0.NestedCollection.0.property1," + "NestedColProperty1",
+        "Class.0.NestedCollection.0.id," + UUID_MARKER,
+        "Class.0.NestedComplex.property1," + "NestedComplexProperty1",
+
+        "Class.1.value.ClassName," + "ClassNameValue2",
+        "Class.1.ClassName," + "ClassNameValue2",
+
+        "Class.1.NotFound," + NULL_MARKER,
+        "Class.2.BadIndex," + NULL_MARKER,
+
+        "Number," + "123",
+
+        "NumberCollection.0.Number," + "456",
+        "NumberCollection.1.Number," + "789",
+
+        "AddressCollection.0.value.AddressLine1," + "Page Street 50",
+
+        "Person.Address.Line1," + "Address Line1",
+        "Person.Name," + "NameValue",
+
+        "evidence.type.document_url," + "http://dm-store:8080/documents/84f04693-56ae-4aad-97e8-d1fc7592acea",
+
+        "description," + NULL_MARKER,
+
+        "CaseLinkCollection.0.CaseReference," + "1637697929437509",
+        "CaseLinkCollection.1.CaseReference," + "1637697929619312"
+    })
+    void testGetValueFromPath(final String path, final String expected) throws JsonProcessingException {
+
+        // ARRANGE
+        final String testId = UUID.randomUUID().toString();
         final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
             "{"
                 + "  \"Name\": \"NameValue\","
@@ -124,7 +165,18 @@ class JacksonUtilsTest {
                 + "    {"
                 + "      \"id\": \"6da7a0cf-8186-49d4-813d-c299d8f3491b\","
                 + "      \"value\": {"
-                + "        \"ClassName\": \"ClassNameValue1\""
+                + "        \"ClassName\": \"ClassNameValue1\","
+                + "        \"NestedCollection\": ["
+                + "          {"
+                + "            \"id\": \"" + testId + "\","
+                + "            \"value\": {"
+                + "              \"property1\" : \"NestedColProperty1\""
+                + "             }"
+                + "          }"
+                + "        ],"
+                + "        \"NestedComplex\": {"
+                + "          \"property1\" : \"NestedComplexProperty1\""
+                + "        }"
                 + "      }"
                 + "    },"
                 + "    {"
@@ -181,21 +233,17 @@ class JacksonUtilsTest {
                 + "      } ]"
                 + "}"));
 
-        assertEquals("ClassNameValue1", JacksonUtils.getValueFromPath("Class.0.value.ClassName", data));
-        assertEquals("ClassNameValue2", JacksonUtils.getValueFromPath("Class.1.value.ClassName", data));
-        assertEquals("NameValue", JacksonUtils.getValueFromPath("Name", data));
-        assertEquals("123", JacksonUtils.getValueFromPath("Number", data));
-        assertEquals("456", JacksonUtils.getValueFromPath("NumberCollection.0.Number", data));
-        assertEquals("789", JacksonUtils.getValueFromPath("NumberCollection.1.Number", data));
-        assertEquals("Page Street 50", JacksonUtils.getValueFromPath("AddressCollection.0.value.AddressLine1", data));
-        assertEquals("Address Line1", JacksonUtils.getValueFromPath("Person.Address.Line1", data));
-        assertEquals("NameValue", JacksonUtils.getValueFromPath("Person.Name", data));
-        assertEquals("http://dm-store:8080/documents/84f04693-56ae-4aad-97e8-d1fc7592acea",
-            JacksonUtils.getValueFromPath("evidence.type.document_url", data));
-        assertEquals(null,
-            JacksonUtils.getValueFromPath("description", data));
-        assertEquals("1637697929437509", JacksonUtils.getValueFromPath("CaseLinkCollection.0.CaseReference", data));
-        assertEquals("1637697929619312", JacksonUtils.getValueFromPath("CaseLinkCollection.1.CaseReference", data));
+        // ACT
+        String result = JacksonUtils.getValueFromPath(path, data);
+
+        // ASSERT
+        if (NULL_MARKER.equals(expected)) {
+            assertNull(result);
+        } else if (UUID_MARKER.equals(expected)) {
+            assertEquals(testId, result);
+        } else {
+            assertEquals(expected, result);
+        }
     }
 
     static Map<String, JsonNode> mySchoolDataWithNestedCollection(String name, String className1, String className2)
