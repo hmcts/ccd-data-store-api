@@ -70,7 +70,7 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
 
     @State("A User Role exists for a Case")
     public void setUpUserRoleExists() {
-        when(securityUtils.getServiceNameFromS2SToken(anyString())).thenReturn("serviceName");
-        when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(Arrays.asList("serviceName"));
+        //when(securityUtils.getServiceNameFromS2SToken(anyString())).thenReturn("serviceName");
+        //when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(Arrays.asList("serviceName"));
     }
 }
