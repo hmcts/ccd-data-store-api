@@ -1,27 +1,27 @@
 {
-	"_guid_": "F-1018_VerifyCaseLinksBase",
+  "_guid_": "F-1018_VerifyCaseLinksBase",
   "_extends_": "Verify_Case_Links_Base",
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
+    "_extends_": "BeftaMasterCaseworker"
     }
   },
 
-	"request": {
-		"pathVariables": {
-			"cid": "${[scenarioContext][parentContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
-		}
-	},
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    }
+  },
 
-	"expectedResponse": {
-		"_extends_": "Common_200_Response",
-		"headers": {
-			"Content-Encoding": "gzip",
-			"Content-Length": "[[ANYTHING_PRESENT]]"
-		},
-		"body": {
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
       "CaseLinks" : [ ]
-		}
-	}
+    }
+  }
 }

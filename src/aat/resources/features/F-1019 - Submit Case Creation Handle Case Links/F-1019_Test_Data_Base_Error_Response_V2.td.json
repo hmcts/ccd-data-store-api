@@ -1,6 +1,6 @@
 {
 	"_guid_": "F-1019_Test_Data_Base_Error_Response_V2",
-  "_extends_": "Case_Creation_Base_V2",
+  "_extends_": "Case_Creation_V2_Base",
 
   "users": {
     "invokingUser": {
@@ -14,7 +14,7 @@
       "experimental": true
     },
 		"pathVariables": {
-      "caseTypeId": "FT_MasterCaseType"
+      "CaseTypeID": "FT_MasterCaseType"
 		}
 	}
 }

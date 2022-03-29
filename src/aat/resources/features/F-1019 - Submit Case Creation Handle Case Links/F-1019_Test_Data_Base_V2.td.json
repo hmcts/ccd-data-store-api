@@ -1,12 +1,6 @@
 {
 	"_guid_": "F-1019_Test_Data_Base_V2",
-  "_extends_": "Case_Creation_Base_V2",
-
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
-    }
-  },
+  "_extends_": "Case_Creation_V2_Data_Base",
 
 	"request": {
     "headers": {
@@ -14,26 +8,16 @@
       "experimental": true
     },
 		"pathVariables": {
-      "caseTypeId": "FT_MasterCaseType"
+      "CaseTypeID": "FT_MasterCaseType"
 		}
 	},
 
   "expectedResponse": {
     "body" : {
       "_links" : "[[ANYTHING_PRESENT]]",
-      "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "BEFTA_MASTER",
       "case_type" : "FT_MasterCaseType",
-      "created_on" : "[[ANYTHING_PRESENT]]",
-      "last_modified_on" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
       "state" : "CaseCreated",
-      "security_classification" : "PUBLIC",
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
 
       "data" : {
         "SearchCriteria" : { }
