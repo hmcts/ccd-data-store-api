@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity.NON_STANDARD_LINK;
 
 public class TestingSupportControllerTestIT extends WireMockBaseTest {
 
@@ -85,7 +86,7 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     @Test
     public void testGetCaseLinkReturnsMultipleResults() throws Exception {
-        CaseLinkEntity caseLinkEntity = new CaseLinkEntity(CASE_22_ID, CASE_04_ID, "Test");
+        CaseLinkEntity caseLinkEntity = new CaseLinkEntity(CASE_22_ID, CASE_04_ID, "Test", NON_STANDARD_LINK);
         caseLinkRepository.save(caseLinkEntity);
 
         final String url = URL + CASE_22_REFERENCE;

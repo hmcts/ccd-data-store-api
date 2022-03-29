@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity.NON_STANDARD_LINK;
+import static uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity.STANDARD_LINK;
 
 public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
@@ -27,7 +29,7 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
     @Before
     public void setup() {
-        caseLinkEntity = new CaseLinkEntity(CASE_13_ID, CASE_14_ID, TEST_ADDRESS_BOOK_CASE);
+        caseLinkEntity = new CaseLinkEntity(CASE_13_ID, CASE_14_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
     }
 
     @Test
@@ -43,6 +45,26 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
             savedEntity.getCaseLinkPrimaryKey().getLinkedCaseId());
         assertEquals(caseLinkEntity.getCaseTypeId(),
             savedEntity.getCaseTypeId());
+        assertEquals(caseLinkEntity.getStandardLink(),
+            savedEntity.getStandardLink());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void testSaveCaseLinkEntityWithStandardLinkTrue() {
+
+        caseLinkEntity.setStandardLink(STANDARD_LINK);
+        CaseLinkEntity savedEntity = caseLinkRepository.save(caseLinkEntity);
+        assertNotNull(savedEntity);
+        assertNotNull(savedEntity.getCaseLinkPrimaryKey());
+        assertEquals(caseLinkEntity.getCaseLinkPrimaryKey().getCaseId(),
+            savedEntity.getCaseLinkPrimaryKey().getCaseId());
+        assertEquals(caseLinkEntity.getCaseLinkPrimaryKey().getLinkedCaseId(),
+            savedEntity.getCaseLinkPrimaryKey().getLinkedCaseId());
+        assertEquals(caseLinkEntity.getCaseTypeId(),
+            savedEntity.getCaseTypeId());
+        assertEquals(caseLinkEntity.getStandardLink(),
+            savedEntity.getStandardLink());
     }
 
     @Test
@@ -66,7 +88,7 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void testSaveFailsIfCaseIdDoesNotExist() {
-        caseLinkEntity = new CaseLinkEntity(1003L, CASE_01_ID, TEST_ADDRESS_BOOK_CASE);
+        caseLinkEntity = new CaseLinkEntity(1003L, CASE_01_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
 
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
     }
@@ -74,7 +96,7 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void testSaveFailsIfLinkedCaseIdDoesNotExist() {
-        caseLinkEntity = new CaseLinkEntity(CASE_01_ID, 999L, "TestAddressBookCase");
+        caseLinkEntity = new CaseLinkEntity(CASE_01_ID, 999L, "TestAddressBookCase", NON_STANDARD_LINK);
 
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
     }
@@ -119,9 +141,9 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
         final List<Long> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID);
 
         final List<CaseLinkEntity> caseLinkEntities = List.of(
-            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(0), TEST_ADDRESS_BOOK_CASE),
-            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(1), TEST_ADDRESS_BOOK_CASE),
-            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(2), TEST_ADDRESS_BOOK_CASE)
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(0), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(1), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(2), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK)
         );
 
         caseLinkRepository.saveAll(caseLinkEntities);
