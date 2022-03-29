@@ -1,4 +1,4 @@
-@F-1006 @elasticsearch @Ignore
+@F-1006 @elasticsearch
 Feature: F-1006: Global Search - Access Control Tests
 
   Background: Load test data for the scenario
@@ -40,7 +40,7 @@ Feature: F-1006: Global Search - Access Control Tests
     And the response [does not contain any fields from the case data for which the user doesn't have Read access],
     And the response has all other details as expected.
 
-  @S-1006.4  @AC4
+  @S-1006.4  @AC4  @Ignore #Scenario should be enabled once CCD-2864 is completed
   Scenario:  Returning all results from Global Search matching the users jurisdictions/case types, excluding any case where the user doesn't have Read access for a search field that they supplied
     Given a user with [no READ access to a field],
     When a request is prepared with appropriate values,
