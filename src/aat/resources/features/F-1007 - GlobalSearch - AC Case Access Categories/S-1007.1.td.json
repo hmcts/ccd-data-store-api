@@ -1,0 +1,48 @@
+{
+  "title": "Successfully search for case with the new global search parameters and case access category value starting with defined CaseAccessCategories pattern in the RolesToAccessProfiles tab, case should be returned",
+  "_guid_": "S-1007.1",
+  "_extends_": "F-1007_SearchCaseBase",
+
+  "specs": [
+    "an active profile in CCD",
+    "the RoleToAccessProfiles tab contains CaseAccessCategory with pattern Civil Standard, Criminal Serious",
+    "the case C1 contains a CaseAccessCategory field value of Civil/Standard/Legal",
+    "contains all the mandatory parameters",
+    "has 200 return code",
+    "contains case C1"
+  ],
+
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "caseReferences": [
+          "${[scenarioContext][childContexts][S-1007.1_CreateCase][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 1,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "stateId" : "CaseCreated",
+          "processForAccess" : "NONE",
+          "caseReference" : "${}${[scenarioContext][childContexts][S-1007.1_CreateCase][testData][actualResponse][body][id]}",
+          "otherReferences" : [ ],
+          "CCDJurisdictionId" : "BEFTA_MASTER",
+          "CCDJurisdictionName" : "BEFTA Master",
+          "CCDCaseTypeId" : "FT_CaseAccessCategories",
+          "CCDCaseTypeName" : "FT_CaseAccessCategories"
+        }
+      ]
+    }
+  }
+}
+
