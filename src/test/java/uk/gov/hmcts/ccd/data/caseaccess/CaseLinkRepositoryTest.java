@@ -107,7 +107,8 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
         caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(Long.parseLong(CASE_19_REFERENCE),
                                                                                     Long.parseLong(CASE_21_REFERENCE),
-                                                                                    "test");
+                                                                                    "test",
+                                                                                    false);
 
         assertTrue(caseLinkRepository.findById(pk).isPresent());
     }

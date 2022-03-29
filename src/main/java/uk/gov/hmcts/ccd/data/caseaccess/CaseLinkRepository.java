@@ -22,14 +22,15 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
                                                     @Param("linkedCaseReference") Long linkedCaseReference);
 
     @Modifying
-    @Query(value = "insert into case_link (case_id, linked_case_id, case_type_id) values ("
+    @Query(value = "insert into case_link (case_id, linked_case_id, case_type_id, standard_link) values ("
         + "(select id from case_data cd where cd.reference=:caseReference),"
         + "(select id from case_data cd where cd.reference=:linkedCaseReference), "
-        + ":caseTypeId)", nativeQuery = true)
+        + ":caseTypeId, :standardLink)", nativeQuery = true)
     void insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(@Param("caseReference") Long caseReference,
                                                                   @Param("linkedCaseReference")
                                                                       Long linkedCaseReference,
-                                                                  @Param("caseTypeId") String caseTypeId);
+                                                                  @Param("caseTypeId") String caseTypeId,
+                                                                  @Param("standard_link") Boolean standardLink);
 
     @Query(value = "select cle from CaseLinkEntity cle where cle.caseLinkPrimaryKey.caseId = "
         + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)")

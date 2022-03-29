@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkExtractor;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -80,7 +82,7 @@ class CaseLinkMigrationServiceTest {
         List<CaseDetails> cases = new ArrayList<>();
         cases.add(createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data));
 
-        List<String> caseLinks = createCaseLinks();
+        List<CaseLink> caseLinks = createCaseLinks();
 
         caseLinkMigrationService.backPopulateCaseLinkTable(cases);
 
@@ -94,9 +96,9 @@ class CaseLinkMigrationServiceTest {
         List<CaseDetails> cases = new ArrayList<>();
         cases.add(createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data));
 
-        List<String> caseLinks = createCaseLinks(CASE_LINK_REFERENCE_1);
+        List<CaseLink> caseLinks = createCaseLinks(CASE_LINK_REFERENCE_1);
 
-        when(caseLinkExtractor.getCaseLinks(data, caseTypeDefinition.getCaseFieldDefinitions())).thenReturn(caseLinks);
+        when(caseLinkExtractor.getCaseLinksFromData(data, caseTypeDefinition.getCaseFieldDefinitions())).thenReturn(caseLinks);
 
         caseLinkMigrationService.backPopulateCaseLinkTable(cases);
 
@@ -110,9 +112,9 @@ class CaseLinkMigrationServiceTest {
         cases.add(createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data));
         cases.add(createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data));
 
-        List<String> caseLinks = createCaseLinks(CASE_LINK_REFERENCE_1, CASE_LINK_REFERENCE_2);
+        List<CaseLink> caseLinks = createCaseLinks(CASE_LINK_REFERENCE_1, CASE_LINK_REFERENCE_2);
 
-        when(caseLinkExtractor.getCaseLinks(data, caseTypeDefinition.getCaseFieldDefinitions())).thenReturn(caseLinks);
+        when(caseLinkExtractor.getCaseLinksFromData(data, caseTypeDefinition.getCaseFieldDefinitions())).thenReturn(caseLinks);
 
         caseLinkMigrationService.backPopulateCaseLinkTable(cases);
 
@@ -129,7 +131,15 @@ class CaseLinkMigrationServiceTest {
         return caseDetails;
     }
 
-    private List<String> createCaseLinks(String... caseLinkReferences) {
-        return new ArrayList<>(Arrays.asList(caseLinkReferences));
+//    private List<String> createCaseLinks(String... caseLinkReferences) {
+//        return new ArrayList<>(Arrays.asList(caseLinkReferences));
+//    }
+
+    private List<CaseLink> createCaseLinks(String... caseLinkReferences) {
+        return Arrays.asList(caseLinkReferences).stream()
+            .map(caseLink -> CaseLink.builder()
+                .linkedCaseReference(Long.parseLong(caseLink))
+                .standard_link(false).build())
+            .collect(Collectors.toList());
     }
 }

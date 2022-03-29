@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -573,9 +574,11 @@ class DefaultCreateCaseOperationTest {
                 + "  ]\n"
                 + "}")
         );
-        final List<String> caseLinks = List.of(caseRef, caseRef2);
+        final List<CaseLink> caseLinks = List.of(
+            CaseLink.builder().linkedCaseReference(Long.valueOf(caseRef)).build(),
+            CaseLink.builder().linkedCaseReference(Long.valueOf(caseRef2)).build());
 
-        given(caseLinkExtractor.getCaseLinks(any(Map.class), any(List.class))).willReturn(caseLinks);
+        given(caseLinkExtractor.getCaseLinksFromData(any(Map.class), any(List.class))).willReturn(caseLinks);
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
         given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);

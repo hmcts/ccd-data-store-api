@@ -11,6 +11,8 @@ import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
@@ -35,54 +37,55 @@ public class CaseLinkService {
     @Transactional
     public void updateCaseLinks(Long caseReference,
                                 String caseTypeId,
-                                List<String> finalCaseLinkReferences) {
-        List<String> currentCaseLinkReferences =
-            getStringCaseReferencesFromCaseLinks(findCaseLinks(caseReference.toString()));
-        deleteRemovedCaseLinks(caseReference, currentCaseLinkReferences, finalCaseLinkReferences);
+                                List<CaseLink> finalCaseLinkReferences) {
+        Map<Long, CaseLink> currentCaseLinkReferences =
+            createMapFromCaseLinks(findCaseLinks(caseReference.toString()));
+        deleteAllCaseLinks(caseReference, currentCaseLinkReferences);
         insertNewCaseLinks(caseReference, caseTypeId, currentCaseLinkReferences, finalCaseLinkReferences);
     }
 
-    private void createCaseLinks(Long caseReference, String caseTypeId, List<String> caseLinks) {
+    private void createCaseLinks(Long caseReference, String caseTypeId, List<CaseLink> caseLinks) {
         caseLinks.stream()
-            .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
+            .filter(caseLinkString -> caseLinkString != null && caseLinkString.getLinkedCaseReference() != null)
             .forEach(caseLinkReference -> {
                 caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(caseReference,
-                    Long.parseLong(caseLinkReference),
-                    caseTypeId);
+                    caseLinkReference.getLinkedCaseReference(),
+                    caseTypeId,
+                    caseLinkReference.getStandard_link());
                 log.debug("inserted case link with id {}, linkedCaseId {} and caseType {}",
-                    caseReference, caseLinkReference, caseTypeId);
+                    caseReference, caseLinkReference.getLinkedCaseReference(), caseTypeId);
             });
 
     }
 
-    private void deleteRemovedCaseLinks(Long caseReference,
-                                        List<String> currentCaseLinkReferences,
-                                        List<String> finalCaseLinkReferences) {
+    private void deleteAllCaseLinks(Long caseReference,
+                                        Map<Long, CaseLink> currentCaseLinkReferences) {
 
-        final var caseLinksToDelete = currentCaseLinkReferences.stream()
+        final var caseLinksToDelete = currentCaseLinkReferences.keySet().stream()
             .distinct()
-            .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
-            .filter(caseLink -> !finalCaseLinkReferences.contains(caseLink))
             .collect(Collectors.toList());
 
         caseLinksToDelete.forEach(caseLink -> {
-            caseLinkRepository.deleteByCaseReferenceAndLinkedCaseReference(caseReference, Long.parseLong(caseLink));
-            log.debug("deleted case link with id {} and linkedCaseId {}", caseReference, caseLink);
+            caseLinkRepository.deleteByCaseReferenceAndLinkedCaseReference(caseReference, caseLink);
+            log.debug("deleted case link with id {} and linkedCaseId {}", caseReference, caseLink.toString());
         });
     }
 
     private void insertNewCaseLinks(Long caseReference,
                                     String caseTypeId,
-                                    List<String> currentCaseLinkReferences,
-                                    List<String> finalCaseLinkReferences) {
+                                    Map<Long, CaseLink> currentCaseLinkReferences,
+                                    List<CaseLink> finalCaseLinkReferences) {
+
         final var caseLinksToInsert = finalCaseLinkReferences.stream()
             .distinct()
-            .filter(caseLink -> !currentCaseLinkReferences.contains(caseLink))
+            .filter(caseLink -> !currentCaseLinkReferences.containsKey(caseLink.getLinkedCaseReference()))
             .collect(Collectors.toList());
 
         createCaseLinks(caseReference, caseTypeId, caseLinksToInsert);
     }
 
+
+    // do we need to set the casetypeid??????
     public List<CaseLink> findCaseLinks(String caseReference) {
         List<CaseLinkEntity> allByCaseReference =
             caseLinkRepository.findAllByCaseReference(Long.parseLong(caseReference));
@@ -115,7 +118,13 @@ public class CaseLinkService {
     private List<String> getStringCaseReferencesFromCaseLinks(List<CaseLink> caseLinks) {
         return caseLinks
             .stream()
-            .map(caseLink -> caseLink.getLinkedCaseReference().toString()) //getCaseReference or getLinkedCaseReference
+            .map(caseLink -> caseLink.getLinkedCaseReference().toString())
             .collect(Collectors.toList());
+    }
+
+    private Map<Long, CaseLink> createMapFromCaseLinks(List<CaseLink> caseLinks) {
+        return caseLinks
+            .stream()
+            .collect(Collectors.toMap(CaseLink::getLinkedCaseReference, Function.identity())); //getCaseReference or getLinkedCaseReference
     }
 }

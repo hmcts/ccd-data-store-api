@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
+import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -249,8 +250,8 @@ public class CreateCaseEventService {
                                  CaseDetails caseDetailsAfterCallback,
                                  List<CaseFieldDefinition> caseFieldDefinitions) {
 
-        List<String> finalCaseLinkReferences =
-            caseLinkExtractor.getCaseLinks(caseDetailsAfterCallback.getData(), caseFieldDefinitions);
+        List<CaseLink> finalCaseLinkReferences =
+            caseLinkExtractor.getCaseLinksFromData(caseDetailsAfterCallback.getData(), caseFieldDefinitions);
 
         // TODO: CaseTypeId needs to be 'case type id of the case to which the case links' so will need to possibly
         //  be updated to take in the linked case - this will need to be confirmed

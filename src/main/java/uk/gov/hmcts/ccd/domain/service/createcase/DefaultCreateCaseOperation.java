@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -185,7 +186,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     }
 
     private void insertCaseLinks(CaseDetails caseDetails, List<CaseFieldDefinition> caseFieldDefinitions) {
-        final List<String> caseLinks = caseLinkExtractor.getCaseLinks(caseDetails.getData(), caseFieldDefinitions);
+        final List<CaseLink> caseLinks = caseLinkExtractor.getCaseLinksFromData(caseDetails.getData(), caseFieldDefinitions);
         caseLinkService.updateCaseLinks(caseDetails.getReference(), caseDetails.getCaseTypeId(), caseLinks);
     }
 

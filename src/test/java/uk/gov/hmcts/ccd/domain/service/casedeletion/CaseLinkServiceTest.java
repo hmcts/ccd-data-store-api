@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.EMPTY_LIST;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -39,6 +40,8 @@ class CaseLinkServiceTest {
 
     @InjectMocks
     private CaseLinkService caseLinkService;
+
+    private static final boolean STANDARD_LINK = false;
 
     private static final String CASE_TYPE_ID = "Test";
 
@@ -66,7 +69,7 @@ class CaseLinkServiceTest {
         verify(caseLinkRepository).deleteByCaseReferenceAndLinkedCaseReference(CASE_ID, 1504259907353545L);
         verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
                                                                                             1504259907353594L,
-                                                                                            CASE_TYPE_ID);
+                                                                                            CASE_TYPE_ID, STANDARD_LINK);
     }
 
     @Test
@@ -92,7 +95,7 @@ class CaseLinkServiceTest {
         verify(caseLinkRepository).deleteByCaseReferenceAndLinkedCaseReference(CASE_ID, 1504259907353552L);
         verify(caseLinkRepository, never()).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
                                                                                                     1504259907353594L,
-                                                                                                    CASE_TYPE_ID);
+                                                                                                    CASE_TYPE_ID, STANDARD_LINK);
 
     }
 
@@ -103,36 +106,37 @@ class CaseLinkServiceTest {
 
         verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
                                                                                             1504259907353552L,
-                                                                                            CASE_TYPE_ID);
+                                                                                            CASE_TYPE_ID, STANDARD_LINK);
         verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
                                                                                             1504259907353594L,
-                                                                                            CASE_TYPE_ID);
+                                                                                            CASE_TYPE_ID, STANDARD_LINK);
     }
 
-    @Test
-    void updateCaseLinksNoRepositoryInteractionCaseLinksIdentical() {
-
-        final List<Long> linkedCaseIds = List.of(2L, 3L);
-        final List<Long> linkedCaseReferences = List.of(1504259907353552L, 1504259907353594L);
-
-        final List<CaseLinkEntity> caseLinkEntities = List.of(
-            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(0), CASE_TYPE_ID),
-            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(1), CASE_TYPE_ID));
-
-        final List<CaseLink> caseLinksModels = createFinalCaseLinks();
-
-        when(caseLinkRepository.findAllByCaseReference(CASE_ID)).thenReturn(caseLinkEntities);
-        when(caseLinkMapper.entitiesToModels(caseLinkEntities)).thenReturn(caseLinksModels);
-        when(caseDetailsRepository.findCaseReferencesByIds(linkedCaseIds)).thenReturn(linkedCaseReferences);
-
-        caseLinkService.updateCaseLinks(CASE_ID,
-            CASE_TYPE_ID,
-            createPostCallbackCaseLinks());
-
-        verify(caseLinkRepository, never())
-            .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(anyLong(), anyLong(), anyString());
-        verify(caseLinkRepository, never()).deleteByCaseReferenceAndLinkedCaseReference(anyLong(), anyLong());
-    }
+    // THIS IS DELETED AS THERE WILL ALSO BE AN INSERT (deletes all and reinserts)
+//    @Test
+//    void updateCaseLinksNoRepositoryInteractionCaseLinksIdentical() {
+//
+//        final List<Long> linkedCaseIds = List.of(2L, 3L);
+//        final List<Long> linkedCaseReferences = List.of(1504259907353552L, 1504259907353594L);
+//
+//        final List<CaseLinkEntity> caseLinkEntities = List.of(
+//            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(0), CASE_TYPE_ID),
+//            new CaseLinkEntity(CASE_ID, linkedCaseIds.get(1), CASE_TYPE_ID));
+//
+//        final List<CaseLink> caseLinksModels = createFinalCaseLinks();
+//
+//        when(caseLinkRepository.findAllByCaseReference(CASE_ID)).thenReturn(caseLinkEntities);
+//        when(caseLinkMapper.entitiesToModels(caseLinkEntities)).thenReturn(caseLinksModels);
+//        when(caseDetailsRepository.findCaseReferencesByIds(linkedCaseIds)).thenReturn(linkedCaseReferences);
+//
+//        caseLinkService.updateCaseLinks(CASE_ID,
+//            CASE_TYPE_ID,
+//            createPostCallbackCaseLinks());
+//
+//        verify(caseLinkRepository, never())
+//            .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(anyLong(), anyLong(), anyString(), anyBoolean());
+//        verify(caseLinkRepository, never()).deleteByCaseReferenceAndLinkedCaseReference(anyLong(), anyLong());
+//    }
 
     @Test
     void findCaseLinksReturnsNoResults() {
@@ -196,40 +200,40 @@ class CaseLinkServiceTest {
     @Test
     void createCaseLinks() {
 
-        final List<String> caseLinks = createPostCallbackCaseLinks();
+        final List<CaseLink> caseLinks = createPostCallbackCaseLinks();
 
         caseLinkService.updateCaseLinks(CASE_ID, CASE_TYPE_ID, caseLinks);
 
         caseLinks.forEach(caseLink ->
             Mockito.verify(caseLinkRepository)
                 .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
-                                                                          Long.valueOf(caseLink),
-                                                                          CASE_TYPE_ID));
+                                                                          caseLink.getLinkedCaseReference(),
+                                                                          CASE_TYPE_ID, STANDARD_LINK));
     }
 
     @Test
     void createCaseLinksFiltersOutNullOrBlanks() {
 
-        final List<String> validCaseLinks = createPostCallbackCaseLinks();
-        final List<String> allCaseLinks = new ArrayList<>(validCaseLinks);
+        final List<CaseLink> validCaseLinks = createPostCallbackCaseLinks();
+        final List<CaseLink> allCaseLinks = new ArrayList<>(validCaseLinks);
         allCaseLinks.add(null);
-        allCaseLinks.add("");
+        allCaseLinks.add(CaseLink.builder().build());
 
         caseLinkService.updateCaseLinks(CASE_ID, CASE_TYPE_ID, allCaseLinks);
 
         validCaseLinks.forEach(caseLink ->
             Mockito.verify(caseLinkRepository)
                 .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
-                    Long.valueOf(caseLink),
-                    CASE_TYPE_ID));
+                    caseLink.getLinkedCaseReference(),
+                    CASE_TYPE_ID, STANDARD_LINK));
     }
 
     @Test
     void createCaseLinksNullAndBlankValuesNotInsertedToDB() {
 
-        final List<String> caseLinks = new ArrayList<>();
+        final List<CaseLink> caseLinks = new ArrayList<>();
         caseLinks.add(null);
-        caseLinks.add("");
+        caseLinks.add(CaseLink.builder().build());
         caseLinks.add(null);
 
         caseLinkService.updateCaseLinks(CASE_ID, CASE_TYPE_ID, caseLinks);
@@ -238,7 +242,7 @@ class CaseLinkServiceTest {
             Mockito.verify(caseLinkRepository, never())
                 .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(anyLong(),
                     anyLong(),
-                    anyString()));
+                    anyString(), anyBoolean()));
     }
 
     private List<String> createPreCallbackCaseLinks() {
@@ -251,8 +255,10 @@ class CaseLinkServiceTest {
             CaseLink.builder().caseReference(1504259907353552L).build());
     }
 
-    private List<String> createPostCallbackCaseLinks() {
-        return List.of("1504259907353552", "1504259907353594");
+    private List<CaseLink> createPostCallbackCaseLinks() {
+        return List.of(
+            CaseLink.builder().linkedCaseReference(1504259907353552L).standard_link(STANDARD_LINK).build(),
+            CaseLink.builder().linkedCaseReference(1504259907353594L).standard_link(STANDARD_LINK).build());
     }
 
     private List<CaseLink> createFinalCaseLinks() {

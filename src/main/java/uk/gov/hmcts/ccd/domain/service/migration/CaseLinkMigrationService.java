@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkExtractor;
@@ -35,8 +36,8 @@ public class CaseLinkMigrationService {
             // caselinks that need creating based on the data
             final CaseTypeDefinition caseTypeDefinition =
                 caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
-            List<String> finalCaseLinkReferences =
-                caseLinkExtractor.getCaseLinks(caseDetails.getData(), caseTypeDefinition.getCaseFieldDefinitions());
+            List<CaseLink> finalCaseLinkReferences =
+                caseLinkExtractor.getCaseLinksFromData(caseDetails.getData(), caseTypeDefinition.getCaseFieldDefinitions());
 
             caseLinkService.updateCaseLinks(
                 caseDetails.getReference(),
