@@ -1,0 +1,104 @@
+{
+  "title":"Top level document and document within complex type defined, both the document field types have non-null sub-field category_id, category hierarchy displayed with the category from the document sub-field",
+  "_guid_": "S-140.7",
+  "_extends_": "F-140_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD and has read access permissions for all the Document fields",
+		"a case definition with category structure exists for the case type CT1",
+    "a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1",
+    "a case C1, containing the above document fields with the category_id in the Document type sub-field exists",
+    "contains the given case reference C1 in the input",
+    "contains a HTTP 200 status code",
+    "contains the category hierarchy"
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+	"request": {
+		"_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-140_CreateCase_hierarchyComplex_override][testData][actualResponse][body][id]}"
+    }
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "caseVersion": 1,
+      "categories": [
+        {
+          "categoryId": "CategoryID1",
+          "categoryName": "Evidences",
+          "categoryOrder": 100,
+          "documents": [
+            {
+              "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+              "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "attributePath": "Document1",
+              "uploadTimestamp": "[[ANYTHING_PRESENT]]"
+            },
+            {
+              "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+              "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "attributePath": "Document2",
+              "uploadTimestamp": "[[ANYTHING_PRESENT]]"
+            },
+            {
+              "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+              "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "attributePath": "ProofType.evidenceDocument",
+              "uploadTimestamp": "[[ANYTHING_PRESENT]]"
+            }
+          ],
+          "subCategories": []
+        },
+        {
+          "categoryId": "CategoryID2",
+          "categoryName": "Supporting",
+          "categoryOrder": 110,
+          "documents": [
+            {
+              "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+              "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "attributePath": "Document3",
+              "uploadTimestamp": "[[ANYTHING_PRESENT]]"
+            }
+          ],
+          "subCategories": []
+        },
+        {
+          "categoryId": "CategoryID3",
+          "categoryName": "Party Documents",
+          "categoryOrder": 120,
+          "documents": [],
+          "subCategories": [
+            {
+              "categoryId": " SubCategoryID1",
+              "categoryName": "Proof Documents",
+              "categoryOrder": 100,
+              "documents": [],
+              "subCategories": []
+            }
+          ]
+        }
+      ],
+      "unCategorisedDocuments": []
+    }
+  }
+}
+
