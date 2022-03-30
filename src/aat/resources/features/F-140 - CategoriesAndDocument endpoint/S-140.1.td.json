@@ -16,7 +16,7 @@
 	"request": {
 		"_extends_": "Common_Request",
     "pathVariables": {
-      "cid": "1919191919191919"
+      "cid": "4444333322221111"
     }
 	},
 
@@ -30,8 +30,8 @@
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
     "body" : {
-      "exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
-      "message": "No case found for reference: 1919191919191919",
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case found",
       "path": "[[ANYTHING_PRESENT]]",
       "details": null,
       "callbackErrors" : null,

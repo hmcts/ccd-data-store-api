@@ -20,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.TestFixtures;
+import uk.gov.hmcts.ccd.domain.model.casefileview.CategoriesAndDocuments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseCategoriesAndDocuments;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
@@ -40,6 +43,7 @@ import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -50,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -86,6 +91,9 @@ class CaseControllerTest {
 
     @Mock
     private SupplementaryDataUpdateRequestValidator requestValidator;
+
+    @Mock
+    private GetCaseCategoriesAndDocuments getCaseCategoriesAndDocuments;
 
     @InjectMocks
     private CaseController caseController;
@@ -428,11 +436,16 @@ class CaseControllerTest {
         @Test
         @DisplayName("should return 200 when case found")
         void caseFound() {
+            final CaseDetails localCaseDetails = TestFixtures.buildCaseDetails(emptyMap());
+            doReturn(Optional.of(localCaseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+            //doReturn().when(getCaseCategoriesAndDocuments).getCategoriesAndDocuments(anyString(), anyMap());
+
             // WHEN
-            final ResponseEntity<Void> response = caseController.getCategoriesAndDocuments(CASE_REFERENCE);
+            final ResponseEntity<CategoriesAndDocuments> response =
+                caseController.getCategoriesAndDocuments(CASE_REFERENCE);
 
             // THEN
-            assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
+            assertThat(response.getStatusCode(), is(HttpStatus.OK));
             assertNull(response.getBody());
         }
 

@@ -35,69 +35,69 @@
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
     "body" : {
-      "caseVersion": 1,
+      "case_version": "[[ANYTHING_PRESENT]]",
       "categories": [
         {
-          "categoryId": "CategoryID1",
-          "categoryName": "Evidences",
-          "categoryOrder": 100,
+          "category_id": "CategoryID1",
+          "category_name": "Evidences",
+          "category_order": 100,
           "documents": [
             {
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attributePath": "Document1",
-              "uploadTimestamp": "[[ANYTHING_PRESENT]]"
+              "attribute_path": "Document1",
+              "upload_timestamp": "[[ANYTHING_PRESENT]]"
             }
           ],
-          "subCategories": []
+          "sub_categories": []
         },
         {
-          "categoryId": "CategoryID2",
-          "categoryName": "Supporting",
-          "categoryOrder": 110,
+          "category_id": "CategoryID2",
+          "category_name": "Supporting",
+          "category_order": 110,
           "documents": [
             {
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attributePath": "Document2",
-              "uploadTimestamp": "[[ANYTHING_PRESENT]]"
+              "attribute_path": "Document2",
+              "upload_timestamp": "[[ANYTHING_PRESENT]]"
             }
           ],
-          "subCategories": []
+          "sub_categories": []
         },
         {
-          "categoryId": "CategoryID3",
-          "categoryName": "Party Documents",
-          "categoryOrder": 120,
+          "category_id": "CategoryID3",
+          "category_name": "Party Documents",
+          "category_order": 120,
           "documents": [],
-          "subCategories": [
+          "sub_categories": [
             {
-              "categoryId": " SubCategoryID1",
-              "categoryName": "Proof Documents",
-              "categoryOrder": 100,
+              "category_id": "SubCategoryID1",
+              "category_name": "Proof Documents",
+              "category_order": 100,
               "documents": [
                 {
                   "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
                   "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
                   "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-                  "attributePath": "ProofType.evidenceDocument",
-                  "uploadTimestamp": "[[ANYTHING_PRESENT]]"
+                  "attribute_path": "[[ANYTHING_PRESENT]]",
+                  "upload_timestamp": "[[ANYTHING_PRESENT]]"
                 }
               ],
-              "subCategories": []
+              "sub_categories": []
             }
           ]
         }
       ],
-      "unCategorisedDocuments": [
+      "uncategorised_documents": [
         {
           "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "attributePath": "Document3",
-          "uploadTimestamp": "[[ANYTHING_PRESENT]]"
+          "attribute_path": "Document3",
+          "upload_timestamp": "[[ANYTHING_PRESENT]]"
         }
       ]
     }

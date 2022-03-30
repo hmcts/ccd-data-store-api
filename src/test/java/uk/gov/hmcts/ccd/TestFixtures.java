@@ -3,13 +3,18 @@ package uk.gov.hmcts.ccd;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.jayway.jsonpath.JsonPath;
 import org.jooq.lambda.tuple.Tuple2;
 import org.junit.jupiter.params.provider.Arguments;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.EventPostStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
@@ -20,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -125,8 +131,7 @@ public abstract class TestFixtures {
     protected final List<BuildingLocation> locationsRefData = List.of(location1, location2);
     protected final List<ServiceReferenceData> servicesRefData = List.of(service1, service2);
 
-    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-        .registerModule(new JavaTimeModule());
+    protected static final ObjectMapper mapper = JacksonUtils.MAPPER.registerModule(new JavaTimeModule());
 
     @SuppressWarnings("unused")
     protected static Stream<Arguments> provideNullListParameters() {
@@ -137,11 +142,12 @@ public abstract class TestFixtures {
         );
     }
 
+    // TODO: consider consolidating this and `loadCaseDataFromJson(...)` below
     protected static Map<String, JsonNode> fromFileAsMap(final String filename) throws IOException {
         final InputStream inputStream = getTestsInputStream(filename);
         final TypeReference<Map<String, JsonNode>> typeReference = new TypeReference<>() {
         };
-        return OBJECT_MAPPER.readValue(inputStream, typeReference);
+        return mapper.readValue(inputStream, typeReference);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -149,7 +155,7 @@ public abstract class TestFixtures {
         final InputStream inputStream = getTestsInputStream(filename);
         final TypeReference<List<JsonNode>> typeReference = new TypeReference<>() {
         };
-        return OBJECT_MAPPER.readValue(inputStream, typeReference);
+        return mapper.readValue(inputStream, typeReference);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -176,7 +182,7 @@ public abstract class TestFixtures {
         return getInputStream("tests/".concat(filename));
     }
 
-    protected CaseDetails buildCaseDetails(final Map<String, JsonNode> data) {
+    public static CaseDetails buildCaseDetails(final Map<String, JsonNode> data) {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setReference(REFERENCE);
@@ -228,5 +234,57 @@ public abstract class TestFixtures {
             postStates.add(definition);
         }
         return postStates;
+    }
+
+    private static <T> T loadFromJson(final String filePath, final Class<T> valueType) throws IOException {
+        final InputStream inputStream = getInputStream(filePath);
+        return mapper.readValue(inputStream, valueType);
+    }
+
+    public static List<CaseFieldDefinition> getCaseFieldsFromJson(final String filePath) throws IOException {
+        final InputStream inputStream = getInputStream(filePath);
+        return mapper.readValue(inputStream, TypeFactory.defaultInstance()
+            .constructCollectionType(List.class, CaseFieldDefinition.class));
+    }
+
+    public static CaseDetails loadCaseDetails(final String filePath) throws IOException {
+        return loadFromJson(filePath, CaseDetails.class);
+    }
+
+    public static CaseFieldDefinition loadCaseFieldFromJson(final String filePath) throws IOException {
+        return loadFromJson(filePath, CaseFieldDefinition.class);
+    }
+
+    public static JsonNode loadJsonNodeFromJson(final String filePath) throws IOException {
+        return loadFromJson(filePath, JsonNode.class);
+    }
+
+    public static CaseTypeDefinition loadCaseTypeDefinition(final String jsonString) {
+        final InputStream inputStream = getInputStream(jsonString);
+        final String jsonPathExpression = "$.response.jsonBody";
+
+        return JsonPath.parse(inputStream)
+            .read(jsonPathExpression, CaseTypeDefinition.class);
+    }
+
+    public static CaseTypeDefinition loadCaseTypeDefinitionFromJson(final String filePath) throws IOException {
+        return loadFromJson(filePath, CaseTypeDefinition.class);
+    }
+
+    public static List<FieldTypeDefinition> getFieldTypesFromJson(final String filePath) throws IOException {
+        final InputStream inputStream = getInputStream(filePath);
+        return mapper.readValue(inputStream, TypeFactory.defaultInstance()
+            .constructCollectionType(List.class, FieldTypeDefinition.class));
+    }
+
+    public static Map<String, JsonNode> loadCaseDataFromJson(final String filePath) throws IOException {
+        final InputStream inputStream = getInputStream(filePath);
+        return mapper.readValue(inputStream, TypeFactory.defaultInstance()
+            .constructMapType(Map.class, String.class, JsonNode.class));
+    }
+
+    public static Map<String, JsonNode> caseDataFromJsonString(final String filePath) throws IOException {
+        return mapper.readValue(filePath, TypeFactory.defaultInstance()
+            .constructMapType(Map.class, String.class, JsonNode.class));
     }
 }

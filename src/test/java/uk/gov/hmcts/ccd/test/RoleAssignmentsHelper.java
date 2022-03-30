@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.ccd.BaseTest.loadCaseTypeDefinition;
+import static uk.gov.hmcts.ccd.TestFixtures.loadCaseTypeDefinition;
 
 public class RoleAssignmentsHelper {
     public static final String GET_ROLE_ASSIGNMENTS_PREFIX = "/am/role-assignments/actors/";

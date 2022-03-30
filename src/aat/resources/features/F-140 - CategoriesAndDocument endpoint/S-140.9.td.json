@@ -35,14 +35,15 @@
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
     "body" : {
-      "caseVersion": 1,
-      "unCategorisedDocuments": [
+      "case_version": "[[ANYTHING_PRESENT]]",
+      "categories" : [ ],
+      "uncategorised_documents": [
         {
           "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "attributePath": "Document1",
-          "uploadTimestamp": "[[ANYTHING_PRESENT]]"
+          "attribute_path": "[[ANYTHING_PRESENT]]",
+          "upload_timestamp": "[[ANYTHING_PRESENT]]"
         }
       ]
     }

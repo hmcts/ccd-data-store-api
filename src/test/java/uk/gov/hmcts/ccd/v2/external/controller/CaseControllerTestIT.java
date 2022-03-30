@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -38,6 +40,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
@@ -53,6 +56,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.ApplicationParams.encode;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.v2.V2.EXPERIMENTAL_HEADER;
@@ -728,6 +732,33 @@ class CaseControllerTestIT extends WireMockBaseTest {
         Assertions.assertThat(mvcResult.getResponse())
             .isNotNull()
             .satisfies(response -> Assertions.assertThat(response.getStatus()).isEqualTo(204));
+    }
+
+    @Test
+    //@Disabled
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void testShouldGetCategoriesAndDocuments_2() throws Exception {
+        final String caseTypeId = "FT_CaseFileView";
+        final CaseTypeDefinition caseTypeDefinition =
+            loadCaseTypeDefinition("mappings/ft-case-file-view-definition.json");
+
+        stubSuccess(String.format("/api/data/case-type/%s", encode(caseTypeId)),
+            objectToJsonString(caseTypeDefinition),
+            UUID.randomUUID());
+
+
+        final String caseId = "1504259907353529";
+        final String URL = "/categoriesAndDocuments/" + caseId;
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        Assertions.assertThat(mvcResult.getResponse())
+            .isNotNull()
+            .satisfies(response -> Assertions.assertThat(response.getStatus()).isEqualTo(200));
     }
 
     @Test

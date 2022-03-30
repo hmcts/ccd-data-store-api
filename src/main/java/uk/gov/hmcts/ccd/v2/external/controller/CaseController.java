@@ -11,6 +11,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.domain.model.casefileview.CategoriesAndDocuments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -32,6 +34,7 @@ import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseCategoriesAndDocuments;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
@@ -56,6 +59,7 @@ public class CaseController {
     private final GetEventsOperation getEventsOperation;
     private final SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private final SupplementaryDataUpdateRequestValidator requestValidator;
+    private final GetCaseCategoriesAndDocuments getCaseCategoriesAndDocuments;
 
     @Autowired
     public CaseController(
@@ -65,8 +69,8 @@ public class CaseController {
         UIDService caseReferenceService,
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
         @Qualifier("authorised") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
-        SupplementaryDataUpdateRequestValidator requestValidator
-    ) {
+        SupplementaryDataUpdateRequestValidator requestValidator,
+        GetCaseCategoriesAndDocuments getCaseCategoriesAndDocuments) {
         this.getCaseOperation = getCaseOperation;
         this.createEventOperation = createEventOperation;
         this.createCaseOperation = createCaseOperation;
@@ -74,6 +78,7 @@ public class CaseController {
         this.getEventsOperation = getEventsOperation;
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.requestValidator = requestValidator;
+        this.getCaseCategoriesAndDocuments = getCaseCategoriesAndDocuments;
     }
 
     @GetMapping(
@@ -423,9 +428,7 @@ public class CaseController {
 
     @GetMapping(
         path = "/categoriesAndDocuments/{caseRef}",
-        produces = {
-            V2.MediaType.CASE
-        }
+        produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ApiResponses({
         @ApiResponse(
@@ -443,11 +446,18 @@ public class CaseController {
     })
     /*TODO @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")*/
-    public ResponseEntity<Void> getCategoriesAndDocuments(@PathVariable("caseRef") final String caseRef) {
+    public ResponseEntity<CategoriesAndDocuments> getCategoriesAndDocuments(
+        @PathVariable("caseRef") final String caseRef
+    ) {
         validateCaseReference(caseRef);
         final CaseDetails caseDetails = getCaseDetails(caseRef);
 
-        return ResponseEntity.noContent().build();  // TODO: for now
+        final CategoriesAndDocuments categoriesAndDocuments = getCaseCategoriesAndDocuments.getCategoriesAndDocuments(
+            caseDetails.getCaseTypeId(),
+            caseDetails.getData()
+        );
+
+        return ResponseEntity.ok(categoriesAndDocuments);
     }
 
     private ResponseEntity<CaseResource> getCaseResourceResponseEntity(String caseTypeId,

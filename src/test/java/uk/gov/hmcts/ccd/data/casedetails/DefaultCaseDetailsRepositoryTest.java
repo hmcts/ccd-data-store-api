@@ -458,7 +458,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     })
     public void searchWithParams_withAccessLevelGranted() throws Exception {
         String userId = "123";
-        CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("/mappings/bookcase-definition.json");
+        CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("mappings/bookcase-definition.json");
         caseTypeDefinition.setRoleToAccessProfiles(asList(roleToAccessProfileDefinition("[CREATOR]")));
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase"))
