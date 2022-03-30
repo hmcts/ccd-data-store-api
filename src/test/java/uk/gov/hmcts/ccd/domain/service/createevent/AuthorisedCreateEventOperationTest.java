@@ -147,7 +147,8 @@ class AuthorisedCreateEventOperationTest {
             accessControlService,
             caseAccessService,
             caseAccessCategoriesService,
-            caseDetailsJsonParser);
+            caseDetailsJsonParser,
+            getCaseOperation);
 
         mockExistingCaseDetails(Maps.newHashMap());
 
