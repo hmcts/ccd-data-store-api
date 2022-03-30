@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-13010_CreateCaseBase",
+  "_guid_": "F-1007_CreateCaseBase",
 
   "productName": "CCD Data Store",
   "operationName": "external create case",
@@ -7,7 +7,12 @@
   "uri": "/case-types/{ctid}/cases",
 
   "specs" : [
-    "to create a full case"
+    "to create a case"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1007_CreateCaseTokenCreation"
+  }
   ],
 
   "users": {
@@ -25,7 +30,7 @@
       "experimental": true
     },
     "body": {
-      "data": {
+        "data": {
         "TextField": "value1",
         "CaseAccessCategory": null
       },
@@ -34,7 +39,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token": "${[scenarioContext][parentContext][childContexts][F-13010_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
       "ignore_warning": false
     }
   },

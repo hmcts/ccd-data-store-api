@@ -1,0 +1,24 @@
+{
+  "_guid_": "S-1007.5_CreateCase",
+  "_extends_" : "F-1007_CreateCaseBase",
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_CaseAccessCategories_2"
+    },
+    "body": {
+      "data": {
+        "CaseAccessCategory": "FamilyLaw/Standard"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "case_type" : "FT_CaseAccessCategories_2",
+      "data": {
+        "CaseAccessCategory": "FamilyLaw/Standard"
+      }
+    }
+  }
+}
