@@ -1,5 +1,40 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint.GLOBAL_SEARCH_PATH;
+
+import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.auditlog.AuditEntry;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortByCategory;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortDirection;
+import uk.gov.hmcts.ccd.domain.model.search.global.Party;
+import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
+import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
+import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
+import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields;
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
@@ -15,39 +50,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.auditlog.AuditEntry;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
-import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
-import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
-import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortByCategory;
-import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortDirection;
-import uk.gov.hmcts.ccd.domain.model.search.global.Party;
-import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
-import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
-import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
-import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint.GLOBAL_SEARCH_PATH;
 
 public class GlobalSearchEndpointIT extends WireMockBaseTest {
 

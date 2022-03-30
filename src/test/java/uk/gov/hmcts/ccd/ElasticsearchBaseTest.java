@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd;
 
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SORT;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
+
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
+
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,14 +23,6 @@ import lombok.Builder;
 import lombok.Singular;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.QueryBuilder;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-
-import java.util.List;
-
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SORT;
-import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
 
 public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
 

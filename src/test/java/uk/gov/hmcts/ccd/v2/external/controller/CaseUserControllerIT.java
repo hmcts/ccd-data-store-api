@@ -1,5 +1,23 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+
+import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.auditlog.AuditEntry;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import javax.inject.Inject;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Sets;
@@ -13,23 +31,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.auditlog.AuditEntry;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
-import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-
-import javax.inject.Inject;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 public class CaseUserControllerIT extends WireMockBaseTest {
 

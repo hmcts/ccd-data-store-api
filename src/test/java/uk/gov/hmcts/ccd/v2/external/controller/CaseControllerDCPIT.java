@@ -1,29 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
-import uk.gov.hmcts.ccd.v2.V2;
-
-import javax.inject.Inject;
-import java.util.Map;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -48,6 +24,32 @@ import static uk.gov.hmcts.ccd.v2.DCPTestHelper.TEXT_FIELD;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.createCaseRequestContent;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.jsonPath;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.updateEventRequestContent;
+
+import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
+import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
+
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class CaseControllerDCPIT extends WireMockBaseTest {

@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.data.definition;
 import com.google.common.collect.Lists;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;

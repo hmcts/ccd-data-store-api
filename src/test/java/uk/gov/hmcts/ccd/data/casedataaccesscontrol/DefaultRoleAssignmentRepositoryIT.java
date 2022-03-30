@@ -1,31 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -47,6 +21,33 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpHeaders.ETAG;
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
+
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
+
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 @Disabled("Temporary for pipeline issues")
 @DisplayName("DefaultRoleAssignmentRepository")

@@ -1,14 +1,16 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
+
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
 
 class FindSupplementaryDataQueryBuilderTest  extends WireMockBaseTest {
 

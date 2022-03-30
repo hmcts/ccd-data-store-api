@@ -18,7 +18,6 @@ import java.util.concurrent.Future;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.protocol.HTTP.CONTENT_TYPE;
@@ -31,6 +30,8 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
 import static wiremock.com.google.common.collect.Lists.newArrayList;
 import static wiremock.org.apache.http.entity.ContentType.APPLICATION_JSON;
+
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

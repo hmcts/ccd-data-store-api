@@ -1,44 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.GlobalSearchTestFixture;
-import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.TestFixtures;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.auditlog.AuditEntry;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
-import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
-import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
-import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -59,6 +20,47 @@ import static uk.gov.hmcts.ccd.v2.V2.EXPERIMENTAL_HEADER;
 import static uk.gov.hmcts.ccd.v2.V2.Error.CASE_ID_INVALID;
 import static uk.gov.hmcts.ccd.v2.V2.Error.CASE_NOT_FOUND;
 import static uk.gov.hmcts.ccd.v2.V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA;
+
+import uk.gov.hmcts.ccd.GlobalSearchTestFixture;
+import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.TestFixtures;
+import uk.gov.hmcts.ccd.auditlog.AuditEntry;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
+import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 class CaseControllerTestIT extends WireMockBaseTest {
 

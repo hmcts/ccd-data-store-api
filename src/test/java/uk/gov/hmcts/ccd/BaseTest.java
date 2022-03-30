@@ -1,5 +1,57 @@
 package uk.gov.hmcts.ccd;
 
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
+
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.DefaultRoleAssignmentRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
+import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
+import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
+import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
+import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
+import uk.gov.hmcts.ccd.domain.types.BaseType;
+import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.sql.DataSource;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -27,56 +79,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
-import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
-import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.DefaultRoleAssignmentRepository;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
-import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
-import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
-import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
-import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
-import uk.gov.hmcts.ccd.domain.types.BaseType;
-import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
-
-import javax.inject.Inject;
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)

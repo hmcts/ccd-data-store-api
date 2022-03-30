@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd;
+package uk.gov.hmcts.ccd.wiremock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.inject.Inject;
@@ -43,7 +44,11 @@ import java.util.stream.Stream;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.BaseTest;
+
 @AutoConfigureWireMock(port = 0)
+@ActiveProfiles("test")
 public abstract class WireMockBaseTest extends BaseTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
@@ -147,29 +152,6 @@ public abstract class WireMockBaseTest extends BaseTest {
             return objectMapper.writeValueAsString(object);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    @Configuration
-    static class WireMockTestConfiguration {
-
-        @Bean
-        public WireMockConfigurationCustomizer wireMockConfigurationCustomizer() {
-            return config -> config.extensions(new ResponseDefinitionTransformer() {
-
-                @Override
-                public String getName() {
-                    return "keep-alive-disabler";
-                }
-
-                @Override
-                public ResponseDefinition transform(Request request, ResponseDefinition responseDefinition,
-                                                    FileSource files, Parameters parameters) {
-                    return ResponseDefinitionBuilder.like(responseDefinition)
-                        .withHeader(HttpHeaders.CONNECTION, "close")
-                        .build();
-                }
-            });
         }
     }
 

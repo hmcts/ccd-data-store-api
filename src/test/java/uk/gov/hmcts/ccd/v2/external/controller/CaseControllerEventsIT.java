@@ -1,25 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import java.util.Arrays;
-import javax.inject.Inject;
-import org.apache.commons.lang.RandomStringUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.http.HttpHeaders;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.assertEquals;
@@ -31,6 +11,29 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentRe
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentResponse;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.enhanceGetCaseTypeStubWithAccessProfiles;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleToAccessProfileDefinition;
+
+import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
+
+import java.util.Arrays;
+
+import javax.inject.Inject;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import org.apache.commons.lang.RandomStringUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.http.HttpHeaders;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 public class CaseControllerEventsIT extends WireMockBaseTest {
     private static final String GET_CASE_EVENTS = "/cases/1504259907353529/events";

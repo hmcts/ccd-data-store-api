@@ -1,5 +1,37 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
+import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
+
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.auditlog.AuditEntry;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
@@ -20,36 +52,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.auditlog.AuditEntry;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
-import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
-import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
-import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
-import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 
 class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 

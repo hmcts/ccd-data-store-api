@@ -47,7 +47,7 @@ apply plugin: 'se.patrikerdes.use-latest-versions'
 def versions = [
         pact_version: '4.1.7'
 ]
-
+ext['spring-security.version'] = '5.6.1'
 ext['spring-framework.version'] = '5.3.15'
 
 
@@ -188,6 +188,8 @@ dependencies {
 
     implementation group: 'net.minidev', name: 'json-smart', version: '2.4.7'
 
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.21'
+
     testCompile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
 
@@ -272,7 +274,7 @@ dependencies {
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
     contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.1'
-    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '5.6.1'
+    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: '5.6.1'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: '5.6.1'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: '5.6.1'

@@ -1,18 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-
-import javax.inject.Inject;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -22,6 +9,20 @@ import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
+
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 public class CaseRolesIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE = "/aggregated/caseworkers/0/jurisdictions/PROBATE"

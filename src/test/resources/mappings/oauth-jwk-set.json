@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/o/jwks"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "transformers" : [ "dynamic-oauth-jwk-set-response-transformer" ]
+  }
+}

@@ -1,32 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.google.common.collect.Lists;
-import org.hamcrest.MatcherAssert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.auditlog.AuditEntry;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
-import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
-import uk.gov.hmcts.ccd.domain.model.std.UserId;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.List;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.util.Collections.singletonList;
@@ -41,6 +14,35 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentRecord;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentResponse;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
+
+import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.auditlog.AuditEntry;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
+import uk.gov.hmcts.ccd.domain.model.std.UserId;
+import uk.gov.hmcts.ccd.wiremock.WireMockBaseTest;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.google.common.collect.Lists;
+import org.hamcrest.MatcherAssert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 public class CaseAccessEndpointIT extends WireMockBaseTest {
 
