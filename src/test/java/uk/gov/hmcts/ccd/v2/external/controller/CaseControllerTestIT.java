@@ -36,7 +36,9 @@ import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
@@ -44,6 +46,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -801,8 +804,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testShouldGetLinkedCases() throws Exception {
-        final String caseId = "1504259907353529";
-        final String URL = "/getLinkedCases/" + caseId;
+        final String caseReference = "1504259907353529";
+        final String URL = "/getLinkedCases/" + caseReference;
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
@@ -816,8 +819,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testShouldGetLinkedCasesOptionalParameters() throws Exception {
-        final String caseId = "1504259907353529";
-        final String URL = "/getLinkedCases/" + caseId + "?startRecordNumber=2&maxReturnRecordCount=1";
+        final String caseReference = "1504259907353529";
+        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=2&maxReturnRecordCount=1";
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
@@ -830,8 +833,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     void testGetLinkedCasesInvalidCaseReferenceShouldReturn400() throws Exception {
-        final String caseId = "abc";
-        final String URL = "/getLinkedCases/" + caseId;
+        final String caseReference = "abc";
+        final String URL = "/getLinkedCases/" + caseReference;
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
@@ -844,8 +847,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     void testShouldGetLinkedCasesReturn404WhenCaseDoesNotExist() throws Exception {
-        final String caseId = "4259907353529155";
-        final String URL = "/getLinkedCases/" + caseId;
+        final String caseReference = "4259907353529155";
+        final String URL = "/getLinkedCases/" + caseReference;
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
@@ -858,8 +861,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     void testShouldGetLinkedCasesStartRecordNumberNotNumericReturn400() throws Exception {
-        final String caseId = "1504259907353529";
-        final String URL = "/getLinkedCases/" + caseId + "?startRecordNumber=A";
+        final String caseReference = "1504259907353529";
+        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=A";
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
@@ -872,8 +875,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     void testShouldGetLinkedCasesMaxRecordCountNotNumericReturn400() throws Exception {
-        final String caseId = "1504259907353529";
-        final String URL = "/getLinkedCases/" + caseId + "?maxReturnRecordCount=A";
+        final String caseReference = "1504259907353529";
+        final String URL = "/getLinkedCases/" + caseReference + "?maxReturnRecordCount=A";
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
@@ -882,6 +885,36 @@ class CaseControllerTestIT extends WireMockBaseTest {
             .andReturn();
 
         assertEquals(400, mvcResult.getResponse().getStatus());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldLogAuditInfoForGetLinkedCases() throws Exception {
+        final String caseReference = "1504259907353529";
+        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=2&maxReturnRecordCount=2";
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+                .header(REQUEST_ID, REQUEST_ID_VALUE)
+                .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
+        String content = mvcResult.getResponse().getContentAsString();
+        assertNotNull("Content Should not be null", content);
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        List<String> cassReferences = Arrays.asList(captor.getValue().getCaseId().split(","));
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.LINKED_CASES_ACCESSED.getLabel()));
+        assertThat(cassReferences, containsInAnyOrder(caseReference, "123", "456"));
+        assertThat(cassReferences.size(), is(3));
+        assertThat(captor.getValue().getIdamId(), is(UID));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
+        assertThat(captor.getValue().getHttpStatus(), is(200));
+        assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
     }
 
 }

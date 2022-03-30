@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
+import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -35,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -44,7 +48,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
@@ -53,6 +56,7 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 @DisplayName("CaseController")
@@ -430,25 +434,22 @@ class CaseControllerTest {
         @DisplayName("should return 200 when case found")
         void linkedCaseFound() {
             // WHEN
-            final ResponseEntity<Void> response = caseController.getLinkedCase(CASE_REFERENCE,
+            final ResponseEntity<GetLinkedCasesResponse> response = caseController.getLinkedCase(CASE_REFERENCE,
                 null, null);
 
             // THEN
             assertThat(response.getStatusCode(), is(HttpStatus.OK));
-            assertNull(response.getBody());
         }
 
         @Test
         @DisplayName("should return 200 when case found with parameters")
         void linkedCaseFoundWithOptionalParameters() {
             // WHEN
-
-            final ResponseEntity<Void> response = caseController.getLinkedCase(CASE_REFERENCE, START_RECORD_NUMBER,
-                MAX_RETURN_RECORD_COUNT);
+            final ResponseEntity<GetLinkedCasesResponse> response =
+                caseController.getLinkedCase(CASE_REFERENCE, START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT);
 
             // THEN
             assertThat(response.getStatusCode(), is(HttpStatus.OK));
-            assertNull(response.getBody());
         }
 
         @Test
@@ -500,6 +501,69 @@ class CaseControllerTest {
             assertThrows(Exception.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
                 START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
 
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /getLinkedCases/{caseReference}")
+    class GetLinkedCasesAuditLogTests {
+
+        @DisplayName("List empty: should return empty string when empty list is passed")
+        @Test
+        void shouldReturnEmptyStringWhenEmptyListPassed() {
+            Assertions.assertEquals(
+                "",
+                CaseController.buildCaseIds("", createGetLinkedCasesResponse(0))
+            );
+        }
+
+        @DisplayName("List one: should return simple string when single list item is passed")
+        @Test
+        void shouldReturnSimpleStringWhenSingleListItemPassed() {
+            Assertions.assertEquals(
+                "reference-1",
+                CaseController.buildCaseIds("reference-1", createGetLinkedCasesResponse(0))
+            );
+        }
+
+        @DisplayName("List many: should return CSV string when many list items are passed")
+        @Test
+        void shouldReturnCsvStringWhenManyListItemsPassed() {
+            Assertions.assertEquals(
+                "reference-1,reference-2,reference-3,reference-4",
+                CaseController.buildCaseIds("reference-1", createGetLinkedCasesResponse(3))
+            );
+        }
+
+        @DisplayName("List too many: should return max CSV string when too many list items are passed")
+        @Test
+        void shouldReturnMaxCsvListWhenTooManyListItemsPassed() {
+
+            // ARRANGE
+            GetLinkedCasesResponse input = createGetLinkedCasesResponse(MAX_CASE_IDS_LIST + 1);
+            String expectedOutput = "reference-1," + createGetLinkedCasesResponse(MAX_CASE_IDS_LIST - 1)
+                .getLinkedCases().stream()
+                .map(CaseLinkInfo::getCaseReference)
+                .collect(Collectors.joining(","));
+
+            // ACT
+            String output = CaseController.buildCaseIds("reference-1", input);
+
+            // ASSERT
+            Assertions.assertEquals(expectedOutput, output);
+        }
+
+        private GetLinkedCasesResponse createGetLinkedCasesResponse(int numberRequired) {
+            List<CaseLinkInfo> results = Lists.newArrayList();
+
+            for (int i = 2; i <= numberRequired + 1; i++) {
+                results.add(CaseLinkInfo.builder()
+                    .caseReference("reference-" + i)
+                    .build()
+                );
+            }
+
+            return GetLinkedCasesResponse.builder().linkedCases(results).build();
         }
     }
 }
