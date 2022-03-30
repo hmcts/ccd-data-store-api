@@ -9,5 +9,5 @@ import java.util.List;
 @Builder
 public class GetLinkedCasesResponse {
     private boolean hasMoreRecords;
-    private List<CaseLinkInfo> caseLinks;
+    private List<CaseLinkInfo> linkedCases;
 }

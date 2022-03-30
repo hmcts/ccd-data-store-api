@@ -13,5 +13,5 @@ public class CaseLinkInfo {
     private String ccdCaseType;
     private String ccdJurisdiction;
     private String state;
-    private List<CaseLinkDetails> caseLinkDetails;
+    private List<CaseLinkDetails> linkDetails;
 }
