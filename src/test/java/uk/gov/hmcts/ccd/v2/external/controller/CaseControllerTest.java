@@ -28,6 +28,8 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
@@ -460,9 +462,9 @@ class CaseControllerTest {
             doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
             // THEN
-            assertThrows(CaseNotFoundException.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
+            assertThrows(ResourceNotFoundException.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
                 START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT),
-                String.format("No case found for reference: %s", CASE_REFERENCE));
+                V2.Error.CASE_NOT_FOUND);
         }
 
         @Test

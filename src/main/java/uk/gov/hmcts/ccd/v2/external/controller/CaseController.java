@@ -37,6 +37,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
@@ -465,12 +466,13 @@ public class CaseController {
             response = CaseResource.class),
         @ApiResponse(
             code = 400,
-            message = V2.Error.CASE_ID_INVALID),
+            message = "One or more of the following reasons:"
+                + "\n1) " + V2.Error.CASE_ID_INVALID
+                + "\n2) " + V2.Error.PARAM_NOT_NUM),
         @ApiResponse(
             code = 404,
-            message = V2.Error.CASE_REFERENCE_NOT_FOUND)
+            message = V2.Error.CASE_NOT_FOUND)
     })
-
     @LogAudit(operationType = LINKED_CASES_ACCESSED,
         caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseController).buildCaseIds(#caseReference, #result.body)")
     public ResponseEntity<GetLinkedCasesResponse> getLinkedCase(
@@ -484,9 +486,6 @@ public class CaseController {
         validateIsNumericParameter(maxReturnRecordCount);
 
         validateCaseReference(caseReference);
-
-        //Validate Case exists
-        getCaseDetails(caseReference);
 
         //TODO remove when stuff built in RDM-13139 functional test F-140.6 might need updated as well
         //TEST create fake Response
@@ -517,11 +516,9 @@ public class CaseController {
         if (!caseReferenceService.validateUID(caseReference)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
-    }
 
-    private CaseDetails getCaseDetails(final String caseReference) {
-        return getCaseOperation.execute(caseReference)
-            .orElseThrow(() -> new CaseNotFoundException(caseReference));
+        getCaseOperation.execute(caseReference)
+            .orElseThrow(() -> new ResourceNotFoundException(V2.Error.CASE_NOT_FOUND));
     }
 
     public static String buildCaseIds(String caseReference, GetLinkedCasesResponse getLinkedCasesResponse) {

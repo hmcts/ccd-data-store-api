@@ -1,6 +1,6 @@
 #====================================
 @F-140
-Feature: F-140: Retrieve a case by case reference
+Feature: F-140: Get Linked Case V2 External
 #====================================
 
 Background:
@@ -37,7 +37,7 @@ Scenario: should get 404 when case reference does not exist
 @S-140.3
 Scenario: must return 404 when request provides authentic credentials without authorised access to the operation
 
-    Given a case that has just been created as in [Unauthorised_Case_Creation_Data],
+    Given a case that has just been created as in [Standard_Full_Case_Creation_Data],
       And a user with [an active profile in CCD],
 
      When a request is prepared with appropriate values,
@@ -101,7 +101,7 @@ Scenario: should return 404 when case reference is not supplied
     Given a user with [an active profile in CCD],
 
      When a request is prepared with appropriate values,
-      And the request [contains an invalid case reference],
+      And the request [does not contain a case reference],
       And it is submitted to call the [retrieve a linked case by case reference] operation of [CCD Data Store],
 
      Then a negative response is received,
