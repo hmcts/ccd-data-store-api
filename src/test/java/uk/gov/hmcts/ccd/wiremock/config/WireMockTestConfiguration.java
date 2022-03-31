@@ -12,8 +12,8 @@ public class WireMockTestConfiguration {
 
     @Bean
     public WireMockConfigurationCustomizer wireMockConfigurationCustomizer() {
-        return config -> config.extensions(new CustomisedResponseTransformer()
-            , new DynamicOAuthJwkSetResponseTransformer());
+        return config -> config.extensions(new CustomisedResponseTransformer(),
+            new DynamicOAuthJwkSetResponseTransformer());
     }
 }
 
