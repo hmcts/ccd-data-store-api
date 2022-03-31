@@ -64,20 +64,12 @@
 		<cve>CVE-2020-36518</cve>
 	</suppress>
 
-	<suppress until="2022-04-25">
-		<notes>
-			CVE affecting hazelcast-spring-4.0.3.jar and hazelcast-4.0.3.jar
-		</notes>
-		<cve>CVE-2022-0265</cve>
-	</suppress>
-
-	<suppress until="2022-04-25">
-		<notes><![CDATA[
-   file name: jackson-databind-2.11.4.jar
+    <suppress until="2022-04-25">
+        <notes><![CDATA[
+   file name: postgresql-42.2.16.jar
    ]]></notes>
-		<packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-		<cve>CVE-2020-36518</cve>
-	</suppress>
-
+        <packageUrl regex="true">^pkg:maven/org\.postgresql/postgresql@.*$</packageUrl>
+        <cve>CVE-2022-21724</cve>
+    </suppress>
 
 </suppressions>
