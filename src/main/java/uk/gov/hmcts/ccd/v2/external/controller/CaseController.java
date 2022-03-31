@@ -516,8 +516,11 @@ public class CaseController {
         if (!caseReferenceService.validateUID(caseReference)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
+        getCaseDetails(caseReference);
+    }
 
-        getCaseOperation.execute(caseReference)
+    private CaseDetails getCaseDetails(final String caseReference) {
+        return getCaseOperation.execute(caseReference)
             .orElseThrow(() -> new ResourceNotFoundException(V2.Error.CASE_NOT_FOUND));
     }
 
