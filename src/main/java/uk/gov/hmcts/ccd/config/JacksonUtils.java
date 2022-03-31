@@ -141,7 +141,10 @@ public final class JacksonUtils {
                 }
             }
         } else {
-            returnValue = getValue(getNestedCaseFieldByPath(jsonNode, path));
+            JsonNode foundNodeValue = getNestedCaseFieldByPath(jsonNode, path);
+            if (foundNodeValue != null) {
+                returnValue = getValue(foundNodeValue);
+            }
         }
 
         return returnValue;
@@ -150,8 +153,8 @@ public final class JacksonUtils {
 
     private static String getValueFromArray(String path, JsonNode jsonNode) {
         ArrayNode arrayNode = (ArrayNode)jsonNode;
-        final var arrayIndex = path.substring(0, path.indexOf("."));
-        final var truncatedPath = path.substring(path.indexOf(".") + 1);
+        final var arrayIndex = path.contains(".") ? path.substring(0, path.indexOf(".")) : path;
+        final var truncatedPath = path.contains(".") ? path.substring(path.indexOf(".") + 1) : "";
         if (StringUtils.isNumeric(arrayIndex)) {
             JsonNode foundJsonNode = arrayNode.get(Integer.parseInt(arrayIndex));
             if (foundJsonNode != null) {
@@ -164,7 +167,11 @@ public final class JacksonUtils {
                     foundJsonNode = foundJsonNode.get(CollectionSanitiser.VALUE);
                 }
 
-                return getValueFromPath(truncatedPath, foundJsonNode);
+                if (StringUtils.isNotBlank(truncatedPath)) {
+                    return getValueFromPath(truncatedPath, foundJsonNode);
+                } else {
+                    return getValue(foundJsonNode);
+                }
             }
         }
         return null;

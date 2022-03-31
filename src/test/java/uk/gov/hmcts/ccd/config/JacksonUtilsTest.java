@@ -123,10 +123,19 @@ class JacksonUtilsTest {
 
     @ParameterizedTest(name = "Test getValueFromPath - #{index} - `{0}`")
     @CsvSource({
-        "Name,NameValue",
+        "String," + "StringValue",
+
+        "StringCollection.0," + "String1",
+        "StringCollection.0.value," + "String1",
+        "StringCollection.1," + "String2",
+        "StringCollection.1.value," + "String2",
+
+        "StringNotACollection.0," + "String3",
+        "StringNotACollection.1," + "String4",
 
         "Class.0.value.ClassName," + "ClassNameValue1",
         "Class.0.ClassName," + "ClassNameValue1",
+        "Class.0.NestedCollection," + NULL_MARKER,
         "Class.0.NestedCollection.0.property1," + "NestedColProperty1",
         "Class.0.NestedCollection.0.id," + UUID_MARKER,
         "Class.0.NestedComplex.property1," + "NestedComplexProperty1",
@@ -134,13 +143,24 @@ class JacksonUtilsTest {
         "Class.1.value.ClassName," + "ClassNameValue2",
         "Class.1.ClassName," + "ClassNameValue2",
 
+        "Class," + NULL_MARKER, // no collection index/property to load
+        "Class.0.NestedCollection," + NULL_MARKER, // no collection index/property to load
+        "ClassNotFound," + NULL_MARKER,
+        "ClassNotFound.1.Property," + NULL_MARKER,
         "Class.1.NotFound," + NULL_MARKER,
         "Class.2.BadIndex," + NULL_MARKER,
+        "Class.NotAnIndex," + NULL_MARKER,
 
         "Number," + "123",
 
-        "NumberCollection.0.Number," + "456",
-        "NumberCollection.1.Number," + "789",
+        "NumberCollection.0," + "456",
+        "NumberCollection.1," + "789",
+
+        "NumberNotACollection.0," + "111",
+        "NumberNotACollection.1," + "222",
+
+        "ArrayWithNumbers.0.Number," + "333",
+        "ArrayWithNumbers.1.Number," + "444",
 
         "AddressCollection.0.value.AddressLine1," + "Page Street 50",
 
@@ -160,7 +180,21 @@ class JacksonUtilsTest {
         final String testId = UUID.randomUUID().toString();
         final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
             "{"
-                + "  \"Name\": \"NameValue\","
+                + "  \"String\": \"StringValue\","
+                + "  \"StringCollection\": ["
+                + "    {"
+                + "      \"id\": \"dbb19fb5-6647-4d6f-9bbb-f0b9fe3f3b49\","
+                + "      \"value\": \"String1\""
+                + "    },"
+                + "    {"
+                + "      \"id\": \"ea73d66f-9388-4344-afba-eac5d37b0baf\","
+                + "      \"value\": \"String2\""
+                + "    }"
+                + "  ],"
+                + "  \"StringNotACollection\": ["
+                + "    \"String3\","
+                + "    \"String4\""
+                + "   ],"
                 + "  \"Class\": ["
                 + "    {"
                 + "      \"id\": \"6da7a0cf-8186-49d4-813d-c299d8f3491b\","
@@ -188,8 +222,22 @@ class JacksonUtilsTest {
                 + "  ],"
                 + "  \"Number\": 123,"
                 + "  \"NumberCollection\": ["
-                + "     {\"Number\" : 456},"
-                + "     {\"Number\" : 789}"
+                + "    {"
+                + "      \"id\": \"7416b8e4-4912-4b9e-b888-61bba42079c2\","
+                + "      \"value\": 456"
+                + "    },"
+                + "    {"
+                + "      \"id\": \"1b4abdf3-0ea7-4dcb-ab6a-c85975a43ab3\","
+                + "      \"value\": 789"
+                + "    }"
+                + "  ],"
+                + "  \"NumberNotACollection\": ["
+                + "     111,"
+                + "     222"
+                + "  ],"
+                + "  \"ArrayWithNumbers\": ["
+                + "     {\"Number\": 333},"
+                + "     {\"Number\": 444}"
                 + "  ],"
                 + "  \"AddressCollection\": ["
                 + "    {"
