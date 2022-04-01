@@ -3,30 +3,28 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
+import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.GetLinkedCasesResponseCreator;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
@@ -39,8 +37,15 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.lang.Integer.valueOf;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -48,12 +53,13 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
@@ -89,6 +95,12 @@ class CaseControllerTest {
 
     @Mock
     private SupplementaryDataUpdateRequestValidator requestValidator;
+
+    @Mock
+    private GetLinkedCasesResponseCreator getLinkedCasesResponseCreator;
+
+    @Mock
+    private CaseLinkRetrievalService caseLinkRetrievalService;
 
     @InjectMocks
     private CaseController caseController;
@@ -429,28 +441,46 @@ class CaseControllerTest {
     class GetLinkedCases {
 
         @Test
-        @DisplayName("should return 200 when case found")
-        void linkedCaseFound() {
+        @DisplayName("should return 200 when case found, and maxRecordNumber parameter is not set")
+        void linkedCaseFoundMaxRecordNumberNotSet() {
+            GetLinkedCasesResponse getLinkedCasesResponse = GetLinkedCasesResponse.builder()
+                .hasMoreRecords(false)
+                .linkedCases(List.of(CaseLinkInfo.builder().build()))
+                .build();
+            when(getLinkedCasesResponseCreator.createResponse(any())).thenReturn(getLinkedCasesResponse);
+
             // WHEN
-            final ResponseEntity<Void> response = caseController.getLinkedCase(CASE_REFERENCE,
-                null, null);
+            final ResponseEntity<GetLinkedCasesResponse> response = caseController.getLinkedCase(CASE_REFERENCE,
+                "1", "");
+
+            ArgumentCaptor<Integer> startRecordNumberCaptor = ArgumentCaptor.forClass(Integer.class);
+            ArgumentCaptor<Integer> maxRecordsNumberCaptor = ArgumentCaptor.forClass(Integer.class);
+            ArgumentCaptor<String> caseReferenceCaptor = ArgumentCaptor.forClass(String.class);
 
             // THEN
             assertThat(response.getStatusCode(), is(HttpStatus.OK));
-            assertNull(response.getBody());
+            assertNotNull(response.getBody());
+
+            verify(caseLinkRetrievalService).getStandardLinkedCases(caseReferenceCaptor.capture(),
+                startRecordNumberCaptor.capture(), maxRecordsNumberCaptor.capture());
+            assertEquals(valueOf(0), maxRecordsNumberCaptor.getValue());
         }
 
         @Test
         @DisplayName("should return 200 when case found")
         void linkedCaseFoundWithOptionalParameters() {
             // WHEN
-
-            final ResponseEntity<Void> response = caseController.getLinkedCase(CASE_REFERENCE, START_RECORD_NUMBER,
-                MAX_RETURN_RECORD_COUNT);
+            GetLinkedCasesResponse getLinkedCasesResponse = GetLinkedCasesResponse.builder()
+                .hasMoreRecords(false)
+                .linkedCases(List.of(CaseLinkInfo.builder().build()))
+                .build();
+            when(getLinkedCasesResponseCreator.createResponse(any())).thenReturn(getLinkedCasesResponse);
+            final ResponseEntity<GetLinkedCasesResponse> response =
+                caseController.getLinkedCase(CASE_REFERENCE, START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT);
 
             // THEN
             assertThat(response.getStatusCode(), is(HttpStatus.OK));
-            assertNull(response.getBody());
+            assertNotNull(response.getBody());
         }
 
         @Test

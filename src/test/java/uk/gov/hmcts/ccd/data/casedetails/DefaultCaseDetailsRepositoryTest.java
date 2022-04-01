@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Maps;
 import org.junit.After;
@@ -146,10 +147,12 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void findByIdShouldReturnCorrectSingleRecord() {
+    public void findByIdShouldReturnCorrectSingleRecord() throws JsonProcessingException {
         assumeDataInitialised();
 
         final CaseDetails byId = caseDetailsRepository.findById(1L);
+        final String s = objectMapper().writeValueAsString(byId);
+        System.out.println("********** GS *********** " + s);
         assertAll(
             () -> assertThat(byId.getId(), is("1")),
             () -> assertThat(byId.getJurisdiction(), is("PROBATE")),

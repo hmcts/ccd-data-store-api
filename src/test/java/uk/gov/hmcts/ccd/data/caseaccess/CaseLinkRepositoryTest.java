@@ -7,9 +7,12 @@ import org.springframework.test.context.jdbc.Sql;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.lang.Long.parseLong;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,9 +30,15 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
     private CaseLinkEntity caseLinkEntity;
 
+    private Map<Long, Long> caseLinkIdToReferenceMap = new HashMap<>();
+
     @Before
     public void setup() {
         caseLinkEntity = new CaseLinkEntity(CASE_13_ID, CASE_14_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
+        caseLinkIdToReferenceMap.put(CASE_02_ID, 1504259907353545L);
+        caseLinkIdToReferenceMap.put(CASE_03_ID, 1504259907353537L);
+        caseLinkIdToReferenceMap.put(CASE_04_ID, 1504259907353552L);
+        caseLinkIdToReferenceMap.put(CASE_13_ID, 1504259907353651L);
     }
 
     @Test
@@ -108,8 +117,8 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
         CaseLinkEntity savedEntity = caseLinkRepository.save(caseLinkEntity);
 
         int deletedCount = caseLinkRepository.deleteByCaseReferenceAndLinkedCaseReference(
-            Long.parseLong(CASE_13_REFERENCE),
-            Long.parseLong(CASE_14_REFERENCE)
+            parseLong(CASE_13_REFERENCE),
+            parseLong(CASE_14_REFERENCE)
         );
 
         assertFalse(caseLinkRepository.findById(savedEntity.getCaseLinkPrimaryKey()).isPresent());
@@ -127,8 +136,8 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
         assertFalse(caseLinkRepository.findById(pk).isPresent());
 
-        caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(Long.parseLong(CASE_19_REFERENCE),
-                                                                                    Long.parseLong(CASE_21_REFERENCE),
+        caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(parseLong(CASE_19_REFERENCE),
+                                                                                    parseLong(CASE_21_REFERENCE),
                                                                                     "test");
 
         assertTrue(caseLinkRepository.findById(pk).isPresent());
@@ -147,7 +156,7 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
         caseLinkRepository.saveAll(caseLinkEntities);
 
-        long caseReference = Long.parseLong(CASE_01_REFERENCE);
+        long caseReference = parseLong(CASE_01_REFERENCE);
         final List<CaseLinkEntity> allByCaseReference = caseLinkRepository.findAllByCaseReference(caseReference);
 
         assertEquals(caseLinkEntities.size(), allByCaseReference.size());
@@ -161,4 +170,69 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
         assertTrue(foundLinkedCaseIds.containsAll(linkedCaseIds));
     }
 
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void testFindAllByCaseReferenceAndStandardLinkTrue() {
+        final List<Long> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID);
+
+        final List<CaseLinkEntity> caseLinkEntities = List.of(
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(0), TEST_ADDRESS_BOOK_CASE, STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(1), TEST_ADDRESS_BOOK_CASE, STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(2), TEST_ADDRESS_BOOK_CASE, STANDARD_LINK)
+        );
+
+        caseLinkRepository.saveAll(caseLinkEntities);
+
+        final List<Long> allByCaseReference
+            = caseLinkRepository.findAllByCaseReferenceAndStandardLink(parseLong(CASE_01_REFERENCE), STANDARD_LINK);
+
+        assertEquals(caseLinkEntities.size(), allByCaseReference.size());
+        assertTrue(allByCaseReference.containsAll(List.of(caseLinkIdToReferenceMap.get(CASE_02_ID),
+            caseLinkIdToReferenceMap.get(CASE_03_ID),
+            caseLinkIdToReferenceMap.get(CASE_04_ID))));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void testFindAllByCaseReferenceAndStandardLinkFalse() {
+        final List<Long> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID);
+
+        final List<CaseLinkEntity> caseLinkEntities = List.of(
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(0), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(1), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(2), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK)
+        );
+
+        caseLinkRepository.saveAll(caseLinkEntities);
+
+        final List<Long> allByCaseReference =
+            caseLinkRepository.findAllByCaseReferenceAndStandardLink(parseLong(CASE_01_REFERENCE), STANDARD_LINK);
+
+        assertEquals(0, allByCaseReference.size());
+    }
+
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void testFindAllByCaseReferenceAndStandardLink() {
+        final List<Long> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID, CASE_13_ID, CASE_19_ID);
+
+        final List<CaseLinkEntity> caseLinkEntities = List.of(
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(0), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(1), TEST_ADDRESS_BOOK_CASE, STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(2), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(3), TEST_ADDRESS_BOOK_CASE, STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(4), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK)
+        );
+
+        caseLinkRepository.saveAll(caseLinkEntities);
+
+        final List<Long> allByCaseReference =
+            caseLinkRepository.findAllByCaseReferenceAndStandardLink(parseLong(CASE_01_REFERENCE), STANDARD_LINK);
+
+        assertEquals(2, allByCaseReference.size());
+
+        assertTrue(allByCaseReference.containsAll(
+            List.of(caseLinkIdToReferenceMap.get(CASE_03_ID), caseLinkIdToReferenceMap.get(CASE_13_ID))));
+    }
 }

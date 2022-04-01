@@ -13,6 +13,10 @@ import java.util.List;
 @Repository
 public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseLinkEntity.CaseLinkPrimaryKey> {
 
+    String FIND_ALL_BY_CASE_REFERENCE_QUERY_STRING =
+        "select cle from CaseLinkEntity cle where cle.caseLinkPrimaryKey.caseId = "
+        + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)";
+
     @Modifying
     @Query("delete from CaseLinkEntity cle where cle.caseLinkPrimaryKey.caseId = "
         + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference) "
@@ -34,4 +38,16 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
     @Query(value = "select cle from CaseLinkEntity cle where cle.caseLinkPrimaryKey.caseId = "
         + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)")
     List<CaseLinkEntity> findAllByCaseReference(@Param("caseReference") Long caseReference);
+
+
+    @Query(value = "select cd.reference from CaseDetailsEntity cd where cd.id in "
+        + "(select cle.caseLinkPrimaryKey.linkedCaseId "
+        + "from CaseLinkEntity cle "
+        + "where "
+        + "cle.caseLinkPrimaryKey.caseId=(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)"
+        + "and "
+        + "cle.standardLink=:standardLink)"
+    )
+    List<Long> findAllByCaseReferenceAndStandardLink(@Param("caseReference") Long caseReference,
+                                                               @Param("standardLink") Boolean standardLink);
 }
