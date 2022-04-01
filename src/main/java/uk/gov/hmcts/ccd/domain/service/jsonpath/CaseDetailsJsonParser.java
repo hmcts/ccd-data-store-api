@@ -36,7 +36,15 @@ public class CaseDetailsJsonParser {
             List jsonArray = JsonPath.read(existingCaseData, path);
             return jsonArray.size() > 0 ? (Map) jsonArray.get(0) : Maps.newHashMap();
         }
-        return JsonPath.read(existingCaseData, path);
+        return readData(existingCaseData, path);
+    }
+
+    private Map readData(String existingCaseData, String path) {
+        Object data = JsonPath.read(existingCaseData, path);
+        if (data instanceof Map) {
+            return (Map) data;
+        }
+        return Maps.newHashMap();
     }
 
     public void updateCaseDocumentData(String attributePath, String value, CaseDetails caseDetails) {
