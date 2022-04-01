@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -101,20 +102,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<HttpError> handleException(final HttpServletRequest request, final Exception exception) {
         LOG.error(exception.getMessage(), exception);
         appInsights.trackException(exception);
-        HttpStatus httpStatus = null;
-        Throwable causeOfException = exception.getCause();
 
-        if (causeOfException instanceof HttpServerErrorException) {
-            httpStatus = ((HttpServerErrorException) causeOfException).getStatusCode();
-            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
-                httpStatus = HttpStatus.BAD_GATEWAY;
-            }
-        } else if (causeOfException instanceof FeignException.FeignServerException) {
-            httpStatus = HttpStatus.valueOf(((FeignException) causeOfException).status());
-            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
-                httpStatus = HttpStatus.BAD_GATEWAY;
-            }
-        }
+        Throwable causeOfException = exception.getCause();
+        HttpStatus httpStatus = (causeOfException != null) ? getHttpStatus(causeOfException) : null;
 
         final HttpError<Serializable> error = new HttpError<>(httpStatus, exception, request);
 
@@ -138,5 +128,32 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(error);
+    }
+
+    private HttpStatus getHttpStatus(Throwable causeOfException) {
+        HttpStatus httpStatus = null;
+        if (causeOfException instanceof HttpServerErrorException) {
+            httpStatus = ((HttpServerErrorException) causeOfException).getStatusCode();
+            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
+                httpStatus = HttpStatus.BAD_GATEWAY;
+            }
+        } else if (causeOfException instanceof FeignException.FeignServerException) {
+            httpStatus = HttpStatus.valueOf(((FeignException) causeOfException).status());
+            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
+                httpStatus = HttpStatus.BAD_GATEWAY;
+            }
+        } else if (causeOfException instanceof HttpClientErrorException) {
+            httpStatus = ((HttpClientErrorException) causeOfException).getStatusCode();
+            if (httpStatus != HttpStatus.UNAUTHORIZED) {
+                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            }
+        } else if (causeOfException instanceof FeignException.FeignClientException) {
+            httpStatus = HttpStatus.valueOf(((FeignException) causeOfException).status());
+            if (httpStatus != HttpStatus.UNAUTHORIZED) {
+                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            }
+        }
+
+        return httpStatus;
     }
 }
