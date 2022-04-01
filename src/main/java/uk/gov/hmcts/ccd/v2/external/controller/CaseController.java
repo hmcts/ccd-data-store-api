@@ -20,8 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
 import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -41,14 +42,23 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.ResponseEntity.status;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CREATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.LINKED_CASES_ACCESSED;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 
 @RestController
 @RequestMapping(path = "/")
@@ -113,7 +123,7 @@ public class CaseController {
             message = V2.Error.CASE_NOT_FOUND
         )
     })
-    @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#caseId",
+    @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
@@ -172,7 +182,7 @@ public class CaseController {
             message = V2.Error.CALLBACK_EXCEPTION
         )
     })
-    @LogAudit(operationType = AuditOperationType.UPDATE_CASE, caseId = "#caseId",
+    @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction",
         caseType = "#result.body.caseType", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted",
@@ -312,12 +322,12 @@ public class CaseController {
             message = V2.Error.CALLBACK_EXCEPTION
         )
     })
-    @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseId = "#result.body.reference",
+    @LogAudit(operationType = CREATE_CASE, caseId = "#result.body.reference",
         jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
                                                    @RequestParam(value = "ignore-warning", required = false) final
-                                                       Boolean ignoreWarning) {
+                                                   Boolean ignoreWarning) {
         return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
     }
 
@@ -457,27 +467,26 @@ public class CaseController {
         }
     )
     @ApiOperation(
-        value = "Retrieve a Linked Case",
-        notes = V2.EXPERIMENTAL_WARNING
+        value = "Retrieve Linked Cases"
     )
     @ApiResponses({
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = CaseResource.class
-        ),
+            response = CaseResource.class),
         @ApiResponse(
             code = 400,
-            message = V2.Error.CASE_ID_INVALID
-        ),
+            message = "One or more of the following reasons:"
+                + "\n1) " + V2.Error.CASE_ID_INVALID
+                + "\n2) " + V2.Error.PARAM_NOT_NUM),
         @ApiResponse(
             code = 404,
-            message = V2.Error.CASE_NOT_FOUND
-        )
+            message = V2.Error.CASE_NOT_FOUND)
     })
-    /*TODO @LogAudit(operationType = LINKED_CASE_ACCESSED, caseId = "#caseId",
-        jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")*/
-    public ResponseEntity<GetLinkedCasesResponse> getLinkedCase(@PathVariable("caseReference") String caseReference,
+    @LogAudit(operationType = LINKED_CASES_ACCESSED,
+        caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseController).buildCaseIds(#caseReference, #result.body)")
+    public ResponseEntity<GetLinkedCasesResponse> getLinkedCase(
+        @PathVariable(name = "caseReference") String caseReference,
                                                                 @RequestParam(name = "startRecordNumber",
                                                   defaultValue = "1", required = false) String startRecordNumber,
                                                                 @RequestParam(name = "maxReturnRecordCount",
@@ -485,15 +494,10 @@ public class CaseController {
 
         maxReturnRecordCount = StringUtils.isBlank(maxReturnRecordCount) ? "0" : maxReturnRecordCount;
 
-        //Validate parameters are numeric
-        validateIsParamNum(startRecordNumber);
-        validateIsParamNum(maxReturnRecordCount);
+        validateIsNumericParameter(startRecordNumber);
+        validateIsNumericParameter(maxReturnRecordCount);
 
-        //Validate Case Reference is valid
         validateCaseReference(caseReference);
-
-        //Validate Case exists
-        final CaseDetails caseDetails = getCaseDetails(caseReference);
 
         final CaseLinkRetrievalResults standardLinkedCases =
             caseLinkRetrievalService.getStandardLinkedCases(caseReference,
@@ -502,10 +506,10 @@ public class CaseController {
 
         final GetLinkedCasesResponse responseBody = getLinkedCasesResponseCreator.createResponse(standardLinkedCases);
 
-        return status(HttpStatus.OK).body(responseBody);
+        return ResponseEntity.ok(responseBody);
     }
 
-    private void validateIsParamNum(String number) {
+    private void validateIsNumericParameter(String number) {
         if (number != null) {
             try {
                 Long.parseLong(number);
@@ -519,10 +523,21 @@ public class CaseController {
         if (!caseReferenceService.validateUID(caseReference)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
+        getCaseDetails(caseReference);
     }
 
     private CaseDetails getCaseDetails(final String caseReference) {
         return getCaseOperation.execute(caseReference)
-            .orElseThrow(() -> new CaseNotFoundException(caseReference));
+            .orElseThrow(() -> new ResourceNotFoundException(V2.Error.CASE_NOT_FOUND));
+    }
+
+    public static String buildCaseIds(String caseReference, GetLinkedCasesResponse getLinkedCasesResponse) {
+        List<String> caseReferences = new ArrayList<>();
+        caseReferences.add(caseReference);
+        if (getLinkedCasesResponse != null) {
+            caseReferences.addAll(getLinkedCasesResponse.getLinkedCases().stream().limit(MAX_CASE_IDS_LIST - 1L)
+                .map(c -> String.valueOf(c.getCaseReference())).collect(Collectors.toList()));
+        }
+        return String.join(CASE_ID_SEPARATOR, caseReferences);
     }
 }

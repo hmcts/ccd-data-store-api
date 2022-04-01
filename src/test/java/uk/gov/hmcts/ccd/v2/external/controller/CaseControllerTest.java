@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +32,8 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
@@ -42,6 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -59,9 +62,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.v2.external.controller.CaseController.buildCaseIds;
 
 @DisplayName("CaseController")
 class CaseControllerTest {
@@ -467,7 +474,7 @@ class CaseControllerTest {
         }
 
         @Test
-        @DisplayName("should return 200 when case found")
+        @DisplayName("should return 200 when case found with parameters")
         void linkedCaseFoundWithOptionalParameters() {
             // WHEN
             GetLinkedCasesResponse getLinkedCasesResponse = GetLinkedCasesResponse.builder()
@@ -487,79 +494,102 @@ class CaseControllerTest {
         @DisplayName("should propagate CaseNotFoundException when case NOT found")
         void linkedCaseNotFound() {
             // GIVEN
-            Mockito.doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
-
-            // WHEN
-            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
-                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
+            doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
             // THEN
-            Assertions.assertThat(thrown)
-                .isInstanceOf(CaseNotFoundException.class)
-                .hasMessage(String.format("No case found for reference: %s", CASE_REFERENCE));
+            assertThrows(ResourceNotFoundException.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
+                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT),
+                V2.Error.CASE_NOT_FOUND);
         }
 
         @Test
-        @DisplayName("should propagate BadRequestException when case reference not valid")
+        @DisplayName("should propagate BadRequestException when case reference is not supplied")
         void linkedCaseReferenceNotValid() {
-            // GIVEN
-            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
-
-            // WHEN
-            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
-                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
 
             // THEN
-            Assertions.assertThat(thrown)
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("Case ID is not valid");
+            assertThrows(BadRequestException.class, () -> caseController.getLinkedCase(null,
+                null, null), "Case Reference not Supplied");
         }
 
         @Test
         @DisplayName("should propagate BadRequestException when Start Record Number is Non Numeric")
         void linkedCaseStartRecordNumberIsNonNumeric() {
-            // GIVEN
-            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
-
-            // WHEN
-            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
-                INVALID_START_RECORD_NUMBER, null));
-
-            // THEN
-            Assertions.assertThat(thrown)
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("Parameter is not numeric");
+            //THEN
+            assertThrows(BadRequestException.class,() -> caseController.getLinkedCase(CASE_REFERENCE,
+                INVALID_START_RECORD_NUMBER, null),
+                "Parameter is not numeric");
         }
 
         @Test
         @DisplayName("should propagate BadRequestException when Max Return Record Count is not valid")
         void linkedCaseMaxReturnRecordCountIsNonNumeric() {
-            // GIVEN
-            Mockito.doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
-
-            // WHEN
-            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
-                null, INVALID_MAX_RETURN_RECORD_COUNT));
-
             // THEN
-            Assertions.assertThat(thrown)
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("Parameter is not numeric");
+            assertThrows(BadRequestException.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
+                null, INVALID_MAX_RETURN_RECORD_COUNT),
+                "Parameter is not numeric");
         }
 
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
             // GIVEN
-            Mockito.doThrow(RuntimeException.class).when(getCaseOperation).execute(CASE_REFERENCE);
-
-            // WHEN
-            final Throwable thrown = catchThrowable(() -> caseController.getLinkedCase(CASE_REFERENCE,
-                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
+            doThrow(RuntimeException.class).when(getCaseOperation).execute(CASE_REFERENCE);
 
             // THEN
-            Assertions.assertThat(thrown)
-                .isInstanceOf(Exception.class);
+            assertThrows(Exception.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
+                START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
+
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /getLinkedCases/{caseReference}")
+    class GetLinkedCasesAuditLogTests {
+
+        @DisplayName("List empty: should return empty string when empty list is passed")
+        @Test
+        void shouldReturnEmptyStringWhenEmptyListPassed() {
+            assertEquals("", buildCaseIds("", createGetLinkedCasesResponse(0)));
+        }
+
+        @DisplayName("List one: should return simple string when single list item is passed")
+        @Test
+        void shouldReturnSimpleStringWhenSingleListItemPassed() {
+            assertEquals("reference-0", buildCaseIds("reference-0", createGetLinkedCasesResponse(0)));
+        }
+
+        @DisplayName("List many: should return CSV string when many list items are passed")
+        @Test
+        void shouldReturnCsvStringWhenManyListItemsPassed() {
+            assertEquals(
+                "reference-0,reference-1,reference-2,reference-3",
+                buildCaseIds("reference-0", createGetLinkedCasesResponse(3))
+            );
+        }
+
+        @DisplayName("List too many: should return max CSV string when too many list items are passed")
+        @Test
+        void shouldReturnMaxCsvListWhenTooManyListItemsPassed() {
+
+            // ARRANGE
+            String expectedOutput = "reference-0," + createGetLinkedCasesResponse(MAX_CASE_IDS_LIST - 1)
+                .getLinkedCases().stream()
+                .map(CaseLinkInfo::getCaseReference)
+                .collect(Collectors.joining(","));
+
+            // ACT
+            String output = buildCaseIds("reference-0", createGetLinkedCasesResponse(MAX_CASE_IDS_LIST + 1));
+
+            // ASSERT
+            assertEquals(expectedOutput, output);
+        }
+
+        private GetLinkedCasesResponse createGetLinkedCasesResponse(int numberRequired) {
+            final List<CaseLinkInfo> caseLinkInfos = IntStream.rangeClosed(1, numberRequired)
+                .mapToObj(num -> CaseLinkInfo.builder().caseReference("reference-" + num).build())
+                .collect(Collectors.toList());
+
+            return GetLinkedCasesResponse.builder().linkedCases(caseLinkInfos).build();
         }
     }
 }
