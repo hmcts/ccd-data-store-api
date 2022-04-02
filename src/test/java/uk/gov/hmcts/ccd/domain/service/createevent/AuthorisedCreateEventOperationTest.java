@@ -29,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
@@ -126,6 +127,9 @@ class AuthorisedCreateEventOperationTest {
     @Mock
     private CaseDetailsJsonParser caseDetailsJsonParser;
 
+    @Mock
+    private CaseService caseService;
+
     private AuthorisedCreateEventOperation authorisedCreateEventOperation;
     private CaseDetails classifiedCase;
     private CaseDetails documentFieldsCase;
@@ -148,7 +152,8 @@ class AuthorisedCreateEventOperationTest {
             caseAccessService,
             caseAccessCategoriesService,
             caseDetailsJsonParser,
-            getCaseOperation);
+            getCaseOperation,
+            caseService);
 
         mockExistingCaseDetails(Maps.newHashMap());
 
@@ -198,6 +203,7 @@ class AuthorisedCreateEventOperationTest {
             .updateCaseDocumentData(anyString(), anyString(), any(CaseDetails.class));
         doCallRealMethod().when(caseDetailsJsonParser).compiledPath(anyString());
         doCallRealMethod().when(caseDetailsJsonParser).compiledPath(anyString(), anyBoolean());
+        when(caseService.clone(any(CaseDetails.class))).thenCallRealMethod();
     }
 
     private void mockExistingCaseDetails(Map<String, JsonNode> existingData) {

@@ -20,7 +20,7 @@ public class CaseDetailsJsonParser {
     private static final String COLLECTION_PATH = "[";
     private static final String ID_EXPRESSION_START = "[?(@.id == \"";
     private static final String ID_EXPRESSION_END = "\")].value";
-    Configuration configuration = Configuration.defaultConfiguration()
+    private static final Configuration configuration = Configuration.defaultConfiguration()
         .addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL)
         .addOptions(Option.SUPPRESS_EXCEPTIONS);
 
@@ -48,7 +48,7 @@ public class CaseDetailsJsonParser {
     }
 
     public void updateCaseDocumentData(String attributePath, String value, CaseDetails caseDetails) {
-        String jsonPath = compiledPath(attributePath) + ".categoryId";
+        String jsonPath = compiledPath(attributePath) + ".category_id";
         DocumentContext documentContext = JsonPath.using(configuration).parse(convertToJson(caseDetails));
         documentContext.set(JsonPath.compile(jsonPath), value);
         try {
@@ -56,7 +56,6 @@ public class CaseDetailsJsonParser {
         } catch (JsonProcessingException e) {
             throw new BadRequestException("Unable to process updated Case Details Data");
         }
-        System.out.println(documentContext.jsonString());
     }
 
     public String compiledPath(String attributePath) {
