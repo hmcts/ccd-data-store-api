@@ -31,8 +31,8 @@ public class ElasticsearchQueryHelper {
 
     private final ApplicationParams applicationParams;
     private final ObjectMapperService objectMapperService;
-    private final UserRepository userRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public ElasticsearchQueryHelper(ApplicationParams applicationParams,
@@ -42,8 +42,8 @@ public class ElasticsearchQueryHelper {
                                     @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository) {
         this.applicationParams = applicationParams;
         this.objectMapperService = objectMapperService;
-        this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.userRepository = userRepository;
     }
 
     public List<String> getCaseTypesAvailableToUser() {

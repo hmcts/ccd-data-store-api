@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,7 +25,6 @@ import static org.mockito.Mockito.anyListOf;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 class ClassifiedGetEventsOperationTest {
@@ -41,7 +40,7 @@ class ClassifiedGetEventsOperationTest {
     private GetEventsOperation getEventsOperation;
 
     @Mock
-    private SecurityClassificationService classificationService;
+    private SecurityClassificationServiceImpl classificationService;
 
     @Mock
     private GetCaseOperation getCaseOperation;
@@ -57,6 +56,7 @@ class ClassifiedGetEventsOperationTest {
         MockitoAnnotations.initMocks(this);
 
         caseDetails = new CaseDetails();
+        caseDetails.setReference(Long.valueOf(CASE_REFERENCE));
         caseDetails.setJurisdiction(JURISDICTION_ID);
         events = Arrays.asList(new AuditEvent(), new AuditEvent());
         event = new AuditEvent();
@@ -71,7 +71,7 @@ class ClassifiedGetEventsOperationTest {
 
         classifiedEvents = Lists.newArrayList(event);
 
-        doReturn(classifiedEvents).when(classificationService).applyClassification(JURISDICTION_ID, events);
+        doReturn(classifiedEvents).when(classificationService).applyClassification(caseDetails, events);
 
         classifiedOperation = new ClassifiedGetEventsOperation(getEventsOperation, classificationService,
                 getCaseOperation);
@@ -96,7 +96,7 @@ class ClassifiedGetEventsOperationTest {
         assertAll(
             () -> assertThat(outputs, is(notNullValue())),
             () -> assertThat(outputs, hasSize(0)),
-            () -> verify(classificationService, never()).applyClassification(JURISDICTION_ID, null)
+            () -> verify(classificationService).applyClassification(caseDetails, null)
         );
     }
 
@@ -106,7 +106,7 @@ class ClassifiedGetEventsOperationTest {
         final List<AuditEvent> outputs = classifiedOperation.getEvents(caseDetails);
 
         assertAll(
-            () -> verify(classificationService).applyClassification(JURISDICTION_ID, events),
+            () -> verify(classificationService).applyClassification(caseDetails, events),
             () -> assertThat(outputs, sameInstance(classifiedEvents))
         );
     }
@@ -117,7 +117,7 @@ class ClassifiedGetEventsOperationTest {
         final List<AuditEvent> outputs = classifiedOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         assertAll(
-            () -> verify(classificationService).applyClassification(JURISDICTION_ID, events),
+            () -> verify(classificationService).applyClassification(caseDetails, events),
             () -> assertThat(outputs, sameInstance(classifiedEvents))
         );
     }
@@ -131,7 +131,7 @@ class ClassifiedGetEventsOperationTest {
 
         assertAll(() -> inOrder.verify(getEventsOperation).getEvents(CASE_REFERENCE),
             () -> inOrder.verify(getCaseOperation).execute(CASE_REFERENCE),
-            () -> inOrder.verify(classificationService).applyClassification(JURISDICTION_ID, events)
+            () -> inOrder.verify(classificationService).applyClassification(caseDetails, events)
         );
     }
 
@@ -161,16 +161,16 @@ class ClassifiedGetEventsOperationTest {
     @Test
     @DisplayName("should apply security classifications when jurisdiction, case type id and case event id is received")
     void shouldApplySecurityClassificationsForJurisdictionCaseTypeIdAndEventId() {
-        doReturn(Optional.of(event)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(Optional.of(event)).when(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
         doReturn(classifiedEvents).when(classificationService)
-            .applyClassification(eq(JURISDICTION_ID), anyListOf(AuditEvent.class));
+            .applyClassification(eq(caseDetails), anyListOf(AuditEvent.class));
 
-        Optional<AuditEvent> optionalAuditEvent = classifiedOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        Optional<AuditEvent> optionalAuditEvent = classifiedOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
 
         assertThat(optionalAuditEvent.isPresent(), is(true));
         AuditEvent output = optionalAuditEvent.get();
         assertAll(
-            () -> verify(classificationService).applyClassification(eq(JURISDICTION_ID), anyListOf(AuditEvent.class)),
+            () -> verify(classificationService).applyClassification(eq(caseDetails), anyListOf(AuditEvent.class)),
             () -> assertThat(output, sameInstance(event))
         );
     }

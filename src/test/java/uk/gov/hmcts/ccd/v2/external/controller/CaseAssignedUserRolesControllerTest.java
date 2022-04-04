@@ -1,10 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.google.common.collect.Lists;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,6 +22,10 @@ import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -35,9 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.ADD_SUCCESS_MESSAGE;
 import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.REMOVE_SUCCESS_MESSAGE;
 
@@ -347,7 +347,7 @@ class CaseAssignedUserRolesControllerTest {
         @BeforeEach
         void setUp() {
             when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList()))
-                    .thenReturn(createCaseAssignedUserRoles());
+                .thenReturn(createCaseAssignedUserRoles());
         }
 
         private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {
@@ -450,14 +450,14 @@ class CaseAssignedUserRolesControllerTest {
         void removeCaseUserRoles_shouldCallRemoveWhenValidSingleGoodCaseUserRoleSupplied() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD)
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD)
             );
 
             CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT
             ResponseEntity<CaseAssignedUserRolesResponse> response =
-                    controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request);
+                controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request);
 
             // ASSERT
             assertNotNull(response);
@@ -471,15 +471,15 @@ class CaseAssignedUserRolesControllerTest {
         void removeCaseUserRoles_shouldCallRemoveWhenValidSingleGoodCaseUserRoleSupplied_withOrganisation() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD,
-                            ORGANISATION_ID_GOOD)
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD,
+                    ORGANISATION_ID_GOOD)
             );
 
             CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT
             ResponseEntity<CaseAssignedUserRolesResponse> response =
-                    controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request);
+                controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request);
 
             // ASSERT
             assertNotNull(response);
@@ -493,17 +493,17 @@ class CaseAssignedUserRolesControllerTest {
         void removeCaseUserRoles_shouldCallRemoveWhenValidMultipleGoodCaseUserRolesSupplied() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD),
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD),
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD,
-                            ORGANISATION_ID_GOOD)
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD),
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD),
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD,
+                    ORGANISATION_ID_GOOD)
             );
 
             CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT
             ResponseEntity<CaseAssignedUserRolesResponse> response =
-                    controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request);
+                controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request);
 
             // ASSERT
             assertNotNull(response);
@@ -524,7 +524,7 @@ class CaseAssignedUserRolesControllerTest {
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION))
+                    containsString(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION))
             );
         }
 
@@ -538,7 +538,7 @@ class CaseAssignedUserRolesControllerTest {
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST))
+                    containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST))
             );
         }
 
@@ -553,7 +553,7 @@ class CaseAssignedUserRolesControllerTest {
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST))
+                    containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST))
             );
         }
 
@@ -570,7 +570,7 @@ class CaseAssignedUserRolesControllerTest {
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST))
+                    containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST))
             );
         }
 
@@ -578,8 +578,8 @@ class CaseAssignedUserRolesControllerTest {
         void removeCaseUserRoles_throwsExceptionWhenInvalidCaseIdPassed() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                    // case_id: has to be a valid 16-digit Luhn number
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_BAD, USER_ID_1, CASE_ROLE_GOOD)
+                // case_id: has to be a valid 16-digit Luhn number
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_BAD, USER_ID_1, CASE_ROLE_GOOD)
             );
 
             CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
@@ -590,7 +590,7 @@ class CaseAssignedUserRolesControllerTest {
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.CASE_ID_INVALID))
+                    containsString(V2.Error.CASE_ID_INVALID))
             );
         }
 
@@ -598,8 +598,8 @@ class CaseAssignedUserRolesControllerTest {
         void removeCaseUserRoles_throwsExceptionWhenInvalidUserIdPassed() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                    // user_id: has to be a string of length > 0
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_GOOD)
+                // user_id: has to be a string of length > 0
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_GOOD)
             );
 
             CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
@@ -610,7 +610,7 @@ class CaseAssignedUserRolesControllerTest {
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.USER_ID_INVALID))
+                    containsString(V2.Error.USER_ID_INVALID))
             );
         }
 
@@ -618,8 +618,8 @@ class CaseAssignedUserRolesControllerTest {
         void removeCaseUserRoles_throwsExceptionWhenInvalidCaseRolePassed() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                    // case_role: has to be a none-empty string in square brackets
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_BAD)
+                // case_role: has to be a none-empty string in square brackets
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_BAD)
             );
 
             CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
@@ -630,7 +630,7 @@ class CaseAssignedUserRolesControllerTest {
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.CASE_ROLE_FORMAT_INVALID))
+                    containsString(V2.Error.CASE_ROLE_FORMAT_INVALID))
             );
         }
 
@@ -638,9 +638,9 @@ class CaseAssignedUserRolesControllerTest {
         void removeCaseUserRoles_throwsExceptionWhenInvalidOrganisationIdPassed() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                    // organisation_id: has to be a non-empty string, when present
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD,
-                            ORGANISATION_ID_BAD)
+                // organisation_id: has to be a non-empty string, when present
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD,
+                    ORGANISATION_ID_BAD)
             );
 
             CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
@@ -651,7 +651,7 @@ class CaseAssignedUserRolesControllerTest {
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.ORGANISATION_ID_INVALID))
+                    containsString(V2.Error.ORGANISATION_ID_INVALID))
             );
         }
 
@@ -659,14 +659,14 @@ class CaseAssignedUserRolesControllerTest {
         void removeCaseUserRoles_throwsExceptionWhenMultipleErrorsPassed() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                    // case_id: has to be a valid 16-digit Luhn number
-                    // case_role: has to be a none-empty string in square brackets
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_BAD, USER_ID_1, CASE_ROLE_BAD),
-                    // user_id: has to be a string of length > 0
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_GOOD),
-                    // organisation_id: has to be a non-empty string, when present
-                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD,
-                            ORGANISATION_ID_BAD)
+                // case_id: has to be a valid 16-digit Luhn number
+                // case_role: has to be a none-empty string in square brackets
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_BAD, USER_ID_1, CASE_ROLE_BAD),
+                // user_id: has to be a string of length > 0
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_GOOD),
+                // organisation_id: has to be a non-empty string, when present
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD,
+                    ORGANISATION_ID_BAD)
             );
 
             CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
@@ -677,13 +677,13 @@ class CaseAssignedUserRolesControllerTest {
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.CASE_ID_INVALID)),
+                    containsString(V2.Error.CASE_ID_INVALID)),
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.USER_ID_INVALID)),
+                    containsString(V2.Error.USER_ID_INVALID)),
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.CASE_ROLE_FORMAT_INVALID)),
+                    containsString(V2.Error.CASE_ROLE_FORMAT_INVALID)),
                 () -> assertThat(exception.getMessage(),
-                            containsString(V2.Error.ORGANISATION_ID_INVALID))
+                    containsString(V2.Error.ORGANISATION_ID_INVALID))
             );
         }
 
@@ -697,11 +697,11 @@ class CaseAssignedUserRolesControllerTest {
         void buildIdLists_shouldReturnEmptyStringWhenNullPassed() {
             // ACT
             String resultBuildCaseIds =
-                    uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(null);
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(null);
             String resultBuildUserIds =
-                    uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(null);
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(null);
             String resultBuildCaseRoles =
-                    uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(null);
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(null);
 
             // ASSERT
             assertEquals("", resultBuildCaseIds);
@@ -714,13 +714,13 @@ class CaseAssignedUserRolesControllerTest {
             // ACT
             String resultBuildCaseIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(
-                        new CaseAssignedUserRolesRequest(null));
+                    new CaseAssignedUserRolesRequest(null));
             String resultBuildUserIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(
-                        new CaseAssignedUserRolesRequest(null));
+                    new CaseAssignedUserRolesRequest(null));
             String resultBuildCaseRoles =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(
-                        new CaseAssignedUserRolesRequest(null));
+                    new CaseAssignedUserRolesRequest(null));
 
             // ASSERT
             assertEquals("", resultBuildCaseIds);
@@ -733,13 +733,13 @@ class CaseAssignedUserRolesControllerTest {
             // ACT
             String resultBuildCaseIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(
-                        createAddCaseAssignedUserRolesRequest(0));
+                    createAddCaseAssignedUserRolesRequest(0));
             String resultBuildUserIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(
-                        createAddCaseAssignedUserRolesRequest(0));
+                    createAddCaseAssignedUserRolesRequest(0));
             String resultBuildCaseRoles =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(
-                        createAddCaseAssignedUserRolesRequest(0));
+                    createAddCaseAssignedUserRolesRequest(0));
 
             // ASSERT
             assertEquals("", resultBuildCaseIds);
@@ -752,13 +752,13 @@ class CaseAssignedUserRolesControllerTest {
             // ACT
             String resultBuildCaseIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(
-                        createAddCaseAssignedUserRolesRequest(1));
+                    createAddCaseAssignedUserRolesRequest(1));
             String resultBuildUserIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(
-                        createAddCaseAssignedUserRolesRequest(1));
+                    createAddCaseAssignedUserRolesRequest(1));
             String resultBuildCaseRoles =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(
-                        createAddCaseAssignedUserRolesRequest(1));
+                    createAddCaseAssignedUserRolesRequest(1));
 
             // ASSERT
             assertEquals("1", resultBuildCaseIds); // test data is: count up
@@ -771,13 +771,13 @@ class CaseAssignedUserRolesControllerTest {
             // ACT
             String resultBuildCaseIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(
-                        createAddCaseAssignedUserRolesRequest(3));
+                    createAddCaseAssignedUserRolesRequest(3));
             String resultBuildCaseRoles =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(
-                        createAddCaseAssignedUserRolesRequest(3));
+                    createAddCaseAssignedUserRolesRequest(3));
             String resultBuildUserIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(
-                        createAddCaseAssignedUserRolesRequest(3));
+                    createAddCaseAssignedUserRolesRequest(3));
 
             // ASSERT
             assertEquals("1,2,3", resultBuildCaseIds); // test data is: count up
@@ -791,13 +791,13 @@ class CaseAssignedUserRolesControllerTest {
             // NB: max list size is 10 (u.g.h.c.a.a.AuditContext.MAX_CASE_IDS_LIST)
             String resultBuildCaseIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(
-                        createAddCaseAssignedUserRolesRequest(11));
+                    createAddCaseAssignedUserRolesRequest(11));
             String resultBuildCaseRoles =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(
-                        createAddCaseAssignedUserRolesRequest(11));
+                    createAddCaseAssignedUserRolesRequest(11));
             String resultBuildUserIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(
-                        createAddCaseAssignedUserRolesRequest(11));
+                    createAddCaseAssignedUserRolesRequest(11));
 
             // ASSERT
             assertEquals("1,2,3,4,5,6,7,8,9,10", resultBuildCaseIds); // test data is: count up
@@ -809,7 +809,7 @@ class CaseAssignedUserRolesControllerTest {
         void buildOptionalIds_shouldReturnEmptyStringWhenEmptyPassed() {
             // ACT
             String resultBuildOptionalIds = uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController
-                    .buildOptionalIds(Optional.empty());
+                .buildOptionalIds(Optional.empty());
 
             // ASSERT
             assertEquals("", resultBuildOptionalIds);
@@ -820,7 +820,7 @@ class CaseAssignedUserRolesControllerTest {
             // ACT
             String resultBuildOptionalIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildOptionalIds(Optional.of(
-                        new ArrayList<>()));
+                    new ArrayList<>()));
 
             // ASSERT
             assertEquals("", resultBuildOptionalIds);
@@ -831,7 +831,7 @@ class CaseAssignedUserRolesControllerTest {
             // ACT
             String resultBuildOptionalIds =
                 uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildOptionalIds(Optional.of(
-                        Lists.newArrayList("1")));
+                    Lists.newArrayList("1")));
 
             // ASSERT
             assertEquals("1", resultBuildOptionalIds);

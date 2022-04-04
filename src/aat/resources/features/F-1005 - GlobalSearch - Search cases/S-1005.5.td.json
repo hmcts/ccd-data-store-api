@@ -1,0 +1,39 @@
+{
+  "title": "Unsuccessful search for case with invalid global search parameters with an invalid user",
+  "_guid_": "S-1005.5",
+  "_extends_": "F-1005_SearchCaseBase",
+  "specs": [
+    "an active profile in CCD",
+    "contains at least one fields from new global search screen",
+    "contains all the mandatory parameters",
+    "contains a user that doesn't have access to the cases",
+    "has 200 return code",
+    "returns 0 cases"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "RestrictedCaseworker"
+    }
+  },
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "CCDCaseTypeIds": [
+          "FT_GlobalSearch"
+        ]
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "resultInfo" : {
+        "casesReturned" : 0,
+        "caseStartRecord" : 1,
+        "moreResultsToGo" : false
+      },
+      "results" : [ ]
+    }
+  }
+}
+

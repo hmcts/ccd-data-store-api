@@ -7,7 +7,9 @@
     "[STATE]": "TODO",
     "[SECURITY_CLASSIFICATION]": "PUBLIC",
     "[CASE_TYPE]": "BEFTA_CASETYPE_1_1",
-    "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+    "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+    "[ACCESS_PROCESS]" : "NONE",
+    "[ACCESS_GRANTED]" : "STANDARD"
   },
   "fields_formatted": {
     "[JURISDICTION]": "BEFTA_JURISDICTION_1",
@@ -16,7 +18,9 @@
     "[STATE]": "TODO",
     "[SECURITY_CLASSIFICATION]": "PUBLIC",
     "[CASE_TYPE]": "BEFTA_CASETYPE_1_1",
-    "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+    "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+    "[ACCESS_PROCESS]" : "NONE",
+    "[ACCESS_GRANTED]" : "STANDARD"
   },
   "supplementary_data" : null
 }

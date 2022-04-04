@@ -1,0 +1,21 @@
+{
+  "_guid_": "UnRegister_All_Doc_Info_Stubs_By_Metadata",
+  "_extends_": "UnRegister_Dynamic_Stub_By_Metadata",
+  "specs": [
+    "to unregister all document info callback stubs from the ccd-test-stubs service",
+    "As a prerequisite"
+  ],
+
+  "request": {
+    "body": {
+      "matchesJsonPath": {
+        "expression": "$.testId",
+        "contains": "S-1041"
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : { }
+  }
+}

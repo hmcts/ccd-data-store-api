@@ -1,0 +1,110 @@
+{
+    "reference": 1111222233334444,
+    "data": {
+        "caseManagementCategory": {
+            "value": {
+                "code": "987",
+                "label": "Category label Order-02"
+            }
+        },
+        "caseManagementLocation": {
+            "baseLocation": "123",
+            "region": "1"
+        },
+        "caseNameHmctsInternal": "Name Internal 01",
+        "SearchCriteria": {
+            "OtherCaseReferences": [
+                {
+                    "id": "72b5ab79-004c-46a6-b935-f1c657bd693a",
+                    "value": "123456789"
+                }
+            ],
+            "SearchParties": [
+                {
+                    "id": "a12cf1f0-c4e6-4f6d-baf2-447e876fd9f7",
+                    "value": {
+                        "DateOfBirth": "2000-01-01",
+                        "DateOfDeath": "2000-02-02",
+                        "AddressLine1": "AddressLine1",
+                        "PostCode": "no-match",
+                        "EmailAddress": "test@example.com",
+                        "Name": "PartyName"
+                    }
+                },
+                {
+                    "id": "18e62954-9b84-4840-9048-f88293d9c5c5",
+                    "value": {
+                        "DateOfBirth": "2000-01-01",
+                        "DateOfDeath": "2000-02-02",
+                        "AddressLine1": "no-match",
+                        "PostCode": "PostCode",
+                        "EmailAddress": "test@example.com",
+                        "Name": "PartyName"
+                    }
+                }
+            ]
+        }
+    },
+    "data_classification": {
+        "caseManagementCategory": "PUBLIC",
+        "caseManagementLocation": {
+            "classification": "PUBLIC",
+            "value": {
+                "baseLocation": "PUBLIC",
+                "region": "PUBLIC"
+            }
+        },
+        "caseNameHmctsInternal": "PUBLIC",
+        "SearchCriteria": {
+            "classification": "PUBLIC",
+            "value": {
+                "OtherCaseReferences": {
+                    "classification": "PUBLIC",
+                    "value": [
+                        {
+                            "id": "72b5ab79-004c-46a6-b935-f1c657bd693a",
+                            "classification": "PUBLIC"
+                        }
+                    ]
+                },
+                "SearchParties": {
+                    "classification": "PUBLIC",
+                    "value": [
+                        {
+                            "id": "a12cf1f0-c4e6-4f6d-baf2-447e876fd9f7",
+                            "value": {
+                                "DateOfBirth": "PUBLIC",
+                                "DateOfDeath": "PUBLIC",
+                                "AddressLine1": "PUBLIC",
+                                "PostCode": "PUBLIC",
+                                "EmailAddress": "PUBLIC",
+                                "Name": "PUBLIC"
+                            }
+                        },
+                        {
+                            "id": "18e62954-9b84-4840-9048-f88293d9c5c5",
+                            "value": {
+                                "DateOfBirth": "PUBLIC",
+                                "DateOfDeath": "PUBLIC",
+                                "AddressLine1": "PUBLIC",
+                                "PostCode": "PUBLIC",
+                                "EmailAddress": "PUBLIC",
+                                "Name": "PUBLIC"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "supplementary_data": {
+        "HMCTSServiceId": "AAA1"
+    },
+    "jurisdiction": "AUTOTEST1",
+    "last_state_modified_date": "2021-09-27T13:34:23.092Z",
+    "security_classification": "PUBLIC",
+    "state": "CaseCreated",
+    "created_date": "2021-09-03T13:34:23.092Z",
+    "last_modified": "2021-09-27T13:34:23.094Z",
+    "case_type_id": "GlobalSearch"
+}

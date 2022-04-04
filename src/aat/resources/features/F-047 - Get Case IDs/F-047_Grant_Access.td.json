@@ -24,7 +24,7 @@
 			"cid": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
 		},
 		"body": {
-			"id": "${[scenarioContext][theInvokingUser][id]}"
+			"id": "${[scenarioContext][parentContext][testData][users][testUser][id]}"
 		}
 	},
 

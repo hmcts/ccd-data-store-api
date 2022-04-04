@@ -313,6 +313,9 @@
 								}
 							],
 							"searchAliasFields": [],
+              "searchParties" : [],
+              "searchCriterias" : [],
+              "roleToAccessProfiles": [],
 							"security_classification": null,
 							"case_fields": [],
 							"printable_document_url": null,
@@ -327,7 +330,9 @@
 								{
                   "_extends_": "CaseworkerCaaAccessControlList"
 								}
-							]
+							],
+              "callback_get_case_url": null,
+              "retries_get_case_url": []
 						},
 						{
 							"id": "CASE_TYPE_WITH_NO_CASES",
@@ -560,6 +565,9 @@
 								}
 							],
 							"searchAliasFields": [],
+              "searchParties" : [],
+              "searchCriterias" : [],
+              "roleToAccessProfiles": [],
 							"security_classification": null,
 							"case_fields": [],
 							"printable_document_url": null,
@@ -567,7 +575,9 @@
 								{
                   "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 								}
-							]
+							],
+              "callback_get_case_url": null,
+              "retries_get_case_url": []
 						}
 					]
 				}

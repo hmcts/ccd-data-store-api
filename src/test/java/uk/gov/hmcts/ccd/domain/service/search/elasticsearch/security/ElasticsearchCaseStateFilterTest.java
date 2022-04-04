@@ -18,12 +18,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 class ElasticsearchCaseStateFilterTest {
 
     @Mock
     private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
+
+    @Mock
+    private ApplicationParams applicationParams;
 
     @InjectMocks
     private ElasticsearchCaseStateFilter filter;

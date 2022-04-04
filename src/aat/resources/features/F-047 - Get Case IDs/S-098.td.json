@@ -5,6 +5,7 @@
 
 	"specs": [
 		"an active profile in CCD",
+		"testUser - with an active profile in CCD",
 		"contains an userId which doesn't have access to the case",
 		"contains an empty list of case ids, along with an HTTP-200 OK"
 	],

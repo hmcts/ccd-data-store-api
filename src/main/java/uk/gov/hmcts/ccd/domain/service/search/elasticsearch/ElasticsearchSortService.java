@@ -26,7 +26,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATE
 @Slf4j
 public class ElasticsearchSortService {
 
-    private static final String KEYWORD_SUFFIX = ".keyword";
+    public static final String KEYWORD_SUFFIX = ".keyword";
 
     private final ObjectMapper objectMapper;
     private final SearchQueryOperation searchQueryOperation;

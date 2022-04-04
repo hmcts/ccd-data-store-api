@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
+import uk.gov.hmcts.ccd.domain.types.sanitiser.CollectionSanitiser;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,7 +22,6 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
-
 
 public final class JacksonUtils {
 
@@ -39,7 +39,6 @@ public final class JacksonUtils {
         .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
         .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
         .build();
-
 
     public static Map<String, JsonNode> convertValue(Object from) {
         return MAPPER.convertValue(from, new TypeReference<HashMap<String, JsonNode>>() {
@@ -89,7 +88,7 @@ public final class JacksonUtils {
 
         for (String key : mergeFrom.keySet()) {
             JsonNode value = mergeFrom.get(key);
-            if (!mergeInto.containsKey(key)) {
+            if (!mergeInto.containsKey(key) || mergeInto.get(key).isNull()) {
                 mergeInto.put(key, value);
             } else {
                 mergeInto.put(key, merge(mergeInto.get(key), value));
@@ -124,47 +123,56 @@ public final class JacksonUtils {
     }
 
     public static String getValueFromPath(final String path, final Map<String, JsonNode> dataMap) {
-        final String[] jsonValue = new String[1];
-        dataMap.entrySet().forEach(entry -> {
-            if (path.contains(".")) {
-                String key = path.substring(0, path.indexOf("."));
-                String truncatedKey = path.substring(path.indexOf(".") + 1);
-
-                if (entry.getKey().equals(key)) {
-                    jsonValue[0] = findValueFromTruncatedKey(entry, truncatedKey);
-                }
-            } else if (entry.getKey().equals(path)) {
-                jsonValue[0] = getValue(entry.getValue());
-            }
-        });
-
-        return jsonValue[0];
+        return getValueFromPath(path, convertValueJsonNode(dataMap));
     }
 
-    private static String findValueFromTruncatedKey(Map.Entry<String, JsonNode> entry, String truncatedKey) {
-        if (entry.getValue().isArray()) {
-            return getValueFromArray(entry, truncatedKey);
+    public static String getValueFromPath(final String path, final JsonNode jsonNode) {
+        String returnValue = null;
+        if (path.contains(".")) {
+            String pathStart = path.substring(0, path.indexOf("."));
+            String truncatedPath = path.substring(path.indexOf(".") + 1);
+
+            JsonNode foundNodeValue = getNestedCaseFieldByPath(jsonNode, pathStart);
+            if (foundNodeValue != null) {
+                if (foundNodeValue.isArray()) {
+                    returnValue = getValueFromArray(truncatedPath, foundNodeValue);
+                } else {
+                    returnValue = getValueFromPath(truncatedPath, foundNodeValue);
+                }
+            }
         } else {
-            JsonNode foundJsonNode = getNestedCaseFieldByPath(entry.getValue(), truncatedKey);
-            if (foundJsonNode != null) {
-                return foundJsonNode.textValue();
+            JsonNode foundNodeValue = getNestedCaseFieldByPath(jsonNode, path);
+            if (foundNodeValue != null) {
+                returnValue = getValue(foundNodeValue);
             }
         }
-        return null;
+
+        return returnValue;
     }
 
-    private static String getValueFromArray(Map.Entry<String, JsonNode> entry, String truncatedKey) {
-        ArrayNode arrayNode = ((ArrayNode)entry.getValue());
-        final var arrayIndex = truncatedKey.substring(0, truncatedKey.indexOf("."));
-        final var keyToArrayContent = truncatedKey.substring(truncatedKey.indexOf(".") + 1);
+
+    private static String getValueFromArray(String path, JsonNode jsonNode) {
+        ArrayNode arrayNode = (ArrayNode)jsonNode;
+        final var arrayIndex = path.contains(".") ? path.substring(0, path.indexOf(".")) : path;
+        final var truncatedPath = path.contains(".") ? path.substring(path.indexOf(".") + 1) : "";
         if (StringUtils.isNumeric(arrayIndex)) {
-            JsonNode jsonNodeFromArray = arrayNode.get(Integer.parseInt(arrayIndex));
-            JsonNode nestedCaseFieldByPath =
-                getNestedCaseFieldByPath(jsonNodeFromArray, keyToArrayContent);
-            if (nestedCaseFieldByPath == null) {
-                nestedCaseFieldByPath = jsonNodeFromArray.get("value");
+            JsonNode foundJsonNode = arrayNode.get(Integer.parseInt(arrayIndex));
+            if (foundJsonNode != null) {
+                // check if need to auto-apply collection processing
+                if (!truncatedPath.startsWith(CollectionSanitiser.VALUE)
+                    && !truncatedPath.startsWith(CollectionSanitiser.ID)
+                    && foundJsonNode.has(CollectionSanitiser.VALUE)
+                ) {
+                    // adjust node to accommodate for use of value property
+                    foundJsonNode = foundJsonNode.get(CollectionSanitiser.VALUE);
+                }
+
+                if (StringUtils.isNotBlank(truncatedPath)) {
+                    return getValueFromPath(truncatedPath, foundJsonNode);
+                } else {
+                    return getValue(foundJsonNode);
+                }
             }
-            return getValue(nestedCaseFieldByPath);
         }
         return null;
     }

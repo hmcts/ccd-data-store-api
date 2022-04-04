@@ -12,7 +12,9 @@ public enum AuditOperationType {
     GET_CASE_ASSIGNED_USER_ROLES("Get Case-Assigned Users and Roles"),
     REVOKE_CASE_ACCESS("Revoke case access permissions"),
     VIEW_CASE_HISTORY("View case history"),
+    GLOBAL_SEARCH("Global search"),
     MIGRATION("Data migration");
+    LINKED_CASES_ACCESSED("Get Linked Cases");
 
     private final String label;
 

@@ -1,0 +1,109 @@
+{
+  "title": "Successfully creates a case with wrong data type for Date fields in a collection",
+  "_guid_": "S-1004.22",
+  "_extends_": "Case_Creation_V2_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains a Text value for the Date fields in a collection",
+    "contains a SearchCriteria with SearchParty excluding the Dates",
+    "to create a full case"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "CaseTypeID": "FT_GlobalSearch"
+    },
+    "body": {
+      "data": {
+        "ListOfPeople": [
+          {
+            "value": {
+              "IndividualOtherName": "other-name",
+              "IndividualDateOfBirthText": "date-of-birth-text",
+              "IndividualDateOfDeathText": "date-of-death-text"
+            },
+            "id" : "4b8f17d9-5e27-4989-8ba5-ca9ce1bbb700"
+          }
+        ]
+      },
+      "event_token": "${[scenarioContext][childContexts][F-1004_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/case-types/FT_GlobalSearch/cases{?ignore-warning}"
+        }
+      },
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseCreated",
+      "case_type": "FT_GlobalSearch",
+      "data": {
+        "ListOfPeople" : [ {
+          "value" : {
+            "IndividualOtherName" : "other-name",
+            "IndividualDateOfBirthText" : "date-of-birth-text",
+            "IndividualDateOfDeathText" : "date-of-death-text"
+          },
+          "id" : "4b8f17d9-5e27-4989-8ba5-ca9ce1bbb700"
+        } ],
+        "SearchCriteria": {
+          "SearchParties": [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "value": {
+                "Name": "other-name"
+              },
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        }
+      },
+      "data_classification": {
+        "ListOfPeople" : {
+          "classification" : "PUBLIC",
+          "value" : [ 
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "value" : {
+                "IndividualOtherName" : "PUBLIC",
+                "IndividualDateOfBirthText" : "PUBLIC",
+                "IndividualDateOfDeathText" : "PUBLIC"
+              },
+              "id" : "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        },
+        "SearchCriteria": {
+          "classification": "PUBLIC",
+          "value": {
+            "SearchParties": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
+                {
+                  "value": {
+                    "Name": "PUBLIC"
+                  },
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "_guid_": "Befta_Global_Search_Expected_Search_Criteria",
+
+  "_extends_": "Befta_Global_Search_Case_Data",
+  "dateOfBirth" : "2012-04-21",
+  "dateOfDeath" : "2020-04-21",
+  "SearchCriteria" : {
+    "OtherCaseReferences" : [ {
+      "value" : "FirstNameValue",
+      "id" : "[[ANYTHING_PRESENT]]"
+    } ],
+    "SearchParties" : [
+      {
+        "__ordering__": "UNORDERED",
+        "__elementId__": "value"
+      },
+      {
+      "value" : {
+        "Name" : "FirstNameValue LastNameValue",
+        "EmailAddress" : "e@mail.com",
+        "AddressLine1" : "Address Value",
+        "PostCode" : "SE1 4EE",
+        "DateOfBirth" : "2012-04-21",
+        "DateOfDeath" : "2020-04-21"
+      },
+      "id" : "[[ANYTHING_PRESENT]]"
+    } ]
+  }
+}

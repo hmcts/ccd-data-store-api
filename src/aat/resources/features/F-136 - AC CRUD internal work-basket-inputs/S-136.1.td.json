@@ -1,0 +1,33 @@
+{
+	"_guid_": "S-136.1",
+	"_extends_": "F-136_Test_Data_Base",
+	"specs": [
+		"contains a CaseType with no R access",
+		"contains a HTTP 404 Not Found"
+	],
+
+	"request": {
+		"_extends_": "Common_Request",
+    "pathVariables": {
+      "ctid": "FT_CRUD_2"
+    }
+	},
+	"expectedResponse": {
+		"_extends_": "Common_404_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case type found",
+      "path": "/internal/case-types/FT_CRUD_2/work-basket-inputs",
+      "details": "Unable to find the case type, please try a search or return to the case list overview page.",
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+	}
+}

@@ -1,0 +1,83 @@
+{
+  "title": "Successfully creates a case with wrong data type for Date fields using V2: /case-types/{caseTypeId}/cases endpoint",
+  "_guid_": "S-1004.9",
+  "_extends_": "Case_Creation_V2_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains a Text value for the Date fields",
+    "contains a SearchCriteria with SearchParty excluding the Dates",
+    "to create a full case"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "CaseTypeID": "FT_GlobalSearch"
+    },
+    "body": {
+      "data": {
+        "dateOfBirthText": "date-of-birth-text",
+        "dateOfDeathText": "date-of-death-text",
+        "OtherName": "other-name"
+      },
+      "event_token": "${[scenarioContext][childContexts][F-1004_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/case-types/FT_GlobalSearch/cases{?ignore-warning}"
+        }
+      },
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseCreated",
+      "case_type": "FT_GlobalSearch",
+      "data": {
+        "dateOfBirthText": "date-of-birth-text",
+        "dateOfDeathText": "date-of-death-text",
+        "OtherName": "other-name",
+        "SearchCriteria": {
+          "SearchParties": [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "value": {
+                "Name": "other-name"
+              },
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        }
+      },
+      "data_classification": {
+        "dateOfBirthText": "PUBLIC",
+        "dateOfDeathText": "PUBLIC",
+        "OtherName": "PUBLIC",
+        "SearchCriteria": {
+          "classification": "PUBLIC",
+          "value": {
+            "SearchParties": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
+                {
+                  "value": {
+                    "Name": "PUBLIC"
+                  },
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -18,7 +18,6 @@
       }
     },
     {
-      "id": "13b731bd-e240-468b-96d1-84bb55079220",
       "request": {
         "method": "GET",
         "url": "/o/userinfo"
@@ -34,7 +33,7 @@
           "roles": [
             "caseworker",
             "caseworker-test",
-            "caseworker-PROBATE-public", "caseworker-PROBATE", "caseworker-DIVORCE", "caseworker-SSCS"
+            "caseworker-probate-public", "caseworker-probate", "caseworker-divorce", "caseworker-sscs"
           ],
           "name": "Cloud Strife",
           "given_name": "Cloud",

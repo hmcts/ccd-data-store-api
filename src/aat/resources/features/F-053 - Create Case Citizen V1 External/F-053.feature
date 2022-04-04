@@ -98,7 +98,7 @@ Scenario: must return negative response HTTP-400 when request contains a malfor
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-552 @Ignore # Response code mismatch, expected: 400, actual: 500 RDM-7358
+@S-552 # Response code mismatch, expected: 400, actual: 500 RDM-7358
 Scenario: must return negative response HTTP-400 when request contains a non-existing jurisdiction ID
 
     Given a user with [an active profile in CCD],

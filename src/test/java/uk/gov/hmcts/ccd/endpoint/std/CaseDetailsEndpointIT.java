@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.ccd.GlobalSearchTestFixture;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
@@ -108,6 +109,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String CASE_TYPE_NO_READ_CASE_TYPE_ACCESS = "TestAddressBookCaseNoReadCaseTypeAccess";
     private static final String CASE_TYPE_TTL = "TestAddressBookCaseTTL";
     private static final String CASE_TYPE_CASELINK = "TestAddressBookCaseCaseLinks";
+    private static final String CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY
+        = "MultipleSearchCriteriaAndSearchParties";
     private static final String JURISDICTION = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
     private static final String CREATE_EVENT_ID = "Create2";
@@ -951,6 +954,37 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
     }
 
+    @Test
+    public void shouldReturn201WithSearchCriteriaWhenPostCreateCaseForCitizen() throws Exception {
+
+        final String URL =
+            "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/"
+                + CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY + "/cases?ignore-warning=true";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent()
+            .withData(GlobalSearchTestFixture.createCaseData())
+            .build();
+
+        final Event triggeringEvent = anEvent().build();
+        triggeringEvent.setEventId(TEST_EVENT_ID);
+        triggeringEvent.setDescription(LONG_COMMENT);
+        triggeringEvent.setSummary(SHORT_COMMENT);
+        caseDetailsToSave.setEvent(triggeringEvent);
+
+        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andReturn();
+
+        assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
+
+        CaseDetails actualData = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseDetails.class);
+
+        GlobalSearchTestFixture.assertGlobalSearchData(actualData.getData());
+    }
+
     private int getPort() {
         return super.wiremockPort;
     }
@@ -1142,6 +1176,27 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Summary", SHORT_COMMENT, caseAuditEvent.getSummary());
         assertTrue(caseAuditEvent.getDataClassification().isEmpty());
         assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
+    }
+
+    @Test
+    public void shouldReturn201WithSearchCriteriaWhenPostCreateCaseForCaseworker() throws Exception {
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
+        caseDetailsToSave.setData(GlobalSearchTestFixture.createCaseData());
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        CaseDetails actualData = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseDetails.class);
+
+        GlobalSearchTestFixture.assertGlobalSearchData(actualData.getData());
     }
 
     @Test
@@ -1888,6 +1943,31 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             JSONCompareMode.LENIENT);
     }
 
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_global_search.sql"})
+    public void shouldReturn201WithSearchCriteriaWhenPostCreateCaseEventCaseworker() throws Exception {
+        final String caseReference = "1504259907353529";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent()
+            .withData(GlobalSearchTestFixture.createCaseData())
+            .build();
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        CaseDetails actualData = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseDetails.class);
+
+        GlobalSearchTestFixture.assertGlobalSearchData(actualData.getData());
+    }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
@@ -1971,6 +2051,36 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         JSONAssert.assertEquals(expectedClassificationString,
             JacksonUtils.convertValueJsonNode(caseAuditEvent.getDataClassification()).toString(),
             JSONCompareMode.LENIENT);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_global_search.sql"})
+    public void shouldReturn201WithSearchCriteriaWhenPostCreateCaseEventForCitizen() throws Exception {
+        final String caseReference = "1504259907353529";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY
+            + "/cases/" + caseReference + "/events";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent()
+            .withData(GlobalSearchTestFixture.createCaseData())
+            .build();
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        CaseDetails actualData = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseDetails.class);
+
+        GlobalSearchTestFixture.assertGlobalSearchData(actualData.getData());
+
     }
 
     @Test
@@ -3669,7 +3779,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201AndInsertCaseLinksWhenCreateCaseEvent()
         throws Exception {
-        final String reference = "3393027116986763";
+        final String reference = CASE_22_REFERENCE;
         final String URL = "/caseworkers/0/jurisdictions/"
             + JURISDICTION
             + "/case-types/TestAddressBookCaseCaseLinks/cases/"
@@ -3690,10 +3800,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final JsonNode data = mapper.readTree(
             "{"
                 + "\"CaseLink1\": {"
-                + "     \"CaseReference\": \"1504259907353529\""
+                + "     \"CaseReference\": \"" + CASE_01_REFERENCE + "\""
                 + "},"
                 + "\"CaseLink2\": {"
-                + "     \"CaseReference\": \"1504259907353545\""
+                + "     \"CaseReference\": \"" + CASE_02_REFERENCE + "\""
                 + "}"
             + "}");
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
@@ -3703,23 +3813,23 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(201))
             .andReturn();
 
-        long expectedCaseId = 21;
+        Long expectedCaseId = CASE_22_ID;
         String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(1L)
+                .linkedCaseId(CASE_01_ID)
                 .caseTypeId(expectedCaseTypeId)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(2L)
+                .linkedCaseId(CASE_02_ID)
                 .caseTypeId(expectedCaseTypeId)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(3L)
+                .linkedCaseId(CASE_03_ID) // NB: previously added in "classpath:sql/insert_cases.sql"
                 .caseTypeId(expectedCaseTypeId)
                 .build()
         );
@@ -3731,7 +3841,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201AndDeleteCaseLinksWhenCreateCaseEvent()
         throws Exception {
-        final String reference = "3393027116986763";
+        final String reference = CASE_22_REFERENCE;
         final String URL = "/caseworkers/0/jurisdictions/"
             + JURISDICTION
             + "/case-types/TestAddressBookCaseCaseLinks/cases/"
@@ -3741,7 +3851,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String callbackData =
               " {\"data\": {"
             + "     \"CaseLink1\": {"
-            + "         \"CaseReference\": \"1504259907353529\""
+            + "         \"CaseReference\": \"" + CASE_01_REFERENCE + "\""
             + "     }"
             + " }"
             + "}";
@@ -3756,27 +3866,30 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             UID, JURISDICTION, CASE_TYPE, reference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
-
-        final MvcResult mvcResult = mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
+        mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(caseDetailsToSave)))
             .andExpect(status().is(201))
             .andReturn();
 
+        Long expectedCaseId = CASE_22_ID;
         String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
-                .caseId(21L)
-                .linkedCaseId(1L)
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_01_ID)
                 .caseTypeId(expectedCaseTypeId)
                 .build()
-        );
+        ); // NB: missing linkedCaseId = CASE_03_ID which is previously added in "classpath:sql/insert_cases.sql"
 
         List<CaseLink> caseLinks = template.query(
-            String.format("SELECT * FROM case_link where case_id=%s", 21),
+            String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
             new BeanPropertyRowMapper<>(CaseLink.class));
 
+        // confirm add of new case link
         assertTrue(caseLinks.containsAll(expectedCaseLinks));
+        // confirm deletion of old case link (i,e. check size is only 1)
+        assertEquals(1, caseLinks.size()); // no extra cases links so confirmed delete of CASE_03_ID link
     }
 
 
@@ -4099,7 +4212,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
         JSONAssert.assertEquals(expectedClassificationString,
-            JacksonUtils.convertValue(caseAuditEvent.getDataClassification()).toString(), JSONCompareMode.LENIENT);
+                mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(),
+                JSONCompareMode.LENIENT);
     }
 
     private void shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinary(String userRole) throws Exception {
