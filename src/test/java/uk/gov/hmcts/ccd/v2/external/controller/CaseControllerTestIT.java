@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,8 @@ import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
+import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -40,6 +43,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
@@ -48,10 +52,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -77,7 +84,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
     private static final String REQUEST_ID = "request-id";
     private static final String REQUEST_ID_VALUE = "1234567898765432";
     public static final String ROLE_PROBATE_SOLICITOR = "caseworker-probate-solicitor";
-    private static final String UID_WITH_EVENT_ACCESS = "123";
 
     @Inject
     private WebApplicationContext wac;
@@ -90,6 +96,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @BeforeEach
     public void setUp() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
@@ -106,9 +113,9 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull("Content Should not be null", content);
+        Assert.assertNotNull("Content Should not be null", content);
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
 
         assertThat(savedCaseResource.getReference(), is(caseId));
@@ -138,9 +145,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull("Content Should not be null", content);
+        Assert.assertNotNull("Content Should not be null", content);
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
 
         assertThat(savedCaseResource.getReference(), is(caseId));
@@ -181,7 +187,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         String content = mvcResult.getResponse().getContentAsString();
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
@@ -233,7 +239,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         String content = mvcResult.getResponse().getContentAsString();
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
@@ -262,9 +268,10 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull("Content Should not be null", content);
+        Assert.assertNotNull("Content Should not be null", content);
+
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
 
@@ -320,14 +327,14 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull("Content Should not be null", content);
+        Assert.assertNotNull("Content Should not be null", content);
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
 
         JsonNode searchCriteriaJsonNode = savedCaseResource.getData().get("SearchCriteria");
-        assertEquals("Saved case data should contain SearchCriteria with OtherCaseReferences",
+        Assert.assertEquals("Saved case data should contain SearchCriteria with OtherCaseReferences",
             searchCriteriaJsonNode.get("OtherCaseReferences").findValue("value").asText(),
             testFieldValue);
 
@@ -335,10 +342,10 @@ class CaseControllerTestIT extends WireMockBaseTest {
             searchCriteriaJsonNode.get("SearchParties").findValue("value"),
             SearchPartyValue.class);
         assertAll("Saved case data should contain SearchCriteria with SearchParty populated",
-            () -> assertEquals("name populated", firstNameValue + " " + lastNameValue, searchPartyValue.getName()),
-            () -> assertEquals("dateOfBirth populated", testFieldValue, searchPartyValue.getDateOfBirth()),
-            () -> assertEquals("Address Line 1 populated", addressLine1, searchPartyValue.getAddressLine1()),
-            () -> assertEquals("PostCode populated", postCode, searchPartyValue.getPostCode())
+            () -> Assert.assertEquals("name populated", firstNameValue + " " + lastNameValue, searchPartyValue.getName()),
+            () -> Assert.assertEquals("dateOfBirth populated", testFieldValue, searchPartyValue.getDateOfBirth()),
+            () -> Assert.assertEquals("Address Line 1 populated", addressLine1, searchPartyValue.getAddressLine1()),
+            () -> Assert.assertEquals("PostCode populated", postCode, searchPartyValue.getPostCode())
         );
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
@@ -381,9 +388,10 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull("Content Should not be null", content);
+        Assert.assertNotNull("Content Should not be null", content);
+
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
 
@@ -438,7 +446,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         String content = mvcResult.getResponse().getContentAsString();
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
@@ -479,12 +487,11 @@ class CaseControllerTestIT extends WireMockBaseTest {
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
 
-        Assertions.assertEquals(201, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        assertEquals(201, mvcResult.getResponse().getStatus());
         final String content = mvcResult.getResponse().getContentAsString();
         Assertions.assertNotNull(content, "Content Should not be null");
         final CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
-        Assertions.assertNotNull(savedCaseResource, "Saved Case Details should not be null");
+        assertNotNull(savedCaseResource, "Saved Case Details should not be null");
 
         final ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
@@ -532,9 +539,9 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull("Content Should not be null", content);
+
+        Assert.assertNotNull("Content Should not be null", content);
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
     }
@@ -563,9 +570,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull("Content Should not be null", content);
+        Assert.assertNotNull("Content Should not be null", content);
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
     }
@@ -598,16 +604,15 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
         SupplementaryDataResource supplementaryDataResource =
             mapper.readValue(content, SupplementaryDataResource.class);
-        assertNotNull(supplementaryDataResource);
-        assertNotNull(supplementaryDataResource.getResponse());
+        Assert.assertNotNull(supplementaryDataResource);
+        Assert.assertNotNull(supplementaryDataResource.getResponse());
         Map<String, Object> response = supplementaryDataResource.getResponse();
-        assertEquals(1, response.size());
+        Assert.assertEquals(1, response.size());
         assertTrue(response.containsKey("orgs_assigned_users.organisationB"));
-        assertEquals(23, response.get("orgs_assigned_users.organisationB"));
+        Assert.assertEquals(23, response.get("orgs_assigned_users.organisationB"));
     }
 
     @Test
@@ -624,19 +629,18 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
         SupplementaryDataResource supplementaryDataResource =
             mapper.readValue(content, SupplementaryDataResource.class);
-        assertNotNull(supplementaryDataResource);
-        assertNotNull(supplementaryDataResource.getResponse());
-        assertNotNull(supplementaryDataResource.getResponse());
+        Assert.assertNotNull(supplementaryDataResource);
+        Assert.assertNotNull(supplementaryDataResource.getResponse());
+        Assert.assertNotNull(supplementaryDataResource.getResponse());
         Map<String, Object> response = supplementaryDataResource.getResponse();
-        assertEquals(2, response.size());
+        Assert.assertEquals(2, response.size());
         assertTrue(response.containsKey("orgs_assigned_users.organisationB"));
-        assertEquals(23, response.get("orgs_assigned_users.organisationB"));
+        Assert.assertEquals(23, response.get("orgs_assigned_users.organisationB"));
         assertTrue(response.containsKey("orgs_assigned_users.organisationA"));
-        assertEquals(25, response.get("orgs_assigned_users.organisationA"));
+        Assert.assertEquals(25, response.get("orgs_assigned_users.organisationA"));
     }
 
     @Test
@@ -653,7 +657,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
         SupplementaryDataResource supplementaryDataResource =
             mapper.readValue(content, SupplementaryDataResource.class);
@@ -674,13 +677,12 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
         SupplementaryDataResource supplementaryDataResource =
             mapper.readValue(content, SupplementaryDataResource.class);
-        assertNotNull(supplementaryDataResource);
-        assertNotNull(supplementaryDataResource.getResponse());
-        assertEquals(1, supplementaryDataResource.getResponse().size());
+        Assert.assertNotNull(supplementaryDataResource);
+        Assert.assertNotNull(supplementaryDataResource.getResponse());
+        Assert.assertEquals(1, supplementaryDataResource.getResponse().size());
     }
 
     @Test
@@ -802,89 +804,113 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
     void testShouldGetLinkedCases() throws Exception {
-        final String caseReference = "1504259907353529";
-        final String URL = "/getLinkedCases/" + caseReference;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        final String caseReference = "1504259907353545";
+        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=1";
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
-                .header(REQUEST_ID, REQUEST_ID_VALUE)
-                .contentType(JSON_CONTENT_TYPE))
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals(200, mvcResult.getResponse().getStatus());
+        assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Assert.assertNotNull("Content Should not be null", content);
+
+        GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
+        Assert.assertEquals(2, getLinkedCasesResponse.getLinkedCases().size());
+
+        final List<String> caseReferences =
+            getLinkedCasesResponse.getLinkedCases().stream()
+                .map(CaseLinkInfo::getCaseReference)
+                .collect(Collectors.toList());
+
+        assertTrue(caseReferences.containsAll(List.of("1504259907353537", "1504259907353552")));
+
+        assertFalse(getLinkedCasesResponse.isHasMoreRecords());
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
     void testShouldGetLinkedCasesOptionalParameters() throws Exception {
-        final String caseReference = "1504259907353529";
+        final String caseReference = "1504259907353545";
         final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=2&maxReturnRecordCount=1";
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals(200, mvcResult.getResponse().getStatus());
+        String content = mvcResult.getResponse().getContentAsString();
+        Assert.assertNotNull("Content Should not be null", content);
+
+        GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
+        Assert.assertEquals(1, getLinkedCasesResponse.getLinkedCases().size());
+
+        final List<String> caseReferences =
+            getLinkedCasesResponse.getLinkedCases().stream()
+                .map(CaseLinkInfo::getCaseReference)
+                .collect(Collectors.toList());
+
+        assertTrue(caseReferences.contains("1504259907353552"));
+
+        assertFalse(getLinkedCasesResponse.isHasMoreRecords());
     }
 
     @Test
     void testGetLinkedCasesInvalidCaseReferenceShouldReturn400() throws Exception {
         final String caseReference = "abc";
         final String URL = "/getLinkedCases/" + caseReference;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals(400, mvcResult.getResponse().getStatus());
+        Assert.assertEquals(400, mvcResult.getResponse().getStatus());
     }
 
     @Test
     void testShouldGetLinkedCasesReturn404WhenCaseDoesNotExist() throws Exception {
         final String caseReference = "4259907353529155";
         final String URL = "/getLinkedCases/" + caseReference;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals(404, mvcResult.getResponse().getStatus());
+        Assert.assertEquals(404, mvcResult.getResponse().getStatus());
     }
 
     @Test
     void testShouldGetLinkedCasesStartRecordNumberNotNumericReturn400() throws Exception {
         final String caseReference = "1504259907353529";
         final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=A";
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals(400, mvcResult.getResponse().getStatus());
+        Assert.assertEquals(400, mvcResult.getResponse().getStatus());
     }
 
     @Test
     void testShouldGetLinkedCasesMaxRecordCountNotNumericReturn400() throws Exception {
         final String caseReference = "1504259907353529";
         final String URL = "/getLinkedCases/" + caseReference + "?maxReturnRecordCount=A";
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals(400, mvcResult.getResponse().getStatus());
+        Assert.assertEquals(400, mvcResult.getResponse().getStatus());
     }
 
     @Test
@@ -893,7 +919,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
     void shouldLogAuditInfoForGetLinkedCases() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=1";
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
@@ -902,7 +927,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
         String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull("Content Should not be null", content);
+        Assert.assertNotNull("Content Should not be null", content);
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
@@ -918,4 +943,92 @@ class CaseControllerTestIT extends WireMockBaseTest {
         assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
     }
 
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
+    void getLinkedCasesShouldReturnEmptyResponsePayloadWhenNoLinkedCasesExist() throws Exception {
+        final String caseReference = "1504259907353552";
+        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=1";
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        Assert.assertEquals(200, mvcResult.getResponse().getStatus());
+
+        final GetLinkedCasesResponse getLinkedCasesResponse =
+            mapper.readValue(mvcResult.getResponse().getContentAsString(), GetLinkedCasesResponse.class);
+
+        assertNotNull("Content should not be null", getLinkedCasesResponse);
+
+        assertFalse(getLinkedCasesResponse.isHasMoreRecords());
+
+        assertTrue(getLinkedCasesResponse.getLinkedCases().isEmpty());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
+    void getLinkedCasesPaginationPage1() throws Exception {
+        final String caseReference = "3522116262568758";
+        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=1&maxReturnRecordCount=3";
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        Assert.assertEquals(200, mvcResult.getResponse().getStatus());
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Assert.assertNotNull("Content Should not be null", content);
+
+        GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
+
+        // We get 4 records back, as the maxReturnRecordCount if 3 has 20% buffer added to it
+        Assert.assertEquals(4, getLinkedCasesResponse.getLinkedCases().size());
+
+        final List<String> caseReferences =
+            getLinkedCasesResponse.getLinkedCases().stream()
+                .map(CaseLinkInfo::getCaseReference)
+                .collect(Collectors.toList());
+
+        assertTrue(caseReferences.containsAll(
+            List.of("4504127458172644", "6913605797587333", "2609130232931622", "8256979053075411")));
+
+        assertTrue(getLinkedCasesResponse.isHasMoreRecords());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
+    void getLinkedCasesPaginationPage2() throws Exception {
+        final String caseReference = "3522116262568758";
+        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=5&maxReturnRecordCount=1";
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        Assert.assertEquals(200, mvcResult.getResponse().getStatus());
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Assert.assertNotNull("Content Should not be null", content);
+
+        GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
+
+        Assert.assertEquals(1, getLinkedCasesResponse.getLinkedCases().size());
+
+        final List<String> caseReferences =
+            getLinkedCasesResponse.getLinkedCases().stream()
+                .map(CaseLinkInfo::getCaseReference)
+                .collect(Collectors.toList());
+
+        assertTrue(caseReferences.containsAll(
+            List.of("8855462425591410")));
+
+        assertFalse(getLinkedCasesResponse.isHasMoreRecords());
+    }
 }

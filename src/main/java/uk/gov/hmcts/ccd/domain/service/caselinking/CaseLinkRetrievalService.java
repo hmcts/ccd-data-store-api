@@ -35,9 +35,11 @@ public class CaseLinkRetrievalService {
             = caseLinkRepository.findAllByCaseReferenceAndStandardLink(parseLong(caseReference),
                 CaseLinkEntity.STANDARD_LINK);
 
+        final int adjustedLimit = getAdjustedLimit(maxNumRecords, linkedStandardCases.size());
+
         final List<Long> paginatedLinkedStandardCases = linkedStandardCases.stream()
             .skip(startRecordNumber - 1L)
-            .limit(getAdjustedLimit(maxNumRecords, linkedStandardCases.size()))
+            .limit(adjustedLimit)
             .collect(Collectors.toList());
 
         final List<CaseDetails> caseDetails = paginatedLinkedStandardCases.stream()
@@ -49,14 +51,14 @@ public class CaseLinkRetrievalService {
 
         return CaseLinkRetrievalResults.builder()
             .caseDetails(caseDetails)
-            .hasMoreResults(startRecordNumber + maxNumRecords < linkedStandardCases.size())
+            .hasMoreResults(startRecordNumber + adjustedLimit <= linkedStandardCases.size())
             .build();
     }
 
     private int getAdjustedLimit(int maxNumRecords, int listSize) {
         int adjustedMaxNumRecords = 0;
 
-        if (maxNumRecords > 1) {
+        if (maxNumRecords > 0) {
             adjustedMaxNumRecords  = (int) Math.round(maxNumRecords * 1.2);
         }
 
