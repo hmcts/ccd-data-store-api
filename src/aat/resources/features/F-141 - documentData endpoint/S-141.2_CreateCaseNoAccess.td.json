@@ -1,45 +1,51 @@
 {
-  "_guid_": "F-140_CreateCase_NoCategories",
+  "_guid_": "S-141.2_CreateCaseNoAccess",
+
   "productName": "CCD Data Store",
   "operationName": "external create case",
   "method": "POST",
   "uri": "/case-types/{ctid}/cases",
-  "specs": [
+
+  "specs" : [
     "to create a full case"
   ],
+
   "prerequisites": [
     {
-      "Token_Creation": "F-140_CreateCase_Token_Creation"
+      "Token_Creation": "S-141.2_CreateCase_Token_Creation"
     }
   ],
+
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCaseworker2Solicitor2"
+      "_extends_": "BeftaCaseworkerCaa"
     }
   },
+
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "ctid": "BEFTA_CASETYPE_2_1"
+      "ctid": "FT_CRUD_2"
     },
     "headers": {
       "experimental": true
     },
     "body": {
       "data": {
-        "DocumentField1": {
-          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
-          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
-        }
+        "TextField": "value1"
       },
       "event": {
-        "id": "CREATE"
+        "id": "createCase"
       },
       "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "event_data": {
+        "TextField": "value1",
+        "TextField2": "value2"
+      },
       "ignore_warning": false
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "headers": {
@@ -51,29 +57,25 @@
       "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
-    "body": {
+    "body" : {
       "_links": {
         "self": {
           "href": "[[ANYTHING_PRESENT]]"
         }
       },
       "id": "[[ANYTHING_PRESENT]]",
-      "jurisdiction": "BEFTA_JURISDICTION_2",
-      "case_type": "BEFTA_CASETYPE_2_1",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_CRUD_2",
       "created_on": "[[ANYTHING_PRESENT]]",
       "last_modified_on": "[[ANYTHING_PRESENT]]",
       "last_state_modified_on": "[[ANYTHING_PRESENT]]",
-      "state": "TODO",
+      "state": "CaseCreated",
       "security_classification": "PUBLIC",
       "data": {
-        "DocumentField1": {
-          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
-          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
-        }
+        "TextField": "value1"
       },
       "data_classification": {
-        "DocumentField1": "PUBLIC"
+        "TextField": "PUBLIC"
       },
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
@@ -83,3 +85,4 @@
     }
   }
 }
+

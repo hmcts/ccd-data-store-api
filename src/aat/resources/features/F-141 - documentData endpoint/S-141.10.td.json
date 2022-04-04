@@ -1,0 +1,44 @@
+{
+  "title":"Document with attributePath had sub-field category id existing, but also having categoryId in definition file, categoryId request value now supplied as Null - return 200 response with the updated document hierarchy (showing document in category as per definition file) for the case",
+  "_guid_": "S-141.10",
+	"_extends_": "F-141_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD and has Update access permissions for the Document field named in the AttributePath",
+		"a case definition with category structure exists for the case type CT1",
+    "a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1",
+    "contains the given case reference C1 in the input",
+    "contains CategoryID value as \"Null\" and attributePath value as \"Document2\" in the input",
+    "contains a HTTP 200 status code"
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+	"request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-141.10_CreateCase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "attributePath": "Document2",
+      "caseVersion":  "0",
+      "categoryId": null
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : null
+  }
+}
+
