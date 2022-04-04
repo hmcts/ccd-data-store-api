@@ -135,7 +135,7 @@ Feature: F-141: CategoriesAndDocument endpoint
     And a call [to verify that the Case Event History contains a new event called "DocumentUpdated"] will get the expected response as in [F-141_GetCaseEventHistory],
 #    And a successful call [contains the updated document hierarchy with Document3 in CategoryID2] as in [F-141_GetCategoriesAndDocuments],
 
-  @S-141.10 #AC10 #why is it returning 2 categoryIDs
+  @S-141.10 #AC10
   Scenario: Document with attributePath had sub-field category id existing, but also having categoryId in definition file, categoryId request value now supplied as Null - return 200 response with the updated document hierarchy (showing document in category as per definition file) for the case
     Given a case that has just been created as in [S-141.10_CreateCase],
     And a user with [an active profile in CCD and has Update access permissions for the Document field named in the AttributePath],
