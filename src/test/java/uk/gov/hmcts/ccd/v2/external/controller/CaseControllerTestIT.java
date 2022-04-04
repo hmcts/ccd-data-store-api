@@ -909,7 +909,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-
         assertEquals(400, mvcResult.getResponse().getStatus());
     }
 
@@ -928,7 +927,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         assertEquals(200, mvcResult.getResponse().getStatus());
         String content = mvcResult.getResponse().getContentAsString();
 
-        Assertions.assertNotNull(content, "Content Should not be null");
+        assertNotNull(content, "Content Should not be null");
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
