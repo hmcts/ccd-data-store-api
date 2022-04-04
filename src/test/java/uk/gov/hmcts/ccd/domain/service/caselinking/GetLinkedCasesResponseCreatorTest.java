@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -239,6 +240,48 @@ class GetLinkedCasesResponseCreatorTest {
 
         assertTrue(caseLinks.get(0).getLinkDetails().isEmpty());
         assertFalse(response.isHasMoreRecords());
+    }
+
+    @Test
+    void testCreateCaseLinkInfosNoCaseNameHmctsInternalFieldPresent() throws JsonProcessingException {
+
+        final String minimalCaseDetails = "{\n"
+            + "  \"id\": \"1500638105106660\",\n"
+            + "  \"jurisdiction\": \"jurisdiction\",\n"
+            + "  \"state\": \"state\",\n"
+            + "  \"version\": 1,\n"
+            + "  \"case_type_id\": \"caseTypeId\",\n"
+            + "  \"created_date\": \"2016-06-22T20:44:52.824\",\n"
+            + "  \"last_modified\": \"2016-06-24T20:44:52.824\",\n"
+            + "  \"last_state_modified_date\": \"2016-06-24T20:44:52.824\",\n"
+            + "  \"security_classification\": \"PUBLIC\",\n"
+            + "  \"case_data\": {\n"
+            + "     \"CaseLink\": {\n"
+            + "         \"CaseReference\": \"1648478073517926\",\n"
+            + "         \"CaseType\": \"MyBaseType\",\n"
+            + "         \"CreatedDateTime\": \"2022-03-28T14:35:48.645045\",\n"
+            + "         \"ReasonForLink\": ["
+            + "             {\n"
+            + "                 \"value\": {\n"
+            + "                     \"Reason\": \"reason2\",\n"
+            + "                     \"OtherDescription\": \"otherDescription2\"\n"
+            + "                 },\n"
+            + "                 \"id\": \"6b9cff58-af9d-11ec-b909-0242ac120002\"\n"
+            + "             }"
+            + "         ]\n"
+            + "     }\n"
+            + "  }\n"
+            + "}";
+
+        CaseLinkRetrievalResults caseLinkRetrievalResults = CaseLinkRetrievalResults.builder()
+            .caseDetails(List.of(OBJECT_MAPPER.readValue(minimalCaseDetails, CaseDetails.class)))
+            .hasMoreResults(false)
+            .build();
+
+        final GetLinkedCasesResponse response = getLinkedCasesResponseCreator.createResponse(caseLinkRetrievalResults);
+
+        assertFalse(response.getLinkedCases().isEmpty());
+        assertNull(response.getLinkedCases().get(0).getCaseNameHmctsInternal());
     }
 
     void assertCaseLinkInfo(CaseLinkInfo caseLinkInfo, List<String> values) {

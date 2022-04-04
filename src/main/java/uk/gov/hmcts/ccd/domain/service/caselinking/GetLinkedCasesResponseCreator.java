@@ -1,8 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.caselinking;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.fasterxml.jackson.databind.node.NullNode;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkDetails;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
@@ -30,7 +29,9 @@ public class GetLinkedCasesResponseCreator {
         List<CaseLinkInfo> caseLinkInfos = new ArrayList<>();
         caseDetails.forEach(
             caseDetail -> caseLinkInfos.add(CaseLinkInfo.builder()
-                .caseNameHmctsInternal(caseDetail.getData().get("caseNameHmctsInternal").asText())
+                .caseNameHmctsInternal(caseDetail.getData()
+                    .getOrDefault("caseNameHmctsInternal", NullNode.getInstance())
+                    .asText(null))
                 .caseReference(String.valueOf(caseDetail.getReference()))
                 .ccdCaseType(caseDetail.getCaseTypeId())
                 .ccdJurisdiction(caseDetail.getJurisdiction())

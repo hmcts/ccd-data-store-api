@@ -888,10 +888,11 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
     void shouldLogAuditInfoForGetLinkedCases() throws Exception {
-        final String caseReference = "1504259907353529";
-        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=2&maxReturnRecordCount=2";
+        final String caseReference = "1504259907353545";
+        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=1";
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
@@ -906,11 +907,11 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        List<String> cassReferences = Arrays.asList(captor.getValue().getCaseId().split(","));
+        List<String> caseReferences = Arrays.asList(captor.getValue().getCaseId().split(","));
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.LINKED_CASES_ACCESSED.getLabel()));
-        assertThat(cassReferences, containsInAnyOrder(caseReference, "123", "456"));
-        assertThat(cassReferences.size(), is(3));
+        assertThat(caseReferences.size(), is(3));
+        assertThat(caseReferences, containsInAnyOrder(caseReference, "1504259907353537", "1504259907353552"));
         assertThat(captor.getValue().getIdamId(), is(UID));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(200));
