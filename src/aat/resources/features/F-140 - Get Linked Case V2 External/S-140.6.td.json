@@ -1,0 +1,42 @@
+{
+  "_guid_": "S-140.6",
+  "_extends_": "Get_Linked_Cases__Base",
+  "title": "should retrieve linked case when the case reference exists",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains the case reference of the case just created",
+    "contains the details of the case just created, along with an HTTP-200 OK"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "hasMoreRecords": false,
+      "linkedCases": [
+        {
+          "caseNameHmctsInternal": null,
+          "caseReference": "123",
+          "ccdCaseType": null,
+          "ccdJurisdiction": null,
+          "state": null,
+          "linkDetails": null
+        },
+        {
+          "caseNameHmctsInternal": null,
+          "caseReference": "456",
+          "ccdCaseType": null,
+          "ccdJurisdiction": null,
+          "state": null,
+          "linkDetails": null
+        }
+      ]
+    }
+  }
+}

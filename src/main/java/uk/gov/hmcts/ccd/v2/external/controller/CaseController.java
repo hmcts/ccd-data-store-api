@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -21,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
+import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -36,15 +37,23 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.springframework.http.ResponseEntity.status;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CREATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.LINKED_CASES_ACCESSED;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 
 @RestController
 @RequestMapping(path = "/")
@@ -112,7 +121,7 @@ public class CaseController {
         }
 
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
-                                                             .orElseThrow(() -> new CaseNotFoundException(caseId));
+            .orElseThrow(() -> new CaseNotFoundException(caseId));
 
         return ResponseEntity.ok(new CaseResource(caseDetails));
     }
@@ -163,10 +172,11 @@ public class CaseController {
             message = V2.Error.CALLBACK_EXCEPTION
         )
     })
-    @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId", jurisdiction = "#result.body.jurisdiction",
+    @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId",
+        jurisdiction = "#result.body.jurisdiction",
         caseType = "#result.body.caseType", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted",
-                                                    required = true)
+        required = true)
                                                     @PathVariable("caseId") String caseId,
                                                     @ApiParam(value = "Case data content for the event. Note that the "
                                                         + "`data` property "
@@ -306,8 +316,8 @@ public class CaseController {
         jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
-                                                   @RequestParam(value = "ignore-warning", required = false)
-                                                       final Boolean ignoreWarning) {
+                                                   @RequestParam(value = "ignore-warning", required = false) final
+                                                   Boolean ignoreWarning) {
         return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
     }
 
@@ -410,7 +420,9 @@ public class CaseController {
                 }))
     })
     public ResponseEntity<SupplementaryDataResource> updateCaseSupplementaryData(@PathVariable("caseId") String caseId,
-                                           @RequestBody SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
+                                                                                 @RequestBody
+                                                                                     SupplementaryDataUpdateRequest
+                                                                                     supplementaryDataUpdateRequest) {
 
         this.requestValidator.validate(supplementaryDataUpdateRequest);
         if (!caseReferenceService.validateUID(caseId)) {
@@ -436,5 +448,89 @@ public class CaseController {
 
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
+    }
+
+    @GetMapping(
+        path = "getLinkedCases/{caseReference}",
+        produces = {
+            V2.MediaType.CASE
+        }
+    )
+    @ApiOperation(
+        value = "Retrieve Linked Cases"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Success",
+            response = CaseResource.class),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:"
+                + "\n1) " + V2.Error.CASE_ID_INVALID
+                + "\n2) " + V2.Error.PARAM_NOT_NUM),
+        @ApiResponse(
+            code = 404,
+            message = V2.Error.CASE_NOT_FOUND)
+    })
+    @LogAudit(operationType = LINKED_CASES_ACCESSED,
+        caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseController).buildCaseIds(#caseReference, #result.body)")
+    public ResponseEntity<GetLinkedCasesResponse> getLinkedCase(
+        @PathVariable(name = "caseReference") String caseReference,
+                                              @RequestParam(name = "startRecordNumber",
+                                                  defaultValue = "1", required = false) String startRecordNumber,
+                                              @RequestParam(name = "maxReturnRecordCount",
+                                                  required = false) String maxReturnRecordCount) {
+
+        validateIsNumericParameter(startRecordNumber);
+        validateIsNumericParameter(maxReturnRecordCount);
+
+        validateCaseReference(caseReference);
+
+        //TODO remove when stuff built in RDM-13139 functional test F-140.6 might need updated as well
+        //TEST create fake Response
+        CaseLinkInfo caseLinkInfo1 = CaseLinkInfo.builder()
+            .caseReference("123")
+            .build();
+        CaseLinkInfo caseLinkInfo2 = CaseLinkInfo.builder()
+            .caseReference("456")
+            .build();
+        GetLinkedCasesResponse response = GetLinkedCasesResponse.builder()
+            .linkedCases(List.of(caseLinkInfo1, caseLinkInfo2))
+            .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    private void validateIsNumericParameter(String number) {
+        if (number != null) {
+            try {
+                Long.parseLong(number);
+            } catch (NumberFormatException nfe) {
+                throw new BadRequestException(V2.Error.PARAM_NOT_NUM);
+            }
+        }
+    }
+
+    private void validateCaseReference(final String caseReference) {
+        if (!caseReferenceService.validateUID(caseReference)) {
+            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
+        }
+        getCaseDetails(caseReference);
+    }
+
+    private CaseDetails getCaseDetails(final String caseReference) {
+        return getCaseOperation.execute(caseReference)
+            .orElseThrow(() -> new ResourceNotFoundException(V2.Error.CASE_NOT_FOUND));
+    }
+
+    public static String buildCaseIds(String caseReference, GetLinkedCasesResponse getLinkedCasesResponse) {
+        List<String> caseReferences = new ArrayList<>();
+        caseReferences.add(caseReference);
+        if (getLinkedCasesResponse != null) {
+            caseReferences.addAll(getLinkedCasesResponse.getLinkedCases().stream().limit(MAX_CASE_IDS_LIST - 1L)
+                .map(c -> String.valueOf(c.getCaseReference())).collect(Collectors.toList()));
+        }
+        return String.join(CASE_ID_SEPARATOR, caseReferences);
     }
 }
