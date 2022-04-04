@@ -120,7 +120,7 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       And   a successful call [to create a case] as in [F-1019_CreateCasePreRequisiteCaseworkerBase]
       When  a request is prepared with appropriate values
       And   the request [contains correctly configured CaseLink field with Case Reference created in F-1019_CreateCasePreRequisiteCaseworkerBase]
-      And   it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
+      And   it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
       And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1019-VerifyCaseLinks_V2]
@@ -130,7 +130,7 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       Given   a user with [an active profile in CCD]
       When    a request is prepared with appropriate values
       And     the request [contains blank/null value in the CaseLink field]
-      And     it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
+      And     it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
       Then    a positive response is received
       And     the response has all other details as expected
       And     a successful call [to verify that no Case Links have been created in the CASE_LINK table] as in [F-1019-VerifyCaseLinksNotInserted]
@@ -140,7 +140,7 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       Given   a user with [an active profile in CCD]
       When    a request is prepared with appropriate values
       And     the request [contains correctly configured CaseLink field with Invalid Case Reference]
-      And     it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
+      And     it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
       Then    a negative response is received,
       And     the response [has the 422 return code],
       And     the response has all other details as expected.
@@ -152,7 +152,7 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       When    a request is prepared with appropriate values
       And     the request [contains correctly configured CaseLink field with valid Case Reference]
       And     the request [contains some invalid case data]
-      And     it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
+      And     it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
       Then    a negative response is received,
       And     the response [has the 422 return code],
       And     the response has all other details as expected.
@@ -164,7 +164,7 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       And     a successful call [to create a case] as in [F-1019_CreateAnotherCasePreRequisiteCaseworkerBase]
       When    a request is prepared with appropriate values
       And     the request [contains collection of correctly configured CaseLink collection field with Case Reference values]
-      And     it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
+      And     it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
       Then    a positive response is received
       And     the response has all other details as expected
       And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1019-VerifyMultipleCaseLinks]

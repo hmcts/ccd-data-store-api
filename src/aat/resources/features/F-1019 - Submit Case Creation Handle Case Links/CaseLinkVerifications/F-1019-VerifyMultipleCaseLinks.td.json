@@ -1,12 +1,7 @@
 {
   "title": "should retrieve case links for a specified case reference",
   "_guid_": "F-1019-VerifyMultipleCaseLinks",
-
-  "productName": "CCD Data Store",
-  "operationName": "Retrieve case links for an existing case reference",
-
-  "method": "GET",
-  "uri": "/testing-support/case-link/{cid}",
+  "_extends_": "Verify_Case_Links_Base",
 
   "specs": [
     "to verify that the Case Links have been created in the CASE_LINK table with correct values"
@@ -19,10 +14,6 @@
   },
 
   "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "experimental": "true"
-    },
     "pathVariables": {
       "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
     }
@@ -40,11 +31,11 @@
         "__elementId__": "LinkedCaseReference"
       }, {
         "CaseReference": "[[ANYTHING_PRESENT]]",
-        "LinkedCaseReference": "${[scenarioContext][parentContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+        "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
         "CaseTypeId": "FT_MasterCaseType"
       }, {
         "CaseReference": "[[ANYTHING_PRESENT]]",
-        "LinkedCaseReference": "${[scenarioContext][parentContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+        "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
         "CaseTypeId": "FT_MasterCaseType"
       }]
     }

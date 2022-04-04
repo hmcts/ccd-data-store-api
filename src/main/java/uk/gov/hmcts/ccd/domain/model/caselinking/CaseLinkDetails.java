@@ -8,6 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
+
 public class CaseLinkDetails {
     private LocalDateTime createdDateTime;
     private List<Reason> reasons;

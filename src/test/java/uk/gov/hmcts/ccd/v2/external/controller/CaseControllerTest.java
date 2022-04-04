@@ -480,6 +480,7 @@ class CaseControllerTest {
                 .linkedCases(List.of(CaseLinkInfo.builder().build()))
                 .build();
             when(getLinkedCasesResponseCreator.createResponse(any())).thenReturn(getLinkedCasesResponse);
+
             final ResponseEntity<GetLinkedCasesResponse> response =
                 caseController.getLinkedCase(CASE_REFERENCE, START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT);
 

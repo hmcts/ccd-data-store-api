@@ -485,11 +485,10 @@ public class CaseController {
         caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseController).buildCaseIds(#caseReference, #result.body)")
     public ResponseEntity<GetLinkedCasesResponse> getLinkedCase(
         @PathVariable(name = "caseReference") String caseReference,
-                                                                @RequestParam(name = "startRecordNumber",
+                                              @RequestParam(name = "startRecordNumber",
                                                   defaultValue = "1", required = false) String startRecordNumber,
-                                                                @RequestParam(name = "maxReturnRecordCount",
+                                              @RequestParam(name = "maxReturnRecordCount",
                                                   required = false) String maxReturnRecordCount) {
-
         maxReturnRecordCount = StringUtils.isBlank(maxReturnRecordCount) ? "0" : maxReturnRecordCount;
 
         validateIsNumericParameter(startRecordNumber);

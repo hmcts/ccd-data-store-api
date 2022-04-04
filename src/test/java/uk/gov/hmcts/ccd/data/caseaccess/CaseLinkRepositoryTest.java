@@ -35,6 +35,7 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
     @Before
     public void setup() {
         caseLinkEntity = new CaseLinkEntity(CASE_13_ID, CASE_14_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
+
         caseLinkIdToReferenceMap.put(CASE_02_ID, 1504259907353545L);
         caseLinkIdToReferenceMap.put(CASE_03_ID, 1504259907353537L);
         caseLinkIdToReferenceMap.put(CASE_04_ID, 1504259907353552L);
@@ -98,7 +99,6 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void testSaveFailsIfCaseIdDoesNotExist() {
         caseLinkEntity = new CaseLinkEntity(1003L, CASE_01_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
-
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
     }
 
@@ -106,7 +106,6 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void testSaveFailsIfLinkedCaseIdDoesNotExist() {
         caseLinkEntity = new CaseLinkEntity(CASE_01_ID, 999L, "TestAddressBookCase", NON_STANDARD_LINK);
-
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
     }
 

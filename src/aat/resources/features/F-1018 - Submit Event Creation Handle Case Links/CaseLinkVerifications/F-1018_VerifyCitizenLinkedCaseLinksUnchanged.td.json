@@ -1,25 +1,25 @@
 {
-	"title": "should retrieve case links for a specified case reference",
-	"_guid_": "F-1018_VerifyCitizenLinkedCaseLinksUnchanged",
+  "title": "should retrieve case links for a specified case reference",
+  "_guid_": "F-1018_VerifyCitizenLinkedCaseLinksUnchanged",
   "_extends_": "F-1018_VerifyCaseLinksBase",
 
   "specs": [
     "to verify that the Case Links in the CASE_LINK table are unchanged"
   ],
 
-	"request": {
-		"pathVariables": {
-			"cid": "${[scenarioContext][parentContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
-		}
-	},
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1018_CreateLinkedCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+    }
+  },
 
-	"expectedResponse": {
-		"body": {
+  "expectedResponse": {
+    "body": {
       "CaseLinks" : [ {
-        "CaseReference" : "${[scenarioContext][parentContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
-        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+        "CaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateLinkedCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+        "LinkedCaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
       }]
-		}
-	}
+    }
+  }
 }

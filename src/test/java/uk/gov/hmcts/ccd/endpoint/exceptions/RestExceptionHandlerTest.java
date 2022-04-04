@@ -131,7 +131,8 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void handleServiceException_shouldReturnHttpServerError_InternalServerError() throws Exception {
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long method name
+    public void handleHttpServerErrorException_shouldReturnBadGatewayWhenReceivedInternalServerError() throws Exception {
 
         // ARRANGE
         String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
@@ -149,7 +150,8 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void handleServiceException_shouldReturnHttpServerError_GatewayTimeout() throws Exception {
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long method name
+    public void handleHttpServerErrorException_shouldReturnGatewayTimeoutWhenReceivedGatewayTimeout() throws Exception {
 
         // ARRANGE
         String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
@@ -167,7 +169,8 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void handleServiceException_shouldReturnHttpClintError_BadRequest() throws Exception {
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long method name
+    public void handleHttpClientErrorException_shouldReturnInternalServerErrorWhenReceivedBadRequest() throws Exception {
 
         // ARRANGE
         String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
@@ -186,7 +189,26 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void handleServiceException_shouldReturnFeignServerError_InternalServerError() throws Exception {
+    public void handleHttpClientErrorException_shouldReturnUnauthorizedWhenReceivedUnauthorized() throws Exception {
+
+        // ARRANGE
+        String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
+
+        ServiceException expectedException = new ServiceException(myUniqueExceptionMessage, HttpClientErrorException
+            .create(HttpStatus.UNAUTHORIZED, myUniqueExceptionMessage, HttpHeaders.EMPTY,
+                new byte[0], Charset.defaultCharset()));
+
+        setupMockServiceToThrowException(expectedException);
+
+        // ACT
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
+
+        // ASSERT
+        assertHttpErrorResponse(result, expectedException, HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    public void handleFeignServerException_shouldReturnBadGatewayWhenReceivedInternalServerError() throws Exception {
 
         // ARRANGE
         String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
@@ -204,7 +226,7 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void handleServiceException_shouldReturnFeignServerError_GatewayTimeout() throws Exception {
+    public void handleFeignServerException_shouldReturnGatewayTimeoutWhenReceivedGatewayTimeout() throws Exception {
 
         // ARRANGE
         String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
@@ -222,7 +244,7 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void handleServiceException_shouldReturnFeignClintError_BadRequest() throws Exception {
+    public void handleFeignClientException_shouldReturnInternalServerErrorWhenReceivedBadRequest() throws Exception {
 
         // ARRANGE
         String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
@@ -241,6 +263,25 @@ public class RestExceptionHandlerTest {
         assertHttpErrorResponse(result, expectedException, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Test
+    public void handleFeignClientException_shouldReturnUnauthorizedWhenReceivedUnauthorized() throws Exception {
+
+        // ARRANGE
+        String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
+
+        ServiceException expectedException = new ServiceException(myUniqueExceptionMessage,
+            new FeignException.FeignClientException(HttpStatus.UNAUTHORIZED.value(), myUniqueExceptionMessage,
+                Request.create(Request.HttpMethod.GET, myUniqueExceptionMessage, Map.of(), new byte[0],
+                    Charset.defaultCharset(), null), new byte[0]));
+
+        setupMockServiceToThrowException(expectedException);
+
+        // ACT
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
+
+        // ASSERT
+        assertHttpErrorResponse(result, expectedException, HttpStatus.UNAUTHORIZED);
+    }
 
     @Test
     public void handleException_shouldLogExceptionAsError() throws Exception {

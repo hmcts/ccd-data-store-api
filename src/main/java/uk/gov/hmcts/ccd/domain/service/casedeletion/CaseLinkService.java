@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.casedeletion;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -31,15 +32,17 @@ public class CaseLinkService {
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
+    @Transactional
     public void updateCaseLinks(Long caseReference,
                                 String caseTypeId,
-                                List<String> preCallbackCaseLinks,
-                                List<String> postCallbackCaseLinks) {
-        deleteRemovedCaseLinks(caseReference, preCallbackCaseLinks, postCallbackCaseLinks);
-        insertNewCaseLinks(caseReference, caseTypeId, preCallbackCaseLinks, postCallbackCaseLinks);
+                                List<String> finalCaseLinkReferences) {
+        List<String> currentCaseLinkReferences =
+            getStringCaseReferencesFromCaseLinks(findCaseLinks(caseReference.toString()));
+        deleteRemovedCaseLinks(caseReference, currentCaseLinkReferences, finalCaseLinkReferences);
+        insertNewCaseLinks(caseReference, caseTypeId, currentCaseLinkReferences, finalCaseLinkReferences);
     }
 
-    public void createCaseLinks(Long caseReference, String caseTypeId, List<String> caseLinks) {
+    private void createCaseLinks(Long caseReference, String caseTypeId, List<String> caseLinks) {
         caseLinks.stream()
             .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
             .forEach(caseLinkReference -> {
@@ -53,13 +56,13 @@ public class CaseLinkService {
     }
 
     private void deleteRemovedCaseLinks(Long caseReference,
-                                        List<String> preCallbackData,
-                                        List<String> postCallbackData) {
+                                        List<String> currentCaseLinkReferences,
+                                        List<String> finalCaseLinkReferences) {
 
-        final var caseLinksToDelete = preCallbackData.stream()
+        final var caseLinksToDelete = currentCaseLinkReferences.stream()
             .distinct()
             .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
-            .filter(caseLink -> !postCallbackData.contains(caseLink))
+            .filter(caseLink -> !finalCaseLinkReferences.contains(caseLink))
             .collect(Collectors.toList());
 
         caseLinksToDelete.forEach(caseLink -> {
@@ -70,11 +73,11 @@ public class CaseLinkService {
 
     private void insertNewCaseLinks(Long caseReference,
                                     String caseTypeId,
-                                    List<String> preCallbackData,
-                                    List<String> postCallbackData) {
-        final var caseLinksToInsert = postCallbackData.stream()
+                                    List<String> currentCaseLinkReferences,
+                                    List<String> finalCaseLinkReferences) {
+        final var caseLinksToInsert = finalCaseLinkReferences.stream()
             .distinct()
-            .filter(caseLink -> !preCallbackData.contains(caseLink))
+            .filter(caseLink -> !currentCaseLinkReferences.contains(caseLink))
             .collect(Collectors.toList());
 
         createCaseLinks(caseReference, caseTypeId, caseLinksToInsert);
@@ -107,5 +110,12 @@ public class CaseLinkService {
             allLinkedCases.get(i).setCaseReference(caseReference);
             allLinkedCases.get(i).setLinkedCaseReference(linkedCaseReferences.get(i));
         }
+    }
+
+    private List<String> getStringCaseReferencesFromCaseLinks(List<CaseLink> caseLinks) {
+        return caseLinks
+            .stream()
+            .map(caseLink -> caseLink.getLinkedCaseReference().toString()) //getCaseReference or getLinkedCaseReference
+            .collect(Collectors.toList());
     }
 }
