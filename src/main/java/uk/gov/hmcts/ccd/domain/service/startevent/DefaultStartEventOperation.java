@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -78,6 +79,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
         this.caseDataService = caseDataService;
     }
 
+    @Transactional
     @Override
     public StartEventResult triggerStartForCaseType(final String caseTypeId,
                                                     final String eventId,
@@ -98,6 +100,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                       newCaseDetails);
     }
 
+    @Transactional
     @Override
     public StartEventResult triggerStartForCase(final String caseReference,
                                                 final String eventId,
@@ -131,6 +134,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
     }
 
+    @Transactional
     @Override
     public StartEventResult triggerStartForDraft(final String draftReference,
                                                  final Boolean ignoreWarning) {

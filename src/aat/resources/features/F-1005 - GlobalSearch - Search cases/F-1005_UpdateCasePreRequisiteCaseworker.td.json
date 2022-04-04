@@ -27,7 +27,10 @@
       "state": "CaseUpdated",
       "case_type": "FT_GlobalSearch",
       "data": {
-        "_extends_": "Befta_Global_Search_Updated_Expected_Search_Criteria"
+        "_extends_": "Befta_Global_Search_Updated_Expected_Search_Criteria",
+        "caseManagementLocation": {
+          "_extends_": "CaseManagementLocation_FromRefData_SiblingContext"
+        }
       }
     }
   }
