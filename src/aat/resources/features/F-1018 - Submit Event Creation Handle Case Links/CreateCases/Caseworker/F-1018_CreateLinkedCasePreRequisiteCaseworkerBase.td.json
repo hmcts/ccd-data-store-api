@@ -18,7 +18,7 @@
       "case_data" : {
         "TextField": "This is the case that is currently linked to the case being updated",
         "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+          "CaseReference": "[[ANY_STRING_NOT_NULLABLE]]"
         }
       },
       "data_classification" : {

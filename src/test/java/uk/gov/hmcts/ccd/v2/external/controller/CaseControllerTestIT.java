@@ -866,12 +866,14 @@ class CaseControllerTestIT extends WireMockBaseTest {
         final String caseReference = "abc";
         final String URL = "/getLinkedCases/" + caseReference;
 
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        Assert.assertEquals(400, mvcResult.getResponse().getStatus());
+        assertEquals(400, mvcResult.getResponse().getStatus());
     }
 
     @Test
@@ -884,7 +886,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        Assert.assertEquals(404, mvcResult.getResponse().getStatus());
+        assertEquals(404, mvcResult.getResponse().getStatus());
     }
 
     @Test
@@ -897,7 +899,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        Assert.assertEquals(400, mvcResult.getResponse().getStatus());
+        assertEquals(400, mvcResult.getResponse().getStatus());
     }
 
     @Test
@@ -909,6 +911,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
+
 
         Assert.assertEquals(400, mvcResult.getResponse().getStatus());
     }
@@ -927,10 +930,12 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
         String content = mvcResult.getResponse().getContentAsString();
-        Assert.assertNotNull("Content Should not be null", content);
+
+        assertNotNull("Content Should not be null", content);
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
+
 
         List<String> caseReferences = Arrays.asList(captor.getValue().getCaseId().split(","));
 

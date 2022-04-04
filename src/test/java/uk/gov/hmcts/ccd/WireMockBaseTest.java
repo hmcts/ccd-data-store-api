@@ -31,17 +31,16 @@ import org.springframework.test.util.ReflectionTestUtils;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @AutoConfigureWireMock(port = 0)
 public abstract class WireMockBaseTest extends BaseTest {

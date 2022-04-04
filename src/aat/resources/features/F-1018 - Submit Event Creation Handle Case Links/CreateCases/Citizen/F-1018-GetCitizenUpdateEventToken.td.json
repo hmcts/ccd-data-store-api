@@ -5,7 +5,7 @@
 
 	"request": {
 		"pathVariables": {
-			"cid": "${[scenarioContext][parentContext][childContexts][F-1018_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+			"cid": "${[scenarioContext][siblingContexts][F-1018_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
 		}
 	}
 }

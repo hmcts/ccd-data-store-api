@@ -9,7 +9,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity.NON_STANDARD_LINK;
 
@@ -43,11 +42,6 @@ class CaseLinkMapperTest {
             assertEquals(LINKED_CASE_ID, mappedCaseLinkEntity.getCaseLinkPrimaryKey().getLinkedCaseId());
             assertEquals(CASE_TYPE_ID, mappedCaseLinkEntity.getCaseTypeId());
         });
-    }
-
-    @Test
-    void testNullModelToEntity() {
-        assertNull(caseLinkMapper.modelToEntity(null));
     }
 
     @Test
@@ -86,11 +80,5 @@ class CaseLinkMapperTest {
         final List<CaseLink> caseLinks = caseLinkMapper.entitiesToModels(caseLinkEntities);
         assertEquals(caseLinkEntities.size(), caseLinks.size());
         assertTrue(expectedCaseLinkModels.containsAll(caseLinks));
-    }
-
-    @Test
-    void testNullEntityToModel() {
-        CaseLinkEntity caseLinkEntity = null;
-        assertNull(caseLinkMapper.entityToModel(caseLinkEntity));
     }
 }

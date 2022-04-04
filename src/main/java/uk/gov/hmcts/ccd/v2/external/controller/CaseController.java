@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
 import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -485,12 +486,11 @@ public class CaseController {
         caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseController).buildCaseIds(#caseReference, #result.body)")
     public ResponseEntity<GetLinkedCasesResponse> getLinkedCase(
         @PathVariable(name = "caseReference") String caseReference,
-                                                                @RequestParam(name = "startRecordNumber",
+                                              @RequestParam(name = "startRecordNumber",
                                                   defaultValue = "1", required = false) String startRecordNumber,
-                                                                @RequestParam(name = "maxReturnRecordCount",
+                                              @RequestParam(name = "maxReturnRecordCount",
                                                   required = false) String maxReturnRecordCount) {
-
-        maxReturnRecordCount = StringUtils.isBlank(maxReturnRecordCount) ? "0" : maxReturnRecordCount;
+        maxReturnRecordCount = StringUtils.isBlank(maxReturnRecordCount) ? "0" : maxReturnRecordCount;                                                
 
         validateIsNumericParameter(startRecordNumber);
         validateIsNumericParameter(maxReturnRecordCount);
