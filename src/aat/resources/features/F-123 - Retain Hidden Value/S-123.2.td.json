@@ -66,7 +66,8 @@
               "display_context" : null,
               "display_context_parameter" : null,
               "retain_hidden_value" : null,
-              "formatted_value" : null
+              "formatted_value" : null,
+              "category_id" : null
             },
               {
               "id" : "MotherFullName",
@@ -90,7 +91,8 @@
               "display_context" : null,
               "display_context_parameter" : null,
               "retain_hidden_value" : null,
-              "formatted_value" : null
+              "formatted_value" : null,
+              "category_id" : null
             },
               {
               "id" : "MotherAge",
@@ -114,7 +116,8 @@
               "display_context" : null,
               "display_context_parameter" : null,
               "retain_hidden_value" : null,
-              "formatted_value" : null
+              "formatted_value" : null,
+              "category_id" : null
             },
               {
               "id" : "FatherFullName",
@@ -138,7 +141,8 @@
               "display_context" : null,
               "display_context_parameter" : null,
               "retain_hidden_value" : null,
-              "formatted_value" : null
+              "formatted_value" : null,
+              "category_id" : null
             }, {
               "id" : "FatherAge",
               "label" : "Father Age",
@@ -161,8 +165,9 @@
               "display_context" : null,
               "display_context_parameter" : null,
               "retain_hidden_value" : null,
-              "formatted_value" : null
-            }, {
+              "formatted_value" : null,
+              "category_id" : null
+              }, {
               "id" : "Children",
               "label" : "Children (collection label)",
               "hidden" : null,
@@ -207,7 +212,8 @@
                     "display_context" : null,
                     "display_context_parameter" : null,
                     "retain_hidden_value" : null,
-                    "formatted_value" : null
+                    "formatted_value" : null,
+                    "category_id" : null
                   }, {
                     "id" : "ChildGender",
                     "label" : "Child Gender",
@@ -249,7 +255,8 @@
                     "display_context" : null,
                     "display_context_parameter" : null,
                     "retain_hidden_value" : true,
-                    "formatted_value" : null
+                    "formatted_value" : null,
+                    "category_id" : null
                   }, {
                     "id" : "ChildDOB",
                     "label" : "Child date of Birth",
@@ -272,7 +279,8 @@
                     "display_context" : null,
                     "display_context_parameter" : null,
                     "retain_hidden_value" : false,
-                    "formatted_value" : null
+                    "formatted_value" : null,
+                    "category_id" : null
                   }, {
                     "id" : "BirthCertificate",
                     "label" : "Child Birth Certificate",
@@ -295,7 +303,8 @@
                     "display_context" : null,
                     "display_context_parameter" : null,
                     "retain_hidden_value" : null,
-                    "formatted_value" : null
+                    "formatted_value" : null,
+                    "category_id" : null
                   }, {
                     "id" : "ChildAddress",
                     "label" : "Child address",
@@ -336,7 +345,8 @@
                         "display_context" : null,
                         "display_context_parameter" : null,
                         "retain_hidden_value" : null,
-                        "formatted_value" : null
+                        "formatted_value" : null,
+                        "category_id" : null
                       }, {
                         "id" : "AddressLine2",
                         "label" : "Address Line 2",
@@ -361,7 +371,8 @@
                         "display_context" : null,
                         "display_context_parameter" : null,
                         "retain_hidden_value" : null,
-                        "formatted_value" : null
+                        "formatted_value" : null,
+                        "category_id" : null
                       }, {
                         "id" : "AddressLine3",
                         "label" : "Address Line 3",
@@ -386,7 +397,8 @@
                         "display_context" : null,
                         "display_context_parameter" : null,
                         "retain_hidden_value" : null,
-                        "formatted_value" : null
+                        "formatted_value" : null,
+                        "category_id" : null
                       }, {
                         "id" : "PostTown",
                         "label" : "Town or City",
@@ -411,7 +423,8 @@
                         "display_context" : null,
                         "display_context_parameter" : null,
                         "retain_hidden_value" : null,
-                        "formatted_value" : null
+                        "formatted_value" : null,
+                        "category_id" : null
                       }, {
                         "id" : "County",
                         "label" : "County",
@@ -436,7 +449,8 @@
                         "display_context" : null,
                         "display_context_parameter" : null,
                         "retain_hidden_value" : null,
-                        "formatted_value" : null
+                        "formatted_value" : null,
+                        "category_id" : null
                       }, {
                         "id" : "PostCode",
                         "label" : "Postcode/Zipcode",
@@ -461,7 +475,8 @@
                         "display_context" : null,
                         "display_context_parameter" : null,
                         "retain_hidden_value" : null,
-                        "formatted_value" : null
+                        "formatted_value" : null,
+                        "category_id" : null
                       }, {
                         "id" : "Country",
                         "label" : "Country",
@@ -486,7 +501,8 @@
                         "display_context" : null,
                         "display_context_parameter" : null,
                         "retain_hidden_value" : null,
-                        "formatted_value" : null
+                        "formatted_value" : null,
+                        "category_id" : null
                       } ],
                       "collection_field_type" : null
                     },
@@ -501,7 +517,8 @@
                     "display_context" : null,
                     "display_context_parameter" : null,
                     "retain_hidden_value" : null,
-                    "formatted_value" : null
+                    "formatted_value" : null,
+                    "category_id" : null
                   }, {
                     "id" : "IsAutistic",
                     "label" : "Is the child autistic?",
@@ -524,7 +541,8 @@
                     "display_context" : null,
                     "display_context_parameter" : null,
                     "retain_hidden_value" : null,
-                    "formatted_value" : null
+                    "formatted_value" : null,
+                    "category_id" : null
                   }, {
                     "id" : "NeedsSupport",
                     "label" : "Does the child needs support?",
@@ -547,7 +565,8 @@
                     "display_context" : null,
                     "display_context_parameter" : null,
                     "retain_hidden_value" : null,
-                    "formatted_value" : null
+                    "formatted_value" : null,
+                    "category_id" : null
                   }, {
                     "id" : "AutisticChildCaseNumber",
                     "label" : "Autistic child case number reference",
@@ -592,7 +611,8 @@
                         "display_context" : null,
                         "display_context_parameter" : null,
                         "retain_hidden_value" : null,
-                        "formatted_value" : null
+                        "formatted_value" : null,
+                        "category_id" : null
                       } ],
                       "collection_field_type" : null
                     },
@@ -607,7 +627,8 @@
                     "display_context" : null,
                     "display_context_parameter" : null,
                     "retain_hidden_value" : null,
-                    "formatted_value" : null
+                    "formatted_value" : null,
+                    "category_id" : null
                   } ],
                   "collection_field_type" : null
                 }
@@ -623,7 +644,8 @@
               "display_context" : null,
               "display_context_parameter" : "#COLLECTION(allowDelete,allowInsert,allowUpdate)",
               "retain_hidden_value" : true,
-              "formatted_value" : null
+              "formatted_value" : null,
+              "category_id" : null
             }, {
               "id" : "FamilyAddress",
               "label" : "Family Address",
@@ -663,7 +685,8 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "category_id" : null
                 }, {
                   "id" : "AddressLine2",
                   "label" : "Address Line 2",
@@ -693,7 +716,8 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "category_id" : null
                 }, {
                   "id" : "AddressLine3",
                   "label" : "Address Line 3",
@@ -718,7 +742,8 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "category_id" : null
                 }, {
                   "id" : "PostTown",
                   "label" : "Town or City",
@@ -743,7 +768,8 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "category_id" : null
                 }, {
                   "id" : "County",
                   "label" : "County",
@@ -768,7 +794,8 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "category_id" : null
                 }, {
                   "id" : "PostCode",
                   "label" : "Postcode/Zipcode",
@@ -793,7 +820,8 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "category_id" : null
                 }, {
                   "id" : "Country",
                   "label" : "Country",
@@ -818,7 +846,8 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "category_id" : null
                 } ],
                 "collection_field_type" : null
               },
@@ -833,12 +862,14 @@
               "display_context" : null,
               "display_context_parameter" : null,
               "retain_hidden_value" : null,
-              "formatted_value" : null
+              "formatted_value" : null,
+              "category_id" : null
             } ]
           },
           "show_condition": "NumberField!=\"0\"",
           "retain_hidden_value": true,
           "formatted_value": null,
+          "category_id" : null,
           "show_summary_change_option" : true,
           "acls": [
             {
@@ -855,6 +886,7 @@
             "_extends_": "BaseNumberFieldType"
           },
           "formatted_value": null,
+          "category_id" : null,
           "show_summary_change_option" : true,
           "acls": [
             {
