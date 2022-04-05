@@ -24,5 +24,5 @@ public class CaseLink {
     private Long linkedCaseId;
     private String caseTypeId;
 
-    private Boolean standard_link;
+    private Boolean standardLink;
 }

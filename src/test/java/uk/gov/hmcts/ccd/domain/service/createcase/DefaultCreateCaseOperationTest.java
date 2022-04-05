@@ -555,7 +555,7 @@ class DefaultCreateCaseOperationTest {
     }
 
     @Test
-    @DisplayName("Should insert case links into DB when case is created")
+    @DisplayName("Should insert case links when case is created")
     void shouldInsertCaseLinks() throws JsonProcessingException {
         final String caseEventStateId = "Some state";
         final Long caseReference = 1855854166952584L;
@@ -578,7 +578,7 @@ class DefaultCreateCaseOperationTest {
             CaseLink.builder().linkedCaseReference(Long.valueOf(caseRef)).build(),
             CaseLink.builder().linkedCaseReference(Long.valueOf(caseRef2)).build());
 
-        given(caseLinkExtractor.getCaseLinksFromData(any(Map.class), any(List.class))).willReturn(caseLinks);
+        given(caseLinkExtractor.getCaseLinksFromData(any(CaseDetails.class), any(List.class))).willReturn(caseLinks);
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
         given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);

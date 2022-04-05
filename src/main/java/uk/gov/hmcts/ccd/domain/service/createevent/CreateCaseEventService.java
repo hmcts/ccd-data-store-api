@@ -219,7 +219,7 @@ public class CreateCaseEventService {
             timeNow
         );
 
-        updateCaseLinks(caseDetailsInDatabase, caseDetailsAfterCallback, caseTypeDefinition.getCaseFieldDefinitions());
+        updateCaseLinks(savedCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
         saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
@@ -246,18 +246,14 @@ public class CreateCaseEventService {
             .build();
     }
 
-    private void updateCaseLinks(CaseDetails caseDetailsBeforeCallback,
-                                 CaseDetails caseDetailsAfterCallback,
+    private void updateCaseLinks(CaseDetails caseDetails,
                                  List<CaseFieldDefinition> caseFieldDefinitions) {
 
-        List<CaseLink> finalCaseLinkReferences =
-            caseLinkExtractor.getCaseLinksFromData(caseDetailsAfterCallback.getData(), caseFieldDefinitions);
+        List<CaseLink> caseLinks = caseLinkExtractor.getCaseLinksFromData(caseDetails, caseFieldDefinitions);
 
         // TODO: CaseTypeId needs to be 'case type id of the case to which the case links' so will need to possibly
         //  be updated to take in the linked case - this will need to be confirmed
-        caseLinkService.updateCaseLinks(caseDetailsBeforeCallback.getReference(),
-                                        caseDetailsBeforeCallback.getCaseTypeId(),
-                                        finalCaseLinkReferences);
+        caseLinkService.updateCaseLinks(caseDetails.getReference(), caseDetails.getCaseTypeId(), caseLinks);
     }
 
     private CaseEventDefinition findAndValidateCaseEvent(final CaseTypeDefinition caseTypeDefinition,

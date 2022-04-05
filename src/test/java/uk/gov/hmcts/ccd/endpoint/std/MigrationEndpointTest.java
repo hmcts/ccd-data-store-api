@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationResult;
@@ -15,15 +16,16 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ForbiddenException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static java.util.Collections.emptyList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static java.util.Collections.emptyList;
 
+
+@ExtendWith(MockitoExtension.class)
 class MigrationEndpointTest {
 
     private static final String CASE_TYPE_ID = "CaseTypeId";
@@ -31,19 +33,15 @@ class MigrationEndpointTest {
 
     @Mock
     private CaseLinkMigrationService service;
+
     @Mock
     private SearchOperation operation;
+
     @Mock
     private ElasticsearchQueryHelper elasticsearchQueryHelper;
 
+    @InjectMocks
     private MigrationEndpoint endpoint;
-
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.initMocks(this);
-
-        endpoint = new MigrationEndpoint(service, operation, elasticsearchQueryHelper);
-    }
 
     @Test
     void shouldRunNoCasesFound() {
@@ -65,7 +63,6 @@ class MigrationEndpointTest {
         assertEquals(0, result.getRecordCount());
 
         verify(service, times(1)).backPopulateCaseLinkTable(any());
-
     }
 
     @Test
@@ -92,7 +89,7 @@ class MigrationEndpointTest {
         String expectedMessage = "Forbidden";
         String actualMessage = exception.getMessage();
 
-        assertTrue(actualMessage.equals(expectedMessage));
+        assertEquals(expectedMessage, actualMessage);
         verify(service, times(0)).backPopulateCaseLinkTable(any());
     }
 

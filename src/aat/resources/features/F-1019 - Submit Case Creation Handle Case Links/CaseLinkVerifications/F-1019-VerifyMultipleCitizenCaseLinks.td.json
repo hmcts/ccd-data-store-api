@@ -32,11 +32,13 @@
       }, {
         "CaseReference": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
         "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1019_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
-        "CaseTypeId": "FT_MasterCaseType"
+        "CaseTypeId": "FT_MasterCaseType",
+        "StandardLink" : false
       }, {
         "CaseReference": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
         "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1019_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
-        "CaseTypeId": "FT_MasterCaseType"
+        "CaseTypeId": "FT_MasterCaseType",
+        "StandardLink" : false
       }]
     }
   }

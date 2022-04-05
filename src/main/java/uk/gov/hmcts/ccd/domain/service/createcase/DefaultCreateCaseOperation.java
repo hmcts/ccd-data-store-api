@@ -186,7 +186,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     }
 
     private void insertCaseLinks(CaseDetails caseDetails, List<CaseFieldDefinition> caseFieldDefinitions) {
-        final List<CaseLink> caseLinks = caseLinkExtractor.getCaseLinksFromData(caseDetails.getData(), caseFieldDefinitions);
+        final List<CaseLink> caseLinks = caseLinkExtractor.getCaseLinksFromData(caseDetails, caseFieldDefinitions);
         caseLinkService.updateCaseLinks(caseDetails.getReference(), caseDetails.getCaseTypeId(), caseLinks);
     }
 

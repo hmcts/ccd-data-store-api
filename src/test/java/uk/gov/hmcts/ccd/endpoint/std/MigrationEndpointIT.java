@@ -48,6 +48,7 @@ import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_CAA;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_PROBATE;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_SSCS;
+import static uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity.NON_STANDARD_LINK;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink.builder;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
@@ -111,6 +112,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
                     .caseId(expectedCaseId)
                     .linkedCaseId(2L)
                     .caseTypeId(CASE_TYPE_ID)
+                    .standardLink(NON_STANDARD_LINK)
                     .build()
             );
             assertCaseLinks(expectedCaseId, expectedCaseLinks);
@@ -143,11 +145,13 @@ class MigrationEndpointIT extends WireMockBaseTest {
                     .caseId(expectedCaseId1)
                     .linkedCaseId(2L)
                     .caseTypeId(CASE_TYPE_ID)
+                    .standardLink(NON_STANDARD_LINK)
                     .build(),
                 builder()
                     .caseId(expectedCaseId1)
                     .linkedCaseId(5L)
                     .caseTypeId(CASE_TYPE_ID)
+                    .standardLink(NON_STANDARD_LINK)
                     .build()
             );
 
@@ -183,11 +187,13 @@ class MigrationEndpointIT extends WireMockBaseTest {
                     .caseId(expectedCaseId1)
                     .linkedCaseId(2L)
                     .caseTypeId(CASE_TYPE_ID)
+                    .standardLink(NON_STANDARD_LINK)
                     .build(),
                 builder()
                     .caseId(expectedCaseId1)
                     .linkedCaseId(5L)
                     .caseTypeId(CASE_TYPE_ID)
+                    .standardLink(NON_STANDARD_LINK)
                     .build()
             );
 
@@ -197,11 +203,13 @@ class MigrationEndpointIT extends WireMockBaseTest {
                     .caseId(expectedCaseId2)
                     .linkedCaseId(4L)
                     .caseTypeId(CASE_TYPE_ID)
+                    .standardLink(NON_STANDARD_LINK)
                     .build(),
                 builder()
                     .caseId(expectedCaseId2)
                     .linkedCaseId(6L)
                     .caseTypeId(CASE_TYPE_ID)
+                    .standardLink(NON_STANDARD_LINK)
                     .build()
             );
 
@@ -234,6 +242,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
                     .caseId(expectedCaseId)
                     .linkedCaseId(4L)
                     .caseTypeId("TestAddressBookCaseCaseLinks")
+                    .standardLink(NON_STANDARD_LINK)
                     .build()
             );
             assertCaseLinks(expectedCaseId, expectedCaseLinksCaseId);

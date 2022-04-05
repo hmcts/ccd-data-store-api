@@ -33,16 +33,15 @@ public class CaseLinkMigrationService {
     public void backPopulateCaseLinkTable(List<CaseDetails> cases) {
 
         for (CaseDetails caseDetails : cases) {
-            // caselinks that need creating based on the data
             final CaseTypeDefinition caseTypeDefinition =
                 caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
-            List<CaseLink> finalCaseLinkReferences =
-                caseLinkExtractor.getCaseLinksFromData(caseDetails.getData(), caseTypeDefinition.getCaseFieldDefinitions());
+            List<CaseLink> caseLinks =
+                caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
             caseLinkService.updateCaseLinks(
                 caseDetails.getReference(),
                 caseDetails.getCaseTypeId(),
-                finalCaseLinkReferences);
+                caseLinks);
         }
     }
 }

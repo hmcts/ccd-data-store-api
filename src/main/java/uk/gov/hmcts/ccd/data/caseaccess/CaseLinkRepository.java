@@ -13,13 +13,16 @@ import java.util.List;
 @Repository
 public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseLinkEntity.CaseLinkPrimaryKey> {
 
+    /**
+     * Delete all CaseLinks records belonging to the supplied Case Reference.
+     *
+     * @param caseReference parent case reference to delete by
+     * @return number of records deleted
+     */
     @Modifying
     @Query("delete from CaseLinkEntity cle where cle.caseLinkPrimaryKey.caseId = "
-        + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference) "
-        + "and cle.caseLinkPrimaryKey.linkedCaseId = (select cd.id from CaseDetailsEntity cd where "
-        + "cd.reference=:linkedCaseReference)")
-    int deleteByCaseReferenceAndLinkedCaseReference(@Param("caseReference") Long caseReference,
-                                                    @Param("linkedCaseReference") Long linkedCaseReference);
+        + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)")
+    int deleteAllByCaseReference(@Param("caseReference") Long caseReference);
 
     @Modifying
     @Query(value = "insert into case_link (case_id, linked_case_id, case_type_id, standard_link) values ("
@@ -30,7 +33,7 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
                                                                   @Param("linkedCaseReference")
                                                                       Long linkedCaseReference,
                                                                   @Param("caseTypeId") String caseTypeId,
-                                                                  @Param("standard_link") Boolean standardLink);
+                                                                  @Param("standardLink") Boolean standardLink);
 
     @Query(value = "select cle from CaseLinkEntity cle where cle.caseLinkPrimaryKey.caseId = "
         + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)")
