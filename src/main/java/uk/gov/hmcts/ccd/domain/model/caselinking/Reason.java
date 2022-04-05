@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-class Reason {
+public class Reason {
     private String reasonCode;
     private String otherDescription;
 }

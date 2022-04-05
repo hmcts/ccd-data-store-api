@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -20,6 +21,8 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.GetLinkedCasesResponseCreator;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
@@ -44,12 +47,14 @@ import java.util.stream.IntStream;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.lang.Integer.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
@@ -57,6 +62,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -94,6 +100,12 @@ class CaseControllerTest {
 
     @Mock
     private SupplementaryDataUpdateRequestValidator requestValidator;
+
+    @Mock
+    private GetLinkedCasesResponseCreator getLinkedCasesResponseCreator;
+
+    @Mock
+    private CaseLinkRetrievalService caseLinkRetrievalService;
 
     @InjectMocks
     private CaseController caseController;
@@ -434,25 +446,47 @@ class CaseControllerTest {
     class GetLinkedCases {
 
         @Test
-        @DisplayName("should return 200 when case found")
-        void linkedCaseFound() {
+        @DisplayName("should return 200 when case found, and maxRecordNumber parameter is not set")
+        void linkedCaseFoundMaxRecordNumberNotSet() {
+            GetLinkedCasesResponse getLinkedCasesResponse = GetLinkedCasesResponse.builder()
+                .hasMoreRecords(false)
+                .linkedCases(List.of(CaseLinkInfo.builder().build()))
+                .build();
+            when(getLinkedCasesResponseCreator.createResponse(any())).thenReturn(getLinkedCasesResponse);
+
             // WHEN
             final ResponseEntity<GetLinkedCasesResponse> response = caseController.getLinkedCase(CASE_REFERENCE,
-                null, null);
+                "1", "");
+
+            ArgumentCaptor<Integer> startRecordNumberCaptor = ArgumentCaptor.forClass(Integer.class);
+            ArgumentCaptor<Integer> maxRecordsNumberCaptor = ArgumentCaptor.forClass(Integer.class);
+            ArgumentCaptor<String> caseReferenceCaptor = ArgumentCaptor.forClass(String.class);
 
             // THEN
             assertThat(response.getStatusCode(), is(HttpStatus.OK));
+            assertNotNull(response.getBody());
+
+            verify(caseLinkRetrievalService).getStandardLinkedCases(caseReferenceCaptor.capture(),
+                startRecordNumberCaptor.capture(), maxRecordsNumberCaptor.capture());
+            assertEquals(valueOf(0), maxRecordsNumberCaptor.getValue());
         }
 
         @Test
         @DisplayName("should return 200 when case found with parameters")
         void linkedCaseFoundWithOptionalParameters() {
             // WHEN
+            GetLinkedCasesResponse getLinkedCasesResponse = GetLinkedCasesResponse.builder()
+                .hasMoreRecords(false)
+                .linkedCases(List.of(CaseLinkInfo.builder().build()))
+                .build();
+            when(getLinkedCasesResponseCreator.createResponse(any())).thenReturn(getLinkedCasesResponse);
+
             final ResponseEntity<GetLinkedCasesResponse> response =
                 caseController.getLinkedCase(CASE_REFERENCE, START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT);
 
             // THEN
             assertThat(response.getStatusCode(), is(HttpStatus.OK));
+            assertNotNull(response.getBody());
         }
 
         @Test

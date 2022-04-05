@@ -1,0 +1,34 @@
+{
+	"title": "should create an event token for correct inputs",
+	"_guid_": "F-1018-GetCitizenUpdateEventTokenBase",
+  "_extends_": "Token_Creation_Data_For_Citizen_Case_Creation",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"cid": "${[scenarioContext][siblingContexts][F-1018_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+			"etid": "updateCaseCitizen"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+			"token": "[[ANYTHING_PRESENT]]",
+			"case_details": "[[ANYTHING_PRESENT]]",
+			"event_id": "updateCaseCitizen"
+		}
+	}
+}

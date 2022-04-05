@@ -51,6 +51,8 @@ public class CaseEventDefinition implements Serializable {
     private List<AccessControlList> accessControlLists;
     @JsonProperty("event_enabling_condition")
     private String eventEnablingCondition;
+    @JsonProperty("ttl_increment")
+    private Integer ttlIncrement;
 
     public String getId() {
         return id;
@@ -225,5 +227,13 @@ public class CaseEventDefinition implements Serializable {
 
     public void setEventEnablingCondition(String eventEnablingCondition) {
         this.eventEnablingCondition = eventEnablingCondition;
+    }
+
+    public Integer getTtlIncrement() {
+        return ttlIncrement;
+    }
+
+    public void setTtlIncrement(Integer ttlIncrement) {
+        this.ttlIncrement = ttlIncrement;
     }
 }

@@ -1,6 +1,6 @@
 {
 	"_guid_": "F-1006_CreateCasePreRequisiteCaseworker",
-	"_extends_": "Case_Creation_Base",
+	"_extends_": "Case_Creation_Data_Base",
 
   "specs": [
     "to create a case",

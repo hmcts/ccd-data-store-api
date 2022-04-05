@@ -16,12 +16,16 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkExtractor;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -82,6 +86,9 @@ public class CreateCaseEventService {
     private final CaseDocumentService caseDocumentService;
     private final CaseDataIssueLogger caseDataIssueLogger;
     private final GlobalSearchProcessorService globalSearchProcessorService;
+    private final TimeToLiveService timeToLiveService;
+    private final CaseLinkService caseLinkService;
+    private final CaseLinkExtractor caseLinkExtractor;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -107,7 +114,10 @@ public class CreateCaseEventService {
                                   @Qualifier("caseEventMessageService") final MessageService messageService,
                                   final CaseDocumentService caseDocumentService,
                                   final CaseDataIssueLogger caseDataIssueLogger,
-                                  final GlobalSearchProcessorService globalSearchProcessorService) {
+                                  final GlobalSearchProcessorService globalSearchProcessorService,
+                                  final TimeToLiveService timeToLiveService,
+                                  final CaseLinkService caseLinkService,
+                                  final CaseLinkExtractor caseLinkExtractor) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -130,6 +140,9 @@ public class CreateCaseEventService {
         this.caseDocumentService = caseDocumentService;
         this.caseDataIssueLogger = caseDataIssueLogger;
         this.globalSearchProcessorService = globalSearchProcessorService;
+        this.timeToLiveService = timeToLiveService;
+        this.caseLinkService = caseLinkService;
+        this.caseLinkExtractor = caseLinkExtractor;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -163,6 +176,9 @@ public class CreateCaseEventService {
             caseEventDefinition,
             caseTypeDefinition
         );
+
+        timeToLiveService.validateSuspensionChange(content.getData(), caseDetailsInDatabase.getData());
+
         final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
 
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
@@ -191,6 +207,9 @@ public class CreateCaseEventService {
             caseDetailsAfterCallback
         );
 
+        caseDetailsAfterCallbackWithoutHashes
+            .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
+
         final CaseDetails savedCaseDetails = saveCaseDetails(
             caseDetailsInDatabase,
             caseDetailsAfterCallbackWithoutHashes,
@@ -198,6 +217,9 @@ public class CreateCaseEventService {
             newState,
             timeNow
         );
+
+        updateCaseLinks(caseDetailsInDatabase, caseDetailsAfterCallback, caseTypeDefinition.getCaseFieldDefinitions());
+
         saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
             content.getEvent(),
@@ -221,6 +243,20 @@ public class CreateCaseEventService {
             .savedCaseDetails(savedCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
+    }
+
+    private void updateCaseLinks(CaseDetails caseDetailsBeforeCallback,
+                                 CaseDetails caseDetailsAfterCallback,
+                                 List<CaseFieldDefinition> caseFieldDefinitions) {
+
+        List<String> finalCaseLinkReferences =
+            caseLinkExtractor.getCaseLinks(caseDetailsAfterCallback.getData(), caseFieldDefinitions);
+
+        // TODO: CaseTypeId needs to be 'case type id of the case to which the case links' so will need to possibly
+        //  be updated to take in the linked case - this will need to be confirmed
+        caseLinkService.updateCaseLinks(caseDetailsBeforeCallback.getReference(),
+                                        caseDetailsBeforeCallback.getCaseTypeId(),
+                                        finalCaseLinkReferences);
     }
 
     private CaseEventDefinition findAndValidateCaseEvent(final CaseTypeDefinition caseTypeDefinition,

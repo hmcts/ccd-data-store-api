@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.core.IsInstanceOf;
@@ -11,6 +12,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -28,6 +30,8 @@ import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkExtractor;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -43,6 +47,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
@@ -112,7 +117,12 @@ class DefaultCreateCaseOperationTest {
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
 
     @Mock
-    private SupplementaryDataUpdateRequestValidator validator;
+    private SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
+
+    @Mock
+    private CaseLinkService caseLinkService;
+    @Mock
+    private CaseLinkExtractor caseLinkExtractor;
 
     private DefaultCreateCaseOperation defaultCreateCaseOperation;
 
@@ -127,9 +137,10 @@ class DefaultCreateCaseOperationTest {
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
     private static final String TOKEN = "toke";
     private static final String DRAFT_ID = "1";
+    private static final String CASE_ID = "123";
 
     private static final IdamUser IDAM_USER = buildIdamUser();
-    private static final CaseTypeDefinition CASE_TYPE = buildCaseType();
+    private static CaseTypeDefinition CASE_TYPE;
     private CaseEventDefinition eventTrigger;
 
     @BeforeEach
@@ -150,12 +161,15 @@ class DefaultCreateCaseOperationTest {
                                                                     caseDataIssueLogger,
                                                                     globalSearchProcessorService,
                                                                     supplementaryDataUpdateOperation,
-                                                                    validator);
+                                                                    supplementaryDataValidator,
+                                                                    caseLinkService,
+                                                                    caseLinkExtractor);
         data = buildJsonNodeData();
         given(userRepository.getUser()).willReturn(IDAM_USER);
         given(userRepository.getUserId()).willReturn(UID);
         eventTrigger = newCaseEvent().withId("eventId").withName("event Name").build();
         eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(DRAFT_ID).build();
+        CASE_TYPE = buildCaseType();
 
         SupplementaryData supplementaryData = new SupplementaryData();
         when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
@@ -535,6 +549,89 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
+            () -> order.verify(draftGateway).delete(DRAFT_ID)
+        );
+    }
+
+    @Test
+    @DisplayName("Should insert case links into DB when case is created")
+    void shouldInsertCaseLinks() throws JsonProcessingException {
+        final String caseEventStateId = "Some state";
+        final Long caseReference = 1855854166952584L;
+        final String caseRef = "1621351496474853";
+        final String caseRef2 = "1630400132944487";
+        final Map<String, JsonNode> data = JacksonUtils.convertValue(new ObjectMapper().readTree(
+            "{\n"
+                + "  \"CaseLinks\" : [\n"
+                + "    {\n"
+                + "      \"value\": "
+                + "        {\n"
+                + "          \"CaseLink1\": \"" + caseRef + "\",\n"
+                + "          \"CaseLink2\": \"" + caseRef2 + "\"\n"
+                + "        }\n"
+                + "    }"
+                + "  ]\n"
+                + "}")
+        );
+        final List<String> caseLinks = List.of(caseRef, caseRef2);
+
+        given(caseLinkExtractor.getCaseLinks(any(Map.class), any(List.class))).willReturn(caseLinks);
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
+        given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
+        given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);
+        given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
+        given(savedCaseType.getState()).willReturn(caseEventStateId);
+        given(savedCaseType.getReference()).willReturn(caseReference);
+        given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
+        eventTrigger.setCallBackURLSubmittedEvent("http://localhost/submittedcallback");
+        given(callbackInvoker.invokeSubmittedCallback(eventTrigger,
+            null,
+            savedCaseType)).willReturn(response);
+        given(response.hasBody()).willReturn(true);
+        given(response.getBody()).willReturn(responseBody);
+        given(response.getStatusCodeValue()).willReturn(200);
+        given(savedCaseType.getCaseTypeId()).willReturn(CASE_TYPE_ID);
+        given(savedCaseType.getId()).willReturn(CASE_ID);
+        given(savedCaseType.getData()).willReturn(data);
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
+            .willReturn(data);
+        given(submitCaseTransaction.submitCase(
+            same(event),
+            same(CASE_TYPE),
+            same(IDAM_USER),
+            same(eventTrigger),
+            any(CaseDetails.class),
+            same(IGNORE_WARNING)))
+            .willReturn(savedCaseType);
+
+        final CaseDetails caseDetails = defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+            eventData,
+            IGNORE_WARNING);
+
+        final InOrder order = inOrder(eventTokenService,
+            caseTypeService,
+            validateCaseFieldsOperation,
+            submitCaseTransaction,
+            callbackInvoker,
+            savedCaseType,
+            caseLinkService,
+            draftGateway);
+
+        assertAll("Call back response returned successfully",
+            () -> assertThat(caseDetails.getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
+                CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
+            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(submitCaseTransaction).submitCase(same(event),
+                same(CASE_TYPE),
+                same(IDAM_USER),
+                same(eventTrigger),
+                any(CaseDetails.class),
+                same(IGNORE_WARNING)),
+            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
+                same(savedCaseType)),
+            () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
+            () -> order.verify(caseLinkService).updateCaseLinks(caseReference, CASE_TYPE_ID, caseLinks),
             () -> order.verify(draftGateway).delete(DRAFT_ID)
         );
     }

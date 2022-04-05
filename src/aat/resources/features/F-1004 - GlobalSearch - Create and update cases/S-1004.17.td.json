@@ -1,7 +1,7 @@
 {
   "title": "Update the Data Store for \"case create\" when valid data has been entered correctly in the CollectionFieldName using V2: /case-types/{caseTypeId}/cases endpoint",
   "_guid_": "S-1004.17",
-  "_extends_": "Case_Creation_V2_Base",
+  "_extends_": "Case_Creation_V2_Data_Base",
 
    "specs": [
     "an active profile in CCD",

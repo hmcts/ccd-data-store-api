@@ -7,9 +7,11 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
 import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -28,6 +29,9 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalResults;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.GetLinkedCasesResponseCreator;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
@@ -65,6 +69,8 @@ public class CaseController {
     private final GetEventsOperation getEventsOperation;
     private final SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private final SupplementaryDataUpdateRequestValidator requestValidator;
+    private final CaseLinkRetrievalService caseLinkRetrievalService;
+    private final GetLinkedCasesResponseCreator getLinkedCasesResponseCreator;
 
     @Autowired
     public CaseController(
@@ -74,8 +80,9 @@ public class CaseController {
         UIDService caseReferenceService,
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
         @Qualifier("authorised") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
-        SupplementaryDataUpdateRequestValidator requestValidator
-    ) {
+        SupplementaryDataUpdateRequestValidator requestValidator,
+        CaseLinkRetrievalService caseLinkRetrievalService,
+        GetLinkedCasesResponseCreator getLinkedCasesResponseCreator) {
         this.getCaseOperation = getCaseOperation;
         this.createEventOperation = createEventOperation;
         this.createCaseOperation = createCaseOperation;
@@ -83,6 +90,8 @@ public class CaseController {
         this.getEventsOperation = getEventsOperation;
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.requestValidator = requestValidator;
+        this.caseLinkRetrievalService = caseLinkRetrievalService;
+        this.getLinkedCasesResponseCreator = getLinkedCasesResponseCreator;
     }
 
     @GetMapping(
@@ -452,9 +461,7 @@ public class CaseController {
 
     @GetMapping(
         path = "getLinkedCases/{caseReference}",
-        produces = {
-            V2.MediaType.CASE
-        }
+        produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ApiOperation(
         value = "Retrieve Linked Cases"
@@ -481,25 +488,21 @@ public class CaseController {
                                                   defaultValue = "1", required = false) String startRecordNumber,
                                               @RequestParam(name = "maxReturnRecordCount",
                                                   required = false) String maxReturnRecordCount) {
+        maxReturnRecordCount = StringUtils.isBlank(maxReturnRecordCount) ? "0" : maxReturnRecordCount;
 
         validateIsNumericParameter(startRecordNumber);
         validateIsNumericParameter(maxReturnRecordCount);
 
         validateCaseReference(caseReference);
 
-        //TODO remove when stuff built in RDM-13139 functional test F-140.6 might need updated as well
-        //TEST create fake Response
-        CaseLinkInfo caseLinkInfo1 = CaseLinkInfo.builder()
-            .caseReference("123")
-            .build();
-        CaseLinkInfo caseLinkInfo2 = CaseLinkInfo.builder()
-            .caseReference("456")
-            .build();
-        GetLinkedCasesResponse response = GetLinkedCasesResponse.builder()
-            .linkedCases(List.of(caseLinkInfo1, caseLinkInfo2))
-            .build();
+        final CaseLinkRetrievalResults standardLinkedCases =
+            caseLinkRetrievalService.getStandardLinkedCases(caseReference,
+                Integer.parseInt(startRecordNumber),
+                Integer.parseInt(maxReturnRecordCount));
 
-        return ResponseEntity.ok(response);
+        final GetLinkedCasesResponse responseBody = getLinkedCasesResponseCreator.createResponse(standardLinkedCases);
+
+        return ResponseEntity.ok(responseBody);
     }
 
     private void validateIsNumericParameter(String number) {
