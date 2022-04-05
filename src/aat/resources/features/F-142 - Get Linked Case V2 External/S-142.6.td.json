@@ -19,24 +19,7 @@
     "_extends_": "Common_200_Response",
     "body": {
       "hasMoreRecords": false,
-      "linkedCases": [
-        {
-          "caseNameHmctsInternal": null,
-          "caseReference": "123",
-          "ccdCaseType": null,
-          "ccdJurisdiction": null,
-          "state": null,
-          "linkDetails": null
-        },
-        {
-          "caseNameHmctsInternal": null,
-          "caseReference": "456",
-          "ccdCaseType": null,
-          "ccdJurisdiction": null,
-          "state": null,
-          "linkDetails": null
-        }
-      ]
+      "linkedCases": [ ]
     }
   }
 }
