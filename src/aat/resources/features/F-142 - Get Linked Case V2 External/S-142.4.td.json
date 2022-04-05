@@ -1,32 +1,28 @@
 {
-  "_guid_": "S-140.3",
+  "_guid_": "S-142.4",
   "_extends_": "Get_Linked_Cases__Base",
-  "title": "should get 404 when case reference exist but not authorised",
+  "title": "should get 400 when case reference is valid but startRecordNumber is invalid",
 
   "specs": [
     "an active profile in CCD",
-    "contains a valid user authorisation token without access to the operation",
-    "contains a case reference that does not exist",
-    "contains an HTTP-404 Not Found"
+    "contains valid case reference but invalid startRecordNumber",
+    "contains an HTTP-400 Bad Request"
   ],
-
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaCaseworker1"
-    }
-  },
 
   "request": {
     "pathVariables": {
       "cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    },
+    "queryParams": {
+      "startRecordNumber": "A"
     }
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "Common_400_Response",
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "Case not found",
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message": "Parameter is not numeric",
       "path": "/getLinkedCases/${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
       "details": null,
       "callbackErrors": null,
