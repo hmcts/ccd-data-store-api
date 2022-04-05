@@ -66,8 +66,7 @@
               "display_context" : null,
               "display_context_parameter" : null,
               "retain_hidden_value" : null,
-              "formatted_value" : null,
-              "category_id" : null
+              "formatted_value" : null
             },
               {
               "id" : "MotherFullName",
@@ -869,7 +868,6 @@
           "show_condition": "NumberField!=\"0\"",
           "retain_hidden_value": true,
           "formatted_value": null,
-          "category_id" : null,
           "show_summary_change_option" : true,
           "acls": [
             {
@@ -886,7 +884,6 @@
             "_extends_": "BaseNumberFieldType"
           },
           "formatted_value": null,
-          "category_id" : null,
           "show_summary_change_option" : true,
           "acls": [
             {
