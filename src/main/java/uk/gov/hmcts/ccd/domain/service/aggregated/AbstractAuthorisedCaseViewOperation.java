@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.AbstractCaseView;
@@ -22,6 +24,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CAS
 
 public abstract class AbstractAuthorisedCaseViewOperation {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractAuthorisedCaseViewOperation.class);
+
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
     private final CaseDetailsRepository caseDetailsRepository;
@@ -39,6 +43,7 @@ public abstract class AbstractAuthorisedCaseViewOperation {
 
     void verifyCaseTypeReadAccess(CaseTypeDefinition caseTypeDefinition, Set<AccessProfile> accessProfiles) {
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ)) {
+            LOG.error("No read access for the given access profile");
             ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(AccessControlService
                 .NO_CASE_TYPE_FOUND);
             resourceNotFoundException.withDetails(NO_CASE_TYPE_FOUND_DETAILS);

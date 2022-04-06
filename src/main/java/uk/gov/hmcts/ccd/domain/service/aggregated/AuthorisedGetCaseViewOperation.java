@@ -61,10 +61,15 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
 
     @Override
     public CaseView execute(String caseReference) {
+        LOG.info("starting execution of AuthorisedGetCaseViewOperation for case {}", caseReference);
         CaseView caseView = getCaseViewOperation.execute(caseReference);
 
         CaseTypeDefinition caseTypeDefinition = getCaseType(caseView.getCaseType().getId());
         Set<AccessProfile> accessProfiles = getAccessProfiles(caseReference);
+
+        accessProfiles.forEach(ap -> LOG.info("readonly {}, access profile {}, case Cat {}, sec Class {}",
+            ap.getReadOnly(), ap.getAccessProfile(), ap.getCaseAccessCategories(), ap.getSecurityClassification()));
+
         verifyCaseTypeReadAccess(caseTypeDefinition, accessProfiles);
         filterCaseTabFieldsByReadAccess(caseView, accessProfiles);
         filterAllowedTabsWithFields(caseView, accessProfiles);

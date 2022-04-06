@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseHistoryViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 
+import java.util.Arrays;
+
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.VIEW_CASE_HISTORY;
 
@@ -30,6 +34,7 @@ import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.VIEW_CASE_HISTORY;
 @RequestMapping(path = "/internal/cases")
 public class UICaseController {
     private static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
+    private static final Logger LOG = LoggerFactory.getLogger(UICaseController.class);
 
     private final GetCaseViewOperation getCaseViewOperation;
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
@@ -77,12 +82,17 @@ public class UICaseController {
     @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId", jurisdiction = "#result.body.caseType.jurisdiction.id",
         caseType = "#result.body.caseType.id")
     public ResponseEntity<CaseViewResource> getCaseView(@PathVariable("caseId") String caseId) {
+        LOG.info("getCaseView started for >>> {}", caseId);
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
 
         final CaseView caseView = getCaseViewOperation.execute(caseId);
-
+        LOG.info("getCaseView started for >>> {}, actionable events below", caseId);
+        if (caseView.getActionableEvents() != null) {
+            Arrays.stream(caseView.getActionableEvents()).forEach(
+                ae -> LOG.info(ae.getId(), ae.getName(), ae.getDescription(), ae.getOrder()));
+        }
         return ResponseEntity.ok(new CaseViewResource(caseView));
     }
 

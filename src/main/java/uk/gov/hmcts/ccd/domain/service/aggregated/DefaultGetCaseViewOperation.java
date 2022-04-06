@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
@@ -39,6 +42,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_
 @Qualifier(DefaultGetCaseViewOperation.QUALIFIER)
 public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultGetCaseViewOperation.class);
     public static final String QUALIFIER = "defaultCase";
 
     private final GetEventsOperation getEventsOperation;
@@ -70,6 +74,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
 
     @Override
     public CaseView execute(String caseReference) {
+        LOG.info("starting execution of DefaultGetCaseViewOperation for case {}", caseReference);
         validateCaseReference(caseReference);
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
@@ -137,6 +142,9 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
             .toArray(CaseViewActionableEvent[]::new);
         caseView.setActionableEvents(actionableEvents);
 
+        LOG.info("Count of actionable events {}", actionableEvents.length);
+        Arrays.stream(actionableEvents).forEach(
+            ae -> LOG.info(ae.getId(), ae.getName(), ae.getDescription(), ae.getOrder()));
         caseView.setEvents(caseViewEvents);
 
         return caseView;
