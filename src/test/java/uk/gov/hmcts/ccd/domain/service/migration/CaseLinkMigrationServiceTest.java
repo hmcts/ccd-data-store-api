@@ -7,25 +7,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkExtractor;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkTestFixtures;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -38,15 +31,12 @@ class CaseLinkMigrationServiceTest extends CaseLinkTestFixtures {
     private CaseLinkService caseLinkService;
 
     @Mock
-    private CaseLinkExtractor caseLinkExtractor;
-
-    @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
 
     @InjectMocks
     private CaseLinkMigrationService caseLinkMigrationService;
 
-    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+    private final CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition();
 
     private final Map<String, JsonNode> data = new HashMap<>();
 
@@ -60,10 +50,8 @@ class CaseLinkMigrationServiceTest extends CaseLinkTestFixtures {
         caseLinkMigrationService.backPopulateCaseLinkTable(cases);
 
         // THEN
-        verifyNoInteractions(caseLinkExtractor);
         verifyNoInteractions(caseLinkService);
     }
-
 
     @Test
     void backPopulateSingleCase() {
@@ -75,19 +63,12 @@ class CaseLinkMigrationServiceTest extends CaseLinkTestFixtures {
         CaseDetails caseDetails = createCaseDetails(data);
         cases.add(caseDetails);
 
-        List<CaseLink> caseLinks = createCaseLinks(LINKED_CASE_REFERENCE_01);
-
-        given(caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions()))
-            .willReturn(caseLinks);
-
         // WHEN
         caseLinkMigrationService.backPopulateCaseLinkTable(cases);
 
         // THEN
-        verify(caseLinkExtractor,
-            times(1)).getCaseLinksFromData(eq(caseDetails), anyList());
         verify(caseLinkService,
-            times(1)).updateCaseLinks(CASE_REFERENCE, CASE_TYPE_ID, caseLinks);
+            times(1)).updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
     }
 
     @Test
@@ -104,36 +85,15 @@ class CaseLinkMigrationServiceTest extends CaseLinkTestFixtures {
         cases.add(caseDetails1);
         cases.add(caseDetails2);
 
-        List<CaseLink> caseLinks1 = createCaseLinks(LINKED_CASE_REFERENCE_01, LINKED_CASE_REFERENCE_02);
-        List<CaseLink> caseLinks2 = createCaseLinks(LINKED_CASE_REFERENCE_02, LINKED_CASE_REFERENCE_03);
-
-        given(caseLinkExtractor.getCaseLinksFromData(caseDetails1, caseTypeDefinition.getCaseFieldDefinitions()))
-            .willReturn(caseLinks1);
-        given(caseLinkExtractor.getCaseLinksFromData(caseDetails2, caseTypeDefinition2.getCaseFieldDefinitions()))
-            .willReturn(caseLinks2);
 
         // WHEN
         caseLinkMigrationService.backPopulateCaseLinkTable(cases);
 
         // THEN
-        verify(caseLinkExtractor,
-            times(2)).getCaseLinksFromData(any(CaseDetails.class), anyList());
-        verify(caseLinkExtractor,
-            times(1)).getCaseLinksFromData(eq(caseDetails1), anyList());
-        verify(caseLinkExtractor,
-            times(1)).getCaseLinksFromData(eq(caseDetails2), anyList());
-
         verify(caseLinkService,
-            times(2)).updateCaseLinks(anyLong(), anyString(), anyList());
-        verify(caseLinkService).updateCaseLinks(CASE_REFERENCE, CASE_TYPE_ID, caseLinks1);
-        verify(caseLinkService).updateCaseLinks(CASE_REFERENCE_02, CASE_TYPE_ID_02, caseLinks2);
+            times(2)).updateCaseLinks(any(CaseDetails.class), anyList());
+        verify(caseLinkService).updateCaseLinks(caseDetails1, caseTypeDefinition.getCaseFieldDefinitions());
+        verify(caseLinkService).updateCaseLinks(caseDetails2,  caseTypeDefinition2.getCaseFieldDefinitions());
     }
 
-    private List<CaseLink> createCaseLinks(Long... caseLinkReferences) {
-        return Arrays.stream(caseLinkReferences)
-            .map(caseLinkReference -> CaseLink.builder()
-                .linkedCaseReference(caseLinkReference)
-                .standardLink(false).build())
-            .collect(Collectors.toList());
-    }
 }

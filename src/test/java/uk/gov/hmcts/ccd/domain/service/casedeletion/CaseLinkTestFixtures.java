@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.domain.service.casedeletion;
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.util.List;
 import java.util.Map;
@@ -81,4 +83,15 @@ public abstract class CaseLinkTestFixtures {
 
         return caseDetails;
     }
+
+    protected CaseTypeDefinition createCaseTypeDefinition() {
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(CASE_TYPE_ID);
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(
+            new CaseFieldDefinition(),
+            new CaseFieldDefinition()
+        ));
+        return caseTypeDefinition;
+    }
+
 }

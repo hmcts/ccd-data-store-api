@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.TestFixtures;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -18,7 +15,6 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -26,7 +22,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
-import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkExtractor;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
@@ -53,7 +48,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -63,7 +57,6 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
@@ -131,9 +124,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     @Mock
     private TimeToLiveService timeToLiveService;
-
-    @Mock
-    private CaseLinkExtractor caseLinkExtractor;
 
     @Mock
     private CaseLinkService caseLinkService;
@@ -350,36 +340,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     @Test
     @DisplayName("Should insert case links when case is modified")
-    void shouldInsertCaseLinks() throws JsonProcessingException {
+    void shouldInsertCaseLinks() {
 
         // GIVEN
-        final String caseRef = "1621351496474853";
-        final String caseRef2 = "1630400132944487";
-        final Map<String, JsonNode> data = JacksonUtils.convertValue(new ObjectMapper().readTree(
-            "{\n"
-                + "  \"CaseLinks\" : [\n"
-                + "    {\n"
-                + "      \"value\": "
-                + "        {\n"
-                + "          \"CaseLink1\": \"" + caseRef + "\",\n"
-                + "          \"CaseLink2\": \"" + caseRef2 + "\"\n"
-                + "        }\n"
-                + "    }"
-                + "  ]\n"
-                + "}")
-        );
-        final List<CaseLink> caseLinks = List.of(
-            CaseLink.builder()
-                .caseReference(Long.parseLong(CASE_REFERENCE))
-                .linkedCaseReference(Long.valueOf(caseRef))
-                .build(),
-            CaseLink.builder()
-                .caseReference(Long.parseLong(CASE_REFERENCE))
-                .linkedCaseReference(Long.valueOf(caseRef2))
-                .build()
-        );
-        given(caseLinkExtractor.getCaseLinksFromData(any(CaseDetails.class), anyList())).willReturn(caseLinks);
-
         final String userToken = "Test_Token";
 
         caseDataContent = newCaseDataContent()
@@ -394,7 +357,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
         underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         // THEN
-        verify(caseLinkService).updateCaseLinks(Long.parseLong(CASE_REFERENCE), CASE_TYPE_ID, caseLinks);
+        // i.e. verify same caseDetails passed to both saveCase and updateCaseLinks
+        verify(caseDetailsRepository).set(caseDetails);
+        verify(caseLinkService).updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
     }
 
     private void createCaseEvent() {
