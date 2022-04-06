@@ -145,7 +145,8 @@ public class DocumentValidator implements BaseTypeValidator {
         final JsonNode categoryId = dataValue.get(CATEGORY_ID);
 
         if (isNullOrEmpty(categoryId)) {
-            return nullOrEmptyValidationResult(CATEGORY_ID, dataFieldId);
+            LOG.debug("{} is not a text value or is null", CATEGORY_ID);
+            return Collections.emptyList();
         }
 
         List<ValidationResult> validationResults =
@@ -174,7 +175,8 @@ public class DocumentValidator implements BaseTypeValidator {
                                                            final CaseFieldDefinition caseFieldDefinition) {
 
         if (isNullOrEmpty(uploadTimeStamp)) {
-            return nullOrEmptyValidationResult(UPLOAD_TIMESTAMP, dataFieldId);
+            LOG.debug("{} is not a text value or is null", UPLOAD_TIMESTAMP);
+            return Collections.emptyList();
         }
 
         List<ValidationResult> validationResults =

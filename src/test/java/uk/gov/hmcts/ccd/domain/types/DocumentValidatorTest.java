@@ -412,12 +412,10 @@ public class DocumentValidatorTest implements IVallidatorTest {
     }
 
     @Test
-    public void shouldFail_whenValidatingNullCategoryId() {
+    public void shouldPass_whenValidatingNullCategoryId() {
         data = createDoc(CATEGORY_ID,null);
         validDocumentUrlResult = validator.validate(CATEGORY_ID, data, caseFieldDefinition);
-        assertThat(validDocumentUrlResult, hasSize(1));
-        assertThat(validDocumentUrlResult.get(0).getErrorMessage(),
-            is(CATEGORY_ID + " is not a text value or is null"));
+        assertThat(validDocumentUrlResult, hasSize(0));
     }
 
     @Test
@@ -445,13 +443,11 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFail_whenValidatingNullUploadTimeStamp() {
         data = createDoc(UPLOAD_TIMESTAMP,null);
         validDocumentUrlResult = validator.validate(UPLOAD_TIMESTAMP, data, caseFieldDefinition);
-        assertThat(validDocumentUrlResult, hasSize(1));
-        assertThat(validDocumentUrlResult.get(0).getErrorMessage(),
-            is(UPLOAD_TIMESTAMP + " is not a text value or is null"));
+        assertThat(validDocumentUrlResult, hasSize(0));
     }
 
     @Test
-    public void shouldFail_whenValidatingUploadTimeStampDate() {
+    public void shouldFail_whenValidatingInvalidUploadTimeStampDate() {
         data = createDoc(UPLOAD_TIMESTAMP, "2001-12-10T00:00:0O");
         validDocumentUrlResult = validator.validate(UPLOAD_TIMESTAMP, data, caseFieldDefinition);
         assertThat(validDocumentUrlResult, hasSize(1));
