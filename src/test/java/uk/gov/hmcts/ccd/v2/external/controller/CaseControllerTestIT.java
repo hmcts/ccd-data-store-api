@@ -720,24 +720,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testShouldGetCategoriesAndDocuments() throws Exception {
-        final String caseId = "1504259907353529";
-        final String URL = "/categoriesAndDocuments/" + caseId;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-            .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        Assertions.assertThat(mvcResult.getResponse())
-            .isNotNull()
-            .satisfies(response -> Assertions.assertThat(response.getStatus()).isEqualTo(204));
-    }
-
-    @Test
-    //@Disabled
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    void testShouldGetCategoriesAndDocuments_2() throws Exception {
         final String caseTypeId = "FT_CaseFileView";
         final CaseTypeDefinition caseTypeDefinition =
             loadCaseTypeDefinition("mappings/ft-case-file-view-definition.json");
@@ -758,7 +740,10 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         Assertions.assertThat(mvcResult.getResponse())
             .isNotNull()
-            .satisfies(response -> Assertions.assertThat(response.getStatus()).isEqualTo(200));
+            .satisfies(response -> {
+                Assertions.assertThat(response.getStatus()).isEqualTo(200);
+                Assertions.assertThat(response.getContentAsString()).isNotEmpty();
+            });
     }
 
     @Test

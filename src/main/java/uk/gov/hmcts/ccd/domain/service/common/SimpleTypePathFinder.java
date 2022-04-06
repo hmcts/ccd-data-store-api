@@ -37,9 +37,6 @@ public class SimpleTypePathFinder implements PathFinder {
         final Optional<FieldTypeDefinition> optionalFieldTypeDefinition =
             Optional.ofNullable(caseFieldDefinition.getFieldTypeDefinition());
 
-//        final String effectiveCategoryId = Optional.ofNullable(caseFieldDefinition.getCategoryId())
-//            .orElse(categoryId);
-
         final Optional<CaseFieldMetadata> optionalCaseFieldMetadata = optionalFieldTypeDefinition
             .map(fieldTypeDefinition -> fieldType.equals(fieldTypeDefinition.getId())
                 ? new CaseFieldMetadata(fieldIdPrefix + nodeEntry.getKey(), caseFieldDefinition.getCategoryId())

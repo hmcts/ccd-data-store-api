@@ -29,12 +29,12 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
+import uk.gov.hmcts.ccd.domain.service.casefileview.CategoriesAndDocumentsService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseCategoriesAndDocuments;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
@@ -59,7 +59,7 @@ public class CaseController {
     private final GetEventsOperation getEventsOperation;
     private final SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private final SupplementaryDataUpdateRequestValidator requestValidator;
-    private final GetCaseCategoriesAndDocuments getCaseCategoriesAndDocuments;
+    private final CategoriesAndDocumentsService categoriesAndDocumentsService;
 
     @Autowired
     public CaseController(
@@ -70,7 +70,7 @@ public class CaseController {
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
         @Qualifier("authorised") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
         SupplementaryDataUpdateRequestValidator requestValidator,
-        GetCaseCategoriesAndDocuments getCaseCategoriesAndDocuments) {
+        CategoriesAndDocumentsService categoriesAndDocumentsService) {
         this.getCaseOperation = getCaseOperation;
         this.createEventOperation = createEventOperation;
         this.createCaseOperation = createCaseOperation;
@@ -78,7 +78,7 @@ public class CaseController {
         this.getEventsOperation = getEventsOperation;
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.requestValidator = requestValidator;
-        this.getCaseCategoriesAndDocuments = getCaseCategoriesAndDocuments;
+        this.categoriesAndDocumentsService = categoriesAndDocumentsService;
     }
 
     @GetMapping(
@@ -452,7 +452,7 @@ public class CaseController {
         validateCaseReference(caseRef);
         final CaseDetails caseDetails = getCaseDetails(caseRef);
 
-        final CategoriesAndDocuments categoriesAndDocuments = getCaseCategoriesAndDocuments.getCategoriesAndDocuments(
+        final CategoriesAndDocuments categoriesAndDocuments = categoriesAndDocumentsService.getCategoriesAndDocuments(
             caseDetails.getCaseTypeId(),
             caseDetails.getData()
         );

@@ -42,8 +42,8 @@
           "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "attribute_path": "[[ANYTHING_PRESENT]]",
-          "upload_timestamp": "[[ANYTHING_PRESENT]]"
+          "attribute_path": "DocumentField1",
+          "upload_timestamp": "[[ANY_NULLABLE]]"
         }
       ]
     }

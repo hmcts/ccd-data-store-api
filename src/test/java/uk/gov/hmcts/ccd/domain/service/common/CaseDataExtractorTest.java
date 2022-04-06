@@ -3,17 +3,14 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldMetadata;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 
@@ -26,9 +23,7 @@ import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.TestFixtures.caseDataFromJsonString;
 import static uk.gov.hmcts.ccd.TestFixtures.getCaseFieldsFromJson;
 import static uk.gov.hmcts.ccd.TestFixtures.loadCaseDataFromJson;
-import static uk.gov.hmcts.ccd.TestFixtures.loadCaseTypeDefinitionFromJson;
 
-@ExtendWith(MockitoExtension.class)
 class CaseDataExtractorTest {
 
     private static final String CASE_FIELD_JSON = "tests/CaseDataExtractor_CaseField.json";
@@ -99,7 +94,7 @@ class CaseDataExtractorTest {
     @ParameterizedTest
     @MethodSource("provideExtractFieldTypePathsParameters")
     void extractFieldTypePathsFromSimpleObject(final String data,
-                                               final List<CaseFieldMetadata> expectedFieldTypePaths) throws Exception {
+                                               final List<CaseFieldMetadata> expectedResults) throws Exception {
         final Map<String, JsonNode> jsonData = caseDataFromJsonString(data);
 
         caseFields = getCaseFieldsFromJson(CASE_FIELD_JSON);
@@ -109,8 +104,8 @@ class CaseDataExtractorTest {
 
         assertThat(results)
             .isNotEmpty()
-            .hasSize(expectedFieldTypePaths.size())
-            .hasSameElementsAs(expectedFieldTypePaths);
+            .hasSize(expectedResults.size())
+            .hasSameElementsAs(expectedResults);
     }
 
     private static Stream<Arguments> provideExtractFieldTypePathsParameters() {

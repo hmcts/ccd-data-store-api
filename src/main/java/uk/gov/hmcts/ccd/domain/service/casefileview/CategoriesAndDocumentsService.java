@@ -1,10 +1,8 @@
-package uk.gov.hmcts.ccd.domain.service.getcase;
+package uk.gov.hmcts.ccd.domain.service.casefileview;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jayway.jsonpath.JsonPath;
+import io.vavr.Tuple2;
 import lombok.NonNull;
-import org.jooq.lambda.tuple.Tuple2;
 import uk.gov.hmcts.ccd.domain.model.casefileview.CategoriesAndDocuments;
 import uk.gov.hmcts.ccd.domain.model.casefileview.Category;
 import uk.gov.hmcts.ccd.domain.model.casefileview.Document;
@@ -15,7 +13,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataExtractor;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +25,9 @@ import javax.inject.Named;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toUnmodifiableList;
-import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 @Named
-public class GetCaseCategoriesAndDocuments {
+public class CategoriesAndDocumentsService {
     private static final String DOCUMENT_TYPE = "Document";
     private static final String UNCATEGORISED_KEY = "uncategorised_documents";
 
@@ -44,12 +40,15 @@ public class GetCaseCategoriesAndDocuments {
 
     private final CaseDataExtractor caseDataExtractor;
     private final CaseTypeService caseTypeService;
+    private final FileViewDocumentService fileViewDocumentService;
 
     @Inject
-    public GetCaseCategoriesAndDocuments(final CaseDataExtractor caseDataExtractor,
-                                         final CaseTypeService caseTypeService) {
+    public CategoriesAndDocumentsService(final CaseDataExtractor caseDataExtractor,
+                                         final CaseTypeService caseTypeService,
+                                         final FileViewDocumentService fileViewDocumentService) {
         this.caseDataExtractor = caseDataExtractor;
         this.caseTypeService = caseTypeService;
+        this.fileViewDocumentService = fileViewDocumentService;
     }
 
     public CategoriesAndDocuments getCategoriesAndDocuments(@NonNull final String caseType,
@@ -88,7 +87,7 @@ public class GetCaseCategoriesAndDocuments {
     }
 
     Function<CategoryDefinition, Function<List<CategoryDefinition>, Function<Map<String, List<Document>>, Category>>>
-        func2 = subject -> categoryDefinitions -> documentDictionary ->
+        categoryHierarchyFunction = subject -> categoryDefinitions -> documentDictionary ->
         transform(subject, categoryDefinitions, documentDictionary);
 
     Category transform(@NonNull final CategoryDefinition categoryDefinition,
@@ -96,8 +95,10 @@ public class GetCaseCategoriesAndDocuments {
                        @NonNull final Map<String, List<Document>> documentDictionary) {
         final String categoryId = categoryDefinition.getCategoryId();
         final List<Category> children = categoryDefinitions.stream()
-            .filter(x -> categoryId.equals(x.getParentCategoryId()))
-            .map(y -> func2.apply(y).apply(categoryDefinitions).apply(documentDictionary))
+            .filter(categoryDef1 -> categoryId.equals(categoryDef1.getParentCategoryId()))
+            .map(categoryDef2 -> categoryHierarchyFunction.apply(categoryDef2)
+                .apply(categoryDefinitions)
+                .apply(documentDictionary))
             .collect(Collectors.toUnmodifiableList());
 
         return new Category(categoryId,
@@ -118,7 +119,7 @@ public class GetCaseCategoriesAndDocuments {
 
     private static final Function<List<Tuple2<String, Optional<Document>>>, List<Document>> DOCUMENTS_FUNCTION =
         list -> list.stream()
-            .map(tuple -> tuple.v2.map(List::of).orElse(emptyList()))
+            .map(tuple -> tuple._2.map(List::of).orElse(emptyList()))
             .flatMap(Collection::stream)
             .collect(Collectors.toUnmodifiableList());
 
@@ -134,48 +135,32 @@ public class GetCaseCategoriesAndDocuments {
 
         return caseFieldExtracts.stream()
             .map(caseFieldExtract -> transformDocument(caseFieldExtract, caseData))
-            .collect(Collectors.groupingBy(tuple -> tuple.v1,
+            .collect(Collectors.groupingBy(tuple -> tuple._1,
                 collectingAndThen(toUnmodifiableList(), DOCUMENTS_FUNCTION)));
     }
 
     Tuple2<String, Optional<Document>> transformDocument(@NonNull final CaseFieldMetadata caseFieldMetadata,
                                                          @NonNull final Map<String, JsonNode> caseData) {
-        final Optional<Map<String, String>> documentNode =
-            findDocumentNode(caseFieldMetadata.getPathAsJsonPath(), caseData);
-        return documentNode.map(node -> {
-            final Document document = buildDocument(node, caseFieldMetadata.getPathAsAttributePath());
-            final String resolvedCategory = resolveDocumentCategory(
-                node.get(CATEGORY_ID),
-                caseFieldMetadata.getCategoryId()
-            );
+        final Tuple2<String, Map<String, String>> documentNode =
+            fileViewDocumentService.getDocumentNode(caseFieldMetadata.getPath(), caseData);
 
-            return new Tuple2<>(resolvedCategory, Optional.of(document));
-        }).orElseGet(() -> {
-            final String resolvedCategory = resolveDocumentCategory(caseFieldMetadata.getCategoryId());
-            return new Tuple2<>(resolvedCategory, Optional.empty());
-        });
+        final Document document = buildDocument(documentNode._1, documentNode._2);
+
+        final String resolvedCategory = resolveDocumentCategory(
+            documentNode._2.get(CATEGORY_ID),
+            caseFieldMetadata.getCategoryId()
+        );
+
+        return new Tuple2<>(resolvedCategory, Optional.of(document));
     }
 
-    private Optional<Map<String, String>> findDocumentNode(@NonNull final String documentPath,
-                                                           @NonNull final Map<String, JsonNode> caseData) {
-        try {
-            final String jsonString = MAPPER.writeValueAsString(caseData);
-            final Map<String, String> documentNode = JsonPath.parse(jsonString)
-                .read(documentPath);
-            return Optional.ofNullable(documentNode);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Document buildDocument(@NonNull final Map<String, String> documentNode, final String attributePath) {
+    private Document buildDocument(final String attributePath, @NonNull final Map<String, String> documentNode) {
         return new Document(
             documentNode.get(DOCUMENT_URL),
             documentNode.get(DOCUMENT_FILENAME),
             documentNode.get(DOCUMENT_BINARY_URL),
             attributePath,
-            LocalDateTime.now()
+            null
         );
     }
 
