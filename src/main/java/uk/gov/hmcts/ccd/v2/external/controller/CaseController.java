@@ -46,6 +46,7 @@ import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
 import static org.springframework.http.ResponseEntity.status;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CATEGORIES_AND_DOCUMENTS_ACCESSED;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CREATE_CASE;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
 
@@ -444,8 +445,7 @@ public class CaseController {
             message = V2.Error.CASE_NOT_FOUND
         )
     })
-    /*TODO @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
-        jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")*/
+    @LogAudit(operationType = CATEGORIES_AND_DOCUMENTS_ACCESSED, caseId = "#caseRef")
     public ResponseEntity<CategoriesAndDocuments> getCategoriesAndDocuments(
         @PathVariable("caseRef") final String caseRef
     ) {

@@ -7,7 +7,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -737,12 +736,19 @@ class CaseControllerTestIT extends WireMockBaseTest {
             .header(REQUEST_ID, REQUEST_ID_VALUE)
             .contentType(JSON_CONTENT_TYPE))
             .andReturn();
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+
+        verify(auditRepository).save(captor.capture());
 
         Assertions.assertThat(mvcResult.getResponse())
             .isNotNull()
             .satisfies(response -> {
                 Assertions.assertThat(response.getStatus()).isEqualTo(200);
                 Assertions.assertThat(response.getContentAsString()).isNotEmpty();
+
+                Assertions.assertThat(captor.getValue().getOperationType())
+                    .isEqualTo(AuditOperationType.CATEGORIES_AND_DOCUMENTS_ACCESSED.getLabel());
+                Assertions.assertThat(captor.getValue().getCaseId()).isEqualTo(caseId);
             });
     }
 
