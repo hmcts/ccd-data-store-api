@@ -13,6 +13,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataExtractor;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +37,9 @@ public class CategoriesAndDocumentsService {
     private static final String DOCUMENT_BINARY_URL = "document_binary_url";
     private static final String DOCUMENT_FILENAME = "document_filename";
     private static final String CATEGORY_ID = "category_id";
-    private static final String ATTRIBUTE_PATH = null;
     private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
+
+    private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     private final CaseDataExtractor caseDataExtractor;
     private final CaseTypeService caseTypeService;
@@ -160,7 +163,7 @@ public class CategoriesAndDocumentsService {
             documentNode.get(DOCUMENT_FILENAME),
             documentNode.get(DOCUMENT_BINARY_URL),
             attributePath,
-            null
+            parseUploadTimestamp(documentNode.get(UPLOAD_TIMESTAMP))
         );
     }
 
@@ -173,4 +176,14 @@ public class CategoriesAndDocumentsService {
     private String resolveDocumentCategory(final String categoryOnFieldDefinition) {
         return null == categoryOnFieldDefinition ? UNCATEGORISED_KEY : categoryOnFieldDefinition;
     }
+
+    LocalDateTime parseUploadTimestamp(final String uploadTimestamp) {
+        return Optional.ofNullable(uploadTimestamp)
+            .map(timestamp -> {
+                final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TIMESTAMP_PATTERN);
+                return LocalDateTime.parse(timestamp, dateTimeFormatter);
+            })
+            .orElse(null);
+    }
+
 }

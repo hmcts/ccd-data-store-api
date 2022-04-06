@@ -20,6 +20,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataExtractor;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -208,6 +211,34 @@ class CategoriesAndDocumentsServiceTest {
         assertThat(result)
             .isNotNull()
             .isEqualTo(expectedResult);
+    }
+
+    @Test
+    void testShouldReturnNullWhenParameterIsNull() {
+        final LocalDateTime result = underTest.parseUploadTimestamp(null);
+
+        assertThat(result)
+            .isNull();
+    }
+
+    @Test
+    void testShouldRaiseExceptionWhenInputIsNotNullButInvalidTimestamp() {
+        final Throwable thrown = catchThrowable(() -> underTest.parseUploadTimestamp("abc"));
+
+        assertThat(thrown)
+            .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void testShouldParseTimestamp() {
+        final String timestamp = "2022-04-06 16:44:52";
+        final LocalDateTime expectedTimestamp = LocalDateTime.of(2022, 4, 6, 16, 44, 52);
+
+        final LocalDateTime result = underTest.parseUploadTimestamp(timestamp);
+
+        assertThat(result)
+            .isNotNull()
+            .isEqualTo(expectedTimestamp);
     }
 
     private static Stream<Arguments> provideCaseFieldExtractParameters() {
