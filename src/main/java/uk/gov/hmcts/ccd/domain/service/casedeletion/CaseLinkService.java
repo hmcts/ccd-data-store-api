@@ -9,10 +9,12 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 
 @Slf4j
 @Service
@@ -21,24 +23,32 @@ public class CaseLinkService {
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseLinkRepository caseLinkRepository;
     private final CaseLinkMapper caseLinkMapper;
+    private final CaseLinkExtractor caseLinkExtractor;
 
     @Inject
     public CaseLinkService(CaseLinkRepository caseLinkRepository,
                            CaseLinkMapper caseLinkMapper,
                            @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
-                               CaseDetailsRepository caseDetailsRepository) {
+                               CaseDetailsRepository caseDetailsRepository,
+                               CaseLinkExtractor caseLinkExtractor) {
         this.caseLinkRepository = caseLinkRepository;
         this.caseLinkMapper = caseLinkMapper;
         this.caseDetailsRepository = caseDetailsRepository;
+        this.caseLinkExtractor = caseLinkExtractor;
     }
 
     @Transactional
-    public void updateCaseLinks(Long caseReference,
-                                String caseTypeId,
-                                List<String> finalCaseLinkReferences) {
+    public void updateCaseLinks(CaseDetails caseDetails, List<CaseFieldDefinition> caseFieldDefinitions) {
+        final Long caseReference = caseDetails.getReference();
+        final String caseTypeId = caseDetails.getCaseTypeId();
+        final List<String> finalCaseLinkReferences =
+            caseLinkExtractor.getCaseLinksFromData(caseDetails, caseFieldDefinitions);
+
         List<String> currentCaseLinkReferences =
             getStringCaseReferencesFromCaseLinks(findCaseLinks(caseReference.toString()));
         deleteRemovedCaseLinks(caseReference, currentCaseLinkReferences, finalCaseLinkReferences);
+        // TODO: CaseTypeId needs to be 'case type id of the case to which the case links' so will need to possibly
+        //  be updated to take in the linked case - this will need to be confirmed
         insertNewCaseLinks(caseReference, caseTypeId, currentCaseLinkReferences, finalCaseLinkReferences);
     }
 
@@ -88,34 +98,25 @@ public class CaseLinkService {
             caseLinkRepository.findAllByCaseReference(Long.parseLong(caseReference));
         List<CaseLink> allLinkedCases =
             caseLinkMapper.entitiesToModels(allByCaseReference);
-        List<Long> linkedCaseReferences =
-            caseDetailsRepository.findCaseReferencesByIds(getAllLinkedCaseIds(allByCaseReference));
 
-        setCaseLinkReferences(allLinkedCases, linkedCaseReferences, Long.valueOf(caseReference));
-
-        return allLinkedCases;
-    }
-
-    private List<Long> getAllLinkedCaseIds(List<CaseLinkEntity> caseLinkEntities) {
-        return caseLinkEntities
-            .stream()
-            .map(c -> c.getCaseLinkPrimaryKey().getLinkedCaseId())
+        return allLinkedCases.stream()
+            .map(caseLink -> setCaseLinkReferences(Long.parseLong(caseReference), caseLink))
             .collect(Collectors.toList());
     }
 
-    private void setCaseLinkReferences(List<CaseLink> allLinkedCases,
-                                       List<Long> linkedCaseReferences,
-                                       Long caseReference) {
-        for (int i = 0; i < allLinkedCases.size(); i++) {
-            allLinkedCases.get(i).setCaseReference(caseReference);
-            allLinkedCases.get(i).setLinkedCaseReference(linkedCaseReferences.get(i));
-        }
+    private CaseLink setCaseLinkReferences(Long caseReference, CaseLink caseLink) {
+
+        caseLink.setCaseReference(caseReference);
+        caseDetailsRepository.findById(null, caseLink.getLinkedCaseId())
+            .ifPresent(caseDetails -> caseLink.setLinkedCaseReference(caseDetails.getReference()));
+
+        return caseLink;
     }
 
     private List<String> getStringCaseReferencesFromCaseLinks(List<CaseLink> caseLinks) {
         return caseLinks
             .stream()
-            .map(caseLink -> caseLink.getLinkedCaseReference().toString()) //getCaseReference or getLinkedCaseReference
+            .map(caseLink -> caseLink.getLinkedCaseReference().toString())
             .collect(Collectors.toList());
     }
 }

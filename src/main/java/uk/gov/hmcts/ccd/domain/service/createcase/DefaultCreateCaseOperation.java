@@ -18,7 +18,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -27,7 +26,6 @@ import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
-import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkExtractor;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
@@ -44,7 +42,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import javax.inject.Inject;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -67,7 +64,6 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final CasePostStateService casePostStateService;
     private final CaseDataIssueLogger caseDataIssueLogger;
     private final CaseLinkService caseLinkService;
-    private final CaseLinkExtractor caseLinkExtractor;
     private final GlobalSearchProcessorService globalSearchProcessorService;
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
@@ -91,8 +87,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       @Qualifier("default")
                                               SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
                                       SupplementaryDataUpdateRequestValidator supplementaryDataValidator,
-                                      final CaseLinkService caseLinkService,
-                                      final CaseLinkExtractor caseLinkExtractor) {
+                                      final CaseLinkService caseLinkService) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.eventTriggerService = eventTriggerService;
@@ -110,7 +105,6 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.supplementaryDataValidator = supplementaryDataValidator;
         this.caseLinkService = caseLinkService;
-        this.caseLinkExtractor = caseLinkExtractor;
     }
 
     @Transactional
@@ -175,18 +169,13 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
 
         submittedCallback(caseEventDefinition, savedCaseDetails);
 
-        insertCaseLinks(savedCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+        caseLinkService.updateCaseLinks(savedCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
         deleteDraft(caseDataContent, savedCaseDetails);
 
         createSupplementaryData(caseDataContent, savedCaseDetails);
 
         return savedCaseDetails;
-    }
-
-    private void insertCaseLinks(CaseDetails caseDetails, List<CaseFieldDefinition> caseFieldDefinitions) {
-        final List<String> caseLinks = caseLinkExtractor.getCaseLinks(caseDetails.getData(), caseFieldDefinitions);
-        caseLinkService.updateCaseLinks(caseDetails.getReference(), caseDetails.getCaseTypeId(), caseLinks);
     }
 
     private void updateCaseState(CaseEventDefinition caseEventDefinition, CaseDetails newCaseDetails) {
