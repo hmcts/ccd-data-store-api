@@ -28,8 +28,8 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.MULTI
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.NUMBER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 
-class SimpleTypePathFinderTest extends BasePathFinderTest {
-    private final SimpleTypePathFinder underTest = new SimpleTypePathFinder();
+class SimpleCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataExtractorTest {
+    private final SimpleCaseTypeMetadataExtractor underTest = new SimpleCaseTypeMetadataExtractor();
 
     @Test
     @SuppressWarnings("ConstantConditions")
@@ -83,13 +83,14 @@ class SimpleTypePathFinderTest extends BasePathFinderTest {
 
         final List<CaseFieldMetadata> metadataList = singletonList(new CaseFieldMetadata("timeline.0.type", null));
 
-        final Either<PathFinder.RecursionParams, List<CaseFieldMetadata>> results = underTest.extractCaseFieldData(
-            new AbstractMap.SimpleEntry<>("type", dataValue),
-            caseFieldDefinition,
-            "timeline.0.",
-            FIELD_TYPE_ID,
-            emptyList()
-        );
+        final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> results =
+            underTest.extractCaseFieldData(
+                new AbstractMap.SimpleEntry<>("type", dataValue),
+                caseFieldDefinition,
+                "timeline.0.",
+                FIELD_TYPE_ID,
+                emptyList()
+            );
 
         VavrAssertions.assertThat(results)
             .isNotNull()
@@ -106,13 +107,14 @@ class SimpleTypePathFinderTest extends BasePathFinderTest {
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
 
-        final Either<PathFinder.RecursionParams, List<CaseFieldMetadata>> results = underTest.extractCaseFieldData(
-            nodeEntry,
-            caseFieldDefinition,
-            "",
-            fieldType,
-            paths
-        );
+        final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> results =
+            underTest.extractCaseFieldData(
+                nodeEntry,
+                caseFieldDefinition,
+                "",
+                fieldType,
+                paths
+            );
 
         VavrAssertions.assertThat(results)
             .isNotNull()
@@ -124,13 +126,14 @@ class SimpleTypePathFinderTest extends BasePathFinderTest {
     void testShouldReturnUnchangedWhenFieldTypeDefinitionIsNull(final List<CaseFieldMetadata> paths) {
         final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
 
-        final Either<PathFinder.RecursionParams, List<CaseFieldMetadata>> results = underTest.extractCaseFieldData(
-            nodeEntry,
-            caseFieldDefinition,
-            "",
-            FIELD_TYPE_ID,
-            paths
-        );
+        final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> results =
+            underTest.extractCaseFieldData(
+                nodeEntry,
+                caseFieldDefinition,
+                "",
+                FIELD_TYPE_ID,
+                paths
+            );
 
         VavrAssertions.assertThat(results)
             .isNotNull()
@@ -146,13 +149,14 @@ class SimpleTypePathFinderTest extends BasePathFinderTest {
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
 
-        final Either<PathFinder.RecursionParams, List<CaseFieldMetadata>> results = underTest.extractCaseFieldData(
-            nodeEntry,
-            caseFieldDefinition,
-            "",
-            FIELD_TYPE_ID,
-            pathsBefore
-        );
+        final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> results =
+            underTest.extractCaseFieldData(
+                nodeEntry,
+                caseFieldDefinition,
+                "",
+                FIELD_TYPE_ID,
+                pathsBefore
+            );
 
         VavrAssertions.assertThat(results)
             .isNotNull()

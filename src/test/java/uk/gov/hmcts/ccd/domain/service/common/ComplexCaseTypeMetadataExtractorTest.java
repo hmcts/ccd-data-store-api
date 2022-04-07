@@ -26,8 +26,8 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.MULTI
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.NUMBER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 
-class ComplexTypePathFinderTest extends BasePathFinderTest {
-    private final ComplexTypePathFinder underTest = new ComplexTypePathFinder();
+class ComplexCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataExtractorTest {
+    private final ComplexCaseTypeMetadataExtractor underTest = new ComplexCaseTypeMetadataExtractor();
 
     @Test
     @SuppressWarnings("ConstantConditions")
@@ -79,21 +79,23 @@ class ComplexTypePathFinderTest extends BasePathFinderTest {
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
 
-        final PathFinder.RecursionParams recursionParams = new PathFinder.RecursionParams(
-            JacksonUtils.convertValue(nodeEntry.getValue()),
-            caseFieldDefinition.getFieldTypeDefinition().getComplexFields(),
-            "timeline.0.",
-            emptyList(),
-            FIELD_TYPE_ID
-        );
+        final CaseFieldMetadataExtractor.RecursionParams recursionParams =
+            new CaseFieldMetadataExtractor.RecursionParams(
+                JacksonUtils.convertValue(nodeEntry.getValue()),
+                caseFieldDefinition.getFieldTypeDefinition().getComplexFields(),
+                "timeline.0.",
+                emptyList(),
+                FIELD_TYPE_ID
+            );
 
-        final Either<PathFinder.RecursionParams, List<CaseFieldMetadata>> results = underTest.extractCaseFieldData(
-            new AbstractMap.SimpleEntry<>("0", dataValue),
-            caseFieldDefinition,
-            "timeline.",
-            FIELD_TYPE_ID,
-            emptyList()
-        );
+        final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> results =
+            underTest.extractCaseFieldData(
+                new AbstractMap.SimpleEntry<>("0", dataValue),
+                caseFieldDefinition,
+                "timeline.",
+                FIELD_TYPE_ID,
+                emptyList()
+            );
 
         VavrAssertions.assertThat(results)
             .isNotNull()

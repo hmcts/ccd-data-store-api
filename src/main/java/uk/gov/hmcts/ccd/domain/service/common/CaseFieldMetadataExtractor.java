@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 import java.util.List;
 import java.util.Map;
 
-public interface PathFinder {
+public interface CaseFieldMetadataExtractor {
 
     String FIELD_SEPARATOR = ".";
 

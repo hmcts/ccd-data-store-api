@@ -16,8 +16,8 @@ import javax.inject.Named;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 @Slf4j
-@Named("complexTypePathFinder")
-public class ComplexTypePathFinder implements PathFinder {
+@Named("complexCaseTypeMetadataExtractor")
+public class ComplexCaseTypeMetadataExtractor implements CaseFieldMetadataExtractor {
 
     @Override
     public Boolean matches(@NonNull final BaseType type) {

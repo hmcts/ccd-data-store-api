@@ -438,7 +438,8 @@ class CaseControllerTest {
         @DisplayName("should return 200 when case found")
         void caseFound() {
             final CaseDetails localCaseDetails = TestFixtures.buildCaseDetails(emptyMap());
-            final CategoriesAndDocuments categoriesAndDocuments = new CategoriesAndDocuments(1L, emptyList(), emptyList());
+            final CategoriesAndDocuments categoriesAndDocuments =
+                new CategoriesAndDocuments(1L, emptyList(), emptyList());
             doReturn(Optional.of(localCaseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
             doReturn(categoriesAndDocuments).when(categoriesAndDocumentsService)
                 .getCategoriesAndDocuments(anyString(), anyMap());

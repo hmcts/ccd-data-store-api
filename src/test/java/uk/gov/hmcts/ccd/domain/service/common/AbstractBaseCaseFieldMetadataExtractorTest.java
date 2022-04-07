@@ -18,15 +18,15 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.doReturn;
 
-abstract class BasePathFinderTest extends TestFixtures {
+abstract class AbstractBaseCaseFieldMetadataExtractorTest extends TestFixtures {
 
     protected static final String DATA_FIELD_ID = "DocumentField";
-    protected static final String DATA_FIELD_VALUE = "{\n" +
-        "    \"document_url\": \"http://dm-store:8080/documents/a2c2f1f9-c309-4060-8f77-1800be0ca885\",\n" +
-        "    \"document_filename\": \"A_Simple Document.docx\",\n" +
-        "    \"document_binary_url\": \"http://dm-store:8080/documents/a2c2f1f9-c309-4060-8f77-1800be0ca885/binary\",\n" +
-        "    \"category_id\": null\n" +
-        "  }";
+    protected static final String DATA_FIELD_VALUE = "{\n"
+        + "    \"document_url\": \"http://dm-store:8080/documents/a2c2f1f9-c309-4060-8f77-1800be0ca885\",\n"
+        + "    \"document_filename\": \"A_Simple Document.docx\",\n"
+        + "\"document_binary_url\": \"http://dm-store:8080/documents/a2c2f1f9-c309-4060-8f77-1800be0ca885/binary\",\n"
+        + "    \"category_id\": null\n"
+        + "  }";
     protected static final String FIELD_TYPE_ID = "Document";
 
     protected static JsonNode dataValue;

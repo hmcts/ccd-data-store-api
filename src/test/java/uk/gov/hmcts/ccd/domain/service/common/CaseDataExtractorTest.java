@@ -75,8 +75,8 @@ class CaseDataExtractorTest {
             + "    }"
             + "}";
 
-    private final PathFinder simpleTypePathFinder = new SimpleTypePathFinder();
-    private final PathFinder complexTypePathFinder = new ComplexTypePathFinder();
+    private final CaseFieldMetadataExtractor simpleTypePathFinder = new SimpleCaseTypeMetadataExtractor();
+    private final CaseFieldMetadataExtractor complexTypePathFinder = new ComplexCaseTypeMetadataExtractor();
 
     private final CaseDataExtractor underTest = new CaseDataExtractor(simpleTypePathFinder, complexTypePathFinder);
 

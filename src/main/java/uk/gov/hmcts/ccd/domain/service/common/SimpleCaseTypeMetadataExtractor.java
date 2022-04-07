@@ -19,8 +19,8 @@ import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
-@Named("simpleTypePathFinder")
-public class SimpleTypePathFinder implements PathFinder {
+@Named("simpleCaseTypeMetadataExtractor")
+public class SimpleCaseTypeMetadataExtractor implements CaseFieldMetadataExtractor {
     @Override
     public Boolean matches(@NonNull final BaseType type) {
         return type != BaseType.get(COMPLEX) && type != BaseType.get(COLLECTION);

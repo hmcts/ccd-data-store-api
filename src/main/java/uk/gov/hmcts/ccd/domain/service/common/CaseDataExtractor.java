@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.service.common.PathFinder.FIELD_SEPARATOR;
+import static uk.gov.hmcts.ccd.domain.service.common.CaseFieldMetadataExtractor.FIELD_SEPARATOR;
 
 @Named
 @Slf4j
@@ -30,14 +30,14 @@ public class CaseDataExtractor {
     private static final String VALUE_FIELD = "value";
     private static final String DOCUMENT_TYPE_ID = "Document";
 
-    private final PathFinder simpleTypePathFinder;
-    private final PathFinder complexTypePathFinder;
+    private final CaseFieldMetadataExtractor simpleCaseTypeMetadataExtractor;
+    private final CaseFieldMetadataExtractor complexCaseTypeMetadataExtractor;
 
     @Inject
-    public CaseDataExtractor(final PathFinder simpleTypePathFinder,
-                             final PathFinder complexTypePathFinder) {
-        this.simpleTypePathFinder = simpleTypePathFinder;
-        this.complexTypePathFinder = complexTypePathFinder;
+    public CaseDataExtractor(final CaseFieldMetadataExtractor simpleCaseTypeMetadataExtractor,
+                             final CaseFieldMetadataExtractor complexCaseTypeMetadataExtractor) {
+        this.simpleCaseTypeMetadataExtractor = simpleCaseTypeMetadataExtractor;
+        this.complexCaseTypeMetadataExtractor = complexCaseTypeMetadataExtractor;
     }
 
     public List<CaseFieldMetadata> extractFieldTypePaths(final Map<String, JsonNode> data,
@@ -104,8 +104,8 @@ public class CaseDataExtractor {
             return extractCollectionField(nodeEntry, caseFieldDefinition, fieldIdPrefix, fieldType, paths);
         }
 
-        final Either<PathFinder.RecursionParams, List<CaseFieldMetadata>> either =
-            Stream.of(simpleTypePathFinder, complexTypePathFinder)
+        final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> either =
+            Stream.of(simpleCaseTypeMetadataExtractor, complexCaseTypeMetadataExtractor)
                 .filter(extractor -> extractor.matches(baseFieldType))
                 .findFirst()
                 .orElseThrow()
@@ -117,7 +117,7 @@ public class CaseDataExtractor {
         );
     }
 
-    private List<CaseFieldMetadata> leftMapper(PathFinder.RecursionParams left) {
+    private List<CaseFieldMetadata> leftMapper(CaseFieldMetadataExtractor.RecursionParams left) {
         return extractFieldTypePaths(
             left.getData(),
             left.getCaseFieldDefinitions(),
@@ -132,7 +132,7 @@ public class CaseDataExtractor {
                                                            final String fieldIdPrefix,
                                                            final String fieldType,
                                                            final List<CaseFieldMetadata> paths) {
-        final List<CaseFieldMetadata> extractionResults = simpleTypePathFinder.extractCaseFieldData(
+        final List<CaseFieldMetadata> extractionResults = simpleCaseTypeMetadataExtractor.extractCaseFieldData(
             nodeEntry,
             caseFieldDefinition,
             fieldIdPrefix,
@@ -188,7 +188,7 @@ public class CaseDataExtractor {
             caseFieldDefinition.setId(index);
             caseFieldDefinition.setCategoryId(categoryId);
 
-            return simpleTypePathFinder.extractCaseFieldData(
+            return simpleCaseTypeMetadataExtractor.extractCaseFieldData(
                 nodeEntry,
                 caseFieldDefinition,
                 fieldIdPrefix,
