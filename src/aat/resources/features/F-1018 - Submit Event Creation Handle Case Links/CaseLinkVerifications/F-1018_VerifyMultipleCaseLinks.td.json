@@ -23,8 +23,8 @@
         },
         {
           "CaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
-          "LinkedCaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateThirdCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
-          "CaseTypeId" : "FT_MasterCaseType"
+          "LinkedCaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+          "CaseTypeId" : "FT_Conditionals"
         }
       ]
     }

@@ -185,8 +185,9 @@ VALUES (4, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '2016-08-24 20:44:53.824'
 );
 
+
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
-VALUES (5, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
+VALUES (5, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Peter",
           "PersonLastName": "Pullen",
@@ -217,6 +218,7 @@ VALUES (5, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '2016-08-24 20:44:53.824',
         '2016-08-24 20:44:53.824'
 );
+
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
 VALUES (6, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',

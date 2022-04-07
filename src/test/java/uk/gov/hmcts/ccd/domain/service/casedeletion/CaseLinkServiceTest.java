@@ -23,7 +23,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -147,10 +146,9 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
                 CASE_REFERENCE,
                 LINKED_CASE_REFERENCE_03 // i.e. existing linked case 03 has been removed
             );
-            verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository).insertUsingCaseReferences(
                 CASE_REFERENCE,
-                LINKED_CASE_REFERENCE_01, // i.e. new linked case 01 has been added
-                CASE_TYPE_ID
+                LINKED_CASE_REFERENCE_01 // i.e. new linked case 01 has been added
             );
             verifyNoMoreInteractions(caseLinkRepository); // i.e. existing linked case 02 is unchanged
         }
@@ -181,10 +179,9 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
                 CASE_REFERENCE,
                 LINKED_CASE_REFERENCE_03 // i.e. existing linked case 03 has been removed
             );
-            verify(caseLinkRepository, never()).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository, never()).insertUsingCaseReferences(
                 anyLong(),
-                anyLong(),
-                anyString()
+                anyLong()
             );
         }
 
@@ -203,15 +200,13 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
             // THEN
-            verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository).insertUsingCaseReferences(
                 CASE_REFERENCE,
-                LINKED_CASE_REFERENCE_01, // i.e. new linked case 01 has been added
-                CASE_TYPE_ID
+                LINKED_CASE_REFERENCE_01 // i.e. new linked case 01 has been added
             );
-            verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository).insertUsingCaseReferences(
                 CASE_REFERENCE,
-                LINKED_CASE_REFERENCE_02, // i.e. new linked case 02 has been added
-                CASE_TYPE_ID
+                LINKED_CASE_REFERENCE_02 // i.e. new linked case 02 has been added
             );
         }
 
@@ -232,10 +227,9 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
             // THEN
-            verify(caseLinkRepository, never()).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository, never()).insertUsingCaseReferences(
                 anyLong(),
-                anyLong(),
-                anyString()
+                anyLong()
             );
             verify(caseLinkRepository, never()).deleteByCaseReferenceAndLinkedCaseReference(
                 anyLong(),
@@ -261,9 +255,7 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             // THEN
             caseLinks.forEach(caseLink ->
                 Mockito.verify(caseLinkRepository)
-                    .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_REFERENCE,
-                                                                              Long.valueOf(caseLink),
-                                                                              CASE_TYPE_ID));
+                    .insertUsingCaseReferences(CASE_REFERENCE, Long.valueOf(caseLink)));
         }
 
         @Test
@@ -286,10 +278,7 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             // THEN
             validCaseLinks.forEach(caseLink ->
                 Mockito.verify(caseLinkRepository)
-                    .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
-                        CASE_REFERENCE,
-                        Long.valueOf(caseLink),
-                        CASE_TYPE_ID));
+                    .insertUsingCaseReferences(CASE_REFERENCE, Long.valueOf(caseLink)));
         }
 
         @Test
@@ -309,9 +298,7 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             // THEN
             caseLinks.forEach(caseLink ->
                 Mockito.verify(caseLinkRepository, never())
-                    .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(anyLong(),
-                        anyLong(),
-                        anyString()));
+                    .insertUsingCaseReferences(anyLong(), anyLong()));
         }
 
         private void mockCallsToFindCurrentCaseLinksToCase02AndCase03() {

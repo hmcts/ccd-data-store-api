@@ -40,27 +40,21 @@ public class CaseLinkService {
     @Transactional
     public void updateCaseLinks(CaseDetails caseDetails, List<CaseFieldDefinition> caseFieldDefinitions) {
         final Long caseReference = caseDetails.getReference();
-        final String caseTypeId = caseDetails.getCaseTypeId();
         final List<String> finalCaseLinkReferences =
             caseLinkExtractor.getCaseLinksFromData(caseDetails, caseFieldDefinitions);
 
         List<String> currentCaseLinkReferences =
             getStringCaseReferencesFromCaseLinks(findCaseLinks(caseReference.toString()));
         deleteRemovedCaseLinks(caseReference, currentCaseLinkReferences, finalCaseLinkReferences);
-        // TODO: CaseTypeId needs to be 'case type id of the case to which the case links' so will need to possibly
-        //  be updated to take in the linked case - this will need to be confirmed
-        insertNewCaseLinks(caseReference, caseTypeId, currentCaseLinkReferences, finalCaseLinkReferences);
+        insertNewCaseLinks(caseReference, currentCaseLinkReferences, finalCaseLinkReferences);
     }
 
-    private void createCaseLinks(Long caseReference, String caseTypeId, List<String> caseLinks) {
+    private void createCaseLinks(Long caseReference, List<String> caseLinks) {
         caseLinks.stream()
             .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
             .forEach(caseLinkReference -> {
-                caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(caseReference,
-                    Long.parseLong(caseLinkReference),
-                    caseTypeId);
-                log.debug("inserted case link with id {}, linkedCaseId {} and caseType {}",
-                    caseReference, caseLinkReference, caseTypeId);
+                caseLinkRepository.insertUsingCaseReferences(caseReference, Long.parseLong(caseLinkReference));
+                log.debug("inserted case link with id {} and linkedCaseId {}", caseReference, caseLinkReference);
             });
 
     }
@@ -82,7 +76,6 @@ public class CaseLinkService {
     }
 
     private void insertNewCaseLinks(Long caseReference,
-                                    String caseTypeId,
                                     List<String> currentCaseLinkReferences,
                                     List<String> finalCaseLinkReferences) {
         final var caseLinksToInsert = finalCaseLinkReferences.stream()
@@ -90,7 +83,7 @@ public class CaseLinkService {
             .filter(caseLink -> !currentCaseLinkReferences.contains(caseLink))
             .collect(Collectors.toList());
 
-        createCaseLinks(caseReference, caseTypeId, caseLinksToInsert);
+        createCaseLinks(caseReference, caseLinksToInsert);
     }
 
     public List<CaseLink> findCaseLinks(String caseReference) {

@@ -139,6 +139,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String MID_EVENT_CALL_BACK_MULTI_PAGE = "/event-callback/multi-page-mid-event";
     public static final int EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED = 5;
     public static final int EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED = 6;
+
+    // data values as per: classpath:sql/insert_cases_case_links.sql
+    private static final String CASE_LINKS_CASE_998_REFERENCE = "1504259907353545";
+    private static final String CASE_LINKS_CASE_999_REFERENCE = "1504259907353537";
+    private static final Long CASE_LINKS_CASE_998_ID = 998L;
+    private static final Long CASE_LINKS_CASE_999_ID = 999L;
+    private static final String CASE_LINKS_CASE_998_TYPE = "TestAddressBookCase1";
+    private static final String CASE_LINKS_CASE_999_TYPE = "TestAddressBookCase2";
+
     @Inject
     private WebApplicationContext wac;
     private MockMvc mockMvc;
@@ -3814,23 +3823,22 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         Long expectedCaseId = CASE_22_ID;
-        String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_01_ID)
-                .caseTypeId(expectedCaseTypeId)
+                .caseTypeId(CASE_01_TYPE)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_02_ID)
-                .caseTypeId(expectedCaseTypeId)
+                .caseTypeId(CASE_02_TYPE)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_03_ID) // NB: previously added in "classpath:sql/insert_cases.sql"
-                .caseTypeId(expectedCaseTypeId)
+                .caseTypeId(CASE_03_TYPE)
                 .build()
         );
 
@@ -3872,13 +3880,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         Long expectedCaseId = CASE_22_ID;
-        String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_01_ID)
-                .caseTypeId(expectedCaseTypeId)
+                .caseTypeId(CASE_01_TYPE)
                 .build()
         ); // NB: missing linkedCaseId = CASE_03_ID which is previously added in "classpath:sql/insert_cases.sql"
 
@@ -5358,10 +5365,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final JsonNode data = mapper.readTree(
             "{"
             + "\"CaseLink1\": {"
-            + "     \"CaseReference\": \"1504259907353537\""
+            + "     \"CaseReference\": \"" + CASE_LINKS_CASE_999_REFERENCE + "\""
             + "},"
             + "\"CaseLink2\": {"
-            + "     \"CaseReference\": \"1504259907353545\""
+            + "     \"CaseReference\": \"" + CASE_LINKS_CASE_998_REFERENCE + "\""
             + "}"
             + "}");
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
@@ -5384,13 +5391,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(999L)
-                .caseTypeId(CASE_TYPE_CASELINK)
+                .linkedCaseId(CASE_LINKS_CASE_999_ID)
+                .caseTypeId(CASE_LINKS_CASE_999_TYPE)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(998L)
-                .caseTypeId(CASE_TYPE_CASELINK)
+                .linkedCaseId(CASE_LINKS_CASE_998_ID)
+                .caseTypeId(CASE_LINKS_CASE_998_TYPE)
                 .build()
         );
 
@@ -5431,13 +5438,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(999L)
-                .caseTypeId(CASE_TYPE_CASELINK)
+                .linkedCaseId(CASE_LINKS_CASE_999_ID)
+                .caseTypeId(CASE_LINKS_CASE_999_TYPE)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(998L)
-                .caseTypeId(CASE_TYPE_CASELINK)
+                .linkedCaseId(CASE_LINKS_CASE_998_ID)
+                .caseTypeId(CASE_LINKS_CASE_998_TYPE)
                 .build()
         );
 
