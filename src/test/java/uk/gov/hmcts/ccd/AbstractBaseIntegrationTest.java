@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import org.junit.After;
 import org.junit.Before;
@@ -79,7 +80,8 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(locations = "classpath:test.properties")
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
-public abstract class AbstractBaseIntegrationTest extends TestFixtures {
+public abstract class AbstractBaseIntegrationTest {
+    protected static final ObjectMapper mapper = JacksonUtils.MAPPER;
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
 
     protected static final MediaType JSON_CONTENT_TYPE = new MediaType(
@@ -171,6 +173,7 @@ public abstract class AbstractBaseIntegrationTest extends TestFixtures {
     @BeforeClass
     @BeforeAll
     public static void init() {
+        mapper.registerModule(new JavaTimeModule());
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         // Force re-initialisation of base types for each test suite

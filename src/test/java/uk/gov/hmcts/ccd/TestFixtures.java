@@ -8,7 +8,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jayway.jsonpath.JsonPath;
 import org.jooq.lambda.tuple.Tuple2;
 import org.junit.jupiter.params.provider.Arguments;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -130,7 +129,8 @@ public abstract class TestFixtures {
     protected final List<BuildingLocation> locationsRefData = List.of(location1, location2);
     protected final List<ServiceReferenceData> servicesRefData = List.of(service1, service2);
 
-    protected static final ObjectMapper mapper = JacksonUtils.MAPPER.registerModule(new JavaTimeModule());
+    protected static final ObjectMapper mapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule());
 
     @SuppressWarnings("unused")
     protected static Stream<Arguments> provideNullListParameters() {

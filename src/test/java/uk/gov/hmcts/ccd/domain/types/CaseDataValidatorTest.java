@@ -25,6 +25,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.TestFixtures.caseDataFromJsonString;
 
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
