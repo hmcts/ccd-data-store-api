@@ -145,7 +145,7 @@ public class DocumentValidator implements BaseTypeValidator {
         final JsonNode categoryId = dataValue.get(CATEGORY_ID);
 
         if (isNullOrEmpty(categoryId)) {
-            LOG.debug("{} is not a text value or is null", CATEGORY_ID);
+            LOG.debug("{}{}",CATEGORY_ID,NOT_TEXT_OR_NULL);
             return Collections.emptyList();
         }
 
@@ -175,7 +175,7 @@ public class DocumentValidator implements BaseTypeValidator {
                                                            final CaseFieldDefinition caseFieldDefinition) {
 
         if (isNullOrEmpty(uploadTimeStamp)) {
-            LOG.debug("{} is not a text value or is null", UPLOAD_TIMESTAMP);
+            LOG.debug("{}{}",UPLOAD_TIMESTAMP,NOT_TEXT_OR_NULL);
             return Collections.emptyList();
         }
 
@@ -188,7 +188,7 @@ public class DocumentValidator implements BaseTypeValidator {
     }
 
     private List<ValidationResult> nullOrEmptyValidationResult(String key, String dataFieldId) {
-        LOG.debug("{} is not a text value or is null", key);
+        LOG.debug("{}{}",key,NOT_TEXT_OR_NULL);
         return Collections.singletonList(new ValidationResult(
             key + NOT_TEXT_OR_NULL, dataFieldId));
     }
