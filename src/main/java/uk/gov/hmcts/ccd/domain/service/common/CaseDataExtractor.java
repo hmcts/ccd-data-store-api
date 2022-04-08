@@ -68,7 +68,7 @@ public class CaseDataExtractor {
                                                 String fieldType) {
         final String caseFieldType = caseFieldDefinition.getFieldTypeDefinition().getType();
 
-        if (!BaseType.contains(caseFieldType)) {
+        if (isNotABaseType(caseFieldType)) {
             log.debug("Ignoring Unknown Type: " + caseFieldType);
             return Collections.emptyList();
         }
@@ -165,7 +165,7 @@ public class CaseDataExtractor {
         }
 
         if (shouldTreatAsValueNode(fieldTypeDefinition, itemValue)) {
-            if (!BaseType.contains(fieldTypeDefinition.getType())) {
+            if (isNotABaseType(fieldTypeDefinition.getType())) {
                 log.debug("Ignoring Unknown Type:" + fieldTypeDefinition.getType() + " " + itemFieldId);
                 return Collections.emptyList();
             }
@@ -198,6 +198,10 @@ public class CaseDataExtractor {
         return fieldTypeDefinition.getType().equalsIgnoreCase("DynamicList")
             || fieldTypeDefinition.getType().equalsIgnoreCase("DynamicMultiSelectList")
             || fieldTypeDefinition.getType().equalsIgnoreCase("DynamicRadioList");
+    }
+
+    private boolean isNotABaseType(String fieldType) {
+        return !BaseType.contains(fieldType);
     }
 }
 
