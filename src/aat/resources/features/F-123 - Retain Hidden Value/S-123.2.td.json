@@ -332,7 +332,7 @@
                         "display_context_parameter": null,
                         "retain_hidden_value": null,
                         "formatted_value": null,
-                        "category_id": "divorceDocs"
+                        "category_id": null
                       },
                       {
                         "id": "ChildAddress",
@@ -378,7 +378,7 @@
                               "display_context_parameter": null,
                               "retain_hidden_value": null,
                               "formatted_value": null,
-                        "category_id": null
+                              "category_id": null
                             },
                             {
                               "id": "AddressLine2",
@@ -407,7 +407,7 @@
                               "display_context_parameter": null,
                               "retain_hidden_value": null,
                               "formatted_value": null,
-                        "category_id": null
+                              "category_id": null
                             },
                             {
                               "id": "AddressLine3",
@@ -436,7 +436,7 @@
                               "display_context_parameter": null,
                               "retain_hidden_value": null,
                               "formatted_value": null,
-                        "category_id": null
+                              "category_id": null
                             },
                             {
                               "id": "PostTown",
@@ -465,7 +465,7 @@
                               "display_context_parameter": null,
                               "retain_hidden_value": null,
                               "formatted_value": null,
-                        "category_id": null
+                              "category_id": null
                             },
                             {
                               "id": "County",
@@ -494,7 +494,7 @@
                               "display_context_parameter": null,
                               "retain_hidden_value": null,
                               "formatted_value": null,
-                        "category_id": null
+                              "category_id": null
                             },
                             {
                               "id": "PostCode",
@@ -523,7 +523,7 @@
                               "display_context_parameter": null,
                               "retain_hidden_value": null,
                               "formatted_value": null,
-                        "category_id": null
+                              "category_id": null
                             },
                             {
                               "id": "Country",
@@ -552,7 +552,7 @@
                               "display_context_parameter": null,
                               "retain_hidden_value": null,
                               "formatted_value": null,
-                        "category_id": null
+                              "category_id": null
                             }
                           ],
                           "collection_field_type": null
@@ -675,7 +675,7 @@
                               "display_context_parameter": null,
                               "retain_hidden_value": null,
                               "formatted_value": null,
-                        "category_id": null
+                              "category_id": null
                             }
                           ],
                           "collection_field_type": null
@@ -714,7 +714,7 @@
                 "display_context_parameter": "#COLLECTION(allowDelete,allowInsert,allowUpdate)",
                 "retain_hidden_value": true,
                 "formatted_value": null,
-                        "category_id": null
+                "category_id": null
               },
               {
                 "id": "FamilyAddress",
@@ -759,7 +759,7 @@
                       "display_context_parameter": null,
                       "retain_hidden_value": null,
                       "formatted_value": null,
-                        "category_id": null
+                      "category_id": null
                     },
                     {
                       "id": "AddressLine2",
@@ -793,7 +793,7 @@
                       "display_context_parameter": null,
                       "retain_hidden_value": null,
                       "formatted_value": null,
-                        "category_id": null
+                      "category_id": null
                     },
                     {
                       "id": "AddressLine3",
@@ -822,7 +822,7 @@
                       "display_context_parameter": null,
                       "retain_hidden_value": null,
                       "formatted_value": null,
-                        "category_id": null
+                      "category_id": null
                     },
                     {
                       "id": "PostTown",
@@ -851,7 +851,7 @@
                       "display_context_parameter": null,
                       "retain_hidden_value": null,
                       "formatted_value": null,
-                        "category_id": null
+                      "category_id": null
                     },
                     {
                       "id": "County",
@@ -880,7 +880,7 @@
                       "display_context_parameter": null,
                       "retain_hidden_value": null,
                       "formatted_value": null,
-                        "category_id": null
+                      "category_id": null
                     },
                     {
                       "id": "PostCode",
@@ -909,7 +909,7 @@
                       "display_context_parameter": null,
                       "retain_hidden_value": null,
                       "formatted_value": null,
-                        "category_id": null
+                      "category_id": null
                     },
                     {
                       "id": "Country",
@@ -938,7 +938,7 @@
                       "display_context_parameter": null,
                       "retain_hidden_value": null,
                       "formatted_value": null,
-                        "category_id": null
+                      "category_id": null
                     }
                   ],
                   "collection_field_type": null
@@ -957,7 +957,7 @@
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
                 "formatted_value": null,
-                        "category_id": null
+                "category_id": null
               }
             ]
           },
