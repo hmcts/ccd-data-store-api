@@ -129,6 +129,7 @@ public class CaseDataValidator {
         validationContext.setFieldValue(dataValue);
         validationContext.setCaseFieldDefinition(caseFieldDefinition);
         validationContext.setFieldId(fieldId);
+        caseFieldDefinition.setCaseTypeId(validationContext.getCaseTypeId());
         Optional<FieldValidator> fieldIdBasedValidator = validators.stream().filter(
             validator -> isFieldIdBasedValidator(validator, fieldId)
         ).findAny();
