@@ -1,13 +1,16 @@
-package uk.gov.hmcts.ccd.domain.service.casedeletion;
+package uk.gov.hmcts.ccd.domain.service.caselinking;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataExtractor;
+import uk.gov.hmcts.ccd.domain.types.CustomTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +21,7 @@ import java.util.stream.Collectors;
 public class CaseLinkExtractor {
 
     protected static final String STANDARD_CASE_LINK_FIELD = "caseLinks";
-    protected static final String TEXT_CASE_REFERENCE = "TextCaseReference";
+    protected static final String TEXT_CASE_REFERENCE = CustomTypes.CASE_LINK_TEXT_CASE_REFERENCE.getId();
 
     private final CaseDataExtractor caseDataExtractor;
 
@@ -35,7 +38,7 @@ public class CaseLinkExtractor {
             caseDataExtractor.extractFieldTypePaths(data, caseFieldDefinitions, TEXT_CASE_REFERENCE)
                 .stream()
                 .map(pathToCaseReference -> JacksonUtils.getValueFromPath(pathToCaseReference, data))
-                .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
+                .filter(StringUtils::isNotBlank)
                 .distinct()
                 .collect(Collectors.toList());
 

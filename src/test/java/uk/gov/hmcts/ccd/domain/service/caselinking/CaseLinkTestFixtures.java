@@ -1,7 +1,7 @@
-package uk.gov.hmcts.ccd.domain.service.casedeletion;
+package uk.gov.hmcts.ccd.domain.service.caselinking;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;

@@ -1,14 +1,14 @@
-package uk.gov.hmcts.ccd.domain.service.casedeletion;
+package uk.gov.hmcts.ccd.domain.service.caselinking;
 
 import lombok.NonNull;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Named;
 
-@Named
+@Service
 public class CaseLinkMapper {
 
     public CaseLink entityToModel(@NonNull final CaseLinkEntity caseLinkEntity) {
@@ -33,5 +33,5 @@ public class CaseLinkMapper {
             caseLink.getCaseTypeId(),
             caseLink.getStandardLink());
     }
-}
 
+}

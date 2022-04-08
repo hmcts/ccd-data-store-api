@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationResult;
-import uk.gov.hmcts.ccd.domain.service.migration.CaseLinkMigrationService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkMigrationService;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ForbiddenException;
@@ -81,9 +81,9 @@ class MigrationEndpointTest {
             new MigrationParameters(caseTypeId, JURISDICTION_ID, caseDataId, numRecords);
 
         // WHEN
-        Exception exception = assertThrows(ForbiddenException.class, () -> {
-            endpoint.backPopulateCaseLinks(migrationParameters);
-        });
+        Exception exception = assertThrows(ForbiddenException.class, () ->
+            endpoint.backPopulateCaseLinks(migrationParameters)
+        );
 
         // THEN
         String expectedMessage = "Forbidden";

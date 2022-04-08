@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.casedeletion;
+package uk.gov.hmcts.ccd.domain.service.caselinking;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,10 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
+import uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity;
+import uk.gov.hmcts.ccd.data.caselinking.CaseLinkRepository;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
@@ -25,13 +25,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity.NON_STANDARD_LINK;
-import static uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity.STANDARD_LINK;
+import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
+import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.STANDARD_LINK;
 
 @ExtendWith(MockitoExtension.class)
 class CaseLinkServiceTest extends CaseLinkTestFixtures {
@@ -120,11 +119,11 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             return  new CaseLinkEntity(CASE_DATA_ID, caseDataId, CASE_TYPE_ID, isStandardLink);
         }
 
-        private void setupMockForCaseDetailsRepositoryFindById(Long linkedCaseDataId01, Long linkedCaseReference01) {
+        private void setupMockForCaseDetailsRepositoryFindById(Long linkedCaseDataId, Long linkedCaseReference) {
             CaseDetails caseDetails = new CaseDetails();
-            caseDetails.setId(linkedCaseDataId01.toString());
-            caseDetails.setReference(linkedCaseReference01);
-            when(caseDetailsRepository.findById(null, linkedCaseDataId01)).thenReturn(Optional.of(caseDetails));
+            caseDetails.setId(linkedCaseDataId.toString());
+            caseDetails.setReference(linkedCaseReference);
+            when(caseDetailsRepository.findById(null, linkedCaseDataId)).thenReturn(Optional.of(caseDetails));
         }
     }
 
@@ -150,10 +149,9 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
             // THEN
-            verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository).insertUsingCaseReferences(
                 CASE_REFERENCE,
                 LINKED_CASE_REFERENCE_01,
-                CASE_TYPE_ID,
                 STANDARD_LINK
             );
         }
@@ -175,28 +173,24 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
             // THEN
-            verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository).insertUsingCaseReferences(
                 CASE_REFERENCE,
                 LINKED_CASE_REFERENCE_01,
-                CASE_TYPE_ID,
                 STANDARD_LINK
             );
-            verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository).insertUsingCaseReferences(
                 CASE_REFERENCE,
                 LINKED_CASE_REFERENCE_02,
-                CASE_TYPE_ID,
                 NON_STANDARD_LINK
             );
-            verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository).insertUsingCaseReferences(
                 CASE_REFERENCE,
                 LINKED_CASE_REFERENCE_03,
-                CASE_TYPE_ID,
                 NON_STANDARD_LINK
             );
-            verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository).insertUsingCaseReferences(
                 CASE_REFERENCE,
                 LINKED_CASE_REFERENCE_04,
-                CASE_TYPE_ID,
                 STANDARD_LINK
             );
         }
@@ -219,10 +213,9 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
             // THEN
-            verify(caseLinkRepository, times(2)).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository, times(2)).insertUsingCaseReferences(
                 anyLong(),
                 anyLong(),
-                anyString(),
                 anyBoolean()
             );
         }
@@ -242,10 +235,9 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
 
             // THEN
             verify(caseLinkRepository).deleteAllByCaseReference(CASE_REFERENCE);
-            verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            verify(caseLinkRepository).insertUsingCaseReferences(
                 CASE_REFERENCE,
                 LINKED_CASE_REFERENCE_01,
-                CASE_TYPE_ID,
                 STANDARD_LINK
             );
         }
@@ -266,22 +258,21 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             // THEN
             InOrder inOrder = Mockito.inOrder(caseLinkRepository);
             inOrder.verify(caseLinkRepository).deleteAllByCaseReference(CASE_REFERENCE);
-            inOrder.verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(
+            inOrder.verify(caseLinkRepository).insertUsingCaseReferences(
                 CASE_REFERENCE,
                 LINKED_CASE_REFERENCE_01,
-                CASE_TYPE_ID,
                 STANDARD_LINK
             );
         }
 
     }
 
-    private CaseLink createCaseLink(Long linkedCaseReference, Long caseDataId, Boolean isStandardLink) {
+    private CaseLink createCaseLink(Long linkedCaseReference, Long linkedCaseDataId, Boolean isStandardLink) {
         return CaseLink.builder()
             .caseReference(CASE_REFERENCE)
             .caseId(CASE_DATA_ID)
             .linkedCaseReference(linkedCaseReference)
-            .linkedCaseId(caseDataId)
+            .linkedCaseId(linkedCaseDataId)
             .standardLink(isStandardLink)
             .build();
     }

@@ -1,14 +1,14 @@
-package uk.gov.hmcts.ccd.domain.service.casedeletion;
+package uk.gov.hmcts.ccd.domain.service.caselinking;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
+import uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity;
+import uk.gov.hmcts.ccd.data.caselinking.CaseLinkRepository;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
@@ -45,21 +45,20 @@ public class CaseLinkService {
 
         // NB: delete all and re-add as this will update any links that have a changed StandardFlag value
         caseLinkRepository.deleteAllByCaseReference(caseReference);
-        // TODO: CaseTypeId needs to be 'case type id of the case to which the case links' so will need to possibly
-        //  be updated to take in the linked case - this will need to be confirmed
-        createCaseLinks(caseReference, caseDetails.getCaseTypeId(), caseLinksWithReferences);
+        createCaseLinks(caseReference, caseLinksWithReferences);
     }
 
-    private void createCaseLinks(Long caseReference, String caseTypeId, List<CaseLink> caseLinksWithReferences) {
+    private void createCaseLinks(Long caseReference, List<CaseLink> caseLinksWithReferences) {
         caseLinksWithReferences.stream()
             .filter(caseLink -> caseLink != null && caseLink.getLinkedCaseReference() != null)
-            .forEach(caseLinkReference -> {
-                caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(caseReference,
-                    caseLinkReference.getLinkedCaseReference(),
-                    caseTypeId,
-                    caseLinkReference.getStandardLink());
-                log.debug("inserted case link with id {}, linkedCaseId {} and caseType {}",
-                    caseReference, caseLinkReference.getLinkedCaseReference(), caseTypeId);
+            .forEach(caseLink -> {
+                caseLinkRepository.insertUsingCaseReferences(
+                    caseReference,
+                    caseLink.getLinkedCaseReference(),
+                    caseLink.getStandardLink());
+                log.debug(
+                    "inserted case link with id {}, linkedCaseId {} and StandardLink {}",
+                    caseReference, caseLink.getLinkedCaseReference(), caseLink.getStandardLink());
             });
     }
 

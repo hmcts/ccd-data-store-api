@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.caseaccess;
+package uk.gov.hmcts.ccd.data.caselinking;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -26,16 +26,16 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
 
     @Modifying
     @Query(value = "insert into case_link (case_id, linked_case_id, case_type_id, standard_link) values ("
-        + "(select id from case_data cd where cd.reference=:caseReference),"
+        + "(select id from case_data cd where cd.reference=:caseReference), "
         + "(select id from case_data cd where cd.reference=:linkedCaseReference), "
-        + ":caseTypeId, :standardLink)", nativeQuery = true)
-    void insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(@Param("caseReference") Long caseReference,
-                                                                  @Param("linkedCaseReference")
-                                                                      Long linkedCaseReference,
-                                                                  @Param("caseTypeId") String caseTypeId,
-                                                                  @Param("standardLink") Boolean standardLink);
+        + "(select case_type_id from case_data cd where cd.reference=:linkedCaseReference), "
+        + ":standardLink)", nativeQuery = true)
+    void insertUsingCaseReferences(@Param("caseReference") Long caseReference,
+                                   @Param("linkedCaseReference") Long linkedCaseReference,
+                                   @Param("standardLink") Boolean standardLink);
 
     @Query(value = "select cle from CaseLinkEntity cle where cle.caseLinkPrimaryKey.caseId = "
         + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)")
     List<CaseLinkEntity> findAllByCaseReference(@Param("caseReference") Long caseReference);
+
 }

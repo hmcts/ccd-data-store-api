@@ -159,7 +159,7 @@ Feature: F-1018: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateAnotherCasePreRequisiteCaseworkerBase]
-      And   another successful call [to create a case] as in [F-1018_CreateThirdCasePreRequisiteCaseworkerBase]
+      And   another successful call [to create a case with a different case_type] as in [F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase]
       And   a successful call [to get an event token for the case just created] as in [F-1018-GetUpdateEventToken]
       When  a request is prepared with appropriate values
       And   the request [contains correctly configured CaseLink field as a collection]
@@ -174,7 +174,7 @@ Feature: F-1018: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateAnotherCasePreRequisiteCaseworkerBase]
-      And   another successful call [to create a case] as in [F-1018_CreateThirdCasePreRequisiteCaseworkerBase]
+      And   another successful call [to create a case with a different case_type] as in [F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase]
       And   a successful call [to get an event token for the case just created] as in [F-1018-GetMultipleLinkedCaseUpdateEventToken]
       When  a request is prepared with appropriate values
@@ -190,7 +190,7 @@ Feature: F-1018: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateAnotherCasePreRequisiteCaseworkerBase]
-      And   another successful call [to create a case] as in [F-1018_CreateThirdCasePreRequisiteCaseworkerBase]
+      And   another successful call [to create a case with a different case_type] as in [F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase]
       And   a successful call [to get an event token for the case just created] as in [F-1018-GetMultipleLinkedCaseUpdateEventToken]
       When  a request is prepared with appropriate values
@@ -249,7 +249,7 @@ Feature: F-1018: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateAnotherCasePreRequisiteCaseworkerBase]
-      And   another successful call [to create a case] as in [F-1018_CreateThirdCasePreRequisiteCaseworkerBase]
+      And   another successful call [to create a case with a different case_type] as in [F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase]
       And   a successful call [to get an event token for the case just created] as in [F-1018-GetMultipleLinkedCaseUpdateEventToken]
       When  a request is prepared with appropriate values
@@ -265,7 +265,7 @@ Feature: F-1018: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateAnotherCasePreRequisiteCaseworkerBase]
-      And   another successful call [to create a case] as in [F-1018_CreateThirdCasePreRequisiteCaseworkerBase]
+      And   another successful call [to create a case with a different case_type] as in [F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase]
       And   a successful call [to get an event token for the case just created] as in [F-1018-GetMultipleLinkedCaseUpdateEventToken]
       When  a request is prepared with appropriate values
@@ -281,7 +281,7 @@ Feature: F-1018: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateAnotherCasePreRequisiteCaseworkerBase]
-      And   another successful call [to create a case] as in [F-1018_CreateThirdCasePreRequisiteCaseworkerBase]
+      And   another successful call [to create a case with a different case_type] as in [F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase]
       And   a successful call [to get an event token for the case just created] as in [F-1018-GetUpdateEventToken]
       When  a request is prepared with appropriate values
       And   the request [contains correctly configured CaseLink field as a collection]
@@ -296,7 +296,7 @@ Feature: F-1018: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateAnotherCasePreRequisiteCaseworkerBase]
-      And   another successful call [to create a case] as in [F-1018_CreateThirdCasePreRequisiteCaseworkerBase]
+      And   another successful call [to create a case with a different case_type] as in [F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase]
       And   a successful call [to get an event token for the case just created] as in [F-1018-GetMultipleLinkedCaseUpdateEventToken]
       When  a request is prepared with appropriate values
