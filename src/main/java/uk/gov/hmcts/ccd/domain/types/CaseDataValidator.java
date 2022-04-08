@@ -200,6 +200,7 @@ public class CaseDataValidator {
             final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
             caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
             caseFieldDefinition.setId(index);
+            caseFieldDefinition.setCaseTypeId(validationContext.getCaseTypeId());
             return validateSimpleField(
                                         index,
                                         itemValue,
