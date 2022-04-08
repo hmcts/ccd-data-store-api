@@ -2,7 +2,7 @@ DELETE FROM case_event;
 DELETE FROM case_data;
 DELETE FROM case_link;
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
 VALUES (1, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Peter",
@@ -56,8 +56,11 @@ VALUES (1, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
             } ]
           }
         }',
-        '3393027116986763'
-       );
+        '3393027116986763',
+        '2016-08-22 20:44:53.824',
+        '2016-08-24 20:44:53.824',
+        '2016-08-24 20:44:53.824'
+);
 
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
@@ -94,7 +97,7 @@ VALUES (2, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
 );
 
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
 VALUES (3, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Peter",
@@ -148,8 +151,11 @@ VALUES (3, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
               } ]
             }
         }',
-        '1504259907353545'
-       );
+        '1504259907353545',
+        '2016-08-22 20:44:53.824',
+        '2016-08-24 20:44:53.824',
+        '2016-08-24 20:44:53.824'
+);
 
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)

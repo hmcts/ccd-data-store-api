@@ -136,7 +136,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             scripts = {"classpath:sql/insert_cases_multiple_missing_case_link.sql"})
         void shouldPopulateCaseLinksWhereCaseHasMultipleMissingCaseLinks(String caseworkerRole) throws Exception {
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_LINKS_CASE_01_TYPE, PROBATE_JURISDICTION_ID, CASE_LINKS_CASE_01_ID, 5);
+                new MigrationParameters(CASE_LINKS_CASE_01_TYPE, PROBATE_JURISDICTION_ID, CASE_LINKS_CASE_01_ID, 1);
 
             stubIdamAndRasRequests(caseworkerRole);
 
@@ -297,7 +297,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
         void shouldVerifyMigrationResultAfterCaseLinkPopulation() throws Exception {
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_LINKS_CASE_01_TYPE, PROBATE_JURISDICTION_ID, CASE_LINKS_CASE_01_ID, 100);
+                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, CASE_LINKS_CASE_01_ID, 100);
 
             stubIdamAndRasRequests(ROLE_CASEWORKER_PROBATE);
 
@@ -401,7 +401,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
             new BeanPropertyRowMapper<>(CaseLink.class));
 
-        assertEquals(expectedCaseLinks, caseLinks);
+        assertEquals(caseLinks, expectedCaseLinks);
     }
 
     private void setUpMvc(WebApplicationContext wac) {
