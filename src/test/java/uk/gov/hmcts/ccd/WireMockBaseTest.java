@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
@@ -28,23 +25,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @AutoConfigureWireMock(port = 0)
-public abstract class WireMockBaseTest extends BaseTest {
+public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
 
@@ -131,20 +127,9 @@ public abstract class WireMockBaseTest extends BaseTest {
         );
     }
 
-    public ObjectMapper objectMapper() {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-
-        return objectMapper;
-    }
-
     public String objectToJsonString(final Object object) {
         try {
-            final ObjectMapper objectMapper = objectMapper();
-
-            return objectMapper.writeValueAsString(object);
+            return mapper.writeValueAsString(object);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

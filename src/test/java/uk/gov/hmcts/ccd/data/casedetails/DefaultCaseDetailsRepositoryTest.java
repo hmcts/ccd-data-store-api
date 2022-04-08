@@ -58,6 +58,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.TestFixtures.loadCaseTypeDefinition;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentRecord;
@@ -458,7 +459,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     })
     public void searchWithParams_withAccessLevelGranted() throws Exception {
         String userId = "123";
-        CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("/mappings/bookcase-definition.json");
+        CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("mappings/bookcase-definition.json");
         caseTypeDefinition.setRoleToAccessProfiles(asList(roleToAccessProfileDefinition("[CREATOR]")));
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase"))

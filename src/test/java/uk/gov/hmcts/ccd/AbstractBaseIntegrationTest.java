@@ -2,10 +2,8 @@ package uk.gov.hmcts.ccd;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
-import com.jayway.jsonpath.JsonPath;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -46,7 +44,6 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -68,7 +65,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.fail;
@@ -84,7 +80,7 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(locations = "classpath:test.properties")
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
-public abstract class BaseTest {
+public abstract class AbstractBaseIntegrationTest {
     protected static final ObjectMapper mapper = JacksonUtils.MAPPER;
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
 
@@ -209,7 +205,7 @@ public abstract class BaseTest {
         return jdbcTemplate.queryForList("SELECT * FROM pg_catalog.pg_tables").stream()
             .filter(tableInfo -> tableInfo.get("schemaname").equals("public"))
             .map(tableInfo -> (String)tableInfo.get("tablename"))
-            .filter(BaseTest::notFlyaway)
+            .filter(AbstractBaseIntegrationTest::notFlyaway)
             .collect(Collectors.toList());
     }
 
@@ -380,21 +376,4 @@ public abstract class BaseTest {
             .orElseThrow(() -> new IllegalArgumentException("Could not find case with reference: " + caseReference));
     }
 
-    public static String getResourceAsString(String absoluteFilename) {
-        return new Scanner(BaseTest.class.getResourceAsStream(absoluteFilename), "UTF-8")
-            .useDelimiter("\\A")
-            .next();
-    }
-
-    public static List<CaseFieldDefinition> getCaseFieldsFromJson(String json) throws IOException {
-        return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class,
-            CaseFieldDefinition.class));
-    }
-
-    public static CaseTypeDefinition loadCaseTypeDefinition(String caseTypeJsonLocation) {
-        String resourceAsString = BaseTest.getResourceAsString(caseTypeJsonLocation);
-        String jsonPathExpression = "$.response.jsonBody";
-        return JsonPath.parse(resourceAsString)
-            .read(jsonPathExpression, CaseTypeDefinition.class);
-    }
 }
