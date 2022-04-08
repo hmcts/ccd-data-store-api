@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.migration;
+package uk.gov.hmcts.ccd.domain.service.caselinking;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
@@ -9,8 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
-import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkTestFixtures;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkTestFixtures;
 
 import java.util.ArrayList;
 import java.util.HashMap;

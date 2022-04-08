@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.migration;
+package uk.gov.hmcts.ccd.domain.service.caselinking;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -7,7 +7,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 
 import java.util.List;
 
@@ -34,4 +34,5 @@ public class CaseLinkMigrationService {
             caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
         }
     }
+
 }

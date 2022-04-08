@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.casedeletion;
+package uk.gov.hmcts.ccd.domain.model.caselinking;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

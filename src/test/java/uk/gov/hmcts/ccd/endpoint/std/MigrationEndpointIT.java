@@ -28,7 +28,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationResult;
 
@@ -49,7 +49,7 @@ import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_CAA;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_PROBATE;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_SSCS;
-import static uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink.builder;
+import static uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink.builder;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
 
