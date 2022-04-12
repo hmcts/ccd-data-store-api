@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.domain.model.casefileview.CategoriesAndDocuments;
 import uk.gov.hmcts.ccd.domain.model.casefileview.Category;
 import uk.gov.hmcts.ccd.domain.model.casefileview.Document;
@@ -36,12 +37,9 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.TestFixtures.getCaseFieldsFromJson;
-import static uk.gov.hmcts.ccd.TestFixtures.loadCaseDataFromJson;
-import static uk.gov.hmcts.ccd.TestFixtures.loadCaseTypeDefinitionFromJson;
 
 @ExtendWith(MockitoExtension.class)
-class CategoriesAndDocumentsServiceTest {
+class CategoriesAndDocumentsServiceTest extends TestFixtures {
     @Mock
     private CaseDataExtractor caseDataExtractor;
     @Mock
@@ -81,7 +79,7 @@ class CategoriesAndDocumentsServiceTest {
     @Test
     void testShouldTransformOne() {
         final CategoryDefinition categoryDefinition =
-            new CategoryDefinition("Cat-1", "Cat-1", null, null, null, "1", "");
+            new CategoryDefinition("Cat-1", "Cat-1", null, null, null, 1, "");
         final List<CategoryDefinition> categoryDefinitions = provideCategoryDefinitions();
         final Category expectedCategory = getCategory1();
 
@@ -371,20 +369,20 @@ class CategoriesAndDocumentsServiceTest {
     }
 
     private List<CategoryDefinition> provideRootCategoryDefinitions() {
-        final CategoryDefinition cat1 = new CategoryDefinition("Cat-1", "Cat-1", null, null, null, "1", "");
-        final CategoryDefinition cat4 = new CategoryDefinition("Cat-4", "Cat-4", null, null, null, "1", "");
+        final CategoryDefinition cat1 = new CategoryDefinition("Cat-1", "Cat-1", null, null, null, 1, "");
+        final CategoryDefinition cat4 = new CategoryDefinition("Cat-4", "Cat-4", null, null, null, 1, "");
 
         return List.of(cat1, cat4);
     }
 
     private List<CategoryDefinition> provideCategoryDefinitions() {
         final List<CategoryDefinition> rootCategoryDefinitions = provideRootCategoryDefinitions();
-        final CategoryDefinition cat2 = new CategoryDefinition("Cat-2", "Cat-2", "Cat-1", null, null, "1", "");
-        final CategoryDefinition cat3 = new CategoryDefinition("Cat-3", "Cat-3", "Cat-2", null, null, "1", "");
-        final CategoryDefinition cat5 = new CategoryDefinition("Cat-5", "Cat-5", "Cat-4", null, null, "1", "");
-        final CategoryDefinition cat6 = new CategoryDefinition("Cat-6", "Cat-6", "Cat-4", null, null, "1", "");
-        final CategoryDefinition cat7 = new CategoryDefinition("Cat-7", "Cat-7", "Cat-6", null, null, "1", "");
-        final CategoryDefinition cat8 = new CategoryDefinition("Cat-8", "Cat-8", "Cat-6", null, null, "1", "");
+        final CategoryDefinition cat2 = new CategoryDefinition("Cat-2", "Cat-2", "Cat-1", null, null, 1, "");
+        final CategoryDefinition cat3 = new CategoryDefinition("Cat-3", "Cat-3", "Cat-2", null, null, 1, "");
+        final CategoryDefinition cat5 = new CategoryDefinition("Cat-5", "Cat-5", "Cat-4", null, null, 1, "");
+        final CategoryDefinition cat6 = new CategoryDefinition("Cat-6", "Cat-6", "Cat-4", null, null, 1, "");
+        final CategoryDefinition cat7 = new CategoryDefinition("Cat-7", "Cat-7", "Cat-6", null, null, 1, "");
+        final CategoryDefinition cat8 = new CategoryDefinition("Cat-8", "Cat-8", "Cat-6", null, null, 1, "");
 
         return Stream.of(rootCategoryDefinitions, List.of(cat2, cat3, cat5, cat6, cat7, cat8))
             .flatMap(Collection::stream)
@@ -631,7 +629,7 @@ class CategoriesAndDocumentsServiceTest {
         );
 
         return new CategoriesAndDocuments(
-            1L,
+            VERSION_NUMBER,
             emptyList(),
             List.of(document00, document10, document20, document30, document31)
         );

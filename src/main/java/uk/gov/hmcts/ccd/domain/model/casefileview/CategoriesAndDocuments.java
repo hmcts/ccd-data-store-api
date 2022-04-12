@@ -9,7 +9,7 @@ import java.util.List;
 @Value
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class CategoriesAndDocuments {
-    Long caseVersion;
+    Integer caseVersion;
     List<Category> categories;
     List<Document> uncategorisedDocuments;
 }

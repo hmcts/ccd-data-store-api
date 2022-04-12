@@ -66,7 +66,7 @@ public class CategoriesAndDocumentsService {
         final List<Category> categories = buildCategories(caseTypeDefinition.getCategories(), documentDictionary);
 
         return new CategoriesAndDocuments(
-            caseTypeDefinition.getVersion().getNumber().longValue(),
+            caseTypeDefinition.getVersion().getNumber(),
             categories,
             Optional.ofNullable(documentDictionary.get(UNCATEGORISED_KEY)).orElse(emptyList())
         );
@@ -106,7 +106,7 @@ public class CategoriesAndDocumentsService {
 
         return new Category(categoryId,
             categoryDefinition.getCategoryLabel(),
-            Integer.valueOf(categoryDefinition.getDisplayOrder()),
+            categoryDefinition.getDisplayOrder(),
             Optional.ofNullable(documentDictionary.get(categoryId)).orElse(emptyList()),
             children
         );
@@ -116,7 +116,7 @@ public class CategoriesAndDocumentsService {
                                        @NonNull final List<CategoryDefinition> categoryDefinitions,
                                        @NonNull final Map<String, List<Document>> documentDictionary) {
         return rootCategoryDefinitions.stream()
-            .map(v -> transform(v, categoryDefinitions, documentDictionary))
+            .map(categoryDef -> transform(categoryDef, categoryDefinitions, documentDictionary))
             .collect(Collectors.toUnmodifiableList());
     }
 

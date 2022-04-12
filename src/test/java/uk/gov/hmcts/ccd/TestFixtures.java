@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.jayway.jsonpath.JsonPath;
+import lombok.SneakyThrows;
 import org.jooq.lambda.tuple.Tuple2;
 import org.junit.jupiter.params.provider.Arguments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -236,7 +236,7 @@ public abstract class TestFixtures {
         return postStates;
     }
 
-    private static <T> T loadFromJson(final String filePath, final Class<T> valueType) throws IOException {
+    public static <T> T loadFromJson(final String filePath, final Class<T> valueType) throws IOException {
         final InputStream inputStream = getInputStream(filePath);
         return mapper.readValue(inputStream, valueType);
     }
@@ -259,12 +259,13 @@ public abstract class TestFixtures {
         return loadFromJson(filePath, JsonNode.class);
     }
 
+    @SneakyThrows
     public static CaseTypeDefinition loadCaseTypeDefinition(final String jsonString) {
         final InputStream inputStream = getInputStream(jsonString);
-        final String jsonPathExpression = "$.response.jsonBody";
+        final JsonNode node = mapper.readTree(inputStream)
+            .at("/response/jsonBody");
 
-        return JsonPath.parse(inputStream)
-            .read(jsonPathExpression, CaseTypeDefinition.class);
+        return mapper.treeToValue(node, CaseTypeDefinition.class);
     }
 
     public static CaseTypeDefinition loadCaseTypeDefinitionFromJson(final String filePath) throws IOException {

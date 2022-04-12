@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +26,6 @@ import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -36,10 +34,9 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import javax.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
@@ -55,8 +52,6 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.ApplicationParams.encode;
-import static uk.gov.hmcts.ccd.TestFixtures.loadCaseTypeDefinition;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.v2.V2.EXPERIMENTAL_HEADER;
@@ -78,7 +73,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
     private static final String REQUEST_ID = "request-id";
     private static final String REQUEST_ID_VALUE = "1234567898765432";
     public static final String ROLE_PROBATE_SOLICITOR = "caseworker-probate-solicitor";
-    private static final String UID_WITH_EVENT_ACCESS = "123";
 
     @Inject
     private WebApplicationContext wac;
@@ -715,93 +709,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
             .andReturn().getResolvedException().getMessage();
 
         assertTrue(StringUtils.contains(message, CASE_ID_INVALID));
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    void testShouldGetCategoriesAndDocuments() throws Exception {
-        final String caseTypeId = "FT_CaseFileView";
-        final CaseTypeDefinition caseTypeDefinition =
-            loadCaseTypeDefinition("mappings/ft-case-file-view-definition.json");
-
-        stubSuccess(String.format("/api/data/case-type/%s", encode(caseTypeId)),
-            objectToJsonString(caseTypeDefinition),
-            UUID.randomUUID());
-
-
-        final String caseId = "1504259907353529";
-        final String URL = "/categoriesAndDocuments/" + caseId;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-            .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-
-        verify(auditRepository).save(captor.capture());
-
-        Assertions.assertThat(mvcResult.getResponse())
-            .isNotNull()
-            .satisfies(response -> {
-                Assertions.assertThat(response.getStatus()).isEqualTo(200);
-                Assertions.assertThat(response.getContentAsString()).isNotEmpty();
-
-                Assertions.assertThat(captor.getValue().getOperationType())
-                    .isEqualTo(AuditOperationType.CATEGORIES_AND_DOCUMENTS_ACCESSED.getLabel());
-                Assertions.assertThat(captor.getValue().getCaseId()).isEqualTo(caseId);
-            });
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    void testGetCategoriesAndDocumentsShouldReturn404WhenCaseDoesNotExist() throws Exception {
-        final String caseId = "4259907353529155";
-        final String URL = "/categoriesAndDocuments/" + caseId;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-            .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        Assertions.assertThat(mvcResult.getResponse())
-            .isNotNull()
-            .satisfies(response -> Assertions.assertThat(response.getStatus()).isEqualTo(404));
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    void testGetCategoriesAndDocumentsShouldReturn404WhenUserIsNotAllowedAccessToCase() throws Exception {
-        final String caseId = "1504259907353529";
-        final String URL = "/categoriesAndDocuments/" + caseId;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CITIZEN);
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-            .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        Assertions.assertThat(mvcResult.getResponse())
-            .isNotNull()
-            .satisfies(response -> Assertions.assertThat(response.getStatus()).isEqualTo(404));
-    }
-
-    @Test
-    void testGetCategoriesAndDocumentsShouldReturnBadRequestWhenCaseRefHasWrongFormat() throws Exception {
-        final String badCaseId = "1504259907353529000";
-        final String URL = "/categoriesAndDocuments/" + badCaseId;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-            .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        Assertions.assertThat(mvcResult.getResponse())
-            .isNotNull()
-            .satisfies(response -> Assertions.assertThat(response.getStatus()).isEqualTo(400));
     }
 
     @Nested
