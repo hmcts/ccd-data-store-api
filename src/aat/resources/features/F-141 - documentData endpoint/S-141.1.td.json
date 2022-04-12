@@ -1,10 +1,10 @@
 {
-	"_guid_": "S-140.1",
-	"_extends_": "F-140_Test_Data_Base",
+	"_guid_": "S-141.1",
+	"_extends_": "F-141_Test_Data_Base",
 	"specs": [
 		"an active profile in CCD",
 		"contains a Non-extant case reference in the input",
-    "contains a HTTP 404 \"001 Non-extant case\""
+    "contains a HTTP 404 status code"
 	],
 
   "users": {
@@ -16,7 +16,12 @@
 	"request": {
 		"_extends_": "Common_Request",
     "pathVariables": {
-      "cid": "4444333322221111"
+      "cid": "1648717404042371"
+    },
+    "body":{
+      "attributePath": "CollectionDocumentField",
+      "caseVersion": 2,
+      "categoryId": null
     }
 	},
 
@@ -31,11 +36,14 @@
     },
     "body" : {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "status": 404,
+      "error": "Not Found",
       "message": "No case found",
-      "path": "[[ANYTHING_PRESENT]]",
+      "path": "/documentData/caseref/1648717404042371",
       "details": null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      "callbackErrors": null,
+      "callbackWarnings": null
     }
 	}
 }

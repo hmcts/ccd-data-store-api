@@ -1,0 +1,78 @@
+{
+  "_guid_": "S-141.11_GetCase",
+  "_extends_": "F-141_GetCase_Base",
+  "specs": [
+    "to verify that the case is updated with category_id and sub-fields for Document3 and it is populated with \"Null\""
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][S-141.11_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "${[scenarioContext][siblingContexts][S-141.11_CreateCase][testData][actualResponse][body][id]}",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_CaseFileView_1",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "CaseCreated",
+      "security_classification": "PUBLIC",
+      "data": {
+        "Document3": {
+          "category_id" : null,
+          "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+        },
+        "Document2": {
+          "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+        },
+        "ApplicantName": "John Doe",
+        "Document1": {
+          "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+        },
+        "nationalityProof": {
+          "dateIssued": "2020-01-01",
+          "typeOfProof": "document",
+          "documentEvidence": {
+            "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+            "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+            "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+          }
+        }
+      },
+      "data_classification": {
+        "Document3": "PUBLIC",
+        "Document2": "PUBLIC",
+        "ApplicantName": "PUBLIC",
+        "Document1": "PUBLIC",
+        "nationalityProof": {
+          "value": {
+            "dateIssued": "PUBLIC",
+            "typeOfProof": "PUBLIC",
+            "documentEvidence": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        }
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}
