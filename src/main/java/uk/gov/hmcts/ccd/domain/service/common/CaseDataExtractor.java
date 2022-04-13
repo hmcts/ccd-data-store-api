@@ -1,7 +1,8 @@
-package uk.gov.hmcts.ccd.domain.service.casedeletion;
+package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -15,13 +16,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.inject.Named;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
-@Named
 @Slf4j
+@Service
 public class CaseDataExtractor {
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
@@ -68,7 +68,7 @@ public class CaseDataExtractor {
                                                 String fieldType) {
         final String caseFieldType = caseFieldDefinition.getFieldTypeDefinition().getType();
 
-        if (!BaseType.contains(caseFieldType)) {
+        if (isNotABaseType(caseFieldType)) {
             log.debug("Ignoring Unknown Type: " + caseFieldType);
             return Collections.emptyList();
         }
@@ -165,7 +165,7 @@ public class CaseDataExtractor {
         }
 
         if (shouldTreatAsValueNode(fieldTypeDefinition, itemValue)) {
-            if (!BaseType.contains(fieldTypeDefinition.getType())) {
+            if (isNotABaseType(fieldTypeDefinition.getType())) {
                 log.debug("Ignoring Unknown Type:" + fieldTypeDefinition.getType() + " " + itemFieldId);
                 return Collections.emptyList();
             }
@@ -198,6 +198,10 @@ public class CaseDataExtractor {
         return fieldTypeDefinition.getType().equalsIgnoreCase("DynamicList")
             || fieldTypeDefinition.getType().equalsIgnoreCase("DynamicMultiSelectList")
             || fieldTypeDefinition.getType().equalsIgnoreCase("DynamicRadioList");
+    }
+
+    private boolean isNotABaseType(String fieldType) {
+        return !BaseType.contains(fieldType);
     }
 }
 

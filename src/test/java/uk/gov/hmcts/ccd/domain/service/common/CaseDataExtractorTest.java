@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.casedeletion;
+package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,7 +29,7 @@ class CaseDataExtractorTest extends WireMockBaseTest {
     private static final String CASE_FIELD_JSON = "/tests/CaseDataExtractor_CaseField.json";
     private static List<CaseFieldDefinition> caseFields;
 
-    private CaseDataExtractor caseDataExtractor = new CaseDataExtractor();
+    private final CaseDataExtractor caseDataExtractor = new CaseDataExtractor();
 
     private static final String SIMPLE_DATA =
         "{\n"
@@ -137,7 +137,7 @@ class CaseDataExtractorTest extends WireMockBaseTest {
     }
 
     @Test
-    public void extractFieldTypeUnknownType() throws IOException {
+    void extractFieldTypeUnknownType() throws IOException {
         final Map<String, JsonNode> jsonData
             = JacksonUtils.MAPPER.readValue(SIMPLE_DATA, new TypeReference<HashMap<String, JsonNode>>() { });
         caseFields = getCaseFieldsFromJson(BaseTest.getResourceAsString(CASE_FIELD_JSON));

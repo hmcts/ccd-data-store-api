@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.caseaccess;
+package uk.gov.hmcts.ccd.data.caselinking;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +8,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -97,7 +98,7 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void testInsertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId() {
+    public void testInsertUsingCaseReferences() {
 
         CaseLinkEntity.CaseLinkPrimaryKey pk = new CaseLinkEntity.CaseLinkPrimaryKey();
         pk.setCaseId(CASE_19_ID);
@@ -105,11 +106,12 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
         assertFalse(caseLinkRepository.findById(pk).isPresent());
 
-        caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(Long.parseLong(CASE_19_REFERENCE),
-                                                                                    Long.parseLong(CASE_21_REFERENCE),
-                                                                                    "test");
+        caseLinkRepository.insertUsingCaseReferences(Long.parseLong(CASE_19_REFERENCE),
+                                                     Long.parseLong(CASE_21_REFERENCE));
 
-        assertTrue(caseLinkRepository.findById(pk).isPresent());
+        Optional<CaseLinkEntity>  caseLinkEntity = caseLinkRepository.findById(pk);
+        assertTrue(caseLinkEntity.isPresent());
+        assertNotNull(caseLinkEntity.get().getCaseTypeId());
     }
 
     @Test

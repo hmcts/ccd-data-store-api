@@ -52,6 +52,7 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       Given   a user with [an active profile in CCD]
       And     a successful call [to create a case] as in [F-1019_CreateCasePreRequisiteCaseworkerBase]
       And     a successful call [to create a case] as in [F-1019_CreateAnotherCasePreRequisiteCaseworkerBase]
+      And     a successful call [to create a case with a different case_type] as in [F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase]
       When    a request is prepared with appropriate values
       And     the request [contains collection of correctly configured CaseLink collection field with Case Reference values]
       And     it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
@@ -107,6 +108,7 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       Given   a user with [an active profile in CCD]
       And     a successful call [to create a case] as in [F-1019_CreateCasePreRequisiteCitizenBase]
       And     a successful call [to create a case] as in [F-1019_CreateAnotherCasePreRequisiteCitizenBase]
+      And     a successful call [to create a case with a different case_type] as in [F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase]
       When    a request is prepared with appropriate values
       And     the request [contains collection of correctly configured CaseLink collection field with Case Reference values]
       And     it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
@@ -162,6 +164,7 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       Given   a user with [an active profile in CCD]
       And     a successful call [to create a case] as in [F-1019_CreateCasePreRequisiteCaseworkerBase]
       And     a successful call [to create a case] as in [F-1019_CreateAnotherCasePreRequisiteCaseworkerBase]
+      And     a successful call [to create a case with a different case_type] as in [F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase]
       When    a request is prepared with appropriate values
       And     the request [contains collection of correctly configured CaseLink collection field with Case Reference values]
       And     it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]

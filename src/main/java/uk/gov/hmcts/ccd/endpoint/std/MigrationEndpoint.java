@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +17,7 @@ import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationResult;
-import uk.gov.hmcts.ccd.domain.service.migration.CaseLinkMigrationService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkMigrationService;
 import uk.gov.hmcts.ccd.domain.service.search.ClassifiedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
@@ -50,7 +49,7 @@ public class MigrationEndpoint {
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
     }
 
-    @Transactional
+
     @PostMapping(path = "/populateCaseLinks", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(
         value = "Migrate case links",

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.core.IsInstanceOf;
@@ -12,7 +11,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -20,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
@@ -30,8 +29,7 @@ import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
-import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkExtractor;
-import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -121,8 +119,6 @@ class DefaultCreateCaseOperationTest {
 
     @Mock
     private CaseLinkService caseLinkService;
-    @Mock
-    private CaseLinkExtractor caseLinkExtractor;
 
     private DefaultCreateCaseOperation defaultCreateCaseOperation;
 
@@ -162,8 +158,7 @@ class DefaultCreateCaseOperationTest {
                                                                     globalSearchProcessorService,
                                                                     supplementaryDataUpdateOperation,
                                                                     supplementaryDataValidator,
-                                                                    caseLinkService,
-                                                                    caseLinkExtractor);
+                                                                    caseLinkService);
         data = buildJsonNodeData();
         given(userRepository.getUser()).willReturn(IDAM_USER);
         given(userRepository.getUserId()).willReturn(UID);
@@ -554,28 +549,11 @@ class DefaultCreateCaseOperationTest {
     }
 
     @Test
-    @DisplayName("Should insert case links into DB when case is created")
-    void shouldInsertCaseLinks() throws JsonProcessingException {
+    @DisplayName("Should insert case links when case is created")
+    void shouldInsertCaseLinks() {
         final String caseEventStateId = "Some state";
         final Long caseReference = 1855854166952584L;
-        final String caseRef = "1621351496474853";
-        final String caseRef2 = "1630400132944487";
-        final Map<String, JsonNode> data = JacksonUtils.convertValue(new ObjectMapper().readTree(
-            "{\n"
-                + "  \"CaseLinks\" : [\n"
-                + "    {\n"
-                + "      \"value\": "
-                + "        {\n"
-                + "          \"CaseLink1\": \"" + caseRef + "\",\n"
-                + "          \"CaseLink2\": \"" + caseRef2 + "\"\n"
-                + "        }\n"
-                + "    }"
-                + "  ]\n"
-                + "}")
-        );
-        final List<String> caseLinks = List.of(caseRef, caseRef2);
 
-        given(caseLinkExtractor.getCaseLinks(any(Map.class), any(List.class))).willReturn(caseLinks);
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
         given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);
@@ -631,7 +609,7 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
-            () -> order.verify(caseLinkService).updateCaseLinks(caseReference, CASE_TYPE_ID, caseLinks),
+            () -> order.verify(caseLinkService).updateCaseLinks(caseDetails, CASE_TYPE.getCaseFieldDefinitions()),
             () -> order.verify(draftGateway).delete(DRAFT_ID)
         );
     }
@@ -681,6 +659,9 @@ class DefaultCreateCaseOperationTest {
         caseTypeDefinition.setName("case type name");
         caseTypeDefinition.setJurisdictionDefinition(j);
         caseTypeDefinition.setVersion(version);
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(
+            new CaseFieldDefinition()
+        ));
         return caseTypeDefinition;
     }
 

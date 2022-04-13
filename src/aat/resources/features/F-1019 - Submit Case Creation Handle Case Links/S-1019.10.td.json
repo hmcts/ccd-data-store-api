@@ -30,7 +30,14 @@
             "value": {
               "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
             }
-          }]
+          },
+          {
+            "id": "a285df66-e36a-4ed3-b5d0-8769f9e7217c",
+            "value": {
+              "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+            }
+          }
+        ]
       },
       "event": {
         "id": "createCaseCaseLinks",
@@ -58,7 +65,14 @@
             "value": {
               "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
             }
-          }]
+          },
+          {
+            "id": "a285df66-e36a-4ed3-b5d0-8769f9e7217c",
+            "value": {
+              "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+            }
+          }
+        ]
       },
       "data_classification" : {
         "CaseLinkCollection" : {
@@ -73,6 +87,11 @@
               "CaseReference" : "PUBLIC"
             },
             "id" : "84e22baf-5bec-4eec-a31f-7a3954efc9c3"
+          }, {
+            "value" : {
+              "CaseReference" : "PUBLIC"
+            },
+            "id" : "a285df66-e36a-4ed3-b5d0-8769f9e7217c"
           } ]
         }
       },
@@ -89,6 +108,11 @@
               "CaseReference" : "PUBLIC"
             },
             "id" : "84e22baf-5bec-4eec-a31f-7a3954efc9c3"
+          }, {
+            "value" : {
+              "CaseReference" : "PUBLIC"
+            },
+            "id" : "a285df66-e36a-4ed3-b5d0-8769f9e7217c"
           } ]
         }
       }

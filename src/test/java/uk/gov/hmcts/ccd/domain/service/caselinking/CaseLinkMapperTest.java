@@ -1,16 +1,16 @@
-package uk.gov.hmcts.ccd.domain.service.casedeletion;
+package uk.gov.hmcts.ccd.domain.service.caselinking;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
+import uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 class CaseLinkMapperTest {
 
@@ -44,6 +44,14 @@ class CaseLinkMapperTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    void testModelToEntity_NPE() {
+        assertThrows(NullPointerException.class, () ->
+            caseLinkMapper.modelToEntity(null)
+        );
+    }
+
+    @Test
     void testEntityToModel() {
         CaseLink mappedCaseLinkModel = caseLinkMapper.entityToModel(caseLinkEntity);
         assertAll(() -> {
@@ -51,6 +59,14 @@ class CaseLinkMapperTest {
             assertEquals(LINKED_CASE_ID, mappedCaseLinkModel.getLinkedCaseId());
             assertEquals(CASE_TYPE_ID, mappedCaseLinkModel.getCaseTypeId());
         });
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    void testEntityToModel_NPE() {
+        assertThrows(NullPointerException.class, () ->
+            caseLinkMapper.entityToModel(null)
+        );
     }
 
     @Test
@@ -80,4 +96,13 @@ class CaseLinkMapperTest {
         assertEquals(caseLinkEntities.size(), caseLinks.size());
         assertTrue(expectedCaseLinkModels.containsAll(caseLinks));
     }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    void testEntitiesToModel_NPE() {
+        assertThrows(NullPointerException.class, () ->
+            caseLinkMapper.entitiesToModels(null)
+        );
+    }
+
 }

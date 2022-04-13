@@ -36,7 +36,6 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     private final Map<String, Optional<CaseDetails>> referenceToCaseDetails = newHashMap();
     private final Map<String, CaseDetails> findHashToCaseDetails = newHashMap();
     private final Map<String, List<CaseDetails>> metaAndFieldDataHashToCaseDetails = newHashMap();
-    private final Map<Long, List<CaseDetails>> paramsWithLimit = newHashMap();
     private final Map<String, PaginatedSearchMetadata> hashToPaginatedSearchMetadata = newHashMap();
 
     @Inject
@@ -114,8 +113,8 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public List<CaseDetails> findByParamsWithLimit(final MigrationParameters migrationParameters) {
-        return paramsWithLimit.computeIfAbsent(migrationParameters.getCaseDataId(), key ->
-            caseDetailsRepository.findByParamsWithLimit(migrationParameters));
+        // no cache in place for migration calls
+        return caseDetailsRepository.findByParamsWithLimit(migrationParameters);
     }
 
     @Override
