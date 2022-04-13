@@ -2,7 +2,7 @@
   "_guid_": "S-1018.17",
   "_extends_": "F-1018_Test_Data_Base_Negative",
 
-  "title": "Case Link does not exist at present and CaseLink field in the Request contains INVALID CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
+  "title": "Case Link value changed and CaseLink field in the Request contains INVALID CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
 
   "specs": [
     "an active profile in CCD",
@@ -29,7 +29,7 @@
               "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
             }
           }],
-        "TextField" : "S-1018.16"
+        "TextField" : "S-1018.17"
       },
       "event": {
         "id": "updateCase",

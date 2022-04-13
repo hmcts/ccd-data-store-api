@@ -2,7 +2,7 @@
   "_guid_": "S-1018.2",
   "_extends_": "F-1018_Test_Data_Base",
 
-  "title": "Case Link value changed and CaseLink field in the Request contains CaseReference value and Submit Event Creation is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
+  "title": "Case Link value changed and CaseLink field in the Request contains CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
 
   "specs": [
     "an active profile in CCD",
