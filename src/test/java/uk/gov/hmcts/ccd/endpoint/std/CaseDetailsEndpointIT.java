@@ -272,7 +272,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
             caseAuditEventList.size());
 
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -1934,7 +1934,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2044,7 +2044,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2234,8 +2234,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<MessageQueueCandidate> messageQueueList =
             template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
         assertEquals("Incorrect number of rows in messageQueue", 0, messageQueueList.size());
+
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2305,7 +2306,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2375,7 +2376,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2446,7 +2447,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -4205,7 +4206,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("A new event should have been created", 6, caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());

@@ -2,7 +2,7 @@
   "_guid_": "S-1018.15",
   "_extends_": "F-1018_Test_Data_Base",
 
-  "title": "CaseLink in database exists and CaseLink field in the Request is a collection and is unchanged and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
+  "title": "CaseLink in database Does NOT exist and CaseLink field is a collection in the Request and is blank and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
 
   "specs": [
     "an active profile in CCD",
