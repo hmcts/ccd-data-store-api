@@ -203,7 +203,7 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
         );
         primeFileViewDocumentServiceForGetCategoriesAndDocuments(caseData);
 
-        final CategoriesAndDocuments result = underTest.getCategoriesAndDocuments(caseType, caseData);
+        final CategoriesAndDocuments result = underTest.getCategoriesAndDocuments(VERSION_NUMBER, caseType, caseData);
 
         assertThat(result)
             .isNotNull()

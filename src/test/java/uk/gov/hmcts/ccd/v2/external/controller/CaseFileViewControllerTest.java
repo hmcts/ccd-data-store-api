@@ -8,9 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.documentdata.DocumentDataRequest;
 import uk.gov.hmcts.ccd.domain.model.casefileview.CategoriesAndDocuments;
@@ -65,7 +62,7 @@ class CaseFileViewControllerTest extends TestFixtures {
         doReturn(TRUE).when(caseReferenceService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
         doReturn(categoriesAndDocuments).when(categoriesAndDocumentsService)
-            .getCategoriesAndDocuments(anyString(), anyMap());
+            .getCategoriesAndDocuments(anyInt(), anyString(), anyMap());
 
         // WHEN
         final ResponseEntity<CategoriesAndDocuments> responseEntity =
@@ -138,7 +135,7 @@ class CaseFileViewControllerTest extends TestFixtures {
         doReturn(caseDetails).when(createEventOperation)
             .createCaseSystemEvent(eq(CASE_REFERENCE), anyInt(), anyString(), anyString());
         doReturn(categoriesAndDocuments).when(categoriesAndDocumentsService)
-            .getCategoriesAndDocuments(anyString(), anyMap());
+            .getCategoriesAndDocuments(anyInt(), anyString(), anyMap());
 
         // WHEN
         final ResponseEntity<CategoriesAndDocuments> responseEntity =
@@ -153,33 +150,4 @@ class CaseFileViewControllerTest extends TestFixtures {
             });
     }
 
-    @Test
-    void test() {
-        // GIVEN
-        final MockHttpServletRequest request = new MockHttpServletRequest();
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-
-        final CaseDetails caseDetails = TestFixtures.buildCaseDetails(emptyMap());
-        final CategoriesAndDocuments categoriesAndDocuments =
-            new CategoriesAndDocuments(VERSION_NUMBER, emptyList(), emptyList());
-        final DocumentDataRequest documentDataRequest =
-            new DocumentDataRequest("path.document", VERSION_NUMBER, "cat-1");
-
-        doReturn(caseDetails).when(createEventOperation)
-            .createCaseSystemEvent(eq(CASE_REFERENCE), anyInt(), anyString(), anyString());
-        doReturn(categoriesAndDocuments).when(categoriesAndDocumentsService)
-            .getCategoriesAndDocuments(anyString(), anyMap());
-
-        // WHEN
-        final ResponseEntity<CategoriesAndDocuments> responseEntity =
-            underTest.updateDocumentField(CASE_REFERENCE, documentDataRequest);
-
-        // THEN
-        assertThat(responseEntity)
-            .isNotNull()
-            .satisfies(response -> {
-                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-                assertThat(response.getBody()).isNotNull();
-            });
-    }
 }

@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,7 +29,7 @@ import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CATEGORIES_AND_DOCUME
 
 @RestController
 @RequestMapping
-//@Validated
+@Validated
 public class CaseFileViewController extends AbstractCaseController {
 
     private final CreateEventOperation createEventOperation;
@@ -69,6 +70,7 @@ public class CaseFileViewController extends AbstractCaseController {
         final CaseDetails caseDetails = getCaseDetails(caseRef);
 
         final CategoriesAndDocuments categoriesAndDocuments = categoriesAndDocumentsService.getCategoriesAndDocuments(
+            caseDetails.getVersion(),
             caseDetails.getCaseTypeId(),
             caseDetails.getData()
         );
@@ -94,6 +96,7 @@ public class CaseFileViewController extends AbstractCaseController {
         );
 
         final CategoriesAndDocuments categoriesAndDocuments = categoriesAndDocumentsService.getCategoriesAndDocuments(
+            caseDetails.getVersion(),
             caseDetails.getCaseTypeId(),
             caseDetails.getData()
         );

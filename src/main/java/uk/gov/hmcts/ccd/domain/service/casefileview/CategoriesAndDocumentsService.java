@@ -54,7 +54,8 @@ public class CategoriesAndDocumentsService {
         this.fileViewDocumentService = fileViewDocumentService;
     }
 
-    public CategoriesAndDocuments getCategoriesAndDocuments(@NonNull final String caseType,
+    public CategoriesAndDocuments getCategoriesAndDocuments(@NonNull Integer version,
+                                                            @NonNull final String caseType,
                                                             @NonNull final Map<String, JsonNode> caseData) {
         final CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseType);
 
@@ -66,7 +67,7 @@ public class CategoriesAndDocumentsService {
         final List<Category> categories = buildCategories(caseTypeDefinition.getCategories(), documentDictionary);
 
         return new CategoriesAndDocuments(
-            caseTypeDefinition.getVersion().getNumber(),
+            version,
             categories,
             Optional.ofNullable(documentDictionary.get(UNCATEGORISED_KEY)).orElse(emptyList())
         );

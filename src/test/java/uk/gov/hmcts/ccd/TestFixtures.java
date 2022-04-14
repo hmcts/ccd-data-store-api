@@ -188,6 +188,7 @@ public abstract class TestFixtures {
         caseDetails.setState(STATE);
         caseDetails.setDataClassification(emptyMap());
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        caseDetails.setVersion(VERSION_NUMBER);
 
         caseDetails.setData(data);
 
