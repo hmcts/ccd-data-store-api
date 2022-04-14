@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -29,6 +30,8 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
@@ -55,6 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
@@ -126,6 +130,12 @@ class AuthorisedCreateEventOperationTest {
     @Mock
     private CaseDetailsJsonParser caseDetailsJsonParser;
 
+    @Mock
+    private CaseDataService caseDataService;
+
+    @InjectMocks
+    private CaseService caseService;
+
     private AuthorisedCreateEventOperation authorisedCreateEventOperation;
     private CaseDetails classifiedCase;
     private CaseDetails documentFieldsCase;
@@ -147,7 +157,9 @@ class AuthorisedCreateEventOperationTest {
             accessControlService,
             caseAccessService,
             caseAccessCategoriesService,
-            caseDetailsJsonParser);
+            caseDetailsJsonParser,
+            getCaseOperation,
+            caseService);
 
         mockExistingCaseDetails(Maps.newHashMap());
 
@@ -197,6 +209,7 @@ class AuthorisedCreateEventOperationTest {
             .updateCaseDocumentData(anyString(), anyString(), any(CaseDetails.class));
         doCallRealMethod().when(caseDetailsJsonParser).compiledPath(anyString());
         doCallRealMethod().when(caseDetailsJsonParser).compiledPath(anyString(), anyBoolean());
+        when(caseDataService.cloneDataMap(anyMap())).thenCallRealMethod();
     }
 
     private void mockExistingCaseDetails(Map<String, JsonNode> existingData) {

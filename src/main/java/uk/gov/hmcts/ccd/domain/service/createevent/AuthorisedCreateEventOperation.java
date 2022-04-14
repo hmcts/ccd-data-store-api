@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
@@ -50,6 +51,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private final CaseAccessService caseAccessService;
     private final CaseAccessCategoriesService caseAccessCategoriesService;
     private final CaseDetailsJsonParser caseDetailsJsonParser;
+    private final GetCaseOperation authGetCaseOperation;
+    private final CaseService caseService;
 
     public AuthorisedCreateEventOperation(@Qualifier("classified") final CreateEventOperation createEventOperation,
                                           @Qualifier("default") final GetCaseOperation getCaseOperation,
@@ -58,7 +61,9 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                           final AccessControlService accessControlService,
                                           CaseAccessService caseAccessService,
                                           CaseAccessCategoriesService caseAccessCategoriesService,
-                                          CaseDetailsJsonParser caseDetailsJsonParser) {
+                                          CaseDetailsJsonParser caseDetailsJsonParser,
+                                          @Qualifier("authorised") final GetCaseOperation authGetCaseOperation,
+                                          CaseService caseService) {
 
         this.createEventOperation = createEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -67,6 +72,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         this.caseAccessService = caseAccessService;
         this.caseAccessCategoriesService = caseAccessCategoriesService;
         this.caseDetailsJsonParser = caseDetailsJsonParser;
+        this.authGetCaseOperation = authGetCaseOperation;
+        this.caseService = caseService;
     }
 
     @Override
@@ -105,7 +112,11 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
         //checks field denoted by attributePath exists and is of type document
         checkCaseDocumentData(attributePath, createCaseEventDetails);
+        CaseDetails clonedCaseDetails = caseService.clone(createCaseEventDetails.getCaseDetails());
+        caseDetailsJsonParser.updateCaseDocumentData(attributePath, categoryId, clonedCaseDetails);
+
         verifyUpsertAccessForCaseSystemEvent(createCaseEventDetails.getCaseDetails(),
+            clonedCaseDetails,
             createCaseEventDetails.getCaseTypeDefinition(),
             createCaseEventDetails.getAccessProfiles());
 
@@ -122,7 +133,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     }
 
     private void checkCaseCategoryId(CaseTypeDefinition caseTypeDefinition, String categoryId) {
-        Boolean validCategoryId = categoryId == null || caseTypeDefinition.getCategories()
+        boolean validCategoryId = categoryId == null || caseTypeDefinition.getCategories()
             .stream()
             .map(cfd -> cfd.getCategoryId())
             .filter(value -> StringUtils.isNotBlank(value))
@@ -145,7 +156,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
     private CreateCaseEventDetails getCreateCaseEventDetails(String caseReference) {
         CreateCaseEventDetails createCaseEventDetails = new CreateCaseEventDetails();
-        CaseDetails existingCaseDetails = getCaseOperation.execute(caseReference)
+        CaseDetails existingCaseDetails = authGetCaseOperation.execute(caseReference)
             .orElseThrow(() -> new ResourceNotFoundException("Case not found"));
         createCaseEventDetails.setCaseDetails(existingCaseDetails);
 
@@ -222,11 +233,12 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     }
 
     private void verifyUpsertAccessForCaseSystemEvent(CaseDetails existingCaseDetails,
+                                                      CaseDetails clonedCaseDetails,
                                                       CaseTypeDefinition caseTypeDefinition,
                                                       Set<AccessProfile> accessProfiles) {
         verifyCaseTypeAndStateAccess(existingCaseDetails, caseTypeDefinition, accessProfiles);
 
-        verifyCaseFieldsAccess(existingCaseDetails.getData(), existingCaseDetails, caseTypeDefinition, accessProfiles);
+        verifyCaseFieldsAccess(clonedCaseDetails.getData(), existingCaseDetails, caseTypeDefinition, accessProfiles);
     }
 
     private void verifyCaseTypeAndStateAccess(CaseDetails existingCaseDetails, CaseTypeDefinition caseTypeDefinition,
