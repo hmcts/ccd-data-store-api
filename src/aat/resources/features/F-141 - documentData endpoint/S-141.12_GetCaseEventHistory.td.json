@@ -1,22 +1,58 @@
 {
-	"_guid_": "S-141.12_GetCaseEventHistory",
-  "_extends_": "F-141_GetCaseEventHistory",
+  "_guid_": "S-141.12_GetCaseEventHistory",
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve audit events by case ID",
+  "method": "GET",
+  "uri": "/cases/{cid}/events",
 
-	"request": {
-		"pathVariables": {
+  "specs": [
+    "to verify that the Case Event History contains a new event called \"DocumentUpdated\""
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true
+    },
+    "pathVariables": {
       "cid": "${[scenarioContext][siblingContexts][S-141.12_CreateCase][testData][actualResponse][body][id]}"
-		}
-	},
-
+    }
+  },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
       "_extends_": "Common_Response_Headers",
       "Content-Length": "[[ANYTHING_PRESENT]]"
     },
-    "body" : {
-      "auditEvents" : [
-      {
+    "body": {
+      "auditEvents" : [ {
+        "id" : "DocumentUpdated",
+        "summary" : null,
+        "description" : null,
+        "user_id" : "[[ANYTHING_PRESENT]]",
+        "user_last_name" : "[[ANYTHING_PRESENT]]",
+        "user_first_name" : "[[ANYTHING_PRESENT]]",
+        "event_name" : "Update Document Category Id",
+        "created_date" : "[[ANYTHING_PRESENT]]",
+        "case_type_id" : "FT_CaseFileView_2",
+        "case_type_version" : "[[ANYTHING_PRESENT]]",
+        "state_id" : "CaseCreated",
+        "state_name" : "Create case",
+        "data" : null,
+        "data_classification" : null,
+        "security_classification" : "PUBLIC",
+        "significant_item" : null,
+        "proxied_by" : null,
+        "proxied_by_last_name" : null,
+        "proxied_by_first_name" : null,
+        "security_classifications" : null
+      }, {
         "id" : "CREATE",
         "summary" : null,
         "description" : null,
@@ -46,5 +82,4 @@
     }
   }
 }
-
 
