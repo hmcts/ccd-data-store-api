@@ -91,8 +91,6 @@ public class CaseDataExtractor {
 
         final String caseFieldType = caseFieldDefinition.getFieldTypeDefinition().getType();
 
-        // TODO: is this defensive block necessary?
-        //  Is it even possible to successfully import a CaseFieldDefinition with an invalid caseFieldType?
         if (!BaseType.contains(caseFieldType)) {
             log.debug("Ignoring Unknown Type: " + caseFieldType);
             return Collections.emptyList();
