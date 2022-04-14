@@ -18,5 +18,75 @@
         }
       }
     }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_CaseFileView_1",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "CaseCreated",
+      "security_classification": "PUBLIC",
+      "data" : {
+        "Document3" : {
+          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "category_id" : "CategoryID2"
+        },
+        "Document2" : {
+          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "category_id" : "CategoryID1"
+        },
+        "nationalityProof" : {
+          "typeOfProof" : "document",
+          "dateIssued" : "2020-01-01",
+          "documentEvidence" : {
+            "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+            "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+            "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+            "category_id" : "CategoryID1"
+          }
+        },
+        "Document1" : {
+          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+        }
+      },
+      "data_classification" : {
+        "Document3" : "PUBLIC",
+        "Document2" : "PUBLIC",
+        "nationalityProof" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "typeOfProof" : "PUBLIC",
+            "dateIssued" : "PUBLIC",
+            "documentEvidence" : "PUBLIC"
+          }
+        },
+        "Document1" : "PUBLIC"
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
   }
 }

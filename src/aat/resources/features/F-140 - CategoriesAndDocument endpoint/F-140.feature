@@ -1,5 +1,4 @@
 @F-140
-@Ignore # QA to enable these tests
 Feature: F-140: CategoriesAndDocument endpoint
 
   Background: Load test data for the scenario
@@ -43,9 +42,9 @@ Feature: F-140: CategoriesAndDocument endpoint
     And the response has all other details as expected.
 
   @S-140.4 #AC4
-  Scenario:  Categories defined, top-level document and document within complex types exist and User has case access BUT not to the Document permissions - Empty Hierarchy returned in the response
+  Scenario:  Categories defined, top-level document and document within complex types exist and User has case access BUT not to the Document permissions
     Given a case that has just been created as in [F-140_CreateCase_hierarchyComplex],
-    And a user with [an active profile in CCD and doesn't have read access permissions for all the Document fields],
+    And a user with [an active profile in CCD and doesn't have read access permissions for most of the the Document fields],
     And [a case definition with category structure exists for the case type CT1] in the context,
     And [a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1] in the context,
     And [a case containing the above document fields *but without* the category_id in the Document type sub-field exists] in the context,
@@ -54,7 +53,7 @@ Feature: F-140: CategoriesAndDocument endpoint
     And it is submitted to call the [Get categoriesAndDocuments] operation of [CCD Data Store],
     Then a positive response is received,
     And the response [contains a HTTP 200 status code],
-    And the response [contains the category hierarchy without the documents],
+    And the response [contains the category hierarchy with only Document2],
     And the response has all other details as expected.
 
   @S-140.5 #AC5
@@ -88,7 +87,6 @@ Feature: F-140: CategoriesAndDocument endpoint
     And the response has all other details as expected.
 
   @S-140.7 #AC7
-  @Ignore # QA to revisit this setup
   Scenario: Top level document and document within complex type defined, both the document field types have non-null sub-field category_id, category hierarchy displayed with the category from the document sub-field
     Given a case that has just been created as in [F-140_CreateCase_hierarchyComplex_override],
     And a user with [an active profile in CCD and has read access permissions for all the Document fields],
@@ -104,7 +102,6 @@ Feature: F-140: CategoriesAndDocument endpoint
     And the response has all other details as expected.
 
   @S-140.8 #AC8
-  @Ignore # QA to revisit this setup
   Scenario:  Collection of documents with some documents having sub-field category_id in the case - Hierarchy with the list of documents (displayed in the sub-field category_id wherever applicable) is returned in the response
     Given a case that has just been created as in [F-140_CreateCase_hierarchyCollectionComplex_override],
     And a user with [an active profile in CCD and has read access permissions for all the Document fields],

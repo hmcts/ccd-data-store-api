@@ -46,14 +46,14 @@
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attribute_path": "evidenceDocuments.document1",
+              "attribute_path" : "evidenceDocuments[ca399773-4dff-48d9-a1de-6ed0a4b6ae77].value",
               "upload_timestamp": "[[ANY_NULLABLE]]"
             },
             {
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attribute_path": "applicationDocuments.documentWithMetaData.document1",
+              "attribute_path" : "applicationDocuments[0dc41c52-095b-4f25-b71d-77326658aaeb].value.document",
               "upload_timestamp": "[[ANY_NULLABLE]]"
             }
           ],
@@ -68,28 +68,28 @@
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attribute_path": "applicationDocuments.documentWithMetaData.document2",
+              "attribute_path" : "applicationDocuments[0dc41c52-095b-4f25-b71d-77326698aaeb].value.document",
               "upload_timestamp": "[[ANY_NULLABLE]]"
             },
             {
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attribute_path": "evidenceDocuments.document2",
+              "attribute_path" : "evidenceDocuments[ca399773-4dff-48d9-a1de-6ed0a4b6ae99].value",
               "upload_timestamp": "[[ANY_NULLABLE]]"
             },
             {
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attribute_path": "ProofType.evidenceDocument.document2",
+              "attribute_path" : "nationalityProof.documentEvidenceCollection[43ff6ca8-a77b-44ad-8769-aab0053db07e].value",
               "upload_timestamp": "[[ANY_NULLABLE]]"
             },
             {
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attribute_path": "miscellanousDocuments.Document2",
+              "attribute_path" : "miscellaneousDocuments[8c964a5c-7dd3-4728-8b22-cc49b9dbb846].value",
               "upload_timestamp": "[[ANY_NULLABLE]]"
             }
           ],
@@ -110,7 +110,7 @@
                   "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
                   "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
                   "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-                  "attribute_path": "ProofType.evidenceDocument.document1",
+                  "attribute_path" : "nationalityProof.documentEvidenceCollection[43ff6ca8-a77b-44ad-8769-aab0053db07g].value",
                   "upload_timestamp": "[[ANY_NULLABLE]]"
                 }
               ],
@@ -124,7 +124,7 @@
           "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "attribute_path": "miscellanousDocuments.Document1",
+          "attribute_path" : "miscellaneousDocuments[8c964a5c-7dd3-4728-8b22-cc49b9dbb889].value",
           "upload_timestamp": "[[ANY_NULLABLE]]"
         }
       ]
