@@ -1,64 +1,62 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import uk.gov.hmcts.ccd.BaseTest;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
+import org.mockito.Mockito;
+import uk.gov.hmcts.ccd.TestFixtures;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.types.BaseType;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static uk.gov.hmcts.ccd.TestFixtures.caseDataFromJsonString;
+import static uk.gov.hmcts.ccd.TestFixtures.getCaseFieldsFromJson;
+import static uk.gov.hmcts.ccd.TestFixtures.loadCaseDataFromJson;
 
-class CaseDataExtractorTest extends WireMockBaseTest {
+class CaseDataExtractorTest {
 
-    private static final String CASE_FIELD_JSON = "/tests/CaseDataExtractor_CaseField.json";
+    private static final String CASE_FIELD_JSON = "tests/CaseDataExtractor_CaseField.json";
     private static List<CaseFieldDefinition> caseFields;
-
-    private final CaseDataExtractor caseDataExtractor = new CaseDataExtractor();
 
     private static final String SIMPLE_DATA =
         "{\n"
-        + "  \"CaseReference\" : \"Address Line 1\"\n"
-        + "}";
+            + "  \"CaseReference\" : \"Address Line 1\"\n"
+            + "}";
 
     private static final String COLLECTION_DATA =
         "{\n"
-        + "  \"CaseLink\" : [\n"
-        + "    {\n"
-        + "      \"value\": "
-        + "        {\n"
-        + "          \"CaseLink1\": \"1596104840593131\",\n"
-        + "          \"CaseLink2\": \"1596104840593131\"\n"
-        + "        }\n"
-        + "    }"
-        + "  ]\n"
-        + "}";
+            + "  \"CaseLink\" : [\n"
+            + "    {\n"
+            + "      \"value\": "
+            + "        {\n"
+            + "          \"CaseLink1\": \"1596104840593131\",\n"
+            + "          \"CaseLink2\": \"1596104840593131\"\n"
+            + "        }\n"
+            + "    }"
+            + "  ]\n"
+            + "}";
 
     private static final String COMPLEX_OBJECT_DATA =
         "{\n"
-        + "   \"Person\": {\n"
-        + "        \"CaseLink1\": \"1596104840593131\",\n"
-        + "        \"Address\": {\n"
-        + "            \"Line1\": \"Address Line1\"\n,"
-        + "            \"Line2\": \"Address Line1\"\n"
-        + "         }\n"
-        + "  }\n"
-        + "}";
+            + "   \"Person\": {\n"
+            + "        \"CaseLink1\": \"1596104840593131\",\n"
+            + "        \"Address\": {\n"
+            + "            \"Line1\": \"Address Line1\"\n,"
+            + "            \"Line2\": \"Address Line1\"\n"
+            + "         }\n"
+            + "  }\n"
+            + "}";
 
     private static final String COMPLEX_OBJECT_DATA_TEST =
         "{\n"
@@ -77,83 +75,108 @@ class CaseDataExtractorTest extends WireMockBaseTest {
             + "    }"
             + "}";
 
+    private final CaseFieldMetadataExtractor simpleTypePathFinder = new SimpleCaseTypeMetadataExtractor();
+    private final CaseFieldMetadataExtractor complexTypePathFinder = new ComplexCaseTypeMetadataExtractor();
+
+    private final CaseDataExtractor underTest = new CaseDataExtractor(simpleTypePathFinder, complexTypePathFinder);
+
+    @BeforeAll
+    static void prepare() throws Exception {
+        final CaseDefinitionRepository caseDefinitionRepository = Mockito.mock(CaseDefinitionRepository.class);
+        BaseType.setCaseDefinitionRepository(caseDefinitionRepository);
+        final List<FieldTypeDefinition> fieldTypeDefinitions = TestFixtures.getFieldTypesFromJson("base-types.json");
+
+        doReturn(fieldTypeDefinitions).when(caseDefinitionRepository).getBaseTypes();
+
+        fieldTypeDefinitions.forEach(fieldType -> BaseType.register(new BaseType(fieldType)));
+    }
+
     @ParameterizedTest
     @MethodSource("provideExtractFieldTypePathsParameters")
-    void extractFieldTypePathsFromSimpleObject(String data, List<String> expectedFieldTypePaths) throws Exception {
-        final Map<String, JsonNode> jsonData
-            = JacksonUtils.MAPPER.readValue(data, new TypeReference<HashMap<String, JsonNode>>() { });
-        caseFields = getCaseFieldsFromJson(BaseTest.getResourceAsString(CASE_FIELD_JSON));
+    void extractFieldTypePathsFromSimpleObject(final String data,
+                                               final List<CaseFieldMetadata> expectedResults) throws Exception {
+        final Map<String, JsonNode> jsonData = caseDataFromJsonString(data);
 
-        List<String> extractedFieldTypePaths =
-            caseDataExtractor.extractFieldTypePaths(jsonData, caseFields, "TextCaseReference");
+        caseFields = getCaseFieldsFromJson(CASE_FIELD_JSON);
 
-        assertEquals(expectedFieldTypePaths.size(), extractedFieldTypePaths.size());
-        assertTrue(extractedFieldTypePaths.containsAll(expectedFieldTypePaths));
+        final List<CaseFieldMetadata> results =
+            underTest.extractFieldTypePaths(jsonData, caseFields, "TextCaseReference");
+
+        assertThat(results)
+            .isNotEmpty()
+            .hasSize(expectedResults.size())
+            .hasSameElementsAs(expectedResults);
     }
 
     private static Stream<Arguments> provideExtractFieldTypePathsParameters() {
         return Stream.of(
-            Arguments.of(SIMPLE_DATA, List.of("CaseReference")),
-            Arguments.of(COLLECTION_DATA, List.of("CaseLink.0.CaseLink1", "CaseLink.0.CaseLink2")),
-            Arguments.of(COMPLEX_OBJECT_DATA, List.of("Person.CaseLink1")),
-            Arguments.of(COMPLEX_OBJECT_DATA_TEST, List.of("CaseLink1.CaseReference", "CaseLink2.CaseReference"))
+            Arguments.of(SIMPLE_DATA, List.of(new CaseFieldMetadata("CaseReference", null))),
+            Arguments.of(COLLECTION_DATA, List.of(new CaseFieldMetadata("CaseLink.0.CaseLink1", null),
+                new CaseFieldMetadata("CaseLink.0.CaseLink2", null))),
+            Arguments.of(COMPLEX_OBJECT_DATA, List.of(new CaseFieldMetadata("Person.CaseLink1", null))),
+            Arguments.of(COMPLEX_OBJECT_DATA_TEST, List.of(new CaseFieldMetadata("CaseLink1.CaseReference", null),
+                new CaseFieldMetadata("CaseLink2.CaseReference", null)))
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideExtractDocumentFieldTypePathsParameters")
-    void extractDocumentFieldTypePaths(String definitionFileName, List<String> expectedPaths) throws IOException {
-        final String readString =
-            Files.readString(Paths.get("src/test/resources/tests/CaseDataExtractorDocumentData.json"));
-        caseFields =
-            getCaseFieldsFromJson(BaseTest.getResourceAsString(String.format("/tests/%s", definitionFileName)));
+    void extractDocumentFieldTypePaths(final String definitionFileName,
+                                       final List<CaseFieldMetadata> expectedPaths) throws Exception {
+        caseFields = getCaseFieldsFromJson(String.format("tests/%s", definitionFileName));
 
-        final Map<String, JsonNode> data
-            = JacksonUtils.MAPPER.readValue(readString, new TypeReference<HashMap<String, JsonNode>>() { });
+        final Map<String, JsonNode> data =
+            loadCaseDataFromJson(String.format("tests/%s", "CaseDataExtractorDocumentData.json"));
 
-        List<String> extractedFieldTypePaths = caseDataExtractor.extractFieldTypePaths(data, caseFields, "Document");
+        final List<CaseFieldMetadata> results = underTest.extractFieldTypePaths(data, caseFields, "Document");
 
-        assertNotNull(extractedFieldTypePaths);
-        assertEquals(expectedPaths.size(), extractedFieldTypePaths.size());
-        assertTrue(extractedFieldTypePaths.containsAll(expectedPaths));
+        assertThat(results)
+            .isNotEmpty()
+            .hasSize(expectedPaths.size())
+            .hasSameElementsAs(expectedPaths);
     }
 
     private static Stream<Arguments> provideExtractDocumentFieldTypePathsParameters() {
         return Stream.of(
-            Arguments.of("DocumentCaseTypeDefinitions_draftOrderDoc.json", List.of("draftOrderDoc")),
-            Arguments.of("DocumentCaseTypeDefinitions_evidence.json", List.of("evidence.type")),
+            Arguments.of("DocumentCaseTypeDefinitions_draftOrderDoc.json",
+                List.of(new CaseFieldMetadata("draftOrderDoc", null))),
+            Arguments.of("DocumentCaseTypeDefinitions_evidence.json",
+                List.of(new CaseFieldMetadata("evidence.type", null))),
             Arguments.of("DocumentCaseTypeDefinitions_extractDocUploadList.json",
-                List.of("extraDocUploadList.0", "extraDocUploadList.1")),
+                List.of(new CaseFieldMetadata("extraDocUploadList.0", null),
+                    new CaseFieldMetadata("extraDocUploadList.1", null))),
             Arguments.of("DocumentCaseTypeDefinitions_state.json",
-                List.of("state.0.partyDetail.0.type",
-                    "state.0.partyDetail.1.type",
-                    "state.1.partyDetail.0.type",
-                    "state.1.partyDetail.1.type",
-                    "state.2.partyDetail.0.type",
-                    "state.2.partyDetail.1.type",
-                    "state.2.partyDetail.2.type")),
-            Arguments.of("DocumentCaseTypeDefinitions_timeline.json", List.of("timeline.0.type", "timeline.1.type"))
+                List.of(new CaseFieldMetadata("state.0.partyDetail.0.type", null),
+                    new CaseFieldMetadata("state.0.partyDetail.1.type", null),
+                    new CaseFieldMetadata("state.1.partyDetail.0.type", null),
+                    new CaseFieldMetadata("state.1.partyDetail.1.type", null),
+                    new CaseFieldMetadata("state.2.partyDetail.0.type", null),
+                    new CaseFieldMetadata("state.2.partyDetail.1.type", null),
+                    new CaseFieldMetadata("state.2.partyDetail.2.type", null))),
+            Arguments.of("DocumentCaseTypeDefinitions_timeline.json",
+                List.of(new CaseFieldMetadata("timeline.0.type", null),
+                    new CaseFieldMetadata("timeline.1.type", null)))
         );
     }
 
     @Test
-    void extractFieldTypeUnknownType() throws IOException {
-        final Map<String, JsonNode> jsonData
-            = JacksonUtils.MAPPER.readValue(SIMPLE_DATA, new TypeReference<HashMap<String, JsonNode>>() { });
-        caseFields = getCaseFieldsFromJson(BaseTest.getResourceAsString(CASE_FIELD_JSON));
+    public void extractFieldTypeUnknownType() throws Exception {
+        final Map<String, JsonNode> jsonData = caseDataFromJsonString(SIMPLE_DATA);
 
-        List<String> extractedFieldTypePaths = caseDataExtractor.extractFieldTypePaths(jsonData, caseFields, "Unknown");
+        caseFields = getCaseFieldsFromJson(CASE_FIELD_JSON);
 
-        assertTrue(extractedFieldTypePaths.isEmpty());
+        final List<CaseFieldMetadata> results = underTest.extractFieldTypePaths(jsonData, caseFields, "Unknown");
+
+        assertThat(results).isEmpty();
     }
 
     @Test
-    void extractFieldTypeTypeNotFound() throws IOException {
-        final Map<String, JsonNode> jsonData
-            = JacksonUtils.MAPPER.readValue(SIMPLE_DATA, new TypeReference<HashMap<String, JsonNode>>() { });
-        caseFields = getCaseFieldsFromJson(BaseTest.getResourceAsString(CASE_FIELD_JSON));
+    void extractFieldTypeTypeNotFound() throws Exception {
+        final Map<String, JsonNode> jsonData = caseDataFromJsonString(SIMPLE_DATA);
 
-        CaseFieldDefinition caseFieldDefinition  = new CaseFieldDefinition();
+        caseFields = getCaseFieldsFromJson(CASE_FIELD_JSON);
+
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
         fieldTypeDefinition.setType("CustomType");
 
@@ -162,10 +185,8 @@ class CaseDataExtractorTest extends WireMockBaseTest {
 
         caseFields.add(caseFieldDefinition);
 
-        List<String> extractedFieldTypePaths = caseDataExtractor.extractFieldTypePaths(jsonData,
-                                                                                       caseFields,
-                                                                                       "CustomType");
+        final List<CaseFieldMetadata> results = underTest.extractFieldTypePaths(jsonData, caseFields, "CustomType");
 
-        assertTrue(extractedFieldTypePaths.isEmpty());
+        assertThat(results).isEmpty();
     }
 }
