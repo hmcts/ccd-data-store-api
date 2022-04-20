@@ -55,8 +55,6 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private Boolean retainHiddenValue;
     @JsonProperty("formatted_value")
     private Object formattedValue;
-    @JsonProperty("category_id")
-    private String categoryId;
 
     @Override
     public String getId() {
@@ -209,14 +207,6 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     @Override
     public void setFormattedValue(Object formattedValue) {
         this.formattedValue = formattedValue;
-    }
-
-    public String getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
     }
 
     @JsonIgnore

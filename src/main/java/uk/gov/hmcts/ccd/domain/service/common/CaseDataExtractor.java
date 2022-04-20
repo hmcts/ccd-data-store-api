@@ -152,7 +152,7 @@ public class CaseDataExtractor {
                     fieldIdPrefix + nodeEntry.getKey() + FIELD_SEPARATOR,
                     paths,
                     fieldType,
-                    caseFieldDefinition.getCategoryId()
+                    null //caseFieldDefinition.getCategoryId() uncomment when RDM-13090 gets merged
                 )
             );
             index++;
@@ -184,7 +184,7 @@ public class CaseDataExtractor {
             final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
             caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
             caseFieldDefinition.setId(index);
-            caseFieldDefinition.setCategoryId(categoryId);
+            //caseFieldDefinition.setCategoryId(categoryId); uncomment when RDM-13090 gets merged
 
             return simpleCaseTypeMetadataExtractor.extractCaseFieldData(
                 nodeEntry,
