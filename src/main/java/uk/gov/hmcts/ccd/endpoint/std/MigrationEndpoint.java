@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationResult;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkMigrationService;
-import uk.gov.hmcts.ccd.domain.service.search.ClassifiedSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.DefaultSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ForbiddenException;
@@ -41,7 +41,7 @@ public class MigrationEndpoint {
 
     @Autowired
     public MigrationEndpoint(final CaseLinkMigrationService caseLinkMigrationService,
-                             @Qualifier(ClassifiedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
+                             @Qualifier(DefaultSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                              final ElasticsearchQueryHelper elasticsearchQueryHelper) {
         this.caseLinkMigrationService = caseLinkMigrationService;
         this.searchOperation = searchOperation;
@@ -76,6 +76,8 @@ public class MigrationEndpoint {
     private List<CaseDetails> searchCases(MigrationParameters migrationParameters) {
         List<String> caseTypesAvailableToUser = elasticsearchQueryHelper.getCaseTypesAvailableToUser();
 
+        // migration is using DefaultSearchOperation rather than AuthorisedSearchOperation or ClassifiedSearchOperation
+        // ... therefore we will verify the user has access to the case type as a simple fallback.
         if (!caseTypesAvailableToUser.contains(migrationParameters.getCaseTypeId())) {
             log.error("User does not have access to CaseType: '{}'", migrationParameters.getCaseTypeId());
             throw new ForbiddenException();
