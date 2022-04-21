@@ -19,9 +19,9 @@
       "cid": "1648717404042371"
     },
     "body":{
-      "attributePath": "CollectionDocumentField",
-      "caseVersion": 2,
-      "categoryId": null
+      "attribute_path": "CollectionDocumentField",
+      "case_version": 2,
+      "category_id": null
     }
 	},
 

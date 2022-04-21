@@ -23,9 +23,9 @@
       "cid": "${[scenarioContext][childContexts][S-141.12_CreateCase][testData][actualResponse][body][id]}"
     },
     "body": {
-      "attributePath": "Document4",
-      "caseVersion":  "0",
-      "categoryId": "CategoryID6"
+      "attribute_path": "Document4",
+      "case_version":  "0",
+      "category_id": "CategoryID6"
     }
   },
 
@@ -38,7 +38,35 @@
       "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
-    "body" : null
+    "body" : {
+      "case_version" : 1,
+      "categories" : [ {
+        "category_id" : "CategoryID4",
+        "category_name" : "Residence Proof",
+        "category_order" : 100,
+        "documents" : [ ],
+        "sub_categories" : [ ]
+      }, {
+        "category_id" : "CategoryID5",
+        "category_name" : "Finance Proof",
+        "category_order" : 110,
+        "documents" : [ ],
+        "sub_categories" : [ ]
+      }, {
+        "category_id" : "CategoryID6",
+        "category_name" : "Finance Statements",
+        "category_order" : 120,
+        "documents" : [ {
+          "document_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "attribute_path" : "Document4",
+          "upload_timestamp": "[[ANY_NULLABLE]]"
+        } ],
+        "sub_categories" : [ ]
+      } ],
+      "uncategorised_documents" : [ ]
+    }
   }
 }
 

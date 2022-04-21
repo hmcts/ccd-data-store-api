@@ -23,9 +23,9 @@
       "cid": "${[scenarioContext][childContexts][F-141_CreateCase][testData][actualResponse][body][id]}"
     },
     "body": {
-      "attributePath": "Document3",
-      "caseVersion":  "7",
-      "categoryId": "CategoryID2"
+      "attribute_path": "Document3",
+      "case_version":  "7",
+      "category_id": "CategoryID2"
     }
   },
 

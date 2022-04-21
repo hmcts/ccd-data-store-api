@@ -19,9 +19,9 @@
       "cid": "${[scenarioContext][childContexts][S-141.2_CreateCaseNoAccess][testData][actualResponse][body][id]}"
     },
     "body":{
-      "attributePath": "CollectionDocumentField",
-      "caseVersion": 2,
-      "categoryId": null
+      "attribute_path": "CollectionDocumentField",
+      "case_version": 2,
+      "category_id": null
     }
 	},
 

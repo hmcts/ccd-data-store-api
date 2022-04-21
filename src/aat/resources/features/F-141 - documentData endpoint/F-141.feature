@@ -32,7 +32,6 @@ Feature: F-141: CategoriesAndDocument endpoint
     And a user with [an active profile in CCD and has read access permissions for all the Document fields],
     And [a case definition with category structure exists for the case type CT1] in the context,
     And [a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1] in the context,
-#    And a successful call [to the get CategoriesAndDocument endpoint to retrieve the caseVersion] as in [F-171_Get_CaseVersion]
     When a request is prepared with appropriate values,
     And the request [contains the given case reference C1 in the input],
     And the request [contains an attributePath value as "EvidenceDocument.document" (non existing in definition file) in the input],
@@ -47,7 +46,6 @@ Feature: F-141: CategoriesAndDocument endpoint
     And a user with [an active profile in CCD and has read access permissions for all the Document fields],
     And [a case definition with category structure exists for the case type CT1] in the context,
     And [a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1] in the context,
-    #    And a successful call [to the get CategoriesAndDocument endpoint to retrieve the caseVersion] as in [F-171_Get_CaseVersion]
     When a request is prepared with appropriate values,
     And the request [contains the given case reference C1 in the input],
     And the request [contains an attributePath value as "ApplicantName" (non Document Type field) in the input],
@@ -62,7 +60,6 @@ Feature: F-141: CategoriesAndDocument endpoint
     And a user with [an active profile in CCD and doesn't have Update access permissions for the Document field named in the attributePath],
     And [a case definition with category structure exists for the case type CT1] in the context,
     And [a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1] in the context,
-#    And a successful call [to the get CategoriesAndDocument endpoint to retrieve the caseVersion] as in [F-171_Get_CaseVersion]
     When a request is prepared with appropriate values,
     And the request [contains the given case reference C1 in the input],
     And the request [contains an attributePath value as "Document2"  in the input],
@@ -77,7 +74,6 @@ Feature: F-141: CategoriesAndDocument endpoint
     And a user with [an active profile in CCD and has Update access permissions for the Document field named in the AttributePath],
     And [a case definition with category structure exists for the case type CT1] in the context,
     And [a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1] in the context,
-#    And a successful call [to the get CategoriesAndDocument endpoint to retrieve the caseVersion] as in [F-171_Get_CaseVersion]    #    And a successful call [to the get CategoriesAndDocument endpoint to retrieve the caseVersion] as in [F-171_Get_CaseVersion]
     When a request is prepared with appropriate values,
     And the request [contains the given case reference C1 in the input],
     And the request [contains CategoryID value as "CategoryID4" and attributePath value as "Document3" in the input],
@@ -114,9 +110,7 @@ Feature: F-141: CategoriesAndDocument endpoint
     And the response [contains a HTTP 200 status code],
     And the response has all other details as expected,
     And a call [to verify that the case is updated with category_id and sub-fields for Document3 and it is populated with "CategoryID2"] will get the expected response as in [S-141.8_GetCase],
-    And a call [to verify that the Case Event History contains a new event called "DocumentUpdated"] will get the expected response as in [F-141_GetCaseEventHistory],
-#    And a successful call [contains the updated document hierarchy with Document3 in CategoryID2] as in [F-141_GetCategoriesAndDocuments],
-
+    And a call [to verify that the Case Event History contains a new event called "DocumentUpdated"] will get the expected response as in [F-141_GetCaseEventHistory].
 
   @S-141.9 #AC9
   Scenario: Document with attributePath already had a category in definition file, now supplied a valid new categoryId - return 200 response with the updated document hierarchy structure for the case
@@ -132,8 +126,7 @@ Feature: F-141: CategoriesAndDocument endpoint
     And the response [contains a HTTP 200 status code],
     And the response has all other details as expected,
     And a call [to verify that the case is updated with category_id and sub-fields for Document2 and it is populated with "CategoryID1"] will get the expected response as in [S-141.9_GetCase],
-    And a call [to verify that the Case Event History contains a new event called "DocumentUpdated"] will get the expected response as in [F-141_GetCaseEventHistory],
-#    And a successful call [contains the updated document hierarchy with Document3 in CategoryID2] as in [F-141_GetCategoriesAndDocuments],
+    And a call [to verify that the Case Event History contains a new event called "DocumentUpdated"] will get the expected response as in [F-141_GetCaseEventHistory].
 
   @S-141.10 #AC10
   Scenario: Document with attributePath had sub-field category id existing, but also having categoryId in definition file, categoryId request value now supplied as Null - return 200 response with the updated document hierarchy (showing document in category as per definition file) for the case
@@ -149,8 +142,7 @@ Feature: F-141: CategoriesAndDocument endpoint
     And the response [contains a HTTP 200 status code],
     And the response has all other details as expected,
     And a call [to verify that the case is updated with category_id and sub-fields for Document2 and it is populated with "Null"] will get the expected response as in [S-141.10_GetCase],
-    And a call [to verify that the Case Event History contains a new event called "DocumentUpdated"] will get the expected response as in [S-141.10_GetCaseEventHistory],
-#    And a successful call [contains the updated document hierarchy with Document3 in CategoryID2] as in [F-141_GetCategoriesAndDocuments],
+    And a call [to verify that the Case Event History contains a new event called "DocumentUpdated"] will get the expected response as in [S-141.10_GetCaseEventHistory].
 
   @S-141.11 #AC11
   Scenario: Document with attributePath had sub-field category id existing but no default categoryID in definition file, now supplied Null categoryId in request - return 200 response with the updated document hierarchy (showing document as Uncategorized) for the case
@@ -166,8 +158,7 @@ Feature: F-141: CategoriesAndDocument endpoint
     And the response [contains a HTTP 200 status code],
     And the response has all other details as expected,
     And a call [to verify that the case is updated with category_id and sub-fields for Document3 and it is populated with "Null"] will get the expected response as in [S-141.11_GetCase],
-    And a call [to verify that the Case Event History contains a new event called "DocumentUpdated"] will get the expected response as in [S-141.11_GetCaseEventHistory],
-#    And a successful call [contains the updated document hierarchy with Document3 in CategoryID2] as in [F-141_GetCategoriesAndDocuments],
+    And a call [to verify that the Case Event History contains a new event called "DocumentUpdated"] will get the expected response as in [S-141.11_GetCaseEventHistory].
 
   @S-141.12 #AC12
   Scenario: Document with attributePath had sub-field category id existing, now supplied new value - return 200 response with the updated document hierarchy for the case
@@ -183,5 +174,4 @@ Feature: F-141: CategoriesAndDocument endpoint
     And the response [contains a HTTP 200 status code],
     And the response has all other details as expected,
     And a call [to verify that the case is updated with category_id and sub-fields for Document4 and it is populated with "CategoryID6"] will get the expected response as in [S-141.12_GetCase],
-    And a call [to verify that the Case Event History contains a new event called "DocumentUpdated"] will get the expected response as in [S-141.12_GetCaseEventHistory],
-#    And a successful call [contains the updated document hierarchy with Document3 in CategoryID2] as in [F-141_GetCategoriesAndDocuments],
+    And a call [to verify that the Case Event History contains a new event called "DocumentUpdated"] will get the expected response as in [S-141.12_GetCaseEventHistory].
