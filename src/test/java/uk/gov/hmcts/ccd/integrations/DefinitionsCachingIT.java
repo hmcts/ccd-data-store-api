@@ -148,7 +148,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testCaseDefinitionLatestVersionsAreCached() {
-        Assert.assertEquals(3, applicationParams.getLatestVersionTTLSecs());
+        Assert.assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_2);
         cachedCaseDefinitionRepository.getLatestVersion(ID_2);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_2);
@@ -160,7 +160,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testTtlBasedEvictionOfCaseDefinitionLatestVersion() throws InterruptedException {
-        Assert.assertEquals(3, applicationParams.getLatestVersionTTLSecs());
+        Assert.assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
 
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_3);
         caseDefinitionRepository.getLatestVersion(ID_3);
