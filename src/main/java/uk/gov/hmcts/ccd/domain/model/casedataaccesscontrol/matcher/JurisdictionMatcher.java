@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -27,7 +26,7 @@ public class JurisdictionMatcher implements RoleAttributeMatcher {
     }
 
     private boolean matchJurisdiction(RoleAssignment roleAssignment, String jurisdictionId) {
-        Optional<String> roleJurisdiction = roleAssignment.getAttributes().getJurisdiction();
+        String roleJurisdiction = roleAssignment.getAttributes().getJurisdiction();
         log.debug("Matching role assignment jurisdiction {} with case definition jurisdiction {}"
                 + " for role assignment {}",
             roleJurisdiction,

@@ -19,7 +19,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.Collections;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -216,8 +215,8 @@ public class DefaultRoleAssignmentRepositoryTest {
         roleAssignmentResource.setRoleType(ROLE_TYPE);
 
         RoleAssignmentAttributesResource attributes = new RoleAssignmentAttributesResource();
-        attributes.setContractType(Optional.of(ATTRIBUTES_CONTRACT_TYPE));
-        attributes.setCaseId(Optional.of(ATTRIBUTES_CASE_ID));
+        attributes.setContractType(ATTRIBUTES_CONTRACT_TYPE);
+        attributes.setCaseId(ATTRIBUTES_CASE_ID);
 
         roleAssignmentResource.setAttributes(attributes);
 

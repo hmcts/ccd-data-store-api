@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -49,7 +48,7 @@ class JurisdictionMatcherTest extends BaseFilter {
         RoleAssignment roleAssignment = createRoleAssignment(
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", Optional.of(CASE_ID_1),
+            "PRIVATE", CASE_ID_1,
             null, null, null);
 
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
@@ -61,8 +60,8 @@ class JurisdictionMatcherTest extends BaseFilter {
         RoleAssignment roleAssignment = createRoleAssignment(
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", Optional.of(CASE_ID_1),
-            Optional.of(""), null, null);
+            "PRIVATE", CASE_ID_1,
+            "xyz", null, null);
 
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
         assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));

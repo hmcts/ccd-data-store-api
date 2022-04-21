@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,9 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import static com.google.common.collect.Maps.newHashMap;
-import static org.springframework.http.HttpHeaders.ETAG;
 
 @Slf4j
 @Repository
@@ -58,9 +55,6 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
-
-    // UserId as a key, Pair<ETag, RoleAssignmentResponse> as a value
-    private final Map<String, Pair<String, RoleAssignmentResponse>> roleAssignments = newHashMap();
 
     public DefaultRoleAssignmentRepository(final ApplicationParams applicationParams,
                                            final SecurityUtils securityUtils,
@@ -112,11 +106,11 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     }
 
     @Override
+    @Cacheable(cacheNames = "roleAssignmentsCache",
+        unless = "#result==null or #result.roleAssignments== null or #result.roleAssignments.isEmpty()")
     public RoleAssignmentResponse getRoleAssignments(String userId) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
-            addETagHeader(userId, headers);
-
             final HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
 
             return getRoleAssignmentResponse(userId, requestEntity);
@@ -125,17 +119,10 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
             if (e instanceof HttpClientErrorException
                 && ((HttpClientErrorException) e).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
                 throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND,
-                                                                  userId, e.getMessage()));
+                    userId, e.getMessage()));
             } else {
                 throw mapException(e, "getting");
             }
-        }
-    }
-
-    private void addETagHeader(String userId, HttpHeaders headers) {
-        if (roleAssignments.containsKey(userId)) {
-            Pair<String, RoleAssignmentResponse> stringRoleAssignmentResponsePair = roleAssignments.get(userId);
-            headers.setIfNoneMatch(stringRoleAssignmentResponsePair.getKey());
         }
     }
 
@@ -145,31 +132,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         ResponseEntity<RoleAssignmentResponse> exchange = exchangeGet(userId, requestEntity);
         log.debug("GET RoleAssignments for user={} returned response status={}", userId, exchange.getStatusCode());
 
-        if (exchange.getStatusCode() == HttpStatus.NOT_MODIFIED && roleAssignments.containsKey(userId)) {
-            return roleAssignments.get(userId).getRight();
-        }
-        if (exchange.getHeaders().containsKey(ETAG) && exchange.getHeaders().getETag() != null) {
-            log.debug("GET RoleAssignments response contains header ETag={}", exchange.getHeaders().getETag());
-            if (thereAreRoleAssignmentsInTheBody(exchange)) {
-                roleAssignments.put(userId, Pair.of(getETag(exchange.getHeaders().getETag()), exchange.getBody()));
-            }
-        }
-
         return exchange.getBody();
-    }
-
-    private boolean thereAreRoleAssignmentsInTheBody(ResponseEntity<RoleAssignmentResponse> exchange) {
-        RoleAssignmentResponse body = exchange.getBody();
-        if (body == null) {
-            return false;
-        }
-
-        List<RoleAssignmentResource> roleAssignments = body.getRoleAssignments();
-        if (roleAssignments == null) {
-            return false;
-        }
-
-        return !roleAssignments.isEmpty();
     }
 
     /**
@@ -273,7 +236,6 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
                 String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, processDescription, exception.getMessage()), exception);
         }
     }
-
 
 
 }

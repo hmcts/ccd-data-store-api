@@ -25,11 +25,11 @@ public class SearchRoleAssignment {
 
     public SearchRoleAssignment(RoleAssignment roleAssignment) {
         setRoleName(roleAssignment.getRoleName());
-        setJurisdiction(defaultOptional(roleAssignment.getAttributes().getJurisdiction()));
-        setCaseType(defaultOptional(roleAssignment.getAttributes().getCaseType()));
-        setRegion(defaultOptional(roleAssignment.getAttributes().getRegion()));
-        setLocation(defaultOptional(roleAssignment.getAttributes().getLocation()));
-        setCaseReference(defaultOptional(roleAssignment.getAttributes().getCaseId()));
+        setJurisdiction(roleAssignment.getAttributes().getJurisdiction());
+        setCaseType(roleAssignment.getAttributes().getCaseType());
+        setRegion(roleAssignment.getAttributes().getRegion());
+        setLocation(roleAssignment.getAttributes().getLocation());
+        setCaseReference(roleAssignment.getAttributes().getCaseId());
         setSecurityClassification(roleAssignment.getClassification());
         setRoleAssignment(roleAssignment);
     }

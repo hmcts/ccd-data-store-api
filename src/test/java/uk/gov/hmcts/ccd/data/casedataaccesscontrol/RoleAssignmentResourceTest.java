@@ -10,7 +10,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -47,7 +46,7 @@ class RoleAssignmentResourceTest {
 
         final Instant currentTIme = Instant.now();
         final RoleAssignmentAttributes roleAssignmentAttributes =
-            RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build();
+            RoleAssignmentAttributes.builder().caseId(CASE_ID).build();
 
         final List<RoleAssignment> roleAssignments = Arrays.asList(
 

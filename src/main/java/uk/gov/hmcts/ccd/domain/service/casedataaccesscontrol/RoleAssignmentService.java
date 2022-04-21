@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -80,9 +79,9 @@ public class RoleAssignmentService implements AccessControl {
                 .readOnly(false)
                 .beginTime(Instant.now())
                 .attributes(RoleAssignmentAttributesResource.builder()
-                    .jurisdiction(Optional.of(caseDetails.getJurisdiction()))
-                    .caseType(Optional.of(caseDetails.getCaseTypeId()))
-                    .caseId(Optional.of(caseDetails.getReferenceAsString()))
+                    .jurisdiction(caseDetails.getJurisdiction())
+                    .caseType(caseDetails.getCaseTypeId())
+                    .caseId(caseDetails.getReferenceAsString())
                     .build())
                 .build())
             .collect(Collectors.toList());
@@ -151,7 +150,6 @@ public class RoleAssignmentService implements AccessControl {
             .filter(this::isValidRoleAssignment)
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
             .filter(Objects::nonNull)
-            .flatMap(Optional::stream)
             .distinct()
             .collect(Collectors.toList());
     }
@@ -182,7 +180,7 @@ public class RoleAssignmentService implements AccessControl {
             .filter(this::isValidRoleAssignment)
             .map(roleAssignment ->
                 new CaseAssignedUserRole(
-                    roleAssignment.getAttributes().getCaseId().orElseThrow(() -> caseIdError),
+                    roleAssignment.getAttributes().getCaseId(),
                     roleAssignment.getActorId(),
                     roleAssignment.getRoleName()
                 )

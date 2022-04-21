@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -49,7 +48,6 @@ public class ExcludedGrantTypeQueryBuilder extends GrantTypeSqlQueryBuilder {
             .filter(roleAssignment -> roleAssignment.getAttributes() != null)
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
             .filter(Objects::nonNull)
-            .map(Optional::get)
             .filter(StringUtils::isNotBlank)
             .collect(Collectors.toSet());
 

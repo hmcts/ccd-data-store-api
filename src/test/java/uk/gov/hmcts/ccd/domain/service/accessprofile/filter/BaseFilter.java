@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.accessprofile.filter;
 import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
@@ -59,8 +58,8 @@ public class BaseFilter {
             startDate,
             endDate,
             securityClassification,
-            Optional.of(""),
-            Optional.of("")
+            "",
+            ""
         );
     }
 
@@ -69,14 +68,14 @@ public class BaseFilter {
                                                   Instant startDate,
                                                   Instant endDate,
                                                   String securityClassification,
-                                                  Optional<String> region,
-                                                  Optional<String> location) {
+                                                  String region,
+                                                  String location) {
         return createRoleAssignment(
             startDate,
             endDate,
             securityClassification,
-            Optional.of(caseId),
-            Optional.of(jurisdiction),
+           caseId,
+            jurisdiction,
             region,
             location
         );
@@ -85,10 +84,10 @@ public class BaseFilter {
     protected RoleAssignment createRoleAssignment(Instant startDate,
                                                   Instant endDate,
                                                   String securityClassification,
-                                                  Optional<String> caseId,
-                                                  Optional<String> jurisdiction,
-                                                  Optional<String> region,
-                                                  Optional<String> location) {
+                                                  String caseId,
+                                                  String jurisdiction,
+                                                  String region,
+                                                  String location) {
         RoleAssignment roleAssignment = RoleAssignment.builder().build();
 
         roleAssignment.setActorId("Actor1");
@@ -114,19 +113,19 @@ public class BaseFilter {
         return roleAssignment;
     }
 
-    private RoleAssignmentAttributes createRoleAssignmentAttributes(Optional<String> caseId,
-                                                                    Optional<String> jurisdiction,
-                                                                    Optional<String> region,
-                                                                    Optional<String> location) {
+    private RoleAssignmentAttributes createRoleAssignmentAttributes(String caseId,
+                                                                    String jurisdiction,
+                                                                    String region,
+                                                                    String location) {
         // role assignment attributes
         RoleAssignmentAttributes roleAssignmentAttributes = new RoleAssignmentAttributes();
 
         roleAssignmentAttributes.setCaseId(caseId);
         roleAssignmentAttributes.setJurisdiction(jurisdiction);
-        roleAssignmentAttributes.setContractType(Optional.of("SALARIED"));
+        roleAssignmentAttributes.setContractType("SALARIED");
         roleAssignmentAttributes.setLocation(location);
         roleAssignmentAttributes.setRegion(region);
-        roleAssignmentAttributes.setCaseType(Optional.of("TEST_CASE_TYPE"));
+        roleAssignmentAttributes.setCaseType("TEST_CASE_TYPE");
         return roleAssignmentAttributes;
     }
 

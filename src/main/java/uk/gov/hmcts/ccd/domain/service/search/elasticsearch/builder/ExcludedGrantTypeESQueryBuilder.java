@@ -50,7 +50,6 @@ public class ExcludedGrantTypeESQueryBuilder extends GrantTypeESQueryBuilder {
             .filter(roleAssignment -> roleAssignment.getAttributes() != null)
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
             .filter(Objects::nonNull)
-            .map(Optional::get)
             .filter(StringUtils::isNotBlank)
             .collect(Collectors.toSet());
 

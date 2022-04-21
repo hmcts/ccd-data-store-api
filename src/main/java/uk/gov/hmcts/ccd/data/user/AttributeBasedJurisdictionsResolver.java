@@ -52,11 +52,11 @@ public class AttributeBasedJurisdictionsResolver implements JurisdictionsResolve
             .forEach(roleAssignments -> {
                 if (Objects.nonNull(roleAssignments.getAttributes().getJurisdiction())) {
                     jurisdictions.add(roleAssignments
-                        .getAttributes().getJurisdiction().get());
+                        .getAttributes().getJurisdiction());
                 } else if (Objects.nonNull(roleAssignments.getAttributes().getCaseType())) {
                     jurisdictions.add(caseDefinitionRepository
                         .getCaseType(roleAssignments
-                            .getAttributes().getCaseType().get()).getJurisdictionId());
+                            .getAttributes().getCaseType()).getJurisdictionId());
                 } else if (roleAssignments.getGrantType().equals(GrantType.STANDARD.name())) {
                     caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore()
                         .forEach(jurisdictionDefinition ->

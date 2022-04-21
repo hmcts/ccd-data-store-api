@@ -17,7 +17,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static uk.gov.hmcts.ccd.BaseTest.loadCaseTypeDefinition;
 
@@ -268,31 +267,29 @@ public class RoleAssignmentsHelper {
                                                                                         boolean localised) {
         if (localised) {
             return RoleAssignmentAttributesResource.builder()
-                .jurisdiction(Optional.of(jurisdiction == null ? "DIVORCE" : jurisdiction))
-                .caseId(Optional.of(caseId))
-                .caseType(Optional.of(caseType == null ? "FT_Tabs" : caseType))
-                .region(Optional.of("Hampshire"))
-                .location(Optional.of("Southampton"))
-                .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
+                .jurisdiction(jurisdiction == null ? "DIVORCE" : jurisdiction)
+                .caseId(caseId)
+                .caseType(caseType == null ? "FT_Tabs" : caseType)
+                .region("Hampshire")
+                .location("Southampton")
+                .contractType("SALARIED") // SALARIED, FEEPAY
                 .build();
         } else {
             return RoleAssignmentAttributesResource.builder()
-                .jurisdiction(Optional.of(jurisdiction == null ? "DIVORCE" : jurisdiction))
-                .caseId(Optional.of(caseId))
-                .caseType(Optional.of(caseType == null ? "FT_Tabs" : caseType))
-                .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
-                .region(Optional.empty())
-                .location(Optional.empty())
+                .jurisdiction(jurisdiction == null ? "DIVORCE" : jurisdiction)
+                .caseId(caseId)
+                .caseType(caseType == null ? "FT_Tabs" : caseType)
+                .contractType("SALARIED") // SALARIED, FEEPAY
                 .build();
         }
     }
 
     private static RoleAssignmentAttributesResource createRoleAssignmentRecordAttribute(String caseId) {
         return RoleAssignmentAttributesResource.builder()
-            .jurisdiction(Optional.of("PROBATE"))
-            .caseId(Optional.of(caseId))
-            .caseType(Optional.of("TestAddressBookNoEventAccessToCaseRole"))
-            .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
+            .jurisdiction("PROBATE")
+            .caseId(caseId)
+            .caseType("TestAddressBookNoEventAccessToCaseRole")
+            .contractType("SALARIED") // SALARIED, FEEPAY
             .build();
     }
 }

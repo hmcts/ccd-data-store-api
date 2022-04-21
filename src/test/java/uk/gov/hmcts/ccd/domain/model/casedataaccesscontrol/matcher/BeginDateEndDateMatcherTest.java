@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
         Instant endDate = null;
 
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
-            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+            beginDate, endDate, Classification.PRIVATE.name(),null, null);
 
         // WHEN / THEN
         assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
@@ -52,7 +51,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
         Instant endDate = afterCurrentDate1;
 
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
-            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+            beginDate, endDate, Classification.PRIVATE.name(), null, null);
 
         // WHEN / THEN
         assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
@@ -67,7 +66,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
         Instant endDate = afterCurrentDate1;
 
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
-            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+            beginDate, endDate, Classification.PRIVATE.name(), null, null);
 
         // WHEN / THEN
         assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
@@ -82,7 +81,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
         Instant endDate = null;
 
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
-            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+            beginDate, endDate, Classification.PRIVATE.name(), null, null);
 
         // WHEN / THEN
         assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
@@ -97,7 +96,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
         Instant endDate = beforeCurrentDate1;
 
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
-            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+            beginDate, endDate, Classification.PRIVATE.name(), null, null);
 
         // WHEN / THEN
         assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
@@ -112,7 +111,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
         Instant endDate = null;
 
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
-            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+            beginDate, endDate, Classification.PRIVATE.name(), null, null);
 
         // WHEN / THEN
         assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
@@ -127,7 +126,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
         Instant endDate = beforeCurrentDate2;
 
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
-            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+            beginDate, endDate, Classification.PRIVATE.name(), null, null);
 
         // WHEN / THEN
         assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
@@ -142,7 +141,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
         Instant endDate = afterCurrentDate2;
 
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
-            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+            beginDate, endDate, Classification.PRIVATE.name(), null, null);
 
         // WHEN / THEN
         assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));

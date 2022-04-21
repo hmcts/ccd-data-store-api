@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Optional;
 
 @Builder
 @Data
@@ -33,10 +32,10 @@ import java.util.Optional;
 public class RoleAssignmentAttributesResource implements Serializable {
     private static final long serialVersionUID = -7106266789404292869L;
 
-    Optional<String> jurisdiction;
-    Optional<String> caseType;
-    Optional<String> caseId;
-    Optional<String> region;
-    Optional<String> location;
-    Optional<String> contractType;
+    private String jurisdiction;
+    private String caseType;
+    private String caseId;
+    private String region;
+    private String location;
+    private String contractType;
 }

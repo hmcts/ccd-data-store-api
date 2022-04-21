@@ -16,7 +16,6 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentServi
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -87,7 +86,7 @@ class AttributeBasedJurisdictionsResolverTest {
                         .roleName(DIVORCE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
-                            .jurisdiction(Optional.of(DIVORCE_JURISDICTION)).build()).build(),
+                            .jurisdiction(DIVORCE_JURISDICTION).build()).build(),
                     RoleAssignment.builder()
                         .grantType("CASE")
                         .roleName(DIVORCE_SOLICITOR_ROLE)
@@ -98,13 +97,13 @@ class AttributeBasedJurisdictionsResolverTest {
                         .roleName(CASEWORKER_CMC_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
-                            .caseId(Optional.of(CASE_ID)).build()).build(),
+                            .caseId(CASE_ID).build()).build(),
                     RoleAssignment.builder()
                         .grantType("CASE")
                         .roleName(PROBATE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
-                            .jurisdiction(Optional.of(PROBATE_JURISDICTION)).build()).build()
+                            .jurisdiction(PROBATE_JURISDICTION).build()).build()
                 ))
             .build()
         );
@@ -128,13 +127,13 @@ class AttributeBasedJurisdictionsResolverTest {
                         .roleName(DIVORCE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
-                            .jurisdiction(Optional.of(DIVORCE_JURISDICTION)).build()).build(),
+                            .jurisdiction(DIVORCE_JURISDICTION).build()).build(),
                     RoleAssignment.builder()
                         .grantType(GrantType.CHALLENGED.name())
                         .roleName(PROBATE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
-                            .jurisdiction(Optional.of(PROBATE_JURISDICTION)).build()).build()
+                            .jurisdiction(PROBATE_JURISDICTION).build()).build()
                 ))
                 .build()
         );
@@ -156,7 +155,7 @@ class AttributeBasedJurisdictionsResolverTest {
                         .roleName(PROBATE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
-                            .jurisdiction(Optional.of(PROBATE_JURISDICTION)).build()).build()
+                            .jurisdiction(PROBATE_JURISDICTION).build()).build()
                 ))
                 .build()
         );
@@ -192,7 +191,7 @@ class AttributeBasedJurisdictionsResolverTest {
                         .roleName(PROBATE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
-                            .jurisdiction(Optional.of(PROBATE_JURISDICTION)).build()).build()
+                            .jurisdiction(PROBATE_JURISDICTION).build()).build()
                 ))
                 .build()
         );
@@ -222,13 +221,13 @@ class AttributeBasedJurisdictionsResolverTest {
                         .roleName(DIVORCE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
-                            .caseType(Optional.of("caseTypeId")).build()).build(),
+                            .caseType("caseTypeId").build()).build(),
                     RoleAssignment.builder()
                         .grantType(GrantType.CHALLENGED.name())
                         .roleName(PROBATE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
-                            .jurisdiction(Optional.of(PROBATE_JURISDICTION)).build()).build()
+                            .jurisdiction(PROBATE_JURISDICTION).build()).build()
                 ))
                 .build()
         );

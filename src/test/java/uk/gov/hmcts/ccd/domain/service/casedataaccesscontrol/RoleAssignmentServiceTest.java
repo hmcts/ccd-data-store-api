@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -259,15 +258,15 @@ class RoleAssignmentServiceTest {
 
                 // attributes match case
                 () -> assertEquals(
-                    Optional.of(expectedCaseDetails.getReferenceAsString()),
+                   expectedCaseDetails.getReferenceAsString(),
                     actualRoleAssignment.getAttributes().getCaseId()
                 ),
                 () -> assertEquals(
-                    Optional.of(expectedCaseDetails.getJurisdiction()),
+                    expectedCaseDetails.getJurisdiction(),
                     actualRoleAssignment.getAttributes().getJurisdiction()
                 ),
                 () -> assertEquals(
-                    Optional.of(expectedCaseDetails.getCaseTypeId()),
+                    expectedCaseDetails.getCaseTypeId(),
                     actualRoleAssignment.getAttributes().getCaseType()
                 )
             );
@@ -429,7 +428,7 @@ class RoleAssignmentServiceTest {
         final long oneHour = 3600000;
 
         final RoleAssignmentAttributes roleAssignmentAttributes =
-            RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build();
+            RoleAssignmentAttributes.builder().caseId(CASE_ID).build();
 
         final List<RoleAssignment> roleAssignments = Arrays.asList(
 
@@ -653,7 +652,7 @@ class RoleAssignmentServiceTest {
         final long oneHour = 3600000;
 
         final RoleAssignmentAttributes roleAssignmentAttributes =
-            RoleAssignmentAttributes.builder().caseId(Optional.of(caseId)).build();
+            RoleAssignmentAttributes.builder().caseId(caseId).build();
 
         final List<RoleAssignment> roleAssignments = Arrays.asList(
 

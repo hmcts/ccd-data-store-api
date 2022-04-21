@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
@@ -56,10 +55,10 @@ abstract class GrantTypeESQueryBuilderTest {
                                                                String caseId,
                                                                String roleName) {
         RoleAssignmentAttributes attributes = RoleAssignmentAttributes.builder()
-            .jurisdiction(Optional.ofNullable(jurisdiction))
-            .location(Optional.ofNullable(location))
-            .region(Optional.ofNullable(region))
-            .caseId(Optional.ofNullable(caseId))
+            .jurisdiction(jurisdiction)
+            .location(location)
+            .region(region)
+            .caseId(caseId)
             .build();
         return RoleAssignment.builder()
             .grantType(grantType.name())

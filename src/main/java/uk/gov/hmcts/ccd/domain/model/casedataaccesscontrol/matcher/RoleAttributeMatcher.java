@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
-import java.util.Optional;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -23,12 +22,12 @@ public interface RoleAttributeMatcher {
     }
 
     @SuppressWarnings("java:S2789")
-    default boolean isValuesMatching(Optional<String> roleAssignmentValue,
+    default boolean isValuesMatching(String roleAssignmentValue,
                                      String caseDataValue) {
         if (roleAssignmentValue == null) {
             return true;
         }
         return roleAssignmentValue.isEmpty()
-            || roleAssignmentValue.get().equals(caseDataValue);
+            || roleAssignmentValue.equals(caseDataValue);
     }
 }

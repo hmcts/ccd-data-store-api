@@ -242,14 +242,14 @@ class PseudoRoleAssignmentsGeneratorTest {
         }
 
         private RoleAssignment caseRoleAssignment(String grantType) {
-            return roleAssignment(Optional.of("12345"), grantType);
+            return roleAssignment("12345", grantType);
         }
 
         private RoleAssignment organisationRoleAssignment(String grantType) {
-            return roleAssignment(Optional.empty(), grantType);
+            return roleAssignment(null, grantType);
         }
 
-        private RoleAssignment roleAssignment(Optional<String> caseId, String grantType) {
+        private RoleAssignment roleAssignment(String caseId, String grantType) {
             return RoleAssignment.builder()
                 .roleName(ROLE_PROVIDED)
                 .grantType(grantType)

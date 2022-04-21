@@ -22,7 +22,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -204,9 +203,9 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
                     .readOnly(false)
                     .beginTime(Instant.now())
                     .attributes(RoleAssignmentAttributesResource.builder()
-                        .jurisdiction(Optional.of(ATTRIBUTES_JURISDICTION))
-                        .caseType(Optional.of(ATTRIBUTES_CASE_ID))
-                        .caseId(Optional.of(ATTRIBUTES_CASE_ID))
+                        .jurisdiction(ATTRIBUTES_JURISDICTION)
+                        .caseType(ATTRIBUTES_CASE_ID)
+                        .caseId(ATTRIBUTES_CASE_ID)
                         .build())
                     .build())
                 .collect(Collectors.toList());
@@ -513,11 +512,11 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             assertThat(roleAssignmentResource.getEndTime(), is(EXPECTED_END_TIME));
             assertThat(roleAssignmentResource.getCreated(), is(EXPECTED_CREATED));
 
-            assertThat(roleAssignmentResource.getAttributes().getContractType().get(), is(ATTRIBUTES_CONTRACT_TYPE));
-            assertThat(roleAssignmentResource.getAttributes().getJurisdiction().get(), is(ATTRIBUTES_JURISDICTION));
-            assertThat(roleAssignmentResource.getAttributes().getCaseId().get(), is(ATTRIBUTES_CASE_ID));
-            assertThat(roleAssignmentResource.getAttributes().getLocation().get(), is(ATTRIBUTES_LOCATION));
-            assertThat(roleAssignmentResource.getAttributes().getRegion().get(), is(ATTRIBUTES_REGION));
+            assertThat(roleAssignmentResource.getAttributes().getContractType(), is(ATTRIBUTES_CONTRACT_TYPE));
+            assertThat(roleAssignmentResource.getAttributes().getJurisdiction(), is(ATTRIBUTES_JURISDICTION));
+            assertThat(roleAssignmentResource.getAttributes().getCaseId(), is(ATTRIBUTES_CASE_ID));
+            assertThat(roleAssignmentResource.getAttributes().getLocation(), is(ATTRIBUTES_LOCATION));
+            assertThat(roleAssignmentResource.getAttributes().getRegion(), is(ATTRIBUTES_REGION));
 
             assertThat(roleAssignmentResource.getAuthorisations().size(), is(2));
             assertThat(roleAssignmentResource.getAuthorisations().get(0), is(AUTHORISATIONS_AUTH_1));
@@ -599,11 +598,11 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             assertThat(roleAssignmentResource.getEndTime(), is(EXPECTED_END_TIME));
             assertThat(roleAssignmentResource.getCreated(), is(EXPECTED_CREATED));
 
-            assertThat(roleAssignmentResource.getAttributes().getContractType().get(), is(ATTRIBUTES_CONTRACT_TYPE));
-            assertThat(roleAssignmentResource.getAttributes().getJurisdiction().get(), is(ATTRIBUTES_JURISDICTION));
-            assertThat(roleAssignmentResource.getAttributes().getCaseId().get(), is(ATTRIBUTES_CASE_ID));
-            assertThat(roleAssignmentResource.getAttributes().getLocation().get(), is(ATTRIBUTES_LOCATION));
-            assertThat(roleAssignmentResource.getAttributes().getRegion().get(), is(ATTRIBUTES_REGION));
+            assertThat(roleAssignmentResource.getAttributes().getContractType(), is(ATTRIBUTES_CONTRACT_TYPE));
+            assertThat(roleAssignmentResource.getAttributes().getJurisdiction(), is(ATTRIBUTES_JURISDICTION));
+            assertThat(roleAssignmentResource.getAttributes().getCaseId(), is(ATTRIBUTES_CASE_ID));
+            assertThat(roleAssignmentResource.getAttributes().getLocation(), is(ATTRIBUTES_LOCATION));
+            assertThat(roleAssignmentResource.getAttributes().getRegion(), is(ATTRIBUTES_REGION));
 
             assertThat(roleAssignmentResource.getAuthorisations().size(), is(2));
             assertThat(roleAssignmentResource.getAuthorisations().get(0), is(AUTHORISATIONS_AUTH_1));

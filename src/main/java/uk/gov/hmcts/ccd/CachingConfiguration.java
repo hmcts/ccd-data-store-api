@@ -50,6 +50,7 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("caseTabCollectionCache", defaultMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", defaultMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("caseTypePseudoRoleToAccessProfileCache", defaultMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("roleAssignmentsCache", defaultMaxIdle));
 
         config.addMapConfig(newMapConfigWithTtl("allJurisdictionsCache", jurisdictionCacheTtl)); // Fixed.
         config.addMapConfig(newMapConfigWithTtl("userRolesCache", userCacheTtl)); // Fixed.
