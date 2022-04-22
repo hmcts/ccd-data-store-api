@@ -1,5 +1,5 @@
 @F-141
-Feature: F-141: CategoriesAndDocument endpoint
+Feature: F-141: DocumentData endpoint
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
