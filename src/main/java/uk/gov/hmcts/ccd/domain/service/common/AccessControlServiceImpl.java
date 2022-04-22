@@ -207,20 +207,25 @@ public class AccessControlServiceImpl implements AccessControlService {
         caseEventTrigger.getCaseFields()
             .forEach(caseViewField -> {
                 String caseViewFieldId = caseViewField.getId();
+                LOG.info("caseViewFieldId => {}", caseViewFieldId);
                 Optional<CaseFieldDefinition> caseFieldOpt = findCaseField(caseFieldDefinitions, caseViewFieldId);
 
                 if (caseFieldOpt.isPresent()) {
                     CaseFieldDefinition field = caseFieldOpt.get();
+                    LOG.info("Case field id => {} access profiles => {} access => {} access control lists => {}",
+                        field.getId(), accessProfiles, access, field.getAccessControlLists());
                     if (!hasAccessControlList(accessProfiles, access, field.getAccessControlLists())) {
+                        LOG.info("No access - changing display context to readonly");
                         caseViewField.setDisplayContext(READONLY);
                         if (shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId, caseReference, eventId,
                             isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents, caseViewFieldId,
                             field, accessProfiles)) {
+                            LOG.info("removed {}", caseViewField.getId());
                             filteredCaseFieldIds.add(caseViewField.getId());
                             return;
                         }
                     }
-
+                    LOG.info("isCompoundFieldType {}", field.isCompoundFieldType());
                     if (field.isCompoundFieldType()) {
                         setChildrenAsReadOnlyIfNoAccess(caseTypeId, caseReference, eventId, isMultipartyFixEnabled,
                             multipartyCaseTypes, multipartyEvents, caseEventTrigger.getWizardPages(), field.getId(),

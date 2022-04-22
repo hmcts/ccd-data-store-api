@@ -301,13 +301,20 @@ public interface AccessControlService {
                                                  CommonField caseViewField) {
         if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().forEach(childField -> {
+                boolean shouldRemoveCaseViewField = false;
+                LOG.info("childField => {} access profiles => {} access => {} access control lists => {}",
+                    childField.getId(), accessProfiles, access, childField.getAccessControlLists());
                 if (!hasAccessControlList(accessProfiles, access, childField.getAccessControlLists())) {
+                    LOG.info("No access for child {} - changing display context to readonly", childField.getId());
                     CommonField childCaseViewField = findNestedField(caseViewField, childField.getId());
                     childCaseViewField.setDisplayContext(READONLY);
 
-                    if (shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId, caseReference, eventId,
+                    shouldRemoveCaseViewField = shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId, caseReference, eventId,
                         isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents,
-                        caseViewField.getId(), childField, accessProfiles)) {
+                        childCaseViewField.getId(), childField, accessProfiles);
+                    if (shouldRemoveCaseViewField) {
+                        LOG.info("removed from parent {} and child is {} ",
+                            caseViewField.getId(), childCaseViewField.getId());
                         caseViewField.getFieldTypeDefinition().getChildren().remove(childCaseViewField);
                     }
 
@@ -315,7 +322,7 @@ public interface AccessControlService {
                     optionalWizardPageField.ifPresent(wizardPageField ->
                         setOverrideAsReadOnlyIfNotReadOnly(wizardPageField, rootFieldId, childField));
                 }
-                if (childField.isCompoundFieldType()) {
+                if (!shouldRemoveCaseViewField && childField.isCompoundFieldType()) {
                     setChildrenAsReadOnlyIfNoAccess(
                         caseTypeId,
                         caseReference,
@@ -601,6 +608,7 @@ public interface AccessControlService {
                                         List<AccessControlList> accessControlLists,
                                         Predicate<AccessControlList> criteria) {
         Set<String> accessProfileNames = extractAccessProfileNames(accessProfiles);
+        LOG.info("access profile names => {} ", accessProfileNames);
         return accessControlLists != null && accessControlLists
             .stream()
             .filter(acls -> accessProfileNames.contains(acls.getAccessProfile()))
