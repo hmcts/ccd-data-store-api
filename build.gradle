@@ -120,12 +120,15 @@ configurations {
     providedRuntime
     annotationProcessor
 //    runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
+    runtime.exclude group: 'ch.qos.logback', module: 'logback-classic'
+    runtime.exclude group: 'ch.qos.logback', module: 'logback-core'
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
     contractTestCompile.extendsFrom(testCompile)
     contractTestRuntime.extendsFrom(testRuntime)
     cucumberRuntime.extendsFrom(functionalRuntime)
+
 }
 
 //This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
@@ -252,8 +255,8 @@ dependencies {
     // for sonar analysis
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
-    testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
-    testCompile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
 
     //excluding log4j-core which causes a vulnerability issue
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
