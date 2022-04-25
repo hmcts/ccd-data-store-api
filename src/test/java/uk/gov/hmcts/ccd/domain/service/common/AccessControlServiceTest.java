@@ -249,7 +249,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("ACL tests - CaseStateDefinition")
-    class CanAccessCaseStateWithCriteria_AclTests {
+    class CanAccessCaseStateWithCriteriaAclTests {
 
         @Test
         @DisplayName("Should not grant access to case state with relevant acl missing")
@@ -402,7 +402,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("ACL tests")
-    class CanAccessCaseFieldsWithCriteria_AclTests {
+    class CanAccessCaseFieldsWithCriteriaAclTests {
 
         @Test
         @DisplayName("Should fail to grant access to fields if acls are missing")
@@ -582,7 +582,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("text value tests")
-    class CanAccessCaseFieldsWithCriteria_TextValueType {
+    class CanAccessCaseFieldsWithCriteriaTextValueType {
 
         @Test
         @DisplayName("Should grant access to case fields with text value")
@@ -638,7 +638,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("collection value tests")
-    class CanAccessCaseFieldsWithCriteria_CollectionValueType {
+    class CanAccessCaseFieldsWithCriteriaCollectionValueType {
 
         @Test
         @DisplayName("Should grant access to case fields with collection")
@@ -716,7 +716,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("complex value tests")
-    class CanAccessCaseFieldsWithCriteria_ComplexValueType {
+    class CanAccessCaseFieldsWithCriteriaComplexValueType {
 
         @Test
         @DisplayName("Should grant access to case fields with complex object")
@@ -775,7 +775,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case fields upsert ACL tests")
-    class CanAccessCaseFieldsForUpsert_AclTests {
+    class CanAccessCaseFieldsForUpsertAclTests {
 
         @Test
         @DisplayName("Should not grant access to field if field acls are missing for update")
@@ -1223,7 +1223,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case event ACL tests")
-    class CanAccessCaseEventWithCriteria_AclTests {
+    class CanAccessCaseEventWithCriteriaAclTests {
 
         @Test
         @DisplayName("Should not grant access to event if acls are missing")
@@ -1357,7 +1357,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case ACL tests")
-    class CanAccessCaseTypeWithCriteria_AclTests {
+    class CanAccessCaseTypeWithCriteriaAclTests {
 
         @Test
         @DisplayName("Should not grant access to case if acls are missing")
@@ -1436,7 +1436,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case fields ACL tests")
-    class ReturnsDataWithCaseFieldReadAccess_AclTests {
+    class ReturnsDataWithCaseFieldReadAccessAclTests {
 
         @Test
         @DisplayName("Should not return data if field acls are missing")
@@ -1666,7 +1666,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("return fields data with text value tests")
-    class ReturnsDataWithCaseFieldAccess_TextValueType {
+    class ReturnsDataWithCaseFieldAccessTextValueType {
 
         @Test
         @DisplayName("Should not return data if field ACL false and empty text")
@@ -1735,7 +1735,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("return fields data with collection value tests")
-    class ReturnsDataWithCaseFieldAccess_CollectionValueType {
+    class ReturnsDataWithCaseFieldAccessCollectionValueType {
         private static final String VALUE = "value";
         private static final String ID = "id";
 
@@ -2162,7 +2162,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("return fields data with complex value tests")
-    class ReturnsDataWithCaseFieldReadAccess_ComplexValueType {
+    class ReturnsDataWithCaseFieldReadAccessComplexValueType {
 
         @Test
         @DisplayName("Should return data if field with complex object")
@@ -2265,7 +2265,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case type ACL tests")
-    class ReturnsDataWithCaseType_AclTests {
+    class ReturnsDataWithCaseTypeAclTests {
 
         @Test
         @DisplayName("Should not return event if event is missing")
@@ -2285,7 +2285,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case audit events ACL tests")
-    class ReturnsDataWithCaseEventReadAccess_AclTests {
+    class ReturnsDataWithCaseEventReadAccessAclTests {
 
         @Test
         @DisplayName("Should not return audit event if event is missing")
@@ -2498,31 +2498,13 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case event trigger ACL tests")
-    class ReturnsCaseEventTriggerDataWithCaseFieldReadonly_AclTests {
+    class ReturnsCaseEventTriggerDataWithCaseFieldReadonlyAclTests {
 
         @Test
         @DisplayName("Should set readonly flag if relevant acl missing")
         void shouldSetReadonlyFlagIfRelevantAclMissing() {
-            final CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
-                    .withAcl(anAcl()
-                        .withRole(ROLE_NOT_IN_USER_ROLES)
-                        .withCreate(true)
-                        .withUpdate(true)
-                        .withRead(true)
-                        .build())
-                    .build())
-                .build();
-
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            final CaseTypeDefinition caseType = defaultCaseTypeDefinition();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -2545,26 +2527,8 @@ public class AccessControlServiceTest {
         void shouldRemoveFieldIfRelevantAclMissingWithMultipartyFix() {
             setApplicationParamsForTest();
 
-            final CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
-                    .withAcl(anAcl()
-                        .withRole(ROLE_NOT_IN_USER_ROLES)
-                        .withCreate(true)
-                        .withUpdate(true)
-                        .withRead(true)
-                        .build())
-                    .build())
-                .build();
-
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            final CaseTypeDefinition caseType = defaultCaseTypeDefinition();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -2587,26 +2551,56 @@ public class AccessControlServiceTest {
             Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList(CASE_TYPE_ID));
             Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(singletonList("*"));
 
-            final CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
-                    .withAcl(anAcl()
-                        .withRole(ROLE_NOT_IN_USER_ROLES)
-                        .withCreate(true)
-                        .withUpdate(true)
-                        .withRead(true)
-                        .build())
-                    .build())
-                .build();
+            final CaseTypeDefinition caseType = defaultCaseTypeDefinition();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertEquals(0, eventTrigger.getCaseFields().size());
+        }
+
+        @Test
+        @DisplayName("Should remove field if relevant acl missing with multiparty fix for all case types and events")
+        void shouldRemoveFieldIfRelevantAclMissingWithMultipartyFixForAllCaseTypesAndEvents() {
+            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList("*"));
+            Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(singletonList("*"));
+
+            final CaseTypeDefinition caseType = defaultCaseTypeDefinition();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
+
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertEquals(0, eventTrigger.getCaseFields().size());
+        }
+
+        @Test
+        @DisplayName("Should remove field if relevant acl missing with multiparty fix for all case types")
+        void shouldRemoveFieldIfRelevantAclMissingWithMultipartyFixForAllCaseTypesAndSpecificEvent() {
+            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList("*"));
+            Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(singletonList(EVENT_ID));
+
+            final CaseTypeDefinition caseType = defaultCaseTypeDefinition();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -2629,26 +2623,8 @@ public class AccessControlServiceTest {
             Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList(CASE_TYPE_ID));
             Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(asList(EVENT_ID, "VALID_EVENT"));
 
-            final CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
-                    .withAcl(anAcl()
-                        .withRole(ROLE_NOT_IN_USER_ROLES)
-                        .withCreate(true)
-                        .withUpdate(true)
-                        .withRead(true)
-                        .build())
-                    .build())
-                .build();
-
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            final CaseTypeDefinition caseType = defaultCaseTypeDefinition();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -2665,32 +2641,14 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should remove field if relevant acl missing with multiparty fix for invalid event")
-        void shouldRemoveFieldIfRelevantAclMissingWithMultipartyFixForInvalidEvent() {
+        @DisplayName("Should not remove field if relevant acl missing with multiparty fix for invalid event")
+        void shouldNotRemoveFieldIfRelevantAclMissingWithMultipartyFixForInvalidEvent() {
             Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
-            Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList(CASE_TYPE_ID));
+            Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList("*"));
             Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(singletonList("INVALID_EVENT"));
 
-            final CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
-                    .withAcl(anAcl()
-                        .withRole(ROLE_NOT_IN_USER_ROLES)
-                        .withCreate(true)
-                        .withUpdate(true)
-                        .withRead(true)
-                        .build())
-                    .build())
-                .build();
-
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            final CaseTypeDefinition caseType = defaultCaseTypeDefinition();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -2707,32 +2665,14 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should remove field if relevant acl missing with multiparty fix for invalid case type")
-        void shouldRemoveFieldIfRelevantAclMissingWithMultipartyFixForInvalidCaseType() {
+        @DisplayName("Should not remove field if relevant acl missing with multiparty fix for invalid case type")
+        void shouldNotRemoveFieldIfRelevantAclMissingWithMultipartyFixForInvalidCaseType() {
             Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
             Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList("INVALID_CASE_TYPE"));
             Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(singletonList("*"));
 
-            final CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
-                    .withAcl(anAcl()
-                        .withRole(ROLE_NOT_IN_USER_ROLES)
-                        .withCreate(true)
-                        .withUpdate(true)
-                        .withRead(true)
-                        .build())
-                    .build())
-                .build();
-
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            final CaseTypeDefinition caseType = defaultCaseTypeDefinition();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -2765,14 +2705,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -2793,26 +2726,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should set readonly flag if relevant field acl missing")
         void shouldSetReadonlyFlagIfRelevantFieldACLMissing() {
-            final CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withCreate(true)
-                        .withUpdate(true)
-                        .withRead(true)
-                        .build())
-                    .build())
-                .build();
-
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("test")
-                        .build())
-                .build();
+            final CaseTypeDefinition caseType = defaultCaseTypeDefinition();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -2835,26 +2750,8 @@ public class AccessControlServiceTest {
         void shouldRemoveFieldIfRelevantFieldACLMissingWithMultipartyFix() {
             setApplicationParamsForTest();
 
-            final CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withCreate(true)
-                        .withUpdate(true)
-                        .withRead(true)
-                        .build())
-                    .build())
-                .build();
-
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("test")
-                        .build())
-                .build();
+            final CaseTypeDefinition caseType = defaultCaseTypeDefinition();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -4004,13 +3901,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 CASE_TYPE_ID,
@@ -4039,13 +3930,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -4141,13 +4026,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 CASE_TYPE_ID,
@@ -4183,13 +4062,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            CaseUpdateViewEvent caseEventTrigger = defaultCaseUpdateViewEvent();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 CASE_TYPE_ID,
@@ -4289,11 +4162,36 @@ public class AccessControlServiceTest {
                     not(hasProperty("displayContext", is(READONLY))))))
             );
         }
+
+        private CaseTypeDefinition defaultCaseTypeDefinition() {
+            return newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
+                .build();
+        }
+
+        private CaseUpdateViewEvent defaultCaseUpdateViewEvent() {
+            return newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
+                        .withId("Addresses")
+                        .build())
+                .build();
+        }
     }
 
     @Nested
     @DisplayName("case event definitions ACL tests")
-    class ReturnsCaseEventsDataWithCaseEventAccess_AclTests {
+    class ReturnsCaseEventsDataWithCaseEventAccessAclTests {
 
         @Test
         @DisplayName("Should not return case event definition if relevant acl missing")
@@ -4438,7 +4336,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case view fields ACL tests")
-    class CaseViewFields_AclTests {
+    class CaseViewFieldsAclTests {
 
         @Test
         @DisplayName("Should not return case event definition if relevant acl missing")
