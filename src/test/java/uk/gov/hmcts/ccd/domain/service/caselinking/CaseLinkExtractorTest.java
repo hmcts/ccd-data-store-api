@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldMetadata;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataExtractor;
 
 import java.io.IOException;
@@ -190,11 +191,11 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
         // mock path extract based on the above
         when(caseDataExtractor.extractFieldTypePaths(anyMap(), eq(caseFieldDefinitions), eq(TEXT_CASE_REFERENCE)))
             .thenReturn(List.of(
-                "CaseLinkField",
-                "CaseLinkCollection.0.value.CaseReference",
-                "CaseLinkCollection.1.value.CaseReference",
-                "CaseLinkCollection.2.value.CaseReference",
-                "CaseLinkCollection.3.value.CaseReference"
+                new CaseFieldMetadata("CaseLinkField", null),
+                new CaseFieldMetadata("CaseLinkCollection.0.value.CaseReference", null),
+                new CaseFieldMetadata("CaseLinkCollection.1.value.CaseReference", null),
+                new CaseFieldMetadata("CaseLinkCollection.2.value.CaseReference", null),
+                new CaseFieldMetadata("CaseLinkCollection.3.value.CaseReference", null)
             ));
 
         // ACT
@@ -347,22 +348,22 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
     private void mockCaseDetailsExtractor(boolean includeSimpleCaseLink,
                                           boolean includeCollectionOfCaseLinks,
                                           boolean includeStandardCaseLinksField) {
-        List<String> dataPaths = new ArrayList<>();
+        List<CaseFieldMetadata> paths = new ArrayList<>();
 
         if (includeSimpleCaseLink) {
-            dataPaths.add("CaseLinkField");
+            paths.add(new CaseFieldMetadata("CaseLinkField", null));
         }
         if (includeCollectionOfCaseLinks) {
-            dataPaths.add("CaseLinkCollection.0.value.CaseReference");
-            dataPaths.add("CaseLinkCollection.1.value.CaseReference");
+            paths.add(new CaseFieldMetadata("CaseLinkCollection.0.value.CaseReference", null));
+            paths.add(new CaseFieldMetadata("CaseLinkCollection.1.value.CaseReference", null));
         }
         if (includeStandardCaseLinksField) {
-            dataPaths.add(STANDARD_CASE_LINK_FIELD + ".0.value.CaseReference");
-            dataPaths.add(STANDARD_CASE_LINK_FIELD + ".1.value.CaseReference");
+            paths.add(new CaseFieldMetadata(STANDARD_CASE_LINK_FIELD + ".0.value.CaseReference", null));
+            paths.add(new CaseFieldMetadata(STANDARD_CASE_LINK_FIELD + ".1.value.CaseReference", null));
         }
 
         when(caseDataExtractor.extractFieldTypePaths(anyMap(), eq(caseFieldDefinitions), eq(TEXT_CASE_REFERENCE)))
-            .thenReturn(dataPaths);
+            .thenReturn(paths);
     }
 
     private CaseFieldDefinition findCaseFieldDefinition(String id) {

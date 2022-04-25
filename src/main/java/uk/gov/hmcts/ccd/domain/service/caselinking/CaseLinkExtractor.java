@@ -37,7 +37,7 @@ public class CaseLinkExtractor {
         List<String> allLinkedCaseReferences =
             caseDataExtractor.extractFieldTypePaths(data, caseFieldDefinitions, TEXT_CASE_REFERENCE)
                 .stream()
-                .map(pathToCaseReference -> JacksonUtils.getValueFromPath(pathToCaseReference, data))
+                .map(metadata -> JacksonUtils.getValueFromPath(metadata.getPath(), data))
                 .filter(StringUtils::isNotBlank)
                 .distinct()
                 .collect(Collectors.toList());
