@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-1019_GetCreateToken_ComplexCollectionComplex_CreateCaseLink",
+  "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
+
+  "specs": [
+    "to create a token for case creation",
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_ComplexCollectionComplex",
+      "etid": "createCaseLink"
+    }
+  },
+
+
+  "expectedResponse": {
+    "body": {
+      "event_id": "createCaseLink"
+    }
+  }
+}
