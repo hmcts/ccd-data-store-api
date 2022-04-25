@@ -33,7 +33,7 @@ public class CaseLinkExtractor {
         // extract all the paths to CaseLink fields and then processes the paths back into the raw data
         return caseDataExtractor.extractFieldTypePaths(data, caseFieldDefinitions, TEXT_CASE_REFERENCE)
             .stream()
-            .map(caseReference ->  JacksonUtils.getValueFromPath(caseReference, data))
+            .map(metadata ->  JacksonUtils.getValueFromPath(metadata.getPath(), data))
             .filter(StringUtils::isNotBlank)
             .collect(Collectors.toList());
     }

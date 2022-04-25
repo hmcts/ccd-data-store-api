@@ -1,71 +1,94 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.vavr.control.Either;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
-import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
-import uk.gov.hmcts.ccd.domain.types.DocumentValidator;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.service.common.CaseFieldMetadataExtractor.FIELD_SEPARATOR;
 
+@Named
 @Slf4j
-@Service
 public class CaseDataExtractor {
     private static final String EMPTY_STRING = "";
-    private static final String FIELD_SEPARATOR = ".";
+    private static final String VALUE_FIELD = "value";
+    private static final String DOCUMENT_TYPE_ID = "Document";
 
-    public List<String> extractFieldTypePaths(final Map<String, JsonNode> data,
-                                              final List<CaseFieldDefinition> caseFieldDefinitions,
-                                              final String fieldType) {
+    private final CaseFieldMetadataExtractor simpleCaseTypeMetadataExtractor;
+    private final CaseFieldMetadataExtractor complexCaseTypeMetadataExtractor;
+
+    @Inject
+    public CaseDataExtractor(final CaseFieldMetadataExtractor simpleCaseTypeMetadataExtractor,
+                             final CaseFieldMetadataExtractor complexCaseTypeMetadataExtractor) {
+        this.simpleCaseTypeMetadataExtractor = simpleCaseTypeMetadataExtractor;
+        this.complexCaseTypeMetadataExtractor = complexCaseTypeMetadataExtractor;
+    }
+
+    public List<CaseFieldMetadata> extractFieldTypePaths(final Map<String, JsonNode> data,
+                                                         final List<CaseFieldDefinition> caseFieldDefinitions,
+                                                         final String fieldType) {
         return extractFieldTypePaths(
             data,
             caseFieldDefinitions,
-            CaseDataExtractor.EMPTY_STRING,
+            EMPTY_STRING,
             Collections.emptyList(),
-            fieldType);
+            fieldType
+        );
     }
 
-    public List<String> extractFieldTypePaths(final Map<String, JsonNode> data,
-                                              final List<CaseFieldDefinition> caseFieldDefinitions,
-                                              final String fieldIdPrefix,
-                                              List<String> paths,
-                                              final String fieldType) {
+    private List<CaseFieldMetadata> extractFieldTypePaths(final Map<String, JsonNode> data,
+                                                          final List<CaseFieldDefinition> caseFieldDefinitions,
+                                                          final String fieldIdPrefix,
+                                                          final List<CaseFieldMetadata> paths,
+                                                          final String fieldType) {
         return (data == null)
             ? Collections.emptyList()
             : data.entrySet().stream()
-                .map(caseDataPair -> caseFieldDefinitions.stream()
-                    .filter(caseField -> caseField.getId().equalsIgnoreCase(caseDataPair.getKey()))
-                    .findAny()
-                    .map(caseField -> extractField(
-                        caseDataPair.getKey(),
-                        caseDataPair.getValue(),
-                        caseField,
-                        fieldIdPrefix,
-                        paths,fieldType
-                    ))
-                    .orElseGet(Collections::emptyList))
+            .map(entry -> extractMetadata(entry, caseFieldDefinitions, fieldIdPrefix, paths, fieldType))
             .flatMap(List::stream)
-            .collect(Collectors.toList());
+            .collect(Collectors.toUnmodifiableList());
     }
 
-    private List<String> extractField(final String dataFieldId,
-                                                final JsonNode dataValue,
-                                                final CaseFieldDefinition caseFieldDefinition,
-                                                final String fieldIdPrefix,
-                                                List<String> paths,
-                                                String fieldType) {
+    private List<CaseFieldMetadata> extractMetadata(final Map.Entry<String, JsonNode> caseDataPair,
+                                                    final List<CaseFieldDefinition> caseFieldDefinitions,
+                                                    final String fieldIdPrefix,
+                                                    final List<CaseFieldMetadata> paths,
+                                                    final String fieldType) {
+        return caseFieldDefinitions.stream()
+            .filter(caseField -> caseField.getId().equalsIgnoreCase(caseDataPair.getKey()))
+            .findAny()
+            .map(caseField -> extractField(
+                caseDataPair,
+                caseField,
+                fieldIdPrefix,
+                paths,
+                fieldType
+            ))
+            .orElseGet(Collections::emptyList);
+    }
+
+    private List<CaseFieldMetadata> extractField(final Map.Entry<String, JsonNode> nodeEntry,
+                                                 final CaseFieldDefinition caseFieldDefinition,
+                                                 final String fieldIdPrefix,
+                                                 final List<CaseFieldMetadata> paths,
+                                                 final String fieldType) {
+
         final String caseFieldType = caseFieldDefinition.getFieldTypeDefinition().getType();
 
         if (isNotABaseType(caseFieldType)) {
@@ -75,90 +98,79 @@ public class CaseDataExtractor {
 
         final BaseType baseFieldType = BaseType.get(caseFieldType);
 
-        if (BaseType.get(COMPLEX) == baseFieldType) {
-            return extractFieldTypePaths(
-                JacksonUtils.convertValue(dataValue),
-                caseFieldDefinition.getFieldTypeDefinition().getComplexFields(),
-                fieldIdPrefix + dataFieldId + FIELD_SEPARATOR, paths, fieldType
-            );
-        } else if (BaseType.get(COLLECTION) == baseFieldType) {
-            return extractCollectionField(
-                                            dataFieldId,
-                                            dataValue,
-                                            caseFieldDefinition,
-                                            fieldIdPrefix,
-                                            fieldType,
-                                            paths
-            );
-        } else {
-            return extractSimpleField(
-                                        dataFieldId,
-                                        caseFieldDefinition,
-                                        fieldIdPrefix,
-                                        fieldType,
-                                        paths
-            );
-        }
-    }
-
-    private List<String> extractSimpleField(final String fieldId,
-                                                      final CaseFieldDefinition caseFieldDefinition,
-                                                      final String fieldIdPrefix,
-                                                      final String fieldType,
-                                                      List<String> paths) {
-        List<String> returnValue = new ArrayList<>(paths);
-        FieldTypeDefinition fieldTypeDefinition = caseFieldDefinition.getFieldTypeDefinition();
-
-        if (fieldTypeDefinition.getId() != null && caseFieldDefinition.getFieldTypeDefinition().getId()
-            .equals(fieldType)) {
-            returnValue.add(fieldIdPrefix + fieldId);
+        if (BaseType.get(COLLECTION) == baseFieldType) {
+            return extractCollectionField(nodeEntry, caseFieldDefinition, fieldIdPrefix, fieldType, paths);
         }
 
-        return returnValue;
+        final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> either =
+            Stream.of(simpleCaseTypeMetadataExtractor, complexCaseTypeMetadataExtractor)
+                .filter(extractor -> extractor.matches(baseFieldType))
+                .findFirst()
+                .orElseThrow()
+                .extractCaseFieldData(nodeEntry, caseFieldDefinition, fieldIdPrefix, fieldType, paths);
+
+        return either.fold(
+            this::leftMapper,
+            right -> right
+        );
     }
 
-    private List<String> extractCollectionField(final String dataFieldId,
-                                                final JsonNode dataValue,
-                                                final CaseFieldDefinition caseFieldDefinition,
-                                                final String fieldIdPrefix,
-                                                final String fieldType,
-                                                List<String> paths) {
-        final List<String> extractionResults =
-            extractSimpleField(
-                dataFieldId,
-                caseFieldDefinition,
-                fieldIdPrefix,
-                fieldType,
-                paths
-            );
-        final Iterator<JsonNode> collectionIterator = dataValue.iterator();
+    private List<CaseFieldMetadata> leftMapper(CaseFieldMetadataExtractor.RecursionParams left) {
+        return extractFieldTypePaths(
+            left.getData(),
+            left.getCaseFieldDefinitions(),
+            left.getFieldIdPrefix(),
+            left.getPaths(),
+            left.getFieldType()
+        );
+    }
+
+    private List<CaseFieldMetadata> extractCollectionField(final Map.Entry<String, JsonNode> nodeEntry,
+                                                           final CaseFieldDefinition caseFieldDefinition,
+                                                           final String fieldIdPrefix,
+                                                           final String fieldType,
+                                                           final List<CaseFieldMetadata> paths) {
+        final List<CaseFieldMetadata> extractionResults = simpleCaseTypeMetadataExtractor.extractCaseFieldData(
+            nodeEntry,
+            caseFieldDefinition,
+            fieldIdPrefix,
+            fieldType,
+            paths
+        ).get();
+
+        List<CaseFieldMetadata> tempList = new ArrayList<>(extractionResults);
+
+        final Iterator<JsonNode> collectionIterator = nodeEntry.getValue().iterator();
 
         int index = 0;
         while (collectionIterator.hasNext()) {
             final JsonNode itemValue = collectionIterator.next();
-            extractionResults.addAll(
+            tempList.addAll(
                 extractCollectionItem(
                     caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition(),
-                    itemValue,
-                    fieldIdPrefix + dataFieldId + FIELD_SEPARATOR, Integer.toString(index),
+                    new AbstractMap.SimpleEntry<>(Integer.toString(index), itemValue),
+                    fieldIdPrefix + nodeEntry.getKey() + FIELD_SEPARATOR,
                     paths,
-                    fieldType
+                    fieldType,
+                    null //caseFieldDefinition.getCategoryId() uncomment when RDM-13090 gets merged
                 )
             );
             index++;
         }
-        return extractionResults;
+
+        return Collections.unmodifiableList(tempList);
     }
 
-    private List<String> extractCollectionItem(FieldTypeDefinition fieldTypeDefinition,
-                                               JsonNode item,
-                                               String fieldIdPrefix,
-                                               String index,
-                                               List<String> paths,
-                                               String fieldType) {
+    private List<CaseFieldMetadata> extractCollectionItem(final FieldTypeDefinition fieldTypeDefinition,
+                                                          final Map.Entry<String, JsonNode> nodeEntry,
+                                                          final String fieldIdPrefix,
+                                                          final List<CaseFieldMetadata> paths,
+                                                          final String fieldType,
+                                                          final String categoryId) {
+        final String index = nodeEntry.getKey();
         final String itemFieldId = fieldIdPrefix + index;
 
-        final JsonNode itemValue = item.get(CollectionValidator.VALUE);
+        final JsonNode itemValue = nodeEntry.getValue().get(VALUE_FIELD);
 
         if (null == itemValue) {
             return Collections.emptyList();
@@ -172,17 +184,23 @@ public class CaseDataExtractor {
             final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
             caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
             caseFieldDefinition.setId(index);
-            return extractSimpleField(index,
-                                        caseFieldDefinition,
-                                        fieldIdPrefix,
-                                        fieldType,
-                                        paths
-            );
+            //caseFieldDefinition.setCategoryId(categoryId); uncomment when RDM-13090 gets merged
+
+            return simpleCaseTypeMetadataExtractor.extractCaseFieldData(
+                nodeEntry,
+                caseFieldDefinition,
+                fieldIdPrefix,
+                fieldType,
+                paths
+            ).get();
         } else if (itemValue.isObject()) {
             return extractFieldTypePaths(
                 JacksonUtils.convertValue(itemValue),
                 fieldTypeDefinition.getComplexFields(),
-                itemFieldId + FIELD_SEPARATOR, paths, fieldType);
+                itemFieldId + FIELD_SEPARATOR,
+                paths,
+                fieldType
+            );
         }
 
         return Collections.emptyList();
@@ -190,7 +208,7 @@ public class CaseDataExtractor {
 
     private boolean shouldTreatAsValueNode(FieldTypeDefinition fieldTypeDefinition, JsonNode itemValue) {
         return itemValue.isValueNode()
-            || fieldTypeDefinition.getType().equalsIgnoreCase(DocumentValidator.TYPE_ID)
+            || fieldTypeDefinition.getType().equalsIgnoreCase(DOCUMENT_TYPE_ID)
             || isDynamicListNode(fieldTypeDefinition);
     }
 

@@ -1,0 +1,24 @@
+{
+  "_guid_": "F-1019-CaseDataWithNestedComplexCaseLinks",
+
+  "CaseLinkCollection": [
+    {
+      "id": "e65b6db6-0000-CollectionCase1",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      }
+    },
+    {
+      "id": "12e28699-0000-CollectionCase2",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      }
+    }
+  ],
+
+  "CaseLinkComplex": {
+    "CaseLinkField": {
+      "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    }
+  }
+}
