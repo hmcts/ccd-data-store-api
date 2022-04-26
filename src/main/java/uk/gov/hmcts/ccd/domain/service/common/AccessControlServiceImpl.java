@@ -211,20 +211,17 @@ public class AccessControlServiceImpl implements AccessControlService {
 
                 if (caseFieldOpt.isPresent()) {
                     CaseFieldDefinition field = caseFieldOpt.get();
-                    boolean shouldRemoveCaseViewField = false;
-
                     if (!hasAccessControlList(accessProfiles, access, field.getAccessControlLists())) {
-                        shouldRemoveCaseViewField = shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId,
-                            caseReference, eventId, isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents,
-                            caseViewFieldId, field, accessProfiles);
                         caseViewField.setDisplayContext(READONLY);
-
-                        if (shouldRemoveCaseViewField) {
+                        if (shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId, caseReference, eventId,
+                            isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents, caseViewFieldId,
+                            field, accessProfiles)) {
                             filteredCaseFieldIds.add(caseViewField.getId());
+                            return;
                         }
                     }
 
-                    if (!shouldRemoveCaseViewField && field.isCompoundFieldType()) {
+                    if (field.isCompoundFieldType()) {
                         setChildrenAsReadOnlyIfNoAccess(caseTypeId, caseReference, eventId, isMultipartyFixEnabled,
                             multipartyCaseTypes, multipartyEvents, caseEventTrigger.getWizardPages(), field.getId(),
                             field, access, accessProfiles, caseViewField);

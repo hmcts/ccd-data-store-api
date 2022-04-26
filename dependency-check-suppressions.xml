@@ -74,7 +74,6 @@
 
 	<suppress until="2022-05-25">
 		<cve>CVE-2022-23708</cve>
-		<cve>CVE-2022-22968</cve>
 	</suppress>
 
 
