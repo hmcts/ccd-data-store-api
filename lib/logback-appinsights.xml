@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <appender name="APP_INSIGHTS" class="ch.qos.logback.core.ConsoleAppender">
+    </appender>
+
+    <logger name="uk.gov.hmcts" level="${ROOT_LOGGING_LEVEL:-INFO}">
+        <appender-ref ref="APP_INSIGHTS" />
+    </logger>
+</included>
