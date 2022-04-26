@@ -12,12 +12,12 @@
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      "caseId": "${[scenarioContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
         "CaseLinkField": {
-          "CaseReference": "INVALID_CASE_REF"
+          "CaseReference": "4444333322221111"
         },
         "TextField" : "S-1018.37"
       },
@@ -41,7 +41,7 @@
       "details" : {
         "field_errors" : [ {
           "id" : "CaseLinkField.CaseReference",
-          "message" : "The data entered is not valid for this type of field, please delete and re-enter using only valid data"
+          "message" : "4444333322221111 does not correspond to an existing CCD case."
         } ]
       },
       "callbackErrors" : null,

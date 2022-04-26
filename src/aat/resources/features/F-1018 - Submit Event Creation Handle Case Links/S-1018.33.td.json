@@ -6,13 +6,13 @@
 
   "specs": [
     "an active profile in CCD",
-    "contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCaseworkerBase",
+    "contains correctly configured CaseLink field with Case Reference created in F-1018_CreateLinkedCasePreRequisiteCaseworkerBase",
     "does not specify a case to be updated"
   ],
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      "caseId": "${[scenarioContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
@@ -34,7 +34,7 @@
 
   "expectedResponse": {
     "body" : {
-      "id": "${}${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+      "id": "${}${[scenarioContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
       "data" : {
         "CaseLinkField": {
           "CaseReference": null
