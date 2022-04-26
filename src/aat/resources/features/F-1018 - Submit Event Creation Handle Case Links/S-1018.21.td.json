@@ -2,7 +2,7 @@
   "_guid_": "S-1018.21",
   "_extends_": "F-1018_Test_Data_Base_Citizen",
 
-  "title": "Case Link does not exist at present and CaseLink field in the Request contains CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
+  "title": "Case Link does not exist at present and CaseLink field in the Request contains CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST",
 
   "specs": [
     "an active profile in CCD",

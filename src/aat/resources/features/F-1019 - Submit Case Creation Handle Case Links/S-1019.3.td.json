@@ -21,7 +21,7 @@
         "CaseLinkField": {
           "CaseReference": "7247798054644494"
         },
-        "TextField" : "S-1019.2"
+        "TextField" : "S-1019.3"
       },
       "event": {
         "id": "createCaseCaseLinks",

@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -74,6 +75,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     private static final long CASE_REFERENCE = 999999L;
     private static final String JURISDICTION_ID = "JeyOne";
     private static final String CASE_TYPE_ID = "CaseTypeOne";
+    private static final String WRONG_CASE_TYPE_ID = "CaseTypeWrong";
     private static final String JURISDICTION = "PROBATE";
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final Long REFERENCE = 1504259907353529L;
@@ -582,6 +584,103 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
 
         assertCaseDetails(caseDetails, "1", JURISDICTION, REFERENCE);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByParamsWithLimit_shouldFindSingleRecord() {
+
+        // GIVEN
+        MigrationParameters parameters = MigrationParameters.builder()
+            .caseTypeId(CASE_01_TYPE)
+            .jurisdictionId(JURISDICTION)
+            .caseDataId(CASE_01_ID)
+            .numRecords(1)
+            .build();
+
+        // WHEN
+        final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
+
+        // THEN
+        assertEquals(1, results.size());
+        assertCaseDetails(results.get(0), CASE_01_ID.toString(), JURISDICTION, Long.parseLong(CASE_01_REFERENCE));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByParamsWithLimit_shouldFindManyRecords() {
+
+        // GIVEN
+        MigrationParameters parameters = MigrationParameters.builder()
+            .caseTypeId(CASE_01_TYPE)
+            .jurisdictionId(JURISDICTION)
+            .caseDataId(CASE_01_ID)
+            .numRecords(5)
+            .build();
+
+        // WHEN
+        final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
+
+        // THEN
+        assertEquals(5, results.size());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByParamsWithLimit_shouldChangeStartingRecord() {
+
+        // GIVEN
+        MigrationParameters parameters = MigrationParameters.builder()
+            .caseTypeId(CASE_01_TYPE)
+            .jurisdictionId(JURISDICTION)
+            .caseDataId(CASE_03_ID)
+            .numRecords(1)
+            .build();
+
+        // WHEN
+        final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
+
+        // THEN
+        assertEquals(1, results.size());
+        assertCaseDetails(results.get(0), CASE_03_ID.toString(), JURISDICTION, Long.parseLong(CASE_03_REFERENCE));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByParamsWithLimit_shouldFilterOnJurisdiction() {
+
+        // GIVEN
+        MigrationParameters parameters = MigrationParameters.builder()
+            .caseTypeId(CASE_01_TYPE)
+            .jurisdictionId(WRONG_JURISDICTION)
+            .caseDataId(CASE_01_ID)
+            .numRecords(1)
+            .build();
+
+        // WHEN
+        final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
+
+        // THEN
+        assertEquals(0, results.size());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByParamsWithLimit_shouldFilterOnCaseType() {
+
+        // GIVEN
+        MigrationParameters parameters = MigrationParameters.builder()
+            .caseTypeId(WRONG_CASE_TYPE_ID)
+            .jurisdictionId(JURISDICTION)
+            .caseDataId(CASE_01_ID)
+            .numRecords(1)
+            .build();
+
+        // WHEN
+        final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
+
+        // THEN
+        assertEquals(0, results.size());
     }
 
     private void assertCaseDetails(CaseDetails caseDetails, String id, String jurisdictionId, Long caseReference) {

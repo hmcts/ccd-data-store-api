@@ -3,7 +3,8 @@
   "_extends_": "Case_Creation_Data_Base",
 
   "specs": [
-    "to create a case"
+    "to create a case",
+    "As a prerequisite"
   ],
 
   "prerequisites" : [ {

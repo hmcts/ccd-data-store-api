@@ -920,4 +920,4 @@ INSERT INTO case_event (
          );
 
 INSERT INTO case_link(case_id, linked_case_id, case_type_id)
-VALUES (22, 3, 'TestAddressBookCaseCaseLinks');
+VALUES (22, 3, 'TestAddressBookCase');

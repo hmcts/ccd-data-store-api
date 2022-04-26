@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.casedeletion;
+package uk.gov.hmcts.ccd.domain.model.caselinking;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -23,4 +23,6 @@ public class CaseLink {
     @JsonIgnore
     private Long linkedCaseId;
     private String caseTypeId;
+
+    private Boolean standardLink;
 }

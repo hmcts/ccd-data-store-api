@@ -4,7 +4,7 @@ DELETE FROM case_link;
 
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
-VALUES (998, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
+VALUES (998, 'TestAddressBookCase1', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "George",
           "PersonLastName": "Roof",
@@ -39,7 +39,7 @@ VALUES (998, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
 
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
-VALUES (999, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
+VALUES (999, 'TestAddressBookCase2', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Peter",
           "PersonLastName": "Pullen",
@@ -73,7 +73,7 @@ VALUES (999, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
 
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, reference)
-VALUES (1000, 'TestAddressBookCase', 'PROBATE', 'Invalid', 'PUBLIC',
+VALUES (1000, 'TestAddressBookCase3', 'PROBATE', 'Invalid', 'PUBLIC',
         '{
           "PersonFirstName": "An",
           "PersonLastName": "Other",

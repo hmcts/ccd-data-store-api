@@ -28,11 +28,12 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationResult;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -48,7 +49,8 @@ import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_CAA;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_PROBATE;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_SSCS;
-import static uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink.builder;
+import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
+import static uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink.builder;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
 
@@ -58,6 +60,22 @@ class MigrationEndpointIT extends WireMockBaseTest {
     private static final String CASE_TYPE_ID = "TestAddressBookCaseCaseLinks";
     private static final String PROBATE_JURISDICTION_ID = "PROBATE";
     private static final String SSCS_JURISDICTION_ID = "SSCS";
+
+    // data values as per:
+    //                      classpath:sql/insert_cases_missing_case_link.sql
+    //                      classpath:sql/insert_cases_multiple_missing_case_link.sql
+    private static final Long CASE_LINKS_CASE_01_ID = 1L; // 3393027116986763
+    private static final Long CASE_LINKS_CASE_02_ID = 2L; // 1504259907353537
+    private static final Long CASE_LINKS_CASE_03_ID = 3L; // 1504259907353545
+    private static final Long CASE_LINKS_CASE_04_ID = 4L; // 1504259907353552
+    private static final Long CASE_LINKS_CASE_05_ID = 5L; // 1557845948403939
+    private static final Long CASE_LINKS_CASE_06_ID = 6L; // 1504254784737847
+    private static final String CASE_LINKS_CASE_01_TYPE = CASE_TYPE_ID;
+    private static final String CASE_LINKS_CASE_02_TYPE = "TestAddressBookCase";
+    private static final String CASE_LINKS_CASE_03_TYPE = CASE_TYPE_ID;
+    private static final String CASE_LINKS_CASE_04_TYPE = "TestAddressBookCase";
+    private static final String CASE_LINKS_CASE_05_TYPE = "TestAddressBookCaseCaseLinks";
+    private static final String CASE_LINKS_CASE_06_TYPE = "TestAddressBookCase";
 
     @Inject
     private WebApplicationContext wac;
@@ -95,7 +113,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
         void shouldPopulateCaseLinksWhereCaseHasSingleMissingCaseLink(String caseworkerRole) throws Exception {
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
+                new MigrationParameters(CASE_LINKS_CASE_01_TYPE, PROBATE_JURISDICTION_ID, CASE_LINKS_CASE_01_ID, 1);
 
             stubIdamAndRasRequests(caseworkerRole);
 
@@ -105,15 +123,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn();
 
-            Long expectedCaseId = 1L;
-            List<CaseLink> expectedCaseLinks = List.of(
-                builder()
-                    .caseId(expectedCaseId)
-                    .linkedCaseId(2L)
-                    .caseTypeId(CASE_TYPE_ID)
-                    .build()
-            );
-            assertCaseLinks(expectedCaseId, expectedCaseLinks);
+            assertCaseLinksMatch_missing_case_links(CASE_LINKS_CASE_01_ID);
         }
 
         @ParameterizedTest(
@@ -127,7 +137,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             scripts = {"classpath:sql/insert_cases_multiple_missing_case_link.sql"})
         void shouldPopulateCaseLinksWhereCaseHasMultipleMissingCaseLinks(String caseworkerRole) throws Exception {
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
+                new MigrationParameters(CASE_LINKS_CASE_01_TYPE, PROBATE_JURISDICTION_ID, CASE_LINKS_CASE_01_ID, 1);
 
             stubIdamAndRasRequests(caseworkerRole);
 
@@ -137,21 +147,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn();
 
-            Long expectedCaseId1 = 1L;
-            List<CaseLink> expectedCaseLinksCaseId1 = List.of(
-                builder()
-                    .caseId(expectedCaseId1)
-                    .linkedCaseId(2L)
-                    .caseTypeId(CASE_TYPE_ID)
-                    .build(),
-                builder()
-                    .caseId(expectedCaseId1)
-                    .linkedCaseId(5L)
-                    .caseTypeId(CASE_TYPE_ID)
-                    .build()
-            );
-
-            assertCaseLinks(expectedCaseId1, expectedCaseLinksCaseId1);
+            assertCaseLinksMatch_multiple_missing_case_links(CASE_LINKS_CASE_01_ID);
         }
 
         @ParameterizedTest(
@@ -167,7 +163,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             throws Exception {
 
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
+                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, CASE_LINKS_CASE_01_ID, 5);
 
             stubIdamAndRasRequests(caseworkerRole);
 
@@ -177,36 +173,8 @@ class MigrationEndpointIT extends WireMockBaseTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn();
 
-            Long expectedCaseId1 = 1L;
-            List<CaseLink> expectedCaseLinksCaseId1 = List.of(
-                builder()
-                    .caseId(expectedCaseId1)
-                    .linkedCaseId(2L)
-                    .caseTypeId(CASE_TYPE_ID)
-                    .build(),
-                builder()
-                    .caseId(expectedCaseId1)
-                    .linkedCaseId(5L)
-                    .caseTypeId(CASE_TYPE_ID)
-                    .build()
-            );
-
-            Long expectedCaseId2 = 3L;
-            List<CaseLink> expectedCaseLinksCaseId2 = List.of(
-                builder()
-                    .caseId(expectedCaseId2)
-                    .linkedCaseId(4L)
-                    .caseTypeId(CASE_TYPE_ID)
-                    .build(),
-                builder()
-                    .caseId(expectedCaseId2)
-                    .linkedCaseId(6L)
-                    .caseTypeId(CASE_TYPE_ID)
-                    .build()
-            );
-
-            assertCaseLinks(expectedCaseId1, expectedCaseLinksCaseId1);
-            assertCaseLinks(expectedCaseId2, expectedCaseLinksCaseId2);
+            assertCaseLinksMatch_multiple_missing_case_links(CASE_LINKS_CASE_01_ID);
+            assertCaseLinksMatch_multiple_missing_case_links(CASE_LINKS_CASE_03_ID);
         }
 
         @ParameterizedTest(name = "Should populate CaseLinks where case has existing CaseLink - #{index} - `{0}`")
@@ -218,7 +186,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
         void shouldPopulateCaseLinksWhereCaseHasExistingCaseLink(String caseworkerRole) throws Exception {
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
+                new MigrationParameters(CASE_LINKS_CASE_03_TYPE, PROBATE_JURISDICTION_ID, CASE_LINKS_CASE_03_ID, 1);
 
             stubIdamAndRasRequests(caseworkerRole);
 
@@ -228,16 +196,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn();
 
-            Long expectedCaseId = 3L;
-            List<CaseLink> expectedCaseLinksCaseId = List.of(
-                builder()
-                    .caseId(expectedCaseId)
-                    .linkedCaseId(4L)
-                    .caseTypeId("TestAddressBookCaseCaseLinks")
-                    .build()
-            );
-            assertCaseLinks(expectedCaseId, expectedCaseLinksCaseId);
-
+            assertCaseLinksMatch_missing_case_links(CASE_LINKS_CASE_03_ID);
         }
 
         @ParameterizedTest(name = "Should NOT populate CaseLink due to starting ID - #{index} - `{0}`")
@@ -249,7 +208,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
         void shouldNotPopulateMissingCaseLinksDueToStartingID(String caseworkerRole) throws Exception {
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 2L, 5);
+                new MigrationParameters(CASE_LINKS_CASE_01_TYPE, PROBATE_JURISDICTION_ID, CASE_LINKS_CASE_01_ID + 1, 5);
 
             stubIdamAndRasRequests(caseworkerRole);
 
@@ -259,7 +218,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn();
 
-            assertCaseLinks(1L, Collections.emptyList());
+            assertCaseLinks(CASE_LINKS_CASE_01_ID, Collections.emptyList());
         }
 
         @ParameterizedTest(name = "Should NOT populate CaseLink with incorrect Jurisdiction - #{index} - `{0}`")
@@ -273,7 +232,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
 
             // NB: case type and jurisdiction mismatch
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_TYPE_ID, SSCS_JURISDICTION_ID, 1L, 5);
+                new MigrationParameters(CASE_LINKS_CASE_01_TYPE, SSCS_JURISDICTION_ID, CASE_LINKS_CASE_01_ID, 5);
 
             stubIdamAndRasRequests(caseworkerRole);
 
@@ -283,10 +242,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn();
 
-            Long expectedCaseId = 1L;
-            List<CaseLink> expectedCaseLinks = Collections.emptyList();
-            assertCaseLinks(expectedCaseId, expectedCaseLinks);
-
+            assertCaseLinks(CASE_LINKS_CASE_01_ID, Collections.emptyList());
         }
 
         @Test
@@ -314,10 +270,10 @@ class MigrationEndpointIT extends WireMockBaseTest {
             scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
         void shouldVerifyLogs() throws Exception {
 
-            Long caseDataId = 1L;
+            Long caseDataId = CASE_LINKS_CASE_01_ID;
 
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, caseDataId, 5);
+                new MigrationParameters(CASE_LINKS_CASE_01_TYPE, PROBATE_JURISDICTION_ID, caseDataId, 5);
 
             stubIdamAndRasRequests(ROLE_CASEWORKER_PROBATE);
 
@@ -342,7 +298,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
         void shouldVerifyMigrationResultAfterCaseLinkPopulation() throws Exception {
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
+                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, CASE_LINKS_CASE_01_ID, 100);
 
             stubIdamAndRasRequests(ROLE_CASEWORKER_PROBATE);
 
@@ -356,7 +312,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             MigrationResult migrationResult = mapper.readValue(content, MigrationResult.class);
 
             assertEquals(2, migrationResult.getRecordCount());
-            assertEquals(3, migrationResult.getFinalRecordId());
+            assertEquals(CASE_LINKS_CASE_03_ID, migrationResult.getFinalRecordId());
         }
     }
 
@@ -387,6 +343,64 @@ class MigrationEndpointIT extends WireMockBaseTest {
                 .andReturn();
         }
 
+    }
+
+    private void assertCaseLinksMatch_missing_case_links(Long expectedCaseId) {
+        List<CaseLink> expectedCaseLinks = new ArrayList<>();
+
+        // data values as per:   classpath:sql/insert_cases_missing_case_link.sql
+        if (CASE_LINKS_CASE_01_ID.equals(expectedCaseId)) {
+            expectedCaseLinks.add(builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_LINKS_CASE_02_ID)
+                .caseTypeId(CASE_LINKS_CASE_02_TYPE)
+                .standardLink(NON_STANDARD_LINK)
+                .build());
+        } else if (CASE_LINKS_CASE_03_ID.equals(expectedCaseId)) {
+            expectedCaseLinks.add(builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_LINKS_CASE_04_ID)
+                .caseTypeId(CASE_LINKS_CASE_04_TYPE)
+                .standardLink(NON_STANDARD_LINK)
+                .build());
+        }
+
+        assertCaseLinks(expectedCaseId, expectedCaseLinks);
+    }
+
+    private void assertCaseLinksMatch_multiple_missing_case_links(Long expectedCaseId) {
+        List<CaseLink> expectedCaseLinks = new ArrayList<>();
+
+        // data values as per:   classpath:sql/insert_cases_multiple_missing_case_link.sql
+        if (CASE_LINKS_CASE_01_ID.equals(expectedCaseId)) {
+            expectedCaseLinks.add(builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_LINKS_CASE_02_ID)
+                .caseTypeId(CASE_LINKS_CASE_02_TYPE)
+                .standardLink(NON_STANDARD_LINK)
+                .build());
+            expectedCaseLinks.add(builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_LINKS_CASE_05_ID)
+                .caseTypeId(CASE_LINKS_CASE_05_TYPE)
+                .standardLink(NON_STANDARD_LINK)
+                .build());
+        } else if (CASE_LINKS_CASE_03_ID.equals(expectedCaseId)) {
+            expectedCaseLinks.add(builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_LINKS_CASE_04_ID)
+                .caseTypeId(CASE_LINKS_CASE_04_TYPE)
+                .standardLink(NON_STANDARD_LINK)
+                .build());
+            expectedCaseLinks.add(builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(CASE_LINKS_CASE_06_ID)
+                .caseTypeId(CASE_LINKS_CASE_06_TYPE)
+                .standardLink(NON_STANDARD_LINK)
+                .build());
+        }
+
+        assertCaseLinks(expectedCaseId, expectedCaseLinks);
     }
 
     private void assertCaseLinks(Long expectedCaseId, List<CaseLink> expectedCaseLinks) {

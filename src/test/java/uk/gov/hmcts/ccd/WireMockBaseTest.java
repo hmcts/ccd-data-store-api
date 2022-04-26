@@ -66,6 +66,9 @@ public abstract class WireMockBaseTest extends BaseTest {
     public static final Long CASE_19_ID = 19L;
     public static final Long CASE_21_ID = 21L;
     public static final Long CASE_22_ID = 22L;
+    public static final String CASE_01_TYPE = "TestAddressBookCase";
+    public static final String CASE_02_TYPE = "TestAddressBookCase";
+    public static final String CASE_03_TYPE = "TestAddressBookCase";
     public static final int NUMBER_OF_CASES = 22;
 
     private static final String BEARER = "Bearer ";

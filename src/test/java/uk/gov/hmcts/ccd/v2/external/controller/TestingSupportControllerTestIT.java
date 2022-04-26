@@ -10,10 +10,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkRepository;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLinksResource;
+import uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity;
+import uk.gov.hmcts.ccd.data.caselinking.CaseLinkRepository;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinksResource;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity.NON_STANDARD_LINK;
+import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
 
 public class TestingSupportControllerTestIT extends WireMockBaseTest {
 

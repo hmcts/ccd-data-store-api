@@ -35,8 +35,8 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
-import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
@@ -85,8 +85,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
-import static uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink.builder;
+import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
+import static uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink.builder;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
@@ -139,6 +140,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String MID_EVENT_CALL_BACK_MULTI_PAGE = "/event-callback/multi-page-mid-event";
     public static final int EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED = 5;
     public static final int EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED = 6;
+
+    // data values as per: classpath:sql/insert_cases_case_links.sql
+    private static final String CASE_LINKS_CASE_998_REFERENCE = "1504259907353545";
+    private static final String CASE_LINKS_CASE_999_REFERENCE = "1504259907353537";
+    private static final Long CASE_LINKS_CASE_998_ID = 998L;
+    private static final Long CASE_LINKS_CASE_999_ID = 999L;
+    private static final String CASE_LINKS_CASE_998_TYPE = "TestAddressBookCase1";
+    private static final String CASE_LINKS_CASE_999_TYPE = "TestAddressBookCase2";
+
     @Inject
     private WebApplicationContext wac;
     private MockMvc mockMvc;
@@ -263,7 +273,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
             caseAuditEventList.size());
 
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -1925,7 +1935,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2035,7 +2045,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2225,8 +2235,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<MessageQueueCandidate> messageQueueList =
             template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
         assertEquals("Incorrect number of rows in messageQueue", 0, messageQueueList.size());
+
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2296,7 +2307,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2366,7 +2377,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2437,7 +2448,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -3814,23 +3825,25 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         Long expectedCaseId = CASE_22_ID;
-        String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_01_ID)
-                .caseTypeId(expectedCaseTypeId)
+                .caseTypeId(CASE_01_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_02_ID)
-                .caseTypeId(expectedCaseTypeId)
+                .caseTypeId(CASE_02_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_03_ID) // NB: previously added in "classpath:sql/insert_cases.sql"
-                .caseTypeId(expectedCaseTypeId)
+                .caseTypeId(CASE_03_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build()
         );
 
@@ -3872,13 +3885,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         Long expectedCaseId = CASE_22_ID;
-        String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_01_ID)
-                .caseTypeId(expectedCaseTypeId)
+                .caseTypeId(CASE_01_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build()
         ); // NB: missing linkedCaseId = CASE_03_ID which is previously added in "classpath:sql/insert_cases.sql"
 
@@ -4198,7 +4211,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("A new event should have been created", 6, caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(caseAuditEventList.size() - 1);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -5358,10 +5371,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final JsonNode data = mapper.readTree(
             "{"
             + "\"CaseLink1\": {"
-            + "     \"CaseReference\": \"1504259907353537\""
+            + "     \"CaseReference\": \"" + CASE_LINKS_CASE_999_REFERENCE + "\""
             + "},"
             + "\"CaseLink2\": {"
-            + "     \"CaseReference\": \"1504259907353545\""
+            + "     \"CaseReference\": \"" + CASE_LINKS_CASE_998_REFERENCE + "\""
             + "}"
             + "}");
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
@@ -5384,13 +5397,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(999L)
-                .caseTypeId(CASE_TYPE_CASELINK)
+                .linkedCaseId(CASE_LINKS_CASE_999_ID)
+                .caseTypeId(CASE_LINKS_CASE_999_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(998L)
-                .caseTypeId(CASE_TYPE_CASELINK)
+                .linkedCaseId(CASE_LINKS_CASE_998_ID)
+                .caseTypeId(CASE_LINKS_CASE_998_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build()
         );
 
@@ -5431,13 +5446,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(999L)
-                .caseTypeId(CASE_TYPE_CASELINK)
+                .linkedCaseId(CASE_LINKS_CASE_999_ID)
+                .caseTypeId(CASE_LINKS_CASE_999_TYPE)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
-                .linkedCaseId(998L)
-                .caseTypeId(CASE_TYPE_CASELINK)
+                .linkedCaseId(CASE_LINKS_CASE_998_ID)
+                .caseTypeId(CASE_LINKS_CASE_998_TYPE)
                 .build()
         );
 

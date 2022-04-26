@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.caseaccess;
+package uk.gov.hmcts.ccd.data.caselinking;
 
 import lombok.EqualsAndHashCode;
 
@@ -81,4 +81,5 @@ public class CaseLinkEntity {
     public void setStandardLink(Boolean standardLink) {
         this.standardLink = standardLink;
     }
+
 }

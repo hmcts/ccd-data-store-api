@@ -2,7 +2,7 @@ DELETE FROM case_event;
 DELETE FROM case_data;
 DELETE FROM case_link;
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
 VALUES (1, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Peter",
@@ -33,8 +33,11 @@ VALUES (1, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
           },
           "CaseLink3": "PUBLIC"
         }',
-        '3393027116986763'
-       );
+        '3393027116986763',
+        '2016-08-22 20:44:53.824',
+        '2016-08-24 20:44:53.824',
+        '2016-08-24 20:44:53.824'
+);
 
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
@@ -70,7 +73,8 @@ VALUES (2, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '2016-08-24 20:44:53.824'
 );
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
+
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
 VALUES (3, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Peter",
@@ -83,7 +87,7 @@ VALUES (3, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
             "Postcode": "SE1 4EE"
           },
           "CaseLink3" : {
-            "CaseReference": "1557850043804031"
+            "CaseReference": "1504259907353552"
           }
         }',
         '{
@@ -101,8 +105,11 @@ VALUES (3, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
           },
           "CaseLink3": "PUBLIC"
         }',
-        '1557845948403939'
-       );
+        '1504259907353545',
+        '2016-08-22 20:44:53.824',
+        '2016-08-24 20:44:53.824',
+        '2016-08-24 20:44:53.824'
+ );
 
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
@@ -132,11 +139,11 @@ VALUES (4, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
             }
           }
         }',
-        '1557850043804031',
+        '1504259907353552',
         '2016-08-22 20:44:53.824',
         '2016-08-24 20:44:53.824',
         '2016-08-24 20:44:53.824'
 );
 
 INSERT INTO case_link(case_id, linked_case_id, case_type_id)
-VALUES (3, 4, 'TestAddressBookCaseCaseLinks');
+VALUES (3, 4, 'TestAddressBookCase');
