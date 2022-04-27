@@ -72,7 +72,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   a successful call [to get an event token for the case just created] as in [F-1018-GetUpdateEventToken]
       When  a request is prepared with appropriate values
-      And   the request [contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCaseworkerBase]
+      And   the request [contains correctly configured CaseLink field set to blank]
+      And the request [specifying the case to be updated, as created in F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
@@ -330,8 +331,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       And   another successful call [to create a case] as in [F-1018_CreateAnotherCasePreRequisiteCitizenBase]
       And   a successful call [to get an update event token for the case just created as a Citizen] as in [F-1018-GetLinkedCitizenCaseUpdateEventToken]
       When  a request is prepared with appropriate values
-      And   the request [contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCaseworkerBase]
-      And   the request [specifying the case to be updated, as created in F-1018_CreateCasePreRequisiteCitizenBase, CaseLink field changed]
+      And   the request [contains correctly configured CaseLink field with Case Reference created in F-1018_CreateAnotherCasePreRequisiteCitizenBase]
+      And   the request [specifying the case to be updated, as created in F-1018_CreateLinkedCasePreRequisiteCitizenBase, CaseLink field changed]
       And   it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
@@ -371,7 +372,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCitizenBase]
       And   a successful call [to get an update event token for the case just created as a Citizen] as in [F-1018-GetCitizenUpdateEventToken]
       When  a request is prepared with appropriate values
-      And   the request [contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCitizenBase]
+      And   the request [contains correctly configured CaseLink field set to blank]
+      And the request [specifying the case to be updated, as created in F-1018_CreateCasePreRequisiteCitizenBase]
       And   it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
@@ -411,7 +413,6 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       And   another successful call [to create a case] as in [F-1018_CreateLinkedCasePreRequisiteCitizenBase]
       And   a successful call [to get an update event token for the case just created as a Citizen] as in [F-1018-GetLinkedCitizenCaseUpdateEventToken]
       When  a request is prepared with appropriate values
-      And   the request [contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCitizenBase]
       And   the request [CaseLink field has a blank reference]
       And   the request [Case data is invalid]
       And   it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
@@ -518,7 +519,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   a successful call [to get an event token for the case just created] as in [F-1018-GetUpdateEventToken]
       When  a request is prepared with appropriate values
-      And   the request [contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCaseworkerBase]
+      And   the request [contains correctly configured CaseLink field set to blank]
+      And the request [specifying the case to be updated, as created in F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
