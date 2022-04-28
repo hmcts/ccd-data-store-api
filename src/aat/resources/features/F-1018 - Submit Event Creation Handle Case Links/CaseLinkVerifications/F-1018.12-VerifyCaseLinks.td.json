@@ -19,12 +19,14 @@
         {
           "CaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
           "LinkedCaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
-          "CaseTypeId" : "FT_MasterCaseType"
+          "CaseTypeId" : "FT_MasterCaseType",
+          "StandardLink" : false
         },
         {
           "CaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
           "LinkedCaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
-          "CaseTypeId" : "FT_Conditionals"
+          "CaseTypeId" : "FT_Conditionals",
+          "StandardLink" : false
         }
       ]
     }

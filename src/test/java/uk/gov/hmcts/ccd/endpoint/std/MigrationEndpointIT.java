@@ -49,6 +49,7 @@ import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_CAA;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_PROBATE;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_SSCS;
+import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
 import static uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink.builder;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
@@ -353,12 +354,14 @@ class MigrationEndpointIT extends WireMockBaseTest {
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_02_ID)
                 .caseTypeId(CASE_LINKS_CASE_02_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build());
         } else if (CASE_LINKS_CASE_03_ID.equals(expectedCaseId)) {
             expectedCaseLinks.add(builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_04_ID)
                 .caseTypeId(CASE_LINKS_CASE_04_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build());
         }
 
@@ -374,22 +377,26 @@ class MigrationEndpointIT extends WireMockBaseTest {
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_02_ID)
                 .caseTypeId(CASE_LINKS_CASE_02_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build());
             expectedCaseLinks.add(builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_05_ID)
                 .caseTypeId(CASE_LINKS_CASE_05_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build());
         } else if (CASE_LINKS_CASE_03_ID.equals(expectedCaseId)) {
             expectedCaseLinks.add(builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_04_ID)
                 .caseTypeId(CASE_LINKS_CASE_04_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build());
             expectedCaseLinks.add(builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_06_ID)
                 .caseTypeId(CASE_LINKS_CASE_06_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build());
         }
 
@@ -401,7 +408,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
             new BeanPropertyRowMapper<>(CaseLink.class));
 
-        assertEquals(caseLinks, expectedCaseLinks);
+        assertEquals(expectedCaseLinks, caseLinks);
     }
 
     private void setUpMvc(WebApplicationContext wac) {

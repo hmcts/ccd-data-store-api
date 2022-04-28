@@ -221,5 +221,5 @@ public class CaseDataExtractor {
     private boolean isNotABaseType(String fieldType) {
         return !BaseType.contains(fieldType);
     }
-}
 
+}

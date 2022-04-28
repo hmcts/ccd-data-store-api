@@ -85,6 +85,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
 import static uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink.builder;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
@@ -3830,16 +3831,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_01_ID)
                 .caseTypeId(CASE_01_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_02_ID)
                 .caseTypeId(CASE_02_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_03_ID) // NB: previously added in "classpath:sql/insert_cases.sql"
                 .caseTypeId(CASE_03_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build()
         );
 
@@ -3887,6 +3891,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_01_ID)
                 .caseTypeId(CASE_01_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build()
         ); // NB: missing linkedCaseId = CASE_03_ID which is previously added in "classpath:sql/insert_cases.sql"
 
@@ -5394,11 +5399,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_999_ID)
                 .caseTypeId(CASE_LINKS_CASE_999_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build(),
             builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_998_ID)
                 .caseTypeId(CASE_LINKS_CASE_998_TYPE)
+                .standardLink(NON_STANDARD_LINK)
                 .build()
         );
 

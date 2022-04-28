@@ -242,6 +242,85 @@
     "retain_hidden_value": null
   },
   {
+    "metadata": false,
+    "id": "caseLinks",
+    "case_type_id": "FT_MasterCaseType",
+    "label": "Standard case links field",
+    "hint_text": null,
+    "field_type": {
+      "id": "caseLinks-70dd4c97-3988-47a3-a9a9-51dc63b0952a",
+      "type": "Collection",
+      "min": null,
+      "max": null,
+      "regular_expression": null,
+      "fixed_list_items": [],
+      "complex_fields": [],
+      "collection_field_type": {
+        "id": "CaseLink",
+        "type": "Complex",
+        "min": null,
+        "max": null,
+        "regular_expression": null,
+        "fixed_list_items": [],
+        "complex_fields": [
+          {
+            "metadata": false,
+            "id": "CaseReference",
+            "case_type_id": null,
+            "label": "Case Reference",
+            "hint_text": null,
+            "field_type": {
+              "id": "TextCaseReference",
+              "type": "Text",
+              "min": null,
+              "max": null,
+              "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)",
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": null
+            },
+            "hidden": null,
+            "security_classification": "PUBLIC",
+            "live_from": null,
+            "live_until": null,
+            "acls": null,
+            "complexACLs": [],
+            "order": null,
+            "show_condition": null,
+            "display_context_parameter": null,
+            "retain_hidden_value": null
+          }
+        ],
+        "collection_field_type": null
+      }
+    },
+    "hidden": false,
+    "security_classification": "PUBLIC",
+    "live_from": "2017-01-01",
+    "live_until": null,
+    "acls": [
+      {
+        "role": "caseworker-befta_master",
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true
+      },
+      {
+        "role": "citizen",
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true
+      }
+    ],
+    "complexACLs": [],
+    "order": null,
+    "show_condition": null,
+    "display_context_parameter": null,
+    "retain_hidden_value": null
+  },
+  {
     "metadata": true,
     "id": "[STATE]",
     "case_type_id": "FT_MasterCaseType",

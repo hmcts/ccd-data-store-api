@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -22,13 +23,14 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
+import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.STANDARD_LINK;
 
 @ExtendWith(MockitoExtension.class)
 class CaseLinkServiceTest extends CaseLinkTestFixtures {
@@ -71,20 +73,20 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
 
             // GIVEN
             List<CaseLinkEntity> caseLinkEntities = List.of(
-                createCaseLinkEntity(LINKED_CASE_DATA_ID_01),
-                createCaseLinkEntity(LINKED_CASE_DATA_ID_02),
-                createCaseLinkEntity(LINKED_CASE_DATA_ID_03),
-                createCaseLinkEntity(LINKED_CASE_DATA_ID_04)
+                createCaseLinkEntity(LINKED_CASE_DATA_ID_01, STANDARD_LINK),
+                createCaseLinkEntity(LINKED_CASE_DATA_ID_02, NON_STANDARD_LINK),
+                createCaseLinkEntity(LINKED_CASE_DATA_ID_03, NON_STANDARD_LINK),
+                createCaseLinkEntity(LINKED_CASE_DATA_ID_04, STANDARD_LINK)
             );
             when(caseLinkRepository.findAllByCaseReference(CASE_REFERENCE)).thenReturn(caseLinkEntities);
 
             when(caseLinkMapper.entitiesToModels(caseLinkEntities)).thenReturn(
                 List.of(
                     // NB: set linked case references to null to prove they have been adjusted by lookup
-                    createCaseLink(null, LINKED_CASE_DATA_ID_01),
-                    createCaseLink(null, LINKED_CASE_DATA_ID_02),
-                    createCaseLink(null, LINKED_CASE_DATA_ID_03),
-                    createCaseLink(null, LINKED_CASE_DATA_ID_04)
+                    createCaseLink(null, LINKED_CASE_DATA_ID_01, STANDARD_LINK),
+                    createCaseLink(null, LINKED_CASE_DATA_ID_02, NON_STANDARD_LINK),
+                    createCaseLink(null, LINKED_CASE_DATA_ID_03, NON_STANDARD_LINK),
+                    createCaseLink(null, LINKED_CASE_DATA_ID_04, STANDARD_LINK)
                 )
             );
 
@@ -107,16 +109,24 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             verify(caseDetailsRepository).findById(null, LINKED_CASE_DATA_ID_03);
             verify(caseDetailsRepository).findById(null, LINKED_CASE_DATA_ID_04);
 
-            assertCaseLink(result, LINKED_CASE_REFERENCE_01);
-            assertCaseLink(result, LINKED_CASE_REFERENCE_02);
-            assertCaseLink(result, LINKED_CASE_REFERENCE_03);
-            assertCaseLink(result, LINKED_CASE_REFERENCE_04);
+            assertCaseLink(result, LINKED_CASE_REFERENCE_01, STANDARD_LINK);
+            assertCaseLink(result, LINKED_CASE_REFERENCE_02, NON_STANDARD_LINK);
+            assertCaseLink(result, LINKED_CASE_REFERENCE_03, NON_STANDARD_LINK);
+            assertCaseLink(result, LINKED_CASE_REFERENCE_04, STANDARD_LINK);
         }
 
-        private CaseLinkEntity createCaseLinkEntity(Long caseDataId) {
-            return  new CaseLinkEntity(CASE_DATA_ID, caseDataId, CASE_TYPE_ID);
+        private CaseLinkEntity createCaseLinkEntity(Long caseDataId, Boolean isStandardLink) {
+            return  new CaseLinkEntity(CASE_DATA_ID, caseDataId, CASE_TYPE_ID, isStandardLink);
+        }
+
+        private void setupMockForCaseDetailsRepositoryFindById(Long linkedCaseDataId, Long linkedCaseReference) {
+            CaseDetails caseDetails = new CaseDetails();
+            caseDetails.setId(linkedCaseDataId.toString());
+            caseDetails.setReference(linkedCaseReference);
+            when(caseDetailsRepository.findById(null, linkedCaseDataId)).thenReturn(Optional.of(caseDetails));
         }
     }
+
 
     @Nested
     @DisplayName("updateCaseLinks")
@@ -126,125 +136,11 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
         private final CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition();
 
         @Test
-        void updateCaseLinksDeletesAndInsertsCaseLinkFields() {
-            // SCENARIO:  BEFORE 02, 03, AFTER: 01, 02
+        void updateCaseLinksCanCreateACaseLinkRecord() {
 
             // GIVEN
-            when(caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions()))
-                .thenReturn(List.of(
-                    LINKED_CASE_REFERENCE_01.toString(),
-                    LINKED_CASE_REFERENCE_02.toString()
-                ));
-
-            mockCallsToFindCurrentCaseLinksToCase02AndCase03();
-
-            // WHEN
-            caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
-
-            // THEN
-            verify(caseLinkRepository).deleteByCaseReferenceAndLinkedCaseReference(
-                CASE_REFERENCE,
-                LINKED_CASE_REFERENCE_03 // i.e. existing linked case 03 has been removed
-            );
-            verify(caseLinkRepository).insertUsingCaseReferences(
-                CASE_REFERENCE,
-                LINKED_CASE_REFERENCE_01 // i.e. new linked case 01 has been added
-            );
-            verifyNoMoreInteractions(caseLinkRepository); // i.e. existing linked case 02 is unchanged
-        }
-
-        @Test
-        void updateCaseLinksDeletesCaseLinkFields() {
-            // SCENARIO:  BEFORE 02, 03, AFTER: none
-
-            // GIVEN
-            when(caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions()))
-                .thenReturn(List.of());
-
-            mockCallsToFindCurrentCaseLinksToCase02AndCase03();
-
-            // WHEN
-            caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
-
-            // THEN
-            verify(caseLinkRepository, times(2)).deleteByCaseReferenceAndLinkedCaseReference(
-                anyLong(),
-                anyLong()
-            );
-            verify(caseLinkRepository).deleteByCaseReferenceAndLinkedCaseReference(
-                CASE_REFERENCE,
-                LINKED_CASE_REFERENCE_02 // i.e. existing linked case 02 has been removed
-            );
-            verify(caseLinkRepository).deleteByCaseReferenceAndLinkedCaseReference(
-                CASE_REFERENCE,
-                LINKED_CASE_REFERENCE_03 // i.e. existing linked case 03 has been removed
-            );
-            verify(caseLinkRepository, never()).insertUsingCaseReferences(
-                anyLong(),
-                anyLong()
-            );
-        }
-
-        @Test
-        void updateCaseLinksInsertsCaseLinkFields() {
-            // SCENARIO:  BEFORE none, AFTER: 01, 02
-
-            // GIVEN
-            when(caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions()))
-                .thenReturn(List.of(
-                    LINKED_CASE_REFERENCE_01.toString(),
-                    LINKED_CASE_REFERENCE_02.toString()
-                ));
-
-            // WHEN
-            caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
-
-            // THEN
-            verify(caseLinkRepository).insertUsingCaseReferences(
-                CASE_REFERENCE,
-                LINKED_CASE_REFERENCE_01 // i.e. new linked case 01 has been added
-            );
-            verify(caseLinkRepository).insertUsingCaseReferences(
-                CASE_REFERENCE,
-                LINKED_CASE_REFERENCE_02 // i.e. new linked case 02 has been added
-            );
-        }
-
-        @Test
-        void updateCaseLinksNoRepositoryInteractionCaseLinksIdentical() {
-            // SCENARIO:  BEFORE: 02, 03, AFTER: 02, 03 (i.e. unchanged)
-
-            // GIVEN
-            when(caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions()))
-                .thenReturn(List.of(
-                    LINKED_CASE_REFERENCE_02.toString(),
-                    LINKED_CASE_REFERENCE_03.toString()
-                ));
-
-            mockCallsToFindCurrentCaseLinksToCase02AndCase03();
-
-            // WHEN
-            caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
-
-            // THEN
-            verify(caseLinkRepository, never()).insertUsingCaseReferences(
-                anyLong(),
-                anyLong()
-            );
-            verify(caseLinkRepository, never()).deleteByCaseReferenceAndLinkedCaseReference(
-                anyLong(),
-                anyLong()
-            );
-        }
-
-        @Test
-        void createCaseLinks() {
-            // SCENARIO:  BEFORE: none, AFTER: 01, 02
-
-            // GIVEN
-            final List<String> caseLinks = List.of(
-                LINKED_CASE_REFERENCE_01.toString(),
-                LINKED_CASE_REFERENCE_02.toString()
+            final List<CaseLink> caseLinks = List.of(
+                createCaseLink(LINKED_CASE_REFERENCE_01, LINKED_CASE_DATA_ID_01, STANDARD_LINK)
             );
             when(caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions()))
                 .thenReturn(caseLinks);
@@ -253,22 +149,63 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
             // THEN
-            caseLinks.forEach(caseLink ->
-                Mockito.verify(caseLinkRepository)
-                    .insertUsingCaseReferences(CASE_REFERENCE, Long.valueOf(caseLink)));
+            verify(caseLinkRepository).insertUsingCaseReferences(
+                CASE_REFERENCE,
+                LINKED_CASE_REFERENCE_01,
+                STANDARD_LINK
+            );
         }
 
         @Test
-        void createCaseLinksFiltersOutNullOrBlanks() {
+        void updateCaseLinksCanCreateMultipleCaseLinkRecordsWithCorrectStandardCaseLinkFlag() {
 
             // GIVEN
-            final List<String> validCaseLinks = List.of(
-                LINKED_CASE_REFERENCE_01.toString(),
-                LINKED_CASE_REFERENCE_02.toString()
+            List<CaseLink> caseLinks = List.of(
+                createCaseLink(LINKED_CASE_REFERENCE_01, LINKED_CASE_DATA_ID_01, STANDARD_LINK),
+                createCaseLink(LINKED_CASE_REFERENCE_02, LINKED_CASE_DATA_ID_02, NON_STANDARD_LINK),
+                createCaseLink(LINKED_CASE_REFERENCE_03, LINKED_CASE_DATA_ID_03, NON_STANDARD_LINK),
+                createCaseLink(LINKED_CASE_REFERENCE_04, LINKED_CASE_DATA_ID_04, STANDARD_LINK)
             );
-            final List<String> allCaseLinks = new ArrayList<>(validCaseLinks);
+            when(caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions()))
+                .thenReturn(caseLinks);
+
+            // WHEN
+            caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+
+            // THEN
+            verify(caseLinkRepository).insertUsingCaseReferences(
+                CASE_REFERENCE,
+                LINKED_CASE_REFERENCE_01,
+                STANDARD_LINK
+            );
+            verify(caseLinkRepository).insertUsingCaseReferences(
+                CASE_REFERENCE,
+                LINKED_CASE_REFERENCE_02,
+                NON_STANDARD_LINK
+            );
+            verify(caseLinkRepository).insertUsingCaseReferences(
+                CASE_REFERENCE,
+                LINKED_CASE_REFERENCE_03,
+                NON_STANDARD_LINK
+            );
+            verify(caseLinkRepository).insertUsingCaseReferences(
+                CASE_REFERENCE,
+                LINKED_CASE_REFERENCE_04,
+                STANDARD_LINK
+            );
+        }
+
+        @Test
+        void updateCaseLinksWillFilterOutCaseLinksThatAreNullOrBlanks() {
+
+            // GIVEN
+            final List<CaseLink> validCaseLinks = List.of(
+                createCaseLink(LINKED_CASE_REFERENCE_01, LINKED_CASE_DATA_ID_01, STANDARD_LINK),
+                createCaseLink(LINKED_CASE_REFERENCE_02, LINKED_CASE_DATA_ID_02, NON_STANDARD_LINK)
+            );
+            final List<CaseLink> allCaseLinks = new ArrayList<>(validCaseLinks);
             allCaseLinks.add(null);
-            allCaseLinks.add("");
+            allCaseLinks.add(CaseLink.builder().build());
             when(caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions()))
                 .thenReturn(allCaseLinks);
 
@@ -276,63 +213,67 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
             // THEN
-            validCaseLinks.forEach(caseLink ->
-                Mockito.verify(caseLinkRepository)
-                    .insertUsingCaseReferences(CASE_REFERENCE, Long.valueOf(caseLink)));
+            verify(caseLinkRepository, times(2)).insertUsingCaseReferences(
+                anyLong(),
+                anyLong(),
+                anyBoolean()
+            );
         }
 
         @Test
-        void createCaseLinksNullAndBlankValuesNotInsertedToDB() {
+        void updateCaseLinksDeletesCaseLinkFields() {
 
             // GIVEN
-            final List<String> caseLinks = new ArrayList<>();
-            caseLinks.add(null);
-            caseLinks.add("");
-            caseLinks.add(null);
+            List<CaseLink> caseLinks = List.of(
+                createCaseLink(LINKED_CASE_REFERENCE_01, LINKED_CASE_DATA_ID_01, STANDARD_LINK)
+            );
             when(caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions()))
-                .thenReturn(List.of());
+                .thenReturn(caseLinks);
 
             // WHEN
             caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
             // THEN
-            caseLinks.forEach(caseLink ->
-                Mockito.verify(caseLinkRepository, never())
-                    .insertUsingCaseReferences(anyLong(), anyLong()));
+            verify(caseLinkRepository).deleteAllByCaseReference(CASE_REFERENCE);
+            verify(caseLinkRepository).insertUsingCaseReferences(
+                CASE_REFERENCE,
+                LINKED_CASE_REFERENCE_01,
+                STANDARD_LINK
+            );
         }
 
-        private void mockCallsToFindCurrentCaseLinksToCase02AndCase03() {
-            final List<CaseLinkEntity> caseLinkEntities = List.of(
-                new CaseLinkEntity(CASE_DATA_ID, LINKED_CASE_DATA_ID_02, CASE_TYPE_ID),
-                new CaseLinkEntity(CASE_DATA_ID, LINKED_CASE_DATA_ID_03, CASE_TYPE_ID)
+        @Test
+        void updateCaseLinksDeletesAllCaseLinksBeforeCreatingNew() {
+
+            // GIVEN
+            List<CaseLink> caseLinks = List.of(
+                createCaseLink(LINKED_CASE_REFERENCE_01, LINKED_CASE_DATA_ID_01, STANDARD_LINK)
             );
+            when(caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions()))
+                .thenReturn(caseLinks);
 
-            final List<CaseLink> caseLinksModels = List.of(
-                createCaseLink(LINKED_CASE_REFERENCE_02, LINKED_CASE_DATA_ID_02),
-                createCaseLink(LINKED_CASE_REFERENCE_03, LINKED_CASE_DATA_ID_03)
+            // WHEN
+            caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+
+            // THEN
+            InOrder inOrder = Mockito.inOrder(caseLinkRepository);
+            inOrder.verify(caseLinkRepository).deleteAllByCaseReference(CASE_REFERENCE);
+            inOrder.verify(caseLinkRepository).insertUsingCaseReferences(
+                CASE_REFERENCE,
+                LINKED_CASE_REFERENCE_01,
+                STANDARD_LINK
             );
-
-            when(caseLinkRepository.findAllByCaseReference(CASE_REFERENCE)).thenReturn(caseLinkEntities);
-            when(caseLinkMapper.entitiesToModels(caseLinkEntities)).thenReturn(caseLinksModels);
-
-            setupMockForCaseDetailsRepositoryFindById(LINKED_CASE_DATA_ID_02, LINKED_CASE_REFERENCE_02);
-            setupMockForCaseDetailsRepositoryFindById(LINKED_CASE_DATA_ID_03, LINKED_CASE_REFERENCE_03);
         }
+
     }
 
-    private void setupMockForCaseDetailsRepositoryFindById(Long linkedCaseDataId01, Long linkedCaseReference01) {
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(linkedCaseDataId01.toString());
-        caseDetails.setReference(linkedCaseReference01);
-        when(caseDetailsRepository.findById(null, linkedCaseDataId01)).thenReturn(Optional.of(caseDetails));
-    }
-
-    private CaseLink createCaseLink(Long linkedCaseReference, Long linkedCaseDataId) {
+    private CaseLink createCaseLink(Long linkedCaseReference, Long linkedCaseDataId, Boolean isStandardLink) {
         return CaseLink.builder()
             .caseReference(CASE_REFERENCE)
             .caseId(CASE_DATA_ID)
             .linkedCaseReference(linkedCaseReference)
             .linkedCaseId(linkedCaseDataId)
+            .standardLink(isStandardLink)
             .build();
     }
 

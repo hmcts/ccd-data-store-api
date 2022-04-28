@@ -39,30 +39,35 @@ public abstract class CaseLinkTestFixtures {
     protected static final Long LINKED_CASE_DATA_ID_04 = CASE_04_ID;
 
     protected static final String LINKED_CASE_REFERENCE_VIA_SIMPLE_FIELD = CASE_01_REFERENCE;
-    protected static final String LINKED_CASE_REFERENCE_VIA_COLLECTION_01 = CASE_02_REFERENCE;
-    protected static final String LINKED_CASE_REFERENCE_VIA_COLLECTION_02 = CASE_03_REFERENCE;
+    protected static final String LINKED_CASE_REFERENCE_VIA_COLLECTION = CASE_02_REFERENCE;
+    protected static final String LINKED_CASE_REFERENCE_VIA_STANDARD_CASE_LINK_FIELD = CASE_03_REFERENCE;
+    protected static final String LINKED_CASE_REFERENCE_VIA_BOTH_COL_AND_STANDARD_CL_FIELD = CASE_04_REFERENCE;
 
     protected void assertCaseLink(List<CaseLink> results,
-                                  Long expectedLinkedCaseReference) {
-        assertCaseLink(results, expectedLinkedCaseReference.toString());
+                                  Long expectedLinkedCaseReference,
+                                  Boolean expectedStandardCaseLinkFlag) {
+        assertCaseLink(results, expectedLinkedCaseReference.toString(), expectedStandardCaseLinkFlag);
     }
 
     protected void assertCaseLink(List<CaseLink> results,
-                                  String expectedLinkedCaseReference) {
+                                  String expectedLinkedCaseReference,
+                                  boolean expectedStandardCaseLinkFlag) {
         CaseLink actualCaseLink = results.stream()
             .filter(caseLink -> expectedLinkedCaseReference.equals(caseLink.getLinkedCaseReference().toString()))
             .findAny().orElse(null);
 
-        assertCaseLink(actualCaseLink, expectedLinkedCaseReference);
+        assertCaseLink(actualCaseLink, expectedLinkedCaseReference, expectedStandardCaseLinkFlag);
     }
 
     protected void assertCaseLink(CaseLink actualCaseLink,
-                                  String expectedLinkedCaseReference) {
+                                  String expectedLinkedCaseReference,
+                                  boolean expectedStandardCaseLinkFlag) {
         assertNotNull(actualCaseLink);
 
         assertEquals(CASE_REFERENCE, actualCaseLink.getCaseReference());
 
         assertEquals(expectedLinkedCaseReference, actualCaseLink.getLinkedCaseReference().toString());
+        assertEquals(expectedStandardCaseLinkFlag, actualCaseLink.getStandardLink());
     }
 
     protected CaseDetails createCaseDetails(Map<String, JsonNode> caseData) {

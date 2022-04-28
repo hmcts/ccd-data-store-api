@@ -3,7 +3,8 @@
   "_extends_": "Befta_Jurisdiction2_Citizen_Case_Creation_Base_Data",
 
   "specs": [
-    "to create a case"
+    "to create a case",
+    "As a prerequisite"
   ],
 
   "prerequisites" : [ {

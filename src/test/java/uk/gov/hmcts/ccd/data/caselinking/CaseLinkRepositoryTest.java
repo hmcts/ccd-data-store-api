@@ -16,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
+import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.STANDARD_LINK;
 
 public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
@@ -28,7 +30,7 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
     @Before
     public void setup() {
-        caseLinkEntity = new CaseLinkEntity(CASE_13_ID, CASE_14_ID, TEST_ADDRESS_BOOK_CASE);
+        caseLinkEntity = new CaseLinkEntity(CASE_13_ID, CASE_14_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
     }
 
     @Test
@@ -44,6 +46,26 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
             savedEntity.getCaseLinkPrimaryKey().getLinkedCaseId());
         assertEquals(caseLinkEntity.getCaseTypeId(),
             savedEntity.getCaseTypeId());
+        assertEquals(caseLinkEntity.getStandardLink(),
+            savedEntity.getStandardLink());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void testSaveCaseLinkEntityWithStandardLinkTrue() {
+
+        caseLinkEntity.setStandardLink(STANDARD_LINK);
+        CaseLinkEntity savedEntity = caseLinkRepository.save(caseLinkEntity);
+        assertNotNull(savedEntity);
+        assertNotNull(savedEntity.getCaseLinkPrimaryKey());
+        assertEquals(caseLinkEntity.getCaseLinkPrimaryKey().getCaseId(),
+            savedEntity.getCaseLinkPrimaryKey().getCaseId());
+        assertEquals(caseLinkEntity.getCaseLinkPrimaryKey().getLinkedCaseId(),
+            savedEntity.getCaseLinkPrimaryKey().getLinkedCaseId());
+        assertEquals(caseLinkEntity.getCaseTypeId(),
+            savedEntity.getCaseTypeId());
+        assertEquals(caseLinkEntity.getStandardLink(),
+            savedEntity.getStandardLink());
     }
 
     @Test
@@ -67,7 +89,7 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void testSaveFailsIfCaseIdDoesNotExist() {
-        caseLinkEntity = new CaseLinkEntity(1003L, CASE_01_ID, TEST_ADDRESS_BOOK_CASE);
+        caseLinkEntity = new CaseLinkEntity(1003L, CASE_01_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
 
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
     }
@@ -75,25 +97,36 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void testSaveFailsIfLinkedCaseIdDoesNotExist() {
-        caseLinkEntity = new CaseLinkEntity(CASE_01_ID, 999L, "TestAddressBookCase");
+        caseLinkEntity = new CaseLinkEntity(CASE_01_ID, 999L, "TestAddressBookCase", NON_STANDARD_LINK);
 
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void testDeleteByCaseReferenceAndLinkedCaseReference() {
+    public void testDeleteAllByCaseReference() {
 
-        CaseLinkEntity savedEntity = caseLinkRepository.save(caseLinkEntity);
-
-        int deletedCount = caseLinkRepository.deleteByCaseReferenceAndLinkedCaseReference(
-            Long.parseLong(CASE_13_REFERENCE),
-            Long.parseLong(CASE_14_REFERENCE)
+        // GIVEN
+        final List<CaseLinkEntity> caseLinkEntities = List.of(
+            new CaseLinkEntity(CASE_01_ID, CASE_02_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, CASE_03_ID, TEST_ADDRESS_BOOK_CASE, STANDARD_LINK),
+            new CaseLinkEntity(CASE_02_ID, CASE_01_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK)
         );
 
-        assertFalse(caseLinkRepository.findById(savedEntity.getCaseLinkPrimaryKey()).isPresent());
+        caseLinkRepository.saveAll(caseLinkEntities);
 
-        assertEquals(1, deletedCount);
+        // WHEN
+        int deletedCount = caseLinkRepository.deleteAllByCaseReference(
+            Long.parseLong(CASE_01_REFERENCE)
+        );
+
+        // THEN
+        assertEquals(2, deletedCount);
+        // check deleted
+        assertFalse(caseLinkRepository.findById(caseLinkEntities.get(0).getCaseLinkPrimaryKey()).isPresent());
+        assertFalse(caseLinkRepository.findById(caseLinkEntities.get(1).getCaseLinkPrimaryKey()).isPresent());
+        // check remain (i.e. must only delete the case links belonging to the case reference supplied)
+        assertTrue(caseLinkRepository.findById(caseLinkEntities.get(2).getCaseLinkPrimaryKey()).isPresent());
     }
 
     @Test
@@ -107,11 +140,15 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
         assertFalse(caseLinkRepository.findById(pk).isPresent());
 
         caseLinkRepository.insertUsingCaseReferences(Long.parseLong(CASE_19_REFERENCE),
-                                                     Long.parseLong(CASE_21_REFERENCE));
+                                                     Long.parseLong(CASE_21_REFERENCE),
+                                                     NON_STANDARD_LINK);
 
-        Optional<CaseLinkEntity>  caseLinkEntity = caseLinkRepository.findById(pk);
-        assertTrue(caseLinkEntity.isPresent());
-        assertNotNull(caseLinkEntity.get().getCaseTypeId());
+        Optional<CaseLinkEntity>  savedCaseLinkEntity = caseLinkRepository.findById(pk);
+        assertTrue(savedCaseLinkEntity.isPresent());
+        assertEquals(CASE_19_ID, savedCaseLinkEntity.get().getCaseLinkPrimaryKey().getCaseId());
+        assertEquals(CASE_21_ID, savedCaseLinkEntity.get().getCaseLinkPrimaryKey().getLinkedCaseId());
+        assertNotNull(savedCaseLinkEntity.get().getCaseTypeId());
+        assertEquals(NON_STANDARD_LINK, savedCaseLinkEntity.get().getStandardLink());
     }
 
     @Test
@@ -120,9 +157,9 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
         final List<Long> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID);
 
         final List<CaseLinkEntity> caseLinkEntities = List.of(
-            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(0), TEST_ADDRESS_BOOK_CASE),
-            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(1), TEST_ADDRESS_BOOK_CASE),
-            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(2), TEST_ADDRESS_BOOK_CASE)
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(0), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(1), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
+            new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(2), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK)
         );
 
         caseLinkRepository.saveAll(caseLinkEntities);

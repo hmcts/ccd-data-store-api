@@ -16,6 +16,7 @@ public class CaseLinkMapper {
             .caseId(caseLinkEntity.getCaseLinkPrimaryKey().getCaseId())
             .linkedCaseId(caseLinkEntity.getCaseLinkPrimaryKey().getLinkedCaseId())
             .caseTypeId(caseLinkEntity.getCaseTypeId())
+            .standardLink(caseLinkEntity.getStandardLink())
             .build();
     }
 
@@ -29,8 +30,8 @@ public class CaseLinkMapper {
         return new CaseLinkEntity(
             caseLink.getCaseId(),
             caseLink.getLinkedCaseId(),
-            caseLink.getCaseTypeId());
+            caseLink.getCaseTypeId(),
+            caseLink.getStandardLink());
     }
 
 }
-
