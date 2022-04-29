@@ -11,24 +11,27 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import static uk.gov.hmcts.ccd.config.JacksonUtils.getValueFromPath;
 
 @Service
 public class GetLinkedCasesResponseCreator {
 
-    public GetLinkedCasesResponse createResponse(CaseLinkRetrievalResults caseLinkRetrievalResults) {
-        List<CaseLinkInfo> caseLinkInfos = createCaseLinkInfos(caseLinkRetrievalResults.getCaseDetails());
+    public GetLinkedCasesResponse createResponse(CaseLinkRetrievalResults caseLinkRetrievalResults,
+                                                 String caseReference) {
+        List<CaseLinkInfo> caseLinkInfoList = createCaseLinkInfoList(caseLinkRetrievalResults.getCaseDetails(),
+                                                                     caseReference);
         return GetLinkedCasesResponse.builder()
-            .linkedCases(caseLinkInfos)
+            .linkedCases(caseLinkInfoList)
             .hasMoreRecords(caseLinkRetrievalResults.isHasMoreResults())
             .build();
     }
 
-    private List<CaseLinkInfo> createCaseLinkInfos(List<CaseDetails> caseDetails) {
-        List<CaseLinkInfo> caseLinkInfos = new ArrayList<>();
+    private List<CaseLinkInfo> createCaseLinkInfoList(List<CaseDetails> caseDetails, String caseReference) {
+        List<CaseLinkInfo> caseLinkInfoList = new ArrayList<>();
         caseDetails.forEach(
-            caseDetail -> caseLinkInfos.add(CaseLinkInfo.builder()
+            caseDetail -> caseLinkInfoList.add(CaseLinkInfo.builder()
                 .caseNameHmctsInternal(caseDetail.getData()
                     .getOrDefault("caseNameHmctsInternal", NullNode.getInstance())
                     .asText(null))
@@ -36,30 +39,44 @@ public class GetLinkedCasesResponseCreator {
                 .ccdCaseType(caseDetail.getCaseTypeId())
                 .ccdJurisdiction(caseDetail.getJurisdiction())
                 .state(caseDetail.getState())
-                .linkDetails(createCaseDetails(caseDetail))
+                .linkDetails(createCaseDetails(caseDetail, caseReference))
                 .build())
         );
 
-        return caseLinkInfos;
+        return caseLinkInfoList;
     }
 
-    private List<CaseLinkDetails> createCaseDetails(CaseDetails caseDetails) {
-        final JsonNode caseLinkJsonNode = caseDetails.getData().get("CaseLink");
-        if (caseLinkJsonNode != null) {
-            final String createdDateTime = caseLinkJsonNode.findValue("CreatedDateTime").asText();
-            final JsonNode reasonForLinkValue = caseLinkJsonNode.get("ReasonForLink");
-            List<Reason> reasonForLinks = new ArrayList<>();
-            reasonForLinkValue.forEach(reasonForLinkNode ->
-                reasonForLinks.add(Reason.builder()
-                    .reasonCode(reasonForLinkNode.get("value").get("Reason").asText())
-                    .otherDescription(reasonForLinkNode.get("value").get("OtherDescription").asText())
-                    .build()));
-            CaseLinkDetails caseLinkDetails = CaseLinkDetails.builder()
-                .createdDateTime(LocalDateTime.parse(createdDateTime))
-                .reasons(reasonForLinks)
-                .build();
-            return List.of(caseLinkDetails);
+    private List<CaseLinkDetails> createCaseDetails(CaseDetails caseDetails, String caseReference) {
+        final JsonNode caseLinksJsonNode = caseDetails.getData().get(CaseLinkExtractor.STANDARD_CASE_LINK_FIELD);
+        List<CaseLinkDetails> caseLinkDetailsList = new ArrayList<>();
+        if (caseLinksJsonNode != null) {
+            caseLinksJsonNode.forEach(caseLinkJsonNode -> {
+                // extract value for item in collection
+                final JsonNode valueNode = caseLinkJsonNode.get("value");
+                // NB: only need to extract case link details from links to the caseReference used in the search
+                if (caseReference.equals(getValueFromPath("CaseReference", valueNode))) {
+                    final String createdDateTime = getValueFromPath("CreatedDateTime", valueNode);
+
+                    List<Reason> reasonForLinks = new ArrayList<>();
+                    final JsonNode reasonForLinkValue = valueNode.get("ReasonForLink");
+                    if (reasonForLinkValue != null) {
+                        reasonForLinkValue.forEach(reasonForLinkNode ->
+                            reasonForLinks.add(Reason.builder()
+                                .reasonCode(getValueFromPath("value.Reason", reasonForLinkNode))
+                                .otherDescription(getValueFromPath("value.OtherDescription", reasonForLinkNode))
+                                .build()));
+                    }
+
+                    CaseLinkDetails caseLinkDetails = CaseLinkDetails.builder()
+                        .createdDateTime(createdDateTime != null ? LocalDateTime.parse(createdDateTime) : null)
+                        .reasons(reasonForLinks)
+                        .build();
+
+                    caseLinkDetailsList.add(caseLinkDetails);
+                }
+            });
         }
-        return Collections.emptyList();
+
+        return caseLinkDetailsList;
     }
 }

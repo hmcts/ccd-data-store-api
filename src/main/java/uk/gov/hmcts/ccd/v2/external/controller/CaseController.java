@@ -500,7 +500,8 @@ public class CaseController {
                 Integer.parseInt(startRecordNumber),
                 Integer.parseInt(maxReturnRecordCount));
 
-        final GetLinkedCasesResponse responseBody = getLinkedCasesResponseCreator.createResponse(standardLinkedCases);
+        final GetLinkedCasesResponse responseBody = getLinkedCasesResponseCreator.createResponse(standardLinkedCases,
+                                                                                                 caseReference);
 
         return ResponseEntity.ok(responseBody);
     }
