@@ -12,7 +12,7 @@
         },
         "jsonBody": {
           "issuer": "http://localhost:{{request.requestLine.port}}/o",
-          "jwks_uri": "http://localhost:{{request.requestLine.port}}/jwks"
+          "jwks_uri": "http://localhost:{{request.requestLine.port}}/o/jwks"
         },
         "transformers": ["response-template"]
       }
