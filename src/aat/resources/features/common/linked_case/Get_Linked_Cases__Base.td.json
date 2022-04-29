@@ -2,7 +2,7 @@
   "_guid_": "Get_Linked_Cases__Base",
 
   "productName": "CCD Data Store",
-  "operationName": "retrieve a linked case by case reference",
+  "operationName": "retrieve linked cases by case reference",
 
   "method": "GET",
   "uri": "/getLinkedCases/{cid}",
