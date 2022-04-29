@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
 
     @Inject
     public JexlEnablingConditionParser(EnablingConditionConverter enablingConditionConverter) {
-        this(enablingConditionConverter, new ObjectMapper());
+        this(enablingConditionConverter, new ObjectMapper().registerModule(new JavaTimeModule()));
     }
 
     protected JexlEnablingConditionParser(EnablingConditionConverter enablingConditionConverter,
