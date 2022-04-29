@@ -6,7 +6,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "contains correctly configured CaseLink field with Case Reference created in F-1018_CreateAnotherCasePreRequisiteCaseworkerBase",
+    "contains correctly configured CaseLink field with Case Reference created in F-1018_CreateAnotherCasePreRequisiteCitizenBase",
     "CaseLink field has a valid reference",
     "Case data is invalid"
   ],

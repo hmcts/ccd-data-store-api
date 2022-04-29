@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CollectionSanitiser;
@@ -38,6 +39,7 @@ public final class JacksonUtils {
         .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true)
         .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
         .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
+        .addModule(new JavaTimeModule())
         .build();
 
     public static Map<String, JsonNode> convertValue(Object from) {

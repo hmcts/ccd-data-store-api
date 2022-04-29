@@ -12,7 +12,7 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
@@ -34,7 +34,7 @@
 
   "expectedResponse": {
     "body" : {
-      "id": "${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+      "id": "${[scenarioContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
       "jurisdiction" : "BEFTA_MASTER",
       "case_type_id" : "FT_MasterCaseType",
       "case_data" : {

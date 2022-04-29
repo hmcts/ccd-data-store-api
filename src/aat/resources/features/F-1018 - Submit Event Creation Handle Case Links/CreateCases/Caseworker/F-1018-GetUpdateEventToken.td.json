@@ -11,7 +11,7 @@
 
 	"request": {
 		"pathVariables": {
-			"cid": "${[scenarioContext][siblingContexts][F-1018_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+			"cid": "${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
 		}
 	},
 
