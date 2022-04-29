@@ -27,6 +27,7 @@ class GetLinkedCasesResponseCreatorTest {
     protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
         .registerModule(new JavaTimeModule());
 
+    private static final String CASE_REFERENCE = "1648478073517926";
 
     private static final String CASE_DETAILS_TEMPLATE = "{\n"
         + "  \"id\": %s,\n"
@@ -41,7 +42,7 @@ class GetLinkedCasesResponseCreatorTest {
         + "  \"case_data\": {\n"
         + "    \"caseNameHmctsInternal\" : \"%s\",\n"
         + "  \"CaseLink\": {\n"
-        + "    \"CaseReference\": \"1648478073517926\",\n"
+        + "    \"CaseReference\": \"" + CASE_REFERENCE + "\",\n"
         + "    \"CaseType\": \"MyBaseType\",\n"
         + "    \"CreatedDateTime\": \"2022-03-28T14:35:48.645045\",\n"
         + "    \"ReasonForLink\": ["
@@ -211,7 +212,8 @@ class GetLinkedCasesResponseCreatorTest {
             .hasMoreResults(false)
             .build();
 
-        final GetLinkedCasesResponse response = getLinkedCasesResponseCreator.createResponse(caseLinkRetrievalResults);
+        final GetLinkedCasesResponse response = getLinkedCasesResponseCreator.createResponse(caseLinkRetrievalResults,
+            CASE_REFERENCE);
 
         final List<CaseLinkInfo> caseLinks = response.getLinkedCases();
 
@@ -234,7 +236,8 @@ class GetLinkedCasesResponseCreatorTest {
             .hasMoreResults(false)
             .build();
 
-        final GetLinkedCasesResponse response = getLinkedCasesResponseCreator.createResponse(caseLinkRetrievalResults);
+        final GetLinkedCasesResponse response = getLinkedCasesResponseCreator.createResponse(caseLinkRetrievalResults,
+            CASE_REFERENCE);
 
         final List<CaseLinkInfo> caseLinks = response.getLinkedCases();
 
@@ -257,7 +260,7 @@ class GetLinkedCasesResponseCreatorTest {
             + "  \"security_classification\": \"PUBLIC\",\n"
             + "  \"case_data\": {\n"
             + "     \"CaseLink\": {\n"
-            + "         \"CaseReference\": \"1648478073517926\",\n"
+            + "         \"CaseReference\": \"" + CASE_REFERENCE + "\",\n"
             + "         \"CaseType\": \"MyBaseType\",\n"
             + "         \"CreatedDateTime\": \"2022-03-28T14:35:48.645045\",\n"
             + "         \"ReasonForLink\": ["
@@ -278,7 +281,8 @@ class GetLinkedCasesResponseCreatorTest {
             .hasMoreResults(false)
             .build();
 
-        final GetLinkedCasesResponse response = getLinkedCasesResponseCreator.createResponse(caseLinkRetrievalResults);
+        final GetLinkedCasesResponse response = getLinkedCasesResponseCreator.createResponse(caseLinkRetrievalResults,
+            CASE_REFERENCE);
 
         assertFalse(response.getLinkedCases().isEmpty());
         assertNull(response.getLinkedCases().get(0).getCaseNameHmctsInternal());

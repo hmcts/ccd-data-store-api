@@ -59,6 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -301,10 +302,10 @@ class CaseControllerTest {
         @DisplayName("should propagate BadRequestException when supplementary data not valid")
         void invalidSupplementaryDataUpdateRequest() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+            SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
 
             assertThrows(BadRequestException.class,
-                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE,
-                    new SupplementaryDataUpdateRequest()));
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, request));
         }
 
         @Test
@@ -320,10 +321,10 @@ class CaseControllerTest {
         @DisplayName("should propagate BadRequestException when supplementary data has empty operation data")
         void shouldThrowBadRequestExceptionWhenSupplementaryDataHasNoData() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+            SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest(new HashMap<>());
 
             assertThrows(BadRequestException.class,
-                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE,
-                    new SupplementaryDataUpdateRequest(new HashMap<>())));
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, request));
         }
 
         @Test
@@ -331,6 +332,7 @@ class CaseControllerTest {
         void shouldThrowBadRequestExceptionWhenSupplementaryDataHasNestedLevels() {
             doCallRealMethod().when(requestValidator).validate(any(SupplementaryDataUpdateRequest.class));
             SupplementaryDataUpdateRequest request = createRequestDataNested();
+
             assertThrows(BadRequestException.class,
                 () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, request));
         }
@@ -339,10 +341,10 @@ class CaseControllerTest {
         @DisplayName("should propagate BadRequestException when case reference not valid")
         void caseReferenceNotValid() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+            SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
 
             assertThrows(BadRequestException.class,
-                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE,
-                    new SupplementaryDataUpdateRequest()));
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, request));
         }
 
         private Map<String, Object> createResponseData() {
@@ -452,7 +454,8 @@ class CaseControllerTest {
                 .hasMoreRecords(false)
                 .linkedCases(List.of(CaseLinkInfo.builder().build()))
                 .build();
-            when(getLinkedCasesResponseCreator.createResponse(any())).thenReturn(getLinkedCasesResponse);
+            when(getLinkedCasesResponseCreator.createResponse(any(), eq(CASE_REFERENCE)))
+                .thenReturn(getLinkedCasesResponse);
 
             // WHEN
             final ResponseEntity<GetLinkedCasesResponse> response = caseController.getLinkedCase(CASE_REFERENCE,
@@ -479,7 +482,8 @@ class CaseControllerTest {
                 .hasMoreRecords(false)
                 .linkedCases(List.of(CaseLinkInfo.builder().build()))
                 .build();
-            when(getLinkedCasesResponseCreator.createResponse(any())).thenReturn(getLinkedCasesResponse);
+            when(getLinkedCasesResponseCreator.createResponse(any(), eq(CASE_REFERENCE)))
+                .thenReturn(getLinkedCasesResponse);
 
             final ResponseEntity<GetLinkedCasesResponse> response =
                 caseController.getLinkedCase(CASE_REFERENCE, START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT);

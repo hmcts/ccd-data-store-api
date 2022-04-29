@@ -96,7 +96,7 @@ class CaseLinkRetrievalServiceTest {
         });
 
         CaseLinkRetrievalResults standardLinkedCases =
-            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE, 1, 3);
+            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE, 1, 4);
 
         final List<Long> expectedLinkedCases = List.of(LINKED_CASE_REFERENCE_1, LINKED_CASE_REFERENCE_2,
             LINKED_CASE_REFERENCE_3, LINKED_CASE_REFERENCE_4);
@@ -130,10 +130,10 @@ class CaseLinkRetrievalServiceTest {
         });
 
         CaseLinkRetrievalResults standardLinkedCases =
-            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE, 3, 3);
+            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE, 4, 3);
 
-        final List<Long> expectedLinkedCases = List.of(LINKED_CASE_REFERENCE_3, LINKED_CASE_REFERENCE_4,
-            LINKED_CASE_REFERENCE_5, LINKED_CASE_REFERENCE_6);
+        final List<Long> expectedLinkedCases = List.of(LINKED_CASE_REFERENCE_4, LINKED_CASE_REFERENCE_5,
+            LINKED_CASE_REFERENCE_6);
         assertEquals(expectedLinkedCases.size(), standardLinkedCases.getCaseDetails().size());
         final List<Long> caseDetailIds = standardLinkedCases.getCaseDetails()
             .stream()
