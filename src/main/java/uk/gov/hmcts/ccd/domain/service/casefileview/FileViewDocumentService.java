@@ -84,7 +84,7 @@ public class FileViewDocumentService {
             : documentPath);
         final String result = sb.toString();
 
-        return new Tuple2<>(result.substring(2), documentNode);
+        return new Tuple2<>(result.substring(2).replaceAll(".value", ""), documentNode);
     }
 
     @SneakyThrows

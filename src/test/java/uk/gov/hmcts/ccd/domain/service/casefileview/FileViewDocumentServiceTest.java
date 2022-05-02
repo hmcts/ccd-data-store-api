@@ -110,14 +110,14 @@ class FileViewDocumentServiceTest {
                     "document_binary_url", "http://dm-store:8080/documents/84f04693-56ae-4aad-97e8-d1fc7592acea/binary"
                 )
             ),
-            Arguments.of("extraDocUploadList.0", "extraDocUploadList[90a2df83-f256-43ec-aaa0-48e127a44402].value",
+            Arguments.of("extraDocUploadList.0", "extraDocUploadList[90a2df83-f256-43ec-aaa0-48e127a44402]",
                 Map.of(
                     "document_url", "http://dm-store:8080/documents/7654b1e0-5df6-47c4-a5a0-3ec79fc78cfb",
                     "document_filename", "C_1_Collection of Documents.docx",
                     "document_binary_url", "http://dm-store:8080/documents/7654b1e0-5df6-47c4-a5a0-3ec79fc78cfb/binary"
                 )
             ),
-            Arguments.of("extraDocUploadList.1", "extraDocUploadList[84e22baf-5bec-4eec-a31f-7a3954efc9c3].value",
+            Arguments.of("extraDocUploadList.1", "extraDocUploadList[84e22baf-5bec-4eec-a31f-7a3954efc9c3]",
                 Map.of(
                     "document_url", "http://dm-store:8080/documents/f6d623f2-db67-4a01-ae6e-3b6ee14a8b20",
                     "document_filename", "C_2_Collection of Documents.docx",
@@ -125,8 +125,8 @@ class FileViewDocumentServiceTest {
                 )
             ),
             Arguments.of("state.0.partyDetail.0.type",
-                "state[01827252-e41c-476a-aec0-29ef33fdb8f9].value"
-                    + ".partyDetail[bf0c087a-cee6-4e6e-b91c-b06a5b4c2e1f].value.type",
+                "state[01827252-e41c-476a-aec0-29ef33fdb8f9]"
+                    + ".partyDetail[bf0c087a-cee6-4e6e-b91c-b06a5b4c2e1f].type",
                 Map.of(
                     "document_url", "http://dm-store:8080/documents/5a16b8ed-c62f-41b3-b3c9-1df20b6a9979",
                     "document_filename", "E_1_AA_Claimant details.xlsx",
@@ -134,8 +134,8 @@ class FileViewDocumentServiceTest {
                 )
             ),
             Arguments.of("state.0.partyDetail.1.type",
-                "state[01827252-e41c-476a-aec0-29ef33fdb8f9].value"
-                    + ".partyDetail[6dc61824-49f8-413e-b61f-a399b9c8436b].value.type",
+                "state[01827252-e41c-476a-aec0-29ef33fdb8f9]"
+                    + ".partyDetail[6dc61824-49f8-413e-b61f-a399b9c8436b].type",
                 Map.of(
                     "document_url", "http://dm-store:8080/documents/19de0db3-37c6-4191-a81d-c31a1379a9ca",
                     "document_filename", "E_1_BBClaimant details.xlsx",
@@ -143,8 +143,8 @@ class FileViewDocumentServiceTest {
                 )
             ),
             Arguments.of("state.1.partyDetail.0.type",
-                "state[c7327e34-48b1-4b5f-8663-5bad84964fb9].value"
-                    + ".partyDetail[f63ebcbc-9abf-40f9-9546-8da5375de65c].value.type",
+                "state[c7327e34-48b1-4b5f-8663-5bad84964fb9]"
+                    + ".partyDetail[f63ebcbc-9abf-40f9-9546-8da5375de65c].type",
                 Map.of(
                     "document_url", "http://dm-store:8080/documents/f51456a2-7b25-4855-844a-81c9763bc02c",
                     "document_filename", "E_2_AA_Claimant details.xlsx",
@@ -152,8 +152,8 @@ class FileViewDocumentServiceTest {
                 )
             ),
             Arguments.of("state.1.partyDetail.1.type",
-                "state[c7327e34-48b1-4b5f-8663-5bad84964fb9].value"
-                    + ".partyDetail[81998007-6fe6-4e1e-97ab-cd8e8fb05090].value.type",
+                "state[c7327e34-48b1-4b5f-8663-5bad84964fb9]"
+                    + ".partyDetail[81998007-6fe6-4e1e-97ab-cd8e8fb05090].type",
                 Map.of(
                     "document_url", "http://dm-store:8080/documents/2b01ebbc-d6e5-4ee5-9a80-58b28cb623ec",
                     "document_filename", "E_2_BB_Claimant details.xlsx",
@@ -161,8 +161,8 @@ class FileViewDocumentServiceTest {
                 )
             ),
             Arguments.of("state.2.partyDetail.0.type",
-                "state[afa735d8-686d-40ed-b43d-0bd875b771b1].value"
-                    + ".partyDetail[45c8633f-6298-4f4f-97df-016e16a18d35].value.type",
+                "state[afa735d8-686d-40ed-b43d-0bd875b771b1]"
+                    + ".partyDetail[45c8633f-6298-4f4f-97df-016e16a18d35].type",
                 Map.of(
                     "document_url", "http://dm-store:8080/documents/c6924316-4146-441d-a66d-6e181c48cb09",
                     "document_filename", "E_3_AA_Claimant details.pdf",
@@ -170,8 +170,8 @@ class FileViewDocumentServiceTest {
                 )
             ),
             Arguments.of("state.2.partyDetail.1.type",
-                "state[afa735d8-686d-40ed-b43d-0bd875b771b1].value"
-                    + ".partyDetail[958df3a9-9a57-4717-99ed-63a7cfc3e0e2].value.type",
+                "state[afa735d8-686d-40ed-b43d-0bd875b771b1]"
+                    + ".partyDetail[958df3a9-9a57-4717-99ed-63a7cfc3e0e2].type",
                 Map.of(
                     "document_url", "http://dm-store:8080/documents/77ad6295-59ce-4167-8f1e-4aa711ba2c00",
                     "document_filename", "E_3_BB_Claimant details.pdf",
@@ -179,8 +179,8 @@ class FileViewDocumentServiceTest {
                 )
             ),
             Arguments.of("state.2.partyDetail.2.type",
-                "state[afa735d8-686d-40ed-b43d-0bd875b771b1].value"
-                    + ".partyDetail[930d2fe8-c0fa-4cde-9e81-6fa39ddf4441].value.type",
+                "state[afa735d8-686d-40ed-b43d-0bd875b771b1]"
+                    + ".partyDetail[930d2fe8-c0fa-4cde-9e81-6fa39ddf4441].type",
                 Map.of(
                     "document_url", "http://dm-store:8080/documents/80e9471e-0f67-42ef-8739-170aa1942363",
                     "document_filename", "E_3_CC_Claimant details.pdf",
