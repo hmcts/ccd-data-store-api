@@ -46,14 +46,14 @@
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attribute_path" : "evidenceDocuments[ca399773-4dff-48d9-a1de-6ed0a4b6ae99].value",
+              "attribute_path" : "evidenceDocuments[ca399773-4dff-48d9-a1de-6ed0a4b6ae99]",
               "upload_timestamp": "[[ANY_NULLABLE]]"
             },
             {
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attribute_path" : "evidenceDocuments[ca399773-4dff-48d9-a1de-6ed0a4b6ae77].value",
+              "attribute_path" : "evidenceDocuments[ca399773-4dff-48d9-a1de-6ed0a4b6ae77]",
               "upload_timestamp": "[[ANY_NULLABLE]]"
             }
           ],
@@ -68,14 +68,14 @@
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attribute_path" : "applicationDocuments[0dc41c52-095b-4f25-b71d-77326658aaeb].value.document",
+              "attribute_path" : "applicationDocuments[0dc41c52-095b-4f25-b71d-77326658aaeb].document",
               "upload_timestamp": "[[ANY_NULLABLE]]"
             },
             {
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "attribute_path" : "applicationDocuments[0dc41c52-095b-4f25-b71d-77326698aaeb].value.document",
+              "attribute_path" : "applicationDocuments[0dc41c52-095b-4f25-b71d-77326698aaeb].document",
               "upload_timestamp": "[[ANY_NULLABLE]]"
             } ],
 
@@ -96,14 +96,14 @@
                   "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
                   "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
                   "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-                  "attribute_path" : "nationalityProof.documentEvidenceCollection[43ff6ca8-a77b-44ad-8769-aab0053db07e].value",
+                  "attribute_path" : "nationalityProof.documentEvidenceCollection[43ff6ca8-a77b-44ad-8769-aab0053db07e]",
                   "upload_timestamp": "[[ANY_NULLABLE]]"
                 },
                 {
                   "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
                   "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
                   "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-                  "attribute_path" : "nationalityProof.documentEvidenceCollection[43ff6ca8-a77b-44ad-8769-aab0053db07g].value",
+                  "attribute_path" : "nationalityProof.documentEvidenceCollection[43ff6ca8-a77b-44ad-8769-aab0053db07g]",
                   "upload_timestamp": "[[ANY_NULLABLE]]"
                 }
               ],
@@ -117,14 +117,14 @@
           "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "attribute_path": "miscellaneousDocuments[8c964a5c-7dd3-4728-8b22-cc49b9dbb846].value",
+          "attribute_path": "miscellaneousDocuments[8c964a5c-7dd3-4728-8b22-cc49b9dbb846]",
           "upload_timestamp": "[[ANY_NULLABLE]]"
         },
         {
           "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "attribute_path" : "miscellaneousDocuments[8c964a5c-7dd3-4728-8b22-cc49b9dbb889].value",
+          "attribute_path" : "miscellaneousDocuments[8c964a5c-7dd3-4728-8b22-cc49b9dbb889]",
           "upload_timestamp": "[[ANY_NULLABLE]]"
         }
       ]
