@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ public final class JacksonUtils {
         .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true)
         .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
         .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
+        .addModule(new JavaTimeModule())
         .build();
 
 

@@ -40,40 +40,14 @@
 		<cve>CVE-2007-1651</cve>
 		<cve>CVE-2007-1652</cve>
 	</suppress>
-
-	<suppress until="2022-05-25">
-    		<notes><![CDATA[
-   			file name: spring-security-core-5.4.7.jar
-   		]]></notes>
-    		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
-    		<vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
-  	</suppress>
-
 	<suppress until="2022-05-25">
 		<notes>
 			CVE affecting hazelcast-spring-4.0.3.jar and hazelcast-4.0.3.jar
 		</notes>
 		<cve>CVE-2022-0265</cve>
 	</suppress>
-
 	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: jackson-databind-2.11.4.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-		<cve>CVE-2020-36518</cve>
-	</suppress>
-
-    <suppress until="2022-05-25">
-        <notes><![CDATA[
-   file name: postgresql-42.2.16.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.postgresql/postgresql@.*$</packageUrl>
-        <cve>CVE-2022-21724</cve>
-    </suppress>
-
-	<suppress until="2022-05-25">
-		<cve>CVE-2022-23708</cve>
+		<cve>CVE-2022-22968</cve>
 	</suppress>
 
 	<suppress until="2022-05-25">
@@ -82,149 +56,5 @@
    ]]></notes>
 		<packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
 		<vulnerabilityName>CVE-2022-23708</vulnerabilityName>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: jackson-databind-2.11.1.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-		<cve>CVE-2020-36518</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: lang-tag-1.4.4.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
-		<cve>CVE-2020-23171</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: lang-tag-1.4.4.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
-		<cve>CVE-2020-29242</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: lang-tag-1.4.4.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
-		<cve>CVE-2020-29243</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: lang-tag-1.4.4.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
-		<cve>CVE-2020-29244</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: lang-tag-1.4.4.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
-		<cve>CVE-2020-29245</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: oauth2-oidc-sdk-8.36.1.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/com\.nimbusds/oauth2\-oidc\-sdk@.*$</packageUrl>
-		<cve>CVE-2007-1651</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: oauth2-oidc-sdk-8.36.1.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/com\.nimbusds/oauth2\-oidc\-sdk@.*$</packageUrl>
-		<cve>CVE-2007-1652</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: postgresql-42.2.16.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/org\.postgresql/postgresql@.*$</packageUrl>
-		<cve>CVE-2022-21724</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: spring-core-5.3.18.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/org\.springframework/spring\-core@.*$</packageUrl>
-		<cve>CVE-2022-22968</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: spring-security-config-5.4.7.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-config@.*$</packageUrl>
-		<cve>CVE-2018-1258</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: spring-security-core-5.4.7.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
-		<cve>CVE-2018-1258</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: spring-security-crypto-5.4.7.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
-		<cve>CVE-2018-1258</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: spring-security-oauth2-client-5.4.7.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-client@.*$</packageUrl>
-		<cve>CVE-2018-1258</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: spring-security-oauth2-core-5.4.7.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-core@.*$</packageUrl>
-		<cve>CVE-2018-1258</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: spring-security-oauth2-jose-5.4.7.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-jose@.*$</packageUrl>
-		<cve>CVE-2018-1258</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: spring-security-oauth2-resource-server-5.4.7.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-resource\-server@.*$</packageUrl>
-		<cve>CVE-2018-1258</cve>
-	</suppress>
-
-	<suppress until="2022-05-25">
-		<notes><![CDATA[
-   file name: spring-security-web-5.4.7.jar
-   ]]></notes>
-		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-web@.*$</packageUrl>
-		<cve>CVE-2018-1258</cve>
 	</suppress>
 </suppressions>
