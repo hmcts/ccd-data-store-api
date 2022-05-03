@@ -20,11 +20,18 @@ elastic:
 
 elasticsearch:
   clusterName: "es"
-  imageTag: "6.4.2"
+  imageTag: "7.11.1"
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
   esJavaOpts: "-Xmx512m -Xms512m"
+  extraEnvs:
+    - name: discovery.type
+      value: single-node
+    - name: cluster.initial_master_nodes
+      value: ""
+    - name: action.auto_create_index
+      value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
   persistence:
     enabled: false
   ingress:
