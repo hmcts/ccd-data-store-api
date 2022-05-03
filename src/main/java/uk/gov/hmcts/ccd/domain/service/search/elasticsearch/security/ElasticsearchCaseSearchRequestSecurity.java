@@ -99,7 +99,7 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
         searchSourceBuilder.query(queryBuilder);
 
         String queryString = searchSourceBuilder.toString();
-        log.info("[[ES Query ]] : " + queryString);
+        log.debug("[[ES Query ]] : " + queryString);
         return queryString;
     }
 
