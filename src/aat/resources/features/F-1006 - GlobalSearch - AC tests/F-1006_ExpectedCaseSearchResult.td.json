@@ -1,0 +1,19 @@
+{
+  "_guid_": "F-1006_ExpectedCaseSearchResult",
+
+  "stateId" : "CaseCreated",
+  "processForAccess" : "NONE",
+  "caseReference" : "[[ANYTHING_PRESENT]]",
+  "otherReferences" : [ "FirstNameValue" ],
+  "caseNameHmctsInternal" : "Name Internal",
+  "baseLocationId" : "1",
+  "baseLocationName" : "[[ANY_NULLABLE]]",
+  "caseManagementCategoryId" : "987",
+  "caseManagementCategoryName" : "Category label",
+  "regionId" : "3",
+  "regionName" : "[[ANY_NULLABLE]]",
+  "CCDJurisdictionId" : "BEFTA_MASTER",
+  "CCDJurisdictionName" : "BEFTA Master",
+  "CCDCaseTypeId" : "FT_GlobalSearch",
+  "CCDCaseTypeName" : "FT_GlobalSearch"
+}

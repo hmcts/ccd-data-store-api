@@ -1,10 +1,10 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  devmemoryRequests: '1524Mi'
-  devmemoryLimits: '2048Mi'
-  memoryRequests: '1524Mi'
-  memoryLimits: '2048Mi'
+  devmemoryRequests: 2048Mi
+  devcpuRequests: 2000m
+  devmemoryLimits: 4096Mi
+  devcpuLimits: 4000m
   keyVaults:
     ccd:
       resourceGroup: ccd-shared

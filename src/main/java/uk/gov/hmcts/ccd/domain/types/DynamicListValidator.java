@@ -26,7 +26,7 @@ public class DynamicListValidator implements BaseTypeValidator {
     @Override
     public List<ValidationResult> validate(String dataFieldId, JsonNode dataValue,
                                            CaseFieldDefinition caseFieldDefinition) {
-        if (isNullOrEmpty(dataValue)) {
+        if (isNullOrEmpty(dataValue) || isNullOrEmpty(dataValue.get(LIST_ITEMS))) {
             return Collections.emptyList();
         }
         List<ValidationResult> results = new ArrayList<>();
@@ -51,8 +51,23 @@ public class DynamicListValidator implements BaseTypeValidator {
     }
 
     protected void validateLength(List<ValidationResult> results, JsonNode node, String dataFieldId) {
-        final String code = node.get(CODE).textValue();
-        final String value = node.get(LABEL).textValue();
+        String code = null;
+        String value = null;
+
+        //If the node is not an object (or it does not have a value for specified field name),
+        //or if there is no field with such name,
+        //null is returned
+
+        //For non-string values textValue() will return null
+        //For String values textValue() is never null, but may be empty
+
+        if (node.get(CODE) != null) {
+            code = node.get(CODE).textValue();
+        }
+        if (node.get(LABEL) != null) {
+            value = node.get(LABEL).textValue();
+        }
+
         if (StringUtils.isNotEmpty(code) && code.length() > 150) {
             results.add(new ValidationResult("Code length exceeds MAX limit", dataFieldId));
         }
