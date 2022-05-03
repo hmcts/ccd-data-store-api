@@ -58,6 +58,7 @@ public class ReferenceDataRepository {
         unless = RESULT_IS_NULL_OR_EMPTY
     )
     public List<BuildingLocation> getBuildingLocations() {
+        log.info("started getBuildingLocations method, ttl {}", applicationParams.getRefDataCacheTtlInSec());
         return getReferenceData(BUILDING_LOCATIONS_PATH, BuildingLocation[].class);
     }
 
@@ -67,6 +68,7 @@ public class ReferenceDataRepository {
         unless = RESULT_IS_NULL_OR_EMPTY
     )
     public List<ServiceReferenceData> getServices() {
+        log.info("started getServices method, ttl {}", applicationParams.getRefDataCacheTtlInSec());
         return getReferenceData(SERVICES_PATH, ServiceReferenceData[].class);
     }
 
