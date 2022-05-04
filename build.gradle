@@ -120,16 +120,14 @@ configurations {
     providedRuntime
     annotationProcessor
 //    runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
-    all*.exclude module : 'logback-classic'
-    all*.exclude module : 'logback-core'
-    all*.exclude module : 'applicationinsights-logging-logback'
+
+    runtime.exclude(group: 'ch.qos.logback')
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
     contractTestCompile.extendsFrom(testCompile)
     contractTestRuntime.extendsFrom(testRuntime)
     cucumberRuntime.extendsFrom(functionalRuntime)
-
 }
 
 //This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
@@ -147,7 +145,6 @@ dependencies {
 
     compile group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
     compile group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLogging
-
 
     compile 'com.github.hmcts:properties-volume-spring-boot-starter:0.0.4'
 
