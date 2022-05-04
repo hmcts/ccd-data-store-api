@@ -120,6 +120,10 @@ configurations {
     providedRuntime
     annotationProcessor
 //    runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
+    all*.exclude module : 'logback-classic'
+    all*.exclude module : 'logback-core'
+    all*.exclude module : 'applicationinsights-logging-logback'
+
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
     contractTestCompile.extendsFrom(testCompile)
