@@ -39,14 +39,14 @@ public class GetLinkedCasesResponseCreator {
                 .ccdCaseType(caseDetail.getCaseTypeId())
                 .ccdJurisdiction(caseDetail.getJurisdiction())
                 .state(caseDetail.getState())
-                .linkDetails(createCaseDetails(caseDetail, caseReference))
+                .linkDetails(createLinkDetailsList(caseDetail, caseReference))
                 .build())
         );
 
         return caseLinkInfoList;
     }
 
-    private List<CaseLinkDetails> createCaseDetails(CaseDetails caseDetails, String caseReference) {
+    private List<CaseLinkDetails> createLinkDetailsList(CaseDetails caseDetails, String caseReference) {
         final JsonNode caseLinksJsonNode = caseDetails.getData().get(CaseLinkExtractor.STANDARD_CASE_LINK_FIELD);
         List<CaseLinkDetails> caseLinkDetailsList = new ArrayList<>();
         if (caseLinksJsonNode != null) {

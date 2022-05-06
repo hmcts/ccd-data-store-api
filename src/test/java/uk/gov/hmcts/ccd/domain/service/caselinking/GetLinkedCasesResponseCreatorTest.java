@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkDetails;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
 import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -14,9 +15,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkExtractor.STANDARD_CASE_LINK_FIELD;
+import static uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkTestFixtures.createCaseLinkCollectionString;
 
 class GetLinkedCasesResponseCreatorTest {
 
@@ -41,34 +45,71 @@ class GetLinkedCasesResponseCreatorTest {
         + "  \"security_classification\": \"PUBLIC\",\n"
         + "  \"case_data\": {\n"
         + "    \"caseNameHmctsInternal\" : \"%s\",\n"
-        + "  \"CaseLink\": {\n"
-        + "    \"CaseReference\": \"" + CASE_REFERENCE + "\",\n"
-        + "    \"CaseType\": \"MyBaseType\",\n"
-        + "    \"CreatedDateTime\": \"2022-03-28T14:35:48.645045\",\n"
-        + "    \"ReasonForLink\": ["
-        + "      {\n"
-        + "        \"value\": {\n"
-        + "          \"Reason\": \"reason\",\n"
-        + "          \"OtherDescription\": \"otherDescription\"\n"
-        + "        },\n"
-        + "        \"id\": \"4eddd3e0-1cf0-4ab3-9783-9d9a96c16db\"\n"
-        + "      },"
-        + "      {\n"
-        + "        \"value\": {\n"
-        + "          \"Reason\": \"reason2\",\n"
-        + "          \"OtherDescription\": \"otherDescription2\"\n"
-        + "        },\n"
-        + "        \"id\": \"6b9cff58-af9d-11ec-b909-0242ac120002\"\n"
-        + "      }"
-        + "     ]\n"
-        + "  },\n"
-        + "  \"PersonAddress\": {\n"
-        + "    \"Country\": \"England\",\n"
-        + "    \"Postcode\": \"HX08 5TG\",\n"
-        + "    \"AddressLine1\": \"123\",\n"
-        + "    \"AddressLine2\": \"Fake Street\",\n"
-        + "    \"AddressLine3\": \"Hexton\"\n"
-        + "  },\n"
+        + "    \"caseLinks\" : [ {\n"
+        // many reasons
+        + "      \"id\" : \"8d64133f-cde0-4db7-bdbe-6cb767c63d7d\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"" + CASE_REFERENCE + "\",\n"
+        + "        \"CaseType\" : \"MyBaseType\",\n"
+        + "        \"CreatedDateTime\" : \"2022-04-14T01:46:57.947877\",\n"
+        + "        \"ReasonForLink\" : [ {\n"
+        + "          \"id\" : \"57bc2066-545e-4020-8365-5cf4512b3c85\",\n"
+        + "          \"value\" : {\n"
+        + "            \"Reason\" : \"Reason 1.1\",\n"
+        + "            \"OtherDescription\" : \"OtherDescription 1.1\"\n"
+        + "          }\n"
+        + "        }, {\n"
+        + "          \"id\" : \"2f069606-18ca-453a-893f-a32c31443b16\",\n"
+        + "          \"value\" : {\n"
+        + "            \"Reason\" : \"Reason 1.2\",\n"
+        + "            \"OtherDescription\" : \"OtherDescription 1.2\"\n"
+        + "         }\n"
+        + "        } ]\n"
+        + "      }\n"
+        + "    }, {\n"
+        // to be ignored as wrong case reference
+        + "      \"id\" : \"d0eec7af-4bf0-4a24-9676-1d2d4dc736e6\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"4444333322221111\",\n"
+        + "        \"CaseType\" : \"MyBaseType\",\n"
+        + "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\",\n"
+        + "        \"ReasonForLink\" : [ {\n"
+        + "          \"id\" : \"b38a2996-3ddb-42fa-85d5-c8b07387e1ae\",\n"
+        + "          \"value\" : {\n"
+        + "            \"Reason\" : \"Reason and link ignored in test (wrong case reference)\",\n"
+        + "            \"OtherDescription\" : \"OtherDescription\"\n"
+        + "          }\n"
+        + "        } ]\n"
+        + "      }\n"
+        + "    }, {\n"
+        // single reason
+        + "      \"id\" : \"ddd50637-1e17-4395-a101-e65b3ed4e634\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"" + CASE_REFERENCE + "\",\n"
+        + "        \"CaseType\" : \"MyBaseType\",\n"
+        + "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\",\n"
+        + "        \"ReasonForLink\" : [ {\n"
+        + "          \"id\" : \"02d7b1a5-d5b7-4abd-8991-59ab8c1b4136\",\n"
+        + "          \"value\" : {\n"
+        + "            \"Reason\" : \"Reason 2.1\",\n"
+        + "            \"OtherDescription\" : \"OtherDescription 2.1\"\n"
+        + "          }\n"
+        + "        } ]\n"
+        + "      }\n"
+        + "    }, {\n"
+        // minimal case link (i.e. no reasons or date time)
+        + "      \"id\" : \"f113b206-9ebd-4e8e-b1c6-ee0093167e1a\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"" + CASE_REFERENCE + "\"\n"
+        + "      }\n"
+        + "    } ],\n"
+        + "    \"PersonAddress\": {\n"
+        + "      \"Country\": \"England\",\n"
+        + "      \"Postcode\": \"HX08 5TG\",\n"
+        + "      \"AddressLine1\": \"123\",\n"
+        + "      \"AddressLine2\": \"Fake Street\",\n"
+        + "      \"AddressLine3\": \"Hexton\"\n"
+        + "    },\n"
         + "    \"PersonLastName\": \"Parker\",\n"
         + "    \"PersonFirstName\": \"Janet\"\n"
         + "  },\n"
@@ -187,19 +228,19 @@ class GetLinkedCasesResponseCreatorTest {
     }
 
     @Test
-    void testCreateCaseLinkInfos() throws JsonProcessingException {
+    void testCreateCaseLinkInfoList() throws JsonProcessingException {
         List<String> caseDetails1 = List.of("1500638105106660",
-            "jusrisdiction",
+            "jurisdiction",
             "state",
             "caseTypeId",
             "caseNameHmctsInternal");
         List<String> caseDetails2 = List.of("9514840069336542",
-            "jusrisdiction2",
+            "jurisdiction2",
             "state2",
             "caseTypeId2",
             "caseNameHmctsInternal2");
         List<String> caseDetails3 = List.of("4827897342988773",
-            "jusrisdiction3",
+            "jurisdiction3",
             "state3",
             "caseTypeId3",
             "caseNameHmctsInternal3");
@@ -227,9 +268,9 @@ class GetLinkedCasesResponseCreatorTest {
     }
 
     @Test
-    void testCreateCaseLinkInfosNoCaseLinkFieldsPresent() throws JsonProcessingException {
+    void testCreateCaseLinkInfoListNoCaseLinkFieldsPresent() throws JsonProcessingException {
         final String caseDetails = String.format(CASE_DETAILS_TEMPLATE_NO_CASE_LINK_FIELDS, "1500638105106660",
-            "jusrisdiction","state",  "caseTypeId", "caseNameHmctsInternal");
+            "jurisdiction", "state", "caseTypeId", "caseNameHmctsInternal");
 
         CaseLinkRetrievalResults caseLinkRetrievalResults = CaseLinkRetrievalResults.builder()
             .caseDetails(List.of(OBJECT_MAPPER.readValue(caseDetails, CaseDetails.class)))
@@ -246,7 +287,7 @@ class GetLinkedCasesResponseCreatorTest {
     }
 
     @Test
-    void testCreateCaseLinkInfosNoCaseNameHmctsInternalFieldPresent() throws JsonProcessingException {
+    void testCreateCaseLinkInfoListNoCaseNameHmctsInternalFieldPresent() throws JsonProcessingException {
 
         final String minimalCaseDetails = "{\n"
             + "  \"id\": \"1500638105106660\",\n"
@@ -259,20 +300,7 @@ class GetLinkedCasesResponseCreatorTest {
             + "  \"last_state_modified_date\": \"2016-06-24T20:44:52.824\",\n"
             + "  \"security_classification\": \"PUBLIC\",\n"
             + "  \"case_data\": {\n"
-            + "     \"CaseLink\": {\n"
-            + "         \"CaseReference\": \"" + CASE_REFERENCE + "\",\n"
-            + "         \"CaseType\": \"MyBaseType\",\n"
-            + "         \"CreatedDateTime\": \"2022-03-28T14:35:48.645045\",\n"
-            + "         \"ReasonForLink\": ["
-            + "             {\n"
-            + "                 \"value\": {\n"
-            + "                     \"Reason\": \"reason2\",\n"
-            + "                     \"OtherDescription\": \"otherDescription2\"\n"
-            + "                 },\n"
-            + "                 \"id\": \"6b9cff58-af9d-11ec-b909-0242ac120002\"\n"
-            + "             }"
-            + "         ]\n"
-            + "     }\n"
+            +        createCaseLinkCollectionString(STANDARD_CASE_LINK_FIELD, List.of(CASE_REFERENCE))
             + "  }\n"
             + "}";
 
@@ -289,10 +317,42 @@ class GetLinkedCasesResponseCreatorTest {
     }
 
     void assertCaseLinkInfo(CaseLinkInfo caseLinkInfo, List<String> values) {
-        assertEquals(caseLinkInfo.getCaseReference(), values.get(0));
-        assertEquals(caseLinkInfo.getCcdJurisdiction(), values.get(1));
-        assertEquals(caseLinkInfo.getState(), values.get(2));
-        assertEquals(caseLinkInfo.getCcdCaseType(), values.get(3));
-        assertEquals(caseLinkInfo.getCaseNameHmctsInternal(), values.get(4));
+        assertEquals(values.get(0), caseLinkInfo.getCaseReference());
+        assertEquals(values.get(1), caseLinkInfo.getCcdJurisdiction());
+        assertEquals(values.get(2), caseLinkInfo.getState());
+        assertEquals(values.get(3), caseLinkInfo.getCcdCaseType());
+        assertEquals(values.get(4), caseLinkInfo.getCaseNameHmctsInternal());
+
+        assertLinkDetailsList(caseLinkInfo.getLinkDetails());
+    }
+
+    void assertLinkDetailsList(List<CaseLinkDetails> caseLinkDetailsList) {
+
+        // verify many case links can be processed for same case reference
+
+        // NB: based on extract from CASE_DETAILS_TEMPLATE
+        assertNotNull(caseLinkDetailsList);
+        assertEquals(3, caseLinkDetailsList.size());
+
+        // many reasons
+        assertNotNull(caseLinkDetailsList.get(0).getCreatedDateTime());
+        assertNotNull(caseLinkDetailsList.get(0).getReasons());
+        assertEquals(2, caseLinkDetailsList.get(0).getReasons().size());
+        assertEquals("Reason 1.1", caseLinkDetailsList.get(0).getReasons().get(0).getReasonCode());
+        assertEquals("OtherDescription 1.1", caseLinkDetailsList.get(0).getReasons().get(0).getOtherDescription());
+        assertEquals("Reason 1.2", caseLinkDetailsList.get(0).getReasons().get(1).getReasonCode());
+        assertEquals("OtherDescription 1.2", caseLinkDetailsList.get(0).getReasons().get(1).getOtherDescription());
+
+        // single reason
+        assertNotNull(caseLinkDetailsList.get(1).getCreatedDateTime());
+        assertNotNull(caseLinkDetailsList.get(1).getReasons());
+        assertEquals(1, caseLinkDetailsList.get(1).getReasons().size());
+        assertEquals("Reason 2.1", caseLinkDetailsList.get(1).getReasons().get(0).getReasonCode());
+        assertEquals("OtherDescription 2.1", caseLinkDetailsList.get(1).getReasons().get(0).getOtherDescription());
+
+        // minimal case link (i.e. no reasons or date time)
+        assertNull(caseLinkDetailsList.get(2).getCreatedDateTime());
+        assertNotNull(caseLinkDetailsList.get(2).getReasons());
+        assertEquals(0, caseLinkDetailsList.get(2).getReasons().size());
     }
 }
