@@ -1,13 +1,20 @@
 package uk.gov.hmcts.ccd.domain.service.caselinking;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -82,6 +89,22 @@ public abstract class CaseLinkTestFixtures {
         caseDetails.setData(caseData);
 
         return caseDetails;
+    }
+
+    protected Map<String, JsonNode> createCaseDataMap(List<String> dataValues) throws JsonProcessingException {
+        return JacksonUtils.MAPPER.readValue("{" + StringUtils.join(dataValues, ",") + "}",
+            new TypeReference<HashMap<String, JsonNode>>() { });
+    }
+
+    protected static String createCaseLinkCollectionString(String fieldName, List<String> linkedCaseReferences) {
+        return "\"" + fieldName + "\" : [ " + linkedCaseReferences.stream()
+            .map(caseReferences -> "{\n"
+               + "        \"id\" : \"" + UUID.randomUUID() + "\",\n"
+               + "        \"value\" : {\n"
+               + "          \"CaseReference\" : \"" + caseReferences + "\"\n"
+               + "        }\n"
+               + "      }")
+            .collect(Collectors.joining(", ")) + " ]";
     }
 
     protected CaseTypeDefinition createCaseTypeDefinition() {

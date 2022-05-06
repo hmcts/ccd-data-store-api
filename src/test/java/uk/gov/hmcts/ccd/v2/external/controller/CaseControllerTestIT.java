@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,8 +28,10 @@ import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkDetails;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
 import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
+import uk.gov.hmcts.ccd.domain.model.caselinking.Reason;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -100,7 +102,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldLogAuditInfoForGetCaseById() throws Exception {
+    void shouldLogAuditInfoForGetCaseById() throws Exception {
         String caseId = "1504259907353529";
         final String URL = "/cases/" + caseId;
 
@@ -133,7 +135,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldLogAuditInfoForGetCaseByIdWithNullRequestId() throws Exception {
+    void shouldLogAuditInfoForGetCaseByIdWithNullRequestId() throws Exception {
         String caseId = "1504259907353529";
         final String URL = "/cases/" + caseId;
 
@@ -164,7 +166,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldLogAuditInfoForCreateEventByCaseId() throws Exception {
+    void shouldLogAuditInfoForCreateEventByCaseId() throws Exception {
         String caseId = "1504259907353529";
         final String URL = "/cases/" + caseId + "/events";
 
@@ -206,7 +208,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldSaveOnBehalfOfUserAndProxiedByUser() throws Exception {
+    void shouldSaveOnBehalfOfUserAndProxiedByUser() throws Exception {
         String caseId = "1504259907353529";
         final String URL = "/cases/" + caseId + "/events";
 
@@ -244,7 +246,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCase() throws Exception {
+    void shouldReturn201WhenPostCreateCase() throws Exception {
         final String URL = "/case-types/" + CASE_TYPE + "/cases";
         final String description = "A very long comment.......";
         final String summary = "Short comment";
@@ -288,7 +290,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldPopulateSearchCriteriaPostCreateCase() throws Exception {
+    void shouldPopulateSearchCriteriaPostCreateCase() throws Exception {
         final String URL = "/case-types/" + CASE_TYPE_WITH_SEARCH_PARTY + "/cases";
         final String description = "A very long comment.......";
         final String summary = "Short comment";
@@ -361,7 +363,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldPopulateMultipleSearchCriteriaAndSearchPartiesPostCreateCase() throws Exception {
+    void shouldPopulateMultipleSearchCriteriaAndSearchPartiesPostCreateCase() throws Exception {
         final String URL = "/case-types/" + CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY + "/cases";
         final String description = "A very long comment.......";
         final String summary = "Short comment";
@@ -412,7 +414,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_global_search.sql"})
-    public void shouldPopulateMultipleSearchCriteriaAndSearchPartiesPostCreateEvent() throws Exception {
+    void shouldPopulateMultipleSearchCriteriaAndSearchPartiesPostCreateEvent() throws Exception {
         String caseId = "1504259907353529";
         final String URL = "/cases/" + caseId + "/events";
 
@@ -455,7 +457,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @Test
     @DisplayName("Submit case creation event without any documents but "
         + "upload a document with 'document_hash' field via about_to_submit callback")
-    public void shouldReturn201WhenPostCreateCaseAndAboutToSubmitCallbackWithDocument() throws Exception {
+    void shouldReturn201WhenPostCreateCaseAndAboutToSubmitCallbackWithDocument() throws Exception {
         final String callbackEventId = "TEST_SUBMIT_CALLBACK_EVENT";
         final String URL = "/case-types/" + CASE_TYPE + "/cases";
         final String description = "A very long comment.......";
@@ -509,7 +511,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseV3() throws Exception {
+    void shouldReturn201WhenPostCreateCaseV3() throws Exception {
         final String url = "/case-types/" + CASE_TYPE + "/cases";
         final String description = "A very long comment.......";
         final String summary = "Short comment";
@@ -545,7 +547,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
@@ -575,7 +577,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRole() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRole() throws Exception {
         final String URL = "/case-types/" + CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -591,7 +593,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void shouldSetSupplementaryData() throws Exception {
+    void shouldSetSupplementaryData() throws Exception {
         String caseId = "1504259907353529";
         final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequestOrgB();
@@ -616,7 +618,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void shouldSetSupplementaryDataMultipleUpdate() throws Exception {
+    void shouldSetSupplementaryDataMultipleUpdate() throws Exception {
         String caseId = "1504259907353529";
         final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequestMultiple();
@@ -644,7 +646,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void shouldIncrementSupplementaryData() throws Exception {
+    void shouldIncrementSupplementaryData() throws Exception {
         String caseId = "1504259907353529";
         final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataIncrementRequest();
@@ -664,7 +666,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void shouldCreateSupplementaryDataWhenNotExists() throws Exception {
+    void shouldCreateSupplementaryDataWhenNotExists() throws Exception {
         String caseId = "1504259907353545";
         final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
@@ -686,35 +688,37 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void shouldThrowExceptionWhenCaseNotFound() throws Exception {
+    void shouldThrowExceptionWhenCaseNotFound() throws Exception {
         String caseId = "1504259907353586";
         final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
-        final String message = mockMvc.perform(post(URL)
+        final Exception exception = mockMvc.perform(post(URL)
                 .contentType(JSON_CONTENT_TYPE)
                 .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
             ).andExpect(status().is(404))
-            .andReturn().getResolvedException().getMessage();
+            .andReturn().getResolvedException();
 
-        assertTrue(StringUtils.contains(message, CASE_NOT_FOUND));
+        assertNotNull(exception);
+        assertTrue(StringUtils.contains(exception.getMessage(), CASE_NOT_FOUND));
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void shouldThrowExceptionWhenCaseIsNotValid() throws Exception {
+    void shouldThrowExceptionWhenCaseIsNotValid() throws Exception {
         String caseId = "12233";
         final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
-        final String message = mockMvc.perform(post(URL)
+        final Exception exception = mockMvc.perform(post(URL)
                 .contentType(JSON_CONTENT_TYPE)
                 .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
             ).andExpect(status().is(400))
-            .andReturn().getResolvedException().getMessage();
+            .andReturn().getResolvedException();
 
-        assertTrue(StringUtils.contains(message, CASE_ID_INVALID));
+        assertNotNull(exception);
+        assertTrue(StringUtils.contains(exception.getMessage(), CASE_ID_INVALID));
     }
 
     @Nested
@@ -746,14 +750,20 @@ class CaseControllerTestIT extends WireMockBaseTest {
             final String URL = "/cases/" + caseId + "/supplementary-data";
             SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
-            final String message = mockMvc.perform(post(URL)
+            final Exception exception = mockMvc.perform(post(URL)
                     .contentType(JSON_CONTENT_TYPE)
                     .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
                 ).andExpect(status().is(403))
-                .andReturn().getResolvedException().getMessage();
+                .andReturn().getResolvedException();
 
-            assertTrue(StringUtils.contains(message, NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA));
+            assertNotNull(exception);
+            assertTrue(StringUtils.contains(exception.getMessage(), NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA));
         }
+    }
+
+    private Map<String, Map<String, Object>> readValueToMap(String jsonRequest) throws JsonProcessingException {
+        return mapper.readValue(jsonRequest, new TypeReference<HashMap<String, Map<String, Object>>>() {
+        });
     }
 
     private SupplementaryDataUpdateRequest createSupplementaryDataSetRequestMultiple() throws JsonProcessingException {
@@ -764,7 +774,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
             + "\t}\n"
             + "}";
 
-        Map<String, Map<String, Object>> requestData = mapper.readValue(jsonRequest, Map.class);
+        Map<String, Map<String, Object>> requestData = readValueToMap(jsonRequest);
         return new SupplementaryDataUpdateRequest(requestData);
     }
 
@@ -775,7 +785,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
             + "\t}\n"
             + "}";
 
-        Map<String, Map<String, Object>> requestData = mapper.readValue(jsonRequest, Map.class);
+        Map<String, Map<String, Object>> requestData = readValueToMap(jsonRequest);
         return new SupplementaryDataUpdateRequest(requestData);
     }
 
@@ -786,7 +796,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
             + "\t}\n"
             + "}";
 
-        Map<String, Map<String, Object>> requestData = mapper.readValue(jsonRequest, Map.class);
+        Map<String, Map<String, Object>> requestData = readValueToMap(jsonRequest);
         return new SupplementaryDataUpdateRequest(requestData);
     }
 
@@ -797,245 +807,332 @@ class CaseControllerTestIT extends WireMockBaseTest {
             + "\t}\n"
             + "}";
 
-        Map<String, Map<String, Object>> requestData = mapper.readValue(jsonRequest, Map.class);
+        Map<String, Map<String, Object>> requestData = readValueToMap(jsonRequest);
         return new SupplementaryDataUpdateRequest(requestData);
     }
 
-    @Disabled("TODO: re-enable after refactor complete")
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
-    void testShouldGetLinkedCases() throws Exception {
-        final String caseReference = "1504259907353545";
-        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=1";
+    @Nested
+    @DisplayName("GET /getLinkedCases/{caseReference}")
+    class GetLinkedCases {
 
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-            .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
+        // data values as per: classpath:sql/insert_cases_get_case_links.sql
 
-        assertEquals(200, mvcResult.getResponse().getStatus());
+        // scenario 1: some linked cases
+        static final String SCENARIO_01_CASE_REFERENCE = "1504259907353545";
+        static final String SCENARIO_01_LINKED_CASE_01_REFERENCE = "1504259907353537";
+        static final String SCENARIO_01_LINKED_CASE_02_REFERENCE = "1504259907353552";
+        static final String SCENARIO_01_LINKED_CASE_03_REFERENCE_NON_STANDARD = "9233017909132197";
 
-        String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull(content, "Content Should not be null");
+        // scenario 2: many linked cases
+        static final String SCENARIO_02_CASE_REFERENCE = "3522116262568758";
+        static final String SCENARIO_02_LINKED_CASE_01_REFERENCE = "4504127458172644";
+        static final String SCENARIO_02_LINKED_CASE_02_REFERENCE = "6913605797587333";
+        static final String SCENARIO_02_LINKED_CASE_03_REFERENCE = "2609130232931622";
+        static final String SCENARIO_02_LINKED_CASE_04_REFERENCE = "8256979053075411";
+        static final String SCENARIO_02_LINKED_CASE_05_REFERENCE_HIDDEN = "1651653562092458";
+        static final String SCENARIO_02_LINKED_CASE_06_REFERENCE = "8855462425591410";
 
-        GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
-        assertEquals(2, getLinkedCasesResponse.getLinkedCases().size());
+        // scenario 3: no linked cases
+        static final String SCENARIO_03_CASE_REFERENCE = "8990926843606105";
 
-        final List<String> caseReferences =
-            getLinkedCasesResponse.getLinkedCases().stream()
-                .map(CaseLinkInfo::getCaseReference)
-                .collect(Collectors.toList());
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
+        void testShouldGetLinkedCases() throws Exception {
+            final String URL = "/getLinkedCases/" + SCENARIO_01_CASE_REFERENCE + "?startRecordNumber=1";
 
-        assertTrue(caseReferences.containsAll(List.of("1504259907353537", "1504259907353552")));
+            final MvcResult mvcResult = mockMvc.perform(get(URL)
+                    .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .contentType(JSON_CONTENT_TYPE))
+                .andReturn();
 
-        assertFalse(getLinkedCasesResponse.isHasMoreRecords());
+            assertEquals(200, mvcResult.getResponse().getStatus());
+
+            String content = mvcResult.getResponse().getContentAsString();
+            assertNotNull(content, "Content Should not be null");
+
+            GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
+            assertEquals(2, getLinkedCasesResponse.getLinkedCases().size());
+
+            final Map<String, CaseLinkInfo> linkedCaseMap = getLinkedCasesAsMap(getLinkedCasesResponse);
+            assertTrue(linkedCaseMap.keySet().containsAll(List.of(
+                SCENARIO_01_LINKED_CASE_01_REFERENCE, SCENARIO_01_LINKED_CASE_02_REFERENCE)));
+
+            // confirm non-standard links are excluded
+            assertFalse(linkedCaseMap.containsKey(SCENARIO_01_LINKED_CASE_03_REFERENCE_NON_STANDARD));
+
+            assertCaseLinkInfo(
+                SCENARIO_01_LINKED_CASE_01_REFERENCE,
+                "Case Name: Scenario 1 linked case 1",
+                List.of(
+                    Reason.builder()
+                        .reasonCode("Reason 1.1")
+                        .otherDescription("OtherDescription 1.1")
+                        .build()
+                ),
+                null,
+                linkedCaseMap.get(SCENARIO_01_LINKED_CASE_01_REFERENCE)
+            );
+
+            assertCaseLinkInfo(
+                SCENARIO_01_LINKED_CASE_02_REFERENCE,
+                "Case Name: Scenario 1 linked case 2",
+                List.of(
+                    Reason.builder()
+                        .reasonCode("Reason 1.2.1")
+                        .otherDescription("OtherDescription 1.2.1")
+                        .build(),
+                    Reason.builder()
+                        .reasonCode("Reason 1.2.2")
+                        .otherDescription("OtherDescription 1.2.2")
+                        .build()
+                ),
+                List.of(
+                    Reason.builder()
+                        .reasonCode("Reason 1.2.3")
+                        .otherDescription("OtherDescription 1.2.3")
+                        .build()
+                ),
+                linkedCaseMap.get(SCENARIO_01_LINKED_CASE_02_REFERENCE)
+            );
+
+            assertFalse(getLinkedCasesResponse.isHasMoreRecords());
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
+        void testShouldGetLinkedCasesOptionalParameters() throws Exception {
+            final String URL = "/getLinkedCases/" + SCENARIO_01_CASE_REFERENCE
+                + "?startRecordNumber=2&maxReturnRecordCount=1";
+
+            final MvcResult mvcResult = mockMvc.perform(get(URL)
+                    .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .contentType(JSON_CONTENT_TYPE))
+                .andReturn();
+
+            String content = mvcResult.getResponse().getContentAsString();
+            assertNotNull(content, "Content Should not be null");
+
+            GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
+            assertEquals(1, getLinkedCasesResponse.getLinkedCases().size());
+
+            final Map<String, CaseLinkInfo> linkedCaseMap = getLinkedCasesAsMap(getLinkedCasesResponse);
+            assertTrue(linkedCaseMap.containsKey(SCENARIO_01_LINKED_CASE_02_REFERENCE));
+
+            assertFalse(getLinkedCasesResponse.isHasMoreRecords());
+        }
+
+        @Test
+        void testGetLinkedCasesInvalidCaseReferenceShouldReturn400() throws Exception {
+            final String caseReference = "abc";
+            final String URL = "/getLinkedCases/" + caseReference;
+
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+            final MvcResult mvcResult = mockMvc.perform(get(URL)
+                    .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .contentType(JSON_CONTENT_TYPE))
+                .andReturn();
+
+            assertEquals(400, mvcResult.getResponse().getStatus());
+        }
+
+        @Test
+        void testShouldGetLinkedCasesReturn404WhenCaseDoesNotExist() throws Exception {
+            final String caseReference = "4444333322221111";
+            final String URL = "/getLinkedCases/" + caseReference;
+
+            final MvcResult mvcResult = mockMvc.perform(get(URL)
+                    .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .contentType(JSON_CONTENT_TYPE))
+                .andReturn();
+
+            assertEquals(404, mvcResult.getResponse().getStatus());
+        }
+
+        @Test
+        void testShouldGetLinkedCasesStartRecordNumberNotNumericReturn400() throws Exception {
+            final String URL = "/getLinkedCases/" + SCENARIO_01_CASE_REFERENCE + "?startRecordNumber=A";
+
+            final MvcResult mvcResult = mockMvc.perform(get(URL)
+                    .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .contentType(JSON_CONTENT_TYPE))
+                .andReturn();
+
+            assertEquals(400, mvcResult.getResponse().getStatus());
+        }
+
+        @Test
+        void testShouldGetLinkedCasesMaxRecordCountNotNumericReturn400() throws Exception {
+            final String URL = "/getLinkedCases/" + SCENARIO_01_CASE_REFERENCE + "?maxReturnRecordCount=A";
+
+            final MvcResult mvcResult = mockMvc.perform(get(URL)
+                    .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .contentType(JSON_CONTENT_TYPE))
+                .andReturn();
+
+            assertEquals(400, mvcResult.getResponse().getStatus());
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
+        void shouldLogAuditInfoForGetLinkedCases() throws Exception {
+            final String URL = "/getLinkedCases/" + SCENARIO_01_CASE_REFERENCE + "?startRecordNumber=1";
+
+            final MvcResult mvcResult = mockMvc.perform(get(URL)
+                    .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .contentType(JSON_CONTENT_TYPE))
+                .andReturn();
+
+            assertEquals(200, mvcResult.getResponse().getStatus());
+            String content = mvcResult.getResponse().getContentAsString();
+
+            assertNotNull(content, "Content Should not be null");
+
+            ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+            verify(auditRepository).save(captor.capture());
+
+            List<String> caseReferences = Arrays.asList(captor.getValue().getCaseId().split(","));
+
+            assertThat(captor.getValue().getOperationType(), is(AuditOperationType.LINKED_CASES_ACCESSED.getLabel()));
+            assertThat(caseReferences.size(), is(3));
+            assertThat(caseReferences, containsInAnyOrder(SCENARIO_01_CASE_REFERENCE,
+                SCENARIO_01_LINKED_CASE_01_REFERENCE, SCENARIO_01_LINKED_CASE_02_REFERENCE));
+            assertThat(captor.getValue().getIdamId(), is(UID));
+            assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
+            assertThat(captor.getValue().getHttpStatus(), is(200));
+            assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
+        void getLinkedCasesShouldReturnEmptyResponsePayloadWhenNoLinkedCasesExist() throws Exception {
+            final String URL = "/getLinkedCases/" + SCENARIO_03_CASE_REFERENCE + "?startRecordNumber=1";
+
+            final MvcResult mvcResult = mockMvc.perform(get(URL)
+                    .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .contentType(JSON_CONTENT_TYPE))
+                .andReturn();
+
+            assertEquals(200, mvcResult.getResponse().getStatus());
+
+            final GetLinkedCasesResponse getLinkedCasesResponse =
+                mapper.readValue(mvcResult.getResponse().getContentAsString(), GetLinkedCasesResponse.class);
+
+            assertNotNull(getLinkedCasesResponse, "Content should not be null");
+
+            assertTrue(getLinkedCasesResponse.getLinkedCases().isEmpty());
+
+            assertFalse(getLinkedCasesResponse.isHasMoreRecords());
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
+        void getLinkedCasesPaginationPage1() throws Exception {
+            final String URL = "/getLinkedCases/" + SCENARIO_02_CASE_REFERENCE
+                + "?startRecordNumber=1&maxReturnRecordCount=4";
+
+            final MvcResult mvcResult = mockMvc.perform(get(URL)
+                    .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .contentType(JSON_CONTENT_TYPE))
+                .andReturn();
+
+            assertEquals(200, mvcResult.getResponse().getStatus());
+
+            String content = mvcResult.getResponse().getContentAsString();
+            assertNotNull(content, "Content should not be null");
+
+            GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
+
+            assertEquals(4, getLinkedCasesResponse.getLinkedCases().size());
+
+            final Map<String, CaseLinkInfo> linkedCaseMap = getLinkedCasesAsMap(getLinkedCasesResponse);
+            assertTrue(linkedCaseMap.keySet().containsAll(List.of(
+                SCENARIO_02_LINKED_CASE_01_REFERENCE,
+                SCENARIO_02_LINKED_CASE_02_REFERENCE,
+                SCENARIO_02_LINKED_CASE_03_REFERENCE,
+                SCENARIO_02_LINKED_CASE_04_REFERENCE)));
+
+            assertTrue(getLinkedCasesResponse.isHasMoreRecords());
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
+        void getLinkedCasesPaginationPage2() throws Exception {
+            final String URL = "/getLinkedCases/" + SCENARIO_02_CASE_REFERENCE
+                + "?startRecordNumber=5&maxReturnRecordCount=4";
+
+            final MvcResult mvcResult = mockMvc.perform(get(URL)
+                    .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .contentType(JSON_CONTENT_TYPE))
+                .andReturn();
+
+            assertEquals(200, mvcResult.getResponse().getStatus());
+
+            String content = mvcResult.getResponse().getContentAsString();
+            assertNotNull(content, "Content Should not be null");
+
+            GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
+
+            assertEquals(1, getLinkedCasesResponse.getLinkedCases().size());
+
+            final Map<String, CaseLinkInfo> linkedCaseMap = getLinkedCasesAsMap(getLinkedCasesResponse);
+            assertTrue(linkedCaseMap.containsKey(SCENARIO_02_LINKED_CASE_06_REFERENCE));
+
+            // confirm case with standard caseLink field that is hidden from user is excluded from results
+            assertFalse(linkedCaseMap.containsKey(SCENARIO_02_LINKED_CASE_05_REFERENCE_HIDDEN));
+
+            assertFalse(getLinkedCasesResponse.isHasMoreRecords());
+        }
+
+        private Map<String, CaseLinkInfo> getLinkedCasesAsMap(GetLinkedCasesResponse getLinkedCasesResponse) {
+            return getLinkedCasesResponse.getLinkedCases().stream()
+                .collect(Collectors.toMap(
+                    CaseLinkInfo::getCaseReference,
+                    caseLinkInfo -> caseLinkInfo));
+        }
+
+        private void assertCaseLinkInfo(String expectedCaseReference,
+                                        String expectedCaseNameHmctsInternal,
+                                        List<Reason> expectedReasonsFromDetails1,
+                                        List<Reason> expectedReasonsFromDetails2,
+                                        CaseLinkInfo actualCaseLinkInfo) {
+            assertNotNull(actualCaseLinkInfo);
+
+            assertEquals(expectedCaseReference, actualCaseLinkInfo.getCaseReference());
+            assertEquals(expectedCaseNameHmctsInternal, actualCaseLinkInfo.getCaseNameHmctsInternal());
+
+            assertNotNull(actualCaseLinkInfo.getState());
+            assertNotNull(actualCaseLinkInfo.getCcdCaseType());
+            assertNotNull(actualCaseLinkInfo.getCcdJurisdiction());
+            assertNotNull(actualCaseLinkInfo.getLinkDetails());
+
+            final CaseLinkDetails caseLinkDetails1 = actualCaseLinkInfo.getLinkDetails().get(0);
+            assertNotNull(caseLinkDetails1.getCreatedDateTime());
+            assertReasonList(expectedReasonsFromDetails1, caseLinkDetails1.getReasons());
+
+            if (expectedReasonsFromDetails2 == null) {
+                assertEquals(1, actualCaseLinkInfo.getLinkDetails().size());
+            } else {
+                assertEquals(2, actualCaseLinkInfo.getLinkDetails().size());
+
+                final CaseLinkDetails caseLinkDetails2 = actualCaseLinkInfo.getLinkDetails().get(1);
+                assertNotNull(caseLinkDetails2.getCreatedDateTime());
+                assertReasonList(expectedReasonsFromDetails2, caseLinkDetails2.getReasons());
+            }
+        }
+
+        private void assertReasonList(List<Reason> expectedReasons,
+                                      List<Reason> actualReasons) {
+            assertNotNull(actualReasons);
+            assertEquals(expectedReasons.size(), actualReasons.size());
+        }
+
     }
 
-    @Disabled("TODO: re-enable after refactor complete")
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
-    void testShouldGetLinkedCasesOptionalParameters() throws Exception {
-        final String caseReference = "1504259907353545";
-        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=2&maxReturnRecordCount=1";
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-                .header(REQUEST_ID, REQUEST_ID_VALUE)
-                .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull(content, "Content Should not be null");
-
-        GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
-        assertEquals(1, getLinkedCasesResponse.getLinkedCases().size());
-
-        final List<String> caseReferences =
-            getLinkedCasesResponse.getLinkedCases().stream()
-                .map(CaseLinkInfo::getCaseReference)
-                .collect(Collectors.toList());
-
-        assertTrue(caseReferences.contains("1504259907353552"));
-
-        assertFalse(getLinkedCasesResponse.isHasMoreRecords());
-    }
-
-    @Test
-    void testGetLinkedCasesInvalidCaseReferenceShouldReturn400() throws Exception {
-        final String caseReference = "abc";
-        final String URL = "/getLinkedCases/" + caseReference;
-
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-                .header(REQUEST_ID, REQUEST_ID_VALUE)
-                .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        assertEquals(400, mvcResult.getResponse().getStatus());
-    }
-
-    @Test
-    void testShouldGetLinkedCasesReturn404WhenCaseDoesNotExist() throws Exception {
-        final String caseReference = "4259907353529155";
-        final String URL = "/getLinkedCases/" + caseReference;
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-                .header(REQUEST_ID, REQUEST_ID_VALUE)
-                .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        assertEquals(404, mvcResult.getResponse().getStatus());
-    }
-
-    @Test
-    void testShouldGetLinkedCasesStartRecordNumberNotNumericReturn400() throws Exception {
-        final String caseReference = "1504259907353529";
-        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=A";
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-                .header(REQUEST_ID, REQUEST_ID_VALUE)
-                .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        assertEquals(400, mvcResult.getResponse().getStatus());
-    }
-
-    @Test
-    void testShouldGetLinkedCasesMaxRecordCountNotNumericReturn400() throws Exception {
-        final String caseReference = "1504259907353529";
-        final String URL = "/getLinkedCases/" + caseReference + "?maxReturnRecordCount=A";
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-                .header(REQUEST_ID, REQUEST_ID_VALUE)
-                .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        assertEquals(400, mvcResult.getResponse().getStatus());
-    }
-
-    @Disabled("TODO: re-enable after refactor complete")
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
-    void shouldLogAuditInfoForGetLinkedCases() throws Exception {
-        final String caseReference = "1504259907353545";
-        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=1";
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-                .header(REQUEST_ID, REQUEST_ID_VALUE)
-                .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        assertEquals(200, mvcResult.getResponse().getStatus());
-        String content = mvcResult.getResponse().getContentAsString();
-
-        assertNotNull(content, "Content Should not be null");
-
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-        verify(auditRepository).save(captor.capture());
-
-        List<String> caseReferences = Arrays.asList(captor.getValue().getCaseId().split(","));
-
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.LINKED_CASES_ACCESSED.getLabel()));
-        assertThat(caseReferences.size(), is(3));
-        assertThat(caseReferences, containsInAnyOrder(caseReference, "1504259907353537", "1504259907353552"));
-        assertThat(captor.getValue().getIdamId(), is(UID));
-        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
-        assertThat(captor.getValue().getHttpStatus(), is(200));
-        assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
-    }
-
-    @Disabled("TODO: re-enable after refactor complete")
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
-    void getLinkedCasesShouldReturnEmptyResponsePayloadWhenNoLinkedCasesExist() throws Exception {
-        final String caseReference = "1504259907353552";
-        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=1";
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-            .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        assertEquals(200, mvcResult.getResponse().getStatus());
-
-        final GetLinkedCasesResponse getLinkedCasesResponse =
-            mapper.readValue(mvcResult.getResponse().getContentAsString(), GetLinkedCasesResponse.class);
-
-        assertNotNull(getLinkedCasesResponse, "Content should not be null");
-
-        assertFalse(getLinkedCasesResponse.isHasMoreRecords());
-
-        assertTrue(getLinkedCasesResponse.getLinkedCases().isEmpty());
-    }
-
-    @Disabled("TODO: re-enable after refactor complete")
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
-    void getLinkedCasesPaginationPage1() throws Exception {
-        final String caseReference = "3522116262568758";
-        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=1&maxReturnRecordCount=3";
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-            .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        assertEquals(200, mvcResult.getResponse().getStatus());
-
-        String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull(content, "Content should not be null");
-
-        GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
-
-        // We get 4 records back, as the maxReturnRecordCount if 3 has 20% buffer added to it
-        assertEquals(4, getLinkedCasesResponse.getLinkedCases().size());
-
-        final List<String> caseReferences =
-            getLinkedCasesResponse.getLinkedCases().stream()
-                .map(CaseLinkInfo::getCaseReference)
-                .collect(Collectors.toList());
-
-        assertTrue(caseReferences.containsAll(
-            List.of("4504127458172644", "6913605797587333", "2609130232931622", "8256979053075411")));
-
-        assertTrue(getLinkedCasesResponse.isHasMoreRecords());
-    }
-
-    @Disabled("TODO: re-enable after refactor complete")
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-        scripts = {"classpath:sql/insert_cases_get_case_links.sql"})
-    void getLinkedCasesPaginationPage2() throws Exception {
-        final String caseReference = "3522116262568758";
-        final String URL = "/getLinkedCases/" + caseReference + "?startRecordNumber=5&maxReturnRecordCount=1";
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-            .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .contentType(JSON_CONTENT_TYPE))
-            .andReturn();
-
-        assertEquals(200, mvcResult.getResponse().getStatus());
-
-        String content = mvcResult.getResponse().getContentAsString();
-        assertNotNull(content, "Content Should not be null");
-
-        GetLinkedCasesResponse getLinkedCasesResponse = mapper.readValue(content, GetLinkedCasesResponse.class);
-
-        assertEquals(1, getLinkedCasesResponse.getLinkedCases().size());
-
-        final List<String> caseReferences =
-            getLinkedCasesResponse.getLinkedCases().stream()
-                .map(CaseLinkInfo::getCaseReference)
-                .collect(Collectors.toList());
-
-        assertTrue(caseReferences.containsAll(
-            List.of("8855462425591410")));
-
-        assertFalse(getLinkedCasesResponse.isHasMoreRecords());
-    }
 }

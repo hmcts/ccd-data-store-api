@@ -44,11 +44,13 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
         + "      from CaseLinkEntity cle "
         + "     where cle.caseLinkPrimaryKey.linkedCaseId = (select lcd.id "
         + "                                                    from CaseDetailsEntity lcd "
-        + "                                                   where lcd.reference=:caseReference)"
+        + "                                                   where lcd.reference=:linkedCaseReference)"
         + "       and cle.standardLink=:standardLink)"
         + " order by cd.createdDate asc"
     )
-    List<Long> findAllByCaseReferenceAndStandardLink(@Param("caseReference") Long caseReference,
-                                                     @Param("standardLink") Boolean standardLink);
+    List<Long> findCaseReferencesByLinkedCaseReferenceAndStandardLink(
+        @Param("linkedCaseReference") Long linkedCaseReference,
+        @Param("standardLink") Boolean standardLink
+    );
 
 }
