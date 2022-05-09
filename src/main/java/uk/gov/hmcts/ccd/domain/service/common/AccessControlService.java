@@ -301,13 +301,16 @@ public interface AccessControlService {
                                                  CommonField caseViewField) {
         if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().forEach(childField -> {
+                boolean shouldRemoveCaseViewField = false;
+
                 if (!hasAccessControlList(accessProfiles, access, childField.getAccessControlLists())) {
                     CommonField childCaseViewField = findNestedField(caseViewField, childField.getId());
                     childCaseViewField.setDisplayContext(READONLY);
 
-                    if (shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId, caseReference, eventId,
-                        isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents,
-                        caseViewField.getId(), childField, accessProfiles)) {
+                    shouldRemoveCaseViewField = shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId, caseReference,
+                        eventId, isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents,
+                        childCaseViewField.getId(), childField, accessProfiles);
+                    if (shouldRemoveCaseViewField) {
                         caseViewField.getFieldTypeDefinition().getChildren().remove(childCaseViewField);
                     }
 
@@ -315,7 +318,8 @@ public interface AccessControlService {
                     optionalWizardPageField.ifPresent(wizardPageField ->
                         setOverrideAsReadOnlyIfNotReadOnly(wizardPageField, rootFieldId, childField));
                 }
-                if (childField.isCompoundFieldType()) {
+
+                if (!shouldRemoveCaseViewField && childField.isCompoundFieldType()) {
                     setChildrenAsReadOnlyIfNoAccess(
                         caseTypeId,
                         caseReference,
