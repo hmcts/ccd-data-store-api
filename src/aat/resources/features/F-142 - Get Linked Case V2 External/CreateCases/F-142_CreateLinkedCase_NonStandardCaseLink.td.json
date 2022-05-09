@@ -5,7 +5,7 @@
   "request": {
     "body": {
       "data": {
-        "caseNameHmctsInternal": "Name internal: ${[scenarioContext][customValues][generateUUID]}",
+        "caseNameHmctsInternal": "Name internal: This case will be ingored by API as it is linked via a non-standard case link.",
 
         "CaseLinkField": {
           "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}"
@@ -17,7 +17,7 @@
   "expectedResponse": {
     "body": {
       "data": {
-        "caseNameHmctsInternal": "[[ANY_STRING_NOT_NULLABLE]]",
+        "caseNameHmctsInternal": "Name internal: This case will be ingored by API as it is linked via a non-standard case link.",
 
         "CaseLinkField": {
           "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}"

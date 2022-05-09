@@ -2,7 +2,7 @@
   "_guid_": "S-142.13",
   "_extends_": "Get_Linked_Cases__Base",
 
-  "title": "Continue from AC05, startRecordNumber = 6, maxReturnRecordCount = 5, return 200 with 4 case links in response payload",
+  "title": "Continue from AC05, startRecordNumber = 6, maxReturnRecordCount = 5, return 200 with 5 case links in response payload",
 
   "specs": [
     "an active profile in CCD and basic access to all the linked cases created",
