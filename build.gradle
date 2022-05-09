@@ -121,8 +121,6 @@ configurations {
     annotationProcessor
 //    runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
 
-    runtimeClasspath.exclude(group: 'ch.qos.logback')
-
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
     contractTestCompile.extendsFrom(testCompile)
@@ -170,7 +168,6 @@ dependencies {
 
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
@@ -261,9 +258,7 @@ dependencies {
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
-    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2') {
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
-    }
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2'
     compile 'org.jooq:jool-java-8:0.9.14'
     compile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
