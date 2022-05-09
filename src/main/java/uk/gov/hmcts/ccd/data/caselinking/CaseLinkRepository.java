@@ -13,10 +13,6 @@ import java.util.List;
 @Repository
 public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseLinkEntity.CaseLinkPrimaryKey> {
 
-    String FIND_ALL_BY_CASE_REFERENCE_QUERY_STRING =
-        "select cle from CaseLinkEntity cle where cle.caseLinkPrimaryKey.caseId = "
-        + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)";
-
     /**
      * Delete all CaseLinks records belonging to the supplied Case Reference.
      *
@@ -44,14 +40,17 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
 
 
     @Query(value = "select cd.reference from CaseDetailsEntity cd where cd.id in "
-        + "(select cle.caseLinkPrimaryKey.linkedCaseId "
-        + "from CaseLinkEntity cle "
-        + "where "
-        + "cle.caseLinkPrimaryKey.caseId=(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)"
-        + "and "
-        + "cle.standardLink=:standardLink)"
+        + "   (select cle.caseLinkPrimaryKey.caseId "
+        + "      from CaseLinkEntity cle "
+        + "     where cle.caseLinkPrimaryKey.linkedCaseId = (select lcd.id "
+        + "                                                    from CaseDetailsEntity lcd "
+        + "                                                   where lcd.reference=:linkedCaseReference)"
+        + "       and cle.standardLink=:standardLink)"
+        + " order by cd.createdDate asc"
     )
-    List<Long> findAllByCaseReferenceAndStandardLink(@Param("caseReference") Long caseReference,
-                                                     @Param("standardLink") Boolean standardLink);
+    List<Long> findCaseReferencesByLinkedCaseReferenceAndStandardLink(
+        @Param("linkedCaseReference") Long linkedCaseReference,
+        @Param("standardLink") Boolean standardLink
+    );
 
 }

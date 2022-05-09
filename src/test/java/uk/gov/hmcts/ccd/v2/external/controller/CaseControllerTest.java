@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -47,18 +49,18 @@ import java.util.stream.IntStream;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.Integer.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -275,7 +277,7 @@ class CaseControllerTest {
     @DisplayName("POST /cases/{caseId}/supplementary-data")
     class UpdateSupplementaryData {
 
-        private ObjectMapper mapper = new ObjectMapper();
+        private final ObjectMapper mapper = new ObjectMapper();
 
         @Test
         @DisplayName("should return 200 when supplementary data updated")
@@ -301,10 +303,10 @@ class CaseControllerTest {
         @DisplayName("should propagate BadRequestException when supplementary data not valid")
         void invalidSupplementaryDataUpdateRequest() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+            SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
 
             assertThrows(BadRequestException.class,
-                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE,
-                    new SupplementaryDataUpdateRequest()));
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, request));
         }
 
         @Test
@@ -320,10 +322,10 @@ class CaseControllerTest {
         @DisplayName("should propagate BadRequestException when supplementary data has empty operation data")
         void shouldThrowBadRequestExceptionWhenSupplementaryDataHasNoData() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+            SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest(new HashMap<>());
 
             assertThrows(BadRequestException.class,
-                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE,
-                    new SupplementaryDataUpdateRequest(new HashMap<>())));
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, request));
         }
 
         @Test
@@ -331,6 +333,7 @@ class CaseControllerTest {
         void shouldThrowBadRequestExceptionWhenSupplementaryDataHasNestedLevels() {
             doCallRealMethod().when(requestValidator).validate(any(SupplementaryDataUpdateRequest.class));
             SupplementaryDataUpdateRequest request = createRequestDataNested();
+
             assertThrows(BadRequestException.class,
                 () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, request));
         }
@@ -339,10 +342,10 @@ class CaseControllerTest {
         @DisplayName("should propagate BadRequestException when case reference not valid")
         void caseReferenceNotValid() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+            SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
 
             assertThrows(BadRequestException.class,
-                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE,
-                    new SupplementaryDataUpdateRequest()));
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, request));
         }
 
         private Map<String, Object> createResponseData() {
@@ -445,48 +448,52 @@ class CaseControllerTest {
     @DisplayName("GET /getLinkedCases/{caseReference}")
     class GetLinkedCases {
 
-        @Test
-        @DisplayName("should return 200 when case found, and maxRecordNumber parameter is not set")
-        void linkedCaseFoundMaxRecordNumberNotSet() {
+        // NB: equivalent test for startRecordNumber not required as defaulted using `@RequestParam`
+        @ParameterizedTest(name = "should return 200 when case found, and maxRecordNumber parameter is not set: {0}")
+        @NullAndEmptySource
+        void linkedCaseFoundWhenMaxRecordNumberNotSet(String maxRecordNumber) {
+            // GIVEN
             GetLinkedCasesResponse getLinkedCasesResponse = GetLinkedCasesResponse.builder()
                 .hasMoreRecords(false)
                 .linkedCases(List.of(CaseLinkInfo.builder().build()))
                 .build();
-            when(getLinkedCasesResponseCreator.createResponse(any())).thenReturn(getLinkedCasesResponse);
+            when(getLinkedCasesResponseCreator.createResponse(any(), eq(CASE_REFERENCE)))
+                .thenReturn(getLinkedCasesResponse);
 
             // WHEN
             final ResponseEntity<GetLinkedCasesResponse> response = caseController.getLinkedCase(CASE_REFERENCE,
-                "1", "");
-
-            ArgumentCaptor<Integer> startRecordNumberCaptor = ArgumentCaptor.forClass(Integer.class);
-            ArgumentCaptor<Integer> maxRecordsNumberCaptor = ArgumentCaptor.forClass(Integer.class);
-            ArgumentCaptor<String> caseReferenceCaptor = ArgumentCaptor.forClass(String.class);
+                "100", maxRecordNumber);
 
             // THEN
             assertThat(response.getStatusCode(), is(HttpStatus.OK));
             assertNotNull(response.getBody());
 
-            verify(caseLinkRetrievalService).getStandardLinkedCases(caseReferenceCaptor.capture(),
-                startRecordNumberCaptor.capture(), maxRecordsNumberCaptor.capture());
-            assertEquals(valueOf(0), maxRecordsNumberCaptor.getValue());
+            assertCallToGetStandardLinkedCases(
+                "100",
+                "0" // i.e. default to zero to turn off limit
+            );
         }
 
         @Test
         @DisplayName("should return 200 when case found with parameters")
-        void linkedCaseFoundWithOptionalParameters() {
-            // WHEN
+        void linkedCaseFoundUsingOptionalParametersSet() {
+            // GIVEN
             GetLinkedCasesResponse getLinkedCasesResponse = GetLinkedCasesResponse.builder()
                 .hasMoreRecords(false)
                 .linkedCases(List.of(CaseLinkInfo.builder().build()))
                 .build();
-            when(getLinkedCasesResponseCreator.createResponse(any())).thenReturn(getLinkedCasesResponse);
+            when(getLinkedCasesResponseCreator.createResponse(any(), eq(CASE_REFERENCE)))
+                .thenReturn(getLinkedCasesResponse);
 
+            // WHEN
             final ResponseEntity<GetLinkedCasesResponse> response =
                 caseController.getLinkedCase(CASE_REFERENCE, START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT);
 
             // THEN
             assertThat(response.getStatusCode(), is(HttpStatus.OK));
             assertNotNull(response.getBody());
+
+            assertCallToGetStandardLinkedCases(START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT);
         }
 
         @Test
@@ -495,7 +502,7 @@ class CaseControllerTest {
             // GIVEN
             doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
-            // THEN
+            // WHEN / THEN
             assertThrows(ResourceNotFoundException.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
                 START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT),
                 V2.Error.CASE_NOT_FOUND);
@@ -504,8 +511,7 @@ class CaseControllerTest {
         @Test
         @DisplayName("should propagate BadRequestException when case reference is not supplied")
         void linkedCaseReferenceNotValid() {
-
-            // THEN
+            // WHEN / THEN
             assertThrows(BadRequestException.class, () -> caseController.getLinkedCase(null,
                 null, null), "Case Reference not Supplied");
         }
@@ -513,19 +519,19 @@ class CaseControllerTest {
         @Test
         @DisplayName("should propagate BadRequestException when Start Record Number is Non Numeric")
         void linkedCaseStartRecordNumberIsNonNumeric() {
-            //THEN
+            // WHEN / THEN
             assertThrows(BadRequestException.class,() -> caseController.getLinkedCase(CASE_REFERENCE,
                 INVALID_START_RECORD_NUMBER, null),
-                "Parameter is not numeric");
+                V2.Error.PARAM_NOT_NUM);
         }
 
         @Test
         @DisplayName("should propagate BadRequestException when Max Return Record Count is not valid")
         void linkedCaseMaxReturnRecordCountIsNonNumeric() {
-            // THEN
+            // WHEN / THEN
             assertThrows(BadRequestException.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
                 null, INVALID_MAX_RETURN_RECORD_COUNT),
-                "Parameter is not numeric");
+                V2.Error.PARAM_NOT_NUM);
         }
 
         @Test
@@ -534,15 +540,28 @@ class CaseControllerTest {
             // GIVEN
             doThrow(RuntimeException.class).when(getCaseOperation).execute(CASE_REFERENCE);
 
-            // THEN
+            // WHEN / THEN
             assertThrows(Exception.class, () -> caseController.getLinkedCase(CASE_REFERENCE,
                 START_RECORD_NUMBER, MAX_RETURN_RECORD_COUNT));
+        }
 
+        private void assertCallToGetStandardLinkedCases(String expectedStartRecordNumber,
+                                                        String expectedMaxRecordsNumber) {
+
+            ArgumentCaptor<Integer> startRecordNumberCaptor = ArgumentCaptor.forClass(Integer.class);
+            ArgumentCaptor<Integer> maxRecordsNumberCaptor = ArgumentCaptor.forClass(Integer.class);
+            ArgumentCaptor<String> caseReferenceCaptor = ArgumentCaptor.forClass(String.class);
+
+            verify(caseLinkRetrievalService).getStandardLinkedCases(caseReferenceCaptor.capture(),
+                startRecordNumberCaptor.capture(), maxRecordsNumberCaptor.capture());
+            assertEquals(CASE_REFERENCE, caseReferenceCaptor.getValue());
+            assertEquals(expectedStartRecordNumber, startRecordNumberCaptor.getValue().toString());
+            assertEquals(expectedMaxRecordsNumber, maxRecordsNumberCaptor.getValue().toString());
         }
     }
 
     @Nested
-    @DisplayName("GET /getLinkedCases/{caseReference}")
+    @DisplayName("GET /getLinkedCases/{caseReference} [AuditLog tests]")
     class GetLinkedCasesAuditLogTests {
 
         @DisplayName("List empty: should return empty string when empty list is passed")
@@ -570,17 +589,23 @@ class CaseControllerTest {
         @Test
         void shouldReturnMaxCsvListWhenTooManyListItemsPassed() {
 
-            // ARRANGE
+            // GIVEN
             String expectedOutput = "reference-0," + createGetLinkedCasesResponse(MAX_CASE_IDS_LIST - 1)
                 .getLinkedCases().stream()
                 .map(CaseLinkInfo::getCaseReference)
                 .collect(Collectors.joining(","));
 
-            // ACT
+            // WHEN
             String output = buildCaseIds("reference-0", createGetLinkedCasesResponse(MAX_CASE_IDS_LIST + 1));
 
-            // ASSERT
+            // THEN
             assertEquals(expectedOutput, output);
+        }
+
+        @DisplayName("should not fail if response passed is null")
+        @Test
+        void shouldNotFailIfResponsePassedIsNull() {
+            assertEquals("reference-0", buildCaseIds("reference-0", null));
         }
 
         private GetLinkedCasesResponse createGetLinkedCasesResponse(int numberRequired) {
@@ -591,4 +616,5 @@ class CaseControllerTest {
             return GetLinkedCasesResponse.builder().linkedCases(caseLinkInfos).build();
         }
     }
+
 }

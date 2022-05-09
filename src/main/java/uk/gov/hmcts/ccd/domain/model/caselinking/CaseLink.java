@@ -1,14 +1,14 @@
 package uk.gov.hmcts.ccd.domain.model.caselinking;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
