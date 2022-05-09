@@ -59,6 +59,7 @@ import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinitionTest.findNestedField;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DOCUMENT;
@@ -109,6 +110,11 @@ public class AccessControlServiceTest {
     private static final String EVENT_ID_LOWER_CASE = "event_id";
     private static final String STATE_ID1 = "State1";
     private static final String STATE_ID2 = "State2";
+
+    private static final String ADDRESSES = "Addresses";
+    private static final String LINE1 = "Line1";
+    private static final String LINE2 = "Line2";
+    private static final String LINE3 = "Line3";
 
     static final String person1 = "{\n"
         + "  \"id\": \"1577805e-9584-4994-bfa0-5618846b8918\",\n"
@@ -409,7 +415,7 @@ public class AccessControlServiceTest {
         void shouldFailToGrantCreateAccessForGivenFieldsIfOneFieldIsMissingAcls() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .build())
                 .build();
             final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
@@ -431,7 +437,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfRelevantAclMissing() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_NOT_IN_USER_ROLES)
                         .withCreate(true)
@@ -458,7 +464,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfRelevantAclNotGrantingAccess() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES_2)
                         .build())
@@ -497,7 +503,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToNullValue() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES_3)
                         .build())
@@ -525,7 +531,7 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToFieldsWithAclMatching() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES_3)
                         .build())
@@ -582,14 +588,14 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("text value tests")
-    class CanAccessCaseFieldsWithCriteriaTextValueType {
+    class CanAccessCaseFieldsWithCriteriaTextValueTypeTests {
 
         @Test
         @DisplayName("Should grant access to case fields with text value")
         void shouldGrantAccessToTextValueType() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -615,7 +621,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToEmptyTextType() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -638,14 +644,14 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("collection value tests")
-    class CanAccessCaseFieldsWithCriteriaCollectionValueType {
+    class CanAccessCaseFieldsWithCriteriaCollectionValueTypeTests {
 
         @Test
         @DisplayName("Should grant access to case fields with collection")
         void shouldGrantAccessToCollectionType() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -693,7 +699,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantCreateAccessToCollectionTypeIfEmpty() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -716,14 +722,14 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("complex value tests")
-    class CanAccessCaseFieldsWithCriteriaComplexValueType {
+    class CanAccessCaseFieldsWithCriteriaComplexValueTypeTests {
 
         @Test
         @DisplayName("Should grant access to case fields with complex object")
         void shouldGrantAccessToComplexType() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -752,7 +758,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToComplexTypeIfEmpty() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -782,8 +788,8 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfFieldIsMissingAclsForUpdate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId(ADDRESSES)
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"UpdateAddress\" }");
@@ -797,7 +803,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfFieldIsMissingAclsForCreate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"CreateAddress\" }\n");
@@ -811,8 +817,8 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfFieldIsMissingRelevantAclForUpdate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId(ADDRESSES)
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_NOT_IN_USER_ROLES)
                         .withCreate(true)
@@ -832,7 +838,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfFieldIsMissingRelevantAclForCreate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_NOT_IN_USER_ROLES)
                         .withCreate(true)
@@ -852,8 +858,8 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldIfRelevantAclNotGrantingAccessForUpdate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId(ADDRESSES)
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -872,7 +878,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldIfRelevantAclNotGrantingAccessForCreate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withRead(true)
@@ -891,8 +897,8 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldWithNullValueForUpdate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId(ADDRESSES)
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -909,7 +915,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldWithNullValueForCreate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -926,7 +932,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldWithAclAccessGrantedAndFieldNameNotMatchingForUpdate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -1021,7 +1027,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldWithAclAccessGrantedAndFieldNameNotMatchingForCreate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -1041,8 +1047,8 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToFieldWithAclMatchingForUpdate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId(ADDRESSES)
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withUpdate(true)
@@ -1060,7 +1066,7 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToFieldWithAclMatchingForCreate() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -1078,7 +1084,7 @@ public class AccessControlServiceTest {
         void shouldNotNeedToGrantAccessToFieldIfNoChangeInValue() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -1095,8 +1101,8 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToFieldsIfAllFieldsHaveAccessGranted() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId(ADDRESSES)
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -1104,7 +1110,7 @@ public class AccessControlServiceTest {
                     .build())
                 .withField(newCaseField()
                     .withId("FirstName")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withUpdate(true)
@@ -1112,14 +1118,14 @@ public class AccessControlServiceTest {
                     .build())
                 .withField(newCaseField()
                     .withId("LastName")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
                     .build())
                 .withField(newCaseField()
                     .withId("Mobile")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withUpdate(true)
@@ -1141,8 +1147,8 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfOneFieldDoesNotHaveAccessGranted() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId(ADDRESSES)
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -1150,21 +1156,21 @@ public class AccessControlServiceTest {
                     .build())
                 .withField(newCaseField()
                     .withId("FirstName")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
                     .build())
                 .withField(newCaseField()
                     .withId("LastName")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
                     .build())
                 .withField(newCaseField()
                     .withId("Mobile")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -1187,8 +1193,8 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfOneFieldDoesNotHaveAcls() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId(ADDRESSES)
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -1196,14 +1202,14 @@ public class AccessControlServiceTest {
                     .build())
                 .withField(newCaseField()
                     .withId("FirstName")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
                     .build())
                 .withField(newCaseField()
                     .withId("LastName")
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -1443,7 +1449,7 @@ public class AccessControlServiceTest {
         void shouldNotReturnDataIfCaseFieldIsMissingAcls() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .build())
                 .build();
             final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
@@ -1466,7 +1472,7 @@ public class AccessControlServiceTest {
         void shouldNotReturnFieldIfRelevantAclMissing() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_NOT_IN_USER_ROLES)
                         .withRead(true)
@@ -1493,7 +1499,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfRelevantAclNotGrantingAccess() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -1519,7 +1525,7 @@ public class AccessControlServiceTest {
         void shouldNotReturnDataWithAclFalseAndNullValue() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES_3)
                         .build())
@@ -1548,7 +1554,7 @@ public class AccessControlServiceTest {
         void shouldNotReturnDataWithAclTrueAndFieldNameNotMatching() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES_3)
                         .build())
@@ -1578,7 +1584,7 @@ public class AccessControlServiceTest {
         void shouldReturnDataWithAclTrueAndNullValue() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES_3)
                         .build())
@@ -1608,7 +1614,7 @@ public class AccessControlServiceTest {
         void shouldReturnDataWithAclTrueAndEmptyValue() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES_3)
                         .build())
@@ -1638,7 +1644,7 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToFieldsWithAclMatching() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES_3)
                         .build())
@@ -1666,14 +1672,14 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("return fields data with text value tests")
-    class ReturnsDataWithCaseFieldAccessTextValueType {
+    class ReturnsDataWithCaseFieldAccessTextValueTypeTests {
 
         @Test
         @DisplayName("Should not return data if field ACL false and empty text")
         void shouldNotGrantAccessToEmptyTextType() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -1699,7 +1705,7 @@ public class AccessControlServiceTest {
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withRead(true)
@@ -1727,7 +1733,7 @@ public class AccessControlServiceTest {
                 false);
 
             assertAll(
-                () -> assertThat(jsonNode.get("Addresses"), is(JSON_NODE_FACTORY.nullNode())),
+                () -> assertThat(jsonNode.get(ADDRESSES), is(JSON_NODE_FACTORY.nullNode())),
                 () -> assertThat(jsonNode.get("Addresses2"), is(getTextNode("")))
             );
         }
@@ -1735,7 +1741,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("return fields data with collection value tests")
-    class ReturnsDataWithCaseFieldAccessCollectionValueType {
+    class ReturnsDataWithCaseFieldAccessCollectionValueTypeTests {
         private static final String VALUE = "value";
         private static final String ID = "id";
 
@@ -1744,7 +1750,7 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToCollectionType() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withRead(true)
@@ -1809,7 +1815,7 @@ public class AccessControlServiceTest {
                     .withRead(false)
                     .build(),
                 aComplexACL()
-                    .withListElementCode("Addresses")
+                    .withListElementCode(ADDRESSES)
                     .withRole(ROLE_IN_USER_ROLES)
                     .withRead(true)
                     .build(),
@@ -1835,11 +1841,11 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("FirstName").textValue(), is("Fatih")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("LastName"), is(nullValue())),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value")
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get(ADDRESSES).get(0).get("value")
                     .get("Name").textValue(), is("home")),
                 () -> assertThat(
-                    jsonNode.get("People").get(0).get("value").get("Addresses").get(1).get("value").get("Address")
-                        .get("Line1").textValue(),
+                    jsonNode.get("People").get(0).get("value").get(ADDRESSES).get(1).get("value").get("Address")
+                        .get(LINE1).textValue(),
                     is("41 Kings Road")
                 ),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value").get("Txt")
@@ -1888,7 +1894,7 @@ public class AccessControlServiceTest {
                     .withRead(true)
                     .build(),
                 aComplexACL()
-                    .withListElementCode("Addresses")
+                    .withListElementCode(ADDRESSES)
                     .withRole(ROLE_IN_USER_ROLES)
                     .withRead(true)
                     .build(),
@@ -1935,12 +1941,12 @@ public class AccessControlServiceTest {
                     is(nullValue())),
                 () -> assertThat(
                     jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornAddress").get("Address")
-                        .get("Line1").textValue(),
+                        .get(LINE1).textValue(),
                     is("23 Lampton Road")
                 ),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value")
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get(ADDRESSES).get(0).get("value")
                     .get("Name").textValue(), is("home")),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value")
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get(ADDRESSES).get(0).get("value")
                     .get("Address"), is(nullValue())),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value")
                     .get("Note"), is(nullValue())),
@@ -1995,7 +2001,7 @@ public class AccessControlServiceTest {
                     .withRead(true)
                     .build(),
                 aComplexACL()
-                    .withListElementCode("Addresses")
+                    .withListElementCode(ADDRESSES)
                     .withRole(ROLE_IN_USER_ROLES)
                     .withRead(true)
                     .build(),
@@ -2052,7 +2058,7 @@ public class AccessControlServiceTest {
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withRead(true)
@@ -2115,19 +2121,19 @@ public class AccessControlServiceTest {
                 () -> assertThat(jsonNode.get("Addresses2"), is(JSON_NODE_FACTORY.arrayNode())),
                 () -> assertThat(jsonNode.has("Addresses3"), is(true)),
                 () -> assertThat(jsonNode.get("Addresses3"), is(JSON_NODE_FACTORY.nullNode())),
-                () -> assertThat(jsonNode.get("Addresses").get(0).get(ID), is(getTextNode(FIRST_CHILD_ID))),
-                () -> assertThat(jsonNode.get("Addresses").get(0).get(VALUE).get("Address"),
+                () -> assertThat(jsonNode.get(ADDRESSES).get(0).get(ID), is(getTextNode(FIRST_CHILD_ID))),
+                () -> assertThat(jsonNode.get(ADDRESSES).get(0).get(VALUE).get("Address"),
                     is(getTextNode("address1"))),
-                () -> assertThat(jsonNode.get("Addresses").get(0).get(VALUE).get("Notes").get("Note1"),
+                () -> assertThat(jsonNode.get(ADDRESSES).get(0).get(VALUE).get("Notes").get("Note1"),
                     is(getTextNode("someNote11"))),
-                () -> assertThat(jsonNode.get("Addresses").get(0).get(VALUE).get("Notes").get("Note2"),
+                () -> assertThat(jsonNode.get(ADDRESSES).get(0).get(VALUE).get("Notes").get("Note2"),
                     is(getTextNode("someNote21"))),
-                () -> assertThat(jsonNode.get("Addresses").get(1).get(ID), is(getTextNode(SECOND_CHILD_ID))),
-                () -> assertThat(jsonNode.get("Addresses").get(1).get(VALUE).get("Address"),
+                () -> assertThat(jsonNode.get(ADDRESSES).get(1).get(ID), is(getTextNode(SECOND_CHILD_ID))),
+                () -> assertThat(jsonNode.get(ADDRESSES).get(1).get(VALUE).get("Address"),
                     is(getTextNode("address2"))),
-                () -> assertThat(jsonNode.get("Addresses").get(1).get(VALUE).get("Notes").get("Note1"),
+                () -> assertThat(jsonNode.get(ADDRESSES).get(1).get(VALUE).get("Notes").get("Note1"),
                     is(getTextNode("someNote21"))),
-                () -> assertThat(jsonNode.get("Addresses").get(1).get(VALUE).get("Notes").get("Note2"),
+                () -> assertThat(jsonNode.get(ADDRESSES).get(1).get(VALUE).get("Notes").get("Note2"),
                     is(getTextNode("someNote22")))
             );
         }
@@ -2138,7 +2144,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToCollectionTypeIfEmpty() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -2162,14 +2168,14 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("return fields data with complex value tests")
-    class ReturnsDataWithCaseFieldReadAccessComplexValueType {
+    class ReturnsDataWithCaseFieldReadAccessComplexValueTypeTests {
 
         @Test
         @DisplayName("Should return data if field with complex object")
         void shouldGrantAccessToComplexType() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withRead(true)
@@ -2191,7 +2197,7 @@ public class AccessControlServiceTest {
                 CAN_READ,
                 false);
 
-            assertThat(jsonNode.get("Addresses").get("Note"), is(getTextNode("someNote11")));
+            assertThat(jsonNode.get(ADDRESSES).get("Note"), is(getTextNode("someNote11")));
         }
 
         @Test
@@ -2199,7 +2205,7 @@ public class AccessControlServiceTest {
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withRead(true)
@@ -2230,7 +2236,7 @@ public class AccessControlServiceTest {
                 false);
 
             assertAll(
-                () -> assertThat(jsonNode.get("Addresses"), is(JSON_NODE_FACTORY.nullNode())),
+                () -> assertThat(jsonNode.get(ADDRESSES), is(JSON_NODE_FACTORY.nullNode())),
                 () -> assertThat(jsonNode.get("Addresses2").get("Note"), is(getTextNode("")))
             );
         }
@@ -2240,7 +2246,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToComplexTypeIfEmpty() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -2695,8 +2701,8 @@ public class AccessControlServiceTest {
 
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(TEXT).build())
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -2770,82 +2776,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should set readonly flag for complex children if relevant acl missing")
         void shouldSetReadonlyFlagForComplexChildrenIfRelevantAclMissing() {
-            final CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withFieldType(aFieldType()
-                        .withType(COMPLEX)
-                        .withComplexField(
-                            newCaseField()
-                                .withFieldType(
-                                    aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
-                                        .build())
-                                .withId("Line1")
-                                .build())
-                        .withComplexField(
-                            newCaseField()
-                                .withFieldType(
-                                    aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
-                                        .build())
-                                .withId("Line2")
-                                .build())
-                        .build())
-                    .withId("Addresses")
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withCreate(true)
-                        .withUpdate(false)
-                        .withRead(true)
-                        .build())
-                    .withComplexACL(
-                        aComplexACL()
-                            .withListElementCode("Line1")
-                            .withRole(ROLE_IN_USER_ROLES)
-                            .withCreate(false)
-                            .withUpdate(false)
-                            .withRead(true)
-                            .build())
-                    .withComplexACL(
-                        aComplexACL()
-                            .withListElementCode("Line2")
-                            .withRole(ROLE_IN_USER_ROLES)
-                            .withCreate(true)
-                            .withRead(true)
-                            .build())
-                    .build())
-                .build();
-            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
-
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType()
-                            .withType(COMPLEX)
-                            .withComplexField(
-                                newCaseField()
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
-                                            .build())
-                                    .withId("Line1")
-                                    .build())
-                            .withComplexField(
-                                newCaseField()
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
-                                            .build())
-                                    .withId("Line2")
-                                    .build())
-                            .build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            final CaseTypeDefinition caseType = createCaseTypeWithTwoSubFields(TEXT);
+            CaseUpdateViewEvent caseEventTrigger = createCaseUpdateViewEventWithTwoSubFields(TEXT);
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 CASE_TYPE_ID,
@@ -2859,9 +2791,9 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
                     is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), LINE1),
                     hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), LINE2),
                     hasProperty("displayContext", is(READONLY)))
             );
         }
@@ -2871,82 +2803,8 @@ public class AccessControlServiceTest {
         void shouldSetReadonlyFlagForComplexChildrenIfRelevantAclMissingWithMultipartyFix() {
             setApplicationParamsForTest();
 
-            final CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withFieldType(aFieldType()
-                        .withType(COMPLEX)
-                        .withComplexField(
-                            newCaseField()
-                                .withFieldType(
-                                    aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
-                                        .build())
-                                .withId("Line1")
-                                .build())
-                        .withComplexField(
-                            newCaseField()
-                                .withFieldType(
-                                    aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
-                                        .build())
-                                .withId("Line2")
-                                .build())
-                        .build())
-                    .withId("Addresses")
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withCreate(true)
-                        .withUpdate(false)
-                        .withRead(true)
-                        .build())
-                    .withComplexACL(
-                        aComplexACL()
-                            .withListElementCode("Line1")
-                            .withRole(ROLE_IN_USER_ROLES)
-                            .withCreate(false)
-                            .withUpdate(false)
-                            .withRead(true)
-                            .build())
-                    .withComplexACL(
-                        aComplexACL()
-                            .withListElementCode("Line2")
-                            .withRole(ROLE_IN_USER_ROLES)
-                            .withCreate(true)
-                            .withRead(true)
-                            .build())
-                    .build())
-                .build();
-            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
-
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType()
-                            .withType(COMPLEX)
-                            .withComplexField(
-                                newCaseField()
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
-                                            .build())
-                                    .withId("Line1")
-                                    .build())
-                            .withComplexField(
-                                newCaseField()
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
-                                            .build())
-                                    .withId("Line2")
-                                    .build())
-                            .build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            final CaseTypeDefinition caseType = createCaseTypeWithTwoSubFields(TEXT);
+            CaseUpdateViewEvent caseEventTrigger = createCaseUpdateViewEventWithTwoSubFields(TEXT);
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 CASE_TYPE_ID,
@@ -2960,9 +2818,9 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
                     is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), LINE1),
                     hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), LINE2),
                     hasProperty("displayContext", is(READONLY)))
             );
         }
@@ -2972,101 +2830,8 @@ public class AccessControlServiceTest {
         void shouldRemoveComplexChildrenIfRelevantAclMissingWithMultipartyFix() {
             setApplicationParamsForTest();
 
-            final CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withFieldType(aFieldType()
-                        .withType(COMPLEX)
-                        .withComplexField(
-                            newCaseField()
-                                .withFieldType(
-                                    aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
-                                        .build())
-                                .withId("Line1")
-                                .build())
-                        .withComplexField(
-                            newCaseField()
-                                .withFieldType(
-                                    aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
-                                        .build())
-                                .withId("Line2")
-                                .build())
-                        .withComplexField(
-                            newCaseField()
-                                .withFieldType(
-                                    aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
-                                        .build())
-                                .withId("Line3")
-                                .build())
-                        .build())
-                    .withId("Addresses")
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withCreate(true)
-                        .withUpdate(true)
-                        .withRead(true)
-                        .build())
-                    .withComplexACL(
-                        aComplexACL()
-                            .withListElementCode("Line1")
-                            .withRole(ROLE_IN_USER_ROLES)
-                            .withCreate(true)
-                            .withUpdate(true)
-                            .withRead(true)
-                            .build())
-                    .withComplexACL(
-                        aComplexACL()
-                            .withListElementCode("Line2")
-                            .withRole(ROLE_IN_USER_ROLES)
-                            .withCreate(true)
-                            .withUpdate(false)
-                            .withRead(false)
-                            .build())
-                    .build())
-                .build();
-            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
-
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType()
-                            .withType(COMPLEX)
-                            .withComplexField(
-                                newCaseField()
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
-                                            .build())
-                                    .withId("Line1")
-                                    .build())
-                            .withComplexField(
-                                newCaseField()
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
-                                            .build())
-                                    .withId("Line2")
-                                    .build())
-                            .withComplexField(
-                                newCaseField()
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
-                                            .build())
-                                    .withId("Line3")
-                                    .build())
-                            .build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            final CaseTypeDefinition caseType = createCaseTypeWithThreeSubFields(TEXT);
+            CaseUpdateViewEvent caseEventTrigger = createCaseUpdateViewEventWithThreeSubFields(TEXT);
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -3082,13 +2847,99 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertEquals(1, eventTrigger.getCaseFields().size()),
                 () -> assertThat(
-                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1").isPresent(),
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField(LINE1).isPresent(),
                     is(true)),
                 () -> assertThat(
-                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2").isPresent(),
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField(LINE2).isPresent(),
                     is(false)),
                 () -> assertThat(
-                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line3").isPresent(),
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField(LINE3).isPresent(),
+                    is(false))
+            );
+        }
+
+        @Test
+        @DisplayName("Should set readonly flag for children of complex type if relevant acl missing")
+        void shouldSetReadonlyFlagForChildrenOfComplexTypeIfRelevantAclMissing() {
+            final CaseTypeDefinition caseType = createCaseTypeWithTwoSubFields(COMPLEX);
+            CaseUpdateViewEvent caseEventTrigger = createCaseUpdateViewEventWithTwoSubFields(COMPLEX);
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
+                    is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), LINE1),
+                    hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), LINE2),
+                    hasProperty("displayContext", is(READONLY)))
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "Should set readonly flag for children of complex type if relevant acl missing with multiparty fix")
+        void shouldSetReadonlyFlagForChildrenOfComplexIfRelevantAclMissingWithMultipartyFix() {
+            setApplicationParamsForTest();
+
+            final CaseTypeDefinition caseType = createCaseTypeWithTwoSubFields(COMPLEX);
+            CaseUpdateViewEvent caseEventTrigger = createCaseUpdateViewEventWithTwoSubFields(COMPLEX);
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
+                    is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), LINE1),
+                    hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), LINE2),
+                    hasProperty("displayContext", is(READONLY)))
+            );
+        }
+
+        @Test
+        @DisplayName("Should remove children of complex type if relevant acl missing with multiparty fix")
+        void shouldRemoveChildrenOfComplexTypeIfRelevantAclMissingWithMultipartyFix() {
+            setApplicationParamsForTest();
+
+            final CaseTypeDefinition caseType = createCaseTypeWithThreeSubFields(COMPLEX);
+            CaseUpdateViewEvent caseEventTrigger = createCaseUpdateViewEventWithThreeSubFields(COMPLEX);
+
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertEquals(1, eventTrigger.getCaseFields().size()),
+                () -> assertThat(
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField(LINE1).isPresent(),
+                    is(true)),
+                () -> assertThat(
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField(LINE2).isPresent(),
+                    is(false)),
+                () -> assertThat(
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField(LINE3).isPresent(),
                     is(false))
             );
         }
@@ -3106,22 +2957,22 @@ public class AccessControlServiceTest {
                             newCaseField()
                                 .withFieldType(
                                     aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
+                                        .withType(TEXT)
+                                        .withId(TEXT)
                                         .build())
-                                .withId("Line1")
+                                .withId(LINE1)
                                 .build())
                         .withComplexField(
                             newCaseField()
                                 .withFieldType(
                                     aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
+                                        .withType(TEXT)
+                                        .withId(TEXT)
                                         .build())
-                                .withId("Line2")
+                                .withId(LINE2)
                                 .build())
                         .build())
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -3130,14 +2981,14 @@ public class AccessControlServiceTest {
                         .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Line1")
+                            .withListElementCode(LINE1)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
                             .withUpdate(false)
                             .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Line2")
+                            .withListElementCode(LINE2)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(true)
                             .build())
@@ -3145,33 +2996,7 @@ public class AccessControlServiceTest {
                 .build();
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType()
-                            .withType(COMPLEX)
-                            .withComplexField(
-                                newCaseField()
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
-                                            .build())
-                                    .withId("Line1")
-                                    .build())
-                            .withComplexField(
-                                newCaseField()
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
-                                            .build())
-                                    .withId("Line2")
-                                    .build())
-                            .build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            CaseUpdateViewEvent caseEventTrigger = createCaseUpdateViewEventWithTwoSubFields(TEXT);
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -3200,19 +3025,19 @@ public class AccessControlServiceTest {
                             newCaseField()
                                 .withFieldType(
                                     aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
+                                        .withType(TEXT)
+                                        .withId(TEXT)
                                         .build())
-                                .withId("Line1")
+                                .withId(LINE1)
                                 .build())
                         .withComplexField(
                             newCaseField()
                                 .withFieldType(
                                     aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
+                                        .withType(TEXT)
+                                        .withId(TEXT)
                                         .build())
-                                .withId("Line2")
+                                .withId(LINE2)
                                 .build())
                         .build())
                     .withId("ResidenceAddress")
@@ -3224,14 +3049,14 @@ public class AccessControlServiceTest {
                         .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Line1")
+                            .withListElementCode(LINE1)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
                             .withUpdate(false)
                             .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Line2")
+                            .withListElementCode(LINE2)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(true)
                             .build())
@@ -3243,19 +3068,19 @@ public class AccessControlServiceTest {
                             newCaseField()
                                 .withFieldType(
                                     aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
+                                        .withType(TEXT)
+                                        .withId(TEXT)
                                         .build())
-                                .withId("Line1")
+                                .withId(LINE1)
                                 .build())
                         .withComplexField(
                             newCaseField()
                                 .withFieldType(
                                     aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
+                                        .withType(TEXT)
+                                        .withId(TEXT)
                                         .build())
-                                .withId("Line2")
+                                .withId(LINE2)
                                 .build())
                         .build())
                     .withId("OfficeAddress")
@@ -3267,14 +3092,14 @@ public class AccessControlServiceTest {
                         .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Line1")
+                            .withListElementCode(LINE1)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
                             .withUpdate(false)
                             .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Line2")
+                            .withListElementCode(LINE2)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(true)
                             .build())
@@ -3291,19 +3116,19 @@ public class AccessControlServiceTest {
                                 newCaseField()
                                     .withFieldType(
                                         aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
+                                            .withType(TEXT)
+                                            .withId(TEXT)
                                             .build())
-                                    .withId("Line1")
+                                    .withId(LINE1)
                                     .build())
                             .withComplexField(
                                 newCaseField()
                                     .withFieldType(
                                         aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
+                                            .withType(TEXT)
+                                            .withId(TEXT)
                                             .build())
-                                    .withId("Line2")
+                                    .withId(LINE2)
                                     .build())
                             .build())
                         .withId("ResidenceAddress")
@@ -3316,19 +3141,19 @@ public class AccessControlServiceTest {
                                 newCaseField()
                                     .withFieldType(
                                         aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
+                                            .withType(TEXT)
+                                            .withId(TEXT)
                                             .build())
-                                    .withId("Line1")
+                                    .withId(LINE1)
                                     .build())
                             .withComplexField(
                                 newCaseField()
                                     .withFieldType(
                                         aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
+                                            .withType(TEXT)
+                                            .withId(TEXT)
                                             .build())
-                                    .withId("Line2")
+                                    .withId(LINE2)
                                     .build())
                             .build())
                         .withId("OfficeAddress")
@@ -3360,22 +3185,22 @@ public class AccessControlServiceTest {
                             newCaseField()
                                 .withFieldType(
                                     aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
+                                        .withType(TEXT)
+                                        .withId(TEXT)
                                         .build())
-                                .withId("Line1")
+                                .withId(LINE1)
                                 .build())
                         .withComplexField(
                             newCaseField()
                                 .withFieldType(
                                     aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
+                                        .withType(TEXT)
+                                        .withId(TEXT)
                                         .build())
-                                .withId("Line2")
+                                .withId(LINE2)
                                 .build())
                         .build())
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -3384,13 +3209,13 @@ public class AccessControlServiceTest {
                         .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Line1")
+                            .withListElementCode(LINE1)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withUpdate(true)
                             .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Line2")
+                            .withListElementCode(LINE2)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withUpdate(true)
                             .build())
@@ -3398,33 +3223,7 @@ public class AccessControlServiceTest {
                 .build();
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(
-                    aViewField()
-                        .withFieldType(aFieldType()
-                            .withType(COMPLEX)
-                            .withComplexField(
-                                newCaseField()
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
-                                            .build())
-                                    .withId("Line1")
-                                    .build())
-                            .withComplexField(
-                                newCaseField()
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withType("Text")
-                                            .withId("Text")
-                                            .build())
-                                    .withId("Line2")
-                                    .build())
-                            .build())
-                        .withId("Addresses")
-                        .build())
-                .build();
+            CaseUpdateViewEvent caseEventTrigger = createCaseUpdateViewEventWithTwoSubFields(TEXT);
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 CASE_TYPE_ID,
@@ -3437,9 +3236,9 @@ public class AccessControlServiceTest {
 
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1"),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField(LINE1),
                     not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2"),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField(LINE2),
                     not(hasProperty("displayContext", is(READONLY))))
             );
         }
@@ -3456,22 +3255,22 @@ public class AccessControlServiceTest {
                             newCaseField()
                                 .withFieldType(
                                     aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
+                                        .withType(TEXT)
+                                        .withId(TEXT)
                                         .build())
-                                .withId("Line1")
+                                .withId(LINE1)
                                 .build())
                         .withComplexField(
                             newCaseField()
                                 .withFieldType(
                                     aFieldType()
-                                        .withType("Text")
-                                        .withId("Text")
+                                        .withType(TEXT)
+                                        .withId(TEXT)
                                         .build())
-                                .withId("Line2")
+                                .withId(LINE2)
                                 .build())
                         .build())
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
@@ -3480,13 +3279,13 @@ public class AccessControlServiceTest {
                         .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Line1")
+                            .withListElementCode(LINE1)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withUpdate(true)
                             .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Line2")
+                            .withListElementCode(LINE2)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withUpdate(false)
                             .build())
@@ -3501,23 +3300,24 @@ public class AccessControlServiceTest {
                         newCaseField()
                             .withFieldType(
                                 aFieldType()
-                                    .withType("Text")
-                                    .withId("Text")
+                                    .withType(TEXT)
+                                    .withId(TEXT)
                                     .build())
-                            .withId("Line1")
+                            .withId(LINE1)
                             .build())
                     .withComplexField(
                         newCaseField()
                             .withFieldType(
                                 aFieldType()
-                                    .withType("Text")
-                                    .withId("Text")
+                                    .withType(TEXT)
+                                    .withId(TEXT)
                                     .build())
-                            .withId("Line2")
+                            .withId(LINE2)
                             .build())
                     .build())
-                .withId("Addresses")
+                .withId(ADDRESSES)
                 .build();
+
             CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withWizardPage(newWizardPage()
@@ -3547,12 +3347,12 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
                 () -> assertThat(
-                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1").orElseThrow(() ->
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField(LINE1).orElseThrow(() ->
                         new RuntimeException("Line 2 is not there")),
                     not(hasProperty("displayContext", is(READONLY)))
                 ),
                 () -> assertThat(
-                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2").orElseThrow(() ->
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField(LINE2).orElseThrow(() ->
                         new RuntimeException("Line 2 is not there")),
                     hasProperty("displayContext", is(READONLY))
                 ),
@@ -3578,21 +3378,21 @@ public class AccessControlServiceTest {
                     .withFieldType(aFieldType()
                         .withType(COLLECTION)
                         .withCollectionField(newCaseField()
-                            .withId("Addresses")
+                            .withId(ADDRESSES)
                             .withFieldType(aFieldType()
                                 .withType(COMPLEX)
                                 .withComplexField(newCaseField()
-                                    .withId("Line1")
+                                    .withId(LINE1)
                                     .withFieldType(aFieldType()
-                                        .withId("Text")
-                                        .withType("Text")
+                                        .withId(TEXT)
+                                        .withType(TEXT)
                                         .build())
                                     .build())
                                 .withComplexField(newCaseField()
-                                    .withId("Line2")
+                                    .withId(LINE2)
                                     .withFieldType(aFieldType()
-                                        .withId("Text")
-                                        .withType("Text")
+                                        .withId(TEXT)
+                                        .withType(TEXT)
                                         .build())
                                     .build())
                                 .build())
@@ -3604,7 +3404,7 @@ public class AccessControlServiceTest {
                         .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Addresses")
+                            .withListElementCode(ADDRESSES)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withUpdate(true)
                             .build())
@@ -3624,35 +3424,7 @@ public class AccessControlServiceTest {
                 .build();
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(aViewField()
-                    .withId("AddressCollection")
-                    .withFieldType(aFieldType()
-                        .withType(COLLECTION)
-                        .withCollectionField(newCaseField()
-                            .withId("Addresses")
-                            .withFieldType(aFieldType()
-                                .withType(COMPLEX)
-                                .withComplexField(newCaseField()
-                                    .withId("Line1")
-                                    .withFieldType(aFieldType()
-                                        .withId("Text")
-                                        .withType("Text")
-                                        .build())
-                                    .build())
-                                .withComplexField(
-                                    newCaseField()
-                                        .withId("Line2")
-                                        .withFieldType(aFieldType()
-                                            .withId("Text")
-                                            .withType("Text")
-                                            .build())
-                                        .build())
-                                .build())
-                            .build())
-                        .build())
-                    .build())
-                .build();
+            CaseUpdateViewEvent caseEventTrigger = createCaseUpdateViewEventForCollection();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 CASE_TYPE_ID,
@@ -3666,7 +3438,7 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext",
                     is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses"),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), ADDRESSES),
                     not(hasProperty("displayContext", is(READONLY)))),
                 () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"),
                     hasProperty("displayContext", is(READONLY))),
@@ -3686,21 +3458,21 @@ public class AccessControlServiceTest {
                     .withFieldType(aFieldType()
                         .withType(COLLECTION)
                         .withCollectionField(newCaseField()
-                            .withId("Addresses")
+                            .withId(ADDRESSES)
                             .withFieldType(aFieldType()
                                 .withType(COMPLEX)
                                 .withComplexField(newCaseField()
-                                    .withId("Line1")
+                                    .withId(LINE1)
                                     .withFieldType(aFieldType()
-                                        .withId("Text")
-                                        .withType("Text")
+                                        .withId(TEXT)
+                                        .withType(TEXT)
                                         .build())
                                     .build())
                                 .withComplexField(newCaseField()
-                                    .withId("Line2")
+                                    .withId(LINE2)
                                     .withFieldType(aFieldType()
-                                        .withId("Text")
-                                        .withType("Text")
+                                        .withId(TEXT)
+                                        .withType(TEXT)
                                         .build())
                                     .build())
                                 .build())
@@ -3712,7 +3484,7 @@ public class AccessControlServiceTest {
                         .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Addresses")
+                            .withListElementCode(ADDRESSES)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withUpdate(false)
                             .build())
@@ -3733,35 +3505,7 @@ public class AccessControlServiceTest {
 
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(aViewField()
-                    .withId("AddressCollection")
-                    .withFieldType(aFieldType()
-                        .withType(COLLECTION)
-                        .withCollectionField(newCaseField()
-                            .withId("Addresses")
-                            .withFieldType(aFieldType()
-                                .withType(COMPLEX)
-                                .withComplexField(newCaseField()
-                                    .withId("Line1")
-                                    .withFieldType(aFieldType()
-                                        .withId("Text")
-                                        .withType("Text")
-                                        .build())
-                                    .build())
-                                .withComplexField(
-                                    newCaseField()
-                                        .withId("Line2")
-                                        .withFieldType(aFieldType()
-                                            .withId("Text")
-                                            .withType("Text")
-                                            .build())
-                                        .build())
-                                .build())
-                            .build())
-                        .build())
-                    .build())
-                .build();
+            CaseUpdateViewEvent caseEventTrigger = createCaseUpdateViewEventForCollection();
 
             assertEquals(1, caseEventTrigger.getCaseFields().size());
 
@@ -3786,21 +3530,21 @@ public class AccessControlServiceTest {
                     .withFieldType(aFieldType()
                         .withType(COLLECTION)
                         .withCollectionField(newCaseField()
-                            .withId("Addresses")
+                            .withId(ADDRESSES)
                             .withFieldType(aFieldType()
                                 .withType(COMPLEX)
                                 .withComplexField(newCaseField()
-                                    .withId("Line1")
+                                    .withId(LINE1)
                                     .withFieldType(aFieldType()
-                                        .withId("Text")
-                                        .withType("Text")
+                                        .withId(TEXT)
+                                        .withType(TEXT)
                                         .build())
                                     .build())
                                 .withComplexField(newCaseField()
-                                    .withId("Line2")
+                                    .withId(LINE2)
                                     .withFieldType(aFieldType()
-                                        .withId("Text")
-                                        .withType("Text")
+                                        .withId(TEXT)
+                                        .withType(TEXT)
                                         .build())
                                     .build())
                                 .build())
@@ -3812,7 +3556,7 @@ public class AccessControlServiceTest {
                         .build())
                     .withComplexACL(
                         aComplexACL()
-                            .withListElementCode("Addresses")
+                            .withListElementCode(ADDRESSES)
                             .withRole(ROLE_IN_USER_ROLES)
                             .withUpdate(true)
                             .build())
@@ -3832,35 +3576,7 @@ public class AccessControlServiceTest {
                 .build();
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
-            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
-                .withField(aViewField()
-                    .withId("AddressCollection")
-                    .withFieldType(aFieldType()
-                        .withType(COLLECTION)
-                        .withCollectionField(newCaseField()
-                            .withId("Addresses")
-                            .withFieldType(aFieldType()
-                                .withType(COMPLEX)
-                                .withComplexField(newCaseField()
-                                    .withId("Line1")
-                                    .withFieldType(aFieldType()
-                                        .withId("Text")
-                                        .withType("Text")
-                                        .build())
-                                    .build())
-                                .withComplexField(
-                                    newCaseField()
-                                        .withId("Line2")
-                                        .withFieldType(aFieldType()
-                                            .withId("Text")
-                                            .withType("Text")
-                                            .build())
-                                        .build())
-                                .build())
-                            .build())
-                        .build())
-                    .build())
-                .build();
+            CaseUpdateViewEvent caseEventTrigger = createCaseUpdateViewEventForCollection();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 CASE_TYPE_ID,
@@ -3874,7 +3590,7 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext",
                     is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses"),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField(ADDRESSES),
                     not(hasProperty("displayContext", is(READONLY)))),
                 () -> assertThat(
                     eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line1"),
@@ -3894,8 +3610,8 @@ public class AccessControlServiceTest {
         void shouldSetReadonlyFlagIfRelevantAclNotGrantingAccess() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(TEXT).build())
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -3923,8 +3639,8 @@ public class AccessControlServiceTest {
 
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(TEXT).build())
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .build())
@@ -3951,7 +3667,7 @@ public class AccessControlServiceTest {
         void shouldSetReadonlyFlagIfRelevantAclGrantingAccessAndEventNameNotMatching() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withUpdate(true)
@@ -3985,7 +3701,7 @@ public class AccessControlServiceTest {
 
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withId("Addresses")
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withUpdate(true)
@@ -4018,8 +3734,8 @@ public class AccessControlServiceTest {
         void shouldNotSetReadonlyFlagIfAclMatching() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(TEXT).build())
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withUpdate(true)
@@ -4046,8 +3762,8 @@ public class AccessControlServiceTest {
         void shouldNotSetReadonlyFlagIfAclMatchingInAclsGroup() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(TEXT).build())
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_NOT_IN_USER_ROLES)
                         .withUpdate(true)
@@ -4083,8 +3799,8 @@ public class AccessControlServiceTest {
         void shouldNotSetReadonlyFlagsIfAclsMatchingInCaseViewFieldsGroup() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(TEXT).build())
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_NOT_IN_USER_ROLES)
                         .build())
@@ -4094,21 +3810,21 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withId("AddressesNoAccess")
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES_3)
                         .build())
                     .build())
                 .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withId("AddressesNoAccess2")
                     .withAcl(anAcl()
                         .withRole(ROLE_NOT_IN_USER_ROLES)
                         .build())
                     .build())
                 .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
+                    .withFieldType(aFieldType().withType(TEXT).build())
                     .withId("Addresses2")
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES_2)
@@ -4120,22 +3836,22 @@ public class AccessControlServiceTest {
             CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
+                        .withFieldType(aFieldType().withType(TEXT).build())
+                        .withId(ADDRESSES)
                         .build())
                 .withField(
                     aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
+                        .withFieldType(aFieldType().withType(TEXT).build())
                         .withId("AddressesNoAccess")
                         .build())
                 .withField(
                     aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
+                        .withFieldType(aFieldType().withType(TEXT).build())
                         .withId("AddressesNoAccess2")
                         .build())
                 .withField(
                     aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
+                        .withFieldType(aFieldType().withType(TEXT).build())
                         .withId("Addresses2")
                         .build())
                 .build();
@@ -4150,7 +3866,7 @@ public class AccessControlServiceTest {
                 CAN_UPDATE);
             assertAll(
                 () -> assertThat(actual.getCaseFields(), hasSize(4)),
-                () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id", is("Addresses")),
+                () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id", is(ADDRESSES)),
                     not(hasProperty("displayContext", is(READONLY)))))),
                 () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id",
                     is("AddressesNoAccess")),
@@ -4166,8 +3882,8 @@ public class AccessControlServiceTest {
         private CaseTypeDefinition defaultCaseTypeDefinition() {
             return newCaseType()
                 .withField(newCaseField()
-                    .withFieldType(aFieldType().withType("Text").build())
-                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(TEXT).build())
+                    .withId(ADDRESSES)
                     .withAcl(anAcl()
                         .withRole(ROLE_NOT_IN_USER_ROLES)
                         .withCreate(true)
@@ -4182,8 +3898,8 @@ public class AccessControlServiceTest {
             return newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
-                        .withFieldType(aFieldType().withType("Text").build())
-                        .withId("Addresses")
+                        .withFieldType(aFieldType().withType(TEXT).build())
+                        .withId(ADDRESSES)
                         .build())
                 .build();
         }
@@ -4481,7 +4197,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("CRUD contract on collection")
-    class CRUDonCollection {
+    class CRUDonCollectionTests {
         private JsonNode existingDataNode;
         private final String comma = ",";
         private final String collStart = "{  \"Addresses\":[  \n";
@@ -4545,7 +4261,7 @@ public class AccessControlServiceTest {
             existingDataNode = getJsonNode(collStart + child1 + comma + child2 + collEnd);
 
             addressField = newCaseField()
-                .withId("Addresses")
+                .withId(ADDRESSES)
                 .withFieldType(aFieldType().withType(COLLECTION).build())
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
@@ -4566,8 +4282,8 @@ public class AccessControlServiceTest {
                 .withComplexField(newCaseField()
                     .withId("Address")
                     .withFieldType(aFieldType()
-                        .withId("Text")
-                        .withType("Text")
+                        .withId(TEXT)
+                        .withType(TEXT)
                         .build())
                     .build())
                 .withComplexField(getNotesFieldDefinition())
@@ -4583,15 +4299,15 @@ public class AccessControlServiceTest {
                     .withComplexField(newCaseField()
                         .withId("Note1")
                         .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                            .withId(TEXT)
+                            .withType(TEXT)
                             .build())
                         .build())
                     .withComplexField(newCaseField()
                         .withId("Note2")
                         .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                            .withId(TEXT)
+                            .withType(TEXT)
                             .build())
                         .build())
                     .build())
@@ -4815,15 +4531,15 @@ public class AccessControlServiceTest {
             .withComplexField(newCaseField()
                 .withId("FirstName")
                 .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+                    .withId(TEXT)
+                    .withType(TEXT)
                     .build())
                 .build())
             .withComplexField(newCaseField()
                 .withId("LastName")
                 .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+                    .withId(TEXT)
+                    .withType(TEXT)
                     .build())
                 .build())
             .withComplexField(getBirtInfoComplexField())
@@ -4834,7 +4550,7 @@ public class AccessControlServiceTest {
 
     static CaseFieldDefinition getAddressesCollectionFieldDefinition() {
         CaseFieldDefinition caseField = newCaseField()
-            .withId("Addresses")
+            .withId(ADDRESSES)
             .withFieldType(aFieldType()
                 .withId("Addresses-XYZT")
                 .withType(COLLECTION)
@@ -4853,15 +4569,15 @@ public class AccessControlServiceTest {
                 .withComplexField(newCaseField()
                     .withId("BornCity")
                     .withFieldType(aFieldType()
-                        .withId("Text")
-                        .withType("Text")
+                        .withId(TEXT)
+                        .withType(TEXT)
                         .build())
                     .build())
                 .withComplexField(newCaseField()
                     .withId("BornCountry")
                     .withFieldType(aFieldType()
-                        .withId("Text")
-                        .withType("Text")
+                        .withId(TEXT)
+                        .withType(TEXT)
                         .build())
                     .build())
                 .withComplexField(newCaseField()
@@ -4879,8 +4595,8 @@ public class AccessControlServiceTest {
             .withComplexField(newCaseField()
                 .withId("Name")
                 .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+                    .withId(TEXT)
+                    .withType(TEXT)
                     .build())
                 .build())
             .withComplexField(newCaseField()
@@ -4895,31 +4611,31 @@ public class AccessControlServiceTest {
             .withId("AddressDetailComplexType")
             .withType(COMPLEX)
             .withComplexField(newCaseField()
-                .withId("Line1")
+                .withId(LINE1)
                 .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+                    .withId(TEXT)
+                    .withType(TEXT)
                     .build())
                 .build())
             .withComplexField(newCaseField()
-                .withId("Line2")
+                .withId(LINE2)
                 .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+                    .withId(TEXT)
+                    .withType(TEXT)
                     .build())
                 .build())
             .withComplexField(newCaseField()
                 .withId("PostCode")
                 .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+                    .withId(TEXT)
+                    .withType(TEXT)
                     .build())
                 .build())
             .withComplexField(newCaseField()
                 .withId("Country")
                 .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+                    .withId(TEXT)
+                    .withType(TEXT)
                     .build())
                 .build())
             .build();
@@ -4939,8 +4655,8 @@ public class AccessControlServiceTest {
             .withComplexField(newCaseField()
                 .withId("Txt")
                 .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+                    .withId(TEXT)
+                    .withType(TEXT)
                     .build())
                 .build())
             .withComplexField(getTagFieldDefinition())
@@ -4962,15 +4678,15 @@ public class AccessControlServiceTest {
             .withComplexField(newCaseField()
                 .withId("Tag")
                 .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+                    .withId(TEXT)
+                    .withType(TEXT)
                     .build())
                 .build())
             .withComplexField(newCaseField()
                 .withId("Category")
                 .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+                    .withId(TEXT)
+                    .withType(TEXT)
                     .build())
                 .build())
             .build());
@@ -5003,5 +4719,222 @@ public class AccessControlServiceTest {
         Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
         Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList(CASE_TYPE_ID));
         Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(singletonList(EVENT_ID));
+    }
+
+    private CaseTypeDefinition createCaseTypeWithTwoSubFields(String type) {
+        final CaseTypeDefinition caseType = newCaseType()
+            .withField(newCaseField()
+                .withFieldType(aFieldType()
+                    .withType(COMPLEX)
+                    .withComplexField(
+                        newCaseField()
+                            .withFieldType(
+                                aFieldType()
+                                    .withType(TEXT)
+                                    .withId(TEXT)
+                                    .build())
+                            .withId(LINE1)
+                            .build())
+                    .withComplexField(
+                        newCaseField()
+                            .withFieldType(
+                                aFieldType()
+                                    .withType(type)
+                                    .withId(TEXT)
+                                    .build())
+                            .withId(LINE2)
+                            .build())
+                    .build())
+                .withId(ADDRESSES)
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .withUpdate(false)
+                    .withRead(true)
+                    .build())
+                .withComplexACL(
+                    aComplexACL()
+                        .withListElementCode(LINE1)
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .withUpdate(false)
+                        .withRead(true)
+                        .build())
+                .withComplexACL(
+                    aComplexACL()
+                        .withListElementCode(LINE2)
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withRead(true)
+                        .build())
+                .build())
+            .build();
+
+        caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+        return caseType;
+    }
+
+    private CaseTypeDefinition createCaseTypeWithThreeSubFields(String type) {
+        final CaseTypeDefinition caseType = newCaseType()
+            .withField(newCaseField()
+                .withFieldType(aFieldType()
+                    .withType(COMPLEX)
+                    .withComplexField(
+                        newCaseField()
+                            .withFieldType(
+                                aFieldType()
+                                    .withType(TEXT)
+                                    .withId(TEXT)
+                                    .build())
+                            .withId(LINE1)
+                            .build())
+                    .withComplexField(
+                        newCaseField()
+                            .withFieldType(
+                                aFieldType()
+                                    .withType(TEXT)
+                                    .withId(TEXT)
+                                    .build())
+                            .withId(LINE2)
+                            .build())
+                    .withComplexField(
+                        newCaseField()
+                            .withFieldType(
+                                aFieldType()
+                                    .withType(type)
+                                    .withId(TEXT)
+                                    .build())
+                            .withId(LINE3)
+                            .build())
+                    .build())
+                .withId(ADDRESSES)
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .withUpdate(true)
+                    .withRead(true)
+                    .build())
+                .withComplexACL(
+                    aComplexACL()
+                        .withListElementCode(LINE1)
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                .withComplexACL(
+                    aComplexACL()
+                        .withListElementCode(LINE2)
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(false)
+                        .withRead(false)
+                        .build())
+                .build())
+            .build();
+
+        caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+        return caseType;
+    }
+
+    private CaseUpdateViewEvent createCaseUpdateViewEventWithTwoSubFields(String type) {
+        return newCaseUpdateViewEvent()
+            .withField(
+                aViewField()
+                    .withFieldType(aFieldType()
+                        .withType(COMPLEX)
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType(TEXT)
+                                        .withId(TEXT)
+                                        .build())
+                                .withId(LINE1)
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType(type)
+                                        .withId(TEXT)
+                                        .build())
+                                .withId(LINE2)
+                                .build())
+                        .build())
+                    .withId(ADDRESSES)
+                    .build())
+            .build();
+    }
+
+    private CaseUpdateViewEvent createCaseUpdateViewEventWithThreeSubFields(String type) {
+        return newCaseUpdateViewEvent()
+            .withField(
+                aViewField()
+                    .withFieldType(aFieldType()
+                        .withType(COMPLEX)
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType(TEXT)
+                                        .withId(TEXT)
+                                        .build())
+                                .withId(LINE1)
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType(TEXT)
+                                        .withId(TEXT)
+                                        .build())
+                                .withId(LINE2)
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType(type)
+                                        .withId(TEXT)
+                                        .build())
+                                .withId(LINE3)
+                                .build())
+                        .build())
+                    .withId(ADDRESSES)
+                    .build())
+            .build();
+    }
+
+    private CaseUpdateViewEvent createCaseUpdateViewEventForCollection() {
+        return newCaseUpdateViewEvent()
+            .withField(aViewField()
+                .withId("AddressCollection")
+                .withFieldType(aFieldType()
+                    .withType(COLLECTION)
+                    .withCollectionField(newCaseField()
+                        .withId(ADDRESSES)
+                        .withFieldType(aFieldType()
+                            .withType(COMPLEX)
+                            .withComplexField(newCaseField()
+                                .withId(LINE1)
+                                .withFieldType(aFieldType()
+                                    .withId(TEXT)
+                                    .withType(TEXT)
+                                    .build())
+                                .build())
+                            .withComplexField(
+                                newCaseField()
+                                    .withId(LINE2)
+                                    .withFieldType(aFieldType()
+                                        .withId(TEXT)
+                                        .withType(TEXT)
+                                        .build())
+                                    .build())
+                            .build())
+                        .build())
+                    .build())
+                .build())
+            .build();
     }
 }
