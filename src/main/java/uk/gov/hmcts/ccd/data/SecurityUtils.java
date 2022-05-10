@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data;
 
 import com.auth0.jwt.JWT;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -18,7 +19,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-@Log4j2
+@Slf4j
 public class SecurityUtils {
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
