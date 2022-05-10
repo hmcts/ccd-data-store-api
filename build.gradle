@@ -119,9 +119,9 @@ targetCompatibility = 11
 configurations {
     providedRuntime
     annotationProcessor
-    runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
+//    runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
 
-    runtimeClasspath.exclude(group: 'ch.qos.logback')
+  //  runtimeClasspath.exclude(group: 'ch.qos.logback')
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
