@@ -129,7 +129,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
 
         assertThat(globalSearchResponsePayload.getResultInfo().getCasesReturned(), is(2));
         assertThat(globalSearchResponsePayload.getResultInfo().getCaseStartRecord(), is(startRecord));
-        assertThat(globalSearchResponsePayload.getResultInfo().isMoreResultsToGo(), is(false));
+        assertThat(globalSearchResponsePayload.getResultInfo().isMoreResultsToGo(), is(true));
 
         assertThat(globalSearchResponsePayload.getResults().get(0).getCaseReference(), is(REFERENCE_1));
         assertThat(globalSearchResponsePayload.getResults().get(0).getCcdJurisdictionId(), is(JURISDICTION));

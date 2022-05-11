@@ -59,8 +59,9 @@ public class GlobalSearchResponseTransformer {
 
     public GlobalSearchResponsePayload.ResultInfo transformResultInfo(final Integer maxReturnRecordCount,
                                                                       final Integer startRecordNumber,
+                                                                      final Long totalSearchHits,
                                                                       final Integer recordsReturnedCount) {
-        final boolean moreToGo = recordsReturnedCount > (maxReturnRecordCount + startRecordNumber - 1);
+        final boolean moreToGo = totalSearchHits > (maxReturnRecordCount + startRecordNumber - 1);
 
         return GlobalSearchResponsePayload.ResultInfo.builder()
             .casesReturned(recordsReturnedCount)

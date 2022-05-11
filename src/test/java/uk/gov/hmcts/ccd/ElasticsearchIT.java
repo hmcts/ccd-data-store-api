@@ -1973,11 +1973,28 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 defaultSortOrder
             ),
 
-            //Arguments.of("1 -> 3  (i.e. some at start)", 1, 3, true,
-            // List.of(defaultSortOrder.get(0), defaultSortOrder.get(1), defaultSortOrder.get(2))),
+            Arguments.of(
+                "1 -> 3  (i.e. some at start)",
+                1,
+                3,
+                true,
+                List.of(
+                    defaultSortOrder.get(0),
+                    defaultSortOrder.get(1),
+                    defaultSortOrder.get(2)
+                )
+            ),
 
-            //Arguments.of("2 -> 3  (i.e. some in middle)", 2, 2, true,
-            // List.of(defaultSortOrder.get(1), defaultSortOrder.get(2))),
+            Arguments.of(
+                "2 -> 3  (i.e. some in middle)",
+                2,
+                2,
+                true,
+                List.of(
+                    defaultSortOrder.get(1),
+                    defaultSortOrder.get(2)
+                )
+            ),
 
             Arguments.of(
                 "3 -> 4  (i.e. some at end)",

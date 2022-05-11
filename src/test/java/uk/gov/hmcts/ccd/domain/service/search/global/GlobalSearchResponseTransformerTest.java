@@ -342,11 +342,13 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     @MethodSource("providePaginationParameters")
     void testShouldEvaluatePaginationInformation(final Integer maxReturnRecordCount,
                                                  final Integer startRecordNumber,
+                                                 final Long totalSearchHits,
                                                  final Integer recordsReturnedCount,
                                                  final Boolean moreToGo) {
         final GlobalSearchResponsePayload.ResultInfo actualResultInfo = underTest.transformResultInfo(
             maxReturnRecordCount,
             startRecordNumber,
+            totalSearchHits,
             recordsReturnedCount
         );
 
@@ -361,11 +363,11 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
 
     private static Stream<Arguments> providePaginationParameters() {
         return Stream.of(
-            Arguments.of(10, 1, 11, true),
-            Arguments.of(5, 5, 10, true),
-            Arguments.of(10, 1, 10, false),
-            Arguments.of(5, 6, 5, false),
-            Arguments.of(5, 1, 2, false)
+            Arguments.of(10, 1, 11L, 10, true),
+            Arguments.of(5, 5, 10L, 5, true),
+            Arguments.of(10, 1, 10L, 10, false),
+            Arguments.of(5, 6, 10L, 5, false),
+            Arguments.of(5, 1, 2L, 2, false)
         );
     }
 

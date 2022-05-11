@@ -132,6 +132,7 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
         final GlobalSearchResponsePayload.ResultInfo resultInfo = globalSearchResponseTransformer.transformResultInfo(
             requestPayload.getMaxReturnRecordCount(),
             requestPayload.getStartRecordNumber(),
+            caseSearchResultTotal,
             results.size()
         );
 

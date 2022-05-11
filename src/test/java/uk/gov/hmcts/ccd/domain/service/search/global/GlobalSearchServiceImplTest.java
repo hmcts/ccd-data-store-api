@@ -130,7 +130,8 @@ class GlobalSearchServiceImplTest extends TestFixtures {
             .when(globalSearchResponseTransformer).transformResultInfo(
                 requestPayload.getMaxReturnRecordCount(),
                 requestPayload.getStartRecordNumber(),
-                        caseSearchResult.getCases().size()
+                caseSearchResult.getTotal(),
+                caseSearchResult.getCases().size()
             );
         doReturn(GlobalSearchResponsePayload.Result.builder().build())
             .when(globalSearchResponseTransformer).transformResult(
@@ -153,7 +154,8 @@ class GlobalSearchServiceImplTest extends TestFixtures {
         verify(globalSearchResponseTransformer).transformResultInfo(
             requestPayload.getMaxReturnRecordCount(),
             requestPayload.getStartRecordNumber(),
-                caseSearchResult.getCases().size()
+            caseSearchResult.getTotal(),
+            caseSearchResult.getCases().size()
         );
         verify(globalSearchResponseTransformer).transformResult(
             any(CaseDetails.class),
