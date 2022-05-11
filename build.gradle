@@ -122,6 +122,7 @@ configurations {
  //   runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
 
 //    runtimeClasspath.exclude(group: 'ch.qos.logback')
+    runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-logging-logback'
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
