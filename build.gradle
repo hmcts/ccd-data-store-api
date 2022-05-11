@@ -594,11 +594,11 @@ compileJava {
     options.annotationProcessorPath = configurations.annotationProcessor
 }
 
-configurations {
-    all.collect { configuration ->
-        configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
-    }
-}
+//configurations {
+//    all.collect { configuration ->
+//        configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+//    }
+//}
 
 compileTestJava {
     options.annotationProcessorPath = configurations.annotationProcessor
