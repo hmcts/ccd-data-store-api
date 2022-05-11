@@ -147,7 +147,7 @@ dependencies {
 
     compile group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
   //  compile group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLogging
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: versions.appInsights
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: '2.6.1'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.1'
     compile 'com.github.hmcts:properties-volume-spring-boot-starter:0.0.4'
 
