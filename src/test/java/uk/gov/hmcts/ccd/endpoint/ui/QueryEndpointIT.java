@@ -40,6 +40,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import javax.inject.Inject;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -1542,8 +1543,6 @@ public class QueryEndpointIT extends WireMockBaseTest {
         );
     }
 
-
-    @Ignore("Temporary for intermittent failure")
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldGetJurisdictionsForReadAccess() throws Exception {
@@ -1556,13 +1555,27 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final JurisdictionDisplayProperties[] jurisdictions = mapper.readValue(
             result.getResponse().getContentAsString(), JurisdictionDisplayProperties[].class);
 
+        // match against wiremock:`/src/test/resources/mappings/jurisdictions.json`
+        assertThat(jurisdictions.length, is(equalTo(4)));
+
+        // find and verify 1
+        JurisdictionDisplayProperties jurisdiction = Arrays.stream(jurisdictions)
+            .filter(item -> item.getId().equalsIgnoreCase("PROBATE"))
+            .findFirst().orElse(null);
+        assertNotNull(jurisdiction);
+
         assertAll(
-            () -> assertThat(jurisdictions.length, is(equalTo(4))),
-            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().size(), is(equalTo(1))),
-            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().get(0).getStates().size(),
-                is(equalTo(2))),
-            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().get(0).getEvents().size(),
-                is(equalTo(2)))
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().size(), is(equalTo(2))),
+
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(0),
+                hasProperty("id", equalTo("GrantOfRepresentation"))),
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(0).getStates().size(), is(equalTo(2))),
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(0).getEvents().size(), is(equalTo(2))),
+
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(1),
+                hasProperty("id", equalTo("TestAddressBookCaseCaseLinks"))),
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(1).getStates().size(), is(equalTo(2))),
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(1).getEvents().size(), is(equalTo(3)))
         );
     }
 

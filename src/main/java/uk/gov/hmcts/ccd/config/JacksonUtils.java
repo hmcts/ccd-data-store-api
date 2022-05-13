@@ -7,8 +7,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.NonNull;
+import org.apache.commons.lang.StringUtils;
+import uk.gov.hmcts.ccd.domain.types.sanitiser.CollectionSanitiser;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
-
+import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
 
 public final class JacksonUtils {
 
@@ -36,7 +41,6 @@ public final class JacksonUtils {
         .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
         .addModule(new JavaTimeModule())
         .build();
-
 
     public static Map<String, JsonNode> convertValue(Object from) {
         return MAPPER.convertValue(from, new TypeReference<HashMap<String, JsonNode>>() {
@@ -118,5 +122,71 @@ public final class JacksonUtils {
             }
         }
         return mainNode;
+    }
+
+    public static String getValueFromPath(final String path, final Map<String, JsonNode> dataMap) {
+        return getValueFromPath(path, convertValueJsonNode(dataMap));
+    }
+
+    public static String getValueFromPath(final String path, final JsonNode jsonNode) {
+        String returnValue = null;
+        if (path.contains(".")) {
+            String pathStart = path.substring(0, path.indexOf("."));
+            String truncatedPath = path.substring(path.indexOf(".") + 1);
+
+            JsonNode foundNodeValue = getNestedCaseFieldByPath(jsonNode, pathStart);
+            if (foundNodeValue != null) {
+                if (foundNodeValue.isArray()) {
+                    returnValue = getValueFromArray(truncatedPath, foundNodeValue);
+                } else {
+                    returnValue = getValueFromPath(truncatedPath, foundNodeValue);
+                }
+            }
+        } else {
+            JsonNode foundNodeValue = getNestedCaseFieldByPath(jsonNode, path);
+            if (foundNodeValue != null) {
+                returnValue = getValue(foundNodeValue);
+            }
+        }
+
+        return returnValue;
+    }
+
+
+    private static String getValueFromArray(String path, JsonNode jsonNode) {
+        ArrayNode arrayNode = (ArrayNode)jsonNode;
+        final var arrayIndex = path.contains(".") ? path.substring(0, path.indexOf(".")) : path;
+        final var truncatedPath = path.contains(".") ? path.substring(path.indexOf(".") + 1) : "";
+        if (StringUtils.isNumeric(arrayIndex)) {
+            JsonNode foundJsonNode = arrayNode.get(Integer.parseInt(arrayIndex));
+            if (foundJsonNode != null) {
+                // check if need to auto-apply collection processing
+                if (!truncatedPath.startsWith(CollectionSanitiser.VALUE)
+                    && !truncatedPath.startsWith(CollectionSanitiser.ID)
+                    && foundJsonNode.has(CollectionSanitiser.VALUE)
+                ) {
+                    // adjust node to accommodate for use of value property
+                    foundJsonNode = foundJsonNode.get(CollectionSanitiser.VALUE);
+                }
+
+                if (StringUtils.isNotBlank(truncatedPath)) {
+                    return getValueFromPath(truncatedPath, foundJsonNode);
+                } else {
+                    return getValue(foundJsonNode);
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String getValue(@NonNull JsonNode jsonNode) {
+        String returnValue = null;
+
+        if (jsonNode instanceof IntNode) {
+            returnValue = jsonNode.toString();
+        } else {
+            return jsonNode.iterator().hasNext() ? jsonNode.iterator().next().textValue() : jsonNode.textValue();
+        }
+        return returnValue;
     }
 }

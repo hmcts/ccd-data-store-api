@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.caseaccess;
+package uk.gov.hmcts.ccd.data.caselinking;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -10,13 +10,16 @@ import java.io.Serializable;
 @Table(name = "case_link")
 public class CaseLinkEntity {
 
+    public static final Boolean STANDARD_LINK = true;
+    public static final Boolean NON_STANDARD_LINK = false;
+
     public static class CaseLinkPrimaryKey implements Serializable {
         @Column(name = "case_id", nullable = false)
         private Long caseId;
         @Column(name = "linked_case_id", nullable = false)
         private Long linkedCaseId;
 
-        public long getCaseId() {
+        public Long getCaseId() {
             return caseId;
         }
 
@@ -24,7 +27,7 @@ public class CaseLinkEntity {
             this.caseId = caseId;
         }
 
-        public long getLinkedCaseId() {
+        public Long getLinkedCaseId() {
             return linkedCaseId;
         }
 
@@ -39,16 +42,20 @@ public class CaseLinkEntity {
     @Column(name = "case_type_id", nullable = false)
     private String caseTypeId;
 
+    @Column(name = "standard_link", nullable = false)
+    private Boolean standardLink;
+
     public CaseLinkEntity() {
 
     }
 
-    public CaseLinkEntity(Long caseId, Long linkedCaseId, String caseTypeId) {
+    public CaseLinkEntity(Long caseId, Long linkedCaseId, String caseTypeId, Boolean standardLink) {
         caseLinkPrimaryKey = new CaseLinkPrimaryKey();
         caseLinkPrimaryKey.setCaseId(caseId);
         caseLinkPrimaryKey.setLinkedCaseId(linkedCaseId);
 
         this.caseTypeId = caseTypeId;
+        this.standardLink = standardLink;
     }
 
     public String getCaseTypeId() {
@@ -62,4 +69,13 @@ public class CaseLinkEntity {
     public CaseLinkPrimaryKey getCaseLinkPrimaryKey() {
         return caseLinkPrimaryKey;
     }
+
+    public Boolean getStandardLink() {
+        return standardLink;
+    }
+
+    public void setStandardLink(Boolean standardLink) {
+        this.standardLink = standardLink;
+    }
+
 }

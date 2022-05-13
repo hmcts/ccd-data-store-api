@@ -1,0 +1,17 @@
+{
+	"_guid_": "F-1019_Test_Data_Citizen_Base_Error_Response",
+  "_extends_": "Citizen_Case_Creation_Data_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+	"request": {
+		"pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+		}
+	}
+}

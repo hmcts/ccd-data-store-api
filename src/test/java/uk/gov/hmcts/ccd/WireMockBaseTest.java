@@ -31,24 +31,45 @@ import org.springframework.test.util.ReflectionTestUtils;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @AutoConfigureWireMock(port = 0)
 public abstract class WireMockBaseTest extends BaseTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
 
-    public static final int NUMBER_OF_CASES = 21;
+    // data values as per: classpath:sql/insert_cases.sql
+    public static final String CASE_01_REFERENCE = "1504259907353529";
+    public static final String CASE_02_REFERENCE = "1504259907353545";
+    public static final String CASE_03_REFERENCE = "1504259907353537";
+    public static final String CASE_04_REFERENCE = "1504259907353552";
+    public static final String CASE_13_REFERENCE = "1504259907353651";
+    public static final String CASE_14_REFERENCE = "1504259907353598";
+    public static final String CASE_19_REFERENCE = "1601933818308168";
+    public static final String CASE_21_REFERENCE = "9816494993793181";
+    public static final String CASE_22_REFERENCE = "3393027116986763";
+    public static final Long CASE_01_ID = 1L;
+    public static final Long CASE_02_ID = 2L;
+    public static final Long CASE_03_ID = 3L;
+    public static final Long CASE_04_ID = 4L;
+    public static final Long CASE_13_ID = 13L;
+    public static final Long CASE_14_ID = 14L;
+    public static final Long CASE_19_ID = 19L;
+    public static final Long CASE_21_ID = 21L;
+    public static final Long CASE_22_ID = 22L;
+    public static final String CASE_01_TYPE = "TestAddressBookCase";
+    public static final String CASE_02_TYPE = "TestAddressBookCase";
+    public static final String CASE_03_TYPE = "TestAddressBookCase";
+    public static final int NUMBER_OF_CASES = 22;
 
     private static final String BEARER = "Bearer ";
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";

@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -84,6 +85,7 @@ public class CreateCaseEventService {
     private final CaseDataIssueLogger caseDataIssueLogger;
     private final GlobalSearchProcessorService globalSearchProcessorService;
     private final TimeToLiveService timeToLiveService;
+    private final CaseLinkService caseLinkService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -110,7 +112,8 @@ public class CreateCaseEventService {
                                   final CaseDocumentService caseDocumentService,
                                   final CaseDataIssueLogger caseDataIssueLogger,
                                   final GlobalSearchProcessorService globalSearchProcessorService,
-                                  final TimeToLiveService timeToLiveService) {
+                                  final TimeToLiveService timeToLiveService,
+                                  final CaseLinkService caseLinkService) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -134,6 +137,7 @@ public class CreateCaseEventService {
         this.caseDataIssueLogger = caseDataIssueLogger;
         this.globalSearchProcessorService = globalSearchProcessorService;
         this.timeToLiveService = timeToLiveService;
+        this.caseLinkService = caseLinkService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -208,6 +212,9 @@ public class CreateCaseEventService {
             newState,
             timeNow
         );
+
+        caseLinkService.updateCaseLinks(savedCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+
         saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
             content.getEvent(),

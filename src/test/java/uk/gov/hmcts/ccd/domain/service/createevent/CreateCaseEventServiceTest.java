@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -100,8 +101,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private CaseService caseService;
     @Mock
     private UserAuthorisation userAuthorisation;
-    @Mock
-    private TimeToLiveService timeToLiveService;
 
     @Mock
     private FieldProcessorService fieldProcessorService;
@@ -122,6 +121,12 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     @Mock
     private GlobalSearchProcessorService globalSearchProcessorService;
+
+    @Mock
+    private TimeToLiveService timeToLiveService;
+
+    @Mock
+    private CaseLinkService caseLinkService;
 
     @InjectMocks
     private CreateCaseEventService underTest;
@@ -170,6 +175,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         aboutToSubmitCallbackResponse.setState(Optional.empty());
 
         caseDetails = new CaseDetails();
+        caseDetails.setReference(Long.parseLong(CASE_REFERENCE));
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
         caseDetails.setLastModified(LAST_MODIFIED);
@@ -330,6 +336,30 @@ class CreateCaseEventServiceTest extends TestFixtures {
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
         assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
             .isEqualTo(LAST_MODIFIED);
+    }
+
+    @Test
+    @DisplayName("Should insert case links when case is modified")
+    void shouldInsertCaseLinks() {
+
+        // GIVEN
+        final String userToken = "Test_Token";
+
+        caseDataContent = newCaseDataContent()
+            .withEvent(event)
+            .withData(data)
+            .withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING)
+            .withOnBehalfOfUserToken(userToken)
+            .build();
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        // i.e. verify same caseDetails passed to both saveCase and updateCaseLinks
+        verify(caseDetailsRepository).set(caseDetails);
+        verify(caseLinkService).updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
     }
 
     private void createCaseEvent() {
