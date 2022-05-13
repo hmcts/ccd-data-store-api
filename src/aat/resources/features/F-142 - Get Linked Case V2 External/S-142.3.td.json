@@ -5,8 +5,10 @@
 
   "specs": [
     "an active profile in CCD",
+
     "contains a valid user authorisation token without access to the operation",
     "contains a case reference that does not exist",
+
     "contains an HTTP-404 Not Found"
   ],
 

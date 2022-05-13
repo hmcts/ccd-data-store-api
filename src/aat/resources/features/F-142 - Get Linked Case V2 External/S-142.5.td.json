@@ -5,9 +5,17 @@
 
   "specs": [
     "an active profile in CCD",
+
     "contains valid case reference but invalid maxReturnRecordCount",
+
     "contains an HTTP-400 Bad Request"
   ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
 
   "request": {
     "pathVariables": {

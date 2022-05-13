@@ -5,9 +5,17 @@
 
   "specs": [
     "an active profile in CCD",
+
     "does not contain a case reference",
+
     "contains an HTTP-404 Bad Request"
   ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
 
   "request": {
     "pathVariables": {
