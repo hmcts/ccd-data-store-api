@@ -70,6 +70,8 @@ class DefinitionBlockGeneratorTest {
     private static final String DOCUMENT_FILENAME = "document_filename";
     private static final String DOCUMENT_URL = "document_url";
     private static final String FIELD_SEPARATOR = ".";
+    private static final String CATEGORY_ID = "category_id";
+    private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
@@ -80,7 +82,7 @@ class DefinitionBlockGeneratorTest {
         mappings.put(DATETIME, SIMPLE_DATE_TIME_TYPE);
         mappings.put(NUMBER, SIMPLE_NUMBER_TYPE);
         mappings.put(DOCUMENT, COMPLEX);
-        
+
         Mockito.when(messagingProperties.getTypeMappings()).thenReturn(mappings);
 
         caseDetails = new CaseDetails();
@@ -273,7 +275,7 @@ class DefinitionBlockGeneratorTest {
             () -> assertThat(result.get(FIELD_ID).getOriginalId(), is(FIELD_ID)),
             () -> assertThat(result.get(FIELD_ID).getType(), is(COMPLEX)),
             () -> assertThat(result.get(FIELD_ID).getSubtype(), is(DOCUMENT)),
-            () -> assertThat(result.get(FIELD_ID).getTypeDef().size(), is(3)),
+            () -> assertThat(result.get(FIELD_ID).getTypeDef().size(), is(5)),
             () -> assertThat(result.get(FIELD_ID).getTypeDef().get(DOCUMENT_BINARY_URL).getOriginalId(),
                 is(DOCUMENT_BINARY_URL)),
             () -> assertThat(result.get(FIELD_ID).getTypeDef().get(DOCUMENT_BINARY_URL).getType(),
@@ -288,7 +290,14 @@ class DefinitionBlockGeneratorTest {
             () -> assertThat(result.get(FIELD_ID).getTypeDef().get(DOCUMENT_URL).getOriginalId(), is(DOCUMENT_URL)),
             () -> assertThat(result.get(FIELD_ID).getTypeDef().get(DOCUMENT_URL).getType(), is(SIMPLE_TEXT_TYPE)),
             () -> assertThat(result.get(FIELD_ID).getTypeDef().get(DOCUMENT_URL).getSubtype(), is(TEXT)),
-            () -> assertThat(result.get(FIELD_ID).getTypeDef().get(DOCUMENT_URL).getTypeDef(), is(nullValue()))
+            () -> assertThat(result.get(FIELD_ID).getTypeDef().get(DOCUMENT_URL).getTypeDef(), is(nullValue())),
+            () -> assertThat(result.get(FIELD_ID).getTypeDef().get(CATEGORY_ID).getType(), is(SIMPLE_TEXT_TYPE)),
+            () -> assertThat(result.get(FIELD_ID).getTypeDef().get(CATEGORY_ID).getSubtype(), is(TEXT)),
+            () -> assertThat(result.get(FIELD_ID).getTypeDef().get(CATEGORY_ID).getTypeDef(), is(nullValue())),
+            () -> assertThat(result.get(FIELD_ID).getTypeDef().get(UPLOAD_TIMESTAMP).getType(),
+                is(SIMPLE_DATE_TIME_TYPE)),
+            () -> assertThat(result.get(FIELD_ID).getTypeDef().get(UPLOAD_TIMESTAMP).getSubtype(), is(DATETIME)),
+            () -> assertThat(result.get(FIELD_ID).getTypeDef().get(UPLOAD_TIMESTAMP).getTypeDef(), is(nullValue()))
         );
     }
 
@@ -712,7 +721,7 @@ class DefinitionBlockGeneratorTest {
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
         Map<String, DefinitionBlock> result = definitionBlockGenerator.generateDefinition(context);
-        
+
         assertAll(
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(result.get(FIELD_ID).getOriginalId(), is(FIELD_ID)),

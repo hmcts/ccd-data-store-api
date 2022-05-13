@@ -6,16 +6,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -28,6 +30,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_S
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_PAYMENT_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPONENT_LAUNCHER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.FLAG_LAUNCHER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.WAYS_TO_PAY;
@@ -112,6 +115,9 @@ public class CaseDetails implements Cloneable {
 
     @JsonIgnore
     private final Map<String, Object> metadata = new HashMap<>();
+
+    @JsonIgnore
+    private LocalDate resolvedTTL;
 
     public String getId() {
         return id;
@@ -273,7 +279,8 @@ public class CaseDetails implements Cloneable {
             .getFieldTypeDefinition().getType().equals(CASE_PAYMENT_HISTORY_VIEWER)
             || caseTypeTabField.getCaseFieldDefinition()
             .getFieldTypeDefinition().getType().equals(WAYS_TO_PAY)
-            || caseTypeTabField.getCaseFieldDefinition().getFieldTypeDefinition().getType().equals(FLAG_LAUNCHER);
+            || caseTypeTabField.getCaseFieldDefinition().getFieldTypeDefinition().getType().equals(FLAG_LAUNCHER)
+            || caseTypeTabField.getCaseFieldDefinition().getFieldTypeDefinition().getType().equals(COMPONENT_LAUNCHER);
     }
 
     @JsonIgnore
@@ -376,4 +383,11 @@ public class CaseDetails implements Cloneable {
         return caseEventData;
     }
 
+    public void setResolvedTTL(LocalDate resolvedTTL) {
+        this.resolvedTTL = resolvedTTL;
+    }
+
+    public LocalDate getResolvedTTL() {
+        return resolvedTTL;
+    }
 }

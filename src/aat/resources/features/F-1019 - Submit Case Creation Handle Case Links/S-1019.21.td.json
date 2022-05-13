@@ -1,0 +1,60 @@
+{
+  "_guid_": "S-1019.21",
+  "_extends_": "Case_Creation_Data_Base",
+
+  "title": "Nested complex fields with CaseLinks should generate caseLink records when Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "prerequisites" : [{
+    "Token_Creation": "S-1019_GetCreateToken_ComplexCollectionComplex_CreateCaseLink"
+  }],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains valid CaseLinks: Complex -> Complex -> Case Link (see CaseLinkComplex)",
+    "contains valid CaseLinks: Collection -> Case Link (see CaseLinkCollection)"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_ComplexCollectionComplex"
+    },
+    "body": {
+      "data": {
+        "_extends_": "F-1019-CaseDataWithNestedComplexCaseLinks"
+      },
+      "event": {
+        "id": "createCaseLink",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "jurisdiction" : "BEFTA_MASTER",
+      "state" : "CaseCreated",
+      "case_type_id" : "FT_ComplexCollectionComplex",
+      "case_data" : {
+        "_extends_": "F-1019-CaseDataWithNestedComplexCaseLinks"
+      },
+      "data_classification" : {
+        "_extends_": "F-1019-ClasificationsForCaseDataWithNestedComplexCaseLinks"
+      },
+      "security_classifications" : {
+        "_extends_": "F-1019-ClasificationsForCaseDataWithNestedComplexCaseLinks"
+      },
+      "supplementary_data" : null
+    }
+  }
+}

@@ -23,6 +23,8 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -85,6 +87,8 @@ public class CreateCaseEventService {
     private final CaseDataIssueLogger caseDataIssueLogger;
     private final GlobalSearchProcessorService globalSearchProcessorService;
     private final CaseDetailsJsonParser caseDetailsJsonParser;
+    private final TimeToLiveService timeToLiveService;
+    private final CaseLinkService caseLinkService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -111,7 +115,9 @@ public class CreateCaseEventService {
                                   final CaseDocumentService caseDocumentService,
                                   final CaseDataIssueLogger caseDataIssueLogger,
                                   final GlobalSearchProcessorService globalSearchProcessorService,
-                                  final CaseDetailsJsonParser jsonPathParser) {
+                                  final CaseDetailsJsonParser jsonPathParser,
+                                  final TimeToLiveService timeToLiveService,
+                                  final CaseLinkService caseLinkService) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -135,6 +141,8 @@ public class CreateCaseEventService {
         this.caseDataIssueLogger = caseDataIssueLogger;
         this.globalSearchProcessorService = globalSearchProcessorService;
         this.caseDetailsJsonParser = jsonPathParser;
+        this.timeToLiveService = timeToLiveService;
+        this.caseLinkService = caseLinkService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -168,6 +176,9 @@ public class CreateCaseEventService {
             caseEventDefinition,
             caseTypeDefinition
         );
+
+        timeToLiveService.validateSuspensionChange(content.getData(), caseDetailsInDatabase.getData());
+
         final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
 
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
@@ -196,6 +207,9 @@ public class CreateCaseEventService {
             caseDetailsAfterCallback
         );
 
+        caseDetailsAfterCallbackWithoutHashes
+            .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
+
         final CaseDetails savedCaseDetails = saveCaseDetails(
             caseDetailsInDatabase,
             caseDetailsAfterCallbackWithoutHashes,
@@ -203,6 +217,9 @@ public class CreateCaseEventService {
             newState,
             timeNow
         );
+
+        caseLinkService.updateCaseLinks(savedCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+
         saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
             content.getEvent(),
@@ -307,7 +324,6 @@ public class CreateCaseEventService {
             .savedCaseDetails(savedCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
-
     }
 
     private CaseEventDefinition findAndValidateCaseEvent(final CaseTypeDefinition caseTypeDefinition,

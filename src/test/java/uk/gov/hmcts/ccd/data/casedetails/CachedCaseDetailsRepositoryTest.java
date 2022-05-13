@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 
 class CachedCaseDetailsRepositoryTest {
 
@@ -438,4 +439,24 @@ class CachedCaseDetailsRepositoryTest {
             );
         }
     }
+
+    @Test
+    @DisplayName("Should call findByParamsWithLimit method of case details repository")
+    void findByParamsWithLimit() {
+
+        // GIVEN
+        MigrationParameters migrationParameters = new MigrationParameters();
+        List<CaseDetails> caseDetailsList = List.of(caseDetails);
+        doReturn(caseDetailsList).when(caseDetailsRepository).findByParamsWithLimit(migrationParameters);
+
+        // WHEN
+        List<CaseDetails> returned = cachedRepository.findByParamsWithLimit(migrationParameters);
+
+        // THEN
+        assertAll(
+            () -> assertThat(returned, is(caseDetailsList)),
+            () -> verify(caseDetailsRepository, times(1)).findByParamsWithLimit(migrationParameters)
+        );
+    }
+
 }

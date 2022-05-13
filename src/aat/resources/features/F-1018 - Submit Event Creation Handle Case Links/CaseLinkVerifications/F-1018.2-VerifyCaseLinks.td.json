@@ -1,0 +1,22 @@
+{
+  "title": "should retrieve case links for a specified case reference",
+  "_guid_": "F-1018.2-VerifyCaseLinks",
+  "_extends_": "F-1018_VerifyCaseLinksBase",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "CaseLinks" : [ {
+        "CaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+        "LinkedCaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+        "CaseTypeId" : "FT_MasterCaseType",
+        "StandardLink" : false
+      }]
+    }
+  }
+}

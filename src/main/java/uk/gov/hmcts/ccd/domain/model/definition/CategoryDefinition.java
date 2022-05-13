@@ -15,12 +15,12 @@ import java.time.LocalDate;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class CategoryDefinition implements Serializable {
 
-    String categoryId;
-    String categoryLabel;
-    String parentCategoryId;
-    LocalDate liveFrom;
-    LocalDate liveTo;
-    Integer displayOrder;
-    String caseTypeId;
+    private String categoryId;
+    private String categoryLabel;
+    private String parentCategoryId;
+    private LocalDate liveFrom;
+    private LocalDate liveTo;
+    private Integer displayOrder;
+    private String caseTypeId;
 
 }

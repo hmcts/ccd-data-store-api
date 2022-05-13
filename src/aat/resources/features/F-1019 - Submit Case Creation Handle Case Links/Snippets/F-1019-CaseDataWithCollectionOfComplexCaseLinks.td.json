@@ -1,0 +1,47 @@
+{
+  "_guid_": "F-1019-CaseDataWithCollectionOfComplexCaseLinks",
+
+  "FamilyDetails": {
+    "Children": [
+      {
+        "id": "292654f1-0000-ChildCase1",
+        "value": {
+          "ChildFullName": "Test Child 1",
+          "AutisticChildCaseNumber": {
+            "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+          }
+        }
+      },
+      {
+        "id": "fc89f508-0000-ChildCase2",
+        "value": {
+          "ChildFullName": "Test Child 2 (Repeated)",
+          "AutisticChildCaseNumber": {
+            "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+          }
+        }
+      }
+    ]
+  },
+
+  "Children": [
+    {
+      "id": "a17f8fbe-0000-ChildCase2",
+      "value": {
+        "ChildFullName": "Test Child 2 (Repeated)",
+        "AutisticChildCaseNumber": {
+          "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+        }
+      }
+    },
+    {
+      "id": "79fe81ed-0000-ChildCase3",
+      "value": {
+        "ChildFullName": "Test Child 3",
+        "AutisticChildCaseNumber": {
+          "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  ]
+}

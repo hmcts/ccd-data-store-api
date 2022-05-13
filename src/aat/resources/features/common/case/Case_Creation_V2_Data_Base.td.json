@@ -1,14 +1,6 @@
 {
-	"_guid_": "Case_Creation_V2_Base",
-
-  "productName": "CCD Data Store",
-  "operationName": "Submit case creation as Case worker (V2)",
-  "method": "POST",
-  "uri": "case-types/{CaseTypeID}/cases",
-
-  "specs": [
-		"to create a full case (V2)"
-	],
+	"_guid_": "Case_Creation_V2_Data_Base",
+  "_extends_": "Case_Creation_V2_Base",
 
   "users": {
     "invokingUser": {
@@ -18,12 +10,8 @@
 
   "request": {
 		"headers": {
-			"_extends_": "Common_Request_Headers",
       "Content-Type": "application/json;charset=UTF-8",
       "experimental": true
-		},
-		"pathVariables": {
-			"CaseTypeID": "OVERRIDE"
 		},
 		"body": {
 			"event": {

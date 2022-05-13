@@ -49,12 +49,11 @@
 	<suppress until="2022-05-25">
 		<cve>CVE-2022-22968</cve>
 	</suppress>
-
 	<suppress until="2022-05-25">
 		<notes><![CDATA[
-   file name: elasticsearch-7.16.2.jar
+   file name: gson-2.8.6.jar
    ]]></notes>
-		<packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-		<vulnerabilityName>CVE-2022-23708</vulnerabilityName>
+		<packageUrl regex="true">^pkg:maven/com\.google\.code\.gson/gson@.*$</packageUrl>
+		<cve>CVE-2022-25647</cve>
 	</suppress>
 </suppressions>

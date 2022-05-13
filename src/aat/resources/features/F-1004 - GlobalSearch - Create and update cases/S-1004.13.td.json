@@ -1,13 +1,20 @@
 {
   "title": "Successfully creates a case with correct data type for Date fields using V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases endpoint",
   "_guid_": "S-1004.13",
-  "_extends_": "Case_Creation_Base",
+  "_extends_": "Case_Creation_Data_Base",
+
   "specs": [
     "an active profile in CCD",
     "contains a Text value for the Date fields",
     "contains a SearchCriteria with SearchParty including the Dates",
     "to create a full case"
   ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
 
   "request": {
     "pathVariables": {
