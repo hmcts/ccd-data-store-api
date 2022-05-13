@@ -142,7 +142,7 @@ dependencies {
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.7.RELEASE'
 
     compile group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.1'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.1'
 
     compile 'com.github.hmcts:properties-volume-spring-boot-starter:0.0.4'
 
