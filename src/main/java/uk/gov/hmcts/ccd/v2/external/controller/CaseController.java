@@ -470,7 +470,7 @@ public class CaseController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = CaseResource.class),
+            response = GetLinkedCasesResponse.class),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
