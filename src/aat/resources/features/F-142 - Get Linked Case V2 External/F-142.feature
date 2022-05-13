@@ -165,7 +165,7 @@ Scenario: No pagination parameters, case link exist for the case reference, all 
 # RDM-13139: AC03 - No pagination parameters, 5 case link exist for the case reference, all case links are in the standard field but user does not have access to 2 linked cases, return 200 with 3 case links in response payload
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-142.10
-Scenario: No pagination parameters, 5 case link exist for the case reference, all case links are in the standard field but user does not have access to 2 linked cases, return 200 with 3 case links in response payloa
+Scenario: No pagination parameters, 5 case link exist for the case reference, all case links are in the standard field but user does not have access to 2 linked cases, return 200 with 3 case links in response payload
 
     Given a successful call [to create the test case] as in [F-142_CreateTestCase_BeftaCaseType11],
       And a successful call [to create 5 standard linked case, 2 with no access for the test account] as in [F-142_Create5LinkedCases_5StandardCaseLinks_2WithNoAccess]
