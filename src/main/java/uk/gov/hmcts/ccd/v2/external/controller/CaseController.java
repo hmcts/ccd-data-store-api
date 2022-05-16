@@ -35,6 +35,7 @@ import uk.gov.hmcts.ccd.domain.service.caselinking.GetLinkedCasesResponseCreator
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
@@ -60,9 +61,11 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 
 @RestController
 @RequestMapping(path = "/")
-public class CaseController extends AbstractCaseController {
+public class CaseController {
+    private final GetCaseOperation getCaseOperation;
     private final CreateEventOperation createEventOperation;
     private final CreateCaseOperation createCaseOperation;
+    private final UIDService caseReferenceService;
     private final GetEventsOperation getEventsOperation;
     private final SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private final SupplementaryDataUpdateRequestValidator requestValidator;
@@ -83,6 +86,7 @@ public class CaseController extends AbstractCaseController {
         this.getCaseOperation = getCaseOperation;
         this.createEventOperation = createEventOperation;
         this.createCaseOperation = createCaseOperation;
+        this.caseReferenceService = caseReferenceService;
         this.getEventsOperation = getEventsOperation;
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.requestValidator = requestValidator;
@@ -121,9 +125,12 @@ public class CaseController extends AbstractCaseController {
     @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
-        validateCaseReference(caseId);
+        if (!caseReferenceService.validateUID(caseId)) {
+            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
+        }
 
-        final CaseDetails caseDetails = getCaseDetails(caseId);
+        final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
+            .orElseThrow(() -> new CaseNotFoundException(caseId));
 
         return ResponseEntity.ok(new CaseResource(caseDetails));
     }
@@ -360,7 +367,9 @@ public class CaseController extends AbstractCaseController {
         )
     })
     public ResponseEntity<CaseEventsResource> getCaseEvents(@PathVariable("caseId") String caseId) {
-        validateCaseReference(caseId);
+        if (!caseReferenceService.validateUID(caseId)) {
+            throw new BadRequestException(V2.Error.ERROR_CASE_ID_INVALID);
+        }
 
         final List<AuditEvent> auditEvents = getEventsOperation.getEvents(caseId);
 
@@ -425,14 +434,18 @@ public class CaseController extends AbstractCaseController {
                                                                                      supplementaryDataUpdateRequest) {
 
         this.requestValidator.validate(supplementaryDataUpdateRequest);
-        validateCaseReference(caseId);
+        if (!caseReferenceService.validateUID(caseId)) {
+            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
+        }
         SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId,
             supplementaryDataUpdateRequest);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
     }
 
     private ResponseEntity<CaseResource> createCaseEvent(String caseId, CaseDataContent content) {
-        validateCaseReference(caseId);
+        if (!caseReferenceService.validateUID(caseId)) {
+            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
+        }
 
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId, content);
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content));
