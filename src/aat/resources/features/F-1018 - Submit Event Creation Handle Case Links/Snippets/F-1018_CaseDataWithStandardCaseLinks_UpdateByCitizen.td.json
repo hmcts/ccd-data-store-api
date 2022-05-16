@@ -1,0 +1,55 @@
+{
+  "_guid_": "F-1018_CaseDataWithStandardCaseLinks_UpdateByCitizen",
+
+  "CaseLinkField": {
+    "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCitizen][childContexts][CaseLinkedViaSimpleField][testData][actualResponse][body][id]}"
+  },
+
+  "CaseLinkCollection": [
+    {
+      "id": "4aeeec22-0000-CaseLinkedViaCollection",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCitizen][childContexts][CaseLinkedViaCollection][testData][actualResponse][body][id]}"
+      }
+    },
+    {
+      "id": "b8be8ac3-0000-CaseLinkedViaBothCollectionAndStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCitizen][childContexts][CaseLinkedViaBothCollectionAndStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    },
+    {
+      "id": "e7cc2b57-0000-CaseLinkedToMigrateFromStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCitizen][childContexts][CaseLinkedToMigrateFromStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    }
+  ],
+
+  "caseLinks": [
+    {
+      "id": "d4f4f2e2-0000-CaseLinkedViaStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCitizen][childContexts][CaseLinkedViaStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    },
+    {
+      "id": "5aa2d2b2-0000-CaseLinkedViaBothCollectionAndStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCitizen][childContexts][CaseLinkedViaBothCollectionAndStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    },
+    {
+      "id": "5ef487f9-0000-CaseLinkedToMigrateToStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCitizen][childContexts][CaseLinkedToMigrateToStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    },
+    {
+      "id": "4f0c525e-0000-CaseLinkedToAddToStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCitizen][childContexts][CaseLinkedToAddToStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    }
+  ]
+}

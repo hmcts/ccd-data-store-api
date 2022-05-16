@@ -1,0 +1,62 @@
+{
+  "_guid_": "F-1018_ClasificationsForCaseDataWithStandardCaseLinks_Creation",
+
+  "CaseLinkField" : {
+    "classification" : "PUBLIC",
+    "value" : {
+      "CaseReference" : "PUBLIC"
+    }
+  },
+  "CaseLinkCollection" : {
+    "classification" : "PUBLIC",
+    "value" : [
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "4aeeec22-0000-CaseLinkedViaCollection"
+      },
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "b8be8ac3-0000-CaseLinkedViaBothCollectionAndStandardCaseLinksField"
+      },
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "189a64bd-0000-CaseLinkedToMigrateToStandardCaseLinksField"
+      }
+    ]
+  },
+  "caseLinks" : {
+    "classification" : "PUBLIC",
+    "value" : [
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "d4f4f2e2-0000-CaseLinkedViaStandardCaseLinksField"
+      },
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "5aa2d2b2-0000-CaseLinkedViaBothCollectionAndStandardCaseLinksField"
+      },
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "84b47d12-0000-CaseLinkedToMigrateFromStandardCaseLinksField"
+      },
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "522c635d-0000-CaseLinkedToRemoveFromStandardCaseLinksField"
+      }
+    ]
+  }
+}

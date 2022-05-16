@@ -1,0 +1,12 @@
+{
+  "_guid_": "TTL_Case_Data_Classifications",
+
+  "TTL": {
+    "value": {
+      "SystemTTL": "PUBLIC",
+      "OverrideTTL": "PUBLIC",
+      "Suspended": "PUBLIC"
+    },
+    "classification": "PUBLIC"
+  }
+}

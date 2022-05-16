@@ -6,6 +6,7 @@ import static java.util.Optional.ofNullable;
 
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.List;
@@ -108,6 +109,12 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
         return metaAndFieldDataHashToCaseDetails.computeIfAbsent(
             format(META_AND_FIELD_DATA_HASH_FORMAT, metadata.hashCode(), getMapHashCode(dataSearchParams)),
             hash -> caseDetailsRepository.findByMetaDataAndFieldData(metadata, dataSearchParams));
+    }
+
+    @Override
+    public List<CaseDetails> findByParamsWithLimit(final MigrationParameters migrationParameters) {
+        // no cache in place for migration calls
+        return caseDetailsRepository.findByParamsWithLimit(migrationParameters);
     }
 
     @Override

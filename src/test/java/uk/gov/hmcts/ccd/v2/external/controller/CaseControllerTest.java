@@ -3,11 +3,6 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,6 +29,12 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -188,8 +189,8 @@ class CaseControllerTest {
             when(caseDetails.getLastStateModifiedDate()).thenReturn(stateModified);
 
             final ResponseEntity<CaseResource> response = caseController.createCase(CASE_TYPE_ID,
-                                                                                    CASE_DATA_CONTENT,
-                                                                                    IGNORE_WARNING);
+                CASE_DATA_CONTENT,
+                IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
@@ -366,7 +367,7 @@ class CaseControllerTest {
         }
 
         private void validateResponseData(Map<String, Object> response, String expectedKey, Object expectedValue) {
-            Map<String, Object> childMap = (Map<String, Object> ) response.get("orgs_assigned_users");
+            Map<String, Object> childMap = (Map<String, Object>) response.get("orgs_assigned_users");
             assertTrue(childMap.containsKey(expectedKey));
             assertEquals(expectedValue, childMap.get(expectedKey));
         }
@@ -413,4 +414,5 @@ class CaseControllerTest {
             return auditEvent;
         }
     }
+
 }

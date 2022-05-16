@@ -189,6 +189,7 @@ dependencies {
     implementation group: 'net.minidev', name: 'json-smart', version: '2.4.7'
 
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.21'
+    implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
 
     testCompile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
@@ -229,10 +230,17 @@ dependencies {
     runtime group: 'com.zaxxer', name: 'HikariCP', version: '4.0.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    configurations.all {
+        exclude group: 'com.vaadin.external.google', module: 'android-json'
+    }
+    testImplementation group: 'org.json', name: 'json', version: '20211205'
+
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
     testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.19.0'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.22.0'
+    testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.2'
     testImplementation("org.testcontainers:postgresql:1.15.2")
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
     testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE')
@@ -268,7 +276,7 @@ dependencies {
     compile 'org.jooq:jool-java-8:0.9.14'
     compile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.18.0'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.0'
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.2-Categories'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version

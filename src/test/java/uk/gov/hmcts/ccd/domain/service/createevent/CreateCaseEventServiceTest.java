@@ -22,6 +22,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
+import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.domain.service.message.CaseEventMessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
@@ -68,6 +71,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private static final String EVENT_ID = "UpdateCase";
     private static final String PRE_STATE_ID = "Created";
     private static final LocalDateTime LAST_MODIFIED = LocalDateTime.of(2015, 12, 21, 15, 30);
+    private static final int CASE_VERSION = 0;
+    private static final String ATTRIBUTE_PATH = "DocumentField";
+    private static final String CATEGORY_ID = "categoryId";
 
     @Mock
     private UserRepository userRepository;
@@ -120,6 +126,15 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private GlobalSearchProcessorService globalSearchProcessorService;
 
+    @Mock
+    private TimeToLiveService timeToLiveService;
+
+    @Mock
+    private CaseLinkService caseLinkService;
+
+    @Mock
+    private CaseDetailsJsonParser caseDetailsJsonParser;
+
     @InjectMocks
     private CreateCaseEventService underTest;
 
@@ -167,6 +182,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         aboutToSubmitCallbackResponse.setState(Optional.empty());
 
         caseDetails = new CaseDetails();
+        caseDetails.setReference(Long.parseLong(CASE_REFERENCE));
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
         caseDetails.setLastModified(LAST_MODIFIED);
@@ -327,6 +343,47 @@ class CreateCaseEventServiceTest extends TestFixtures {
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
         assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
             .isEqualTo(LAST_MODIFIED);
+    }
+
+    @Test
+    @DisplayName("Should insert case links when case is modified")
+    void shouldInsertCaseLinks() {
+
+        // GIVEN
+        final String userToken = "Test_Token";
+
+        caseDataContent = newCaseDataContent()
+            .withEvent(event)
+            .withData(data)
+            .withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING)
+            .withOnBehalfOfUserToken(userToken)
+            .build();
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        // i.e. verify same caseDetails passed to both saveCase and updateCaseLinks
+        verify(caseDetailsRepository).set(caseDetails);
+        verify(caseLinkService).updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+    }
+
+    @Test
+    @DisplayName("should update case category id")
+    void shouldUpdateCaseDocumentCategoryId() {
+        CaseStateDefinition state = new CaseStateDefinition();
+        state.setId(POST_STATE);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
+        caseDetails.setState(POST_STATE);
+        doReturn(caseDetails).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
+
+        final CreateCaseEventResult caseEventResult = underTest.createCaseSystemEvent(CASE_REFERENCE,
+            ATTRIBUTE_PATH,
+            CATEGORY_ID,
+            new Event());
+
+        assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
     }
 
     private void createCaseEvent() {
