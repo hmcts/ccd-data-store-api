@@ -11,8 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.ccd.BaseTest;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -39,7 +38,7 @@ import static uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkExtractor.TEXT
 @ExtendWith(MockitoExtension.class)
 class CaseLinkExtractorTest extends CaseLinkTestFixtures {
 
-    private static final String CASE_FIELDS_JSON = "/tests/CaseLinkExtractor_CaseFields.json";
+    private static final String CASE_FIELDS_JSON = "tests/CaseLinkExtractor_CaseFields.json";
     private static List<CaseFieldDefinition> caseFieldDefinitions;
 
     @Mock
@@ -81,7 +80,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
 
     @BeforeEach
     void setup() throws IOException {
-        caseFieldDefinitions = WireMockBaseTest.getCaseFieldsFromJson(BaseTest.getResourceAsString(CASE_FIELDS_JSON));
+        caseFieldDefinitions = TestFixtures.getCaseFieldsFromJson(CASE_FIELDS_JSON);
     }
 
     @DisplayName("Should extract a simple CaseLink value")

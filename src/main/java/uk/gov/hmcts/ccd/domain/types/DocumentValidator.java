@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.Category;
+import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -155,7 +155,7 @@ public class DocumentValidator implements BaseTypeValidator {
             return validationResult(CATEGORY_ID,validationResults);
         }
 
-        final List<Category> categoryList =
+        final List<CategoryDefinition> categoryList =
             caseDefinitionRepository.getCaseType(caseFieldDefinition.getCaseTypeId()).getCategories();
         String categoryIdValue = categoryId.textValue();
         final boolean caseTypeContainsKnownCategoryId = categoryList.stream()

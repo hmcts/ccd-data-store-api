@@ -39,7 +39,7 @@ public class SimpleCaseTypeMetadataExtractor implements CaseFieldMetadataExtract
 
         final Optional<CaseFieldMetadata> optionalCaseFieldMetadata = optionalFieldTypeDefinition
             .map(fieldTypeDefinition -> fieldType.equals(fieldTypeDefinition.getId())
-                ? new CaseFieldMetadata(fieldIdPrefix + nodeEntry.getKey(), null)
+                ? new CaseFieldMetadata(fieldIdPrefix + nodeEntry.getKey(), caseFieldDefinition.getCategoryId())
                 : null);
 
         final List<CaseFieldMetadata> results = optionalCaseFieldMetadata

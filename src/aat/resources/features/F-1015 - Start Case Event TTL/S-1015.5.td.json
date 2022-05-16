@@ -69,7 +69,8 @@
             "display_context" : null,
             "display_context_parameter" : null,
             "retain_hidden_value" : null,
-            "formatted_value" : null
+            "formatted_value" : null,
+            "category_id": "[[ANY_NULLABLE]]"
           }, {
             "id" : "OverrideTTL",
             "label" : "Override TTL",
@@ -97,7 +98,8 @@
             "display_context" : null,
             "display_context_parameter" : null,
             "retain_hidden_value" : null,
-            "formatted_value" : null
+            "formatted_value" : null,
+            "category_id": "[[ANY_NULLABLE]]"
           }, {
             "id" : "Suspended",
             "label" : "Suspended",
@@ -125,7 +127,8 @@
             "display_context" : null,
             "display_context_parameter" : null,
             "retain_hidden_value" : null,
-            "formatted_value" : null
+            "formatted_value" : null,
+            "category_id": "[[ANY_NULLABLE]]"
           } ],
           "collection_field_type" : null
         },

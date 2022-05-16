@@ -626,6 +626,7 @@
 							],
 							"searchAliasFields": [],
               "searchParties" : [],
+              "categories" : [],
               "searchCriterias" : [],
               "categories" : [],
               "roleToAccessProfiles": [],

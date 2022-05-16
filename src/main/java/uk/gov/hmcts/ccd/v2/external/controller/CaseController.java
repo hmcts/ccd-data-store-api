@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -30,16 +29,16 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateReques
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
-import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
+
+import java.util.List;
 
 import static org.springframework.http.ResponseEntity.status;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
@@ -48,11 +47,9 @@ import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
 
 @RestController
 @RequestMapping(path = "/")
-public class CaseController {
-    private final GetCaseOperation getCaseOperation;
+public class CaseController extends AbstractCaseController {
     private final CreateEventOperation createEventOperation;
     private final CreateCaseOperation createCaseOperation;
-    private final UIDService caseReferenceService;
     private final GetEventsOperation getEventsOperation;
     private final SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private final SupplementaryDataUpdateRequestValidator requestValidator;
@@ -65,12 +62,10 @@ public class CaseController {
         UIDService caseReferenceService,
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
         @Qualifier("authorised") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
-        SupplementaryDataUpdateRequestValidator requestValidator
-    ) {
-        this.getCaseOperation = getCaseOperation;
+        SupplementaryDataUpdateRequestValidator requestValidator) {
+        super(getCaseOperation, caseReferenceService);
         this.createEventOperation = createEventOperation;
         this.createCaseOperation = createCaseOperation;
-        this.caseReferenceService = caseReferenceService;
         this.getEventsOperation = getEventsOperation;
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.requestValidator = requestValidator;
@@ -107,12 +102,9 @@ public class CaseController {
     @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
-        if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
-        }
+        validateCaseReference(caseId);
 
-        final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
-                                                             .orElseThrow(() -> new CaseNotFoundException(caseId));
+        final CaseDetails caseDetails = getCaseDetails(caseId);
 
         return ResponseEntity.ok(new CaseResource(caseDetails));
     }
@@ -348,9 +340,7 @@ public class CaseController {
         )
     })
     public ResponseEntity<CaseEventsResource> getCaseEvents(@PathVariable("caseId") String caseId) {
-        if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(V2.Error.ERROR_CASE_ID_INVALID);
-        }
+        validateCaseReference(caseId);
 
         final List<AuditEvent> auditEvents = getEventsOperation.getEvents(caseId);
 
@@ -413,18 +403,14 @@ public class CaseController {
                                            @RequestBody SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
 
         this.requestValidator.validate(supplementaryDataUpdateRequest);
-        if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
-        }
+        validateCaseReference(caseId);
         SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId,
             supplementaryDataUpdateRequest);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
     }
 
     private ResponseEntity<CaseResource> createCaseEvent(String caseId, CaseDataContent content) {
-        if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
-        }
+        validateCaseReference(caseId);
 
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId, content);
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content));
@@ -437,4 +423,5 @@ public class CaseController {
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
     }
+
 }

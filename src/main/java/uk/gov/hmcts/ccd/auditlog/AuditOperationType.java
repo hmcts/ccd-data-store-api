@@ -13,7 +13,8 @@ public enum AuditOperationType {
     REVOKE_CASE_ACCESS("Revoke case access permissions"),
     VIEW_CASE_HISTORY("View case history"),
     GLOBAL_SEARCH("Global search"),
-    MIGRATION("Data migration");
+    MIGRATION("Data migration"),
+    CATEGORIES_AND_DOCUMENTS_ACCESSED("Categories and documents accessed");
 
     private final String label;
 

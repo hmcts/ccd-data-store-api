@@ -1,0 +1,54 @@
+{
+  "title":"User does not have access to the document field supplied in the attributePath value, Return 404 error",
+  "_guid_": "S-141.5",
+	"_extends_": "F-141_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD and doesn't have Update access permissions for the Document field named in the attributePath",
+		"a case definition with category structure exists for the case type CT1",
+    "a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1",
+    "contains the given case reference C1 in the input",
+    "contains an attributePath value as \"Document2\"  in the input",
+    "contains a HTTP 404 status code"
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+	"request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-141_CreateCase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "attribute_path": "Document2",
+      "case_version": "0",
+      "category_id": "CategoryID1"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "status" : 404,
+      "error" : "Not Found",
+      "message" : "No field found",
+      "path" : "/documentData/caseref/${[scenarioContext][childContexts][F-141_CreateCase][testData][actualResponse][body][id]}",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
+

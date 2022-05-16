@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.Category;
+import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.List;
@@ -488,9 +488,9 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
     private void setupWithCategories() {
         final CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
-        Category category = new Category();
+        CategoryDefinition category = new CategoryDefinition();
         category.setCategoryId(VALID_CATEGORY_ID);
-        List<Category> categories = List.of(category);
+        List<CategoryDefinition> categories = List.of(category);
         doReturn(caseTypeDefinition)
             .when(caseDefinitionRepository).getCaseType(anyString());
         doReturn(categories)
