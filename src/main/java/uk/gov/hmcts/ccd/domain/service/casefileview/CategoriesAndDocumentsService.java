@@ -54,7 +54,7 @@ public class CategoriesAndDocumentsService {
         this.fileViewDocumentService = fileViewDocumentService;
     }
 
-    public CategoriesAndDocuments getCategoriesAndDocuments(@NonNull Integer version,
+    public CategoriesAndDocuments getCategoriesAndDocuments(@NonNull final Integer version,
                                                             @NonNull final String caseType,
                                                             @NonNull final Map<String, JsonNode> caseData) {
         final CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseType);

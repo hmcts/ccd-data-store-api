@@ -91,7 +91,7 @@ public class CaseDataExtractor {
 
         final String caseFieldType = caseFieldDefinition.getFieldTypeDefinition().getType();
 
-        if (!BaseType.contains(caseFieldType)) {
+        if (isNotABaseType(caseFieldType)) {
             log.debug("Ignoring Unknown Type: " + caseFieldType);
             return Collections.emptyList();
         }
@@ -177,7 +177,7 @@ public class CaseDataExtractor {
         }
 
         if (shouldTreatAsValueNode(fieldTypeDefinition, itemValue)) {
-            if (!BaseType.contains(fieldTypeDefinition.getType())) {
+            if (isNotABaseType(fieldTypeDefinition.getType())) {
                 log.debug("Ignoring Unknown Type:" + fieldTypeDefinition.getType() + " " + itemFieldId);
                 return Collections.emptyList();
             }
@@ -187,12 +187,13 @@ public class CaseDataExtractor {
             caseFieldDefinition.setCategoryId(categoryId);
 
             return simpleCaseTypeMetadataExtractor.extractCaseFieldData(
-                nodeEntry,
-                caseFieldDefinition,
-                fieldIdPrefix,
-                fieldType,
-                paths
-            ).get();
+                    nodeEntry,
+                    caseFieldDefinition,
+                    fieldIdPrefix,
+                    fieldType,
+                    paths
+                )
+                .get();
         } else if (itemValue.isObject()) {
             return extractFieldTypePaths(
                 JacksonUtils.convertValue(itemValue),
@@ -218,4 +219,7 @@ public class CaseDataExtractor {
             || fieldTypeDefinition.getType().equalsIgnoreCase("DynamicRadioList");
     }
 
+    private boolean isNotABaseType(String fieldType) {
+        return !BaseType.contains(fieldType);
+    }
 }
