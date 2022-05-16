@@ -1,0 +1,314 @@
+{
+  "_guid_": "F-140_CreateCase_hierarchyCollectionComplex_override",
+
+  "productName": "CCD Data Store",
+  "operationName": "external create case",
+  "method": "POST",
+  "uri": "/case-types/{ctid}/cases",
+
+  "specs" : [
+    "to create a full case"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-140_CreateCase_Token_Creation"
+  }
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "ctid": "FT_CaseFileView_1"
+    },
+    "headers": {
+      "experimental": true
+    },
+    "body": {
+      "data": {
+        "miscellaneousDocuments": [
+          {
+            "id": "8c964a5c-7dd3-4728-8b22-cc49b9dbb846",
+            "value": {
+              "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+              "category_id": "CategoryID2"
+            }
+          },
+          {
+            "id": "8c964a5c-7dd3-4728-8b22-cc49b9dbb889",
+            "value": {
+              "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+            }
+          }
+        ],
+        "applicationDocuments": [
+          {
+            "id": "0dc41c52-095b-4f25-b71d-77326658aaeb",
+            "value": {
+              "issuedBy": "gov",
+              "description": "documents",
+              "document": {
+                "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+                "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+                "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+                "category_id": "CategoryID1"
+              }
+            }
+          },
+          {
+            "id": "0dc41c52-095b-4f25-b71d-77326698aaeb",
+            "value": {
+              "issuedBy": "gov",
+              "description": "documents2",
+              "document": {
+                "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+                "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+                "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+              }
+            }
+          }
+        ],
+        "nationalityProof": {
+          "typeOfProof": "doc",
+          "dateIssued": "2020-01-01",
+          "documentEvidenceCollection": [
+            {
+              "id": "43ff6ca8-a77b-44ad-8769-aab0053db07e",
+              "value": {
+                "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+                "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+                "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+                "category_id": "CategoryID2"
+              }
+            },
+            {
+              "id": "43ff6ca8-a77b-44ad-8769-aab0053db07g",
+              "value": {
+                "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+                "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+                "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+              }
+            }
+          ]
+        },
+        "evidenceDocuments": [
+          {
+            "id": "ca399773-4dff-48d9-a1de-6ed0a4b6ae99",
+            "value": {
+              "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+              "category_id": "CategoryID2"
+            }
+          },
+          {
+            "id": "ca399773-4dff-48d9-a1de-6ed0a4b6ae77",
+            "value": {
+              "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+            }
+          }
+        ]
+      },
+      "event": {
+        "id": "CREATE"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": false
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_CaseFileView_1",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "CaseCreated",
+      "security_classification": "PUBLIC",
+      "data": {
+        "evidenceDocuments": [
+          {
+            "value": {
+              "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+              "category_id": "CategoryID2"
+            },
+            "id" : "ca399773-4dff-48d9-a1de-6ed0a4b6ae99"
+          },
+          {
+            "value": {
+              "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+            },
+            "id" : "ca399773-4dff-48d9-a1de-6ed0a4b6ae77"
+          }
+        ],
+        "nationalityProof" : {
+          "typeOfProof" : "doc",
+          "dateIssued" : "2020-01-01",
+          "documentEvidenceCollection" : [ {
+            "value" : {
+              "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+              "category_id": "CategoryID2"
+            },
+            "id" : "43ff6ca8-a77b-44ad-8769-aab0053db07e"
+          }, {
+            "value" : {
+              "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+            },
+            "id" : "43ff6ca8-a77b-44ad-8769-aab0053db07g"
+          } ]
+        },
+        "miscellaneousDocuments": [
+          {
+            "value": {
+              "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+              "category_id": "CategoryID2"
+            },
+            "id": "8c964a5c-7dd3-4728-8b22-cc49b9dbb846"
+          },
+          {
+            "value": {
+              "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+            },
+            "id": "8c964a5c-7dd3-4728-8b22-cc49b9dbb889"
+          }
+        ],
+        "applicationDocuments": [
+          {
+            "value": {
+              "issuedBy": "gov",
+              "description": "documents",
+              "document": {
+                "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+                "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+                "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+                "category_id": "CategoryID1"
+              }
+            },
+            "id": "0dc41c52-095b-4f25-b71d-77326658aaeb"
+          },
+          {
+            "value": {
+              "issuedBy": "gov",
+              "description": "documents2",
+              "document": {
+                "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+                "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+                "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+              }
+            },
+            "id": "0dc41c52-095b-4f25-b71d-77326698aaeb"
+          }
+        ]
+      },
+      "data_classification": {
+        "evidenceDocuments": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "id": "ca399773-4dff-48d9-a1de-6ed0a4b6ae99",
+              "classification": "PUBLIC"
+            },
+            {
+              "id": "ca399773-4dff-48d9-a1de-6ed0a4b6ae77",
+              "classification": "PUBLIC"
+            }
+          ]
+        },
+        "nationalityProof": {
+          "classification": "PUBLIC",
+          "value": {
+            "typeOfProof": "PUBLIC",
+            "dateIssued": "PUBLIC",
+            "documentEvidenceCollection": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "id": "43ff6ca8-a77b-44ad-8769-aab0053db07e",
+                  "classification": "PUBLIC"
+                },
+                {
+                  "id": "43ff6ca8-a77b-44ad-8769-aab0053db07g",
+                  "classification": "PUBLIC"
+                }
+              ]
+            }
+          }
+        },
+        "miscellaneousDocuments": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "id": "8c964a5c-7dd3-4728-8b22-cc49b9dbb846",
+              "classification": "PUBLIC"
+            },
+            {
+              "id": "8c964a5c-7dd3-4728-8b22-cc49b9dbb889",
+              "classification": "PUBLIC"
+            }
+          ]
+        },
+        "applicationDocuments": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "issuedBy": "PUBLIC",
+                "description": "PUBLIC",
+                "document": "PUBLIC"
+              },
+              "id": "0dc41c52-095b-4f25-b71d-77326658aaeb"
+            },
+            {
+              "value": {
+                "issuedBy": "PUBLIC",
+                "description": "PUBLIC",
+                "document": "PUBLIC"
+              },
+              "id": "0dc41c52-095b-4f25-b71d-77326698aaeb"
+            }
+          ]
+        }
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

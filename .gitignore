@@ -34,3 +34,6 @@ out/
 
 ### MacOS
 .DS_Store
+
+### BEFTA
+befta_recent_executions_info_LOCAL.json

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
+import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
@@ -84,6 +86,7 @@ public class CreateCaseEventService {
     private final CaseDocumentService caseDocumentService;
     private final CaseDataIssueLogger caseDataIssueLogger;
     private final GlobalSearchProcessorService globalSearchProcessorService;
+    private final CaseDetailsJsonParser caseDetailsJsonParser;
     private final TimeToLiveService timeToLiveService;
     private final CaseLinkService caseLinkService;
 
@@ -112,6 +115,7 @@ public class CreateCaseEventService {
                                   final CaseDocumentService caseDocumentService,
                                   final CaseDataIssueLogger caseDataIssueLogger,
                                   final GlobalSearchProcessorService globalSearchProcessorService,
+                                  final CaseDetailsJsonParser jsonPathParser,
                                   final TimeToLiveService timeToLiveService,
                                   final CaseLinkService caseLinkService) {
         this.userRepository = userRepository;
@@ -136,6 +140,7 @@ public class CreateCaseEventService {
         this.caseDocumentService = caseDocumentService;
         this.caseDataIssueLogger = caseDataIssueLogger;
         this.globalSearchProcessorService = globalSearchProcessorService;
+        this.caseDetailsJsonParser = jsonPathParser;
         this.timeToLiveService = timeToLiveService;
         this.caseLinkService = caseLinkService;
     }
@@ -223,7 +228,88 @@ public class CreateCaseEventService {
             caseTypeDefinition,
             timeNow,
             oldState,
-            content.getOnBehalfOfUserToken()
+            content.getOnBehalfOfUserToken(),
+            securityClassificationService.getClassificationForEvent(caseTypeDefinition,
+                caseEventDefinition)
+        );
+
+        caseDocumentService.attachCaseDocuments(
+            caseDetails.getReferenceAsString(),
+            caseDetails.getCaseTypeId(),
+            caseDetails.getJurisdiction(),
+            documentHashes
+        );
+
+        return CreateCaseEventResult.caseEventWith()
+            .caseDetailsBefore(caseDetailsInDatabase)
+            .savedCaseDetails(savedCaseDetails)
+            .eventTrigger(caseEventDefinition)
+            .build();
+    }
+
+    public CreateCaseEventResult createCaseSystemEvent(final String caseReference,
+                                                       final String attributePath,
+                                                       final String categoryId,
+                                                       Event event) {
+        final CaseDetails caseDetails = getCaseDetails(caseReference);
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId("DocumentUpdated");
+        caseEventDefinition.setName("Update Document Category Id");
+        caseDetails.setLastModified(now());
+
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+
+        final CaseDetails caseDetailsInDatabase = caseService.clone(caseDetails);
+
+        final String oldState = caseDetails.getState();
+
+        // Logic start from here to attach document with case ID
+
+        final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(caseDetails);
+
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
+            caseEventDefinition,
+            caseDetailsInDatabase,
+            updatedCaseDetailsWithoutHashes,
+            caseTypeDefinition,
+            false
+        );
+
+        final Optional<String> newState = Optional.ofNullable(oldState);
+
+        @SuppressWarnings("UnnecessaryLocalVariable")
+        final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
+        caseDetailsJsonParser.updateCaseDocumentData(attributePath, categoryId, caseDetailsAfterCallback);
+
+        final LocalDateTime timeNow = now();
+
+        final List<DocumentHashToken> documentHashes = caseDocumentService.extractDocumentHashToken(
+            caseDetailsInDatabase.getData(),
+            caseDetailsInDatabase.getData(),
+            Optional.ofNullable(caseDetailsAfterCallback.getData()).orElse(emptyMap())
+        );
+
+        final CaseDetails caseDetailsAfterCallbackWithoutHashes = caseDocumentService.stripDocumentHashes(
+            caseDetailsAfterCallback
+        );
+
+        final CaseDetails savedCaseDetails = saveCaseDetails(
+            caseDetailsInDatabase,
+            caseDetailsAfterCallbackWithoutHashes,
+            caseEventDefinition,
+            newState,
+            timeNow
+        );
+        saveAuditEventForCaseDetails(
+            aboutToSubmitCallbackResponse,
+            event,
+            caseEventDefinition,
+            savedCaseDetails,
+            caseTypeDefinition,
+            timeNow,
+            oldState,
+            null,
+            SecurityClassification.PUBLIC
         );
 
         caseDocumentService.attachCaseDocuments(
@@ -349,7 +435,8 @@ public class CreateCaseEventService {
                                               final CaseTypeDefinition caseTypeDefinition,
                                               final LocalDateTime timeNow,
                                               final String oldState,
-                                              final String onBehalfOfUserToken) {
+                                              final String onBehalfOfUserToken,
+                                              final SecurityClassification securityClassification) {
         final CaseStateDefinition caseStateDefinition =
             caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
@@ -364,8 +451,7 @@ public class CreateCaseEventService {
         auditEvent.setCaseTypeId(caseTypeDefinition.getId());
         auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
         auditEvent.setCreatedDate(timeNow);
-        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition,
-            caseEventDefinition));
+        auditEvent.setSecurityClassification(securityClassification);
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
         saveUserDetails(onBehalfOfUserToken, auditEvent);

@@ -152,7 +152,7 @@ public class CaseDataExtractor {
                     fieldIdPrefix + nodeEntry.getKey() + FIELD_SEPARATOR,
                     paths,
                     fieldType,
-                    null //caseFieldDefinition.getCategoryId() uncomment when RDM-13090 gets merged
+                    caseFieldDefinition.getCategoryId()
                 )
             );
             index++;
@@ -184,15 +184,16 @@ public class CaseDataExtractor {
             final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
             caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
             caseFieldDefinition.setId(index);
-            //caseFieldDefinition.setCategoryId(categoryId); uncomment when RDM-13090 gets merged
+            caseFieldDefinition.setCategoryId(categoryId);
 
             return simpleCaseTypeMetadataExtractor.extractCaseFieldData(
-                nodeEntry,
-                caseFieldDefinition,
-                fieldIdPrefix,
-                fieldType,
-                paths
-            ).get();
+                    nodeEntry,
+                    caseFieldDefinition,
+                    fieldIdPrefix,
+                    fieldType,
+                    paths
+                )
+                .get();
         } else if (itemValue.isObject()) {
             return extractFieldTypePaths(
                 JacksonUtils.convertValue(itemValue),
@@ -221,5 +222,4 @@ public class CaseDataExtractor {
     private boolean isNotABaseType(String fieldType) {
         return !BaseType.contains(fieldType);
     }
-
 }

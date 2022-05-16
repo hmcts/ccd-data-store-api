@@ -22,840 +22,236 @@
       "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
       "Strict-Transport-Security": "[[ANYTHING_NULLABLE]]"
     },
-    "body": {
-      "id": "CREATE2",
-      "name": "Create case 2",
-      "description": "Create case 2",
-      "case_id": null,
-      "case_fields": [
-        {
-          "_extends_": "CaseViewFieldMetadataFalse",
-          "id": "FamilyDetails",
-          "label": "Family Details",
-          "value": null,
-          "field_type": {
-            "_extends_": "BaseComplexFieldType",
-            "id": "Family",
-            "complex_fields" : [
-              {
-              "id" : "Family Details",
-              "label" : "Update family details here",
-              "hidden" : null,
-              "order" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "Label",
-                "type" : "Label",
-                "min" : null,
-                "max" : null,
-                "regular_expression" : null,
-                "fixed_list_items" : [ ],
-                "complex_fields" : [ ],
-                "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : [ {
-                "_extends_": "CaseworkerBeftaMasterAccessControlList"
-              } ],
-              "complexACLs" : [ ],
-              "display_context" : null,
-              "display_context_parameter" : null,
-              "retain_hidden_value" : null,
-              "formatted_value" : null
+    "body" : {
+      "id" : "CREATE2",
+      "name" : "Create case 2",
+      "description" : "Create case 2",
+      "case_id" : null,
+      "case_fields" : [ {
+        "id" : "FamilyDetails",
+        "label" : "Family Details",
+        "hidden" : false,
+        "value" : null,
+        "metadata" : false,
+        "hint_text" : null,
+        "field_type" : {
+          "id" : "Family",
+          "type" : "Complex",
+          "min" : null,
+          "max" : null,
+          "regular_expression" : null,
+          "fixed_list_items" : [ ],
+          "complex_fields" : [ {
+            "id" : "Family Details",
+            "label" : "Update family details here",
+            "hidden" : null,
+            "order" : null,
+            "metadata" : false,
+            "case_type_id" : null,
+            "hint_text" : null,
+            "field_type" : {
+              "id" : "Label",
+              "type" : "Label",
+              "min" : null,
+              "max" : null,
+              "regular_expression" : null,
+              "fixed_list_items" : [ ],
+              "complex_fields" : [ ],
+              "collection_field_type" : null
             },
-              {
-              "id" : "MotherFullName",
-              "label" : "Mother Full Name",
-              "hidden" : null,
-              "order" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "_extends_": "BaseTextFieldType"
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : [ {
-                "_extends_": "CaseworkerBeftaMasterAccessControlList"
-              } ],
-              "complexACLs" : [ ],
-              "display_context" : null,
-              "display_context_parameter" : null,
-              "retain_hidden_value" : null,
-              "formatted_value" : null
+            "security_classification" : "PUBLIC",
+            "live_from" : null,
+            "live_until" : null,
+            "show_condition" : null,
+            "acls" : [ {
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true,
+              "role" : "caseworker-befta_master"
+            } ],
+            "complexACLs" : [ ],
+            "display_context" : null,
+            "display_context_parameter" : null,
+            "retain_hidden_value" : null,
+            "formatted_value" : null,
+            "category_id" : null
+          }, {
+            "id" : "MotherFullName",
+            "label" : "Mother Full Name",
+            "hidden" : null,
+            "order" : null,
+            "metadata" : false,
+            "case_type_id" : null,
+            "hint_text" : null,
+            "field_type" : {
+              "id" : "Text",
+              "type" : "Text",
+              "min" : null,
+              "max" : null,
+              "regular_expression" : null,
+              "fixed_list_items" : [ ],
+              "complex_fields" : [ ],
+              "collection_field_type" : null
             },
-              {
-              "id" : "MotherAge",
-              "label" : "Mother Age",
-              "hidden" : null,
-              "order" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "_extends_": "BaseTextFieldType"
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : "MotherFullName=\"Mary\"",
-              "acls" : [ {
-                "_extends_": "CaseworkerBeftaMasterAccessControlList"
-              } ],
-              "complexACLs" : [ ],
-              "display_context" : null,
-              "display_context_parameter" : null,
-              "retain_hidden_value" : null,
-              "formatted_value" : null
+            "security_classification" : "PUBLIC",
+            "live_from" : null,
+            "live_until" : null,
+            "show_condition" : null,
+            "acls" : [ {
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true,
+              "role" : "caseworker-befta_master"
+            } ],
+            "complexACLs" : [ ],
+            "display_context" : null,
+            "display_context_parameter" : null,
+            "retain_hidden_value" : null,
+            "formatted_value" : null,
+            "category_id" : null
+          }, {
+            "id" : "MotherAge",
+            "label" : "Mother Age",
+            "hidden" : null,
+            "order" : null,
+            "metadata" : false,
+            "case_type_id" : null,
+            "hint_text" : null,
+            "field_type" : {
+              "id" : "Text",
+              "type" : "Text",
+              "min" : null,
+              "max" : null,
+              "regular_expression" : null,
+              "fixed_list_items" : [ ],
+              "complex_fields" : [ ],
+              "collection_field_type" : null
             },
-              {
-              "id" : "FatherFullName",
-              "label" : "Father Full Name",
-              "hidden" : null,
-              "order" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "_extends_": "BaseTextFieldType"
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : "MotherFullName=\"Mary\"",
-              "acls" : [ {
-                "_extends_": "CaseworkerBeftaMasterAccessControlList"
-              } ],
-              "complexACLs" : [ ],
-              "display_context" : null,
-              "display_context_parameter" : null,
-              "retain_hidden_value" : null,
-              "formatted_value" : null
-            }, {
-              "id" : "FatherAge",
-              "label" : "Father Age",
-              "hidden" : null,
-              "order" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "_extends_": "BaseTextFieldType"
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : [ {
-                "_extends_": "CaseworkerBeftaMasterAccessControlList"
-              } ],
-              "complexACLs" : [ ],
-              "display_context" : null,
-              "display_context_parameter" : null,
-              "retain_hidden_value" : null,
-              "formatted_value" : null
-            }, {
-              "id" : "Children",
-              "label" : "Children (collection label)",
-              "hidden" : null,
-              "order" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "[[ANYTHING_PRESENT]]",
-                "type" : "Collection",
-                "min" : null,
-                "max" : null,
-                "regular_expression" : null,
-                "fixed_list_items" : [ ],
-                "complex_fields" : [ ],
-                "collection_field_type" : {
-                  "id" : "Child",
-                  "type" : "Complex",
-                  "min" : null,
-                  "max" : null,
-                  "regular_expression" : null,
-                  "fixed_list_items" : [ ],
-                  "complex_fields" : [ {
-                    "id" : "ChildFullName",
-                    "label" : "Child Full Name",
-                    "hidden" : null,
-                    "order" : null,
-                    "metadata" : false,
-                    "case_type_id" : null,
-                    "hint_text" : null,
-                    "field_type" : {
-                      "_extends_": "BaseTextFieldType"
-                    },
-                    "security_classification" : "PUBLIC",
-                    "live_from" : null,
-                    "live_until" : null,
-                    "show_condition" : null,
-                    "acls" : [ {
-                      "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                    } ],
-                    "complexACLs" : [ ],
-                    "display_context" : null,
-                    "display_context_parameter" : null,
-                    "retain_hidden_value" : null,
-                    "formatted_value" : null
-                  }, {
-                    "id" : "ChildGender",
-                    "label" : "Child Gender",
-                    "hidden" : null,
-                    "order" : null,
-                    "metadata" : false,
-                    "case_type_id" : null,
-                    "hint_text" : null,
-                    "field_type" : {
-                      "id" : "FixedList-gender",
-                      "type" : "FixedList",
-                      "min" : null,
-                      "max" : null,
-                      "regular_expression" : null,
-                      "fixed_list_items" : [ {
-                        "code" : "OTHER",
-                        "label" : "Other",
-                        "order" : "4"
-                      }, {
-                        "code" : "FEMALE",
-                        "label" : "Female",
-                        "order" : null
-                      }, {
-                        "code" : "MALE",
-                        "label" : "Male",
-                        "order" : null
-                      } ],
-                      "complex_fields" : [ ],
-                      "collection_field_type" : null
-                    },
-                    "security_classification" : "PUBLIC",
-                    "live_from" : null,
-                    "live_until" : null,
-                    "show_condition" : "ChildFullName=\"Jack\"",
-                    "acls" : [ {
-                      "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                    } ],
-                    "complexACLs" : [ ],
-                    "display_context" : null,
-                    "display_context_parameter" : null,
-                    "retain_hidden_value" : true,
-                    "formatted_value" : null
-                  }, {
-                    "id" : "ChildDOB",
-                    "label" : "Child date of Birth",
-                    "hidden" : null,
-                    "order" : null,
-                    "metadata" : false,
-                    "case_type_id" : null,
-                    "hint_text" : null,
-                    "field_type" : {
-                      "_extends_": "BaseDateFieldType"
-                    },
-                    "security_classification" : "PUBLIC",
-                    "live_from" : null,
-                    "live_until" : null,
-                    "show_condition" : "ChildFullName=\"Jack\"",
-                    "acls" : [ {
-                      "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                    } ],
-                    "complexACLs" : [ ],
-                    "display_context" : null,
-                    "display_context_parameter" : null,
-                    "retain_hidden_value" : false,
-                    "formatted_value" : null
-                  }, {
-                    "id" : "BirthCertificate",
-                    "label" : "Child Birth Certificate",
-                    "hidden" : null,
-                    "order" : null,
-                    "metadata" : false,
-                    "case_type_id" : null,
-                    "hint_text" : null,
-                    "field_type" : {
-                      "_extends_": "BaseDocumentFieldType"
-                    },
-                    "security_classification" : "PUBLIC",
-                    "live_from" : null,
-                    "live_until" : null,
-                    "show_condition" : null,
-                    "acls" : [ {
-                      "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                    } ],
-                    "complexACLs" : [ ],
-                    "display_context" : null,
-                    "display_context_parameter" : null,
-                    "retain_hidden_value" : null,
-                    "formatted_value" : null
-                  }, {
-                    "id" : "ChildAddress",
-                    "label" : "Child address",
-                    "hidden" : null,
-                    "order" : null,
-                    "metadata" : false,
-                    "case_type_id" : null,
-                    "hint_text" : null,
-                    "field_type" : {
-                      "id" : "AddressUK",
-                      "type" : "Complex",
-                      "min" : null,
-                      "max" : null,
-                      "regular_expression" : null,
-                      "fixed_list_items" : [ ],
-                      "complex_fields" : [ {
-                        "id" : "AddressLine1",
-                        "label" : "Building and Street",
-                        "hidden" : null,
-                        "order" : null,
-                        "metadata" : false,
-                        "case_type_id" : null,
-                        "hint_text" : null,
-                        "field_type" : {
-                          "_extends_": "BaseTextFieldType",
-                          "id" : "TextMax150",
-                          "type" : "Text",
-                          "max" : 150
-                        },
-                        "security_classification" : "PUBLIC",
-                        "live_from" : null,
-                        "live_until" : null,
-                        "show_condition" : null,
-                        "acls" : [ {
-                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                        } ],
-                        "complexACLs" : [ ],
-                        "display_context" : null,
-                        "display_context_parameter" : null,
-                        "retain_hidden_value" : null,
-                        "formatted_value" : null
-                      }, {
-                        "id" : "AddressLine2",
-                        "label" : "Address Line 2",
-                        "hidden" : null,
-                        "order" : null,
-                        "metadata" : false,
-                        "case_type_id" : null,
-                        "hint_text" : null,
-                        "field_type" : {
-                          "_extends_": "BaseTextFieldType",
-                          "id" : "TextMax50",
-                          "max" : 50
-                        },
-                        "security_classification" : "PUBLIC",
-                        "live_from" : null,
-                        "live_until" : null,
-                        "show_condition" : null,
-                        "acls" : [ {
-                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                        } ],
-                        "complexACLs" : [ ],
-                        "display_context" : null,
-                        "display_context_parameter" : null,
-                        "retain_hidden_value" : null,
-                        "formatted_value" : null
-                      }, {
-                        "id" : "AddressLine3",
-                        "label" : "Address Line 3",
-                        "hidden" : null,
-                        "order" : null,
-                        "metadata" : false,
-                        "case_type_id" : null,
-                        "hint_text" : null,
-                        "field_type" : {
-                          "_extends_": "BaseTextFieldType",
-                          "id" : "TextMax50",
-                          "max" : 50
-                        },
-                        "security_classification" : "PUBLIC",
-                        "live_from" : null,
-                        "live_until" : null,
-                        "show_condition" : null,
-                        "acls" : [ {
-                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                        } ],
-                        "complexACLs" : [ ],
-                        "display_context" : null,
-                        "display_context_parameter" : null,
-                        "retain_hidden_value" : null,
-                        "formatted_value" : null
-                      }, {
-                        "id" : "PostTown",
-                        "label" : "Town or City",
-                        "hidden" : null,
-                        "order" : null,
-                        "metadata" : false,
-                        "case_type_id" : null,
-                        "hint_text" : null,
-                        "field_type" : {
-                          "_extends_": "BaseTextFieldType",
-                          "id" : "TextMax50",
-                          "max" : 50
-                        },
-                        "security_classification" : "PUBLIC",
-                        "live_from" : null,
-                        "live_until" : null,
-                        "show_condition" : null,
-                        "acls" : [ {
-                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                        } ],
-                        "complexACLs" : [ ],
-                        "display_context" : null,
-                        "display_context_parameter" : null,
-                        "retain_hidden_value" : null,
-                        "formatted_value" : null
-                      }, {
-                        "id" : "County",
-                        "label" : "County",
-                        "hidden" : null,
-                        "order" : null,
-                        "metadata" : false,
-                        "case_type_id" : null,
-                        "hint_text" : null,
-                        "field_type" : {
-                          "_extends_": "BaseTextFieldType",
-                          "id" : "TextMax50",
-                          "max" : 50
-                        },
-                        "security_classification" : "PUBLIC",
-                        "live_from" : null,
-                        "live_until" : null,
-                        "show_condition" : null,
-                        "acls" : [ {
-                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                        } ],
-                        "complexACLs" : [ ],
-                        "display_context" : null,
-                        "display_context_parameter" : null,
-                        "retain_hidden_value" : null,
-                        "formatted_value" : null
-                      }, {
-                        "id" : "PostCode",
-                        "label" : "Postcode/Zipcode",
-                        "hidden" : null,
-                        "order" : null,
-                        "metadata" : false,
-                        "case_type_id" : null,
-                        "hint_text" : null,
-                        "field_type" : {
-                          "_extends_": "BaseTextFieldType",
-                          "id" : "TextMax14",
-                          "max" : 14
-                        },
-                        "security_classification" : "PUBLIC",
-                        "live_from" : null,
-                        "live_until" : null,
-                        "show_condition" : null,
-                        "acls" : [ {
-                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                        } ],
-                        "complexACLs" : [ ],
-                        "display_context" : null,
-                        "display_context_parameter" : null,
-                        "retain_hidden_value" : null,
-                        "formatted_value" : null
-                      }, {
-                        "id" : "Country",
-                        "label" : "Country",
-                        "hidden" : null,
-                        "order" : null,
-                        "metadata" : false,
-                        "case_type_id" : null,
-                        "hint_text" : null,
-                        "field_type" : {
-                          "_extends_": "BaseTextFieldType",
-                          "id" : "TextMax50",
-                          "max" : 50
-                        },
-                        "security_classification" : "PUBLIC",
-                        "live_from" : null,
-                        "live_until" : null,
-                        "show_condition" : null,
-                        "acls" : [ {
-                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                        } ],
-                        "complexACLs" : [ ],
-                        "display_context" : null,
-                        "display_context_parameter" : null,
-                        "retain_hidden_value" : null,
-                        "formatted_value" : null
-                      } ],
-                      "collection_field_type" : null
-                    },
-                    "security_classification" : "PUBLIC",
-                    "live_from" : null,
-                    "live_until" : null,
-                    "show_condition" : null,
-                    "acls" : [ {
-                      "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                    } ],
-                    "complexACLs" : [ ],
-                    "display_context" : null,
-                    "display_context_parameter" : null,
-                    "retain_hidden_value" : null,
-                    "formatted_value" : null
-                  }, {
-                    "id" : "IsAutistic",
-                    "label" : "Is the child autistic?",
-                    "hidden" : null,
-                    "order" : null,
-                    "metadata" : false,
-                    "case_type_id" : null,
-                    "hint_text" : null,
-                    "field_type" : {
-                      "_extends_": "BaseYesOrNoFieldType"
-                    },
-                    "security_classification" : "PUBLIC",
-                    "live_from" : null,
-                    "live_until" : null,
-                    "show_condition" : null,
-                    "acls" : [ {
-                      "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                    } ],
-                    "complexACLs" : [ ],
-                    "display_context" : null,
-                    "display_context_parameter" : null,
-                    "retain_hidden_value" : null,
-                    "formatted_value" : null
-                  }, {
-                    "id" : "NeedsSupport",
-                    "label" : "Does the child needs support?",
-                    "hidden" : null,
-                    "order" : null,
-                    "metadata" : false,
-                    "case_type_id" : null,
-                    "hint_text" : null,
-                    "field_type" : {
-                      "_extends_": "BaseYesOrNoFieldType"
-                    },
-                    "security_classification" : "PUBLIC",
-                    "live_from" : null,
-                    "live_until" : null,
-                    "show_condition" : null,
-                    "acls" : [ {
-                      "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                    } ],
-                    "complexACLs" : [ ],
-                    "display_context" : null,
-                    "display_context_parameter" : null,
-                    "retain_hidden_value" : null,
-                    "formatted_value" : null
-                  }, {
-                    "id" : "AutisticChildCaseNumber",
-                    "label" : "Autistic child case number reference",
-                    "hidden" : null,
-                    "order" : null,
-                    "metadata" : false,
-                    "case_type_id" : null,
-                    "hint_text" : null,
-                    "field_type" : {
-                      "id" : "CaseLink",
-                      "type" : "Complex",
-                      "min" : null,
-                      "max" : null,
-                      "regular_expression" : null,
-                      "fixed_list_items" : [ ],
-                      "complex_fields" : [ {
-                        "id" : "CaseReference",
-                        "label" : "Case Reference",
-                        "hidden" : null,
-                        "order" : null,
-                        "metadata" : false,
-                        "case_type_id" : null,
-                        "hint_text" : null,
-                        "field_type" : {
-                          "id" : "TextCaseReference",
-                          "type" : "Text",
-                          "min" : null,
-                          "max" : null,
-                          "regular_expression" : "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)",
-                          "fixed_list_items" : [ ],
-                          "complex_fields" : [ ],
-                          "collection_field_type" : null
-                        },
-                        "security_classification" : "PUBLIC",
-                        "live_from" : null,
-                        "live_until" : null,
-                        "show_condition" : null,
-                        "acls" : [ {
-                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                        } ],
-                        "complexACLs" : [ ],
-                        "display_context" : null,
-                        "display_context_parameter" : null,
-                        "retain_hidden_value" : null,
-                        "formatted_value" : null
-                      }, {
-                        "id" : "ReasonForLink",
-                        "label" : "ReasonForLink",
-                        "hidden" : null,
-                        "order" : null,
-                        "metadata" : false,
-                        "case_type_id" : null,
-                        "hint_text" : null,
-                        "field_type" : {
-                          "id" : "ReasonForLinkList",
-                          "type" : "Collection",
-                          "min" : null,
-                          "max" : null,
-                          "regular_expression" : null,
-                          "fixed_list_items" : [ ],
-                          "complex_fields" : [ ],
-                          "collection_field_type" : {
-                            "id" : "LinkReason",
-                            "type" : "Complex",
-                            "min" : null,
-                            "max" : null,
-                            "regular_expression" : null,
-                            "fixed_list_items" : [ ],
-                            "complex_fields" : [ {
-                              "id" : "Reason",
-                              "label" : "Reason",
-                              "hidden" : null,
-                              "order" : null,
-                              "metadata" : false,
-                              "case_type_id" : null,
-                              "hint_text" : null,
-                              "field_type" : {
-                                "id" : "Text",
-                                "type" : "Text",
-                                "min" : null,
-                                "max" : null,
-                                "regular_expression" : null,
-                                "fixed_list_items" : [ ],
-                                "complex_fields" : [ ],
-                                "collection_field_type" : null
-                              },
-                              "security_classification" : "PUBLIC",
-                              "live_from" : null,
-                              "live_until" : null,
-                              "show_condition" : null,
-                              "acls" : [ {
-                                "create" : true,
-                                "read" : true,
-                                "update" : true,
-                                "delete" : true,
-                                "role" : "caseworker-befta_master"
-                              } ],
-                              "complexACLs" : [ ],
-                              "display_context" : null,
-                              "display_context_parameter" : null,
-                              "retain_hidden_value" : null,
-                              "formatted_value" : null
-                            }, {
-                              "id" : "OtherDescription",
-                              "label" : "OtherDescription",
-                              "hidden" : null,
-                              "order" : null,
-                              "metadata" : false,
-                              "case_type_id" : null,
-                              "hint_text" : null,
-                              "field_type" : {
-                                "id" : "Text",
-                                "type" : "Text",
-                                "min" : null,
-                                "max" : null,
-                                "regular_expression" : null,
-                                "fixed_list_items" : [ ],
-                                "complex_fields" : [ ],
-                                "collection_field_type" : null
-                              },
-                              "security_classification" : "PUBLIC",
-                              "live_from" : null,
-                              "live_until" : null,
-                              "show_condition" : null,
-                              "acls" : [ {
-                                "create" : true,
-                                "read" : true,
-                                "update" : true,
-                                "delete" : true,
-                                "role" : "caseworker-befta_master"
-                              } ],
-                              "complexACLs" : [ ],
-                              "display_context" : null,
-                              "display_context_parameter" : null,
-                              "retain_hidden_value" : null,
-                              "formatted_value" : null
-                            } ],
-                            "collection_field_type" : null
-                          }
-                        },
-                        "security_classification" : "PUBLIC",
-                        "live_from" : null,
-                        "live_until" : null,
-                        "show_condition" : null,
-                        "acls" : [ {
-                          "create" : true,
-                          "read" : true,
-                          "update" : true,
-                          "delete" : true,
-                          "role" : "caseworker-befta_master"
-                        } ],
-                        "complexACLs" : [ ],
-                        "display_context" : null,
-                        "display_context_parameter" : "#COLLECTION(allowDelete,allowInsert,allowUpdate)",
-                        "retain_hidden_value" : null,
-                        "formatted_value" : null
-                      }, {
-                        "id" : "CreatedDateTime",
-                        "label" : "Created Date Time",
-                        "hidden" : null,
-                        "order" : null,
-                        "metadata" : false,
-                        "case_type_id" : null,
-                        "hint_text" : null,
-                        "field_type" : {
-                          "id" : "DateTime",
-                          "type" : "DateTime",
-                          "min" : null,
-                          "max" : null,
-                          "regular_expression" : null,
-                          "fixed_list_items" : [ ],
-                          "complex_fields" : [ ],
-                          "collection_field_type" : null
-                        },
-                        "security_classification" : "PUBLIC",
-                        "live_from" : null,
-                        "live_until" : null,
-                        "show_condition" : null,
-                        "acls" : [ {
-                          "create" : true,
-                          "read" : true,
-                          "update" : true,
-                          "delete" : true,
-                          "role" : "caseworker-befta_master"
-                        } ],
-                        "complexACLs" : [ ],
-                        "display_context" : null,
-                        "display_context_parameter" : null,
-                        "retain_hidden_value" : null,
-                        "formatted_value" : null
-                      }, {
-                        "id" : "CaseType",
-                        "label" : "Case Type",
-                        "hidden" : null,
-                        "order" : null,
-                        "metadata" : false,
-                        "case_type_id" : null,
-                        "hint_text" : null,
-                        "field_type" : {
-                          "id" : "Text",
-                          "type" : "Text",
-                          "min" : null,
-                          "max" : null,
-                          "regular_expression" : null,
-                          "fixed_list_items" : [ ],
-                          "complex_fields" : [ ],
-                          "collection_field_type" : null
-                        },
-                        "security_classification" : "PUBLIC",
-                        "live_from" : null,
-                        "live_until" : null,
-                        "show_condition" : null,
-                        "acls" : [ {
-                          "create" : true,
-                          "read" : true,
-                          "update" : true,
-                          "delete" : true,
-                          "role" : "caseworker-befta_master"
-                        } ],
-                        "complexACLs" : [ ],
-                        "display_context" : null,
-                        "display_context_parameter" : null,
-                        "retain_hidden_value" : null,
-                        "formatted_value" : null
-                      } ],
-                      "collection_field_type" : null
-                    },
-                    "security_classification" : "PUBLIC",
-                    "live_from" : null,
-                    "live_until" : null,
-                    "show_condition" : null,
-                    "acls" : [ {
-                      "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                    } ],
-                    "complexACLs" : [ ],
-                    "display_context" : null,
-                    "display_context_parameter" : null,
-                    "retain_hidden_value" : null,
-                    "formatted_value" : null
-                  } ],
-                  "collection_field_type" : null
-                }
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : "MotherFullName=\"Mary\"",
-              "acls" : [ {
-                "_extends_": "CaseworkerBeftaMasterAccessControlList"
-              } ],
-              "complexACLs" : [ ],
-              "display_context" : null,
-              "display_context_parameter" : "#COLLECTION(allowDelete,allowInsert,allowUpdate)",
-              "retain_hidden_value" : true,
-              "formatted_value" : null
-            }, {
-              "id" : "FamilyAddress",
-              "label" : "Family Address",
-              "hidden" : null,
-              "order" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "AddressUK",
+            "security_classification" : "PUBLIC",
+            "live_from" : null,
+            "live_until" : null,
+            "show_condition" : "MotherFullName=\"Mary\"",
+            "acls" : [ {
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true,
+              "role" : "caseworker-befta_master"
+            } ],
+            "complexACLs" : [ ],
+            "display_context" : null,
+            "display_context_parameter" : null,
+            "retain_hidden_value" : null,
+            "formatted_value" : null,
+            "category_id" : null
+          }, {
+            "id" : "FatherFullName",
+            "label" : "Father Full Name",
+            "hidden" : null,
+            "order" : null,
+            "metadata" : false,
+            "case_type_id" : null,
+            "hint_text" : null,
+            "field_type" : {
+              "id" : "Text",
+              "type" : "Text",
+              "min" : null,
+              "max" : null,
+              "regular_expression" : null,
+              "fixed_list_items" : [ ],
+              "complex_fields" : [ ],
+              "collection_field_type" : null
+            },
+            "security_classification" : "PUBLIC",
+            "live_from" : null,
+            "live_until" : null,
+            "show_condition" : "MotherFullName=\"Mary\"",
+            "acls" : [ {
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true,
+              "role" : "caseworker-befta_master"
+            } ],
+            "complexACLs" : [ ],
+            "display_context" : null,
+            "display_context_parameter" : null,
+            "retain_hidden_value" : null,
+            "formatted_value" : null,
+            "category_id" : null
+          }, {
+            "id" : "FatherAge",
+            "label" : "Father Age",
+            "hidden" : null,
+            "order" : null,
+            "metadata" : false,
+            "case_type_id" : null,
+            "hint_text" : null,
+            "field_type" : {
+              "id" : "Text",
+              "type" : "Text",
+              "min" : null,
+              "max" : null,
+              "regular_expression" : null,
+              "fixed_list_items" : [ ],
+              "complex_fields" : [ ],
+              "collection_field_type" : null
+            },
+            "security_classification" : "PUBLIC",
+            "live_from" : null,
+            "live_until" : null,
+            "show_condition" : null,
+            "acls" : [ {
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true,
+              "role" : "caseworker-befta_master"
+            } ],
+            "complexACLs" : [ ],
+            "display_context" : null,
+            "display_context_parameter" : null,
+            "retain_hidden_value" : null,
+            "formatted_value" : null,
+            "category_id" : null
+          }, {
+            "id" : "Children",
+            "label" : "Children (collection label)",
+            "hidden" : null,
+            "order" : null,
+            "metadata" : false,
+            "case_type_id" : null,
+            "hint_text" : null,
+            "field_type" : {
+              "id" : "[[ANYTHING_PRESENT]]",
+              "type" : "Collection",
+              "min" : null,
+              "max" : null,
+              "regular_expression" : null,
+              "fixed_list_items" : [ ],
+              "complex_fields" : [ ],
+              "collection_field_type" : {
+                "id" : "Child",
                 "type" : "Complex",
                 "min" : null,
                 "max" : null,
                 "regular_expression" : null,
                 "fixed_list_items" : [ ],
                 "complex_fields" : [ {
-                  "id" : "AddressLine1",
-                  "label" : "Building and Street",
+                  "id" : "ChildFullName",
+                  "label" : "Child Full Name",
                   "hidden" : null,
                   "order" : null,
                   "metadata" : false,
                   "case_type_id" : null,
                   "hint_text" : null,
                   "field_type" : {
-                    "_extends_": "BaseTextFieldType",
-                    "id" : "TextMax150",
-                    "max" : 150
-                  },
-                  "security_classification" : "PUBLIC",
-                  "live_from" : null,
-                  "live_until" : null,
-                  "show_condition" : null,
-                  "acls" : [ {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  } ],
-                  "complexACLs" : [ ],
-                  "display_context" : null,
-                  "display_context_parameter" : null,
-                  "retain_hidden_value" : null,
-                  "formatted_value" : null
-                }, {
-                  "id" : "AddressLine2",
-                  "label" : "Address Line 2",
-                  "hidden" : null,
-                  "order" : null,
-                  "metadata" : false,
-                  "case_type_id" : null,
-                  "hint_text" : null,
-                  "field_type" : {
-                    "id" : "TextMax50",
+                    "id" : "Text",
                     "type" : "Text",
                     "min" : null,
-                    "max" : 50,
+                    "max" : null,
                     "regular_expression" : null,
                     "fixed_list_items" : [ ],
                     "complex_fields" : [ ],
@@ -866,214 +262,1126 @@
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : true,
+                    "role" : "caseworker-befta_master"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "category_id" : null
                 }, {
-                  "id" : "AddressLine3",
-                  "label" : "Address Line 3",
+                  "id" : "ChildGender",
+                  "label" : "Child Gender",
                   "hidden" : null,
                   "order" : null,
                   "metadata" : false,
                   "case_type_id" : null,
                   "hint_text" : null,
                   "field_type" : {
-                    "_extends_": "BaseTextFieldType",
-                    "id" : "TextMax50",
-                    "max" : 50
+                    "id" : "FixedList-gender",
+                    "type" : "FixedList",
+                    "min" : null,
+                    "max" : null,
+                    "regular_expression" : null,
+                    "fixed_list_items" : [ {
+                      "code" : "OTHER",
+                      "label" : "Other",
+                      "order" : "4"
+                    }, {
+                      "code" : "FEMALE",
+                      "label" : "Female",
+                      "order" : null
+                    }, {
+                      "code" : "MALE",
+                      "label" : "Male",
+                      "order" : null
+                    } ],
+                    "complex_fields" : [ ],
+                    "collection_field_type" : null
                   },
                   "security_classification" : "PUBLIC",
                   "live_from" : null,
                   "live_until" : null,
-                  "show_condition" : null,
+                  "show_condition" : "ChildFullName=\"Jack\"",
                   "acls" : [ {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : true,
+                    "role" : "caseworker-befta_master"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "retain_hidden_value" : true,
+                  "formatted_value" : null,
+                  "category_id" : null
                 }, {
-                  "id" : "PostTown",
-                  "label" : "Town or City",
+                  "id" : "ChildDOB",
+                  "label" : "Child date of Birth",
                   "hidden" : null,
                   "order" : null,
                   "metadata" : false,
                   "case_type_id" : null,
                   "hint_text" : null,
                   "field_type" : {
-                    "_extends_": "BaseTextFieldType",
-                    "id" : "TextMax50",
-                    "max" : 50
+                    "id" : "Date",
+                    "type" : "Date",
+                    "min" : null,
+                    "max" : null,
+                    "regular_expression" : null,
+                    "fixed_list_items" : [ ],
+                    "complex_fields" : [ ],
+                    "collection_field_type" : null
                   },
                   "security_classification" : "PUBLIC",
                   "live_from" : null,
                   "live_until" : null,
-                  "show_condition" : null,
+                  "show_condition" : "ChildFullName=\"Jack\"",
                   "acls" : [ {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : true,
+                    "role" : "caseworker-befta_master"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "retain_hidden_value" : false,
+                  "formatted_value" : null,
+                  "category_id" : null
                 }, {
-                  "id" : "County",
-                  "label" : "County",
+                  "id" : "BirthCertificate",
+                  "label" : "Child Birth Certificate",
                   "hidden" : null,
                   "order" : null,
                   "metadata" : false,
                   "case_type_id" : null,
                   "hint_text" : null,
                   "field_type" : {
-                    "_extends_": "BaseTextFieldType",
-                    "id" : "TextMax50",
-                    "max" : 50
+                    "id" : "Document",
+                    "type" : "Document",
+                    "min" : null,
+                    "max" : null,
+                    "regular_expression" : null,
+                    "fixed_list_items" : [ ],
+                    "complex_fields" : [ ],
+                    "collection_field_type" : null
                   },
                   "security_classification" : "PUBLIC",
                   "live_from" : null,
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : true,
+                    "role" : "caseworker-befta_master"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "category_id" : "divorceDocs"
                 }, {
-                  "id" : "PostCode",
-                  "label" : "Postcode/Zipcode",
+                  "id" : "ChildAddress",
+                  "label" : "Child address",
                   "hidden" : null,
                   "order" : null,
                   "metadata" : false,
                   "case_type_id" : null,
                   "hint_text" : null,
                   "field_type" : {
-                    "_extends_": "BaseTextFieldType",
-                    "id" : "TextMax14",
-                    "max" : 14
+                    "id" : "AddressUK",
+                    "type" : "Complex",
+                    "min" : null,
+                    "max" : null,
+                    "regular_expression" : null,
+                    "fixed_list_items" : [ ],
+                    "complex_fields" : [ {
+                      "id" : "AddressLine1",
+                      "label" : "Building and Street",
+                      "hidden" : null,
+                      "order" : null,
+                      "metadata" : false,
+                      "case_type_id" : null,
+                      "hint_text" : null,
+                      "field_type" : {
+                        "id" : "TextMax150",
+                        "type" : "Text",
+                        "min" : null,
+                        "max" : 150,
+                        "regular_expression" : null,
+                        "fixed_list_items" : [ ],
+                        "complex_fields" : [ ],
+                        "collection_field_type" : null
+                      },
+                      "security_classification" : "PUBLIC",
+                      "live_from" : null,
+                      "live_until" : null,
+                      "show_condition" : null,
+                      "acls" : [ {
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : true,
+                        "role" : "caseworker-befta_master"
+                      } ],
+                      "complexACLs" : [ ],
+                      "display_context" : null,
+                      "display_context_parameter" : null,
+                      "retain_hidden_value" : null,
+                      "formatted_value" : null,
+                      "category_id" : null
+                    }, {
+                      "id" : "AddressLine2",
+                      "label" : "Address Line 2",
+                      "hidden" : null,
+                      "order" : null,
+                      "metadata" : false,
+                      "case_type_id" : null,
+                      "hint_text" : null,
+                      "field_type" : {
+                        "id" : "TextMax50",
+                        "type" : "Text",
+                        "min" : null,
+                        "max" : 50,
+                        "regular_expression" : null,
+                        "fixed_list_items" : [ ],
+                        "complex_fields" : [ ],
+                        "collection_field_type" : null
+                      },
+                      "security_classification" : "PUBLIC",
+                      "live_from" : null,
+                      "live_until" : null,
+                      "show_condition" : null,
+                      "acls" : [ {
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : true,
+                        "role" : "caseworker-befta_master"
+                      } ],
+                      "complexACLs" : [ ],
+                      "display_context" : null,
+                      "display_context_parameter" : null,
+                      "retain_hidden_value" : null,
+                      "formatted_value" : null,
+                      "category_id" : null
+                    }, {
+                      "id" : "AddressLine3",
+                      "label" : "Address Line 3",
+                      "hidden" : null,
+                      "order" : null,
+                      "metadata" : false,
+                      "case_type_id" : null,
+                      "hint_text" : null,
+                      "field_type" : {
+                        "id" : "TextMax50",
+                        "type" : "Text",
+                        "min" : null,
+                        "max" : 50,
+                        "regular_expression" : null,
+                        "fixed_list_items" : [ ],
+                        "complex_fields" : [ ],
+                        "collection_field_type" : null
+                      },
+                      "security_classification" : "PUBLIC",
+                      "live_from" : null,
+                      "live_until" : null,
+                      "show_condition" : null,
+                      "acls" : [ {
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : true,
+                        "role" : "caseworker-befta_master"
+                      } ],
+                      "complexACLs" : [ ],
+                      "display_context" : null,
+                      "display_context_parameter" : null,
+                      "retain_hidden_value" : null,
+                      "formatted_value" : null,
+                      "category_id" : null
+                    }, {
+                      "id" : "PostTown",
+                      "label" : "Town or City",
+                      "hidden" : null,
+                      "order" : null,
+                      "metadata" : false,
+                      "case_type_id" : null,
+                      "hint_text" : null,
+                      "field_type" : {
+                        "id" : "TextMax50",
+                        "type" : "Text",
+                        "min" : null,
+                        "max" : 50,
+                        "regular_expression" : null,
+                        "fixed_list_items" : [ ],
+                        "complex_fields" : [ ],
+                        "collection_field_type" : null
+                      },
+                      "security_classification" : "PUBLIC",
+                      "live_from" : null,
+                      "live_until" : null,
+                      "show_condition" : null,
+                      "acls" : [ {
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : true,
+                        "role" : "caseworker-befta_master"
+                      } ],
+                      "complexACLs" : [ ],
+                      "display_context" : null,
+                      "display_context_parameter" : null,
+                      "retain_hidden_value" : null,
+                      "formatted_value" : null,
+                      "category_id" : null
+                    }, {
+                      "id" : "County",
+                      "label" : "County",
+                      "hidden" : null,
+                      "order" : null,
+                      "metadata" : false,
+                      "case_type_id" : null,
+                      "hint_text" : null,
+                      "field_type" : {
+                        "id" : "TextMax50",
+                        "type" : "Text",
+                        "min" : null,
+                        "max" : 50,
+                        "regular_expression" : null,
+                        "fixed_list_items" : [ ],
+                        "complex_fields" : [ ],
+                        "collection_field_type" : null
+                      },
+                      "security_classification" : "PUBLIC",
+                      "live_from" : null,
+                      "live_until" : null,
+                      "show_condition" : null,
+                      "acls" : [ {
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : true,
+                        "role" : "caseworker-befta_master"
+                      } ],
+                      "complexACLs" : [ ],
+                      "display_context" : null,
+                      "display_context_parameter" : null,
+                      "retain_hidden_value" : null,
+                      "formatted_value" : null,
+                      "category_id" : null
+                    }, {
+                      "id" : "PostCode",
+                      "label" : "Postcode/Zipcode",
+                      "hidden" : null,
+                      "order" : null,
+                      "metadata" : false,
+                      "case_type_id" : null,
+                      "hint_text" : null,
+                      "field_type" : {
+                        "id" : "TextMax14",
+                        "type" : "Text",
+                        "min" : null,
+                        "max" : 14,
+                        "regular_expression" : null,
+                        "fixed_list_items" : [ ],
+                        "complex_fields" : [ ],
+                        "collection_field_type" : null
+                      },
+                      "security_classification" : "PUBLIC",
+                      "live_from" : null,
+                      "live_until" : null,
+                      "show_condition" : null,
+                      "acls" : [ {
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : true,
+                        "role" : "caseworker-befta_master"
+                      } ],
+                      "complexACLs" : [ ],
+                      "display_context" : null,
+                      "display_context_parameter" : null,
+                      "retain_hidden_value" : null,
+                      "formatted_value" : null,
+                      "category_id" : null
+                    }, {
+                      "id" : "Country",
+                      "label" : "Country",
+                      "hidden" : null,
+                      "order" : null,
+                      "metadata" : false,
+                      "case_type_id" : null,
+                      "hint_text" : null,
+                      "field_type" : {
+                        "id" : "TextMax50",
+                        "type" : "Text",
+                        "min" : null,
+                        "max" : 50,
+                        "regular_expression" : null,
+                        "fixed_list_items" : [ ],
+                        "complex_fields" : [ ],
+                        "collection_field_type" : null
+                      },
+                      "security_classification" : "PUBLIC",
+                      "live_from" : null,
+                      "live_until" : null,
+                      "show_condition" : null,
+                      "acls" : [ {
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : true,
+                        "role" : "caseworker-befta_master"
+                      } ],
+                      "complexACLs" : [ ],
+                      "display_context" : null,
+                      "display_context_parameter" : null,
+                      "retain_hidden_value" : null,
+                      "formatted_value" : null,
+                      "category_id" : null
+                    } ],
+                    "collection_field_type" : null
                   },
                   "security_classification" : "PUBLIC",
                   "live_from" : null,
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : true,
+                    "role" : "caseworker-befta_master"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "category_id" : null
                 }, {
-                  "id" : "Country",
-                  "label" : "Country",
+                  "id" : "IsAutistic",
+                  "label" : "Is the child autistic?",
                   "hidden" : null,
                   "order" : null,
                   "metadata" : false,
                   "case_type_id" : null,
                   "hint_text" : null,
                   "field_type" : {
-                    "_extends_": "BaseTextFieldType",
-                    "id" : "TextMax50",
-                    "max" : 50
+                    "id" : "YesOrNo",
+                    "type" : "YesOrNo",
+                    "min" : null,
+                    "max" : null,
+                    "regular_expression" : null,
+                    "fixed_list_items" : [ ],
+                    "complex_fields" : [ ],
+                    "collection_field_type" : null
                   },
                   "security_classification" : "PUBLIC",
                   "live_from" : null,
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : true,
+                    "role" : "caseworker-befta_master"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "category_id" : null
+                }, {
+                  "id" : "NeedsSupport",
+                  "label" : "Does the child needs support?",
+                  "hidden" : null,
+                  "order" : null,
+                  "metadata" : false,
+                  "case_type_id" : null,
+                  "hint_text" : null,
+                  "field_type" : {
+                    "id" : "YesOrNo",
+                    "type" : "YesOrNo",
+                    "min" : null,
+                    "max" : null,
+                    "regular_expression" : null,
+                    "fixed_list_items" : [ ],
+                    "complex_fields" : [ ],
+                    "collection_field_type" : null
+                  },
+                  "security_classification" : "PUBLIC",
+                  "live_from" : null,
+                  "live_until" : null,
+                  "show_condition" : null,
+                  "acls" : [ {
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : true,
+                    "role" : "caseworker-befta_master"
+                  } ],
+                  "complexACLs" : [ ],
+                  "display_context" : null,
+                  "display_context_parameter" : null,
+                  "retain_hidden_value" : null,
+                  "formatted_value" : null,
+                  "category_id" : null
+                }, {
+                  "id" : "AutisticChildCaseNumber",
+                  "label" : "Autistic child case number reference",
+                  "hidden" : null,
+                  "order" : null,
+                  "metadata" : false,
+                  "case_type_id" : null,
+                  "hint_text" : null,
+                  "field_type" : {
+                    "id" : "CaseLink",
+                    "type" : "Complex",
+                    "min" : null,
+                    "max" : null,
+                    "regular_expression" : null,
+                    "fixed_list_items" : [ ],
+                    "complex_fields" : [ {
+                      "id" : "CaseReference",
+                      "label" : "Case Reference",
+                      "hidden" : null,
+                      "order" : null,
+                      "metadata" : false,
+                      "case_type_id" : null,
+                      "hint_text" : null,
+                      "field_type" : {
+                        "id" : "TextCaseReference",
+                        "type" : "Text",
+                        "min" : null,
+                        "max" : null,
+                        "regular_expression" : "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)",
+                        "fixed_list_items" : [ ],
+                        "complex_fields" : [ ],
+                        "collection_field_type" : null
+                      },
+                      "security_classification" : "PUBLIC",
+                      "live_from" : null,
+                      "live_until" : null,
+                      "show_condition" : null,
+                      "acls" : [ {
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : true,
+                        "role" : "caseworker-befta_master"
+                      } ],
+                      "complexACLs" : [ ],
+                      "display_context" : null,
+                      "display_context_parameter" : null,
+                      "retain_hidden_value" : null,
+                      "formatted_value" : null,
+                      "category_id" : null
+                    }, {
+                      "id" : "ReasonForLink",
+                      "label" : "ReasonForLink",
+                      "hidden" : null,
+                      "order" : null,
+                      "metadata" : false,
+                      "case_type_id" : null,
+                      "hint_text" : null,
+                      "field_type" : {
+                        "id" : "ReasonForLinkList",
+                        "type" : "Collection",
+                        "min" : null,
+                        "max" : null,
+                        "regular_expression" : null,
+                        "fixed_list_items" : [ ],
+                        "complex_fields" : [ ],
+                        "collection_field_type" : {
+                          "id" : "LinkReason",
+                          "type" : "Complex",
+                          "min" : null,
+                          "max" : null,
+                          "regular_expression" : null,
+                          "fixed_list_items" : [ ],
+                          "complex_fields" : [ {
+                            "id" : "Reason",
+                            "label" : "Reason",
+                            "hidden" : null,
+                            "order" : null,
+                            "metadata" : false,
+                            "case_type_id" : null,
+                            "hint_text" : null,
+                            "field_type" : {
+                              "id" : "Text",
+                              "type" : "Text",
+                              "min" : null,
+                              "max" : null,
+                              "regular_expression" : null,
+                              "fixed_list_items" : [ ],
+                              "complex_fields" : [ ],
+                              "collection_field_type" : null
+                            },
+                            "security_classification" : "PUBLIC",
+                            "live_from" : null,
+                            "live_until" : null,
+                            "show_condition" : null,
+                            "acls" : [ {
+                              "create" : true,
+                              "read" : true,
+                              "update" : true,
+                              "delete" : true,
+                              "role" : "caseworker-befta_master"
+                            } ],
+                            "complexACLs" : [ ],
+                            "display_context" : null,
+                            "display_context_parameter" : null,
+                            "retain_hidden_value" : null,
+                            "formatted_value" : null,
+                            "category_id" : null
+                          }, {
+                            "id" : "OtherDescription",
+                            "label" : "OtherDescription",
+                            "hidden" : null,
+                            "order" : null,
+                            "metadata" : false,
+                            "case_type_id" : null,
+                            "hint_text" : null,
+                            "field_type" : {
+                              "id" : "Text",
+                              "type" : "Text",
+                              "min" : null,
+                              "max" : null,
+                              "regular_expression" : null,
+                              "fixed_list_items" : [ ],
+                              "complex_fields" : [ ],
+                              "collection_field_type" : null
+                            },
+                            "security_classification" : "PUBLIC",
+                            "live_from" : null,
+                            "live_until" : null,
+                            "show_condition" : null,
+                            "acls" : [ {
+                              "create" : true,
+                              "read" : true,
+                              "update" : true,
+                              "delete" : true,
+                              "role" : "caseworker-befta_master"
+                            } ],
+                            "complexACLs" : [ ],
+                            "display_context" : null,
+                            "display_context_parameter" : null,
+                            "retain_hidden_value" : null,
+                            "formatted_value" : null,
+                            "category_id" : null
+                          } ],
+                          "collection_field_type" : null
+                        }
+                      },
+                      "security_classification" : "PUBLIC",
+                      "live_from" : null,
+                      "live_until" : null,
+                      "show_condition" : null,
+                      "acls" : [ {
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : true,
+                        "role" : "caseworker-befta_master"
+                      } ],
+                      "complexACLs" : [ ],
+                      "display_context" : null,
+                      "display_context_parameter" : "#COLLECTION(allowDelete,allowInsert,allowUpdate)",
+                      "retain_hidden_value" : null,
+                      "formatted_value" : null,
+                      "category_id" : null
+                    }, {
+                      "id" : "CreatedDateTime",
+                      "label" : "Created Date Time",
+                      "hidden" : null,
+                      "order" : null,
+                      "metadata" : false,
+                      "case_type_id" : null,
+                      "hint_text" : null,
+                      "field_type" : {
+                        "id" : "DateTime",
+                        "type" : "DateTime",
+                        "min" : null,
+                        "max" : null,
+                        "regular_expression" : null,
+                        "fixed_list_items" : [ ],
+                        "complex_fields" : [ ],
+                        "collection_field_type" : null
+                      },
+                      "security_classification" : "PUBLIC",
+                      "live_from" : null,
+                      "live_until" : null,
+                      "show_condition" : null,
+                      "acls" : [ {
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : true,
+                        "role" : "caseworker-befta_master"
+                      } ],
+                      "complexACLs" : [ ],
+                      "display_context" : null,
+                      "display_context_parameter" : null,
+                      "retain_hidden_value" : null,
+                      "formatted_value" : null,
+                      "category_id" : null
+                    }, {
+                      "id" : "CaseType",
+                      "label" : "Case Type",
+                      "hidden" : null,
+                      "order" : null,
+                      "metadata" : false,
+                      "case_type_id" : null,
+                      "hint_text" : null,
+                      "field_type" : {
+                        "id" : "Text",
+                        "type" : "Text",
+                        "min" : null,
+                        "max" : null,
+                        "regular_expression" : null,
+                        "fixed_list_items" : [ ],
+                        "complex_fields" : [ ],
+                        "collection_field_type" : null
+                      },
+                      "security_classification" : "PUBLIC",
+                      "live_from" : null,
+                      "live_until" : null,
+                      "show_condition" : null,
+                      "acls" : [ {
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : true,
+                        "role" : "caseworker-befta_master"
+                      } ],
+                      "complexACLs" : [ ],
+                      "display_context" : null,
+                      "display_context_parameter" : null,
+                      "retain_hidden_value" : null,
+                      "formatted_value" : null,
+                      "category_id" : null
+                    } ],
+                    "collection_field_type" : null
+                  },
+                  "security_classification" : "PUBLIC",
+                  "live_from" : null,
+                  "live_until" : null,
+                  "show_condition" : null,
+                  "acls" : [ {
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : true,
+                    "role" : "caseworker-befta_master"
+                  } ],
+                  "complexACLs" : [ ],
+                  "display_context" : null,
+                  "display_context_parameter" : null,
+                  "retain_hidden_value" : null,
+                  "formatted_value" : null,
+                  "category_id" : null
                 } ],
                 "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : [ {
-                "_extends_": "CaseworkerBeftaMasterAccessControlList"
-              } ],
-              "complexACLs" : [ ],
-              "display_context" : null,
-              "display_context_parameter" : null,
-              "retain_hidden_value" : null,
-              "formatted_value" : null
-            } ]
-          },
-          "show_condition": "NumberField!=\"0\"",
-          "retain_hidden_value": true,
-          "formatted_value": null,
-          "show_summary_change_option" : true,
-          "acls": [
-            {
-              "_extends_": "CaseworkerBeftaMasterAccessControlList"
-            }
-          ]
-        },
-        {
-          "_extends_": "CaseViewFieldMetadataFalse",
-          "id": "NumberField",
-          "label": "Number Field",
-          "value": null,
-          "field_type": {
-            "_extends_": "BaseNumberFieldType"
-          },
-          "formatted_value": null,
-          "show_summary_change_option" : true,
-          "acls": [
-            {
-              "_extends_": "CaseworkerBeftaMasterAccessControlList"
-            }
-          ]
-        }
-      ],
-      "event_token": "[[ANYTHING_PRESENT]]",
-      "wizard_pages": [
-        {
-          "id": "CREATE2SingleFormPage",
-          "label": "Retain Hidden Value Page",
-          "order": 1,
-          "wizard_page_fields": [
-            {
-              "case_field_id": "FamilyDetails",
-              "order": 2,
-              "page_column_no": null,
-              "complex_field_overrides": []
+              }
             },
-            {
-              "case_field_id": "NumberField",
-              "order": 1,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            }
-          ],
-          "show_condition": null,
-          "callback_url_mid_event": null,
-          "retries_timeout_mid_event": []
-        }
-      ],
-      "show_summary": true,
-      "show_event_notes": null,
-      "end_button_label": null,
-      "can_save_draft": null,
+            "security_classification" : "PUBLIC",
+            "live_from" : null,
+            "live_until" : null,
+            "show_condition" : "MotherFullName=\"Mary\"",
+            "acls" : [ {
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true,
+              "role" : "caseworker-befta_master"
+            } ],
+            "complexACLs" : [ ],
+            "display_context" : null,
+            "display_context_parameter" : "#COLLECTION(allowDelete,allowInsert,allowUpdate)",
+            "retain_hidden_value" : true,
+            "formatted_value" : null,
+            "category_id" : null
+          }, {
+            "id" : "FamilyAddress",
+            "label" : "Family Address",
+            "hidden" : null,
+            "order" : null,
+            "metadata" : false,
+            "case_type_id" : null,
+            "hint_text" : null,
+            "field_type" : {
+              "id" : "AddressUK",
+              "type" : "Complex",
+              "min" : null,
+              "max" : null,
+              "regular_expression" : null,
+              "fixed_list_items" : [ ],
+              "complex_fields" : [ {
+                "id" : "AddressLine1",
+                "label" : "Building and Street",
+                "hidden" : null,
+                "order" : null,
+                "metadata" : false,
+                "case_type_id" : null,
+                "hint_text" : null,
+                "field_type" : {
+                  "id" : "TextMax150",
+                  "type" : "Text",
+                  "min" : null,
+                  "max" : 150,
+                  "regular_expression" : null,
+                  "fixed_list_items" : [ ],
+                  "complex_fields" : [ ],
+                  "collection_field_type" : null
+                },
+                "security_classification" : "PUBLIC",
+                "live_from" : null,
+                "live_until" : null,
+                "show_condition" : null,
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : true,
+                  "role" : "caseworker-befta_master"
+                } ],
+                "complexACLs" : [ ],
+                "display_context" : null,
+                "display_context_parameter" : null,
+                "retain_hidden_value" : null,
+                "formatted_value" : null,
+                "category_id" : null
+              }, {
+                "id" : "AddressLine2",
+                "label" : "Address Line 2",
+                "hidden" : null,
+                "order" : null,
+                "metadata" : false,
+                "case_type_id" : null,
+                "hint_text" : null,
+                "field_type" : {
+                  "id" : "TextMax50",
+                  "type" : "Text",
+                  "min" : null,
+                  "max" : 50,
+                  "regular_expression" : null,
+                  "fixed_list_items" : [ ],
+                  "complex_fields" : [ ],
+                  "collection_field_type" : null
+                },
+                "security_classification" : "PUBLIC",
+                "live_from" : null,
+                "live_until" : null,
+                "show_condition" : null,
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : true,
+                  "role" : "caseworker-befta_master"
+                } ],
+                "complexACLs" : [ ],
+                "display_context" : null,
+                "display_context_parameter" : null,
+                "retain_hidden_value" : null,
+                "formatted_value" : null,
+                "category_id" : null
+              }, {
+                "id" : "AddressLine3",
+                "label" : "Address Line 3",
+                "hidden" : null,
+                "order" : null,
+                "metadata" : false,
+                "case_type_id" : null,
+                "hint_text" : null,
+                "field_type" : {
+                  "id" : "TextMax50",
+                  "type" : "Text",
+                  "min" : null,
+                  "max" : 50,
+                  "regular_expression" : null,
+                  "fixed_list_items" : [ ],
+                  "complex_fields" : [ ],
+                  "collection_field_type" : null
+                },
+                "security_classification" : "PUBLIC",
+                "live_from" : null,
+                "live_until" : null,
+                "show_condition" : null,
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : true,
+                  "role" : "caseworker-befta_master"
+                } ],
+                "complexACLs" : [ ],
+                "display_context" : null,
+                "display_context_parameter" : null,
+                "retain_hidden_value" : null,
+                "formatted_value" : null,
+                "category_id" : null
+              }, {
+                "id" : "PostTown",
+                "label" : "Town or City",
+                "hidden" : null,
+                "order" : null,
+                "metadata" : false,
+                "case_type_id" : null,
+                "hint_text" : null,
+                "field_type" : {
+                  "id" : "TextMax50",
+                  "type" : "Text",
+                  "min" : null,
+                  "max" : 50,
+                  "regular_expression" : null,
+                  "fixed_list_items" : [ ],
+                  "complex_fields" : [ ],
+                  "collection_field_type" : null
+                },
+                "security_classification" : "PUBLIC",
+                "live_from" : null,
+                "live_until" : null,
+                "show_condition" : null,
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : true,
+                  "role" : "caseworker-befta_master"
+                } ],
+                "complexACLs" : [ ],
+                "display_context" : null,
+                "display_context_parameter" : null,
+                "retain_hidden_value" : null,
+                "formatted_value" : null,
+                "category_id" : null
+              }, {
+                "id" : "County",
+                "label" : "County",
+                "hidden" : null,
+                "order" : null,
+                "metadata" : false,
+                "case_type_id" : null,
+                "hint_text" : null,
+                "field_type" : {
+                  "id" : "TextMax50",
+                  "type" : "Text",
+                  "min" : null,
+                  "max" : 50,
+                  "regular_expression" : null,
+                  "fixed_list_items" : [ ],
+                  "complex_fields" : [ ],
+                  "collection_field_type" : null
+                },
+                "security_classification" : "PUBLIC",
+                "live_from" : null,
+                "live_until" : null,
+                "show_condition" : null,
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : true,
+                  "role" : "caseworker-befta_master"
+                } ],
+                "complexACLs" : [ ],
+                "display_context" : null,
+                "display_context_parameter" : null,
+                "retain_hidden_value" : null,
+                "formatted_value" : null,
+                "category_id" : null
+              }, {
+                "id" : "PostCode",
+                "label" : "Postcode/Zipcode",
+                "hidden" : null,
+                "order" : null,
+                "metadata" : false,
+                "case_type_id" : null,
+                "hint_text" : null,
+                "field_type" : {
+                  "id" : "TextMax14",
+                  "type" : "Text",
+                  "min" : null,
+                  "max" : 14,
+                  "regular_expression" : null,
+                  "fixed_list_items" : [ ],
+                  "complex_fields" : [ ],
+                  "collection_field_type" : null
+                },
+                "security_classification" : "PUBLIC",
+                "live_from" : null,
+                "live_until" : null,
+                "show_condition" : null,
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : true,
+                  "role" : "caseworker-befta_master"
+                } ],
+                "complexACLs" : [ ],
+                "display_context" : null,
+                "display_context_parameter" : null,
+                "retain_hidden_value" : null,
+                "formatted_value" : null,
+                "category_id" : null
+              }, {
+                "id" : "Country",
+                "label" : "Country",
+                "hidden" : null,
+                "order" : null,
+                "metadata" : false,
+                "case_type_id" : null,
+                "hint_text" : null,
+                "field_type" : {
+                  "id" : "TextMax50",
+                  "type" : "Text",
+                  "min" : null,
+                  "max" : 50,
+                  "regular_expression" : null,
+                  "fixed_list_items" : [ ],
+                  "complex_fields" : [ ],
+                  "collection_field_type" : null
+                },
+                "security_classification" : "PUBLIC",
+                "live_from" : null,
+                "live_until" : null,
+                "show_condition" : null,
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : true,
+                  "role" : "caseworker-befta_master"
+                } ],
+                "complexACLs" : [ ],
+                "display_context" : null,
+                "display_context_parameter" : null,
+                "retain_hidden_value" : null,
+                "formatted_value" : null,
+                "category_id" : null
+              } ],
+              "collection_field_type" : null
+            },
+            "security_classification" : "PUBLIC",
+            "live_from" : null,
+            "live_until" : null,
+            "show_condition" : null,
+            "acls" : [ {
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true,
+              "role" : "caseworker-befta_master"
+            } ],
+            "complexACLs" : [ ],
+            "display_context" : null,
+            "display_context_parameter" : null,
+            "retain_hidden_value" : null,
+            "formatted_value" : null,
+            "category_id" : null
+          } ],
+          "collection_field_type" : null
+        },
+        "validation_expr" : null,
+        "security_label" : "PUBLIC",
+        "order" : null,
+        "formatted_value" : null,
+        "display_context" : "OPTIONAL",
+        "display_context_parameter" : null,
+        "show_condition" : "NumberField!=\"0\"",
+        "show_summary_change_option" : true,
+        "show_summary_content_option" : null,
+        "retain_hidden_value" : true,
+        "publish" : false,
+        "publish_as" : null,
+        "acls" : [ {
+          "create" : true,
+          "read" : true,
+          "update" : true,
+          "delete" : true,
+          "role" : "caseworker-befta_master"
+        } ]
+      }, {
+        "id" : "NumberField",
+        "label" : "Number Field",
+        "hidden" : false,
+        "value" : null,
+        "metadata" : false,
+        "hint_text" : null,
+        "field_type" : {
+          "id" : "Number",
+          "type" : "Number",
+          "min" : null,
+          "max" : null,
+          "regular_expression" : null,
+          "fixed_list_items" : [ ],
+          "complex_fields" : [ ],
+          "collection_field_type" : null
+        },
+        "validation_expr" : null,
+        "security_label" : "PUBLIC",
+        "order" : null,
+        "formatted_value" : null,
+        "display_context" : "OPTIONAL",
+        "display_context_parameter" : null,
+        "show_condition" : null,
+        "show_summary_change_option" : true,
+        "show_summary_content_option" : null,
+        "retain_hidden_value" : null,
+        "publish" : false,
+        "publish_as" : null,
+        "acls" : [ {
+          "create" : true,
+          "read" : true,
+          "update" : true,
+          "delete" : true,
+          "role" : "caseworker-befta_master"
+        } ]
+      } ],
+      "event_token" : "[[ANYTHING_PRESENT]]",
+      "wizard_pages" : [ {
+        "id" : "CREATE2SingleFormPage",
+        "label" : "Retain Hidden Value Page",
+        "order" : 1,
+        "wizard_page_fields" : [ {
+          "case_field_id" : "NumberField",
+          "order" : 1,
+          "page_column_no" : null,
+          "complex_field_overrides" : [ ]
+        }, {
+          "case_field_id" : "FamilyDetails",
+          "order" : 2,
+          "page_column_no" : null,
+          "complex_field_overrides" : [ ]
+        } ],
+        "show_condition" : null,
+        "callback_url_mid_event" : null,
+        "retries_timeout_mid_event" : [ ]
+      } ],
+      "show_summary" : true,
+      "show_event_notes" : null,
+      "end_button_label" : null,
+      "can_save_draft" : null,
       "access_granted" : "STANDARD",
       "access_process" : "NONE",
-      "title_display": null,
+      "title_display" : null,
       "supplementary_data" : null,
       "_links": {
         "self": {
