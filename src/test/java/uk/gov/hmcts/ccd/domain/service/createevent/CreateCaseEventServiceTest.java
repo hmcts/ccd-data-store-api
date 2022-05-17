@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -45,6 +46,7 @@ import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
@@ -360,6 +362,37 @@ class CreateCaseEventServiceTest extends TestFixtures {
         // i.e. verify same caseDetails passed to both saveCase and updateCaseLinks
         verify(caseDetailsRepository).set(caseDetails);
         verify(caseLinkService).updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+    }
+
+    @Test
+    @DisplayName("Should verify calls to validate TTL Suspension changes and set Resolved TTL")
+    void shouldVerifyTTLSuspensionValidateAndSetResolvedTTL() {
+
+        // GIVEN
+        final String userToken = "Test_Token";
+
+        caseDataContent = newCaseDataContent()
+            .withEvent(event)
+            .withData(data)
+            .withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING)
+            .withOnBehalfOfUserToken(userToken)
+            .build();
+
+        LocalDate expectedResolvedTTL = LocalDate.now().plusDays(100);
+        doReturn(expectedResolvedTTL).when(timeToLiveService).getUpdatedResolvedTTL(any());
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        verify(timeToLiveService).validateSuspensionChange(any(), any());
+        verify(timeToLiveService).getUpdatedResolvedTTL(any());
+
+        // verify saved case details reflects resolved TTL
+        ArgumentCaptor<CaseDetails> captor = ArgumentCaptor.forClass(CaseDetails.class);
+        verify(caseDetailsRepository).set(captor.capture());
+        assertThat(captor.getValue().getResolvedTTL()).isEqualTo(expectedResolvedTTL);
     }
 
     private void createCaseEvent() {

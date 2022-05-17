@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.casedeletion;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +22,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,7 +39,7 @@ class TimeToLiveServiceTest {
     private CaseEventDefinition caseEventDefinition;
     private static final Integer TTL_INCREMENT = 10;
     private static final Integer TTL_GUARD = 365;
-    private Map<String, JsonNode> caseData = new HashMap<>();
+    private final Map<String, JsonNode> caseData = new HashMap<>();
 
     @Spy
     private ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
@@ -50,7 +50,6 @@ class TimeToLiveServiceTest {
     @BeforeEach
     void setUp() throws JsonProcessingException {
         caseData.put("key", objectMapper.readTree("{\"Value\": \"value\"}"));
-        //timeToLiveService = new TimeToLiveService(objectMapper, applicationParams);
         caseEventDefinition = new CaseEventDefinition();
     }
 
@@ -93,24 +92,23 @@ class TimeToLiveServiceTest {
 
         doThrow(JsonProcessingException.class).when(objectMapper).readValue(ttlNodeAsString, TTL.class);
 
-
-        Exception exception = assertThrows(ValidationException.class, () -> {
-            timeToLiveService.updateCaseDetailsWithTTL(caseData, caseEventDefinition);
-        });
+        Exception exception = assertThrows(ValidationException.class, () ->
+            timeToLiveService.updateCaseDetailsWithTTL(caseData, caseEventDefinition)
+        );
 
         assertEquals(TimeToLiveService.FAILED_TO_READ_TTL_FROM_CASE_DATA, exception.getMessage());
     }
 
     @Test
     void verifyTTLContentNotChangedNullCaseData() {
-        timeToLiveService.verifyTTLContentNotChanged(null, null);
+        assertDoesNotThrow(() -> timeToLiveService.verifyTTLContentNotChanged(null, null));
     }
 
     @Test
     void verifyTTLContentNotChangedNoTTLInCaseData() {
         Map<String, JsonNode> expectedCaseData = new HashMap<>(caseData);
 
-        timeToLiveService.verifyTTLContentNotChanged(expectedCaseData, caseData);
+        assertDoesNotThrow(() -> timeToLiveService.verifyTTLContentNotChanged(expectedCaseData, caseData));
     }
 
     @Test
@@ -121,7 +119,7 @@ class TimeToLiveServiceTest {
         Map<String, JsonNode> expectedCaseData = new HashMap<>(caseData);
         expectedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
 
-        timeToLiveService.verifyTTLContentNotChanged(expectedCaseData, caseData);
+        assertDoesNotThrow(() -> timeToLiveService.verifyTTLContentNotChanged(expectedCaseData, caseData));
     }
 
     @Test
@@ -131,9 +129,9 @@ class TimeToLiveServiceTest {
 
         Map<String, JsonNode> expectedCaseData = addDaysToSystemTTL(caseData, TTL_INCREMENT);
 
-        Exception exception = assertThrows(BadRequestException.class, () -> {
-            timeToLiveService.verifyTTLContentNotChanged(expectedCaseData, caseData);
-        });
+        Exception exception = assertThrows(BadRequestException.class, () ->
+            timeToLiveService.verifyTTLContentNotChanged(expectedCaseData, caseData)
+        );
 
         assertEquals(TimeToLiveService.TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE, exception.getMessage());
     }
@@ -183,7 +181,7 @@ class TimeToLiveServiceTest {
 
         final ValidationException exception = assertThrows(ValidationException.class,
             () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
-        Assert.assertThat(exception.getMessage(),
+        assertThat(exception.getMessage(),
             startsWith("Unsetting a suspension can only be allowed "
                 + "if the deletion will occur beyond the guard period."));
     }
@@ -236,7 +234,7 @@ class TimeToLiveServiceTest {
 
         final ValidationException exception = assertThrows(ValidationException.class,
             () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
-        Assert.assertThat(exception.getMessage(),
+        assertThat(exception.getMessage(),
             startsWith("Unsetting a suspension can only be allowed "
                 + "if the deletion will occur beyond the guard period."));
     }
@@ -291,14 +289,14 @@ class TimeToLiveServiceTest {
 
         doThrow(JsonProcessingException.class).when(objectMapper).readValue(ttlNodeAsString, TTL.class);
 
-
-        Exception exception = assertThrows(ValidationException.class, () -> {
-            timeToLiveService.verifyTTLContentNotChanged(caseData, caseData);
-        });
+        Exception exception = assertThrows(ValidationException.class, () ->
+            timeToLiveService.verifyTTLContentNotChanged(caseData, caseData)
+        );
 
         assertEquals(TimeToLiveService.FAILED_TO_READ_TTL_FROM_CASE_DATA, exception.getMessage());
     }
 
+    @SuppressWarnings("SameParameterValue")
     private Map<String, JsonNode> addDaysToSystemTTL(Map<String, JsonNode> data, Integer numOfDays) {
         Map<String, JsonNode> clonedData = new HashMap<>(data);
         TTL expectedTtl = TTL.builder()
