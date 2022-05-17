@@ -1,0 +1,66 @@
+{
+  "_guid_": "S-142.6",
+  "_extends_": "Get_Linked_Cases__Base",
+
+  "title": "should retrieve linked case when the case reference exists",
+
+  "specs": [
+    "an active profile in CCD",
+
+    "contains the case reference of the case just created",
+
+    "contains HTTP 200 Ok status code",
+    "contains the case link details for the linked case using the the new standard CaseLinks top level collection field"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "hasMoreRecords": false,
+      "linkedCases": [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "caseReference"
+        },
+        {
+          "caseNameHmctsInternal": "${[scenarioContext][childContexts][F-142_Create1LinkedCases_1StandardCaseLinks][childContexts][StandardCaseLink1][testData][actualResponse][body][data][caseNameHmctsInternal]}",
+          "caseReference": "${[scenarioContext][childContexts][F-142_Create1LinkedCases_1StandardCaseLinks][childContexts][StandardCaseLink1][testData][actualResponse][body][id]}",
+          "ccdCaseType": "FT_MasterCaseType",
+          "ccdJurisdiction": "BEFTA_MASTER",
+          "state": "CaseCreated",
+          "linkDetails": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "createdDateTime"
+            },
+            {
+              "createdDateTime": "${[scenarioContext][childContexts][F-142_Create1LinkedCases_1StandardCaseLinks][childContexts][StandardCaseLink1][testData][actualResponse][body][data][caseLinks][0][value][CreatedDateTime]}",
+              "reasons": [
+                {
+                  "__ordering__": "unordered",
+                  "__elementId__": "reasonCode"
+                },
+                {
+                  "reasonCode": "Reason 1",
+                  "otherDescription": "${[scenarioContext][childContexts][F-142_Create1LinkedCases_1StandardCaseLinks][childContexts][StandardCaseLink1][testData][actualResponse][body][data][caseLinks][0][value][ReasonForLink][0][value][OtherDescription]}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

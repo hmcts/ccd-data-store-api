@@ -1,0 +1,275 @@
+{
+  "_guid_": "F-142_CreateLinkedCase_StandardCaseLink_ManyLinkDetails",
+  "_extends_": "F-142_CreateCase_MasterCaseType__Base",
+
+  "request": {
+    "body": {
+      "data": {
+        "caseNameHmctsInternal": "Name internal: ${[scenarioContext][customValues][generateUUID]}",
+
+        "CaseLinkField": {
+          "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}",
+          "CaseType": "${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][case_type_id]}",
+          "CreatedDateTime": "2022-04-27T11:46:24.947877",
+          "ReasonForLink": [
+            { 
+              "id": "9b59635d-04b5-4a44-9be5-b30053b97d19",
+              "value": {
+                "Reason": "This link and reason will be ignored as not a Standard Case Link",
+                "OtherDescription": "Description: ${[scenarioContext][customValues][generateUUID]}"
+              }
+            }
+          ]
+        },
+
+        "caseLinks": [
+          {
+            "id": "52837798-42c6-43cc-98f6-0895fdba4961",
+            "value": {
+              "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}",
+              "CaseType": "${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][case_type_id]}",
+              "CreatedDateTime": "2022-04-28T13:26:53.947877",
+              "ReasonForLink": [
+                { 
+                  "id": "ffea83f4-3ec1-4be6-b530-e0b0b2a239af",
+                  "value": {
+                    "Reason": "Link 1, Reason 1",
+                    "OtherDescription": "Description: ${[scenarioContext][customValues][generateUUID]}"
+                  }
+                },
+                { 
+                  "id": "3ef6929d-1f3d-4603-9ed4-64b7394e5dd9",
+                  "value": {
+                    "Reason": "Link 1, Reason 2",
+                    "OtherDescription": "Description: ${[scenarioContext][customValues][generateUUID]}"
+                  }
+                }
+              ]
+            }
+          },
+
+          {
+            "id": "3f48381c-116f-400d-a89d-c355feb18036",
+            "value": {
+              "CaseReference": "${}${[scenarioContext][siblingContexts][StandardCaseLink1][testData][actualResponse][body][id]}",
+              "CaseType": "${[scenarioContext][siblingContexts][StandardCaseLink1][testData][actualResponse][body][case_type_id]}",
+              "CreatedDateTime": "2022-04-29T09:53:41.947877",
+              "ReasonForLink": [
+                { 
+                  "id": "d3e33b4a-0c64-4715-aeca-5b63dfbde994",
+                  "value": {
+                    "Reason": "This link and reason will be ignored as not the case being searched for",
+                    "OtherDescription": "Description: ${[scenarioContext][customValues][generateUUID]}"
+                  }
+                }
+              ]
+            }
+          },
+
+          {
+            "id": "35237bd9-9d73-48f2-899b-155b6ed31c8e",
+            "value": {
+              "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}",
+              "CaseType": "${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][case_type_id]}",
+              "CreatedDateTime": "2022-04-30T16:32:12.947877",
+              "ReasonForLink": [
+                { 
+                  "id": "61881cfc-0861-481e-a09a-f28af60fe89a",
+                  "value": {
+                    "Reason": "Link 2, Reason 1",
+                    "OtherDescription": "Description: ${[scenarioContext][customValues][generateUUID]}"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "data": {
+        "caseNameHmctsInternal": "[[ANY_STRING_NOT_NULLABLE]]",
+
+        "CaseLinkField": {
+          "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}",
+          "CaseType": "${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][case_type_id]}",
+          "CreatedDateTime": "[[ANY_DATE_NOT_NULLABLE]]",
+          "ReasonForLink": [
+            { 
+              "id": "9b59635d-04b5-4a44-9be5-b30053b97d19",
+              "value": {
+                "Reason": "This link and reason will be ignored as not a Standard Case Link",
+                "OtherDescription": "[[ANY_STRING_NOT_NULLABLE]]"
+              }
+            }
+          ]
+        },
+
+        "caseLinks": [
+          {
+            "id": "52837798-42c6-43cc-98f6-0895fdba4961",
+            "value": {
+              "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}",
+              "CaseType": "${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][case_type_id]}",
+              "CreatedDateTime": "[[ANY_DATE_NOT_NULLABLE]]",
+              "ReasonForLink": [
+                { 
+                  "id": "ffea83f4-3ec1-4be6-b530-e0b0b2a239af",
+                  "value": {
+                    "Reason": "Link 1, Reason 1",
+                    "OtherDescription": "[[ANY_STRING_NOT_NULLABLE]]"
+                  }
+                },
+                { 
+                  "id": "3ef6929d-1f3d-4603-9ed4-64b7394e5dd9",
+                  "value": {
+                    "Reason": "Link 1, Reason 2",
+                    "OtherDescription": "[[ANY_STRING_NOT_NULLABLE]]"
+                  }
+                }
+              ]
+            }
+          },
+
+          {
+            "id": "3f48381c-116f-400d-a89d-c355feb18036",
+            "value": {
+              "CaseReference": "${}${[scenarioContext][siblingContexts][StandardCaseLink1][testData][actualResponse][body][id]}",
+              "CaseType": "${[scenarioContext][siblingContexts][StandardCaseLink1][testData][actualResponse][body][case_type_id]}",
+              "CreatedDateTime": "[[ANY_DATE_NOT_NULLABLE]]",
+              "ReasonForLink": [
+                { 
+                  "id": "d3e33b4a-0c64-4715-aeca-5b63dfbde994",
+                  "value": {
+                    "Reason": "This link and reason will be ignored as not the case being searched for",
+                    "OtherDescription": "[[ANY_STRING_NOT_NULLABLE]]"
+                  }
+                }
+              ]
+            }
+          },
+
+          {
+            "id": "35237bd9-9d73-48f2-899b-155b6ed31c8e",
+            "value": {
+              "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}",
+              "CaseType": "${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][case_type_id]}",
+              "CreatedDateTime": "[[ANY_DATE_NOT_NULLABLE]]",
+              "ReasonForLink": [
+                { 
+                  "id": "61881cfc-0861-481e-a09a-f28af60fe89a",
+                  "value": {
+                    "Reason": "Link 2, Reason 1",
+                    "OtherDescription": "[[ANY_STRING_NOT_NULLABLE]]"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "data_classification": {
+        "caseNameHmctsInternal": "PUBLIC",
+
+        "CaseLinkField": {
+          "classification": "PUBLIC",
+          "value": {
+            "CaseReference": "PUBLIC",
+            "CaseType": "PUBLIC",
+            "CreatedDateTime": "PUBLIC",
+            "ReasonForLink": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "value": {
+                    "Reason": "PUBLIC",
+                    "OtherDescription": "PUBLIC"
+                  },
+                  "id": "9b59635d-04b5-4a44-9be5-b30053b97d19"
+                }
+              ]
+            }
+          }
+        },
+
+        "caseLinks": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "CaseReference": "PUBLIC",
+                "CaseType": "PUBLIC",
+                "CreatedDateTime": "PUBLIC",
+                "ReasonForLink": {
+                  "classification": "PUBLIC",
+                  "value": [
+                    {
+                      "value": {
+                        "Reason": "PUBLIC",
+                        "OtherDescription": "PUBLIC"
+                      },
+                      "id": "ffea83f4-3ec1-4be6-b530-e0b0b2a239af"
+                    },
+                    {
+                      "value": {
+                        "Reason": "PUBLIC",
+                        "OtherDescription": "PUBLIC"
+                      },
+                      "id": "3ef6929d-1f3d-4603-9ed4-64b7394e5dd9"
+                    }
+                  ]
+                }
+              },
+              "id": "52837798-42c6-43cc-98f6-0895fdba4961"
+            },
+
+            {
+              "value": {
+                "CaseReference": "PUBLIC",
+                "CaseType": "PUBLIC",
+                "CreatedDateTime": "PUBLIC",
+                "ReasonForLink": {
+                  "classification": "PUBLIC",
+                  "value": [
+                    {
+                      "value": {
+                        "Reason": "PUBLIC",
+                        "OtherDescription": "PUBLIC"
+                      },
+                      "id": "d3e33b4a-0c64-4715-aeca-5b63dfbde994"
+                    }
+                  ]
+                }
+              },
+              "id": "3f48381c-116f-400d-a89d-c355feb18036"
+            },
+
+            {
+              "value": {
+                "CaseReference": "PUBLIC",
+                "CaseType": "PUBLIC",
+                "CreatedDateTime": "PUBLIC",
+                "ReasonForLink": {
+                  "classification": "PUBLIC",
+                  "value": [
+                    {
+                      "value": {
+                        "Reason": "PUBLIC",
+                        "OtherDescription": "PUBLIC"
+                      },
+                      "id": "61881cfc-0861-481e-a09a-f28af60fe89a"
+                    }
+                  ]
+                }
+              },
+              "id": "35237bd9-9d73-48f2-899b-155b6ed31c8e"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

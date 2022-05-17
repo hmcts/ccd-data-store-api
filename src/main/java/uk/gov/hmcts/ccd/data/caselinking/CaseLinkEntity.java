@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.data.caselinking;
 
+import lombok.EqualsAndHashCode;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -7,12 +9,14 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 @Entity
+@EqualsAndHashCode
 @Table(name = "case_link")
 public class CaseLinkEntity {
 
     public static final Boolean STANDARD_LINK = true;
     public static final Boolean NON_STANDARD_LINK = false;
 
+    @EqualsAndHashCode
     public static class CaseLinkPrimaryKey implements Serializable {
         @Column(name = "case_id", nullable = false)
         private Long caseId;

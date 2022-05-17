@@ -232,7 +232,7 @@
         },
         {
           "id": "PersonAddress",
-          "case_type_id": "TestAddressBookCase",
+          "case_type_id": "TestAddressBookCaseCaseLinks",
           "label": "Address",
           "security_classification": "PUBLIC",
           "acls": [
@@ -298,7 +298,7 @@
         {
           "metadata": false,
           "id": "CaseLink1",
-          "case_type_id": "TestAddressBookCase",
+          "case_type_id": "TestAddressBookCaseCaseLinks",
           "label": "Case Link Field",
           "hint_text": null,
           "field_type": {
@@ -361,7 +361,7 @@
         {
           "metadata": false,
           "id": "CaseLink2",
-          "case_type_id": "TestAddressBookCase",
+          "case_type_id": "TestAddressBookCaseCaseLinks",
           "label": "Case Link Field",
           "hint_text": null,
           "field_type": {
@@ -424,7 +424,7 @@
         {
           "metadata": false,
           "id": "CaseLink3",
-          "case_type_id": "TestAddressBookCase",
+          "case_type_id": "TestAddressBookCaseCaseLinks",
           "label": "Case Link Field",
           "hint_text": null,
           "field_type": {
@@ -487,7 +487,7 @@
         {
           "metadata": false,
           "id": "CaseLinkCollection",
-          "case_type_id": "TestAddressBookCase",
+          "case_type_id": "TestAddressBookCaseCaseLinks",
           "label": "Case Link Field",
           "hint_text": null,
           "field_type": {
@@ -540,6 +540,256 @@
           "hidden": false,
           "security_classification": "PUBLIC",
           "live_from": "2017-01-01",
+          "live_until": null,
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": true
+            }
+          ],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null
+        }, {
+          "metadata": false,
+          "id": "caseLinks",
+          "case_type_id": "TestAddressBookCaseCaseLinks",
+          "label": "Standard case links field",
+          "hint_text": null,
+          "field_type": {
+            "id": "caseLinks-e66d2a91-681e-42e9-aac5-a7d07b1a36a6",
+            "type": "Collection",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": {
+              "id": "CaseLink",
+              "type": "Complex",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [
+                {
+                  "metadata": false,
+                  "id": "CaseReference",
+                  "case_type_id": null,
+                  "label": "Case Reference",
+                  "hint_text": null,
+                  "field_type": {
+                    "id": "TextCaseReference",
+                    "type": "Text",
+                    "min": null,
+                    "max": null,
+                    "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)",
+                    "fixed_list_items": [],
+                    "complex_fields": [],
+                    "collection_field_type": null
+                  },
+                  "hidden": null,
+                  "security_classification": "PUBLIC",
+                  "live_from": null,
+                  "live_until": null,
+                  "acls": null,
+                  "complexACLs": [],
+                  "order": null,
+                  "show_condition": null,
+                  "display_context_parameter": null,
+                  "retain_hidden_value": null
+                },
+                {
+                  "metadata": false,
+                  "id": "ReasonForLink",
+                  "case_type_id": null,
+                  "label": "ReasonForLink",
+                  "hint_text": null,
+                  "field_type": {
+                    "id": "ReasonForLinkList",
+                    "type": "Collection",
+                    "min": null,
+                    "max": null,
+                    "regular_expression": null,
+                    "fixed_list_items": [],
+                    "complex_fields": [],
+                    "collection_field_type": {
+                      "id": "LinkReason",
+                      "type": "Complex",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [
+                        {
+                          "metadata": false,
+                          "id": "Reason",
+                          "case_type_id": null,
+                          "label": "Reason",
+                          "hint_text": null,
+                          "field_type": {
+                            "id": "Text",
+                            "type": "Text",
+                            "min": null,
+                            "max": null,
+                            "regular_expression": null,
+                            "fixed_list_items": [],
+                            "complex_fields": [],
+                            "collection_field_type": null
+                          },
+                          "hidden": null,
+                          "security_classification": "PUBLIC",
+                          "live_from": null,
+                          "live_until": null,
+                          "acls": null,
+                          "complexACLs": [],
+                          "order": null,
+                          "show_condition": null,
+                          "display_context_parameter": null,
+                          "retain_hidden_value": null
+                        },
+                        {
+                          "metadata": false,
+                          "id": "OtherDescription",
+                          "case_type_id": null,
+                          "label": "OtherDescription",
+                          "hint_text": null,
+                          "field_type": {
+                            "id": "Text",
+                            "type": "Text",
+                            "min": null,
+                            "max": null,
+                            "regular_expression": null,
+                            "fixed_list_items": [],
+                            "complex_fields": [],
+                            "collection_field_type": null
+                          },
+                          "hidden": null,
+                          "security_classification": "PUBLIC",
+                          "live_from": null,
+                          "live_until": null,
+                          "acls": null,
+                          "complexACLs": [],
+                          "order": null,
+                          "show_condition": null,
+                          "display_context_parameter": null,
+                          "retain_hidden_value": null
+                        }
+                      ],
+                      "collection_field_type": null
+                    }
+                  },
+                  "hidden": null,
+                  "security_classification": "PUBLIC",
+                  "live_from": null,
+                  "live_until": null,
+                  "acls": null,
+                  "complexACLs": [],
+                  "order": null,
+                  "show_condition": null,
+                  "display_context_parameter": null,
+                  "retain_hidden_value": null
+                },
+                {
+                  "metadata": false,
+                  "id": "CreatedDateTime",
+                  "case_type_id": null,
+                  "label": "Created Date Time",
+                  "hint_text": null,
+                  "field_type": {
+                    "id": "DateTime",
+                    "type": "DateTime",
+                    "min": null,
+                    "max": null,
+                    "regular_expression": null,
+                    "fixed_list_items": [],
+                    "complex_fields": [],
+                    "collection_field_type": null
+                  },
+                  "hidden": null,
+                  "security_classification": "PUBLIC",
+                  "live_from": null,
+                  "live_until": null,
+                  "acls": null,
+                  "complexACLs": [],
+                  "order": null,
+                  "show_condition": null,
+                  "display_context_parameter": null,
+                  "retain_hidden_value": null
+                },
+                {
+                  "metadata": false,
+                  "id": "CaseType",
+                  "case_type_id": null,
+                  "label": "Case Type",
+                  "hint_text": null,
+                  "field_type": {
+                    "id": "Text",
+                    "type": "Text",
+                    "min": null,
+                    "max": null,
+                    "regular_expression": null,
+                    "fixed_list_items": [],
+                    "complex_fields": [],
+                    "collection_field_type": null
+                  },
+                  "hidden": null,
+                  "security_classification": "PUBLIC",
+                  "live_from": null,
+                  "live_until": null,
+                  "acls": null,
+                  "complexACLs": [],
+                  "order": null,
+                  "show_condition": null,
+                  "display_context_parameter": null,
+                  "retain_hidden_value": null
+                }
+              ],
+              "collection_field_type": null
+            }
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2017-01-01",
+          "live_until": null,
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": true
+            }
+          ],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null
+        }, {
+          "metadata": false,
+          "id": "caseNameHmctsInternal",
+          "case_type_id": "TestAddressBookCaseCaseLinks",
+          "label": "Case Name HMCTS Internal",
+          "hint_text": null,
+          "field_type": {
+            "id": "Text",
+            "type": "Text",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2017-01-03",
           "live_until": null,
           "acls": [
             {
