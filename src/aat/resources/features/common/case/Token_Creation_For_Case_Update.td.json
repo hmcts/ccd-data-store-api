@@ -1,0 +1,64 @@
+{
+  "_guid_": "Token_Creation_For_Case_Update",
+
+  "title": "Retrieve an Event Trigger for a Case by Event ID using v2_external#start-event-controller/getStartEventTriggerUsingGET",
+
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve an Event Trigger for a Case by Event ID",
+
+  "method": "GET",
+  "uri": "/cases/{cid}/event-triggers/{etid}",
+
+  "specs": [
+    "to create a token for case update event"
+  ],
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "cid": "OVERRIDE",
+      "etid": "OVERRIDE"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-start-event-trigger.v2+json;charset=UTF-8",
+      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+    },
+    "body": {
+      "token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "_links": {
+        "self": {
+          "href": "[[ANY_STRING_NOT_NULLABLE]]"
+        }
+      },
+
+      "event_id": "${[scenarioContext][testData][request][pathVariables][etid]}",
+
+      "case_details": {
+        "id": "[[ANYTHING_PRESENT]]",
+
+        "jurisdiction": "OVERRIDE",
+        "case_type_id": "OVERRIDE",
+        "state": "OVERRIDE",
+
+        "version": 0,
+        "created_date": "[[ANY_DATE_NOT_NULLABLE]]",
+        "last_modified":"[[ANY_DATE_NOT_NULLABLE]]",
+        "last_state_modified_date": "[[ANY_DATE_NOT_NULLABLE]]",
+        "security_classification": "PUBLIC",
+        "supplementary_data": null,
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null
+      }
+    }
+  }
+}

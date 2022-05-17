@@ -108,6 +108,7 @@
       "document_filename": "B_Document Inside Complex Type.docx",
       "document_binary_url": "http://dm-store:8080/documents/84f04693-56ae-4aad-97e8-d1fc7592acea/binary"
     },
+    "type1": null,
     "description": null
   },
   "timeline": [

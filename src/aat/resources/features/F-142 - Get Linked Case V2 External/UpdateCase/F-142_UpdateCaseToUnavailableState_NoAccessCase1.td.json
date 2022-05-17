@@ -1,0 +1,16 @@
+{
+  "_guid_": "F-142_UpdateCaseToUnavailableState_NoAccessCase1",
+  "_extends_": "F-142_UpdateCaseToUnavailableState__Base",
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-142_GetUpdateToken_MasterCaseType_NoAccessCase1"
+    }
+  ],
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][siblingContexts][NoAccessCase1][testData][actualResponse][body][id]}"
+    }
+  }
+}

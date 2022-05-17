@@ -1,0 +1,96 @@
+{
+  "title":"Document with attributePath had sub-field category id existing but no default categoryID in definition file, now supplied Null categoryId in request - return 200 response with the updated document hierarchy (showing document as Uncategorized) for the case",
+  "_guid_": "S-141.11",
+	"_extends_": "F-141_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD and has Update access permissions for the Document field named in the AttributePath",
+		"a case definition with category structure exists for the case type CT1",
+    "a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1",
+    "contains the given case reference C1 in the input",
+    "contains CategoryID value as \"Null\" and attributePath value as \"Document3\" in the input",
+    "contains a HTTP 200 status code"
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+	"request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-141.11_CreateCase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "attribute_path": "Document3",
+      "case_version":  "0",
+      "category_id": null
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "case_version" : 1,
+      "categories" : [ {
+        "category_id" : "CategoryID1",
+        "category_name" : "Evidences",
+        "category_order" : 100,
+        "documents" : [ {
+          "document_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "attribute_path" : "Document1",
+          "upload_timestamp": "[[ANY_NULLABLE]]"
+        } ],
+        "sub_categories" : [ ]
+      }, {
+        "category_id" : "CategoryID2",
+        "category_name" : "Supporting",
+        "category_order" : 110,
+        "documents" : [ {
+          "document_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "attribute_path" : "Document2",
+          "upload_timestamp": "[[ANY_NULLABLE]]"
+        } ],
+        "sub_categories" : [ ]
+      }, {
+        "category_id" : "CategoryID3",
+        "category_name" : "Party Documents",
+        "category_order" : 120,
+        "documents" : [ ],
+        "sub_categories" : [ {
+          "category_id" : "SubCategoryID1",
+          "category_name" : "Proof Documents",
+          "category_order" : 100,
+          "documents" : [ {
+            "document_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+            "document_binary_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+            "document_filename": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+            "attribute_path" : "nationalityProof.documentEvidence",
+            "upload_timestamp": "[[ANY_NULLABLE]]"
+          } ],
+          "sub_categories" : [ ]
+        } ]
+      } ],
+      "uncategorised_documents" : [ {
+        "document_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+        "document_binary_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+        "document_filename": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+        "attribute_path" : "Document3",
+        "upload_timestamp": "[[ANY_NULLABLE]]"
+      } ]
+    }
+  }
+}
+

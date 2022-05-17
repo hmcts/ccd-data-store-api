@@ -1,9 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.caselinking;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,9 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.ccd.BaseTest;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -22,7 +18,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataExtractor;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,7 +34,7 @@ import static uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkExtractor.TEXT
 @ExtendWith(MockitoExtension.class)
 class CaseLinkExtractorTest extends CaseLinkTestFixtures {
 
-    private static final String CASE_FIELDS_JSON = "/tests/CaseLinkExtractor_CaseFields.json";
+    private static final String CASE_FIELDS_JSON = "tests/CaseLinkExtractor_CaseFields.json";
     private static List<CaseFieldDefinition> caseFieldDefinitions;
 
     @Mock
@@ -54,34 +49,20 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
             + "      }";
 
     private static final String CASE_LINK_VIA_COLLECTION =
-        "\"CaseLinkCollection\" : [ {\n"
-            + "        \"id\" : \"" + UUID.randomUUID() + "\",\n"
-            + "        \"value\" : {\n"
-            + "          \"CaseReference\" : \"" + LINKED_CASE_REFERENCE_VIA_COLLECTION + "\"\n"
-            + "        }\n"
-            + "      }, {\n"
-            + "        \"id\" : \"" + UUID.randomUUID() + "\",\n"
-            + "        \"value\" : {\n"
-            + "          \"CaseReference\" : \"" + LINKED_CASE_REFERENCE_VIA_BOTH_COL_AND_STANDARD_CL_FIELD + "\"\n"
-            + "        }\n"
-            + "      } ]";
+        createCaseLinkCollectionString("CaseLinkCollection", List.of(
+            LINKED_CASE_REFERENCE_VIA_COLLECTION,
+            LINKED_CASE_REFERENCE_VIA_BOTH_COL_AND_STANDARD_CL_FIELD
+        ));
 
     private static final String CASE_LINK_VIA_STANDARD_CASE_LINKS_FIELD =
-        "\"" + STANDARD_CASE_LINK_FIELD + "\" : [ {\n"
-            + "        \"id\" : \"" + UUID.randomUUID() + "\",\n"
-            + "        \"value\" : {\n"
-            + "          \"CaseReference\" : \"" + LINKED_CASE_REFERENCE_VIA_STANDARD_CASE_LINK_FIELD + "\"\n"
-            + "        }\n"
-            + "      }, {\n"
-            + "        \"id\" : \"" + UUID.randomUUID() + "\",\n"
-            + "        \"value\" : {\n"
-            + "          \"CaseReference\" : \"" + LINKED_CASE_REFERENCE_VIA_BOTH_COL_AND_STANDARD_CL_FIELD + "\"\n"
-            + "        }\n"
-            + "      } ]";
+        createCaseLinkCollectionString(STANDARD_CASE_LINK_FIELD, List.of(
+            LINKED_CASE_REFERENCE_VIA_STANDARD_CASE_LINK_FIELD,
+            LINKED_CASE_REFERENCE_VIA_BOTH_COL_AND_STANDARD_CL_FIELD
+        ));
 
     @BeforeEach
     void setup() throws IOException {
-        caseFieldDefinitions = WireMockBaseTest.getCaseFieldsFromJson(BaseTest.getResourceAsString(CASE_FIELDS_JSON));
+        caseFieldDefinitions = TestFixtures.getCaseFieldsFromJson(CASE_FIELDS_JSON);
     }
 
     @DisplayName("Should extract a simple CaseLink value")
@@ -326,11 +307,6 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
         }
 
         return createCaseDataMap(dataValues);
-    }
-
-    private Map<String, JsonNode> createCaseDataMap(List<String> dataValues) throws JsonProcessingException {
-        return JacksonUtils.MAPPER.readValue("{" + StringUtils.join(dataValues, ",") + "}",
-            new TypeReference<HashMap<String, JsonNode>>() { });
     }
 
     private CaseDetails createCaseDetailsAndMockCaseDetailsExtractor(boolean includeSimpleCaseLink,
