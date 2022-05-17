@@ -2,7 +2,8 @@
   "_guid_": "S-1016.6",
   "_extends_": "F-1016_Test_Data_Base",
 
-  "title": "TTL.Suspended changed to \"Yes\"",
+  "title": "TTL.Suspended changed to \"Yes\" using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
+
   "prerequisites" : [ {
     "Token_Creation": "S-1016_GetUpdateTokenCaseworker"
   }

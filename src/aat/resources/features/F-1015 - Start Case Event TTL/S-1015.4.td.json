@@ -1,7 +1,8 @@
 {
   "_guid_": "S-1015.4",
   "_extends_": "F-1015_AggregatedRetrieveTrigger",
-  "title": "must successfully update a cases TTL.SystemTTL value using v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET",
+
+  "title": "must successfully update a cases TTL.SystemTTL value using '/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}'",
 
   "specs": [
     "an active profile in CCD",
