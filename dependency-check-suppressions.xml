@@ -46,9 +46,7 @@
 		</notes>
 		<cve>CVE-2022-0265</cve>
 	</suppress>
-	<suppress until="2022-05-25">
-		<cve>CVE-2022-22968</cve>
-	</suppress>
+
 	<suppress until="2022-05-25">
 		<notes><![CDATA[
    file name: gson-2.8.6.jar
@@ -56,4 +54,5 @@
 		<packageUrl regex="true">^pkg:maven/com\.google\.code\.gson/gson@.*$</packageUrl>
 		<cve>CVE-2022-25647</cve>
 	</suppress>
+
 </suppressions>
