@@ -1,7 +1,8 @@
 {
   "_guid_": "S-1015.16",
   "_extends_": "F-1015_RetrieveTriggerInternalErrorResponse",
-  "title": "must error when updating a case where about to start callback has modified TTL.Suspended",
+
+  "title": "must error when updating a case where about to start callback has modified TTL.Suspended using V2 'internal/cases/{caseId}/event-triggers/{triggerId}'",
 
   "specs": [
     "to create a token for case creation",
@@ -21,7 +22,7 @@
   "request": {
     "pathVariables": {
       "caseId": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
-      "triggerId": "updateModifiedOverrideTTL"
+      "triggerId": "updateModifiedSuspendedTTL"
     }
   }
 }

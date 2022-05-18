@@ -1,7 +1,8 @@
 {
   "_guid_": "S-1015.22",
   "_extends_": "F-1015-CreateEventTokenErrorResponseCitizen",
-  "title": "must error when updating a case where about to start callback has modified TTL.Suspended",
+
+  "title": "must error when updating a case where about to start callback has modified TTL.Suspended using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token'",
 
   "specs": [
     "to create a token for case creation",

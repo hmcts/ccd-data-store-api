@@ -136,7 +136,8 @@ class CallbackInvokerTest {
             globalSearchProcessorService,
             caseDataService,
             securityValidationService,
-            caseSanitiser);
+            caseSanitiser,
+            timeToLiveService);
     }
 
     @Nested
@@ -524,6 +525,8 @@ class CallbackInvokerTest {
 
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChanged(
+                        any(), eq(callbackResponse.getData())),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
                     () -> inOrder.verify(globalSearchProcessorService, never())
                         .populateGlobalSearchData(caseTypeDefinition,
@@ -738,6 +741,8 @@ class CallbackInvokerTest {
                 assertAll(
                     () -> assertThat(caseDetails.getState(), is("toto")),
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChanged(
+                        any(), eq(callbackResponse.getData())),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService, times(2))
@@ -839,6 +844,8 @@ class CallbackInvokerTest {
 
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
+                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChanged(
+                        any(), eq(callbackResponse.getData())),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
                     () -> inOrder.verify(globalSearchProcessorService, never())
                         .populateGlobalSearchData(caseTypeDefinition,
