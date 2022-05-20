@@ -152,7 +152,6 @@ public abstract class TestFixtures {
         return OBJECT_MAPPER.readValue(inputStream, typeReference);
     }
 
-    @SuppressWarnings("SameParameterValue")
     public static String fromFileAsString(final String filePath) {
         StringBuilder json = new StringBuilder();
         try (final InputStreamReader inputStreamReader = new InputStreamReader(getInputStream(filePath));
