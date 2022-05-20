@@ -7,11 +7,11 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,6 +40,9 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
+import uk.gov.hmcts.ccd.validator.annotation.ValidCaseTypeId;
+
+import java.util.List;
 
 import static org.springframework.http.ResponseEntity.status;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
@@ -48,6 +51,7 @@ import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
 
 @RestController
 @RequestMapping(path = "/")
+@Validated
 public class CaseController {
     private final GetCaseOperation getCaseOperation;
     private final CreateEventOperation createEventOperation;
@@ -304,7 +308,7 @@ public class CaseController {
     })
     @LogAudit(operationType = CREATE_CASE, caseId = "#result.body.reference",
         jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
-    public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
+    public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") @ValidCaseTypeId String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
                                                    @RequestParam(value = "ignore-warning", required = false)
                                                        final Boolean ignoreWarning) {

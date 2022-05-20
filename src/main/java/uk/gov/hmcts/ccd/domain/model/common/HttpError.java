@@ -49,6 +49,10 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
     }
 
+    public HttpError(Exception exception, HttpServletRequest request, HttpStatus status) {
+        this(exception, request.getRequestURI(), status);
+    }
+
     private Integer getStatusFromResponseStatus(ResponseStatus responseStatus, HttpStatus status) {
         if (status != null) {
             return status.value();

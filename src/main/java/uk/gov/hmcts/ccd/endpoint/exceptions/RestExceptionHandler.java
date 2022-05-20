@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -92,6 +93,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(Collections.singletonMap("errorMessage", errorMsg));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseBody
+    public ResponseEntity<HttpError> handleConstraintViolationException(final HttpServletRequest request,
+                                                                        final Exception exception) {
+        LOG.error(exception.getMessage());
+        appInsights.trackException(exception);
+
+        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
+            .withDetails(exception.getCause());
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(error);
     }
 
     @ExceptionHandler(Exception.class)
