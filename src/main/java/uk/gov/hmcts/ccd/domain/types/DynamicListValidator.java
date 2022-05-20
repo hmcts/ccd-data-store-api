@@ -68,10 +68,14 @@ public class DynamicListValidator implements BaseTypeValidator {
             value = node.get(LABEL).textValue();
         }
 
-        if (StringUtils.isNotEmpty(code) && code.length() > 150) {
+        //To correct Fortify dereferencing a null-pointer,
+        // thereby causing a null-pointer exception warning
+        if (code != null && StringUtils.isNotEmpty(code) && code.length() > 150) {
             results.add(new ValidationResult("Code length exceeds MAX limit", dataFieldId));
         }
-        if (StringUtils.isNotEmpty(value) && value.length() > 250) {
+        //To correct Fortify dereferencing a null-pointer,
+        // thereby causing a null-pointer exception warning
+        if (value != null && StringUtils.isNotEmpty(value) && value.length() > 250) {
             results.add(new ValidationResult("Value length exceeds MAX limit", dataFieldId));
         }
 
