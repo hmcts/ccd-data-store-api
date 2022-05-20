@@ -77,6 +77,9 @@ repositories {
     maven {
         url 'https://jitpack.io'
     }
+    maven {
+        url 'https://repo.spring.io/plugins-release/'
+    }
 }
 // end::repositories[]
 
@@ -139,6 +142,7 @@ tasks.withType(Test) {
 
 dependencies {
     compile 'com.google.code.gson:gson:2.8.9'
+    implementation 'org.springframework:spring-core:6.0.0-M4'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.1'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.7.RELEASE'
 
