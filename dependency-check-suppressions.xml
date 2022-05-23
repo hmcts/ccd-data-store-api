@@ -46,10 +46,11 @@
 		</notes>
 		<cve>CVE-2022-0265</cve>
 	</suppress>
+
 	<suppress until="2022-06-25">
-		<notes><![CDATA[
-   file name: spring-core-5.3.18.jar
-   ]]></notes>
+		<notes>
+			False-positive. See CCD-3255.
+		</notes>
 		<cve>CVE-2016-1000027</cve>
 	</suppress>
 </suppressions>
