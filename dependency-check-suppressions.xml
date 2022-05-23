@@ -8,7 +8,7 @@
 			CVE-2020-23171 Reference https://tools.hmcts.net/jira/browse/CCD-1871
 		</notes>
 		<packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
-		<cpe>cpe:/a:nim-lang:nim-lang</cpe>
+		<cpe>cpe:/a:nim-lang:nim-lang</cpe>erwe
 		<cve>CVE-2020-23171</cve>
 	</suppress>
 
