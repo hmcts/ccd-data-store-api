@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.HashMap;
@@ -29,6 +30,8 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(JexlEnablingConditionParser.class);
 
+    private static final String EVENT_ENABLE_CONDITION_NON_EXISTING_SUB_FIELD = "[__FNA__]";
+
     private final JexlEngine engine;
 
     private final ObjectMapper objectMapper;
@@ -37,7 +40,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
 
     @Inject
     public JexlEnablingConditionParser(EnablingConditionConverter enablingConditionConverter) {
-        this(enablingConditionConverter, new ObjectMapper());
+        this(enablingConditionConverter, new ObjectMapper().registerModule(new JavaTimeModule()));
     }
 
     protected JexlEnablingConditionParser(EnablingConditionConverter enablingConditionConverter,
@@ -72,7 +75,10 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
             Optional<Object> value = getValueFromContext(context, variable);
             if (value.isPresent()) {
                 contextData.put(variable, value.get());
+            } else {
+                contextData.put(variable, EVENT_ENABLE_CONDITION_NON_EXISTING_SUB_FIELD);
             }
+
         }
         return contextData;
     }

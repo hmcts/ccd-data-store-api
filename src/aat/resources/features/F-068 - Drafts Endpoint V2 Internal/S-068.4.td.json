@@ -1,0 +1,24 @@
+{
+  "_guid_": "S-068.4",
+  "operationName": "Delete a given draft",
+  "_extends_": "F-068_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "Delete a given draft",
+    "contains HTTP 200"
+  ],
+  "method": "DELETE",
+  "uri": "/internal/drafts/{did}",
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "did": "${[scenarioContext][childContexts][F-068_Create_Draft][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : null
+  }
+}

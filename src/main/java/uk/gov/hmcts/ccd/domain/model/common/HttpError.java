@@ -49,8 +49,8 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
     }
 
-    public HttpError(Exception exception, HttpServletRequest request, HttpStatus status) {
-        this(exception, request.getRequestURI(), status);
+    public HttpError(Exception exception, HttpServletRequest request, HttpStatus upstreamPreferredHttpStatus) {
+        this(exception, request.getRequestURI(), upstreamPreferredHttpStatus);
     }
 
     private Integer getStatusFromResponseStatus(ResponseStatus responseStatus, HttpStatus status) {
@@ -172,7 +172,7 @@ public class HttpError<T extends Serializable> implements Serializable {
     }
 
     public HttpError(Exception exception, WebRequest request, HttpStatus status) {
-        this(exception, ((ServletWebRequest)request).getRequest().getRequestURI(), status);
+        this(exception, ((ServletWebRequest) request).getRequest().getRequestURI(), status);
     }
 
     public HttpError<T> withMessage(String message) {

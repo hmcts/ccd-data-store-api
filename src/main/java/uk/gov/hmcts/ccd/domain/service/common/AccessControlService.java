@@ -59,7 +59,7 @@ public interface AccessControlService {
     String NO_EVENT_FOUND = "No event found";
     String NO_FIELD_FOUND = "No field found";
     String VALUE = "value";
-    String ALL_EVENTS = "*";
+    String ALL = "*";
 
     static boolean hasAccess(Set<String> userRoles,
                              Predicate<AccessControlList> criteria,
@@ -272,9 +272,9 @@ public interface AccessControlService {
                                                             CaseFieldDefinition field,
                                                             Set<AccessProfile> accessProfiles) {
         boolean isMultipartyCaseTypePresent = multipartyCaseTypes
-            .stream().anyMatch(caseType -> caseType.equals(caseTypeId));
+            .stream().anyMatch(caseType -> caseType.equals(ALL) || caseType.equalsIgnoreCase(caseTypeId));
         boolean isMultipartyEventPresent = multipartyEvents
-            .stream().anyMatch(event -> event.equals(ALL_EVENTS) || event.equals(eventId));
+            .stream().anyMatch(event -> event.equals(ALL) || event.equalsIgnoreCase(eventId));
 
         if (isMultipartyFixEnabled
             && isMultipartyCaseTypePresent && isMultipartyEventPresent
@@ -301,13 +301,16 @@ public interface AccessControlService {
                                                  CommonField caseViewField) {
         if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().forEach(childField -> {
+                boolean shouldRemoveCaseViewField = false;
+
                 if (!hasAccessControlList(accessProfiles, access, childField.getAccessControlLists())) {
                     CommonField childCaseViewField = findNestedField(caseViewField, childField.getId());
                     childCaseViewField.setDisplayContext(READONLY);
 
-                    if (shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId, caseReference, eventId,
-                        isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents,
-                        caseViewField.getId(), childField, accessProfiles)) {
+                    shouldRemoveCaseViewField = shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId, caseReference,
+                        eventId, isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents,
+                        childCaseViewField.getId(), childField, accessProfiles);
+                    if (shouldRemoveCaseViewField) {
                         caseViewField.getFieldTypeDefinition().getChildren().remove(childCaseViewField);
                     }
 
@@ -315,7 +318,8 @@ public interface AccessControlService {
                     optionalWizardPageField.ifPresent(wizardPageField ->
                         setOverrideAsReadOnlyIfNotReadOnly(wizardPageField, rootFieldId, childField));
                 }
-                if (childField.isCompoundFieldType()) {
+
+                if (!shouldRemoveCaseViewField && childField.isCompoundFieldType()) {
                     setChildrenAsReadOnlyIfNoAccess(
                         caseTypeId,
                         caseReference,
