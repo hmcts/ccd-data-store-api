@@ -69,4 +69,5 @@
 		<packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
 		<cve>CVE-2022-29885</cve>
 	</suppress>
+
 </suppressions>
