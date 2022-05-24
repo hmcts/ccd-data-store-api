@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
@@ -103,8 +104,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         LOG.error(exception.getMessage(), exception);
         appInsights.trackException(exception);
 
-        Throwable causeOfException = exception.getCause();
-        HttpStatus httpStatus = (causeOfException != null) ? getHttpStatus(causeOfException) : null;
+        Throwable targetException;
+
+        if (exception instanceof HttpStatusCodeException || exception instanceof FeignException) {
+            targetException = exception;
+        } else {
+            targetException = exception.getCause();
+        }
+
+        HttpStatus httpStatus = (targetException != null) ? getHttpStatus(targetException) : null;
 
         final HttpError<Serializable> error = new HttpError<>(httpStatus, exception, request);
 
