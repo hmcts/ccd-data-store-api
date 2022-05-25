@@ -271,7 +271,7 @@ class DefaultGetCaseViewOperationTest {
             caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\"");
             caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
             doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
-            doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), any());
+            doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class));
 
             CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
             assertNotNull(caseView);
@@ -279,17 +279,49 @@ class DefaultGetCaseViewOperationTest {
         }
 
         @Test
-        @DisplayName("should  filter event when enabling condition is not valid")
+        @DisplayName("should filter event when enabling condition is not valid")
         void shouldFilterEventWhenEnablingConditionIsNotValid() {
             CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
             caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\" AND dataTestField2=\"Test\"");
             caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
             doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
-            doReturn(false).when(caseEventEnablingService).isEventEnabled(any(), any());
+            doReturn(false).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class));
 
             CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
             assertNotNull(caseView);
             assertEquals(0, caseView.getActionableEvents().length);
+        }
+
+        @Test
+        @DisplayName("should not filter event when enabling condition is valid "
+                    + "and injected data enabling condition is not matched")
+        void shouldFilterEventWhenEnabledConditionIsValidAndInjectedDataEnablingConditionIsNotMatched() {
+            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+            caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\" AND dataTestField2=\"Test\"");
+            caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
+            doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
+            doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class));
+            doReturn(false).when(caseEventEnablingService).isEventEnabled(any(), anyList());
+
+            CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
+            assertNotNull(caseView);
+            assertEquals(1, caseView.getActionableEvents().length);
+        }
+
+        @Test
+        @DisplayName("should filter event when enabling condition is valid "
+            + "and injected data enabling condition is matched")
+        void shouldFilterEventWhenEnabledConditionIsValidAndInjectedDataEnablingConditionIsMatched() {
+            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+            caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\" AND dataTestField2=\"Test\"");
+            caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
+            doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
+            doReturn(false).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class));
+            doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), anyList());
+
+            CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
+            assertNotNull(caseView);
+            assertEquals(1, caseView.getActionableEvents().length);
         }
     }
 
