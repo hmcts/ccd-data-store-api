@@ -138,6 +138,7 @@ tasks.withType(Test) {
 }
 
 dependencies {
+    compile 'com.google.code.gson:gson:2.8.9'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.1'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.7.RELEASE'
 
@@ -295,7 +296,7 @@ dependencyManagement {
 
         // CVE-2019-0232 - Java and Command Line injections in Windows (updated to version 9.0.19)
         // CVE-2021-42340 - Memory leak (updated to version 9.0.54)
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.58') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.63') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
