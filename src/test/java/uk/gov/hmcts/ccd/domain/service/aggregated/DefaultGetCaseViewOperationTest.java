@@ -271,7 +271,7 @@ class DefaultGetCaseViewOperationTest {
             caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\"");
             caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
             doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
-            doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class));
+            doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class), anyList());
 
             CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
             assertNotNull(caseView);
@@ -285,7 +285,7 @@ class DefaultGetCaseViewOperationTest {
             caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\" AND dataTestField2=\"Test\"");
             caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
             doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
-            doReturn(false).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class));
+            doReturn(false).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class), anyList());
 
             CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
             assertNotNull(caseView);
@@ -300,8 +300,7 @@ class DefaultGetCaseViewOperationTest {
             caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\" AND dataTestField2=\"Test\"");
             caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
             doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
-            doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class));
-            doReturn(false).when(caseEventEnablingService).isEventEnabled(any(), anyList());
+            doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class), anyList());
 
             CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
             assertNotNull(caseView);
@@ -316,8 +315,7 @@ class DefaultGetCaseViewOperationTest {
             caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\" AND dataTestField2=\"Test\"");
             caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
             doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
-            doReturn(false).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class));
-            doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), anyList());
+            doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class), anyList());
 
             CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
             assertNotNull(caseView);

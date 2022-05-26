@@ -119,16 +119,15 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         caseView.setTabs(getTabs(caseDetails, caseDetails.getCaseDataAndMetadata(), caseTypeTabsDefinition));
         List<CaseViewField> metadataFields = getMetadataFields(caseTypeDefinition, caseDetails);
 
-        final List<CaseViewField> caseViewFields =
+        final List<CaseViewField> updatedMetadataFields =
             updateMetadataWithGetCaseCallbackResponse(caseTypeDefinition, caseDetails, metadataFields);
-        caseView.setMetadataFields(caseViewFields);
+        caseView.setMetadataFields(updatedMetadataFields);
 
         final CaseViewActionableEvent[] actionableEvents = caseTypeDefinition.getEvents()
             .stream()
             .filter(event -> eventTriggerService.isPreStateValid(caseStateDefinition.getId(), event))
-            .filter(event ->
-                this.caseEventEnablingService.isEventEnabled(event.getEventEnablingCondition(), caseDetails)
-                || this.caseEventEnablingService.isEventEnabled(event.getEventEnablingCondition(), caseViewFields))
+            .filter(event -> this.caseEventEnablingService.isEventEnabled(event.getEventEnablingCondition(),
+                caseDetails, updatedMetadataFields))
             .map(event -> {
                 final CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
                 caseViewActionableEvent.setId(event.getId());
