@@ -1,0 +1,68 @@
+{
+  "_guid_": "F-142_UpdateCaseToUnavailableState__Base",
+  "_extends_": "Event_Creation_Caseworker_Base_V2",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "caseId": "OVERRIDE"
+    },
+    "body": {
+      "data": {
+        "TextField": "UPDATED"
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "_links": "[[ANYTHING_PRESENT]]",
+
+      "id": "[[ANYTHING_PRESENT]]",
+
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_MasterCaseType",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "CaseUpdated",
+      "security_classification": "PUBLIC",
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null,
+
+      "data": {
+        "caseLinks":  "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][case_details][case_data][caseLinks]}",
+        "caseNameHmctsInternal":  "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][case_details][case_data][caseNameHmctsInternal]}",
+        "TextField": "UPDATED",
+        "SearchCriteria": { }
+      },
+      "data_classification": {
+        "caseLinks":  "[[ANYTHING_PRESENT]]",
+        "caseNameHmctsInternal":  "PUBLIC",
+        "TextField": "PUBLIC",
+        "SearchCriteria": "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}

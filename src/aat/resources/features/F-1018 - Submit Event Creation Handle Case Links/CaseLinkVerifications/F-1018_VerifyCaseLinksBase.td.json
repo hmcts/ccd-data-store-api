@@ -1,0 +1,27 @@
+{
+  "_guid_": "F-1018_VerifyCaseLinksBase",
+  "_extends_": "Verify_Case_Links_Base",
+
+  "users": {
+    "invokingUser": {
+    "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "CaseLinks" : [ ]
+    }
+  }
+}

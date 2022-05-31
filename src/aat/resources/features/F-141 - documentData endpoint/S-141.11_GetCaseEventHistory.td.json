@@ -1,0 +1,10 @@
+{
+	"_guid_": "S-141.11_GetCaseEventHistory",
+  "_extends_": "F-141_GetCaseEventHistory",
+
+	"request": {
+		"pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][S-141.11_CreateCase][testData][actualResponse][body][id]}"
+		}
+	}
+}

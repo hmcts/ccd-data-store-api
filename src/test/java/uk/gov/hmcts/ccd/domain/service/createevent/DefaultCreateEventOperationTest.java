@@ -1,11 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,12 +22,20 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -54,6 +57,9 @@ class DefaultCreateEventOperationTest {
     private static final Integer VERSION_NUMBER = 1;
     private static final LocalDateTime LAST_MODIFIED = LocalDateTime.of(2015, 12, 21, 15, 30);
     private static final String CALLBACK_URL = "http://sscs.reform.hmcts.net/callback";
+    private static final int CASE_VERSION = 0;
+    private static final String ATTRIBUTE_PATH = "DocumentField";
+    private static final String CATEGORY_ID = "categoryId";
 
     @Mock
     private EventValidator eventValidator;
@@ -121,6 +127,8 @@ class DefaultCreateEventOperationTest {
             .eventTrigger(caseEventDefinition)
             .build();
         given(createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent)).willReturn(caseEventResult);
+        given(createEventService.createCaseSystemEvent(anyString(), anyString(), anyString(), any(Event.class)))
+            .willReturn(caseEventResult);
     }
 
     private List<EventPostStateDefinition> getEventPostStates(String... postStateReferences) {
@@ -188,6 +196,31 @@ class DefaultCreateEventOperationTest {
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertNotNull(caseDetails);
+    }
+
+    @Test
+    @DisplayName("should invoke after submit callback case system event")
+    void shouldInvokeAfterSubmitCallbackCaseSystemEvent() {
+        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        AfterSubmitCallbackResponse response = new AfterSubmitCallbackResponse();
+        response.setConfirmationHeader("Header");
+        response.setConfirmationBody("Body");
+        doReturn(ResponseEntity.ok(response)).when(callbackInvoker)
+            .invokeSubmittedCallback(caseEventDefinition,
+                caseDetailsBefore,
+                caseDetails);
+
+        final CaseDetails caseDetails = createEventOperation.createCaseSystemEvent(CASE_REFERENCE, CASE_VERSION,
+            ATTRIBUTE_PATH, CATEGORY_ID);
+
+        assertAll(
+            () -> verify(callbackInvoker).invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore,
+                this.caseDetails),
+            () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationHeader(), is("Header")),
+            () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationBody(), is("Body")),
+            () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
+            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("CALLBACK_COMPLETED"))
+        );
     }
 
     private Map<String, JsonNode> buildJsonNodeData() {

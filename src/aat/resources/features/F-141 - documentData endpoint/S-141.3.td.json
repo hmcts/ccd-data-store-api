@@ -1,0 +1,54 @@
+{
+  "title":"Document field identified by the attributePath value does not exist in definition file, Return 400 - Bad request error",
+  "_guid_": "S-141.3",
+	"_extends_": "F-141_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD and has read access permissions for all the Document fields",
+		"a case definition with category structure exists for the case type CT1",
+    "a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1",
+    "contains the given case reference C1 in the input",
+    "contains an attributePath value as \"EvidenceDocument.document\" (non existing in definition file) in the input",
+    "contains a HTTP 400 status code"
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+	"request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-141_CreateCase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "attribute_path": "EvidenceDocument.document",
+      "case_version":  "0",
+      "category_id": "CategoryID1"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "Field 'EvidenceDocument.document' cannot be found",
+      "path" : "/documentData/caseref/${[scenarioContext][childContexts][F-141_CreateCase][testData][actualResponse][body][id]}",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
+

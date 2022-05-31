@@ -19,7 +19,7 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 /**
  * Max and Min is expressed as EPOCH.
  */
-@Named
+@Named("DateTimeValidator")
 @Singleton
 public class DateTimeValidator implements BaseTypeValidator {
     static final String TYPE_ID = "DateTime";

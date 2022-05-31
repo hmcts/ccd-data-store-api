@@ -27,8 +27,12 @@ public class MockUtils {
        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     }
 
+    public static final String ROLE_CASEWORKER = "caseworker";
+    public static final String ROLE_CASEWORKER_CAA = "caseworker-caa";
     public static final String ROLE_CASEWORKER_PUBLIC = "caseworker-probate-public";
     public static final String ROLE_CASEWORKER_PRIVATE = "caseworker-probate-private";
+    public static final String ROLE_CASEWORKER_PROBATE = "caseworker-probate";
+    public static final String ROLE_CASEWORKER_SSCS = "caseworker-sscs";
     public static final String ROLE_TEST_PUBLIC = "caseworker-test-public";
     public static final String ROLE_CITIZEN = "citizen";
     public static final String ROLE_DCP_CASEWORKER = "caseworker-dcptest1";
@@ -45,11 +49,11 @@ public class MockUtils {
             .compact();
     }
 
-    public static final void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {
+    public static void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {
         setSecurityAuthorities("aJwtToken", authenticationMock, authorities);
     }
 
-    public static final void setSecurityAuthorities(String jwtToken, Authentication authenticationMock,
+    public static void setSecurityAuthorities(String jwtToken, Authentication authenticationMock,
                                                     String... authorities) {
 
         Jwt jwt =   Jwt.withTokenValue(jwtToken)
@@ -60,10 +64,11 @@ public class MockUtils {
         when(authenticationMock.getPrincipal()).thenReturn(jwt);
 
         Collection<? extends GrantedAuthority> authorityCollection = Stream.of(authorities)
-            .map(a -> new SimpleGrantedAuthority(a))
+            .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toCollection(ArrayList::new));
 
         when(authenticationMock.getAuthorities()).thenAnswer(invocationOnMock -> authorityCollection);
 
     }
+
 }

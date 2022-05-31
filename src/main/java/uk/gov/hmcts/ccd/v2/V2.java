@@ -68,6 +68,7 @@ public final class V2 {
     }
 
     public final class Error {
+
         private Error() {
         }
 
@@ -118,5 +119,6 @@ public final class V2 {
         public static final String UNAUTHORISED_S2S_SERVICE = "Unauthorised S2S service";
         public static final String CASE_TYPE_INVALID = "Case Type Id is not valid";
         public static final String DATE_STRING_INVALID = "Invalid date sent to search case query ";
+        public static final String PARAM_NOT_NUM = "Parameter is not numeric";
     }
 }

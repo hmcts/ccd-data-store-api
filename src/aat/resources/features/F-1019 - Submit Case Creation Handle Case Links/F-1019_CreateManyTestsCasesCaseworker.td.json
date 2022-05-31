@@ -1,0 +1,15 @@
+{
+  "_guid_": "F-1019_CreateManyTestsCasesCaseworker",
+  "_extends_": "F-1019_CreateCasePreRequisiteCaseworkerBase",
+
+  "specs": [
+    "to create many cases to link to"
+  ],
+
+  "prerequisites" : [ {
+    "CaseLinkedViaCollection": "F-1019_CreateCasePreRequisiteCaseworkerBase",
+    "CaseLinkedViaStandardCaseLinksField": "F-1019_CreateCasePreRequisiteCaseworkerBase",
+    "CaseLinkedViaBothCollectionAndStandardCaseLinksField": "F-1019_CreateCasePreRequisiteCaseworkerBase"
+  } ]
+
+}

@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-142_GetUpdateToken_MasterCaseType_NoAccessCase1",
+  "_extends_": "F-142_GetUpdateToken_MasterCaseType__Base",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][siblingContexts][NoAccessCase1][testData][actualResponse][body][id]}"
+    }
+  }
+}
