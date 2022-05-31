@@ -1,5 +1,5 @@
 #===================================================
-@F-047 #Find case ids to which an user has access to
+@F-047 @Ignore #Find case ids to which an user has access to
 Feature: F-047: Get case ids
 #===================================================
 
