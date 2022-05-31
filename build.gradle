@@ -284,6 +284,7 @@ dependencies {
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
     contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
+    contractTestCompile group: 'io.vavr', name: 'vavr', version: '0.10.4'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.1'
     contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: '5.6.1'
