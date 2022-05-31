@@ -139,8 +139,8 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
             context.setTarget(new HttpTestTarget("localhost", 8123, "/"));
         }
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
-         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
-         when(userAuthorisation.getUserId()).thenReturn("userId");
+        when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
+        when(userAuthorisation.getUserId()).thenReturn("userId");
     }
 
     @State("adoption-web makes request to get cases")
@@ -186,7 +186,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Read for a Caseworker is requested"})
     public void toReadForCaseworker(Map<String, Object> dataMap) {
-         toGetACase(dataMap);
+        toGetACase(dataMap);
     }
 
     @State({"A Search for cases is requested"})
@@ -238,7 +238,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Submit Event for a Citizen is requested"})
     public void toSubmitEventForACitizen(Map<String, Object> dataMap) {
-         toSubmitEventForACaseworker(dataMap);
+        toSubmitEventForACaseworker(dataMap);
     }
 
     @State({"A Submit for a Caseworker is requested"})
