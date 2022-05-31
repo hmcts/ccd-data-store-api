@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -15,6 +16,8 @@ import uk.gov.hmcts.reform.idam.client.models.AuthenticateUserRequest;
 import uk.gov.hmcts.reform.idam.client.models.AuthenticateUserResponse;
 import uk.gov.hmcts.reform.idam.client.models.ExchangeCodeRequest;
 import uk.gov.hmcts.reform.idam.client.models.TokenExchangeResponse;
+import uk.gov.hmcts.reform.idam.client.models.TokenRequest;
+import uk.gov.hmcts.reform.idam.client.models.TokenResponse;
 
 import java.util.Base64;
 import java.util.HashMap;
@@ -86,10 +89,10 @@ public class ContractTestSecurityUtils extends SecurityUtils {
     }
 
     private void setAuthenticationOnSecurityContext(String caseworkerUserName, String caseworkerPassword) {
-    //    SecurityContextHolder.getContext()
-    //        .setAuthentication(
-    //            new UsernamePasswordAuthenticationToken(caseworkerUserName, getCaseworkerToken(caseworkerUserName,
-    //                caseworkerPassword)));
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(caseworkerUserName, getCaseworkerToken(caseworkerUserName,
+                    caseworkerPassword)));
     }
 
     private String getCaseworkerToken(String caseworkerUserName, String caseworkerPassword) {
@@ -101,20 +104,21 @@ public class ContractTestSecurityUtils extends SecurityUtils {
 
         log.info("Client ID: {} . Authenticating...", authClientId);
 
-        AuthenticateUserResponse authenticateUserResponse = idamClient.authenticateUser(
-            basicAuthHeader, new AuthenticateUserRequest(CODE, authClientId, authRedirectUrl)
-        );
+        TokenRequest tokenRequest = new TokenRequest(authClientId, authClientSecret,
+            AUTHORIZATION_CODE, authRedirectUrl, "userName", "password", "scope", "", CODE);
 
-        log.info("Authenticated. Exchanging...");
-        TokenExchangeResponse tokenExchangeResponse = idamClient.exchangeCode(
-            new ExchangeCodeRequest(authenticateUserResponse.getCode(),
-                AUTHORIZATION_CODE,
-                authRedirectUrl,
-                authClientId,
-                authClientSecret));
+        TokenResponse authenticateUserResponse = idamClient.generateOpenIdToken(tokenRequest);
+
+//        log.info("Authenticated. Exchanging...");
+//        TokenExchangeResponse tokenExchangeResponse = idamClient.exchangeCode(
+//            new ExchangeCodeRequest("",
+//                AUTHORIZATION_CODE,
+//                authRedirectUrl,
+//                authClientId,
+//                authClientSecret));
 
         log.info("Getting AccessToken...");
-        return tokenExchangeResponse.getAccessToken();
+        return authenticateUserResponse.accessToken;
     }
 
     private String getBasicAuthHeader(String username, String password) {
