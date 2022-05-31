@@ -109,14 +109,6 @@ public class ContractTestSecurityUtils extends SecurityUtils {
 
         TokenResponse authenticateUserResponse = idamClient.generateOpenIdToken(tokenRequest);
 
-//        log.info("Authenticated. Exchanging...");
-//        TokenExchangeResponse tokenExchangeResponse = idamClient.exchangeCode(
-//            new ExchangeCodeRequest("",
-//                AUTHORIZATION_CODE,
-//                authRedirectUrl,
-//                authClientId,
-//                authClientSecret));
-
         log.info("Getting AccessToken...");
         return authenticateUserResponse.accessToken;
     }
