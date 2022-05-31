@@ -1,0 +1,55 @@
+{
+  "_guid_": "S-1018.31",
+  "_extends_": "F-1018_Test_Data_Base_V2",
+
+  "title": "Case Link does not exist at present and CaseLink field in the Request contains CaseReference value and Submit Event Creation is invoked on v2_external#/case-controller/createEventUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCaseworkerBase",
+    "specifying the case to be updated, as created in F-1018_CreateAnotherCasePreRequisiteCaseworkerBase, does not contain a CaseLink field"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "TextField": "This is a text field",
+        "CaseLinkField": {
+          "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+        }
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetUpdateEventToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id": "${}${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+      "data" : {
+        "TextField": "This is a text field",
+        "CaseLinkField" : {
+          "CaseReference" : "${}${[scenarioContext][childContexts][F-1018_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+        }
+      },
+      "data_classification" : {
+        "TextField": "PUBLIC",
+        "CaseLinkField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseReference" : "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}

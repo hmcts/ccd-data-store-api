@@ -1,0 +1,28 @@
+{
+  "_guid_": "F-1017_CreateSuspendedCasePreRequisiteCitizen",
+  "_extends_": "F-1015_CreateCasePreRequisiteCitizen",
+
+  "request": {
+    "body": {
+      "data": {
+        "TTL": {
+          "Suspended": "Yes",
+          "OverrideTTL": "2010-04-30",
+          "SystemTTL": "2010-04-30"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "TTL": {
+          "Suspended": "Yes",
+          "OverrideTTL": "2010-04-30",
+          "SystemTTL": "2010-04-30"
+        }
+      }
+    }
+  }
+}

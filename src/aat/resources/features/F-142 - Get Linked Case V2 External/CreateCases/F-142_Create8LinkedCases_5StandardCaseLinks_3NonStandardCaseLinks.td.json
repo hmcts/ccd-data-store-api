@@ -1,0 +1,32 @@
+{
+  "_guid_": "F-142_Create8LinkedCases_5StandardCaseLinks_3NonStandardCaseLinks",
+  "_extends_": "Health__Base",
+
+  "specs": [
+    "to create 5 standard linked case and 3 non standard case links, with basic access for test account"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "StandardCaseLink1": "F-142_CreateLinkedCase_StandardCaseLink",
+
+      "NonStandardCaseLink1": "F-142_CreateLinkedCase_NonStandardCaseLink",
+
+      "StandardCaseLink2": "F-142_CreateLinkedCase_StandardCaseLink",
+      "StandardCaseLink3": "F-142_CreateLinkedCase_StandardCaseLink",
+
+      "NonStandardCaseLink2": "F-142_CreateLinkedCase_NonStandardCaseLink",
+      "NonStandardCaseLink3": "F-142_CreateLinkedCase_NonStandardCaseLink",
+
+      "StandardCaseLink4": "F-142_CreateLinkedCase_StandardCaseLink",
+      "StandardCaseLink5": "F-142_CreateLinkedCase_StandardCaseLink"
+    }
+  ]
+
+}

@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -52,6 +53,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private final CallbackInvoker callbackInvoker;
     private final UIDService uidService;
     private final CaseDataService caseDataService;
+    private final TimeToLiveService timeToLiveService;
 
     @Autowired
     public DefaultStartEventOperation(final EventTokenService eventTokenService,
@@ -65,7 +67,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                       final UserAuthorisation userAuthorisation,
                                       final CallbackInvoker callbackInvoker,
                                       final UIDService uidService,
-                                      final CaseDataService caseDataService) {
+                                      final CaseDataService caseDataService,
+                                      final TimeToLiveService timeToLiveService) {
 
         this.eventTokenService = eventTokenService;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -77,6 +80,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
         this.callbackInvoker = callbackInvoker;
         this.uidService = uidService;
         this.caseDataService = caseDataService;
+        this.timeToLiveService = timeToLiveService;
     }
 
     @Transactional
@@ -122,6 +126,10 @@ public class DefaultStartEventOperation implements StartEventOperation {
             mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
         }
 
+        Map<String, JsonNode> caseDataWithTtl
+            = timeToLiveService.updateCaseDetailsWithTTL(caseDetails.getData(), caseEventDefinition);
+        caseDetails.setData(caseDataWithTtl);
+
         final String eventToken = eventTokenService.generateToken(uid,
             caseDetails,
             caseEventDefinition,
@@ -129,6 +137,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
             caseTypeDefinition);
 
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, ignoreWarning);
+
+        timeToLiveService.verifyTTLContentNotChanged(caseDataWithTtl, caseDetails.getData());
 
         return buildStartEventTrigger(eventId, eventToken, caseDetails);
 

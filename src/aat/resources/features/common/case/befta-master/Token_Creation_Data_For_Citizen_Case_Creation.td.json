@@ -1,0 +1,22 @@
+{
+	"_guid_": "Token_Creation_Data_For_Citizen_Case_Creation",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation process to update a case as Citizen",
+
+  "method": "GET",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+
+  "specs": [
+    "to get an update event token for the case just created as a Citizen"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "etid": "OVERRIDE"
+    }
+  }
+}

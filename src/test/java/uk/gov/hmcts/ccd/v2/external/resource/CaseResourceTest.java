@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -91,8 +92,8 @@ class CaseResourceTest {
             final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
                     new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails);
 
-            Optional<Link> self = caseResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(linkSelf));
+            final Optional<Link> self = caseResource.getLink("self");
+            self.ifPresent(link -> assertThat(link.getHref(), endsWith(linkSelf)));
         }
     }
 
@@ -134,8 +135,8 @@ class CaseResourceTest {
             final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
                     new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent);
 
-            Optional<Link> self = caseResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(linkSelf));
+            final Optional<Link> self = caseResource.getLink("self");
+            self.ifPresent(link -> assertThat(link.getHref(), endsWith(linkSelf)));
         }
     }
 
@@ -180,8 +181,8 @@ class CaseResourceTest {
                     new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent,
                             IGNORE_WARNING);
 
-            Optional<Link> self = caseResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(linkSelf));
+            final Optional<Link> self = caseResource.getLink("self");
+            self.ifPresent(link -> assertThat(link.getHref(), endsWith(linkSelf)));
         }
     }
 
