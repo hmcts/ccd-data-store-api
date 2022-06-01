@@ -1,0 +1,52 @@
+{
+  "_guid_": "S-1018.29",
+  "_extends_": "F-1018_Test_Data_Base_Negative_Citizen",
+
+  "title": "Case Link does not exist at present and CaseLink field in the Request contains CaseReference value but Invalid Case data and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCitizenBase",
+    "CaseLink field has a valid reference",
+    "Case data is invalid"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+        },
+        "TextField" : 1
+      },
+      "event": {
+        "id": "updateCaseCitizen",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetCitizenUpdateEventToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "message" : "Case data validation failed",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : {
+        "field_errors" : [ {
+          "id" : "TextField",
+          "message" : "number is not a string"
+        } ]
+      },
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "title": "should retrieve case links for a specified case reference",
+  "_guid_": "F-1018_VerifyRemovedCaseLinks",
+  "_extends_": "F-1018_VerifyBlankCaseLinks",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    }
+  }
+}

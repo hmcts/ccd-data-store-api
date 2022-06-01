@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -62,6 +63,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final DraftGateway draftGateway;
     private final CasePostStateService casePostStateService;
     private final CaseDataIssueLogger caseDataIssueLogger;
+    private final CaseLinkService caseLinkService;
     private final GlobalSearchProcessorService globalSearchProcessorService;
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
@@ -84,7 +86,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final GlobalSearchProcessorService globalSearchProcessorService,
                                       @Qualifier("default")
                                               SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
-                                      SupplementaryDataUpdateRequestValidator supplementaryDataValidator) {
+                                      SupplementaryDataUpdateRequestValidator supplementaryDataValidator,
+                                      final CaseLinkService caseLinkService) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.eventTriggerService = eventTriggerService;
@@ -101,6 +104,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.globalSearchProcessorService = globalSearchProcessorService;
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.supplementaryDataValidator = supplementaryDataValidator;
+        this.caseLinkService = caseLinkService;
     }
 
     @Transactional
@@ -164,6 +168,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                                                               ignoreWarning);
 
         submittedCallback(caseEventDefinition, savedCaseDetails);
+
+        caseLinkService.updateCaseLinks(savedCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
         deleteDraft(caseDataContent, savedCaseDetails);
 

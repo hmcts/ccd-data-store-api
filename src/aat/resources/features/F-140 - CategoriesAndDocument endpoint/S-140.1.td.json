@@ -1,0 +1,42 @@
+{
+	"_guid_": "S-140.1",
+	"_extends_": "F-140_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD",
+		"contains a Non-extant case reference in the input",
+    "contains a HTTP 404 \"001 Non-extant case\""
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+	"request": {
+		"_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "4444333322221111"
+    }
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_404_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case found",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+	}
+}
+

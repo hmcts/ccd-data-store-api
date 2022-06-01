@@ -1,0 +1,174 @@
+[
+  {
+    "metadata": false,
+    "id": "state",
+    "case_type_id": "MoneyClaimTest",
+    "label": "Collection of Complex Type with Collection of Complex Type containing Document",
+    "hint_text": null,
+    "field_type": {
+      "id": "state-8e35d28d-8537-4af3-b346-7343de704ce8",
+      "type": "Collection",
+      "min": null,
+      "max": null,
+      "regular_expression": null,
+      "fixed_list_items": [],
+      "complex_fields": [],
+      "collection_field_type": {
+        "id": "Applicant",
+        "type": "Complex",
+        "min": null,
+        "max": null,
+        "regular_expression": null,
+        "fixed_list_items": [],
+        "complex_fields": [
+          {
+            "metadata": false,
+            "id": "partyName",
+            "case_type_id": null,
+            "label": "Applicant name",
+            "hint_text": null,
+            "field_type": {
+              "id": "Text",
+              "type": "Text",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": null
+            },
+            "hidden": null,
+            "security_classification": "PUBLIC",
+            "live_from": null,
+            "live_until": null,
+            "acls": null,
+            "complexACLs": [],
+            "order": null,
+            "show_condition": null,
+            "display_context_parameter": null,
+            "retain_hidden_value": null
+          },
+          {
+            "metadata": false,
+            "id": "partyDetailsLabel",
+            "case_type_id": null,
+            "label": "**Claimant details**",
+            "hint_text": null,
+            "field_type": {
+              "id": "Label",
+              "type": "Label",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": null
+            },
+            "hidden": null,
+            "security_classification": "PUBLIC",
+            "live_from": null,
+            "live_until": null,
+            "acls": null,
+            "complexACLs": [],
+            "order": null,
+            "show_condition": null,
+            "display_context_parameter": null,
+            "retain_hidden_value": null
+          },
+          {
+            "metadata": false,
+            "id": "partyDetail",
+            "case_type_id": null,
+            "label": "Claimant details",
+            "hint_text": null,
+            "field_type": {
+              "id": "partyDetail-64ade9d1-ea83-45e1-b984-a0d01c46425a",
+              "type": "Collection",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": {
+                "id": "EvidenceRow",
+                "type": "Complex",
+                "min": null,
+                "max": null,
+                "regular_expression": null,
+                "fixed_list_items": [],
+                "complex_fields": [
+                  {
+                    "metadata": false,
+                    "id": "type",
+                    "case_type_id": null,
+                    "label": "Document",
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Document",
+                      "type": "Document",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "hidden": null,
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "acls": null,
+                    "complexACLs": [],
+                    "order": null,
+                    "show_condition": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": null
+                  },
+                  {
+                    "metadata": false,
+                    "id": "description",
+                    "case_type_id": null,
+                    "label": "Evidence Description",
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "hidden": null,
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "acls": null,
+                    "complexACLs": [],
+                    "order": null,
+                    "show_condition": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": null
+                  }
+                ],
+                "collection_field_type": null
+              }
+            },
+            "hidden": null,
+            "security_classification": "PUBLIC",
+            "live_from": null,
+            "live_until": null,
+            "acls": null,
+            "complexACLs": [],
+            "order": null,
+            "show_condition": null,
+            "display_context_parameter": null,
+            "retain_hidden_value": null
+          }
+        ],
+        "collection_field_type": null
+      }
+    }
+  }
+]

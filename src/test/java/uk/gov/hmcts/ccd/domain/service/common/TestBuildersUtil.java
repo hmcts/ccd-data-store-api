@@ -837,6 +837,11 @@ public class TestBuildersUtil {
             caseEventDefinition.setShowEventNotes(showEventNotes);
             return this;
         }
+
+        public CaseEventBuilder withTTLIncrement(Integer ttlIncrement) {
+            caseEventDefinition.setTtlIncrement(ttlIncrement);
+            return this;
+        }
     }
 
     public static class CaseEventFieldDefinitionBuilder {

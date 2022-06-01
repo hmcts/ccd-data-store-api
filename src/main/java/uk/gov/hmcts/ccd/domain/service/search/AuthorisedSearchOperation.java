@@ -1,11 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.google.common.collect.Lists;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -17,10 +12,17 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation.QUALIFIER;
@@ -37,7 +39,8 @@ public class AuthorisedSearchOperation implements SearchOperation {
     private final AuthorisedCaseDefinitionDataService caseDefinitionDataService;
 
     @Autowired
-    public AuthorisedSearchOperation(@Qualifier("classified") final SearchOperation searchOperation,
+    public AuthorisedSearchOperation(@Qualifier(ClassifiedSearchOperation.QUALIFIER)
+                                         final SearchOperation searchOperation,
                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                          final CaseDefinitionRepository caseDefinitionRepository,
                                      final AccessControlService accessControlService,
@@ -52,11 +55,20 @@ public class AuthorisedSearchOperation implements SearchOperation {
 
     @Override
     public List<CaseDetails> execute(MetaData metaData, Map<String, String> criteria) {
-
         final List<CaseDetails> results = searchOperation.execute(metaData, criteria);
-        CaseTypeDefinition caseTypeDefinition = getCaseType(metaData.getCaseTypeId());
+        return filterResults(results, metaData.getCaseTypeId());
+    }
+
+    @Override
+    public List<CaseDetails> execute(MigrationParameters migrationParameters) {
+        final List<CaseDetails> results = searchOperation.execute(migrationParameters);
+        return filterResults(results, migrationParameters.getCaseTypeId());
+    }
+
+    private List<CaseDetails> filterResults(List<CaseDetails> results, String caseTypeId) {
+        CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
         if (results == null
-            || caseDefinitionDataService.getAuthorisedCaseType(metaData.getCaseTypeId(), CAN_READ).isEmpty()) {
+            || caseDefinitionDataService.getAuthorisedCaseType(caseTypeId, CAN_READ).isEmpty()) {
             return Lists.newArrayList();
         }
 
