@@ -1,0 +1,56 @@
+{
+  "_guid_": "S-1019.13",
+  "_extends_": "F-1019_Test_Data_Base_Error_Response_V2",
+
+  "title": "CaseLink field contains Invalid CaseReference value and Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST",
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1019_GetCreateToken"
+  }
+  ],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured CaseLink field with Invalid Case Reference",
+    "has the 422 return code"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": "7247798054644494"
+        },
+        "TextField" : "S-1019.13"
+      },
+      "event": {
+        "id": "createCaseCaseLinks",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "error" : "Unprocessable Entity",
+      "message" : "Case data validation failed",
+      "path" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "details" : {
+        "field_errors": [
+          {
+            "id": "CaseLinkField.CaseReference",
+            "message": "7247798054644494 does not correspond to an existing CCD case."
+          }
+        ]
+      },
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

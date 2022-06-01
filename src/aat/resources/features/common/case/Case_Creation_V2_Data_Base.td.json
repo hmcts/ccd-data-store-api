@@ -1,0 +1,47 @@
+{
+	"_guid_": "Case_Creation_V2_Data_Base",
+  "_extends_": "Case_Creation_V2_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+		"headers": {
+      "Content-Type": "application/json;charset=UTF-8",
+      "experimental": true
+		},
+		"body": {
+			"event": {
+				"id": "CREATE",
+				"summary": "",
+				"description": ""
+			},
+			"ignore_warning": false,
+			"draft_id": null
+		}
+	},
+
+	"expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Transfer-Encoding" : "chunked"
+    },
+    "body": {
+      "id" : "[[ANYTHING_PRESENT]]",
+      "created_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "state" : "TODO",
+      "security_classification" : "PUBLIC",
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+	}
+}

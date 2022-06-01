@@ -1,0 +1,30 @@
+{
+	"title": "should create an event token for correct inputs",
+	"_guid_": "F-1018-GetMultipleLinkedCaseUpdateEventToken",
+  "_extends_": "Token_Creation_Data_For_Master_Caseworker_Case_Creation",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+	"request": {
+		"pathVariables": {
+			"cid": "${[scenarioContext][siblingContexts][F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+		}
+	},
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": "[[ANYTHING_PRESENT]]",
+      "event_id": "updateCase"
+    }
+  }
+}

@@ -10,7 +10,6 @@ import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.applicationinsights.TelemetryClient;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +33,8 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedC
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+
+import java.util.Map;
 
 @ExtendWith(SpringExtension.class)
 @Provider("ccdDataStoreAPI_Cases")
@@ -133,6 +134,34 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
         // when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         // when(userAuthorisation.getUserId()).thenReturn("userId");
+    }
+
+    @State("adoption-web makes request to get cases")
+    public void adoptionWebToGetCases(Map<String, Object> dataMap) {
+    }
+
+    @State("adoption-web makes request to send case event")
+    public void adoptionWebToSendCaseEvent(Map<String, Object> dataMap) {
+    }
+
+    @State("adoption-web makes request to get citizen-create-application event token")
+    public void adoptionWebToGetCitizenCreateEventToken(Map<String, Object> dataMap) {
+    }
+
+    @State("adoption-web makes request to get case by id")
+    public void adoptionWebToGetCaseById(Map<String, Object> dataMap) {
+    }
+
+    @State("adoption-web makes request to create case")
+    public void adoptionWebToCreateCase(Map<String, Object> dataMap) {
+    }
+
+    @State("adoption-web makes request to get case-users roles")
+    public void adoptionWebToGetCaseUsersRoles(Map<String, Object> dataMap) {
+    }
+
+    @State("adoption-web makes request to get citizen-update-application event token")
+    public void adoptionWebToGetCitizenUpdateEventToken(Map<String, Object> dataMap) {
     }
 
     @State({"A Get Case is requested"})

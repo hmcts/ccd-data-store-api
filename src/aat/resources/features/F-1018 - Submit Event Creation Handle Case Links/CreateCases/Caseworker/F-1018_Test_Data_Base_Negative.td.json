@@ -1,0 +1,18 @@
+{
+	"_guid_": "F-1018_Test_Data_Base_Negative",
+  "_extends_": "Event_Creation_Caseworker_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "headers" : {
+      "Content-Encoding" : "gzip",
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
