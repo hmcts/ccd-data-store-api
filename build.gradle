@@ -788,10 +788,12 @@ task smoke() {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
 
-    new File("$buildDir/test-results/test").mkdirs()
+    // Copy dummy test result file to location expected by pipeline.  This needs to be done because
+    // BEFTA tests are used for smoke tests which create test result files in a different location.
+    new File("$buildDir/test-results/smoke").mkdirs()
     copy {
         from "src/aat/resources/DummyTest.xml"
-        into "$buildDir/test-results/test"
+        into "$buildDir/test-results/smoke"
     }
 
     doLast {
@@ -822,10 +824,13 @@ task smoke() {
 task functional() {
     description = 'Executes functional tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
-    new File("$buildDir/test-results/test").mkdirs()
+
+    // Copy dummy test result file to location expected by pipeline.  This needs to be done because
+    // BEFTA tests are used for functional tests which create test result files in a different location.
+    new File("$buildDir/test-results/functional").mkdirs()
     copy {
         from "src/aat/resources/DummyTest.xml"
-        into "$buildDir/test-results/test"
+        into "$buildDir/test-results/functional"
     }
 
     doFirst {
