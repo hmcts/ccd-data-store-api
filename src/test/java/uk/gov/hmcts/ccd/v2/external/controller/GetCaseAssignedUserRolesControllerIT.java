@@ -9,6 +9,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -28,6 +30,9 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.userRoleAssignmentJson
 import static uk.gov.hmcts.ccd.v2.V2.Error.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED;
 
 class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesControllerIT {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GetCaseAssignedUserRolesControllerIT.class);
+    private static final int TEST_RUN = 1;
 
     // AC-1
     @Test
@@ -57,6 +62,7 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertNotNull("Case Assigned User Roles should not be null", caseAssignedUserRolesResource);
 
         verifyAuditForGetCaseUserRoles(HttpStatus.OK, CASE_IDS, USER_IDS);
+        LOG.debug("getUserCaseRolesAssignedToUser PASS (" + TEST_RUN + ")");
     }
 
     // AC-2
@@ -96,6 +102,7 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertEquals("[CREATOR]", caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0).getCaseRole());
 
         verifyAuditForGetCaseUserRoles(HttpStatus.OK, CASE_IDS, USER_IDS_1);
+        LOG.debug("shouldGetSelfCaseUserRolesAssigned PASS (" + TEST_RUN + ")");
     }
 
     // AC-3
@@ -146,6 +153,8 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
                     hasProperty("caseRole", Matchers.is("[DEFENDANT]"))))));
 
         verifyAuditForGetCaseUserRoles(HttpStatus.OK, CASE_ID_2, null);
+        LOG.debug("shouldGetAllUserCaseRolesRelatingToAllUsersWhenNoUserIDPassedForPassedCaseId PASS ("
+            + TEST_RUN + ")");
     }
 
     // AC-4
@@ -193,6 +202,8 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
                     hasProperty("caseRole", Matchers.is("[DEFENDANT]"))))));
 
         verifyAuditForGetCaseUserRoles(HttpStatus.OK, CASE_IDS, null);
+        LOG.debug("shouldGetAllUserCaseRolesRelatingToAllUsersWhenNoUserIDPassedForListOfCaseIds PASS ("
+            + TEST_RUN + ")");
     }
 
     // AC-5
@@ -212,6 +223,7 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(V2.Error.EMPTY_CASE_ID_LIST));
 
         verifyAuditForGetCaseUserRoles(HttpStatus.BAD_REQUEST, null, USER_IDS);
+        LOG.debug("shouldThrowExceptionWhenEmptyCaseIDListPassed PASS (" + TEST_RUN + ")");
     }
 
     @Test
@@ -243,6 +255,7 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(V2.Error.CASE_ID_INVALID));
 
         verifyAuditForGetCaseUserRoles(HttpStatus.BAD_REQUEST, INVALID_CASE_ID.toString(), USER_IDS);
+        LOG.debug("shouldThrowExceptionWhenInvalidCaseIDIsPassed PASS (" + TEST_RUN + ")");
     }
 
     // AC-7
@@ -262,6 +275,7 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(V2.Error.USER_ID_INVALID));
 
         verifyAuditForGetCaseUserRoles(HttpStatus.BAD_REQUEST, CASE_IDS, INVALID_USER_IDS);
+        LOG.debug("shouldThrowExceptionWhenInvalidUserIdDataPassed PASS (" + TEST_RUN + ")");
     }
 
     // AC-8
@@ -281,6 +295,7 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED));
 
         verifyAuditForGetCaseUserRoles(HttpStatus.FORBIDDEN, CASE_IDS, USER_IDS.replace(" ", ""));
+        LOG.debug("shouldThrowExceptionWhenInvokingUserHasNoPrivileges PASS (" + TEST_RUN + ")");
     }
 
     @Test
@@ -299,5 +314,7 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED));
 
         verifyAuditForGetCaseUserRoles(HttpStatus.FORBIDDEN, CASE_IDS, USER_IDS);
+        LOG.debug("shouldThrowExceptionWhenUserRequestedForSelfCaseRoleAccessAlongWithOtherUsers PASS ("
+            + TEST_RUN + ")");
     }
 }
