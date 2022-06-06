@@ -1,0 +1,81 @@
+{
+  "title": "should retrieve case links for a specified case reference",
+  "_guid_": "F-1018_VerifyMultipleCaseLinksUsingStandardLinkField_Caseworker",
+  "_extends_": "Verify_Case_Links_Base",
+
+  "specs": [
+    "to verify that the Case Links have been created in the CASE_LINK table with correct values"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "CaseLinks": [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "LinkedCaseReference"
+        },
+        {
+          "CaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}",
+          "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][childContexts][CaseLinkedViaSimpleField][testData][actualResponse][body][id]}",
+          "CaseTypeId": "FT_MasterCaseType",
+          "StandardLink": false
+        },
+        {
+          "CaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}",
+          "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][childContexts][CaseLinkedViaCollection][testData][actualResponse][body][id]}",
+          "CaseTypeId": "FT_MasterCaseType",
+          "StandardLink": false
+        },
+        {
+          "CaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}",
+          "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][childContexts][CaseLinkedViaStandardCaseLinksField][testData][actualResponse][body][id]}",
+          "CaseTypeId": "FT_MasterCaseType",
+          "StandardLink": true
+        },
+        {
+          "CaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}",
+          "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][childContexts][CaseLinkedViaBothCollectionAndStandardCaseLinksField][testData][actualResponse][body][id]}",
+          "CaseTypeId": "FT_MasterCaseType",
+          "StandardLink": true
+        },
+
+        {
+          "CaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}",
+          "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][childContexts][CaseLinkedToMigrateToStandardCaseLinksField][testData][actualResponse][body][id]}",
+          "CaseTypeId": "FT_MasterCaseType",
+          "StandardLink": true
+        },
+        {
+          "CaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}",
+          "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][childContexts][CaseLinkedToMigrateFromStandardCaseLinksField][testData][actualResponse][body][id]}",
+          "CaseTypeId": "FT_MasterCaseType",
+          "StandardLink": false
+        },
+
+        {
+          "CaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}",
+          "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][childContexts][CaseLinkedToAddToStandardCaseLinksField][testData][actualResponse][body][id]}",
+          "CaseTypeId": "FT_MasterCaseType",
+          "StandardLink": true
+        }
+      ]
+    }
+  }
+}

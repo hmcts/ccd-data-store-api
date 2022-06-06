@@ -1,0 +1,55 @@
+{
+  "_guid_": "S-1019.12",
+  "_extends_": "F-1019_Test_Data_Base_V2",
+
+  "title": "CaseLink field contains blank value and Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST",
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1019_GetCreateToken"
+  }
+  ],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains blank/null value in the CaseLink field"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": ""
+        },
+        "TextField" : "S-1019.12"
+      },
+      "event": {
+        "id": "createCaseCaseLinks",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "data" : {
+        "TextField" : "S-1019.12",
+        "CaseLinkField" : {
+          "CaseReference" : ""
+        }
+      },
+      "data_classification" : {
+        "TextField" : "PUBLIC",
+        "CaseLinkField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseReference" : "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}

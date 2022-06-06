@@ -1,0 +1,33 @@
+{
+  "_guid_": "S-142.7",
+  "_extends_": "Get_Linked_Cases__Base",
+  "title": "should get 404 when case reference is not supplied",
+
+  "specs": [
+    "an active profile in CCD",
+
+    "does not contain a case reference",
+
+    "contains an HTTP-404 Bad Request"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": ""
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "message": "No message available",
+      "path": "/getLinkedCases/"
+    }
+  }
+}

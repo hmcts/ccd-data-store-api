@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-142.1",
+  "_extends_": "Get_Linked_Cases__Base",
+  "title": "should get 400 when case reference invalid",
+
+  "specs": [
+    "an active profile in CCD",
+
+    "contains an invalid case reference",
+
+    "contains an HTTP-400 Bad Request"
+  ],
+
+  "users": {
+    "invokingUser": {
+    "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "abc"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message": "Case ID is not valid",
+      "path": "/getLinkedCases/abc",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

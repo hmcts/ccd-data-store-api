@@ -1,7 +1,7 @@
 {
   "title": "Successfully creates a case with wrong data type for Date fields using V2: /case-types/{caseTypeId}/cases endpoint",
   "_guid_": "S-1004.9",
-  "_extends_": "Case_Creation_V2_Base",
+  "_extends_": "Case_Creation_V2_Data_Base",
   "specs": [
     "an active profile in CCD",
     "contains a Text value for the Date fields",

@@ -1,0 +1,54 @@
+{
+  "title":"Field specified in the attributePath value exists in definition file but it is not a Document type field, Return 400 - Non Document field",
+  "_guid_": "S-141.4",
+	"_extends_": "F-141_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD and has read access permissions for all the Document fields",
+		"a case definition with category structure exists for the case type CT1",
+    "a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1",
+    "contains the given case reference C1 in the input",
+    "contains an attributePath value as \"ApplicantName\" (non Document Type field) in the input",
+    "contains a HTTP 400 status code"
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+	"request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-141_CreateCase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "attribute_path": "ApplicantName",
+      "case_version":  "0",
+      "category_id": "CategoryID1"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "Field denoted by path: 'ApplicantName' is not a document field type",
+      "path" : "/documentData/caseref/${[scenarioContext][childContexts][F-141_CreateCase][testData][actualResponse][body][id]}",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
+

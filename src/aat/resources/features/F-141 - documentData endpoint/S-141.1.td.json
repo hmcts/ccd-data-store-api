@@ -1,0 +1,50 @@
+{
+	"_guid_": "S-141.1",
+	"_extends_": "F-141_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD",
+		"contains a Non-extant case reference in the input",
+    "contains a HTTP 404 status code"
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+	"request": {
+		"_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "1648717404042371"
+    },
+    "body":{
+      "attribute_path": "CollectionDocumentField",
+      "case_version": 2,
+      "category_id": null
+    }
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_404_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "status": 404,
+      "error": "Not Found",
+      "message": "No case found",
+      "path": "/documentData/caseref/1648717404042371",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+	}
+}
+
