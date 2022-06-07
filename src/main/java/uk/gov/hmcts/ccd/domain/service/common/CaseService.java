@@ -52,7 +52,7 @@ public class CaseService {
      */
     public String hashData(CaseDetails caseDetails) {
         final JsonNode jsonData = JacksonUtils.convertValueJsonNode(caseDetails.getData());
-        return DigestUtils.sha1Hex(jsonData.toString());
+        return DigestUtils.sha256Hex(jsonData.toString());
     }
 
     /**
