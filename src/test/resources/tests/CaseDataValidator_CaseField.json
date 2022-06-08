@@ -52,7 +52,6 @@
       }
     }
   },
-
   {
     "id": "OtherAddresses",
     "case_type_id": "TestAddressBookCase",

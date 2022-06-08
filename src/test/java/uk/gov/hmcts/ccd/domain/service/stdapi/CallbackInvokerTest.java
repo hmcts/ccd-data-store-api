@@ -25,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
@@ -84,6 +85,9 @@ class CallbackInvokerTest {
     private CaseTypeService caseTypeService;
 
     @Mock
+    private TimeToLiveService timeToLiveService;
+
+    @Mock
     private CaseDataService caseDataService;
 
     @Mock
@@ -132,7 +136,8 @@ class CallbackInvokerTest {
             globalSearchProcessorService,
             caseDataService,
             securityValidationService,
-            caseSanitiser);
+            caseSanitiser,
+            timeToLiveService);
     }
 
     @Nested
@@ -520,6 +525,8 @@ class CallbackInvokerTest {
 
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChanged(
+                        any(), eq(callbackResponse.getData())),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
                     () -> inOrder.verify(globalSearchProcessorService, never())
                         .populateGlobalSearchData(caseTypeDefinition,
@@ -734,6 +741,8 @@ class CallbackInvokerTest {
                 assertAll(
                     () -> assertThat(caseDetails.getState(), is("toto")),
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChanged(
+                        any(), eq(callbackResponse.getData())),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService, times(2))
@@ -835,6 +844,8 @@ class CallbackInvokerTest {
 
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
+                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChanged(
+                        any(), eq(callbackResponse.getData())),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
                     () -> inOrder.verify(globalSearchProcessorService, never())
                         .populateGlobalSearchData(caseTypeDefinition,

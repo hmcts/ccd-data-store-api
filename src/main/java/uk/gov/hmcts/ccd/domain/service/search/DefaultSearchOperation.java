@@ -7,14 +7,17 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.List;
 import java.util.Map;
 
 @Service
-@Qualifier("default")
+@Qualifier(DefaultSearchOperation.QUALIFIER)
 public class DefaultSearchOperation implements SearchOperation {
+    public static final String QUALIFIER = "default";
+
     private final CaseDetailsRepository caseDetailsRepository;
 
     @Autowired
@@ -30,5 +33,10 @@ public class DefaultSearchOperation implements SearchOperation {
             return Lists.newArrayList();
         }
         return caseDetailsRepository.findByMetaDataAndFieldData(metaData, criteria);
+    }
+
+    @Override
+    public List<CaseDetails> execute(MigrationParameters migrationParameters) {
+        return caseDetailsRepository.findByParamsWithLimit(migrationParameters);
     }
 }

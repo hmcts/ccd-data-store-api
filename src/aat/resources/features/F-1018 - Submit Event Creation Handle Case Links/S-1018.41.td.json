@@ -1,0 +1,51 @@
+{
+  "_guid_": "S-1018.41",
+  "_extends_": "F-1018_Test_Data_Base",
+
+  "title": "Standard CaseLinks field should generate caseLink records with StandardLink set to true when Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains the standard CaseLinks field with Case Reference values"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "_extends_": "F-1018_CaseDataWithStandardCaseLinks_UpdateByCaseworker",
+        "TextField" : "S-1018.41"
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetUpdateEventToken_ForStandardCaseLinkTests][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id": "${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}",
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type_id" : "FT_MasterCaseType",
+      "case_data" : {
+        "_extends_": "F-1018_CaseDataWithStandardCaseLinks_UpdateByCaseworker",
+        "TextField" : "S-1018.41"
+      },
+      "data_classification" : {
+        "_extends_": "F-1018_ClasificationsForCaseDataWithStandardCaseLinks_Update",
+        "TextField" : "PUBLIC"
+      },
+      "security_classifications" : {
+        "_extends_": "F-1018_ClasificationsForCaseDataWithStandardCaseLinks_Update",
+        "TextField" : "PUBLIC"
+      }
+    }
+  }
+}

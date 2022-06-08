@@ -1,0 +1,47 @@
+{
+  "_guid_": "F-142_CreateLinkedCase_StandardCaseLink_BasicLinkDetails",
+  "_extends_": "F-142_CreateCase_MasterCaseType__Base",
+
+  "request": {
+    "body": {
+      "data": {
+        "caseLinks": [
+          {
+            "id": "52837798-42c6-43cc-98f6-0895fdba4961",
+            "value": {
+              "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}"
+            }
+          }
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "data": {
+        "caseLinks": [
+          {
+            "id": "52837798-42c6-43cc-98f6-0895fdba4961",
+            "value": {
+              "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}"
+            }
+          }
+        ]
+      },
+      "data_classification": {
+        "caseLinks": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "CaseReference": "PUBLIC"
+              },
+              "id": "52837798-42c6-43cc-98f6-0895fdba4961"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "_guid_": "F-142_Create1LinkedCases_1StandardCaseLinks",
+  "_extends_": "Health__Base",
+
+  "specs": [
+    "to create 1 standard linked case with basic access for test account"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "StandardCaseLink1": "F-142_CreateLinkedCase_StandardCaseLink"
+    }
+  ]
+
+}

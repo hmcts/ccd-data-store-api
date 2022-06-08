@@ -1,0 +1,48 @@
+{
+  "_guid_": "F-142_CreateCase_MasterCaseType__Base",
+  "_extends_": "Case_Creation_V2_Data_Base",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-142_GetCreateToken_MasterCaseType"
+    }
+  ],
+
+  "request": {
+    "pathVariables": {
+      "CaseTypeID": "FT_MasterCaseType"
+    },
+    "body": {
+      "event": {
+        "id": "createCaseCaseLinks",
+        "summary": "",
+        "description": ""
+      },
+      "data": {},
+      "security_classification": "PUBLIC",
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "_links": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_MasterCaseType",
+      "state": "CaseCreated",
+
+      "data": {
+        "SearchCriteria": { }
+      },
+      "data_classification": {
+        "SearchCriteria": "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}

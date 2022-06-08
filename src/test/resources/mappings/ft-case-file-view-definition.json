@@ -1,0 +1,760 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/case-type/FT_CaseFileView"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "FT_CaseFileView",
+      "description": "Case Type for testing CaseFileViews",
+      "version": {
+        "number": 1,
+        "live_from": "2017-01-03T00:00:00.000+0000",
+        "live_until": null
+      },
+      "name": "FT_CaseFileView",
+      "jurisdiction": {
+        "id": "BEFTA_MASTER",
+        "name": "BEFTA Master",
+        "description": "Content for the BEFTA Master Jurisdiction.",
+        "live_from": "2017-01-01T00:00:00.000+0000",
+        "live_until": null,
+        "case_types": []
+      },
+      "events": [
+        {
+          "id": "CREATE",
+          "name": "Create a case",
+          "description": "Create a case",
+          "order": 1,
+          "case_fields": [
+            {
+              "case_field_id": "CollectionDocumentFieldNoCategory",
+              "display_context": "OPTIONAL",
+              "display_context_parameter": null,
+              "retain_hidden_value": null,
+              "show_condition": null,
+              "show_summary_change_option": true,
+              "show_summary_content_option": null,
+              "label": null,
+              "hint_text": null,
+              "publish": false,
+              "publish_as": null,
+              "default_value": null,
+              "case_fields_complex": []
+            },
+            {
+              "case_field_id": "DocumentFieldNoCategory",
+              "display_context": "OPTIONAL",
+              "display_context_parameter": null,
+              "retain_hidden_value": null,
+              "show_condition": null,
+              "show_summary_change_option": true,
+              "show_summary_content_option": null,
+              "label": null,
+              "hint_text": null,
+              "publish": false,
+              "publish_as": null,
+              "default_value": null,
+              "case_fields_complex": []
+            },
+            {
+              "case_field_id": "CollectionDocumentField",
+              "display_context": "OPTIONAL",
+              "display_context_parameter": null,
+              "retain_hidden_value": null,
+              "show_condition": null,
+              "show_summary_change_option": true,
+              "show_summary_content_option": null,
+              "label": null,
+              "hint_text": null,
+              "publish": false,
+              "publish_as": null,
+              "default_value": null,
+              "case_fields_complex": []
+            },
+            {
+              "case_field_id": "DocumentField",
+              "display_context": "OPTIONAL",
+              "display_context_parameter": null,
+              "retain_hidden_value": null,
+              "show_condition": null,
+              "show_summary_change_option": true,
+              "show_summary_content_option": null,
+              "label": null,
+              "hint_text": null,
+              "publish": false,
+              "publish_as": null,
+              "default_value": null,
+              "case_fields_complex": []
+            }
+          ],
+          "pre_states": [],
+          "post_states": [
+            {
+              "enabling_condition": null,
+              "priority": 99,
+              "post_state_reference": "CaseCreated"
+            }
+          ],
+          "callback_url_about_to_start_event": null,
+          "retries_timeout_about_to_start_event": [],
+          "callback_url_about_to_submit_event": null,
+          "retries_timeout_url_about_to_submit_event": [],
+          "callback_url_submitted_event": null,
+          "retries_timeout_url_submitted_event": [],
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-befta_master",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": true
+            },
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-test-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "citizen",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }
+          ],
+          "show_summary": true,
+          "publish": false,
+          "show_event_notes": null,
+          "can_save_draft": false,
+          "end_button_label": null,
+          "event_enabling_condition": null
+        }
+      ],
+      "states": [
+        {
+          "id": "CaseCreated",
+          "name": "Create case",
+          "description": null,
+          "order": 1,
+          "title_display": null,
+          "acls": [
+            {
+              "role": "caseworker-befta_master",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": true
+            },        {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-test-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "citizen",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }
+          ]
+        }
+      ],
+      "acls": [
+        {
+          "role": "caseworker-befta_master",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": true
+        },        {
+          "role": "caseworker-probate-public",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-probate-private",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-test-public",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "citizen",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        }
+      ],
+      "searchAliasFields": [],
+      "roleToAccessProfiles": [],
+      "searchCriterias": [],
+      "searchParties": [],
+      "categories": [
+        {
+          "category_id": "evidenceDocs",
+          "category_label": "Evidence Documents",
+          "parent_category_id": null,
+          "live_from": "2017-01-01",
+          "live_to": "2017-01-01",
+          "display_order": 131,
+          "case_type_id": "FT_CaseFileView"
+        }
+      ],
+      "case_fields": [
+        {
+          "metadata": false,
+          "id": "DocumentField",
+          "case_type_id": "FT_CaseFileView",
+          "label": "Document Field",
+          "hint_text": "Document Hint Text",
+          "field_type": {
+            "id": "Document",
+            "type": "Document",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2017-01-01",
+          "live_until": null,
+          "acls": [
+            {
+              "role": "caseworker-befta_master",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": true
+            },        {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-test-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "citizen",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }
+          ],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": "evidenceDocs"
+        },
+        {
+          "metadata": false,
+          "id": "CollectionDocumentField",
+          "case_type_id": "FT_CaseFileView",
+          "label": "Document Field Collection",
+          "hint_text": null,
+          "field_type": {
+            "id": "CollectionDocumentField-a39a76a4-1abb-4c58-acbf-957174a64377",
+            "type": "Collection",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": {
+              "id": "Document",
+              "type": "Document",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": null
+            }
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2017-01-01",
+          "live_until": null,
+          "acls": [
+            {
+              "role": "caseworker-befta_master",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": true
+            },        {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-test-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "citizen",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }
+          ],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": "evidenceDocs"
+        },
+        {
+          "metadata": false,
+          "id": "DocumentFieldNoCategory",
+          "case_type_id": "FT_CaseFileView",
+          "label": "Document Field No Category",
+          "hint_text": "Document Hint Text",
+          "field_type": {
+            "id": "Document",
+            "type": "Document",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2017-01-01",
+          "live_until": null,
+          "acls": [
+            {
+              "role": "caseworker-befta_master",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": true
+            },        {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-test-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "citizen",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }
+          ],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": null
+        },
+        {
+          "metadata": false,
+          "id": "CollectionDocumentFieldNoCategory",
+          "case_type_id": "FT_CaseFileView",
+          "label": "Document Field Collection No Category",
+          "hint_text": null,
+          "field_type": {
+            "id": "CollectionDocumentFieldNoCategory-eb974374-f2c7-411e-9244-d101b2f6387b",
+            "type": "Collection",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": {
+              "id": "Document",
+              "type": "Document",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": null
+            }
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2017-01-01",
+          "live_until": null,
+          "acls": [
+            {
+              "role": "caseworker-befta_master",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": true
+            },        {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-test-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "citizen",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }
+          ],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": null
+        },
+        {
+          "metadata": true,
+          "id": "[STATE]",
+          "case_type_id": "FT_CaseFileView",
+          "label": "State",
+          "hint_text": null,
+          "field_type": {
+            "id": "FixedList-FT_CaseFileView[STATE]",
+            "type": "FixedList",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [
+              {
+                "code": "CaseCreated",
+                "label": "Create case",
+                "order": null
+              }
+            ],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2022-03-10",
+          "live_until": null,
+          "acls": [],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": null
+        },
+        {
+          "metadata": true,
+          "id": "[CASE_REFERENCE]",
+          "case_type_id": null,
+          "label": "Case Reference",
+          "hint_text": null,
+          "field_type": {
+            "id": "Text",
+            "type": "Text",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2022-02-01",
+          "live_until": null,
+          "acls": [],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": null
+        },
+        {
+          "metadata": true,
+          "id": "[LAST_STATE_MODIFIED_DATE]",
+          "case_type_id": null,
+          "label": "Last State Modified Date",
+          "hint_text": null,
+          "field_type": {
+            "id": "DateTime",
+            "type": "DateTime",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2022-02-01",
+          "live_until": null,
+          "acls": [],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": null
+        },
+        {
+          "metadata": true,
+          "id": "[LAST_MODIFIED_DATE]",
+          "case_type_id": null,
+          "label": "Last Modified Date",
+          "hint_text": null,
+          "field_type": {
+            "id": "DateTime",
+            "type": "DateTime",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2022-02-01",
+          "live_until": null,
+          "acls": [],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": null
+        },
+        {
+          "metadata": true,
+          "id": "[CREATED_DATE]",
+          "case_type_id": null,
+          "label": "Created Date",
+          "hint_text": null,
+          "field_type": {
+            "id": "DateTime",
+            "type": "DateTime",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2022-02-01",
+          "live_until": null,
+          "acls": [],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": null
+        },
+        {
+          "metadata": true,
+          "id": "[SECURITY_CLASSIFICATION]",
+          "case_type_id": null,
+          "label": "Security Classification",
+          "hint_text": null,
+          "field_type": {
+            "id": "Text",
+            "type": "Text",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2022-02-01",
+          "live_until": null,
+          "acls": [],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": null
+        },
+        {
+          "metadata": true,
+          "id": "[CASE_TYPE]",
+          "case_type_id": null,
+          "label": "Case Type",
+          "hint_text": null,
+          "field_type": {
+            "id": "Text",
+            "type": "Text",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2022-02-01",
+          "live_until": null,
+          "acls": [],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": null
+        },
+        {
+          "metadata": true,
+          "id": "[JURISDICTION]",
+          "case_type_id": null,
+          "label": "Jurisdiction",
+          "hint_text": null,
+          "field_type": {
+            "id": "Text",
+            "type": "Text",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2022-02-01",
+          "live_until": null,
+          "acls": [],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null,
+          "category_id": null
+        }
+      ],
+      "printable_document_url": null,
+      "callback_get_case_url": null,
+      "retries_get_case_url": [],
+      "security_classification": "PUBLIC"
+    }
+  }
+}

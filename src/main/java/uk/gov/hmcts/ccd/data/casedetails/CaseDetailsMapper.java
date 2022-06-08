@@ -37,6 +37,7 @@ public class CaseDetailsMapper {
         if (caseDetailsEntity.getSupplementaryData() != null) {
             caseDetails.setSupplementaryData(JacksonUtils.convertValue(caseDetailsEntity.getSupplementaryData()));
         }
+        caseDetails.setResolvedTTL(caseDetailsEntity.getResolvedTTL());
         return caseDetails;
     }
 
@@ -72,6 +73,7 @@ public class CaseDetailsMapper {
             newCaseDetailsEntity.setSupplementaryData(JacksonUtils.convertValueJsonNode(caseDetails
                     .getSupplementaryData()));
         }
+        newCaseDetailsEntity.setResolvedTTL(caseDetails.getResolvedTTL());
         return newCaseDetailsEntity;
     }
 
