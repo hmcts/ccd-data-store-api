@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ccd.v2.V2.Error.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANT
 class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesControllerIT {
 
     private static final Logger LOG = LoggerFactory.getLogger(GetCaseAssignedUserRolesControllerIT.class);
-    private static final int TEST_RUN = 23;
+    private static final int TEST_RUN = 24;
 
     // AC-1
     @Test
