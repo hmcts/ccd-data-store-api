@@ -2,17 +2,6 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Maps;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequestEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,11 +23,25 @@ import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequestEvent;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -58,6 +61,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.TestFixtures.loadCaseTypeDefinition;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentRecord;
@@ -71,10 +75,12 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     private static final long CASE_REFERENCE = 999999L;
     private static final String JURISDICTION_ID = "JeyOne";
     private static final String CASE_TYPE_ID = "CaseTypeOne";
+    private static final String WRONG_CASE_TYPE_ID = "CaseTypeWrong";
     private static final String JURISDICTION = "PROBATE";
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final Long REFERENCE = 1504259907353529L;
     private static final Long WRONG_REFERENCE = 9999999999999999L;
+    private static final LocalDate RESOLVED_TTL = LocalDate.now();
 
     private JdbcTemplate template;
     private MockHttpServletRequest request;
@@ -126,6 +132,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         caseDetails.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
         caseDetails.setState("CaseCreated");
         caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
+        caseDetails.setResolvedTTL(RESOLVED_TTL);
         try {
             caseDetails.setData(JacksonUtils.convertValue(
                 mapper.readTree("{\"Alliases\": [], \"HasOtherInfo\": \"Yes\"}")));
@@ -137,6 +144,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         assertThat(caseDetailsPersisted.getReference(), is(caseDetails.getReference()));
         assertThat(caseDetailsPersisted.getJurisdiction(), is(caseDetails.getJurisdiction()));
         assertThat(caseDetailsPersisted.getCaseTypeId(), is(caseDetails.getCaseTypeId()));
+        assertThat(caseDetailsPersisted.getResolvedTTL(), is(caseDetails.getResolvedTTL()));
     }
 
     @Test
@@ -458,7 +466,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     })
     public void searchWithParams_withAccessLevelGranted() throws Exception {
         String userId = "123";
-        CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("/mappings/bookcase-definition.json");
+        CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("mappings/bookcase-definition.json");
         caseTypeDefinition.setRoleToAccessProfiles(asList(roleToAccessProfileDefinition("[CREATOR]")));
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase"))
@@ -574,6 +582,103 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
 
         assertCaseDetails(caseDetails, "1", JURISDICTION, REFERENCE);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByParamsWithLimit_shouldFindSingleRecord() {
+
+        // GIVEN
+        MigrationParameters parameters = MigrationParameters.builder()
+            .caseTypeId(CASE_01_TYPE)
+            .jurisdictionId(JURISDICTION)
+            .caseDataId(CASE_01_ID)
+            .numRecords(1)
+            .build();
+
+        // WHEN
+        final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
+
+        // THEN
+        assertEquals(1, results.size());
+        assertCaseDetails(results.get(0), CASE_01_ID.toString(), JURISDICTION, Long.parseLong(CASE_01_REFERENCE));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByParamsWithLimit_shouldFindManyRecords() {
+
+        // GIVEN
+        MigrationParameters parameters = MigrationParameters.builder()
+            .caseTypeId(CASE_01_TYPE)
+            .jurisdictionId(JURISDICTION)
+            .caseDataId(CASE_01_ID)
+            .numRecords(5)
+            .build();
+
+        // WHEN
+        final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
+
+        // THEN
+        assertEquals(5, results.size());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByParamsWithLimit_shouldChangeStartingRecord() {
+
+        // GIVEN
+        MigrationParameters parameters = MigrationParameters.builder()
+            .caseTypeId(CASE_01_TYPE)
+            .jurisdictionId(JURISDICTION)
+            .caseDataId(CASE_03_ID)
+            .numRecords(1)
+            .build();
+
+        // WHEN
+        final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
+
+        // THEN
+        assertEquals(1, results.size());
+        assertCaseDetails(results.get(0), CASE_03_ID.toString(), JURISDICTION, Long.parseLong(CASE_03_REFERENCE));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByParamsWithLimit_shouldFilterOnJurisdiction() {
+
+        // GIVEN
+        MigrationParameters parameters = MigrationParameters.builder()
+            .caseTypeId(CASE_01_TYPE)
+            .jurisdictionId(WRONG_JURISDICTION)
+            .caseDataId(CASE_01_ID)
+            .numRecords(1)
+            .build();
+
+        // WHEN
+        final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
+
+        // THEN
+        assertEquals(0, results.size());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByParamsWithLimit_shouldFilterOnCaseType() {
+
+        // GIVEN
+        MigrationParameters parameters = MigrationParameters.builder()
+            .caseTypeId(WRONG_CASE_TYPE_ID)
+            .jurisdictionId(JURISDICTION)
+            .caseDataId(CASE_01_ID)
+            .numRecords(1)
+            .build();
+
+        // WHEN
+        final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
+
+        // THEN
+        assertEquals(0, results.size());
     }
 
     private void assertCaseDetails(CaseDetails caseDetails, String id, String jurisdictionId, Long caseReference) {

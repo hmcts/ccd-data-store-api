@@ -1,0 +1,36 @@
+{
+  "_guid_": "F-142_GetUpdateToken_MasterCaseType__Base",
+  "_extends_": "Token_Creation_For_Case_Update",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "OVERRIDE",
+      "etid": "updateCase"
+    }
+  },
+
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "jurisdiction": "BEFTA_MASTER",
+        "case_type_id": "FT_MasterCaseType",
+        "state": "CaseCreated",
+
+        "case_data": "[[ANYTHING_PRESENT]]",
+        "data_classification": "[[ANYTHING_PRESENT]]",
+        "security_classifications": "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "_guid_": "F-1019-ClasificationsForCaseDataWithStandardCaseLinks",
+
+  "CaseLinkField" : {
+    "classification" : "PUBLIC",
+    "value" : {
+      "CaseReference" : "PUBLIC"
+    }
+  },
+  "CaseLinkCollection" : {
+    "classification" : "PUBLIC",
+    "value" : [
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "70280019-0000-CaseLinkedViaCollection"
+      },
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "b92cd7a8-0000-CaseLinkedViaBothCollectionAndStandardCaseLinksField"
+      }
+    ]
+  },
+  "caseLinks" : {
+    "classification" : "PUBLIC",
+    "value" : [
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "d7e67a81-0000-CaseLinkedViaStandardCaseLinksField"
+      },
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "d606281e-0000-CaseLinkedViaBothCollectionAndStandardCaseLinksField"
+      }
+    ]
+  }
+}

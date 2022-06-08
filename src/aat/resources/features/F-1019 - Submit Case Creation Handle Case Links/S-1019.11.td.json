@@ -1,0 +1,56 @@
+{
+  "_guid_": "S-1019.11",
+  "_extends_": "F-1019_Test_Data_Base_V2",
+
+  "title": "CaseLink field contains CaseReference value and Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST",
+
+  "prerequisites" : [ {
+      "Token_Creation": "S-1019_GetCreateToken"
+    }
+  ],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured CaseLink field with Case Reference created in F-1019_CreateCasePreRequisiteCaseworkerBase"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+        },
+        "TextField" : "S-1019.11"
+      },
+      "event": {
+        "id": "createCaseCaseLinks",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body" : {
+      "data" : {
+        "TextField" : "S-1019.11",
+        "CaseLinkField" : {
+          "CaseReference" : "${}${[scenarioContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+        }
+      },
+      "data_classification" : {
+        "TextField" : "PUBLIC",
+        "CaseLinkField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseReference" : "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}

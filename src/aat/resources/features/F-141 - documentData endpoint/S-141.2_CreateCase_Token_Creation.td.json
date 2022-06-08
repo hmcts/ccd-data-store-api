@@ -1,0 +1,26 @@
+{
+  "_guid_": "S-141.2_CreateCase_Token_Creation",
+  "_extends_": "F-141_CreateCase_Token_Creation",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker2Solicitor2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "etid": "createCase",
+      "ctid": "FT_CRUD_2"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "case_details" : {
+        "case_type_id" : "FT_CRUD_2"
+      },
+      "event_id" : "createCase"
+    }
+  }
+}
