@@ -1,0 +1,43 @@
+{
+  "_guid_": "F-1015_CitizenCreateUpdateEvent",
+  "title": "should create an event token for correct inputs",
+  "_extends_": "Token_Creation_Data_For_Citizen_Case_Creation",
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "OVERRIDE",
+      "ctid": "OVERRIDE",
+      "cid": "OVERRIDE",
+      "etid": "OVERRIDE"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": {
+        "version": 0,
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "security_classification": "PUBLIC",
+        "supplementary_data": null,
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null
+      },
+      "event_id": "UPDATE"
+    }
+  }
+}

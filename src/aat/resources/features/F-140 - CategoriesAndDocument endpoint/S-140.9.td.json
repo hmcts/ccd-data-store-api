@@ -1,0 +1,52 @@
+{
+  "title":"No Categories defined in Categories tab, no categories assigned to Document - Return the hierarchy with ALL documents in the \"unCategorisedDocuments\" element.",
+  "_guid_": "S-140.9",
+  "_extends_": "F-140_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD and has read access permissions for all the Document fields",
+		"a case definition with Document fields in CaseField tab and ComplexTab exist *without* the category Id for case type CT1",
+    "a case definition with Collection of Document fields in CaseField tab and ComplexTab exist with the category Id for case type CT1",
+    "a case C1, containing the above document fields *but without* the category_id in the Document type sub-field exists",
+    "contains the given case reference C1 in the input",
+    "contains a HTTP 200 status code",
+    "contains the category hierarchy"
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker2Solicitor2"
+    }
+  },
+
+	"request": {
+		"_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-140_CreateCase_NoCategories][testData][actualResponse][body][id]}"
+    }
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "case_version": "[[ANYTHING_PRESENT]]",
+      "categories" : [ ],
+      "uncategorised_documents": [
+        {
+          "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "attribute_path": "DocumentField1",
+          "upload_timestamp": "[[ANY_NULLABLE]]"
+        }
+      ]
+    }
+  }
+}
+
