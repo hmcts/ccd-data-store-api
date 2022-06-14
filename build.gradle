@@ -799,8 +799,11 @@ task smoke() {
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
-            args = ['--plugin', "json:${rootDir}/target/cucumber.json", '--tags', '@Smoke and not @Ignore', '--glue',
-                    'uk.gov.hmcts.befta.player', '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
+            args = ['--plugin', "json:${rootDir}/target/cucumber.json",
+                    '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
+                    '--tags', '@Smoke and not @Ignore',
+                    '--glue', 'uk.gov.hmcts.befta.player',
+                    '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
         }
     }
@@ -822,6 +825,7 @@ task smoke() {
 task functional() {
     description = 'Executes functional tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
+
     new File("$buildDir/test-results/test").mkdirs()
     copy {
         from "src/aat/resources/DummyTest.xml"
@@ -836,6 +840,7 @@ task functional() {
             args = [
                     '--threads', '1',
                     '--plugin', "json:${rootDir}/target/cucumber.json",
+                    '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
                     '--tags', 'not @Ignore',
                     '--glue', 'uk.gov.hmcts.befta.player',
                     '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
