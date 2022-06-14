@@ -4,10 +4,10 @@ import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
+import uk.gov.hmcts.reform.authorisation.exceptions.ServiceException;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -40,10 +40,15 @@ public class IdamRepository {
                     userInfo.getUid(), userInfo.getRoles());
             }
             return userInfo;
-        } catch (FeignException feignException) {
-            log.error("FeignException: retrieve user info ", feignException);
-            HttpStatus httpStatus = getHttpStatus(feignException);
-            throw new ResponseStatusException(httpStatus, "error while retrieving user info", feignException);
+        } catch (FeignException exception) {
+            log.error("FeignException: retrieve user info: {} ", exception.getMessage());
+
+            boolean isClientError = exception.status() >= 400 && exception.status() <= 499;
+            if (isClientError) {
+                throw new InvalidTokenException(exception.getMessage(), exception);
+            } else {
+                throw new ServiceException(exception.getMessage(), exception);
+            }
         }
     }
 
@@ -64,21 +69,5 @@ public class IdamRepository {
         log.info("Getting a fresh token for system account.");
         return idamClient.getAccessToken(applicationParams.getDataStoreSystemUserId(),
             applicationParams.getDataStoreSystemUserPassword());
-    }
-
-    private HttpStatus getHttpStatus(FeignException exception) {
-        HttpStatus httpStatus = HttpStatus.valueOf(exception.status());
-
-        if (exception instanceof FeignException.FeignClientException) {
-            if (httpStatus != HttpStatus.UNAUTHORIZED) {
-                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            }
-        } else if (exception instanceof FeignException.FeignServerException) {
-            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
-                httpStatus = HttpStatus.BAD_GATEWAY;
-            }
-        }
-
-        return httpStatus;
     }
 }
