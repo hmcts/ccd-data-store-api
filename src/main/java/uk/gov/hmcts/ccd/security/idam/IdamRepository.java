@@ -1,9 +1,12 @@
 package uk.gov.hmcts.ccd.security.idam;
 
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -30,11 +33,18 @@ public class IdamRepository {
 
     @Cacheable(value = "userInfoCache")
     public UserInfo getUserInfo(String jwtToken) {
-        UserInfo userInfo = idamClient.getUserInfo("Bearer " + jwtToken);
-        if (userInfo != null) {
-            log.info("Queried user info from IDAM API. User Id={}. Roles={}.", userInfo.getUid(), userInfo.getRoles());
+        try {
+            UserInfo userInfo = idamClient.getUserInfo("Bearer " + jwtToken);
+            if (userInfo != null) {
+                log.info("Queried user info from IDAM API. User Id={}. Roles={}.",
+                    userInfo.getUid(), userInfo.getRoles());
+            }
+            return userInfo;
+        } catch (FeignException feignException) {
+            log.error("FeignException: retrieve user info ", feignException);
+            HttpStatus httpStatus = getHttpStatus(feignException);
+            throw new ResponseStatusException(httpStatus, "error while retrieving user info", feignException);
         }
-        return userInfo;
     }
 
     @Cacheable("idamUserRoleCache")
@@ -54,5 +64,21 @@ public class IdamRepository {
         log.info("Getting a fresh token for system account.");
         return idamClient.getAccessToken(applicationParams.getDataStoreSystemUserId(),
             applicationParams.getDataStoreSystemUserPassword());
+    }
+
+    private HttpStatus getHttpStatus(FeignException exception) {
+        HttpStatus httpStatus = HttpStatus.valueOf(exception.status());
+
+        if (exception instanceof FeignException.FeignClientException) {
+            if (httpStatus != HttpStatus.UNAUTHORIZED) {
+                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            }
+        } else if (exception instanceof FeignException.FeignServerException) {
+            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
+                httpStatus = HttpStatus.BAD_GATEWAY;
+            }
+        }
+
+        return httpStatus;
     }
 }
