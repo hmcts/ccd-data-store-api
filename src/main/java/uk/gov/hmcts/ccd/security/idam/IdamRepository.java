@@ -43,13 +43,16 @@ public class IdamRepository {
         } catch (FeignException exception) {
             log.error("FeignException: retrieve user info: {} ", exception.getMessage());
 
-            boolean isClientError = exception.status() >= 400 && exception.status() <= 499;
-            if (isClientError) {
+            if (isClientError(exception)) {
                 throw new InvalidTokenException(exception.getMessage(), exception);
             } else {
                 throw new ServiceException(exception.getMessage(), exception);
             }
         }
+    }
+
+    private boolean isClientError(FeignException exception) {
+        return exception.status() >= 400 && exception.status() <= 499;
     }
 
     @Cacheable("idamUserRoleCache")
