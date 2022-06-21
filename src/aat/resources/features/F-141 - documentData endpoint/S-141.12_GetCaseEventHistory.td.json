@@ -1,0 +1,20 @@
+{
+	"_guid_": "S-141.12_GetCaseEventHistory",
+  "_extends_": "F-141_GetCaseEventHistory",
+
+	"request": {
+		"pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][S-141.12_CreateCase][testData][actualResponse][body][id]}"
+		}
+	},
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
+
+

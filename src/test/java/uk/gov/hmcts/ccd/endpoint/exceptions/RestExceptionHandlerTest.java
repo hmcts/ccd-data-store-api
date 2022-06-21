@@ -42,12 +42,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -282,6 +282,47 @@ public class RestExceptionHandlerTest {
 
         // ASSERT
         assertHttpErrorResponse(result, expectedException, HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    public void handleDirectFeignClientException_shouldReturnUnauthorizedWhenReceivedUnauthorized() throws Exception {
+
+        // ARRANGE
+        String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
+
+        FeignException.FeignClientException expectedException =
+            new FeignException.FeignClientException(HttpStatus.UNAUTHORIZED.value(), myUniqueExceptionMessage,
+                Request.create(Request.HttpMethod.GET, myUniqueExceptionMessage, Map.of(), new byte[0],
+                    Charset.defaultCharset(), null), new byte[0]);
+
+        setupMockServiceToThrowException(expectedException);
+
+        // ACT
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
+
+        // ASSERT
+        assertHttpErrorResponse(result, expectedException, HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    public void handleDirectFeignClientException_shouldReturnInternalServerErrorWhenReceivedBadRequest()
+        throws Exception {
+
+        // ARRANGE
+        String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
+
+        FeignException.FeignClientException expectedException =
+            new FeignException.FeignClientException(HttpStatus.BAD_REQUEST.value(), myUniqueExceptionMessage,
+                Request.create(Request.HttpMethod.GET, myUniqueExceptionMessage, Map.of(), new byte[0],
+                    Charset.defaultCharset(), null), new byte[0]);
+
+        setupMockServiceToThrowException(expectedException);
+
+        // ACT
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
+
+        // ASSERT
+        assertHttpErrorResponse(result, expectedException, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test

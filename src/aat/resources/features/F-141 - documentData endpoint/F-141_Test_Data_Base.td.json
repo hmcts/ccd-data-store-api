@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-141_Test_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "PUT documentData",
+  "method": "PUT",
+  "uri": "/documentData/caseref/{cid}",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    }
+  }
+}

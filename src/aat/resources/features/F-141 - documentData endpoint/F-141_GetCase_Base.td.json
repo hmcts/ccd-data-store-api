@@ -1,0 +1,31 @@
+{
+	"_guid_": "F-141_GetCase_Base",
+	"productName": "CCD Data Store",
+	"operationName": "retrieve a case by id",
+	"method": "GET",
+	"uri": "/cases/{cid}",
+
+	"users": {
+		"invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+		}
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers",
+			"experimental": true
+		},
+		"pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-141_CreateCase][testData][actualResponse][body][id]}"
+		}
+	},
+
+	"expectedResponse": {
+    "_extends_": "Common_200_Response",
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}

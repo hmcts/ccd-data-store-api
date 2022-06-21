@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.v2.external.resource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
+
+import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentPermissions;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
@@ -24,10 +26,10 @@ class CaseDocumentResourceTest {
         = String.format("/cases/%s/documents/%s", CASE_REFERENCE, CASE_DOCUMENT_ID);
     private final CaseDocumentMetadata caseDocumentMetadata = CaseDocumentMetadata.builder()
         .caseId(CASE_REFERENCE)
-            .documentPermissions(DocumentPermissions.builder()
-                .id(CASE_DOCUMENT_ID)
-                .permissions(Arrays.asList(Permission.READ, Permission.UPDATE))
-        .build())
+        .documentPermissions(DocumentPermissions.builder()
+            .id(CASE_DOCUMENT_ID)
+            .permissions(Arrays.asList(Permission.READ, Permission.UPDATE))
+            .build())
         .build();
 
     @Test
@@ -59,10 +61,8 @@ class CaseDocumentResourceTest {
         final CaseDocumentResource result
             = new CaseDocumentResource(CASE_REFERENCE, CASE_DOCUMENT_ID, caseDocumentMetadata);
 
-        Optional<Link> self = (Optional<Link>) result.getLink("self");
-        if (self.isPresent()) {
-            assertThat(self.get().getHref(), equalTo(linkSelfForCaseDocument));
-        }
+        final Optional<Link> self = result.getLink("self");
+        self.ifPresent(link -> assertThat(link.getHref(), endsWith(linkSelfForCaseDocument)));
     }
 
 }

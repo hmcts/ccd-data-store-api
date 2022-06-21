@@ -1,0 +1,44 @@
+{
+  "_guid_": "F-1018_CreateCaseWithStandardCaseLinksByCitizen",
+  "_extends_": "F-1018_CreateCasePreRequisiteCitizenBase",
+
+  "specs": [
+    "to create a case with many case links"
+  ],
+
+  "prerequisites" : [ {
+    "CaseLinkedViaSimpleField": "F-1018_CreateCasePreRequisiteCitizenBase",
+    "CaseLinkedViaCollection": "F-1018_CreateCasePreRequisiteCitizenBase",
+    "CaseLinkedViaStandardCaseLinksField": "F-1018_CreateCasePreRequisiteCitizenBase",
+    "CaseLinkedViaBothCollectionAndStandardCaseLinksField": "F-1018_CreateCasePreRequisiteCitizenBase",
+
+    "CaseLinkedToMigrateToStandardCaseLinksField": "F-1018_CreateCasePreRequisiteCitizenBase",
+    "CaseLinkedToMigrateFromStandardCaseLinksField": "F-1018_CreateCasePreRequisiteCitizenBase",
+
+    "CaseLinkedToAddToStandardCaseLinksField": "F-1018_CreateCasePreRequisiteCitizenBase",
+    "CaseLinkedToRemoveFromStandardCaseLinksField": "F-1018_CreateCasePreRequisiteCitizenBase"
+  } ],
+
+  "request": {
+    "body": {
+      "data" : {
+        "_extends_": "F-1018_CaseDataWithStandardCaseLinks_Creation"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data" : {
+        "_extends_": "F-1018_CaseDataWithStandardCaseLinks_Creation"
+      },
+      "data_classification" : {
+        "_extends_": "F-1018_ClasificationsForCaseDataWithStandardCaseLinks_Creation"
+      },
+      "security_classifications" : {
+        "_extends_": "F-1018_ClasificationsForCaseDataWithStandardCaseLinks_Creation"
+      }
+    }
+  }
+
+}

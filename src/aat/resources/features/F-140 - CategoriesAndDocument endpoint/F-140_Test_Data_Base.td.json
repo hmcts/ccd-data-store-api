@@ -1,0 +1,15 @@
+{
+  "_guid_": "F-140_Test_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Get categoriesAndDocuments",
+  "method": "GET",
+  "uri": "/categoriesAndDocuments/{cid}",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": true,
+      "_extends_": "Common_Request_Headers"
+    }
+  }
+}

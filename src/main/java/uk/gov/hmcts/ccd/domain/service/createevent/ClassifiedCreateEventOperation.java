@@ -32,4 +32,14 @@ public class ClassifiedCreateEventOperation implements CreateEventOperation {
                        .flatMap(classificationService::applyClassification)
                        .orElse(null);
     }
+
+    @Override
+    public CaseDetails createCaseSystemEvent(String caseReference, Integer version,
+                                             String attributePath, String categoryId) {
+        final CaseDetails caseDetails = createEventOperation.createCaseSystemEvent(caseReference,
+            version, attributePath, categoryId);
+        return Optional.ofNullable(caseDetails)
+            .flatMap(classificationService::applyClassification)
+            .orElse(null);
+    }
 }

@@ -1,0 +1,45 @@
+{
+  "_guid_": "S-1019.16",
+  "_extends_": "F-1019_Test_Data_Base",
+
+  "title": "Standard CaseLinks field should generate caseLink records with StandardLink set to true when Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST",
+
+  "prerequisites" : [{
+    "Token_Creation": "S-1019_GetCreateToken"
+  }],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains the standard CaseLinks field with Case Reference values"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "_extends_": "F-1019-CaseDataWithStandardCaseLinks"
+      },
+      "event": {
+        "id": "createCaseCaseLinks",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "case_data" : {
+        "_extends_": "F-1019-CaseDataWithStandardCaseLinks"
+      },
+      "data_classification" : {
+        "_extends_": "F-1019-ClasificationsForCaseDataWithStandardCaseLinks"
+      },
+      "security_classifications" : {
+        "_extends_": "F-1019-ClasificationsForCaseDataWithStandardCaseLinks"
+      }
+    }
+  }
+}

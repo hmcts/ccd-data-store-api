@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-142.2",
+  "_extends_": "Get_Linked_Cases__Base",
+  "title": "should get 404 when case reference does not exist",
+
+  "specs": [
+    "an active profile in CCD",
+
+    "contains a case reference that does not exist",
+
+    "contains an HTTP-404 Not Found"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "4444333322221111"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case found",
+      "path": "/getLinkedCases/4444333322221111",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
