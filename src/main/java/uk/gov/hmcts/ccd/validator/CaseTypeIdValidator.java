@@ -13,7 +13,7 @@ public class CaseTypeIdValidator implements ConstraintValidator<ValidCaseTypeId,
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseTypeIdValidator.class);
 
-    private static final String REG_EXP_VALID_CASE_TYPE_ID = "^[a-zA-Z0-9_-]+$";
+    private static final String REG_EXP_VALID_CASE_TYPE_ID = "^[a-zA-Z0-9]+[a-zA-Z_0-9\\-.]*$";
 
     @Override
     public boolean isValid(String caseTypeId, ConstraintValidatorContext context) {
