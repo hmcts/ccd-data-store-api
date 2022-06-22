@@ -41,10 +41,9 @@ public class CaseDocumentAmApiClient {
             if (!(feignException instanceof FeignClientException.Forbidden)) {
                 exceptionScenarios(feignException);
             }
-            final String badDocument = feignException.getMessage();
 
             throw new DocumentTokenException(
-                String.format("The user has provided an invalid hashToken for document %s", badDocument)
+                String.format("Error from CCD AM api:  %s", feignException.getMessage())
             );
         }
     }
