@@ -86,6 +86,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .addFilterAfter(securityLoggingFilter, BearerTokenAuthenticationFilter.class)
             .addFilterAfter(v1EndpointsPathParamSecurityFilter, SecurityLoggingFilter.class)
             .sessionManagement().sessionCreationPolicy(STATELESS).and()
+            .csrf().disable()
             .formLogin().disable()
             .logout().disable()
             .authorizeRequests()
