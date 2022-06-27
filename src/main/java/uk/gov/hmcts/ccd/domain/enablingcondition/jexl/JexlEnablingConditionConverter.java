@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.commons.jexl3.JexlOperator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -32,12 +31,12 @@ public class JexlEnablingConditionConverter implements EnablingConditionConverte
     private static final String OR_OPERATOR = " or ";
 
     private static final Pattern EQUALITY_CONDITION_PATTERN =
-        Pattern.compile("\\s*?(.*)\\s*?(=|CONTAINS)\\s*?(\".*\")\\s*?");
+        Pattern.compile("\\s*?(.*?)\\s*?(=|CONTAINS)\\s*?(\".*?\")\\s*?");
 
     private static final Pattern NOT_EQUAL_CONDITION_PATTERN =
-        Pattern.compile("\\s*?(.*)\\s*?(!=|CONTAINS)\\s*?(\".*\")\\s*?");
+        Pattern.compile("\\s*?(.*?)\\s*?(!=|CONTAINS)\\s*?(\".*?\")\\s*?");
 
-    private Pattern orConditionPattern = Pattern.compile(OR_CONDITION_REGEX);
+    private final Pattern orConditionPattern = Pattern.compile(OR_CONDITION_REGEX);
 
     private static final String WILD_CARD = "\"*\"";
 
@@ -80,9 +79,7 @@ public class JexlEnablingConditionConverter implements EnablingConditionConverte
                 parsedConditions.add(parseEqualityCondition(equalityMatcher, true));
             }
         }
-        return parsedConditions
-            .stream()
-            .collect(Collectors.joining(conditionalOperator));
+        return String.join(conditionalOperator, parsedConditions);
     }
 
     private String parseEqualityCondition(Matcher matcher, boolean equality) {

@@ -10,7 +10,7 @@ public enum DisplayContextParameterType {
     TABLE,
     LIST;
 
-    private static final Pattern PATTERN = Pattern.compile("#(.+)\\((.+)\\)");
+    private static final Pattern PATTERN = Pattern.compile("#(.+?)\\((.+?)\\)");
     private static final int TYPE_GROUP = 1;
     private static final int VALUE_GROUP = 2;
 
