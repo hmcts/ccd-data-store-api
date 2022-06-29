@@ -1,0 +1,38 @@
+{
+  "_guid_": "F-142_CreateLinkedCase_NonStandardCaseLink",
+  "_extends_": "F-142_CreateCase_MasterCaseType__Base",
+
+  "request": {
+    "body": {
+      "data": {
+        "caseNameHmctsInternal": "Name internal: This case will be ingored by API as it is linked via a non-standard case link.",
+
+        "CaseLinkField": {
+          "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "data": {
+        "caseNameHmctsInternal": "Name internal: This case will be ingored by API as it is linked via a non-standard case link.",
+
+        "CaseLinkField": {
+          "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}"
+        }
+      },
+      "data_classification": {
+        "caseNameHmctsInternal": "PUBLIC",
+
+        "CaseLinkField": {
+          "classification": "PUBLIC",
+          "value": {
+            "CaseReference": "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}

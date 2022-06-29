@@ -1,0 +1,72 @@
+{
+  "title":"Document with attributePath had sub-field category id existing, now supplied new value - return 200 response with the updated document hierarchy for the case",
+  "_guid_": "S-141.12",
+	"_extends_": "F-141_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD and has Update access permissions for the Document field named in the AttributePath",
+		"a case definition with category structure exists for the case type CT2",
+    "a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT2",
+    "contains the given case reference C2 in the input",
+    "contains CategoryID value as \"CategoryID6\" and attributePath value as \"Document4\" in the input",
+    "contains a HTTP 200 status code"
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+	"request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-141.12_CreateCase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "attribute_path": "Document4",
+      "case_version":  "0",
+      "category_id": "CategoryID6"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "case_version" : 1,
+      "categories" : [ {
+        "category_id" : "CategoryID4",
+        "category_name" : "Residence Proof",
+        "category_order" : 100,
+        "documents" : [ ],
+        "sub_categories" : [ ]
+      }, {
+        "category_id" : "CategoryID5",
+        "category_name" : "Finance Proof",
+        "category_order" : 110,
+        "documents" : [ ],
+        "sub_categories" : [ ]
+      }, {
+        "category_id" : "CategoryID6",
+        "category_name" : "Finance Statements",
+        "category_order" : 120,
+        "documents" : [ {
+          "document_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][childContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "attribute_path" : "Document4",
+          "upload_timestamp": "[[ANY_NULLABLE]]"
+        } ],
+        "sub_categories" : [ ]
+      } ],
+      "uncategorised_documents" : [ ]
+    }
+  }
+}
+

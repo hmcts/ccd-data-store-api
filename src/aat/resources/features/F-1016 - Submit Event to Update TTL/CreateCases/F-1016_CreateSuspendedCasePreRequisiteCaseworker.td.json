@@ -1,0 +1,28 @@
+{
+  "_guid_": "F-1016_CreateSuspendedCasePreRequisiteCaseworker",
+  "_extends_": "F-1016_CreateCasePreRequisiteCaseworkerBase",
+
+  "request": {
+    "body": {
+      "data": {
+        "TTL": {
+          "Suspended": "Yes",
+          "OverrideTTL": "2010-04-30",
+          "SystemTTL": "2010-04-30"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "TTL": {
+          "Suspended": "Yes",
+          "OverrideTTL": "2010-04-30",
+          "SystemTTL": "2010-04-30"
+        }
+      }
+    }
+  }
+}

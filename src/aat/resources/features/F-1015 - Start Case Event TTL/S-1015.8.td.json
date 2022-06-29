@@ -1,0 +1,58 @@
+{
+  "_guid_": "S-1015.8",
+  "_extends_": "F-1015_RetrieveTrigger",
+
+  "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified using v2 '/cases/{caseId}/event-triggers/{triggerId}'",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "has a null TTLIncrement configured",
+    "is configured to trigger an About to Start callback",
+    "contains the TTL.SystemTTL for the case, that has not been modified"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "triggerId": "updateCaseNoTTLInc"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary": "Accept-Encoding"
+    },
+    "body": {
+      "case_details": {
+        "id": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+        "jurisdiction": "BEFTA_MASTER",
+        "state": "CaseCreated",
+        "version": 0,
+        "case_type_id": "FT_MasterCaseType",
+        "case_data": {
+          "_extends_": "TTL_Case_Data",
+          "SearchCriteria" : { }
+        },
+        "data_classification": {
+          "_extends_": "TTL_Case_Data_Classifications",
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        },
+        "security_classifications": {
+          "_extends_": "TTL_Case_Data_Classifications",
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "event_id": "updateCaseNoTTLInc"
+    }
+  }
+}

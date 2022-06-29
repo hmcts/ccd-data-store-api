@@ -1,0 +1,151 @@
+{
+  "_guid_": "S-142.9",
+  "_extends_": "Get_Linked_Cases__Base",
+
+  "title": "No pagination parameters, case link exist for the case reference, all case links are in the standard field, return 200 with all the case links in response payload",
+
+  "specs": [
+    "an active profile in CCD and basic access to all the linked cases created",
+
+    "contains the case reference of the case just created",
+
+    "contains HTTP 200 Ok status code",
+    "contains the case link details for all the linked cases using the the new standard CaseLinks top level collection field"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "hasMoreRecords": false,
+      "linkedCases": [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "caseReference"
+        },
+        {
+          "caseNameHmctsInternal": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink1][testData][actualResponse][body][data][caseNameHmctsInternal]}",
+          "caseReference": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink1][testData][actualResponse][body][id]}",
+          "ccdCaseType": "FT_MasterCaseType",
+          "ccdJurisdiction": "BEFTA_MASTER",
+          "state": "CaseCreated",
+          "linkDetails": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "createdDateTime"
+            },
+            {
+              "createdDateTime": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink1][testData][actualResponse][body][data][caseLinks][0][value][CreatedDateTime]}",
+              "reasons": [
+                {
+                  "__ordering__": "unordered",
+                  "__elementId__": "reasonCode"
+                },
+                {
+                  "reasonCode": "Reason 1",
+                  "otherDescription": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink1][testData][actualResponse][body][data][caseLinks][0][value][ReasonForLink][0][value][OtherDescription]}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "caseNameHmctsInternal": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink2_ManyLinkDetails][testData][actualResponse][body][data][caseNameHmctsInternal]}",
+          "caseReference": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink2_ManyLinkDetails][testData][actualResponse][body][id]}",
+          "ccdCaseType": "FT_MasterCaseType",
+          "ccdJurisdiction": "BEFTA_MASTER",
+          "state": "CaseCreated",
+          "linkDetails": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "createdDateTime"
+            },
+            {
+              "createdDateTime": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink2_ManyLinkDetails][testData][actualResponse][body][data][caseLinks][0][value][CreatedDateTime]}",
+              "reasons": [
+                {
+                  "__ordering__": "unordered",
+                  "__elementId__": "reasonCode"
+                },
+                {
+                  "reasonCode": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink2_ManyLinkDetails][testData][actualResponse][body][data][caseLinks][0][value][ReasonForLink][0][value][Reason]}",
+                  "otherDescription": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink2_ManyLinkDetails][testData][actualResponse][body][data][caseLinks][0][value][ReasonForLink][0][value][OtherDescription]}"
+                },
+                {
+                  "reasonCode": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink2_ManyLinkDetails][testData][actualResponse][body][data][caseLinks][0][value][ReasonForLink][1][value][Reason]}",
+                  "otherDescription": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink2_ManyLinkDetails][testData][actualResponse][body][data][caseLinks][0][value][ReasonForLink][1][value][OtherDescription]}"
+                }
+              ]
+            },
+            {
+              "createdDateTime": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink2_ManyLinkDetails][testData][actualResponse][body][data][caseLinks][2][value][CreatedDateTime]}",
+              "reasons": [
+                {
+                  "__ordering__": "unordered",
+                  "__elementId__": "reasonCode"
+                },
+                {
+                  "reasonCode": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink2_ManyLinkDetails][testData][actualResponse][body][data][caseLinks][2][value][ReasonForLink][0][value][Reason]}",
+                  "otherDescription": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink2_ManyLinkDetails][testData][actualResponse][body][data][caseLinks][2][value][ReasonForLink][0][value][OtherDescription]}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "caseNameHmctsInternal": null,
+          "caseReference": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink3_BasicLinkDetails][testData][actualResponse][body][id]}",
+          "ccdCaseType": "FT_MasterCaseType",
+          "ccdJurisdiction": "BEFTA_MASTER",
+          "state": "CaseCreated",
+          "linkDetails": [
+            {
+              "__ordering__": "ordered"
+            },
+            {
+              "createdDateTime": null,
+              "reasons": []
+            }
+          ]
+        },
+        {
+          "caseNameHmctsInternal": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink4][testData][actualResponse][body][data][caseNameHmctsInternal]}",
+          "caseReference": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink4][testData][actualResponse][body][id]}",
+          "ccdCaseType": "FT_MasterCaseType",
+          "ccdJurisdiction": "BEFTA_MASTER",
+          "state": "CaseCreated",
+          "linkDetails": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "createdDateTime"
+            },
+            {
+              "createdDateTime": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink4][testData][actualResponse][body][data][caseLinks][0][value][CreatedDateTime]}",
+              "reasons": [
+                {
+                  "__ordering__": "unordered",
+                  "__elementId__": "reasonCode"
+                },
+                {
+                  "reasonCode": "Reason 1",
+                  "otherDescription": "${[scenarioContext][childContexts][F-142_Create4LinkedCases_4StandardCaseLinks][childContexts][StandardCaseLink4][testData][actualResponse][body][data][caseLinks][0][value][ReasonForLink][0][value][OtherDescription]}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

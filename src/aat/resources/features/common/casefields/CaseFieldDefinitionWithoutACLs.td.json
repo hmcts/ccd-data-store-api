@@ -19,5 +19,6 @@
   "display_context": null,
   "display_context_parameter": null,
   "retain_hidden_value": null,
-  "formatted_value": null
+  "formatted_value": null,
+  "category_id": null
 }

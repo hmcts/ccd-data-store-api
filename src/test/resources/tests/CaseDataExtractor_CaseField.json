@@ -1,0 +1,198 @@
+[
+  {
+    "id": "CaseReference",
+    "case_type_id": "CaseReference",
+    "field_type": {
+      "type": "Text",
+      "id": "TextCaseReference",
+      "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)"
+    }
+  },
+  {
+    "id": "Person",
+    "case_type_id": "TestAddressBookCase",
+    "field_type": {
+      "type": "Complex",
+      "id": "Person",
+      "complex_fields": [
+        {
+          "id": "CaseLink1",
+          "field_type": {
+            "id": "TextCaseReference",
+            "type": "Text",
+            "min": null,
+            "max": null,
+            "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)",
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          }
+        },
+        {
+          "id": "Address",
+          "label": "Address",
+          "field_type": {
+            "type": "Complex",
+            "complex_fields": [
+              {
+                "id": "Line1",
+                "label": "Line1",
+                "field_type": {
+                  "type": "Text"
+                }
+              },
+              {
+                "id": "Line2",
+                "field_type": {
+                  "type": "Text"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+  "metadata": false,
+  "id": "CaseLink1",
+  "case_type_id": "FT_MasterCaseType",
+  "label": "MyCaseLink",
+  "hint_text": null,
+  "field_type": {
+  "id": "CaseLink",
+  "type": "Complex",
+  "min": null,
+  "max": null,
+  "regular_expression": null,
+  "fixed_list_items": [],
+  "complex_fields": [
+  {
+  "metadata": false,
+  "id": "CaseReference",
+  "case_type_id": null,
+  "label": "Case Reference",
+  "hint_text": null,
+  "field_type": {
+  "id": "TextCaseReference",
+  "type": "Text",
+  "min": null,
+  "max": null,
+  "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)",
+  "fixed_list_items": [],
+  "complex_fields": [],
+  "collection_field_type": null
+  },
+  "hidden": null,
+  "security_classification": "PUBLIC",
+  "live_from": null,
+  "live_until": null,
+  "acls": null,
+  "complexACLs": [],
+  "order": null,
+  "show_condition": null,
+  "display_context_parameter": null,
+  "retain_hidden_value": null
+  }
+  ],
+  "collection_field_type": null
+  },
+  "hidden": false,
+  "security_classification": "PUBLIC",
+  "live_from": "2017-01-01",
+  "live_until": null,
+  "acls": [],
+  "complexACLs": [],
+  "order": null,
+  "show_condition": null,
+  "display_context_parameter": null,
+  "retain_hidden_value": null
+  },
+  {
+  "metadata": false,
+  "id": "CaseLink2",
+  "case_type_id": "FT_MasterCaseType",
+  "label": "MyCaseLink",
+  "hint_text": null,
+  "field_type": {
+  "id": "CaseLink",
+  "type": "Complex",
+  "min": null,
+  "max": null,
+  "regular_expression": null,
+  "fixed_list_items": [],
+  "complex_fields": [
+  {
+  "metadata": false,
+  "id": "CaseReference",
+  "case_type_id": null,
+  "label": "Case Reference",
+  "hint_text": null,
+  "field_type": {
+  "id": "TextCaseReference",
+  "type": "Text",
+  "min": null,
+  "max": null,
+  "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)",
+  "fixed_list_items": [],
+  "complex_fields": [],
+  "collection_field_type": null
+  },
+  "hidden": null,
+  "security_classification": "PUBLIC",
+  "live_from": null,
+  "live_until": null,
+  "acls": null,
+  "complexACLs": [],
+  "order": null,
+  "show_condition": null,
+  "display_context_parameter": null,
+  "retain_hidden_value": null
+  }
+  ],
+  "collection_field_type": null
+  },
+  "hidden": false,
+  "security_classification": "PUBLIC",
+  "live_from": "2017-01-01",
+  "live_until": null,
+  "acls": [],
+  "complexACLs": [],
+  "order": null,
+  "show_condition": null,
+  "display_context_parameter": null,
+  "retain_hidden_value": null
+  },
+
+  {
+    "id": "CaseLink",
+    "case_type_id": "TestAddressBookCase",
+    "field_type": {
+      "type": "Collection",
+      "id": "Address",
+      "max": 1,
+      "collection_field_type": {
+        "type": "Complex",
+        "complex_fields": [
+          {
+            "id": "CaseLink1",
+            "label": "Line1",
+            "field_type": {
+              "type": "Text",
+              "id": "TextCaseReference",
+              "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)"
+            }
+          },
+          {
+            "id": "CaseLink2",
+            "field_type": {
+              "type": "Text",
+              "id": "TextCaseReference",
+              "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

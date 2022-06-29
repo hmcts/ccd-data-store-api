@@ -1,0 +1,69 @@
+{
+  "_guid_": "Health__Base",
+  "title": "must return a successful response when hitting data-store's Healthcheck Operation",
+
+  "productName": "CCD Data Store",
+  "operationName": "Healthcheck",
+
+  "method": "GET",
+  "uri": "/health",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "Common_User_For_Request"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "status": "UP",
+      "components": {
+        "caseDocumentManagement": {
+          "status": "UP"
+        },
+        "db": {
+          "status": "UP",
+          "details": {
+            "database": "PostgreSQL",
+            "validationQuery": "isValid()"
+          }
+        },
+        "diskSpace": {
+          "status": "UP",
+          "details": {
+            "total": "[[ANYTHING_PRESENT]]",
+            "free": "[[ANYTHING_PRESENT]]",
+            "threshold": "[[ANYTHING_PRESENT]]",
+            "exists": true
+          }
+        },
+        "hazelcast": {
+          "status": "UP",
+          "details": {
+            "name": "hazelcast-instance-ccd",
+            "uuid": "[[ANYTHING_PRESENT]]"
+          }
+        },
+        "livenessState": "[[ANY_OBJECT_NULLABLE]]",
+        "ping": {
+          "status": "UP"
+        },
+        "readinessState": "[[ANY_OBJECT_NULLABLE]]",
+        "refreshScope": {
+          "status": "UP"
+        },
+        "serviceAuth": {
+          "status": "UP"
+        }
+      },
+      "groups": "[[ANY_OBJECT_NULLABLE]]"
+    }
+  }
+}

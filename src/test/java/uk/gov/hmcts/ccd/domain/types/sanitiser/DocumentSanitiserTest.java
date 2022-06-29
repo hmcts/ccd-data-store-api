@@ -49,6 +49,8 @@ class DocumentSanitiserTest {
     private static final String DOCUMENT_URL_VALUE = "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
     private static final String BINARY_URL = "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary";
     private static final String FILENAME = "Seagulls_Sqaure.jpg";
+    private static final String CATEGORY_ID = "supportDocuments";
+    private static final String UPLOAD_TIMESTAMP = "2001-12-10T00:00:00";
     private static final String DOCUMENT_HASH = "document_hash";
     private static final String DOCUMENT_HASH_VALUE = "document_hash_value";
 
@@ -109,7 +111,12 @@ class DocumentSanitiserTest {
         document.setOriginalDocumentName(FILENAME);
         when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
+
+        documentValueSanitised.put("category_id", CATEGORY_ID);
+        documentValueSanitised.put("upload_timestamp", UPLOAD_TIMESTAMP);
         documentValueInitial.put(DOCUMENT_HASH, DOCUMENT_HASH_VALUE);
+        documentValueInitial.put("category_id", CATEGORY_ID);
+        documentValueInitial.put("upload_timestamp", UPLOAD_TIMESTAMP);
         JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
 
         documentValueSanitised.put(DOCUMENT_HASH, DOCUMENT_HASH_VALUE);

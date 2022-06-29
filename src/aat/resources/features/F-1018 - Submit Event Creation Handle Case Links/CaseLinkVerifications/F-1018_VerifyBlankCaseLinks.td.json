@@ -1,0 +1,21 @@
+{
+  "title": "should retrieve case links for a specified case reference",
+  "_guid_": "F-1018_VerifyBlankCaseLinks",
+  "_extends_": "F-1018_VerifyCaseLinksBase",
+
+  "specs": [
+    "to verify that no Case Links exist in the CASE_LINK table"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "CaseLinks" : [ ]
+    }
+  }
+}

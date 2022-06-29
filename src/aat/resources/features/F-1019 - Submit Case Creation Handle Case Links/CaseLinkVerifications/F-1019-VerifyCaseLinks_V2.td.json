@@ -1,0 +1,32 @@
+{
+  "title": "should retrieve case links for a specified case reference",
+  "_guid_": "F-1019-VerifyCaseLinks_V2",
+  "_extends_": "Verify_Case_Links_Base",
+
+  "users": {
+    "invokingUser": {
+    "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "CaseLinks": [{
+        "__ordering__": "unordered",
+        "__elementId__": "LinkedCaseReference"
+      }, {
+        "CaseReference": "[[ANYTHING_PRESENT]]",
+        "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+        "CaseTypeId": "FT_MasterCaseType",
+        "StandardLink" : false
+      }]
+    }
+  }
+}

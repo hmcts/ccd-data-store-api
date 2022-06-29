@@ -1,44 +1,262 @@
 [
   {
-    "type": "Text"
+    "id": "Text",
+    "type": "Text",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
-    "type": "Number"
+    "id": "Number",
+    "type": "Number",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
-    "type": "Email"
+    "id": "Email",
+    "type": "Email",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
-    "type": "YesOrNo"
+    "id": "YesOrNo",
+    "type": "YesOrNo",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
-    "type": "Date"
+    "id": "Date",
+    "type": "Date",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
-    "type": "FixedList"
+    "id": "FixedList",
+    "type": "FixedList",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
-    "type": "PostCode",
-    "regular_expression": "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$"
+    "id": "Postcode",
+    "type": "Postcode",
+    "min": null,
+    "max": null,
+    "regular_expression": "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$",
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
-    "type": "MoneyGBP"
+    "id": "MoneyGBP",
+    "type": "MoneyGBP",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
+    "id": "PhoneUK",
     "type": "PhoneUK",
-    "regular_expression": "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$"
+    "min": null,
+    "max": null,
+    "regular_expression": "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$",
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
-    "type": "TextArea"
+    "id": "TextArea",
+    "type": "TextArea",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
-    "type": "Complex"
+    "id": "Complex",
+    "type": "Complex",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
-    "type": "Collection"
+    "id": "Collection",
+    "type": "Collection",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   },
   {
-    "type": "MultiSelectList"
+    "id": "MultiSelectList",
+    "type": "MultiSelectList",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "Document",
+    "type": "Document",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "Label",
+    "type": "Label",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "DateTime",
+    "type": "DateTime",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "CasePaymentHistoryViewer",
+    "type": "CasePaymentHistoryViewer",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "FixedRadioList",
+    "type": "FixedRadioList",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "CaseHistoryViewer",
+    "type": "CaseHistoryViewer",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "DynamicList",
+    "type": "DynamicList",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "Region",
+    "type": "Region",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "BaseLocation",
+    "type": "BaseLocation",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "DynamicRadioList",
+    "type": "DynamicRadioList",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "DynamicMultiSelectList",
+    "type": "DynamicMultiSelectList",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "WaysToPay",
+    "type": "WaysToPay",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
+    "id": "FlagLauncher",
+    "type": "FlagLauncher",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
   }
 ]
-
