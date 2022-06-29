@@ -30,11 +30,11 @@ import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.inject.Inject;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -47,6 +47,11 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
+import static uk.gov.hmcts.ccd.data.ReferenceDataTestFixtures.BUILDING_LOCATIONS_STUB_ID;
+import static uk.gov.hmcts.ccd.data.ReferenceDataTestFixtures.SERVICES_STUB_ID;
 import static uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint.GLOBAL_SEARCH_PATH;
 
 public class GlobalSearchEndpointIT extends WireMockBaseTest {
@@ -104,6 +109,14 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         invalidSortCriteriaOne.setSortDirection("invalid");
         invalidSortCriteria = List.of(invalidSortCriteriaOne);
         validCaseReferences = List.of(REFERENCE_1, "1234-1234-1234-1234", "234-1234*", "1234-1234-1234-123?");
+
+        wireMockServer.resetAll();
+
+        final String buildings = fromFileAsString("tests/refdata/get_building_locations.json");
+        final String orgServices = fromFileAsString("tests/refdata/get_org_services.json");
+
+        stubSuccess(BUILDING_LOCATIONS_PATH, buildings, BUILDING_LOCATIONS_STUB_ID);
+        stubSuccess(SERVICES_PATH, orgServices, SERVICES_STUB_ID);
     }
 
     @Test
