@@ -840,8 +840,8 @@ task functional() {
                     '--threads', '1',
                     '--plugin', "json:${rootDir}/target/cucumber.json",
                     '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-//                    '--tags', 'not @Ignore',
-                    '--tags', '@Ignore',
+                    '--tags', 'not @Ignore',
+//                    '--tags', '@Ignore',
 //                    '--tags', '@F-065',
                     '--glue', 'uk.gov.hmcts.befta.player',
                     '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
