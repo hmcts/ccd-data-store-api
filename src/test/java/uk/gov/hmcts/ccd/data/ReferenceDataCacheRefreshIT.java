@@ -1,54 +1,31 @@
 package uk.gov.hmcts.ccd.data;
 
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import com.github.tomakehurst.wiremock.verification.VerificationResult;
 import org.awaitility.Duration;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
 import org.springframework.test.context.TestPropertySource;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
 
-import javax.inject.Inject;
 import java.util.List;
-import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_CACHE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
-import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
 
 @Isolated("Isolate from other integration tests that may utilise the same ReferenceData cache.")
 @TestPropertySource(locations = "classpath:cache-refresh-schedule.properties")
-class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceDataTestFixtures {
+class ReferenceDataCacheRefreshIT extends AbstractReferenceDataIT {
 
     private final List<BuildingLocation> updatedBuildingLocations = ReferenceDataTestFixtures.buildingLocations("2");
     private final List<ServiceReferenceData> updatedServices = ReferenceDataTestFixtures.services(22);
-
-    @Inject
-    private ReferenceDataRepository underTest;
-
-    @BeforeEach
-    void prepare() {
-        List.of(BUILDING_LOCATIONS_CACHE, SERVICES_CACHE)
-            .parallelStream()
-            .forEach(cacheName -> underTest.invalidateCache(cacheName));
-
-        List.of(BUILDING_LOCATIONS_STUB_ID, SERVICES_STUB_ID).forEach(id -> {
-            final Optional<StubMapping> stubMapping = Optional.ofNullable(wireMockServer.getSingleStubMapping(id));
-            stubMapping.ifPresent(mapping -> wireMockServer.removeStub(mapping));
-        });
-        wireMockServer.resetRequests();
-    }
 
     @Test
     void testShouldRefreshBuildingLocationCacheOnScheduleSuccessfully() {
@@ -58,7 +35,7 @@ class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceD
 
         // WHEN/THEN
         await()
-            .pollDelay(1500, MICROSECONDS)
+            .pollDelay(1500, MILLISECONDS)
             .atMost(Duration.FIVE_SECONDS)
             .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
                 .isNotEmpty()
@@ -75,7 +52,7 @@ class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceD
 
         // WHEN/THEN
         await()
-            .pollDelay(1500, MICROSECONDS)
+            .pollDelay(1500, MILLISECONDS)
             .atMost(Duration.FIVE_SECONDS)
             .untilAsserted(() -> assertThat(underTest.getServices())
                 .isNotEmpty()
@@ -92,7 +69,7 @@ class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceD
 
         // WHEN/THEN
         await()
-            .pollDelay(1500, MICROSECONDS)
+            .pollDelay(1500, MILLISECONDS)
             .atMost(Duration.FIVE_SECONDS)
             .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
                 .isNotEmpty()
@@ -107,7 +84,7 @@ class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceD
 
         // WHEN/THEN
         await()
-            .pollDelay(1500, MICROSECONDS)
+            .pollDelay(1500, MILLISECONDS)
             .atMost(Duration.FIVE_SECONDS)
             .untilAsserted(() -> assertThat(underTest.getServices())
                 .isNotEmpty()
