@@ -1,0 +1,31 @@
+{
+  "_guid_": "Get_Linked_Cases__Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "retrieve linked cases by case reference",
+
+  "method": "GET",
+  "uri": "/getLinkedCases/{cid}",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "Common_User_For_Request"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "cid": "OVERRIDE"
+    }
+  },
+
+  "expectedResponse": {
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

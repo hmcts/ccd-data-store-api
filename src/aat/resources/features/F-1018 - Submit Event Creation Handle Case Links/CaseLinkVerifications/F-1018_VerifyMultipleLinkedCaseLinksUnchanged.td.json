@@ -1,0 +1,38 @@
+{
+  "title": "should retrieve case links for a specified case reference",
+  "_guid_": "F-1018_VerifyMultipleLinkedCaseLinksUnchanged",
+  "_extends_": "F-1018_VerifyCaseLinksBase",
+
+  "specs": [
+    "to verify that the Case Links in the CASE_LINK table are unchanged"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "CaseLinks" : [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "LinkedCaseReference"
+        },
+        {
+          "CaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+          "LinkedCaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+          "CaseTypeId" : "FT_MasterCaseType",
+          "StandardLink" : false
+        },
+        {
+          "CaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+          "LinkedCaseReference" : "${[scenarioContext][siblingContexts][F-1018_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+          "CaseTypeId" : "FT_MasterCaseType",
+          "StandardLink" : false
+        }
+      ]
+    }
+  }
+}

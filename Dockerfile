@@ -3,6 +3,7 @@ ARG APP_INSIGHTS_AGENT_VERSION=2.6.1
 ARG PLATFORM=""
 
 FROM hmctspublic.azurecr.io/base/java${PLATFORM}:11-distroless
+USER hmcts
 LABEL maintainer="https://github.com/hmcts/ccd-data-store-api"
 
 COPY build/libs/core-case-data.jar /opt/app/

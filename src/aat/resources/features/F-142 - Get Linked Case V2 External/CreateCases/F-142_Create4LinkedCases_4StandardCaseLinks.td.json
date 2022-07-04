@@ -1,0 +1,24 @@
+{
+  "_guid_": "F-142_Create4LinkedCases_4StandardCaseLinks",
+  "_extends_": "Health__Base",
+
+  "specs": [
+    "to create 4 standard linked case with basic access for test account"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "StandardCaseLink1": "F-142_CreateLinkedCase_StandardCaseLink",
+      "StandardCaseLink2_ManyLinkDetails": "F-142_CreateLinkedCase_StandardCaseLink_ManyLinkDetails",
+      "StandardCaseLink3_BasicLinkDetails": "F-142_CreateLinkedCase_StandardCaseLink_BasicLinkDetails",
+      "StandardCaseLink4": "F-142_CreateLinkedCase_StandardCaseLink"
+    }
+  ]
+
+}

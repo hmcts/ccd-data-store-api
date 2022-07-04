@@ -1,13 +1,19 @@
 {
   "title": "must successfully create a case V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases endpoint",
   "_guid_": "S-1004.1",
-  "_extends_": "Case_Creation_Base",
+  "_extends_": "Case_Creation_Data_Base",
 
   "specs": [
     "an active profile in CCD",
     "contains data fields that will be used to populate SearchCriteria",
     "to create a full case"
   ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
 
   "request": {
     "pathVariables": {

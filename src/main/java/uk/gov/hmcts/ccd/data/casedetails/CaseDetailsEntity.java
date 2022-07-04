@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.data.JsonDataConverter;
+
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -14,7 +15,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import uk.gov.hmcts.ccd.data.JsonDataConverter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @SuppressWarnings("checkstyle:OperatorWrap")
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
@@ -49,6 +51,15 @@ import uk.gov.hmcts.ccd.data.JsonDataConverter;
     @NamedQuery(
         name = CaseDetailsEntity.CASES_COUNT_BY_CASE_TYPE,
         query = "SELECT cd.caseType, COUNT(cd) FROM CaseDetailsEntity cd GROUP BY cd.caseType"
+    ),
+
+    @NamedQuery(
+        name = CaseDetailsEntity.FIND_CASE_WITH_LIMITS,
+        query = "SELECT cd FROM CaseDetailsEntity cd " +
+            "WHERE UPPER(cd.jurisdiction) LIKE UPPER(:jurisdictionId) " +
+            "AND UPPER(cd.caseType) LIKE UPPER(:caseTypeId) " +
+            "AND cd.id >= :caseDataId " +
+            "ORDER BY cd.createdDate ASC "
     )
 })
 @Table(name = "case_data")
@@ -59,6 +70,7 @@ public class CaseDetailsEntity {
     static final String FIND_BY_REFERENCE = "CaseDataEntity_FIND_BY_REFERENCE";
     static final String FIND_BY_REF_AND_JURISDICTION = "CaseDataEntity_FIND_BY_REFERENCE_AND_JURISDICTION";
     static final String CASES_COUNT_BY_CASE_TYPE = "CaseDataEntity_CASES_COUNT_BY_CASE_TYPE";
+    static final String FIND_CASE_WITH_LIMITS = "CaseDataEntity_FIND_CASE_WITH_LIMITS";
 
     static final String JURISDICTION_ID_PARAM = "JURISDICTION_ID_PARAM";
     static final String CASE_TYPE_PARAM = "CASE_TYPE_PARAM";
@@ -77,6 +89,9 @@ public class CaseDetailsEntity {
     public static final String DATA_COL = "data";
     public static final String DATA_CLASSIFICATION_COL = "data_classification";
     public static final String SUPPLEMENTARY_DATA_COL = "supplementary_data";
+    public static final String RESOLVED_TTL_COL = "resolved_ttl";
+
+
     public static final String LOCATION = "data.caseManagementLocation.baseLocation";
     public static final String REGION = "data.caseManagementLocation.region";
     public static final String CASE_ACCESS_CATEGORY = "data.CaseAccessCategory";
@@ -112,6 +127,8 @@ public class CaseDetailsEntity {
     @Column(name = SUPPLEMENTARY_DATA_COL)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode supplementaryData;
+    @Column(name = RESOLVED_TTL_COL)
+    private LocalDate resolvedTTL;
 
     @Version
     private Integer version;
@@ -172,6 +189,10 @@ public class CaseDetailsEntity {
         this.state = state;
     }
 
+    public void setResolvedTTL(LocalDate resolvedTTL) {
+        this.resolvedTTL = resolvedTTL;
+    }
+
     public SecurityClassification getSecurityClassification() {
         return securityClassification;
     }
@@ -218,5 +239,9 @@ public class CaseDetailsEntity {
 
     public void setLastStateModifiedDate(LocalDateTime lastStateModifiedDate) {
         this.lastStateModifiedDate = lastStateModifiedDate;
+    }
+
+    public LocalDate getResolvedTTL() {
+        return resolvedTTL;
     }
 }

@@ -1,0 +1,37 @@
+{
+  "_guid_": "F-141_Document_Upload",
+  "_extends_": "Default_Document_Upload_Data_Base",
+
+  "specs": [
+    "to upload a document"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "body": {
+      "arrayInMap": [
+        {
+          "key": "classification",
+          "value": "PUBLIC"
+        },
+        {
+          "key": "caseTypeId",
+          "value": "FT_CaseFileView_1"
+        },
+        {
+          "key": "jurisdictionId",
+          "value": "BEFTA_MASTER"
+        },
+        {
+          "key": "files",
+          "filePath": "features/common/files/Sample.pdf"
+        }
+      ]
+    }
+  }
+}
