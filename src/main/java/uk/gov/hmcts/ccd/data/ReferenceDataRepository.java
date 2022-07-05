@@ -38,8 +38,8 @@ public class ReferenceDataRepository {
     public static final String SERVICES_CACHE = "orgServices";
     public static final String SERVICES_CACHE_KEY = "getServices";
 
-    static final String BUILDING_LOCATIONS_PATH = "/refdata/location/building-locations";
-    static final String SERVICES_PATH = "/refdata/location/orgServices";
+    public static final String BUILDING_LOCATIONS_PATH = "/refdata/location/building-locations";
+    public static final String SERVICES_PATH = "/refdata/location/orgServices";
 
     @Inject
     public ReferenceDataRepository(final SecurityUtils securityUtils,

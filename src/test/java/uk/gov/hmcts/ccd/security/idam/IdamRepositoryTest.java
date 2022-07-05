@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.security.idam;
 import feign.FeignException;
 import feign.Request;
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,9 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.powermock.reflect.Whitebox;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
+import uk.gov.hmcts.reform.authorisation.exceptions.ServiceException;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -56,42 +55,36 @@ class IdamRepositoryTest {
     }
 
     @Test
-    @DisplayName("Unauthorized get user info")
+    @DisplayName("Return InvalidTokenException when get user info Unauthorized")
     void shouldReturnUnauthorizedGetUserInfo() {
         FeignException.Unauthorized exception = new FeignException
             .Unauthorized("myUniqueExceptionMessage",
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0]);
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        ResponseStatusException thrown = Assert.assertThrows(ResponseStatusException.class,
-            () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
-        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, thrown.getStatus());
+        Assert.assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
     @Test
-    @DisplayName("Internal Server Error when get user info returns BadRequest")
+    @DisplayName("Return InvalidTokenException when get user info returns BadRequest")
     void shouldInternalServerErrorGetUserInfoWithBadRequest() {
         FeignException.BadRequest exception = new FeignException
             .BadRequest("myUniqueExceptionMessage",
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0]);
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        ResponseStatusException thrown = Assert.assertThrows(ResponseStatusException.class,
-            () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, thrown.getStatus());
+        Assert.assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
     @Test
-    @DisplayName("BadGateway when get user info returns InternalServerError")
+    @DisplayName("Return ServiceException when get user info returns InternalServerError")
     void shouldBadGatewayGetUserInfo() {
         FeignException.InternalServerError exception = new FeignException
             .InternalServerError("myUniqueExceptionMessage",
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0]);
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        ResponseStatusException thrown = Assert.assertThrows(ResponseStatusException.class,
-            () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
-        Assertions.assertEquals(HttpStatus.BAD_GATEWAY, thrown.getStatus());
+        Assert.assertThrows(ServiceException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
     @Test
@@ -102,9 +95,8 @@ class IdamRepositoryTest {
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0]);
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        ResponseStatusException thrown = Assert.assertThrows(ResponseStatusException.class,
+        Assert.assertThrows(ServiceException.class,
             () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
-        Assertions.assertEquals(HttpStatus.SERVICE_UNAVAILABLE, thrown.getStatus());
     }
 
     @Test

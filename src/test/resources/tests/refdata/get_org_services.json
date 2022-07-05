@@ -1,0 +1,14 @@
+[
+  {
+    "jurisdiction": "AUTOTEST1",
+    "service_id": 1,
+    "org_unit": "HMCTS",
+    "business_area": "TEST",
+    "sub_business_area": "TEST",
+    "service_description": "test_service_description",
+    "service_code": "AAA1",
+    "service_short_description": "test_service_short_description",
+    "last_update": "2021-09-23T18:40:21.123456",
+    "ccd_case_types": []
+  }
+]

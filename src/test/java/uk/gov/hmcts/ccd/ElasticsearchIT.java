@@ -83,6 +83,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDEX_TYPE;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDICES;
+import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
+import static uk.gov.hmcts.ccd.data.ReferenceDataTestFixtures.BUILDING_LOCATIONS_STUB_ID;
+import static uk.gov.hmcts.ccd.data.ReferenceDataTestFixtures.SERVICES_STUB_ID;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_LINE_1;
@@ -219,6 +224,17 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 embeddedElastic.index(idx, INDEX_TYPE, caseString);
             }
         }
+    }
+
+    @BeforeEach
+    public void prepare() {
+        wireMockServer.resetAll();
+
+        final String buildings = fromFileAsString("tests/refdata/get_building_locations.json");
+        final String orgServices = fromFileAsString("tests/refdata/get_org_services.json");
+
+        stubSuccess(BUILDING_LOCATIONS_PATH, buildings, BUILDING_LOCATIONS_STUB_ID);
+        stubSuccess(SERVICES_PATH, orgServices, SERVICES_STUB_ID);
     }
 
     @AfterAll
