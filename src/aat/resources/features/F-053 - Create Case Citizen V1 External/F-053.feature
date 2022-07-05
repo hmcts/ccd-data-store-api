@@ -22,7 +22,7 @@ Scenario: must create case successfully and return positive response HTTP-201 f
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-270 @Ignore # wrong scenario in Excel
+@S-270 @Ignore @Reenable # wrong scenario in Excel
 Scenario: must return 201 if event creation is successful for a citizen
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -54,19 +54,19 @@ Scenario: must return 403 when request provides authentic credentials without au
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-273 @Ignore # Postponed.
+@S-273 @Ignore @Reenable # Postponed.
 Scenario: must return 409 if case is altered outside of transaction
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-274 @Ignore # Postponed
+@S-274 @Ignore @Reenable # Postponed
 Scenario: must return 409 when case reference is not unique
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-275 @Ignore # Postponed
+@S-275 @Ignore @Reenable # Postponed
 Scenario: must return 422 if event trigger has failed
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-276 @Ignore # Postponed
+@S-276 @Ignore @Reenable # Postponed
 Scenario: must return 422 when process could not be started
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

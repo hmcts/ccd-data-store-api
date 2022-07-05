@@ -15,7 +15,7 @@ Feature: F-102: Get jurisdictions available to the user
     And the response [contains the list of jurisdictions a user has access to],
     And the response has all other details as expected.
 
-  @S-534 @Ignore
+  @S-534 @Ignore @Reenable
   Scenario: No jurisdictions found for given access criteria
     #We will never get a "No jurisdictions found for given access criteria" in real time scenario.
     #Hence skipping the scenario implementation.

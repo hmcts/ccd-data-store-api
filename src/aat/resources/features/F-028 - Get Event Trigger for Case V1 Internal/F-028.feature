@@ -22,7 +22,7 @@ Scenario: must return event trigger data successfully for valid pre-state condit
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-045 @Ignore # re-write as part of RDM-6847
+@S-045 @Ignore @Reenable # re-write as part of RDM-6847
 Scenario: must return negative response when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],

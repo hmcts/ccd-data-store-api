@@ -34,7 +34,7 @@ Scenario: must return an empty SearchResultView envelope and status code 200 if 
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-074 @Ignore # re-write as part of RDM-6847
+@S-074 @Ignore @Reenable # re-write as part of RDM-6847
 Scenario: must return appropriate negative response when request does not provide valid authentication credentials
 
    Given  a user with     [an active profile in CCD],
@@ -103,7 +103,7 @@ Scenario: must return the list of cases and status code 200 for correct inputs
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-588 @Ignore @RDM-7739 @RDM-7793 #Get cases list from Last State Modified Date filter - when data list 1 or more
+@S-588 @Ignore @RDM-7739 @RDM-7793 @Reenable #Get cases list from Last State Modified Date filter - when data list 1 or more
 # Enable this after changing it to use Dynamic date instead of a static one
 # Also update this with data ordering when FW support is available
 Scenario: must return the list of cases and status code 200 for correct inputs

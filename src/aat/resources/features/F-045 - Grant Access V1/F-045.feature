@@ -40,7 +40,7 @@ Scenario: must return 404 when case id is structurally valid but not exist in CC
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-153 @Ignore # re-write as part of RDM-6847
+@S-153 @Ignore @Reenable # re-write as part of RDM-6847
 Scenario: must return negative response when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],

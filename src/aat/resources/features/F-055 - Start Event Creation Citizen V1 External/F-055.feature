@@ -37,7 +37,7 @@ Scenario: must return 401 when request does not provide valid authentication cre
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-253 @Ignore # re-write as part of RDM-6847
+@S-253 @Ignore @Reenable # re-write as part of RDM-6847
 Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
 
     Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation],

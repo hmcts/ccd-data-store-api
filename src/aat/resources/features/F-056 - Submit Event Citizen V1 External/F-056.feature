@@ -35,7 +35,7 @@ Scenario: must return 403 when request provides authentic credentials without au
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-286 @Ignore
+@S-286 @Ignore @Reenable
 #    Code says "409" when case reference is not unique however we do not provide a case reference
 #  Scenario is when the case has been altered outside the transaction, as the endpoint doesnt allow for case ref to be passed in this scenario
   #  to be ignored for now and investigated further later on

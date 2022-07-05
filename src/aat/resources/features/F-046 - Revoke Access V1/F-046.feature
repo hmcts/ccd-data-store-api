@@ -56,7 +56,7 @@ Scenario: must return 401 when request does not provide valid authentication cre
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-225 @Ignore # re-write as part of RDM-6847
+@S-225 @Ignore @Reenabled # re-write as part of RDM-6847
 Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
 
     Given a user with [an active profile in CCD],

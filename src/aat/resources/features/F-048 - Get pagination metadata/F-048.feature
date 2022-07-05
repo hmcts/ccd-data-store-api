@@ -89,7 +89,7 @@ Scenario: must return 400 when security classification in input parameters is pr
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-592 @Ignore @RDM-7739 # Pagination data with Last State Modified Date filter - with results
+@S-592 @Ignore @RDM-7739 @Reenable # Pagination data with Last State Modified Date filter - with results
                          # Enable this after changing it to use Dynamic date instead of a static one
 Scenario: must return pagination metadata successfully for correct Last State Modified State input
 
