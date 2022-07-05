@@ -55,46 +55,41 @@ public class TimeToLiveService {
                                                                      Map<String, JsonNode> dataClassification,
                                                                      CaseEventDefinition caseEventDefinition,
                                                                      CaseTypeDefinition caseTypeDefinition) {
-        Map<String, JsonNode> clonedDataClassification = dataClassification;
+        Map<String, JsonNode> outputDataClassification = dataClassification;
         Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
 
         // if TTL is in play then ensure data classification contains TTL data
-        if (isCaseTypeUsingTTL(caseTypeDefinition) && (ttlIncrement != null)
-            && data != null && data.get(TTL_CASE_FIELD_ID) != null) {
+        if (isCaseTypeUsingTTL(caseTypeDefinition) && (ttlIncrement != null) && isTtlCaseFieldPresent(data)) {
 
-            // using just the TTL data ....
-            Map<String, JsonNode> justTtlData = new HashMap<>();
-            justTtlData.put(TTL_CASE_FIELD_ID, data.get(TTL_CASE_FIELD_ID));
-
-            // ... generate just the TTL data classification
+            // generate just the TTL data classification from just the TTL field data
             Map<String, JsonNode> justTtlDataClassification = caseDataService.getDefaultSecurityClassifications(
                 caseTypeDefinition,
-                justTtlData,
+                Map.of(TTL_CASE_FIELD_ID, data.get(TTL_CASE_FIELD_ID)),
                 new HashMap<>()
             );
 
             // .. then clone current data classification and set the TTL classification
-            clonedDataClassification = cloneOrNewJsonMap(dataClassification);
-            clonedDataClassification.put(TTL_CASE_FIELD_ID, justTtlDataClassification.get(TTL_CASE_FIELD_ID));
+            outputDataClassification = cloneOrNewJsonMap(dataClassification);
+            outputDataClassification.put(TTL_CASE_FIELD_ID, justTtlDataClassification.get(TTL_CASE_FIELD_ID));
         }
 
-        return clonedDataClassification;
+        return outputDataClassification;
     }
 
     public Map<String, JsonNode> updateCaseDetailsWithTTL(Map<String, JsonNode> data,
                                                           CaseEventDefinition caseEventDefinition,
                                                           CaseTypeDefinition caseTypeDefinition) {
-        Map<String, JsonNode> clonedData = data;
+        Map<String, JsonNode> outputdData = data;
         Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
 
         if (isCaseTypeUsingTTL(caseTypeDefinition) && (ttlIncrement != null)) {
 
-            clonedData = cloneOrNewJsonMap(data);
+            outputdData = cloneOrNewJsonMap(data);
             TTL timeToLive = null;
 
             // load existing TTL
-            if (clonedData.get(TTL_CASE_FIELD_ID) != null) {
-                timeToLive = getTTLFromJson(clonedData.get(TTL_CASE_FIELD_ID));
+            if (outputdData.get(TTL_CASE_FIELD_ID) != null) {
+                timeToLive = getTTLFromJson(outputdData.get(TTL_CASE_FIELD_ID));
             }
 
             // if TTL still missing create one
@@ -104,10 +99,10 @@ public class TimeToLiveService {
 
             // set system TTL and write TTL field to cloned data
             timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
-            clonedData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
+            outputdData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
         }
 
-        return clonedData;
+        return outputdData;
     }
 
     public void verifyTTLContentNotChanged(Map<String, JsonNode> expected, Map<String, JsonNode> actual) {
@@ -186,6 +181,10 @@ public class TimeToLiveService {
         } else {
             return new HashMap<>();
         }
+    }
+
+    private boolean isTtlCaseFieldPresent(Map<String, JsonNode> data) {
+        return data != null && data.get(TTL_CASE_FIELD_ID) != null;
     }
 
 }

@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.startevent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -82,10 +81,10 @@ public class DefaultStartEventOperationTest {
     private static final int TTL_INCREMENT = 20;
 
     private static final Map<String, JsonNode> NEW_FIELDS_CLASSIFICATION =
-        ImmutableMap.of("key", JSON_NODE_FACTORY.textNode("value"));
+        Map.of("key", JSON_NODE_FACTORY.textNode("value"));
 
     private static final Map<String, JsonNode> NEW_FIELDS_CLASSIFICATION_TTL =
-        ImmutableMap.of("key", JSON_NODE_FACTORY.textNode("value_with_ttl"));
+        Map.of("key", JSON_NODE_FACTORY.textNode("value_with_ttl"));
 
     static Map<String, JsonNode> expectedDefaultValue() {
         Map<String, JsonNode> data = new HashMap<>();
