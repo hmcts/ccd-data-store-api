@@ -10,7 +10,6 @@ def suppressCves(reportPath, suppressionsPath) {
 
         vulns.each {
             def cveName = it
-            println(cveName)
             suppressions.appendNode {
                 suppress {
                     notes('Ticket TBC')
@@ -18,8 +17,6 @@ def suppressCves(reportPath, suppressionsPath) {
                 }
             }
         }
-
-        println(XmlUtil.serialize(suppressions))
 
         file.write(XmlUtil.serialize(suppressions))
     }
