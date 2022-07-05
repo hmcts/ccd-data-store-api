@@ -3,7 +3,9 @@ package uk.gov.hmcts.ccd.domain.service.callbacks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -15,8 +17,6 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import javax.inject.Inject;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
@@ -25,12 +25,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @TestPropertySource(properties =
     {
         "http.client.read.timeout=500"
@@ -58,7 +58,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         caseEventDefinition.setName("Test");
     }
 
-    // @Test FIXME: flakey one need some investigation - RDM-7504
+    @Test
     public void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
@@ -75,13 +75,8 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
             .whenScenarioStateIs("SecondFailedAttempt")
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(490)));
 
-        Instant start = Instant.now();
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false);
 
-        final Duration between = Duration.between(start, Instant.now());
-        // 0s retryInterval + 0.5s readTimeout + 1s retryInterval + 0.5s readTimeout + 3s retryInterval + 0.49s
-        // readTimeout
-        assertTrue((int) between.toMillis() > 5500);
         verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
@@ -95,15 +90,10 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
         List<Integer> disabledRetries = Lists.newArrayList(0);
         caseEventDefinition.setRetriesTimeoutAboutToStartEvent(disabledRetries);
-        Instant start = Instant.now();
 
         CallbackException callbackException = assertThrows(CallbackException.class, () ->
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false));
         assertEquals("Callback to service has been unsuccessful for event Test", callbackException.getMessage());
-
-        final Duration between = Duration.between(start, Instant.now());
-        // 0s retryInterval + 0.5s readTimeout + 1s bufferTimeToAvoidIntermittentBuildFails and no followup retries
-        assertTrue((int) between.toMillis() < 2500);
         verify(exactly(1), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
