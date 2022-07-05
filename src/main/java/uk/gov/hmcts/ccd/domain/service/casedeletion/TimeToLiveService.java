@@ -79,17 +79,17 @@ public class TimeToLiveService {
     public Map<String, JsonNode> updateCaseDetailsWithTTL(Map<String, JsonNode> data,
                                                           CaseEventDefinition caseEventDefinition,
                                                           CaseTypeDefinition caseTypeDefinition) {
-        Map<String, JsonNode> outputdData = data;
+        Map<String, JsonNode> outputData = data;
         Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
 
         if (isCaseTypeUsingTTL(caseTypeDefinition) && (ttlIncrement != null)) {
 
-            outputdData = cloneOrNewJsonMap(data);
+            outputData = cloneOrNewJsonMap(data);
             TTL timeToLive = null;
 
             // load existing TTL
-            if (outputdData.get(TTL_CASE_FIELD_ID) != null) {
-                timeToLive = getTTLFromJson(outputdData.get(TTL_CASE_FIELD_ID));
+            if (outputData.get(TTL_CASE_FIELD_ID) != null) {
+                timeToLive = getTTLFromJson(outputData.get(TTL_CASE_FIELD_ID));
             }
 
             // if TTL still missing create one
@@ -99,10 +99,10 @@ public class TimeToLiveService {
 
             // set system TTL and write TTL field to cloned data
             timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
-            outputdData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
+            outputData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
         }
 
-        return outputdData;
+        return outputData;
     }
 
     public void verifyTTLContentNotChanged(Map<String, JsonNode> expected, Map<String, JsonNode> actual) {
