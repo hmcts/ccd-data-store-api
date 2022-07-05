@@ -11,7 +11,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     When  a request is prepared with appropriate values,
     And   the request [contains correctly configured event details]
     And   the request [has a TTLIncrement of 20 days configured]
-    And   the request [is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL]
+    And   the request [is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL ]
     And   it is submitted to call the [Start event creation process to update a case] operation of [CCD Data Store]
     Then  a positive response is received
     And   the response has all other details as expected
@@ -24,7 +24,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     When  a request is prepared with appropriate values,
     And   the request [contains correctly configured event details]
     And   the request [has a TTLIncrement of 20 days configured]
-    And   the request [is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL]
+    And   the request [is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL ]
     And   the request [is a repeat of S-1015.1 but with no TTL in create case call]
     And   it is submitted to call the [Start event creation process to update a case] operation of [CCD Data Store]
     Then  a positive response is received
@@ -38,7 +38,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     When  a request is prepared with appropriate values,
     And   the request [contains correctly configured event details]
     And   the request [has a TTLIncrement of 20 days configured]
-    And   the request [is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL]
+    And   the request [is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL ]
     And   it is submitted to call the [Start event creation process to update a case as Citizen] operation of [CCD Data Store]
     Then  a positive response is received
     And   the response has all other details as expected
@@ -51,7 +51,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     When  a request is prepared with appropriate values,
     And   the request [contains correctly configured event details]
     And   the request [has a TTLIncrement of 20 days configured]
-    And   the request [is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL]
+    And   the request [is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL ]
     And   the request [is a repeat of S-1015.2 but with no TTL in create case call]
     And   it is submitted to call the [Start event creation process to update a case as Citizen] operation of [CCD Data Store]
     Then  a positive response is received
@@ -65,7 +65,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     When  a request is prepared with appropriate values
     And   the request [contains correctly configured event details]
     And   the request [has a TTLIncrement of 20 days configured]
-    And   the request [is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL]
+    And   the request [is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL ]
     And   it is submitted to call the [Retrieve an update event trigger for case] operation of [CCD Data Store]
     Then  a positive response is received
     And   the response has all other details as expected
@@ -78,7 +78,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     When  a request is prepared with appropriate values
     And   the request [contains correctly configured event details]
     And   the request [has a TTLIncrement of 20 days configured]
-    And   the request [is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL]
+    And   the request [is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL ]
     And   the request [is a repeat of S-1015.3 but with no TTL in create case call]
     And   it is submitted to call the [Retrieve an update event trigger for case] operation of [CCD Data Store]
     Then  a positive response is received
@@ -92,7 +92,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     When  a request is prepared with appropriate values
     And   the request [contains correctly configured event details]
     And   the request [has a TTLIncrement of 20 days configured]
-    And   the request [is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL]
+    And   the request [is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL ]
     And   it is submitted to call the [Fetch an update event trigger in the context of a case] operation of [CCD Data Store]
     Then  a positive response is received
     And   the response has all other details as expected
@@ -105,7 +105,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     When  a request is prepared with appropriate values
     And   the request [contains correctly configured event details]
     And   the request [has a TTLIncrement of 20 days configured]
-    And   the request [is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL]
+    And   the request [is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL ]
     And   the request [is a repeat of S-1015.4 but with no TTL in create case call]
     And   it is submitted to call the [Fetch an update event trigger in the context of a case] operation of [CCD Data Store]
     Then  a positive response is received
@@ -119,7 +119,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     When  a request is prepared with appropriate values,
     And   the request [contains correctly configured event details],
     And   the request [has a TTLIncrement of 20 days configured],
-    And   the request [is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL],
+    And   the request [is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL ],
     And   it is submitted to call the [Retrieve an start event trigger for case] operation of [CCD Data Store],
     Then  a positive response is received,
     And   the response has all other details as expected,
@@ -132,7 +132,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     When  a request is prepared with appropriate values,
     And   the request [contains correctly configured event details],
     And   the request [has a TTLIncrement of 20 days configured],
-    And   the request [is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL],
+    And   the request [is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL ],
     And   the request [is a repeat of S-1015.5 but with no TTL in create case call]
     And   it is submitted to call the [Retrieve an start event trigger for case] operation of [CCD Data Store],
     Then  a positive response is received,

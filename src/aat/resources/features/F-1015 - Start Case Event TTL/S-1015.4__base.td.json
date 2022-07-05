@@ -9,7 +9,7 @@
     "contains correctly configured event details",
     "has a TTLIncrement of 20 days configured",
     "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
-    "is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL"
+    "is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL "
   ],
 
   "users": {
