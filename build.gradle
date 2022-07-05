@@ -44,6 +44,8 @@ apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 
+apply from: './gradle/suppress.gradle'
+
 def versions = [
         pact_version: '4.1.7'
 ]
