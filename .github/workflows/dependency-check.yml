@@ -19,3 +19,4 @@ jobs:
           java-version: 11
       - name: Run dependency-check
         run: ./gradlew dependencyCheckAnalyze
+        continue-on-error: true
