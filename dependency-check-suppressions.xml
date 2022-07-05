@@ -57,4 +57,8 @@
     <notes>Ticket TBC</notes>
     <cve>CVE-2020-5408</cve>
   </suppress>
+  <suppress>
+    <notes>Ticket TBC</notes>
+    <cve>CVE-2022-22976</cve>
+  </suppress>
 </suppressions>
