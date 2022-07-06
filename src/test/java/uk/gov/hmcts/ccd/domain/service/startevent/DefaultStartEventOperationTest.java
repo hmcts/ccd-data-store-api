@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.startevent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -81,8 +80,11 @@ public class DefaultStartEventOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final int TTL_INCREMENT = 20;
 
-    private static Map<String, JsonNode> NEW_FIELDS_CLASSIFICATION =
-        ImmutableMap.of("key", JSON_NODE_FACTORY.textNode("value"));
+    private static final Map<String, JsonNode> NEW_FIELDS_CLASSIFICATION =
+        Map.of("key", JSON_NODE_FACTORY.textNode("value"));
+
+    private static final Map<String, JsonNode> NEW_FIELDS_CLASSIFICATION_TTL =
+        Map.of("key", JSON_NODE_FACTORY.textNode("value_with_ttl"));
 
     static Map<String, JsonNode> expectedDefaultValue() {
         Map<String, JsonNode> data = new HashMap<>();
@@ -518,7 +520,17 @@ public class DefaultStartEventOperationTest {
             expectedData.putAll(ttlCaseData(twentyDaysFromNow.toString()));
 
             doReturn(expectedData)
-                .when(timeToLiveService).updateCaseDetailsWithTTL(anyMap(), any(CaseEventDefinition.class));
+                .when(timeToLiveService).updateCaseDetailsWithTTL(
+                    anyMap(), any(CaseEventDefinition.class), any(CaseTypeDefinition.class)
+                );
+
+            doReturn(NEW_FIELDS_CLASSIFICATION_TTL)
+                .when(timeToLiveService).updateCaseDataClassificationWithTTL(
+                    anyMap(),
+                    eq(NEW_FIELDS_CLASSIFICATION),
+                    any(CaseEventDefinition.class),
+                    any(CaseTypeDefinition.class)
+                );
 
             doReturn(NEW_FIELDS_CLASSIFICATION).when(caseDataService)
                 .getDefaultSecurityClassifications(eq(caseTypeDefinition),
@@ -561,10 +573,16 @@ public class DefaultStartEventOperationTest {
                     caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition),
                 () -> verify(callbackInvoker).invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition,
                                                                          actual.getCaseDetails(), IGNORE_WARNING),
+                () -> verify(timeToLiveService).updateCaseDetailsWithTTL(
+                    any(), eq(caseEventDefinition), eq(caseTypeDefinition)
+                ),
+                () -> verify(timeToLiveService).updateCaseDataClassificationWithTTL(
+                    any(), any(), eq(caseEventDefinition), eq(caseTypeDefinition)
+                ),
                 () -> assertThat(actual.getCaseDetails(), is(equalTo(caseDetails))),
                 () -> assertThat(actual.getCaseDetails().getData(), is(equalTo(expectedData))),
                 () -> assertThat(actual.getCaseDetails().getDataClassification(),
-                    is(equalTo(NEW_FIELDS_CLASSIFICATION))),
+                    is(equalTo(NEW_FIELDS_CLASSIFICATION_TTL))),
                 () -> assertThat(actual.getToken(), is(equalTo(TEST_EVENT_TOKEN))),
                 () -> assertThat(actual.getEventId(), is(equalTo(TEST_EVENT_TRIGGER_ID)))
             );

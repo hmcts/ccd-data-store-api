@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.casedeletion;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,13 +11,18 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.NO;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
 
 @Slf4j
@@ -31,31 +37,74 @@ public class TimeToLiveService {
 
     private final ObjectMapper objectMapper;
     private final ApplicationParams applicationParams;
+    private final CaseDataService caseDataService;
 
     @Autowired
     public TimeToLiveService(@Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
-                             ApplicationParams applicationParams) {
+                             ApplicationParams applicationParams,
+                             CaseDataService caseDataService) {
         this.objectMapper = objectMapper;
         this.applicationParams = applicationParams;
+        this.caseDataService = caseDataService;
+    }
+
+    public boolean isCaseTypeUsingTTL(@NonNull CaseTypeDefinition caseTypeDefinition) {
+        return Optional.ofNullable(caseTypeDefinition.getCaseFieldDefinitions()).orElse(Collections.emptyList())
+            .stream().anyMatch(caseFieldDefinition -> TTL_CASE_FIELD_ID.equals(caseFieldDefinition.getId()));
+    }
+
+    public Map<String, JsonNode> updateCaseDataClassificationWithTTL(Map<String, JsonNode> data,
+                                                                     Map<String, JsonNode> dataClassification,
+                                                                     CaseEventDefinition caseEventDefinition,
+                                                                     CaseTypeDefinition caseTypeDefinition) {
+        Map<String, JsonNode> outputDataClassification = dataClassification;
+        Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
+
+        // if TTL is in play then ensure data classification contains TTL data
+        if (isCaseTypeUsingTTL(caseTypeDefinition) && (ttlIncrement != null) && isTtlCaseFieldPresent(data)) {
+
+            // generate just the TTL data classification from just the TTL field data
+            Map<String, JsonNode> justTtlDataClassification = caseDataService.getDefaultSecurityClassifications(
+                caseTypeDefinition,
+                Map.of(TTL_CASE_FIELD_ID, data.get(TTL_CASE_FIELD_ID)),
+                new HashMap<>()
+            );
+
+            // .. then clone current data classification and set the TTL classification
+            outputDataClassification = cloneOrNewJsonMap(dataClassification);
+            outputDataClassification.put(TTL_CASE_FIELD_ID, justTtlDataClassification.get(TTL_CASE_FIELD_ID));
+        }
+
+        return outputDataClassification;
     }
 
     public Map<String, JsonNode> updateCaseDetailsWithTTL(Map<String, JsonNode> data,
-                                                          CaseEventDefinition caseEventDefinition) {
-        Map<String, JsonNode> clonedData = data;
+                                                          CaseEventDefinition caseEventDefinition,
+                                                          CaseTypeDefinition caseTypeDefinition) {
+        Map<String, JsonNode> outputData = data;
+        Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
 
-        if (clonedData != null) {
-            Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
-            clonedData = new HashMap<>(data);
-            if (clonedData.get(TTL_CASE_FIELD_ID) != null && (ttlIncrement != null)) {
-                TTL timeToLive = getTTLFromJson(clonedData.get(TTL_CASE_FIELD_ID));
-                if (timeToLive != null) {
-                    timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
-                    clonedData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
-                }
+        if (isCaseTypeUsingTTL(caseTypeDefinition) && (ttlIncrement != null)) {
+
+            outputData = cloneOrNewJsonMap(data);
+            TTL timeToLive = null;
+
+            // load existing TTL
+            if (outputData.get(TTL_CASE_FIELD_ID) != null) {
+                timeToLive = getTTLFromJson(outputData.get(TTL_CASE_FIELD_ID));
             }
+
+            // if TTL still missing create one
+            if (timeToLive == null) {
+                timeToLive = TTL.builder().suspended(NO).build();
+            }
+
+            // set system TTL and write TTL field to cloned data
+            timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
+            outputData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
         }
 
-        return clonedData;
+        return outputData;
     }
 
     public void verifyTTLContentNotChanged(Map<String, JsonNode> expected, Map<String, JsonNode> actual) {
@@ -124,6 +173,15 @@ public class TimeToLiveService {
             }
         }
         return null;
+    }
+
+    private Map<String, JsonNode> cloneOrNewJsonMap(Map<String, JsonNode> jsonMap) {
+        if (jsonMap != null) {
+            // shallow clone
+            return new HashMap<>(jsonMap);
+        } else {
+            return new HashMap<>();
+        }
     }
 
     private boolean isTtlCaseFieldPresent(Map<String, JsonNode> data) {
