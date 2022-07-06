@@ -25,10 +25,12 @@ public class TimeToLiveService {
 
     protected static final String TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE =
         "Time to live content has been modified by callback";
+    protected static final String TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE =
+        "Unsetting a suspension can only be allowed if the deletion will occur beyond the guard period.";
     protected static final String FAILED_TO_READ_TTL_FROM_CASE_DATA = "Failed to read TTL from case data";
 
-    private ObjectMapper objectMapper;
-    private ApplicationParams applicationParams;
+    private final ObjectMapper objectMapper;
+    private final ApplicationParams applicationParams;
 
     @Autowired
     public TimeToLiveService(@Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
@@ -71,9 +73,8 @@ public class TimeToLiveService {
                                           Map<String, JsonNode> currentDataInDatabase) {
         TTL beforeCallbackTTL = null;
         TTL currentTTLInDatabase = null;
-        if (beforeCallbackData != null
-            && beforeCallbackData.get(TTL_CASE_FIELD_ID) != null
-            && currentDataInDatabase.get(TTL_CASE_FIELD_ID) != null) {
+
+        if (isTtlCaseFieldPresent(beforeCallbackData) && isTtlCaseFieldPresent(currentDataInDatabase)) {
             beforeCallbackTTL = getTTLFromJson(beforeCallbackData.get(TTL_CASE_FIELD_ID));
             currentTTLInDatabase = getTTLFromJson(currentDataInDatabase.get(TTL_CASE_FIELD_ID));
         }
@@ -81,17 +82,17 @@ public class TimeToLiveService {
         if (beforeCallbackTTL == null || currentTTLInDatabase == null) {
             return;
         }
-        // check caseDetailsInDatabase (which is the current state of the fields) against the updatedCaseDetails when
-        // checking if TTL.suspended has changed value
+
         LocalDate localDate = LocalDate.now().plusDays(applicationParams.getTtlGuard());
-        if (!beforeCallbackTTL.getSuspended().equalsIgnoreCase(currentTTLInDatabase.getSuspended())
+
+        // checking if TTL.suspended has changed value
+        if ((beforeCallbackTTL.isSuspended() != currentTTLInDatabase.isSuspended())
             && (!beforeCallbackTTL.isSuspended()
             && (beforeCallbackTTL.getSystemTTL() != null
             && beforeCallbackTTL.getSystemTTL().isBefore(localDate)))
             && beforeCallbackTTL.getOverrideTTL() != null
             && beforeCallbackTTL.getOverrideTTL().isBefore(localDate)) {
-            throw new ValidationException("Unsetting a suspension can only be allowed if"
-                + " the deletion will occur beyond the guard period.");
+            throw new ValidationException(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE);
         }
     }
 
@@ -124,4 +125,9 @@ public class TimeToLiveService {
         }
         return null;
     }
+
+    private boolean isTtlCaseFieldPresent(Map<String, JsonNode> data) {
+        return data != null && data.get(TTL_CASE_FIELD_ID) != null;
+    }
+
 }

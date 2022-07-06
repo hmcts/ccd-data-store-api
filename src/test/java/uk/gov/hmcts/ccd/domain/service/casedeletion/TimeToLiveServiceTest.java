@@ -37,6 +37,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTLTest.TTL_SUSPENSION_NO_PARAMETERS;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTLTest.TTL_SUSPENSION_YES_PARAMETERS;
+import static uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService.TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE;
 
 @ExtendWith(MockitoExtension.class)
 class TimeToLiveServiceTest {
@@ -296,8 +297,7 @@ class TimeToLiveServiceTest {
             final ValidationException exception = assertThrows(ValidationException.class,
                 () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
             assertThat(exception.getMessage(),
-                startsWith("Unsetting a suspension can only be allowed "
-                    + "if the deletion will occur beyond the guard period."));
+                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
         }
 
         @ParameterizedTest(
@@ -327,8 +327,7 @@ class TimeToLiveServiceTest {
             final ValidationException exception = assertThrows(ValidationException.class,
                 () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
             assertThat(exception.getMessage(),
-                startsWith("Unsetting a suspension can only be allowed "
-                    + "if the deletion will occur beyond the guard period."));
+                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
         }
 
         @Test
@@ -380,8 +379,7 @@ class TimeToLiveServiceTest {
             final ValidationException exception = assertThrows(ValidationException.class,
                 () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
             assertThat(exception.getMessage(),
-                startsWith("Unsetting a suspension can only be allowed "
-                    + "if the deletion will occur beyond the guard period."));
+                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
         }
 
         @Test
@@ -433,8 +431,7 @@ class TimeToLiveServiceTest {
             final ValidationException exception = assertThrows(ValidationException.class,
                 () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
             assertThat(exception.getMessage(),
-                startsWith("Unsetting a suspension can only be allowed "
-                    + "if the deletion will occur beyond the guard period."));
+                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
         }
 
     }
