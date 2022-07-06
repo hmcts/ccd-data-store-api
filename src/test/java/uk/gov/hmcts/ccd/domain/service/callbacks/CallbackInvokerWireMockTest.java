@@ -6,6 +6,8 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -37,6 +39,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
     })
 public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CallbackInvokerWireMockTest.class);
+
     private static final ObjectMapper mapper = JacksonUtils.MAPPER;
 
     @Inject
@@ -60,6 +64,8 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
     @Test
     public void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
+
+        LOG.debug("JCDEBUG: shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext");
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .inScenario("CallbackRetry")
