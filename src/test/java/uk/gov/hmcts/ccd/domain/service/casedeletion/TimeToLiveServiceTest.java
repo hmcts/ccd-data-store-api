@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -52,7 +53,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.NO;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
+import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTLTest.TTL_SUSPENSION_NO_PARAMETERS;
+import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTLTest.TTL_SUSPENSION_YES_PARAMETERS;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
+import static uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService.TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE;
 
 @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
 @ExtendWith(MockitoExtension.class)
@@ -519,8 +523,61 @@ class TimeToLiveServiceTest {
     @DisplayName("validateSuspensionChange")
     class ValidateSuspensionChange {
 
+        @ParameterizedTest(
+            name = "validateSuspensionChange generates no error if supplied case data is null or empty: {0}"
+        )
+        @NullAndEmptySource
+        void verifyTTLSuspension_NoError_whenCaseDataNullOrEmpty(Map<String, JsonNode> data) {
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.YES)
+                .overrideTTL(LocalDate.now())
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, data));
+        }
+
+        @ParameterizedTest(
+            name = "validateSuspensionChange generates no error if supplied updated case data is null or empty: {0}"
+        )
+        @NullAndEmptySource
+        void verifyTTLSuspension_NoError_whenUpdatedCaseDataNullOrEmpty(Map<String, JsonNode> updatedData) {
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.YES)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedData, caseData));
+        }
+
         @Test
-        void verifyTTLSuspensionNotChanged() {
+        void verifyTTLSuspensionNotChanged_Yes() {
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.YES)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.YES)
+                .overrideTTL(LocalDate.now())
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+        }
+
+        @Test
+        void verifyTTLSuspensionNotChanged_No() {
             TTL ttl = TTL
                 .builder()
                 .systemTTL(LocalDate.now())
@@ -540,14 +597,95 @@ class TimeToLiveServiceTest {
             assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
         }
 
-        @Test
-        void verifyTTLSuspensionChanged() {
+        @ParameterizedTest(
+            name = "validateSuspensionChange generates no error if TTL.suspended changed: {0} -> Yes"
+        )
+        @MethodSource(TTL_SUSPENSION_NO_PARAMETERS)
+        void verifyTTLSuspensionChanged_NoToYes_alternativeNos(String ttlSuspended) {
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(ttlSuspended)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.YES)
+                .overrideTTL(LocalDate.now())
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+        }
+
+        @ParameterizedTest(
+            name = "validateSuspensionChange generates no error if TTL.suspended changed: No -> {0}"
+        )
+        @MethodSource(TTL_SUSPENSION_YES_PARAMETERS)
+        void verifyTTLSuspensionChanged_NoToYes_alternativeYeses(String updatedTtlSuspended) {
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(updatedTtlSuspended)
+                .overrideTTL(LocalDate.now())
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+        }
+
+        @ParameterizedTest(
+            name = "validateSuspensionChange generates error if TTL.suspended changed: Yes -> {0}"
+        )
+        @MethodSource(TTL_SUSPENSION_NO_PARAMETERS)
+        void verifyTTLSuspensionChanged_YesToNo_alternativeNos(String updatedTtlSuspended) {
             when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
 
             TTL ttl = TTL
                 .builder()
                 .systemTTL(LocalDate.now())
                 .suspended(TTL.YES)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(updatedTtlSuspended)
+                .overrideTTL(LocalDate.now())
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            final ValidationException exception = assertThrows(ValidationException.class,
+                () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+            assertThat(exception.getMessage(),
+                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
+        }
+
+        @ParameterizedTest(
+            name = "validateSuspensionChange generates error if TTL.suspended changed: {0} -> No"
+        )
+        @MethodSource(TTL_SUSPENSION_YES_PARAMETERS)
+        void verifyTTLSuspensionChanged_YesToNo_alternativeYeses(String ttlSuspended) {
+            when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
+
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(ttlSuspended)
                 .overrideTTL(LocalDate.now())
                 .build();
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
@@ -564,8 +702,7 @@ class TimeToLiveServiceTest {
             final ValidationException exception = assertThrows(ValidationException.class,
                 () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
             assertThat(exception.getMessage(),
-                startsWith("Unsetting a suspension can only be allowed "
-                    + "if the deletion will occur beyond the guard period."));
+                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
         }
 
         @Test
@@ -617,8 +754,59 @@ class TimeToLiveServiceTest {
             final ValidationException exception = assertThrows(ValidationException.class,
                 () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
             assertThat(exception.getMessage(),
-                startsWith("Unsetting a suspension can only be allowed "
-                    + "if the deletion will occur beyond the guard period."));
+                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
+        }
+
+        @Test
+        void verifyTTLGuardOverrideTtlNotBeforeTtlGuard() {
+            when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
+
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.YES)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .overrideTTL(LocalDate.now().plusDays(TTL_GUARD))
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+        }
+
+        @Test
+        void verifyTTLGuardOverrideTtlIsBeforeTtlGuard() {
+
+            when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
+
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.YES)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .overrideTTL(LocalDate.now().plusDays(TTL_GUARD - 1))
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            final ValidationException exception = assertThrows(ValidationException.class,
+                () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+            assertThat(exception.getMessage(),
+                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
         }
 
     }
