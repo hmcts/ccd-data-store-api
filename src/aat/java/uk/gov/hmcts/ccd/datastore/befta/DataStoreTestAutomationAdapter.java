@@ -182,6 +182,10 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             }
         } else if (key.toString().equalsIgnoreCase("dateTwentyDaysFromToday")) {
             return LocalDate.now().plusDays(20).toString();
+        } else if (key.toString().equalsIgnoreCase("dateGreaterThanTTLGuardDate")) {
+            return LocalDate.now().plusYears(10).toString();
+        } else if (key.toString().equalsIgnoreCase("dateLessThanTTLGuardDate")) {
+            return LocalDate.now().plusDays(10).toString();
         } else if (key.toString().equalsIgnoreCase("generateUUID")) {
             return UUID.randomUUID();
         }

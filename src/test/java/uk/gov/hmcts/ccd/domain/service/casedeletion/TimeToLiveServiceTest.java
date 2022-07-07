@@ -66,6 +66,7 @@ class TimeToLiveServiceTest {
     private TimeToLiveService timeToLiveService;
     private static final Integer TTL_INCREMENT = 10;
     private static final Integer TTL_GUARD = 365;
+    private static final LocalDate FAR_FUTURE_DATE = LocalDate.now().plusDays(TTL_GUARD * 2);
     private final Map<String, JsonNode> caseData = new HashMap<>();
 
     @Spy
@@ -87,7 +88,7 @@ class TimeToLiveServiceTest {
     @DisplayName("isCaseTypeUsingTTL")
     class IsCaseTypeUsingTTL {
 
-        @ParameterizedTest(name = "isCaseTypeUsingTtl false when list of CaseFieldDefinitions is null or empty: {0}")
+        @ParameterizedTest(name = "isCaseTypeUsingTTL false when list of CaseFieldDefinitions is null or empty: {0}")
         @NullAndEmptySource
         void isCaseTypeUsingTTL_falseWhenCaseFieldDefinitionsNullOrEmpty(List<CaseFieldDefinition> caseFields) {
 
@@ -713,7 +714,7 @@ class TimeToLiveServiceTest {
                 .builder()
                 .systemTTL(LocalDate.now())
                 .suspended(TTL.YES)
-                .overrideTTL(LocalDate.now())
+                .overrideTTL(null)
                 .build();
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
 
@@ -721,7 +722,7 @@ class TimeToLiveServiceTest {
                 .builder()
                 .systemTTL(LocalDate.now().plusDays(TTL_GUARD))
                 .suspended(TTL.NO)
-                .overrideTTL(LocalDate.now())
+                .overrideTTL(null)
                 .build();
             Map<String, JsonNode> updatedCaseData = new HashMap<>();
             updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
@@ -738,7 +739,7 @@ class TimeToLiveServiceTest {
                 .builder()
                 .systemTTL(LocalDate.now())
                 .suspended(TTL.YES)
-                .overrideTTL(LocalDate.now())
+                .overrideTTL(null)
                 .build();
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
 
@@ -746,7 +747,7 @@ class TimeToLiveServiceTest {
                 .builder()
                 .systemTTL(LocalDate.now().plusDays(TTL_GUARD - 1))
                 .suspended(TTL.NO)
-                .overrideTTL(LocalDate.now())
+                .overrideTTL(null)
                 .build();
             Map<String, JsonNode> updatedCaseData = new HashMap<>();
             updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
@@ -763,7 +764,7 @@ class TimeToLiveServiceTest {
 
             TTL ttl = TTL
                 .builder()
-                .systemTTL(LocalDate.now())
+                .systemTTL(FAR_FUTURE_DATE)
                 .suspended(TTL.YES)
                 .overrideTTL(LocalDate.now())
                 .build();
@@ -771,7 +772,7 @@ class TimeToLiveServiceTest {
 
             TTL updatedTtl = TTL
                 .builder()
-                .systemTTL(LocalDate.now())
+                .systemTTL(FAR_FUTURE_DATE)
                 .suspended(TTL.NO)
                 .overrideTTL(LocalDate.now().plusDays(TTL_GUARD))
                 .build();
@@ -788,7 +789,7 @@ class TimeToLiveServiceTest {
 
             TTL ttl = TTL
                 .builder()
-                .systemTTL(LocalDate.now())
+                .systemTTL(FAR_FUTURE_DATE)
                 .suspended(TTL.YES)
                 .overrideTTL(LocalDate.now())
                 .build();
@@ -796,7 +797,7 @@ class TimeToLiveServiceTest {
 
             TTL updatedTtl = TTL
                 .builder()
-                .systemTTL(LocalDate.now())
+                .systemTTL(FAR_FUTURE_DATE)
                 .suspended(TTL.NO)
                 .overrideTTL(LocalDate.now().plusDays(TTL_GUARD - 1))
                 .build();

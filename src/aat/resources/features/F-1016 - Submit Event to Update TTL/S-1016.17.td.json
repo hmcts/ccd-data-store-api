@@ -28,8 +28,8 @@
       "data": {
         "TTL": {
           "Suspended": "No",
-          "OverrideTTL": null,
-          "SystemTTL": "2030-04-30"
+          "SystemTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "OverrideTTL": null
         }
       },
       "event": {
@@ -58,8 +58,8 @@
       "case_data" : {
         "TTL" : {
           "Suspended": "No",
-          "OverrideTTL": null,
-          "SystemTTL": "2030-04-30"
+          "SystemTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "OverrideTTL": null
         }
       },
       "data_classification" : {
