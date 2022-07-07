@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1015_CreateCasePreRequisiteCitizen",
+  "_guid_": "F-1015_CreateCasePreRequisiteCitizen_noTTL",
   "_extends_": "Befta_Jurisdiction2_Citizen_Case_Creation_Base_Data",
 
   "specs": [
@@ -23,12 +23,8 @@
       "ctid": "FT_MasterCaseType"
     },
     "body": {
-      "data": {
-       "_extends_": "TTL_Case_Data"
-      },
-      "data_classification": {
-        "_extends_": "TTL_Case_Data_Classifications"
-      },
+      "data": { },
+      "data_classification": { },
       "event": {
         "id": "createCaseTTL",
         "summary": "",
@@ -49,15 +45,9 @@
       "last_modified": "[[ANYTHING_PRESENT]]",
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
-      "case_data": {
-        "_extends_": "TTL_Case_Data"
-      },
-      "data_classification": {
-        "_extends_": "TTL_Case_Data_Classifications"
-      },
-      "security_classifications": {
-        "_extends_": "TTL_Case_Data_Classifications"
-      },
+      "case_data": { },
+      "data_classification": { },
+      "security_classifications": { },
       "supplementary_data": null,
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
