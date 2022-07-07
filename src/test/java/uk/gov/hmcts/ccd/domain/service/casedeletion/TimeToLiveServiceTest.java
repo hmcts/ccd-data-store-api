@@ -466,8 +466,21 @@ class TimeToLiveServiceTest {
     class VerifyTTLContentNotChanged {
 
         @Test
-        void verifyTTLContentNotChangedNullCaseData() {
-            assertDoesNotThrow(() -> timeToLiveService.verifyTTLContentNotChanged(null, null));
+        void verifyTTLContentNotChangedWhenActualCaseDataIsNull() {
+            TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
+
+            Map<String, JsonNode> expectedCaseData = new HashMap<>(caseData);
+            expectedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            assertDoesNotThrow(() -> timeToLiveService.verifyTTLContentNotChanged(expectedCaseData, null));
+        }
+
+        @Test
+        void verifyTTLContentNotChangedWhenExpectedCaseDataIsNull() {
+            TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            assertDoesNotThrow(() -> timeToLiveService.verifyTTLContentNotChanged(null, caseData));
         }
 
         @Test
@@ -554,6 +567,37 @@ class TimeToLiveServiceTest {
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
 
             assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedData, caseData));
+        }
+
+        @Test
+        void verifyTTLSuspension_NoError_whenCaseDataTtlIsNull() {
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(null));
+
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.YES)
+                .overrideTTL(LocalDate.now())
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+        }
+
+        @Test
+        void verifyTTLSuspension_NoError_whenUpdatedCaseDataTtlIsNull() {
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.YES)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(null));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
         }
 
         @Test
@@ -855,6 +899,17 @@ class TimeToLiveServiceTest {
             LocalDate updatedResolvedTTL = timeToLiveService.getUpdatedResolvedTTL(caseData);
 
             assertEquals(ttl.getSystemTTL(), updatedResolvedTTL);
+        }
+
+        @ParameterizedTest(
+            name = "Verify ResolvedTtl set to null when supplied data is null or empty: {0}"
+        )
+        @NullAndEmptySource
+        void verifyResolvedTtlSetToNullWhenCaseDataNullOrEmpty(Map<String, JsonNode> data) {
+
+            LocalDate updatedResolvedTTL = timeToLiveService.getUpdatedResolvedTTL(data);
+
+            assertNull(updatedResolvedTTL);
         }
 
     }
