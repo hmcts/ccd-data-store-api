@@ -77,7 +77,7 @@ Scenario: must not validate when CMC ExternalID is not unique or already exists
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-059.1 @Ignore @Reenable # Enable this when Citizen Login is enabled for BEFTA_MASTER jurisdiction
+@S-059.1 @Ignore # Enable this when Citizen Login is enabled for BEFTA_MASTER jurisdiction
 Scenario: must validate date in a right format
 
     Given a user with [an active profile in CCD],
@@ -91,7 +91,7 @@ Scenario: must validate date in a right format
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-059.2 @Ignore @Reenable # Enable this when Citizen Login is enabled for BEFTA_MASTER jurisdiction
+@S-059.2 @Ignore # Enable this when Citizen Login is enabled for BEFTA_MASTER jurisdiction
 Scenario: must return an error for date value with invalid format
 
     Given a user with [an active profile in CCD],
