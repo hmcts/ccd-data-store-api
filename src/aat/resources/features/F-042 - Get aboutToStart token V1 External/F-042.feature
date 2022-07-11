@@ -68,7 +68,7 @@ Scenario: Return error code 422 when an event request could not be processed.
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-244 @Ignore @Reenable # re-write as part of RDM-6847
+@S-244 # re-write as part of RDM-6847
 Scenario: must return a negative response when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],

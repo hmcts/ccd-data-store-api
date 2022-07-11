@@ -116,7 +116,7 @@ Scenario: must return 404 when request contains a non-existing jurisdiction Id
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-560 @Ignore @Reenable # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6918
+@S-560 # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6918
 Scenario: must return 404 when request contains a non-existing case type
 
     Given a user with [an active profile in CCD],
@@ -156,52 +156,52 @@ Scenario: must update successfully all and only the respective fields with updat
       And a call [to get the same case by Solicitor 3, who doesn't have READ permission] will get the expected response as in [S-579_Later_Case_Read_By_Solicitor_3].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-113 @Ignore @Reenable
+@S-113
 Scenario: should not update a case if the caseworker has 'C' access on CaseType
           <already implemented previously. will be refactored later.>
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-114 @Ignore @Reenable
+@S-114
 Scenario: should not update a case if the caseworker has 'CR' access on CaseType
           <already implemented previously. will be refactored later.>
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-115 @Ignore @Reenable
+@S-115
 Scenario: should not update a case if the caseworker has 'D' access on CaseType
           <already implemented previously. will be refactored later.>
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-116 @Ignore @Reenable
+@S-116
 Scenario: should not update a case if the caseworker has 'R' access on CaseType
           <already implemented previously. will be refactored later.>
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-117 @Ignore @Reenable
+@S-117
 Scenario: should progress case state
           <already implemented previously. will be refactored later.>
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-118 @Ignore @Reenable
+@S-118
 Scenario: should update a case if the caseworker has 'CRUD' access on CaseType
           <already implemented previously. will be refactored later.>
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-119 @Ignore @Reenable
+@S-119
 Scenario: should update a case if the caseworker has 'CU' access on CaseType
           <already implemented previously. will be refactored later.>
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-120 @Ignore @Reenable
+@S-120
 Scenario: should update a case if the caseworker has 'RU' access on CaseType
           <already implemented previously. will be refactored later.>
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-121 @Ignore @Reenable
+@S-121
 Scenario: should update a case if the caseworker has 'U' access on CaseType
           <already implemented previously. will be refactored later.>
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-122 @Ignore @Reenable
+@S-122
 Scenario: should update a single case field
           <already implemented previously. will be refactored later.>
 

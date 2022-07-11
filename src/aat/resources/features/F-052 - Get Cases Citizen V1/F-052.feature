@@ -49,7 +49,7 @@ Scenario: must return 403 when request provides authentic credentials without au
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-069 @Ignore @Reenable # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6918
+@S-069 # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6918
 Scenario: must return 404 when request contains a non-existing case type
 
     Given a user with [an active profile in CCD],
