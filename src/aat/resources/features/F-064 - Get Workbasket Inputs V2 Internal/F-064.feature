@@ -48,11 +48,11 @@ Scenario: must return 403 when request provides authentic credentials without au
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-219 @Ignore @Reenable # this scenario will later be refactored from previous implementation.
+@S-219 @Ignore # this scenario will later be refactored from previous implementation.
 Scenario: should retrieve search inputs
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-220 @Ignore @Reenable # this scenario will later be refactored from previous implementation.
+@S-220 @Ignore # this scenario will later be refactored from previous implementation.
 Scenario: should retrieve workbasket inputs
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

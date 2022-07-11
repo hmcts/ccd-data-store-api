@@ -78,7 +78,7 @@ Scenario: must return 404 when event not provided
       And the response ha s all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-312 @Ignore @Reenable #This scenario is invalid. Jira: RDM-6410
+@S-312 @Ignore #This scenario is invalid. Jira: RDM-6410
 Scenario: must return 422 when event trigger does not exist
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

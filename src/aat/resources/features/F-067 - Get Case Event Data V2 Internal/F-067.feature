@@ -24,7 +24,7 @@ Scenario: should retrieve case view with response code HTTP 200 when the case re
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-211 @Ignore @Reenable #This is an invalid scenario with respect to this endpoint.
+@S-211 @Ignore #This is an invalid scenario with respect to this endpoint.
 Scenario: should retrieve case view history when the case reference exists
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

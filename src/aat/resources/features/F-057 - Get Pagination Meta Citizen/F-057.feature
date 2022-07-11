@@ -91,7 +91,7 @@ Scenario: must return appropriate negative response when request provides an inv
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-057.01 @Ignore @RDM-7739 @Reenable # Pagination data with Last State Modified Date filter - with results
+@S-057.01 @Ignore @RDM-7739 # Pagination data with Last State Modified Date filter - with results
     # Enable this after changing it to use Dynamic date instead of a static one
 Scenario: must return pagination metadata successfully for correct Last State Modified State input
 
