@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.casedeletion;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -136,8 +136,8 @@ public class TimeToLiveService {
         }
 
         // checking if `TTL.suspended` has changed value
-        if (updatedTTL.isSuspended() != currentTTL.isSuspended() ||
-            !updatedTTL.getOverrideTTL().equals(currentTTL.getOverrideTTL())) {
+        if (updatedTTL.isSuspended() != currentTTL.isSuspended()
+            || overrideTTLIsChanged(currentTTL.getOverrideTTL(), updatedTTL.getOverrideTTL())) {
             LocalDate ttlGuardDate = LocalDate.now().plusDays(applicationParams.getTtlGuard());
             LocalDate resolvedTTL = getResolvedTTL(updatedTTL);
 
@@ -149,6 +149,16 @@ public class TimeToLiveService {
                 throw new ValidationException(TIME_TO_LIVE_GUARD_ERROR_MESSAGE);
             }
         }
+    }
+
+    // check if overrideTTL has changed value
+    private boolean overrideTTLIsChanged(LocalDate currentOverrideTTL, LocalDate updatedOverrideTTL) {
+        if (currentOverrideTTL == null && updatedOverrideTTL == null
+            || (currentOverrideTTL != null && updatedOverrideTTL != null
+            && currentOverrideTTL.equals(updatedOverrideTTL))) {
+            return false;
+        }
+        return true;
     }
 
     public LocalDate getUpdatedResolvedTTL(Map<String, JsonNode> caseData) {
