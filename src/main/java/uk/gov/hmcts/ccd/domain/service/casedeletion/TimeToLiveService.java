@@ -30,7 +30,7 @@ public class TimeToLiveService {
     protected static final String TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE =
         "Time to live content has been modified by callback";
     protected static final String TIME_TO_LIVE_GUARD_ERROR_MESSAGE =
-        "Unsetting a suspension or override can only be allowed if the deletion will occur beyond the guard period.";
+        "Updating the TTL suspension or override values only allowed if the deletion will occur beyond the guard period.";
     protected static final String FAILED_TO_READ_TTL_FROM_CASE_DATA = "Failed to read TTL from case data";
 
     private final ObjectMapper objectMapper;
