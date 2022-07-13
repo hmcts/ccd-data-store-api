@@ -751,6 +751,51 @@ class TimeToLiveServiceTest {
         }
 
         @Test
+        void verifyTTLOverrideChangedWithValidValue() {
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .overrideTTL(LocalDate.now().plusDays(2L))
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+        }
+
+        @Test
+        void verifyTTLOverrideChangedWithInValidValue() {
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .overrideTTL(LocalDate.now().minusDays(2L))
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            final ValidationException exception = assertThrows(ValidationException.class,
+                () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+            assertThat(exception.getMessage(),
+                startsWith(TIME_TO_LIVE_GUARD_ERROR_MESSAGE));
+        }
+
+        @Test
         void verifyTTLGuardSystemTtlNotBeforeTtlGuard() {
             when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
 
