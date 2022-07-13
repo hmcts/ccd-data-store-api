@@ -1,8 +1,8 @@
 {
-  "_guid_": "S-1016.22",
-  "_extends_": "F-1016_Test_Data_Base",
+  "_guid_": "S-1016.28",
+  "_extends_": "F-1016_Test_Data_Base_V2",
 
-  "title": "OverrideTTL changed to a date less than Guard value, SystemTTL is null and TTL.Suspended is \"No\" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
+  "title": "OverrideTTL changed to a date less than Guard value, SystemTTL is null and TTL.Suspended is \"No\" and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST",
 
   "prerequisites" : [ {
     "Token_Creation": "S-1016_GetUpdateTokenOverrideTTLCaseworker"
