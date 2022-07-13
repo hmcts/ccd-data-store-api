@@ -56,7 +56,7 @@ import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTLTest.TTL_SUSPENSION_NO_PARAMETERS;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTLTest.TTL_SUSPENSION_YES_PARAMETERS;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
-import static uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService.TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE;
+import static uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService.TIME_TO_LIVE_GUARD_ERROR_MESSAGE;
 
 @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
 @ExtendWith(MockitoExtension.class)
@@ -717,7 +717,7 @@ class TimeToLiveServiceTest {
             final ValidationException exception = assertThrows(ValidationException.class,
                 () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
             assertThat(exception.getMessage(),
-                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
+                startsWith(TIME_TO_LIVE_GUARD_ERROR_MESSAGE));
         }
 
         @ParameterizedTest(
@@ -747,7 +747,7 @@ class TimeToLiveServiceTest {
             final ValidationException exception = assertThrows(ValidationException.class,
                 () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
             assertThat(exception.getMessage(),
-                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
+                startsWith(TIME_TO_LIVE_GUARD_ERROR_MESSAGE));
         }
 
         @Test
@@ -799,7 +799,7 @@ class TimeToLiveServiceTest {
             final ValidationException exception = assertThrows(ValidationException.class,
                 () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
             assertThat(exception.getMessage(),
-                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
+                startsWith(TIME_TO_LIVE_GUARD_ERROR_MESSAGE));
         }
 
         @Test
@@ -851,7 +851,7 @@ class TimeToLiveServiceTest {
             final ValidationException exception = assertThrows(ValidationException.class,
                 () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
             assertThat(exception.getMessage(),
-                startsWith(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE));
+                startsWith(TIME_TO_LIVE_GUARD_ERROR_MESSAGE));
         }
 
     }

@@ -29,8 +29,8 @@ public class TimeToLiveService {
 
     protected static final String TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE =
         "Time to live content has been modified by callback";
-    protected static final String TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE =
-        "Unsetting a suspension can only be allowed if the deletion will occur beyond the guard period.";
+    protected static final String TIME_TO_LIVE_GUARD_ERROR_MESSAGE =
+        "Unsetting a suspension or override can only be allowed if the deletion will occur beyond the guard period.";
     protected static final String FAILED_TO_READ_TTL_FROM_CASE_DATA = "Failed to read TTL from case data";
 
     private final ObjectMapper objectMapper;
@@ -136,7 +136,8 @@ public class TimeToLiveService {
         }
 
         // checking if `TTL.suspended` has changed value
-        if (updatedTTL.isSuspended() != currentTTL.isSuspended()) {
+        if (updatedTTL.isSuspended() != currentTTL.isSuspended() ||
+            !updatedTTL.getOverrideTTL().equals(currentTTL.getOverrideTTL())) {
             LocalDate ttlGuardDate = LocalDate.now().plusDays(applicationParams.getTtlGuard());
             LocalDate resolvedTTL = getResolvedTTL(updatedTTL);
 
@@ -145,7 +146,7 @@ public class TimeToLiveService {
 
             // validate: Unsetting a suspension can only be allowed if the deletion will occur beyond the guard period
             if (resolvedTTL != null && resolvedTTL.isBefore(ttlGuardDate)) {
-                throw new ValidationException(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE);
+                throw new ValidationException(TIME_TO_LIVE_GUARD_ERROR_MESSAGE);
             }
         }
     }
