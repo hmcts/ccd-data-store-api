@@ -1,7 +1,8 @@
 ARG JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
 ARG APP_INSIGHTS_AGENT_VERSION=2.6.1
+ARG PLATFORM=""
 
-FROM hmctspublic.azurecr.io/base/java:openjdk-11-distroless-1.4
+FROM hmctspublic.azurecr.io/base/java${PLATFORM}:11-distroless
 USER hmcts
 LABEL maintainer="https://github.com/hmcts/ccd-data-store-api"
 
