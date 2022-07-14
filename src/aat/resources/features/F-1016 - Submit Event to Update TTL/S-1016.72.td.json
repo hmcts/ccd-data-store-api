@@ -1,39 +1,50 @@
 {
-  "_guid_": "S-1016.16",
+  "_guid_": "S-1016.72",
   "_extends_": "F-1016_Test_Data_Base_Citizen",
 
-  "title": "TTL.Suspended changed to \"No\", SystemTTL and OverrideTTL set to NULL using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
+  "title": "Set TTL for first time when TTL data not present in event data using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
 
-  "prerequisites" : [{
-    "Token_Creation": "S-1016_GetUpdateSuspendedCaseTokenCitizen"
-  }],
+  "prerequisites" : [ {
+    "Token_Creation": "F-1016_UpdateCase_TTLCaseType_updateCaseTTLIncHidden_PreRequisiteCitizen_TokenCreation"
+  } ],
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCitizen",
+    "a caseworker with an active profile in CCD",
+    "access to manage TTL properties",
+
+    "contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen",
     "contains an event token for the case just created above",
-    "has TTL.Suspended value changed to No from Yes",
-    "has TTL.SystemTTL set to null",
-    "has TTL.OverrideTTL set to null"
+    "has no TTL data present in the submitted data",
+
+    "will update the existing TTL value with TTL increment of 30 days"
   ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    },
+    "caseworker": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "manageTTL": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1016_CreateSuspendedCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
     },
     "headers": {
       "_extends_": "Common_Request_Headers"
     },
     "body": {
       "data": {
-        "TTL": {
-          "Suspended": "No",
-          "SystemTTL": null,
-          "OverrideTTL": null
-        }
+        "TextField": "Updated without supplying TTL"
       },
       "event": {
-        "id": "updateCaseSubmitTTL",
+        "id": "updateCaseTTLIncHidden",
         "summary": "",
         "description": ""
       },
@@ -49,21 +60,17 @@
       "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "BEFTA_MASTER",
       "state" : "CaseUpdated",
-      "version" : 1,
-      "case_type_id" : "FT_MasterCaseType",
+      "version" : 2,
+      "case_type_id" : "FT_TTL",
       "created_date" : "[[ANYTHING_PRESENT]]",
       "last_modified" : "[[ANYTHING_PRESENT]]",
       "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
       "security_classification" : "PUBLIC",
       "case_data" : {
-        "TTL" : {
-          "Suspended" : "No",
-          "SystemTTL" : null,
-          "OverrideTTL" : null
-        }
+        "TextField": "Updated without supplying TTL"
       },
       "data_classification" : {
-        "_extends_": "TTL_Classifications"
+        "TextField" : "PUBLIC"
       },
       "supplementary_data" : null,
       "after_submit_callback_response" : null,
@@ -72,9 +79,8 @@
       "delete_draft_response_status_code" : null,
       "delete_draft_response_status" : null,
       "security_classifications" : {
-        "_extends_": "TTL_Classifications"
+        "TextField" : "PUBLIC"
       }
     }
   }
-
 }
