@@ -752,6 +752,7 @@ class TimeToLiveServiceTest {
 
         @Test
         void verifyTTLOverrideChangedWithValidValue() {
+            when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
             TTL ttl = TTL
                 .builder()
                 .systemTTL(LocalDate.now())
@@ -763,7 +764,7 @@ class TimeToLiveServiceTest {
             TTL updatedTtl = TTL.builder()
                 .systemTTL(LocalDate.now())
                 .suspended(TTL.NO)
-                .overrideTTL(LocalDate.now().plusDays(2L))
+                .overrideTTL(FAR_FUTURE_DATE)
                 .build();
             Map<String, JsonNode> updatedCaseData = new HashMap<>();
             updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
@@ -773,11 +774,103 @@ class TimeToLiveServiceTest {
 
         @Test
         void verifyTTLOverrideChangedWithInValidValue() {
+            when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
             TTL ttl = TTL
                 .builder()
                 .systemTTL(LocalDate.now())
                 .suspended(TTL.NO)
                 .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .overrideTTL(LocalDate.now().plusDays(TTL_GUARD - 1))
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            final ValidationException exception = assertThrows(ValidationException.class,
+                () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+            assertThat(exception.getMessage(),
+                startsWith(TIME_TO_LIVE_GUARD_ERROR_MESSAGE));
+        }
+
+        @Test
+        void verifyTTLOverrideRemovedWithAndSystemTTLValue() {
+            when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.YES)
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+        }
+
+        @Test
+        void verifyTTLOverrideRemovedWithInValidSystemTTLValue() {
+            when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
+
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .overrideTTL(LocalDate.now())
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            final ValidationException exception = assertThrows(ValidationException.class,
+                () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+            assertThat(exception.getMessage(),
+                startsWith(TIME_TO_LIVE_GUARD_ERROR_MESSAGE));
+        }
+
+        @Test
+        void verifyTTLOverrideAddedWithValidValue() {
+            when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .overrideTTL(FAR_FUTURE_DATE)
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+        }
+
+        @Test
+        void verifyTTLOverrideAddedWithInValidValue() {
+            when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
                 .build();
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
 
@@ -793,6 +886,27 @@ class TimeToLiveServiceTest {
                 () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
             assertThat(exception.getMessage(),
                 startsWith(TIME_TO_LIVE_GUARD_ERROR_MESSAGE));
+        }
+
+        @Test
+        void verifyTTLOverrideAddedWithInValidValueAndSuspended() {
+            when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
+            TTL ttl = TTL
+                .builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.NO)
+                .build();
+            caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+            TTL updatedTtl = TTL.builder()
+                .systemTTL(LocalDate.now())
+                .suspended(TTL.YES)
+                .overrideTTL(LocalDate.now().minusDays(2L))
+                .build();
+            Map<String, JsonNode> updatedCaseData = new HashMap<>();
+            updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+            assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
         }
 
         @Test
