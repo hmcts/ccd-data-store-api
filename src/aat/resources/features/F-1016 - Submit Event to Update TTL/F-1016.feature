@@ -4,7 +4,11 @@ Feature: F-1016: Submit Event to Update TTL
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-    @S-1016.1 #AC-1
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-1016.1 #AC-1
     Scenario: TTL.Suspended changed to "No", SystemTTL and OverrideTTL less than Guard value and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
     Given a user with [an active profile in CCD]
       And a successful call [to create a case] as in [F-1016_CreateSuspendedCasePreRequisiteCaseworker]
@@ -164,6 +168,10 @@ Feature: F-1016: Submit Event to Update TTL
       And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
      Then a negative response is received
       And the response has all other details as expected
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#v2_external#/case-controller/createEventUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1016.8 #AC-1 #AC-11
   Scenario: TTL.Suspended changed to "No", SystemTTL and OverrideTTL less than Guard value and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
@@ -325,6 +333,10 @@ Feature: F-1016: Submit Event to Update TTL
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response has all other details as expected
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1016.15 #AC-1 #AC-10
   Scenario: TTL.Suspended changed to "No", SystemTTL and OverrideTTL less than Guard value and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
