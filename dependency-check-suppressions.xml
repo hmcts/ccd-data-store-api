@@ -35,6 +35,17 @@
 	    </notes>
 	    <cve>CVE-2022-34305</cve>
 	  </suppress>
+
+		<suppress>
+			<notes>Temporary Suppression
+			</notes>
+			<cve>CVE-2020-15522</cve>
+			<cve>CVE-2022-22969</cve>
+			<cve>CVE-2022-22978</cve>
+			<cve>CVE-2021-22112</cve>
+			<cve>CVE-2022-22976</cve>
+			<cve>CVE-2021-22044</cve>
+		</suppress>
 	<!--End of temporary suppression section -->
 
 </suppressions>
