@@ -170,7 +170,7 @@ Feature: F-1016: Submit Event to Update TTL
       And the response has all other details as expected
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#v2_external#/case-controller/createEventUsingPOST
+# v2_external#/case-controller/createEventUsingPOST
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1016.8 #AC-1 #AC-11
@@ -335,7 +335,7 @@ Feature: F-1016: Submit Event to Update TTL
     And the response has all other details as expected
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+# v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1016.15 #AC-1 #AC-10
@@ -498,6 +498,7 @@ Feature: F-1016: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response has all other details as expected
+
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # CCD-3459: v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
@@ -732,3 +733,177 @@ Feature: F-1016: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# CCD-3476: TTL Increment tests when data not present in event data or permission restricted: v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    @S-1016.51 #CCD-3476
+    Scenario: Set TTL for first time when TTL data not present in event data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+
+     When a request is prepared with appropriate values
+      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains an event token for the case just created above]
+      And the request [has no TTL data present in the submitted data]
+      And the request [will create a TTL value using TTL increment of 30 days]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+     Then a positive response is received
+      And the response has all other details as expected
+
+    @S-1016.52 #CCD-3476
+    Scenario: Update TTL value when TTL data not present in event data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+      And a user with [access to manage TTL properties]
+      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
+
+     When a request is prepared with appropriate values
+      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains an event token for the case just created above]
+      And the request [has no TTL data present in the submitted data]
+      And the request [will update the existing TTL value with TTL increment of 30 days]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+     Then a positive response is received
+      And the response has all other details as expected
+
+    @S-1016.53 #CCD-3476
+    Scenario: Attempt to update SystemTTL without permissions and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+      And a user with [access to manage TTL properties]
+      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
+
+     When a request is prepared with appropriate values
+      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains an event token for the case just created above]
+      And the request [has TTL.SystemTTL value set to a valid date]
+      And the request [will fail due to lack of permissions to TTL field]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+     Then a negative response is received
+      And the response has all other details as expected
+      And another call [to verify that the TTL data is unchanged] will get the expected response as in [S-1016.53.VerifyTtlUnchanged]
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# CCD-3476: TTL Increment tests when data not present in event data or permission restricted: v2_external#/case-controller/createEventUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    @S-1016.61 #CCD-3476
+    Scenario: Set TTL for first time when TTL data not present in event data and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+
+     When a request is prepared with appropriate values
+      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains an event token for the case just created above]
+      And the request [has no TTL data present in the submitted data]
+      And the request [will create a TTL value using TTL increment of 30 days]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+     Then a positive response is received
+      And the response has all other details as expected
+
+    @S-1016.62 #CCD-3476
+    Scenario: Update TTL value when TTL data not present in event data and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+      And a user with [access to manage TTL properties]
+      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
+
+     When a request is prepared with appropriate values
+      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains an event token for the case just created above]
+      And the request [has no TTL data present in the submitted data]
+      And the request [will update the existing TTL value with TTL increment of 30 days]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+     Then a positive response is received
+      And the response has all other details as expected
+
+    @S-1016.63 #CCD-3476
+    Scenario: Attempt to update SystemTTL without permissions and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+      And a user with [access to manage TTL properties]
+      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
+
+     When a request is prepared with appropriate values
+      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains an event token for the case just created above]
+      And the request [has TTL.SystemTTL value set to a valid date]
+      And the request [will fail due to lack of permissions to TTL field]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+     Then a negative response is received
+      And the response has all other details as expected
+      And another call [to verify that the TTL data is unchanged] will get the expected response as in [S-1016.63.VerifyTtlUnchanged]
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# CCD-3476: TTL Increment tests when data not present in event data or permission restricted: v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    @S-1016.71 #CCD-3476
+    Scenario: Set TTL for first time when TTL data not present in event data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+      And a user with [a caseworker with an active profile in CCD]
+      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
+
+     When a request is prepared with appropriate values
+      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And the request [contains an event token for the case just created above]
+      And the request [has no TTL data present in the submitted data]
+      And the request [will create a TTL value using TTL increment of 30 days]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+
+     Then a positive response is received
+      And the response has all other details as expected
+      And another call [to verify that the TTL data has changed] will get the expected response as in [S-1016.71.VerifyCaseDetails]
+
+    @S-1016.72 #CCD-3476
+    Scenario: Update TTL value when TTL data not present in event data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+      And a user with [a caseworker with an active profile in CCD]
+      And a user with [access to manage TTL properties]
+      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
+      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen]
+
+     When a request is prepared with appropriate values
+      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And the request [contains an event token for the case just created above]
+      And the request [has no TTL data present in the submitted data]
+      And the request [will update the existing TTL value with TTL increment of 30 days]
+      And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+
+     Then a positive response is received
+      And the response has all other details as expected
+      And another call [to verify that the TTL data has changed] will get the expected response as in [S-1016.72.VerifyCaseDetails]
+
+    @S-1016.73 #CCD-3476
+    Scenario: Attempt to update SystemTTL without permissions and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+      And a user with [a caseworker with an active profile in CCD]
+      And a user with [access to manage TTL properties]
+      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
+      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen]
+
+     When a request is prepared with appropriate values
+      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And the request [contains an event token for the case just created above]
+      And the request [has TTL.SystemTTL value set to a valid date]
+      And the request [will fail due to lack of permissions to TTL field]
+      And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+
+     Then a negative response is received
+      And the response has all other details as expected
+      And another call [to verify that the TTL data is unchanged] will get the expected response as in [S-1016.73.VerifyTtlUnchanged]

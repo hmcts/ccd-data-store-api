@@ -34,7 +34,16 @@
       "callback_response_status_code" : null,
       "callback_response_status" : null,
       "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null
+      "delete_draft_response_status" : null,
+      "case_data" : {
+        "TTL": "[[ANYTHING_PRESENT]]"
+      },
+      "data_classification" : {
+        "TTL": "[[ANYTHING_PRESENT]]"
+      },
+      "security_classifications" : {
+        "TTL": "[[ANYTHING_PRESENT]]"
+      }
     }
   }
 }
