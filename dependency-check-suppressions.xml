@@ -29,4 +29,28 @@
         </notes>
     <cve>CVE-2022-34305</cve>
   </suppress>
+  <suppress>
+    <notes>Ticket TBC</notes>
+    <cve>CVE-2020-15522</cve>
+  </suppress>
+  <suppress>
+    <notes>Ticket TBC</notes>
+    <cve>CVE-2022-22978</cve>
+  </suppress>
+  <suppress>
+    <notes>Ticket TBC</notes>
+    <cve>CVE-2021-22112</cve>
+  </suppress>
+  <suppress>
+    <notes>Ticket TBC</notes>
+    <cve>CVE-2022-22969</cve>
+  </suppress>
+  <suppress>
+    <notes>Ticket TBC</notes>
+    <cve>CVE-2022-22976</cve>
+  </suppress>
+  <suppress>
+    <notes>Ticket TBC</notes>
+    <cve>CVE-2021-22044</cve>
+  </suppress>
 </suppressions>
