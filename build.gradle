@@ -68,6 +68,9 @@ dependencyUpdates.resolutionStrategy = {
 
 dependencyCheck {
     suppressionFile = 'dependency-check-suppressions.xml'
+    ossIndex {
+      enabled = false
+    }
 }
 
 mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
