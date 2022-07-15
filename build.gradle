@@ -68,8 +68,10 @@ dependencyUpdates.resolutionStrategy = {
 
 dependencyCheck {
     suppressionFile = 'dependency-check-suppressions.xml'
-    ossIndex {
-      enabled = false
+    analyzers {
+        ossIndex {
+            enabled = false
+        }
     }
 }
 
