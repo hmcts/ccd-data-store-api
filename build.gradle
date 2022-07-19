@@ -180,7 +180,7 @@ dependencies {
     compile "org.bouncycastle:bcprov-jdk15on:1.61", "org.bouncycastle:bcpkix-jdk15on:1.61"
 
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.4.5'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.5.14'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server' , version: '5.6.1'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: '5.6.1'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: '5.6.1'
@@ -286,7 +286,7 @@ dependencies {
     contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
     contractTestCompile group: 'io.vavr', name: 'vavr', version: '0.10.4'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.1'
-    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
+    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.5.14'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: '5.6.1'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: '5.6.1'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: '5.6.1'
