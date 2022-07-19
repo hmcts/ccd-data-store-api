@@ -32,6 +32,7 @@
 	  <suppress>
 	    <notes>Temporary Suppression
 	      CVE-2022-34305 refer https://tools.hmcts.net/jira/browse/CCD-3436
+	      CVE-2022-31569 refer https://tools.hmcts.net/jira/browse/CCD-3536
 			CVE-2020-15522 refer https://tools.hmcts.net/jira/browse/CCD-3511
 			CVE-2022-22969 refer https://tools.hmcts.net/jira/browse/CCD-3512
 			CVE-2022-22978 refer https://tools.hmcts.net/jira/browse/CCD-3513
@@ -40,12 +41,13 @@
 			CVE-2021-22044 refer https://tools.hmcts.net/jira/browse/CCD-3509
 	    </notes>
 	    <cve>CVE-2022-34305</cve>
-	    <cve>CVE-2020-15522</cve>
-	    <cve>CVE-2022-22969</cve>
-	    <cve>CVE-2022-22978</cve>
-	    <cve>CVE-2021-22112</cve>
-	    <cve>CVE-2022-22976</cve>
-	    <cve>CVE-2021-22044</cve>
+	    <cve>CVE-2022-31569</cve>
+		<cve>CVE-2020-15522</cve>
+		<cve>CVE-2022-22969</cve>
+		<cve>CVE-2022-22978</cve>
+		<cve>CVE-2021-22112</cve>
+		<cve>CVE-2022-22976</cve>
+		<cve>CVE-2021-22044</cve>
 	  </suppress>
 	<!--End of temporary suppression section -->
 
