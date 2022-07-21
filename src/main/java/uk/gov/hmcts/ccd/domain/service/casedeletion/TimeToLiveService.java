@@ -109,15 +109,28 @@ public class TimeToLiveService {
     public void verifyTTLContentNotChangedByCallback(Map<String, JsonNode> beforeCaseData,
                                                      Map<String, JsonNode> callbackResponseCaseData) {
 
-        if (beforeCaseData != null && callbackResponseCaseData != null
-            // NB: callbacks permitted to omit TTL from response as CCD will preserve the current TTL (+ ttl increment)
-            && callbackResponseCaseData.containsKey(TTL_CASE_FIELD_ID)) {
+        if (beforeCaseData != null && callbackResponseCaseData != null) {
 
-            TTL beforeTtl = getTTLFromJson(beforeCaseData.get(TTL_CASE_FIELD_ID));
-            TTL callbackTtl = getTTLFromJson(callbackResponseCaseData.get(TTL_CASE_FIELD_ID));
+            // if callback is dropping TTL field (NB: set to null is a different hard failure tested in else statement)
+            if (!callbackResponseCaseData.containsKey(TTL_CASE_FIELD_ID) && isTtlCaseFieldPresent(beforeCaseData)) {
+                // NB: two checks in above if clause are intentionally different:
+                //  * `containsKey` checks the field exists (above if is also using a not: i.e. TTL field not present)
+                //  * `isTtlCaseFieldPresent()` is a check that TTL field exists & it is non-null
 
-            if ((beforeTtl != null && !beforeTtl.equals(callbackTtl)) || (beforeTtl == null && callbackTtl != null)) {
-                throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
+                //  WORKAROUND: repopulate TTL from beforeCaseData as dropping field is a soft fail
+                callbackResponseCaseData.put(TTL_CASE_FIELD_ID, beforeCaseData.get(TTL_CASE_FIELD_ID).deepCopy());
+
+            } else { // otherwise verify data not changed or being removed
+
+                TTL beforeTtl = getTTLFromJson(beforeCaseData.get(TTL_CASE_FIELD_ID));
+                TTL callbackTtl = getTTLFromJson(callbackResponseCaseData.get(TTL_CASE_FIELD_ID));
+
+                // if "before TTL has changed, including callback setting it to null"
+                // or "no-before TTl but callback is trying to add a TTL"
+                if ((beforeTtl != null && !beforeTtl.equals(callbackTtl))
+                        || (beforeTtl == null && callbackTtl != null)) {
+                    throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
+                }
             }
         }
     }

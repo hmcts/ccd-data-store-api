@@ -484,7 +484,7 @@ class TimeToLiveServiceTest {
         }
 
         @Test
-        void verifyTTLContentNotChangedByCallback_WhenTTLMissingFromCallbackResponseCaseData() {
+        void verifyTTLContentNotChangedByCallback_WhenTTLMissingFromCallbackResponseCaseData_CheckRepopulate() {
             TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
 
             Map<String, JsonNode> beforeCaseData = new HashMap<>(caseData);
@@ -492,6 +492,8 @@ class TimeToLiveServiceTest {
             beforeCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
 
             assertDoesNotThrow(() -> timeToLiveService.verifyTTLContentNotChangedByCallback(beforeCaseData, caseData));
+            // verify missing callback TTL repopulated from beforeCaseData
+            assertEquals(beforeCaseData.get(TTL_CASE_FIELD_ID), caseData.get(TTL_CASE_FIELD_ID));
         }
 
         @Test
