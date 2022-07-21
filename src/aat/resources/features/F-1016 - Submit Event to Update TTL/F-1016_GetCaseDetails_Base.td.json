@@ -39,21 +39,8 @@
       "state": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "data": {
-        "TTL": {
-          "Suspended" : "Yes",
-          "OverrideTTL" : "2010-04-30",
-          "SystemTTL" : "2010-04-30"
-        }
       },
       "data_classification": {
-        "TTL": {
-          "value": {
-            "Suspended": "PUBLIC",
-            "SystemTTL": "PUBLIC",
-            "OverrideTTL": "PUBLIC"
-          },
-          "classification": "PUBLIC"
-        }
       },
       "after_submit_callback_response": null,
       "callback_response_status_code": null,

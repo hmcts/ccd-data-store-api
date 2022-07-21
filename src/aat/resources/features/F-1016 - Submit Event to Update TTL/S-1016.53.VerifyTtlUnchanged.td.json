@@ -1,0 +1,33 @@
+{
+  "_guid_": "S-1016.53.VerifyTtlUnchanged",
+  "_extends_": "F-1016_GetCaseDetails_Base",
+
+  "specs": [
+    "to verify that the TTL data is unchanged"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_type" : "FT_TTL",
+      "data": {
+        "TextField" : "${[scenarioContext][siblingContexts][F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker][testData][actualResponse][body][case_data][TextField]}",
+        "TTL" : "${[scenarioContext][siblingContexts][F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker][testData][actualResponse][body][case_data][TTL]}"
+      },
+      "data_classification": {
+        "TextField" : "PUBLIC"
+      }
+    }
+  }
+}
