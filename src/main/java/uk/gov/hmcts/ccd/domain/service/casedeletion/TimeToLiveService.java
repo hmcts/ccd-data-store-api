@@ -106,12 +106,17 @@ public class TimeToLiveService {
         return outputData;
     }
 
-    public void verifyTTLContentNotChanged(Map<String, JsonNode> expected, Map<String, JsonNode> actual) {
-        if (expected != null && actual != null) {
-            TTL expectedTtl = getTTLFromJson(expected.get(TTL_CASE_FIELD_ID));
-            TTL actualTtl = getTTLFromJson(actual.get(TTL_CASE_FIELD_ID));
+    public void verifyTTLContentNotChangedByCallback(Map<String, JsonNode> beforeCaseData,
+                                                     Map<String, JsonNode> callbackResponseCaseData) {
 
-            if (expectedTtl != null && !expectedTtl.equals(actualTtl)) {
+        if (beforeCaseData != null && callbackResponseCaseData != null
+            // NB: callbacks permitted to omit TTL from response as CCD will preserve the current TTL (+ ttl increment)
+            && callbackResponseCaseData.containsKey(TTL_CASE_FIELD_ID)) {
+
+            TTL beforeTtl = getTTLFromJson(beforeCaseData.get(TTL_CASE_FIELD_ID));
+            TTL callbackTtl = getTTLFromJson(callbackResponseCaseData.get(TTL_CASE_FIELD_ID));
+
+            if ((beforeTtl != null && !beforeTtl.equals(callbackTtl)) || (beforeTtl == null && callbackTtl != null)) {
                 throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
             }
         }
