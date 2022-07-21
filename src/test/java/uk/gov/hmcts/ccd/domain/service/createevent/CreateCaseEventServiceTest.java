@@ -61,6 +61,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -369,6 +370,58 @@ class CreateCaseEventServiceTest extends TestFixtures {
         // i.e. verify same caseDetails passed to both saveCase and updateCaseLinks
         verify(caseDetailsRepository).set(caseDetails);
         verify(caseLinkService).updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+    }
+
+    @Test
+    @DisplayName("Should verify calls to increment TTL are made if CaseType is using TTL")
+    void shouldVerifyTTLIncrementCallsMadeIfCaseTypeUsingTTL() {
+
+        // GIVEN
+        final String userToken = "Test_Token";
+
+        caseDataContent = newCaseDataContent()
+            .withEvent(event)
+            .withData(data)
+            .withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING)
+            .withOnBehalfOfUserToken(userToken)
+            .build();
+
+        doReturn(true).when(timeToLiveService).isCaseTypeUsingTTL(any());
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        verify(timeToLiveService).isCaseTypeUsingTTL(any());
+        verify(timeToLiveService).updateCaseDetailsWithTTL(any(), any(), any());
+        verify(timeToLiveService).updateCaseDataClassificationWithTTL(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Should verify calls to increment TTL are not made if CaseType is not using TTL")
+    void shouldVerifyTTLIncrementCallsNotMadeIfCaseTypeNotUsingTTL() {
+
+        // GIVEN
+        final String userToken = "Test_Token";
+
+        caseDataContent = newCaseDataContent()
+            .withEvent(event)
+            .withData(data)
+            .withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING)
+            .withOnBehalfOfUserToken(userToken)
+            .build();
+
+        doReturn(false).when(timeToLiveService).isCaseTypeUsingTTL(any());
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        verify(timeToLiveService).isCaseTypeUsingTTL(any());
+        verify(timeToLiveService, never()).updateCaseDetailsWithTTL(any(), any(), any());
+        verify(timeToLiveService, never()).updateCaseDataClassificationWithTTL(any(), any(), any(), any());
     }
 
     @Test
