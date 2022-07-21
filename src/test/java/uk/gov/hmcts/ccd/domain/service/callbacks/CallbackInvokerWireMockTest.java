@@ -73,7 +73,8 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .inScenario("CallbackRetry")
             .whenScenarioStateIs("SecondFailedAttempt")
-            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(490)));
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(490))
+            .willSetStateTo("SuccessfulAttempt"));
 
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false);
 

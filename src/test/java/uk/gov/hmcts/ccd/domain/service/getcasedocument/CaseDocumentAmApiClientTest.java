@@ -114,7 +114,7 @@ class CaseDocumentAmApiClientTest extends TestFixtures {
     private static Stream<Arguments> provideErrorScenarioParameters() {
         final String badRequestMessage = "The input parameter does not comply with the required pattern";
         final String notFoundMessage = "The resource X was not found";
-        final String serviceErrorMessage = "The downstream CCD AM application has failed";
+        final String serviceErrorMessage = "The downstream CCD CDAM application has failed";
         final String forbiddenMessage = "The user has provided an invalid hashToken for document";
 
         Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(),
