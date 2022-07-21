@@ -4,7 +4,11 @@ Feature: F-1016: Submit Event to Update TTL
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-    @S-1016.1 #AC-1
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-1016.1 #AC-1
     Scenario: TTL.Suspended changed to "No", SystemTTL and OverrideTTL less than Guard value and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
     Given a user with [an active profile in CCD]
       And a successful call [to create a case] as in [F-1016_CreateSuspendedCasePreRequisiteCaseworker]
@@ -30,6 +34,38 @@ Feature: F-1016: Submit Event to Update TTL
       And the request [has TTL.Suspended value changed to NULL from Yes]
       And the request [has TTL.OverrideTTL set to less than today + TTL Guard]
       And the request [has TTL.SystemTTL set to less than today + TTL Guard]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+     Then a negative response is received
+      And the response has all other details as expected
+      And another call [to verify that the TTL.Suspended value has not changed in the database] will get the expected response as in [F-1016_GetCaseDetails_Caseworker]
+
+    @S-1016.1.repeat.SystemTTL
+    Scenario: TTL.Suspended changed to "No", SystemTTL less than Guard value, OverrideTTL NULL and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+      And a successful call [to create a case] as in [F-1016_CreateSuspendedCasePreRequisiteCaseworker]
+     When a request is prepared with appropriate values
+      And the request [is a repeat of S-1016.1 but with TTL.OverrideTTL set to null]
+      And the request [contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCaseworker]
+      And the request [contains an event token for the case just created above]
+      And the request [has TTL.Suspended value changed to No from Yes]
+      And the request [has TTL.OverrideTTL set to null]
+      And the request [has TTL.SystemTTL set to less than today + TTL Guard]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+     Then a negative response is received
+      And the response has all other details as expected
+      And another call [to verify that the TTL.Suspended value has not changed in the database] will get the expected response as in [F-1016_GetCaseDetails_Caseworker]
+
+    @S-1016.1.repeat.OverrideTTL
+    Scenario: TTL.Suspended changed to "No", SystemTTL greater than Guard value, OverrideTTL less than Guard value and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+      And a successful call [to create a case] as in [F-1016_CreateSuspendedCasePreRequisiteCaseworker]
+     When a request is prepared with appropriate values
+      And the request [is a repeat of S-1016.1 but with TTL.SystemTTL valid]
+      And the request [contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCaseworker]
+      And the request [contains an event token for the case just created above]
+      And the request [has TTL.Suspended value changed to No from Yes]
+      And the request [has TTL.OverrideTTL set to less than today + TTL Guard]
+      And the request [has TTL.SystemTTL set to greater than today + guard value]
       And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
      Then a negative response is received
       And the response has all other details as expected
@@ -133,6 +169,10 @@ Feature: F-1016: Submit Event to Update TTL
      Then a negative response is received
       And the response has all other details as expected
 
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# v2_external#/case-controller/createEventUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
   @S-1016.8 #AC-1 #AC-11
   Scenario: TTL.Suspended changed to "No", SystemTTL and OverrideTTL less than Guard value and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [an active profile in CCD]
@@ -148,7 +188,6 @@ Feature: F-1016: Submit Event to Update TTL
     And the response has all other details as expected
     And another call [to verify that the TTL.Suspended value has not changed in the database] will get the expected response as in [F-1016_GetCaseDetails_Caseworker]
 
-
   @S-1016.8.repeat
   Scenario: TTL.Suspended changed to null, SystemTTL and OverrideTTL less than Guard value and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [an active profile in CCD]
@@ -160,6 +199,38 @@ Feature: F-1016: Submit Event to Update TTL
     And the request [has TTL.Suspended value changed to NULL from Yes]
     And the request [has TTL.OverrideTTL set to less than today + TTL Guard]
     And the request [has TTL.SystemTTL set to less than today + TTL Guard]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+    And another call [to verify that the TTL.Suspended value has not changed in the database] will get the expected response as in [F-1016_GetCaseDetails_Caseworker]
+
+  @S-1016.8.repeat.SystemTTL
+  Scenario: TTL.Suspended changed to "No", SystemTTL less than Guard value, OverrideTTL NULL and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateSuspendedCasePreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [is a repeat of S-1016.8 but with TTL.OverrideTTL set to null]
+    And the request [contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.Suspended value changed to No from Yes]
+    And the request [has TTL.OverrideTTL set to null]
+    And the request [has TTL.SystemTTL set to less than today + TTL Guard]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+    And another call [to verify that the TTL.Suspended value has not changed in the database] will get the expected response as in [F-1016_GetCaseDetails_Caseworker]
+
+  @S-1016.8.repeat.OverrideTTL
+  Scenario: TTL.Suspended changed to "No", SystemTTL greater than Guard value, OverrideTTL less than Guard value and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateSuspendedCasePreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [is a repeat of S-1016.8 but with TTL.SystemTTL valid]
+    And the request [contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.Suspended value changed to No from Yes]
+    And the request [has TTL.OverrideTTL set to less than today + TTL Guard]
+    And the request [has TTL.SystemTTL set to greater than today + guard value]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response has all other details as expected
@@ -263,6 +334,10 @@ Feature: F-1016: Submit Event to Update TTL
     Then a negative response is received
     And the response has all other details as expected
 
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
   @S-1016.15 #AC-1 #AC-10
   Scenario: TTL.Suspended changed to "No", SystemTTL and OverrideTTL less than Guard value and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
     Given a user with [an active profile in CCD]
@@ -289,6 +364,38 @@ Feature: F-1016: Submit Event to Update TTL
     And the request [has TTL.Suspended value changed to NULL from Yes]
     And the request [has TTL.OverrideTTL set to less than today + TTL Guard]
     And the request [has TTL.SystemTTL set to less than today + TTL Guard]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+    And a successful call [to verify that the TTL.Suspended value has not changed in the database] as in [F-1016_GetCaseDetails_Citizen]
+
+  @S-1016.15.repeat.SystemTTL
+  Scenario: TTL.Suspended changed to "No", SystemTTL less than Guard value, OverrideTTL NULL and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateSuspendedCasePreRequisiteCitizen]
+    When a request is prepared with appropriate values
+    And the request [is a repeat of S-1016.15 but with TTL.OverrideTTL set to null]
+    And the request [contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCitizen]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.Suspended value changed to No from Yes]
+    And the request [has TTL.OverrideTTL set to null]
+    And the request [has TTL.SystemTTL set to less than today + TTL Guard]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+    And a successful call [to verify that the TTL.Suspended value has not changed in the database] as in [F-1016_GetCaseDetails_Citizen]
+
+  @S-1016.15.repeat.OverrideTTL
+  Scenario: TTL.Suspended changed to "No", SystemTTL greater than Guard value, OverrideTTL less than Guard value and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateSuspendedCasePreRequisiteCitizen]
+    When a request is prepared with appropriate values
+    And the request [is a repeat of S-1016.15 but with TTL.SystemTTL valid]
+    And the request [contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCitizen]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.Suspended value changed to No from Yes]
+    And the request [has TTL.OverrideTTL set to less than today + TTL Guard]
+    And the request [has TTL.SystemTTL set to greater than today + guard value]
     And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response has all other details as expected
@@ -391,6 +498,242 @@ Feature: F-1016: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response has all other details as expected
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# CCD-3459: v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-1016.22 #CCD-3459
+  Scenario: OverrideTTL changed to a date less than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.23 #CCD-3459
+  Scenario: OverrideTTL changed to a date greater than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to greater than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response has all other details as expected
+
+  @S-1016.24 #CCD-3459
+  Scenario: OverrideTTL is added with a date less than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.25 #CCD-3459
+  Scenario: OverrideTTL is added with a date greater than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to greater than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response has all other details as expected
+
+  @S-1016.26 #CCD-3459
+  Scenario: OverrideTTL is removed, SystemTTL is less than Guard value and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.SystemTTL set to less than today + guard value]
+    And the request [has TTL.OverrideTTL value removed]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.27 #CCD-3459
+  Scenario: OverrideTTL is removed, SystemTTL is greater than Guard value and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.SystemTTL set to greater than today + guard value]
+    And the request [has TTL.OverrideTTL value removed]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response has all other details as expected
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# CCD-3459: v2_external#/case-controller/createEventUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-1016.28 #CCD-3459
+  Scenario: OverrideTTL changed to a date less than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.29 #CCD-3459
+  Scenario: OverrideTTL changed to a date greater than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to greater than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response has all other details as expected
+
+  @S-1016.30 #CCD-3459
+  Scenario: OverrideTTL is added with a date less than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.31 #CCD-3459
+  Scenario: OverrideTTL is added with a date greater than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to greater than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response has all other details as expected
+
+  @S-1016.32 #CCD-3459
+  Scenario: OverrideTTL is removed, SystemTTL is less than Guard value and TTL.Suspended is "No" and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.SystemTTL set to less than today + guard value]
+    And the request [has TTL.OverrideTTL value removed]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.33 #CCD-3459
+  Scenario: OverrideTTL is removed, SystemTTL is greater than Guard value and TTL.Suspended is "No" and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.SystemTTL set to greater than today + guard value]
+    And the request [has TTL.OverrideTTL value removed]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response has all other details as expected
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# CCD-3459: v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-1016.34 #CCD-3459
+  Scenario: OverrideTTL changed to a date less than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCitizen]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCitizen]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.35 #CCD-3459
+  Scenario: OverrideTTL changed to a date greater than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCitizen]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCitizen]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to greater than today + guard value]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response has all other details as expected
+
+  @S-1016.36 #CCD-3459
+  Scenario: OverrideTTL is added with a date less than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCitizen]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCitizen]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.37 #CCD-3459
+  Scenario: OverrideTTL is added with a date greater than Guard value, SystemTTL is null and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCitizen]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCitizen]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to greater than today + guard value]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response has all other details as expected
+
+  @S-1016.38 #CCD-3459
+  Scenario: OverrideTTL is removed, SystemTTL is less than Guard value and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCitizen]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCitizen]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.SystemTTL set to less than today + guard value]
+    And the request [has TTL.OverrideTTL value removed]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.39 #CCD-3459
+  Scenario: OverrideTTL is removed, SystemTTL is greater than Guard value and TTL.Suspended is "No" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCaseOverrideTTLPreRequisiteCitizen]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCitizen]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.SystemTTL set to greater than today + guard value]
+    And the request [has TTL.OverrideTTL value removed]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response has all other details as expected
+
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # CCD-3476: TTL Increment tests when data not present in event data or permission restricted: v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
@@ -564,4 +907,3 @@ Feature: F-1016: Submit Event to Update TTL
      Then a negative response is received
       And the response has all other details as expected
       And another call [to verify that the TTL data is unchanged] will get the expected response as in [S-1016.73.VerifyTtlUnchanged]
-

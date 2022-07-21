@@ -29,8 +29,8 @@
       "data": {
         "TTL": {
           "Suspended": "Yes",
-          "OverrideTTL": "2023-04-30",
-          "SystemTTL": "2023-04-30"
+          "SystemTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
         }
       },
       "event": {

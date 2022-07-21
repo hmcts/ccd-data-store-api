@@ -1,26 +1,24 @@
 {
-  "_guid_": "S-1016.3",
-  "_extends_": "F-1016_Test_Data_Base",
+  "_guid_": "S-1016.35",
+  "_extends_": "F-1016_Test_Data_Base_Citizen",
 
-  "title": "TTL.Suspended changed to \"No\", SystemTTL greater than TTLGuard, OverrideTTL is NULL using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
+  "title": "OverrideTTL changed to a date greater than Guard value, SystemTTL is null and TTL.Suspended is \"No\" and Submit Event is invoked on vv1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1016_GetUpdateSuspendedCaseTokenCaseworker"
+    "Token_Creation": "S-1016_GetUpdateTokenOverrideTTLCitizen"
   }
   ],
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCaseworker",
+    "contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCitizen",
     "contains an event token for the case just created above",
-    "has TTL.Suspended value changed to No from Yes",
-    "has TTL.SystemTTL set to greater than today + guard value",
-    "has TTL.OverrideTTL set to null"
+    "has TTL.OverrideTTL set to greater than today + guard value"
   ],
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1016_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1016_CreateCaseOverrideTTLPreRequisiteCitizen][testData][actualResponse][body][id]}"
     },
     "headers": {
       "_extends_": "Common_Request_Headers"
@@ -28,9 +26,9 @@
     "body": {
       "data": {
         "TTL": {
-          "Suspended": "No",
-          "SystemTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
-          "OverrideTTL": null
+          "Suspended" : "No",
+          "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "SystemTTL" : null
         }
       },
       "event": {
@@ -59,14 +57,12 @@
       "case_data" : {
         "TTL" : {
           "Suspended" : "No",
-          "SystemTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
-          "OverrideTTL": null
-        },
-        "SearchCriteria" : { }
+          "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "SystemTTL" : null
+        }
       },
       "data_classification" : {
-        "_extends_": "TTL_Classifications",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        "_extends_": "TTL_Classifications"
       },
       "supplementary_data" : null,
       "after_submit_callback_response" : null,
@@ -75,8 +71,7 @@
       "delete_draft_response_status_code" : null,
       "delete_draft_response_status" : null,
       "security_classifications" : {
-        "_extends_": "TTL_Classifications",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        "_extends_": "TTL_Classifications"
       }
     }
   }

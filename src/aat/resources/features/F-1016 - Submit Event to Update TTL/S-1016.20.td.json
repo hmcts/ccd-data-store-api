@@ -26,8 +26,8 @@
       "data": {
         "TTL": {
           "Suspended": "Yes",
-          "OverrideTTL" : null,
-          "SystemTTL" : null
+          "SystemTTL" : null,
+          "OverrideTTL" : null
         }
       },
       "event": {
@@ -56,8 +56,8 @@
       "case_data" : {
         "TTL" : {
           "Suspended": "Yes",
-          "OverrideTTL" : null,
-          "SystemTTL" : null
+          "SystemTTL" : null,
+          "OverrideTTL" : null
         }
       },
       "data_classification" : {
