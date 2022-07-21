@@ -29,8 +29,8 @@
       "data": {
         "TTL": {
           "Suspended": "No",
-          "OverrideTTL": null,
-          "SystemTTL": "2030-04-30"
+          "SystemTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "OverrideTTL": null
         }
       },
       "event": {
@@ -59,8 +59,8 @@
       "data" : {
         "TTL" : {
           "Suspended" : "No",
-          "OverrideTTL" : null,
-          "SystemTTL" : "2030-04-30"
+          "SystemTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "OverrideTTL" : null
         },
         "SearchCriteria" : { }
       },

@@ -28,8 +28,8 @@
       "data": {
         "TTL": {
           "Suspended": "No",
-          "OverrideTTL": "2030-04-30",
-          "SystemTTL": "2010-04-30"
+          "SystemTTL": "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
         }
       },
       "event": {
@@ -58,8 +58,8 @@
       "data" : {
         "TTL" : {
           "Suspended": "No",
-          "OverrideTTL": "2030-04-30",
-          "SystemTTL": "2010-04-30"
+          "SystemTTL": "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
         },
         "SearchCriteria" : { }
       },
