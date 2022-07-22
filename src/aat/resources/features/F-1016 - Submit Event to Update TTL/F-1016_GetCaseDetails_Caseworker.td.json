@@ -21,9 +21,15 @@
   "expectedResponse": {
     "body": {
       "data": {
+        "TTL": {
+          "Suspended" : "Yes",
+          "OverrideTTL" : "2010-04-30",
+          "SystemTTL" : "2010-04-30"
+        },
         "SearchCriteria" : { }
       },
       "data_classification": {
+        "_extends_": "TTL_Classifications",
         "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       }
     }
