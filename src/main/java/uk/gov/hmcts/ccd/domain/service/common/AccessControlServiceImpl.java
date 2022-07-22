@@ -127,7 +127,14 @@ public class AccessControlServiceImpl implements AccessControlService {
     public boolean canAccessCaseViewFieldWithCriteria(final CommonField caseViewField,
                                                       final Set<AccessProfile> accessProfiles,
                                                       final Predicate<AccessControlList> criteria) {
-        return hasAccessControlList(accessProfiles, criteria, caseViewField.getAccessControlLists());
+        boolean hasAccess = hasAccessControlList(accessProfiles, criteria, caseViewField.getAccessControlLists());
+        if (!hasAccess) {
+            LOG.debug("No relevant case view field access for caseViewField={}, caseViewFieldAcls={}, userRoles={}",
+                caseViewField.getId(),
+                caseViewField.getAccessControlLists(),
+                accessProfiles);
+        }
+        return hasAccess;
     }
 
     @Override

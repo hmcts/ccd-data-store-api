@@ -153,8 +153,7 @@ public class CaseDataValidator {
                     new ValidationResult(result.getErrorMessage(), fieldIdPrefix + result.getFieldId()))
                 .collect(Collectors.toList()))
             .orElseThrow(() -> {
-                log.error(
-                    "No validator found for field " + fieldIdPrefix + fieldId + ", type " + fieldType.getType());
+                log.error("No validator found for field {} of type {}", fieldIdPrefix + fieldId, fieldType.getType());
                 return new RuntimeException("System error: No validator found for " + fieldType.getType());
             });
     }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
@@ -9,17 +10,11 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -28,6 +23,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -37,8 +33,16 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -52,17 +56,16 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinitionTest.findNestedField;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DOCUMENT;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -4489,6 +4492,94 @@ public class AccessControlServiceTest {
                     caseType.getCaseFieldDefinitions(),
                     ACCESS_PROFILES),
                 is(true));
+        }
+    }
+
+    @Nested
+    @DisplayName("Case View Field with Criteria tests")
+    class canAccessCaseViewFieldWithCriteriaTests {
+
+        private Logger logger;
+        private Level originalLevel;
+        private ListAppender<ILoggingEvent> listAppender;
+
+        @BeforeEach
+        void setUp() {
+            logger = (Logger) LoggerFactory.getLogger(AccessControlServiceImpl.class);
+
+            // Store original logger level so it can be reset after tests
+            originalLevel = logger.getLevel();
+
+            listAppender = new ListAppender<>();
+            listAppender.start();
+            logger.addAppender(listAppender);
+        }
+
+        @AfterEach
+        void tearDown() {
+            // Reset logging level to original value.  This ensures other tests that
+            // don't expect debug messages to be present in the log will still work.
+            logger.setLevel(originalLevel);
+
+            logger.detachAndStopAllAppenders();
+        }
+
+        @Test
+        @DisplayName("Should allow access when the role has read permission")
+        void shouldGrantAccessWhenRoleHasReadPermissionForField() {
+            final CommonField viewField =
+                newCaseField()
+                    .withId("NotesReadAccessForRole")
+                    .withFieldType(aFieldType()
+                        .withType(TEXT)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build();
+
+            assertThat(
+                accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ),
+                is(true)
+            );
+        }
+
+        @Test
+        @DisplayName("Should not allow access when the role does not have read permission")
+        void shouldRejectAccessWhenRoleDoesNotHaveReadPermissionForField() {
+            final CommonField viewField =
+                newCaseField()
+                    .withId("NotesNoReadAccessForRole")
+                    .withFieldType(aFieldType()
+                        .withType(TEXT)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build();
+
+            // Change logger level so that message logged by canAccessCaseViewFieldWithCriteria
+            // method at debug level is present in logger
+            logger.setLevel(Level.DEBUG);
+
+            boolean canAccessCaseViewField =
+                accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ);
+
+            List<ILoggingEvent> loggerList = listAppender.list;
+            ILoggingEvent lastLogEntry = loggerList.get(loggerList.size() - 1);
+
+            String expectedLogMessage =
+                "No relevant case view field access for caseViewField=NotesNoReadAccessForRole, " +
+                    "caseViewFieldAcls=[ACL{accessProfile='caseworker-divorce-loa4', crud=R}], " +
+                    "userRoles=" + ACCESS_PROFILES.toString();
+
+            assertAll(
+                () -> assertThat(canAccessCaseViewField, is(false)),
+                () -> assertThat(lastLogEntry.getLevel(), is(Level.DEBUG)),
+                () -> assertThat(lastLogEntry.getFormattedMessage(), is(expectedLogMessage))
+            );
         }
     }
 

@@ -723,8 +723,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         List<ILoggingEvent> loggerList = listAppender.list;
         ILoggingEvent lastLogEntry = loggerList.get(loggerList.size() - 1);
         assertEquals(Level.ERROR, lastLogEntry.getLevel());
-        assertEquals("No validator found for field NoValidatorForFieldType.0.Line1, type Label",
-            lastLogEntry.getMessage());
+        assertEquals("No validator found for field NoValidatorForFieldType.0.Line1 of type Label",
+            lastLogEntry.getFormattedMessage());
 
         logger.detachAndStopAllAppenders();
     }
