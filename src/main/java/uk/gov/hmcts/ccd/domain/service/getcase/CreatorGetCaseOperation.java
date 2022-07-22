@@ -20,7 +20,7 @@ public class CreatorGetCaseOperation implements GetCaseOperation {
 
     private ApplicationParams applicationParams;
 
-    public CreatorGetCaseOperation(@Qualifier("restricted") GetCaseOperation getCaseOperation,
+    public CreatorGetCaseOperation(@Qualifier("authorised") GetCaseOperation getCaseOperation,
                                    CaseAccessService caseAccessService,
                                    ApplicationParams applicationParams) {
         this.getCaseOperation = getCaseOperation;

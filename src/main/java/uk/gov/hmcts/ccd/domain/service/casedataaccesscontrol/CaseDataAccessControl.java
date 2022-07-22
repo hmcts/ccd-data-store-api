@@ -46,4 +46,6 @@ public interface CaseDataAccessControl {
 
     SecurityClassification getHighestUserClassification(CaseTypeDefinition caseTypeDefinition,
                                                         boolean isCreateProfile);
+
+    Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference);
 }

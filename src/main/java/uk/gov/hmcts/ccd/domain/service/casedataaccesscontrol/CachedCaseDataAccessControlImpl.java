@@ -153,4 +153,10 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
             .max(comparingInt(SecurityClassification::getRank))
             .orElseThrow(() -> new ServiceException("No security classification found for user"));
     }
+
+    @Override
+    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference) {
+        return caseReferenceAccessProfiles.computeIfAbsent(caseReference,
+            e -> noCacheCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseReference));
+    }
 }

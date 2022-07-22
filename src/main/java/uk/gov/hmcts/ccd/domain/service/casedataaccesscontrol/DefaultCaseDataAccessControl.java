@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -58,6 +59,9 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     private final CaseDetailsRepository caseDetailsRepository;
     private final UserAuthorisation userAuthorisation;
     private final CaseUserRepository caseUserRepository;
+
+    @Value("#{'${ccd.case.read.roleNames}'.split(',')}")
+    private List<String> listOfRoleNames;
 
     @Autowired
     public DefaultCaseDataAccessControl(RoleAssignmentService roleAssignmentService,
@@ -148,6 +152,32 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
         return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
             caseTypeDefinition, false));
+    }
+
+    @Override
+    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference) {
+        Optional<CaseDetails> caseDetails =  caseDetailsRepository.findByReference(caseReference);
+        // TODO do we need to check for caseDetails empty() like in above method?
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+        Stream<RoleAssignment> roleAssignmentsWithGrantType = filterRoleNames(roleAssignments);
+        FilteredRoleAssignments filteredRoleAssignments =
+            roleAssignmentsFilteringService
+                .filter((RoleAssignments) roleAssignmentsWithGrantType, caseDetails.get(),
+                    Lists.newArrayList(
+                        MatcherType.SECURITYCLASSIFICATION
+                    )
+                );
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.get().getCaseTypeId());
+
+        // TODO does Access Profile need any other implementation?
+        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
+            caseTypeDefinition, false));
+    }
+
+    private Stream<RoleAssignment> filterRoleNames(RoleAssignments roleAssignments) {
+        return roleAssignments.getRoleAssignments().stream()
+            .filter(roleAssignment -> roleAssignment.getGrantType().equals(GrantType.BASIC.name())
+                && listOfRoleNames.contains(roleAssignment.getRoleName()));
     }
 
     @Override

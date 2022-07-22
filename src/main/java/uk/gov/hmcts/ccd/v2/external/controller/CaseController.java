@@ -35,7 +35,6 @@ import uk.gov.hmcts.ccd.domain.service.caselinking.GetLinkedCasesResponseCreator
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
-import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
@@ -49,6 +48,7 @@ import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.ResponseEntity.status;
@@ -71,6 +71,7 @@ public class CaseController {
     private final SupplementaryDataUpdateRequestValidator requestValidator;
     private final CaseLinkRetrievalService caseLinkRetrievalService;
     private final GetLinkedCasesResponseCreator getLinkedCasesResponseCreator;
+    private final GetCaseOperation restrictedGetCaseOperation;
 
     @Autowired
     public CaseController(
@@ -82,7 +83,8 @@ public class CaseController {
         @Qualifier("authorised") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
         SupplementaryDataUpdateRequestValidator requestValidator,
         CaseLinkRetrievalService caseLinkRetrievalService,
-        GetLinkedCasesResponseCreator getLinkedCasesResponseCreator) {
+        GetLinkedCasesResponseCreator getLinkedCasesResponseCreator,
+        @Qualifier("restricted") GetCaseOperation restrictedGetCaseOperation) {
         this.getCaseOperation = getCaseOperation;
         this.createEventOperation = createEventOperation;
         this.createCaseOperation = createCaseOperation;
@@ -92,6 +94,7 @@ public class CaseController {
         this.requestValidator = requestValidator;
         this.caseLinkRetrievalService = caseLinkRetrievalService;
         this.getLinkedCasesResponseCreator = getLinkedCasesResponseCreator;
+        this.restrictedGetCaseOperation = restrictedGetCaseOperation;
     }
 
     @GetMapping(
@@ -129,10 +132,11 @@ public class CaseController {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
 
-        final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
-            .orElseThrow(() -> new CaseNotFoundException(caseId));
-
-        return ResponseEntity.ok(new CaseResource(caseDetails));
+        final Optional<CaseDetails> caseDetails = this.getCaseOperation.execute(caseId);
+        if (caseDetails.isEmpty()) {
+            restrictedGetCaseOperation.execute(caseId);
+        }
+        return ResponseEntity.ok(new CaseResource(caseDetails.get()));
     }
 
     @ResponseStatus(code = HttpStatus.CREATED)
