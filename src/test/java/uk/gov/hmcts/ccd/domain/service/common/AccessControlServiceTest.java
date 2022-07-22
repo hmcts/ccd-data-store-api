@@ -4571,9 +4571,9 @@ public class AccessControlServiceTest {
             ILoggingEvent lastLogEntry = loggerList.get(loggerList.size() - 1);
 
             String expectedLogMessage =
-                "No relevant case view field access for caseViewField=NotesNoReadAccessForRole, " +
-                    "caseViewFieldAcls=[ACL{accessProfile='caseworker-divorce-loa4', crud=R}], " +
-                    "userRoles=" + ACCESS_PROFILES.toString();
+                "No relevant case view field access for caseViewField=NotesNoReadAccessForRole, "
+                    + "caseViewFieldAcls=[ACL{accessProfile='caseworker-divorce-loa4', crud=R}], "
+                    + "userRoles=" + ACCESS_PROFILES.toString();
 
             assertAll(
                 () -> assertThat(canAccessCaseViewField, is(false)),
