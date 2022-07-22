@@ -1,13 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.casedeletion;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -25,14 +24,14 @@ import java.util.Optional;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.NO;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
 
-@Slf4j
 @Service
 public class TimeToLiveService {
 
     protected static final String TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE =
         "Time to live content has been modified by callback";
-    protected static final String TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE =
-        "Unsetting a suspension can only be allowed if the deletion will occur beyond the guard period.";
+    protected static final String TIME_TO_LIVE_GUARD_ERROR_MESSAGE =
+        "Updating the TTL suspension or override values only allowed if the deletion will occur "
+            + "beyond the guard period.";
     protected static final String FAILED_TO_READ_TTL_FROM_CASE_DATA = "Failed to read TTL from case data";
 
     private final ObjectMapper objectMapper;
@@ -118,50 +117,71 @@ public class TimeToLiveService {
         }
     }
 
-    public void validateSuspensionChange(Map<String, JsonNode> beforeCallbackData,
-                                          Map<String, JsonNode> currentDataInDatabase) {
-        TTL beforeCallbackTTL = null;
-        TTL currentTTLInDatabase = null;
+    public void validateSuspensionChange(Map<String, JsonNode> updatedCaseData,
+                                          Map<String, JsonNode> currentCaseData) {
 
-        if (isTtlCaseFieldPresent(beforeCallbackData) && isTtlCaseFieldPresent(currentDataInDatabase)) {
-            beforeCallbackTTL = getTTLFromJson(beforeCallbackData.get(TTL_CASE_FIELD_ID));
-            currentTTLInDatabase = getTTLFromJson(currentDataInDatabase.get(TTL_CASE_FIELD_ID));
+        // the rule: "Unsetting a suspension can only be allowed if the deletion will occur beyond the guard period."
+
+        TTL updatedTTL = null;
+        TTL currentTTL = null;
+
+        if (isTtlCaseFieldPresent(updatedCaseData) && isTtlCaseFieldPresent(currentCaseData)) {
+            updatedTTL = getTTLFromJson(updatedCaseData.get(TTL_CASE_FIELD_ID));
+            currentTTL = getTTLFromJson(currentCaseData.get(TTL_CASE_FIELD_ID));
         }
 
-        if (beforeCallbackTTL == null || currentTTLInDatabase == null) {
+        if (updatedTTL == null || currentTTL == null) {
+            // if `updatedTTL` is null then all is OK as no TTL in place, i.e. no deletion will occur.
+            // if `currentTTL` is null then all is OK as no previous suspension to validate against.
             return;
         }
 
-        LocalDate localDate = LocalDate.now().plusDays(applicationParams.getTtlGuard());
+        // checking if `TTL.suspended` has changed value
+        if (updatedTTL.isSuspended() != currentTTL.isSuspended()
+            || overrideTTLIsChanged(currentTTL.getOverrideTTL(), updatedTTL.getOverrideTTL())) {
+            LocalDate ttlGuardDate = LocalDate.now().plusDays(applicationParams.getTtlGuard());
+            LocalDate resolvedTTL = getResolvedTTL(updatedTTL);
 
-        // checking if TTL.suspended has changed value
-        if ((beforeCallbackTTL.isSuspended() != currentTTLInDatabase.isSuspended())
-            && (!beforeCallbackTTL.isSuspended()
-            && (beforeCallbackTTL.getSystemTTL() != null
-            && beforeCallbackTTL.getSystemTTL().isBefore(localDate)))
-            && beforeCallbackTTL.getOverrideTTL() != null
-            && beforeCallbackTTL.getOverrideTTL().isBefore(localDate)) {
-            throw new ValidationException(TIME_TO_LIVE_SUSPENSION_ERROR_MESSAGE);
+            // NB: if `resolvedTTL` is non-null then no suspension in place  ...
+            //     ... so given we know `TTL.suspended` has changed value it must have been lifted
+
+            // validate: Unsetting a suspension can only be allowed if the deletion will occur beyond the guard period
+            if (resolvedTTL != null && resolvedTTL.isBefore(ttlGuardDate)) {
+                throw new ValidationException(TIME_TO_LIVE_GUARD_ERROR_MESSAGE);
+            }
         }
     }
 
+    // check if overrideTTL has changed value
+    private boolean overrideTTLIsChanged(LocalDate currentOverrideTTL, LocalDate updatedOverrideTTL) {
+        if (currentOverrideTTL == null && updatedOverrideTTL == null
+            || (currentOverrideTTL != null && updatedOverrideTTL != null
+            && currentOverrideTTL.equals(updatedOverrideTTL))) {
+            return false;
+        }
+        return true;
+    }
+
     public LocalDate getUpdatedResolvedTTL(Map<String, JsonNode> caseData) {
-        LocalDate resolveTTL = null;
-        TTL afterCallbackTTL = null;
-        if (caseData.get(TTL_CASE_FIELD_ID) != null) {
-            afterCallbackTTL = getTTLFromJson(caseData.get(TTL_CASE_FIELD_ID));
+        TTL ttl = null;
+
+        if (isTtlCaseFieldPresent(caseData)) {
+            ttl = getTTLFromJson(caseData.get(TTL_CASE_FIELD_ID));
         }
 
-        if (afterCallbackTTL != null) {
-            if (afterCallbackTTL.isSuspended()) {
-                resolveTTL = null;
-            } else {
-                resolveTTL = afterCallbackTTL.getOverrideTTL() != null
-                    ? afterCallbackTTL.getOverrideTTL()
-                    : afterCallbackTTL.getSystemTTL();
-            }
+        return getResolvedTTL(ttl);
+    }
+
+    private LocalDate getResolvedTTL(TTL ttl) {
+        LocalDate resolvedTTL = null; // default response
+
+        if (ttl != null && (!ttl.isSuspended())) {
+            resolvedTTL = ttl.getOverrideTTL() != null
+                ? ttl.getOverrideTTL()
+                : ttl.getSystemTTL();
         }
-        return resolveTTL;
+
+        return resolvedTTL;
     }
 
     private TTL getTTLFromJson(JsonNode ttlJsonNode) {

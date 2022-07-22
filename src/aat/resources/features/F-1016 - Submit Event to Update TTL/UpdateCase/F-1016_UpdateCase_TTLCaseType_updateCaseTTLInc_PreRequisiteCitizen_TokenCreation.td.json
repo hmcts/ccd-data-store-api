@@ -1,0 +1,18 @@
+{
+  "_guid_": "F-1016_UpdateCase_TTLCaseType_updateCaseTTLInc_PreRequisiteCitizen_TokenCreation",
+  "_extends_": "F-1016_UpdateCase_TTLCaseType_updateCaseTTLInc_PreRequisiteCaseworker_TokenCreation",
+
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  }
+}
