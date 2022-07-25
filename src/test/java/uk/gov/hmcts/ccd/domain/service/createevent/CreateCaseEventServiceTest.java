@@ -446,7 +446,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         // THEN
-        verify(timeToLiveService).validateSuspensionChange(any(), any());
+        verify(timeToLiveService).validateTTLChangeAgainstTTLGuard(any(), any());
         verify(timeToLiveService).getUpdatedResolvedTTL(any());
 
         // verify saved case details reflects resolved TTL

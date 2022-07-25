@@ -132,16 +132,17 @@ public class TimeToLiveService {
         }
     }
 
-    public void validateSuspensionChange(Map<String, JsonNode> updatedCaseData,
-                                          Map<String, JsonNode> currentCaseData) {
+    public void validateTTLChangeAgainstTTLGuard(Map<String, JsonNode> updatedCaseData,
+                                                 Map<String, JsonNode> currentCaseData) {
 
         // the rule: "Updating the TTL suspension or override values only allowed if the deletion will occur beyond
         //            the guard period."
 
         TTL updatedTTL = getTTLFromCaseData(updatedCaseData);
         if (updatedTTL == null) {
-            // if `updatedTTL` is null then all is OK as either no change made (if missing)
-            //    or no TTL in place (if null) (i.e. no deletion will occur)
+            // if `updatedTTL` is null then all is OK as either:
+            //  * no change made (if missing)
+            //  * or no TTL in place (if null) i.e. no deletion will occur
             return;
         }
 
