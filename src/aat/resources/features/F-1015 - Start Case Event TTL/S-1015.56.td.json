@@ -1,0 +1,33 @@
+{
+  "_guid_": "S-1015.56",
+  "_extends_": "F-1015_UpdateCase_TTLCaseType_v2Ext_startEventCaseworker__Base",
+
+  "title": "must error when updating updating a cases TTL.SystemTTL value where about to start callback responds with TTL set to null by using v2 '/cases/{cid}/event-triggers/{etid}'",
+
+  "specs": [
+    "a caseworker with an active profile in CCD",
+
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger an About To Start callback that responds with TTL set to null",
+
+    "contains the error message indicating unauthorised change to the TTL values"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateWithStartTTLNull"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

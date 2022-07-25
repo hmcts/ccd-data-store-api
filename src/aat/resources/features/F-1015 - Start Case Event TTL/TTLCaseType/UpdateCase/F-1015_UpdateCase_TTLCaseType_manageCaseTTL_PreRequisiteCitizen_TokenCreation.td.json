@@ -1,0 +1,18 @@
+{
+  "_guid_": "F-1015_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen_TokenCreation",
+  "_extends_": "F-1015_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker_TokenCreation",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][siblingContexts][F-1015_CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "id": "${[scenarioContext][parentContext][siblingContexts][F-1015_CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+      }
+    }
+  }
+}

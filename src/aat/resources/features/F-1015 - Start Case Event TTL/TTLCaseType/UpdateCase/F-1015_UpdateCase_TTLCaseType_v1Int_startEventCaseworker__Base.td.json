@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-1015_UpdateCase_TTLCaseType_v1Int_startEventCaseworker__Base",
+  "_extends_": "UpdateCase_StartCase_v1Int_Caseworker__Base",
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL",
+
+      "cid": "OVERRIDE",
+      "etid": "OVERRIDE"
+    }
+  }
+}

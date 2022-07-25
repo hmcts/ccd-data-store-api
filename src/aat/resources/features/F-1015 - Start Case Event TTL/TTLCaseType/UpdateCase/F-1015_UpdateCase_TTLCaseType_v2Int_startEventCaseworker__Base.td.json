@@ -1,0 +1,11 @@
+{
+  "_guid_": "F-1015_UpdateCase_TTLCaseType_v2Int_startEventCaseworker__Base",
+  "_extends_": "UpdateCase_StartCase_v2Int_Caseworker__Base",
+
+  "request": {
+    "pathVariables": {
+      "cid": "OVERRIDE",
+      "etid": "OVERRIDE"
+    }
+  }
+}

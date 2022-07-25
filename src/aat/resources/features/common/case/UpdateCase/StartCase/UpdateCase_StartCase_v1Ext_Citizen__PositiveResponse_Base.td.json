@@ -1,20 +1,6 @@
 {
-  "_guid_": "F-1015_CitizenCreateUpdateEvent",
-  "title": "should create an event token for correct inputs",
-  "_extends_": "Token_Creation_Data_For_Citizen_Case_Creation",
-
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "OVERRIDE",
-      "ctid": "OVERRIDE",
-      "cid": "OVERRIDE",
-      "etid": "OVERRIDE"
-    }
-  },
+  "_guid_": "UpdateCase_StartCase_v1Ext_Citizen__PositiveResponse_Base",
+  "_extends_": "UpdateCase_StartCase_1Ext_Citizen__Base",
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
@@ -25,11 +11,23 @@
     "body": {
       "token": "[[ANYTHING_PRESENT]]",
       "case_details": {
-        "version": 0,
+
+        "id": "OVERRIDE",
+        "version": "OVERRIDE",
+
+        "jurisdiction": "OVERRIDE",
+        "case_type_id": "OVERRIDE",
+
+        "state": "[[ANYTHING_PRESENT]]",
         "created_date": "[[ANYTHING_PRESENT]]",
         "last_modified": "[[ANYTHING_PRESENT]]",
         "last_state_modified_date": "[[ANYTHING_PRESENT]]",
         "security_classification": "PUBLIC",
+
+        "case_data": "OVERRIDE",
+        "data_classification": "OVERRIDE",
+        "security_classifications":  "OVERRIDE",
+
         "supplementary_data": null,
         "after_submit_callback_response": null,
         "callback_response_status_code": null,
@@ -37,7 +35,8 @@
         "delete_draft_response_status_code": null,
         "delete_draft_response_status": null
       },
-      "event_id": "UPDATE"
+
+      "event_id": "OVERRIDE"
     }
   }
 }

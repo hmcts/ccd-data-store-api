@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1016_GrantAccess__Base",
+  "_guid_": "Grant_Access__Base",
 
   "productName": "CCD Data Store",
   "operationName": "Grant access to case",
@@ -15,16 +15,10 @@
     "_extends_": "Common_Request",
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER"
-    }
-  },
+      "jid": "BEFTA_MASTER",
 
-  "expectedResponse": {
-    "_extends_": "Common_201_Response",
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Type": "[[ANY_STRING_NULLABLE]]",
-      "Vary": "Accept-Encoding"
+      "ctid": "OVERRIDE",
+      "cid": "OVERRIDE"
     }
   }
 }

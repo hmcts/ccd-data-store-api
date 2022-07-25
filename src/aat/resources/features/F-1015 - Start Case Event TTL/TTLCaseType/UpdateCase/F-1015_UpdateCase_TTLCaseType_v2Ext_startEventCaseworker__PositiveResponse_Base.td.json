@@ -1,0 +1,28 @@
+{
+  "_guid_": "F-1015_UpdateCase_TTLCaseType_v2Ext_startEventCaseworker__PositiveResponse_Base",
+  "_extends_": "UpdateCase_StartCase_v2Ext_Caseworker__PositiveResponse_Base",
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "id": "OVERRIDE",
+        "version": "OVERRIDE",
+
+        "jurisdiction": "BEFTA_MASTER",
+        "case_type_id": "FT_TTL",
+
+        "case_data": {
+          "TextField" : "[[ANYTHING_PRESENT]]"
+        },
+        "data_classification": {
+          "TextField" : "PUBLIC"
+        },
+        "security_classifications": {
+          "TextField" : "PUBLIC"
+        }
+      },
+
+      "event_id": "OVERRIDE"
+    }
+  }
+}

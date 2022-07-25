@@ -1,6 +1,6 @@
 {
   "_guid_": "F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker",
-  "_extends_": "F-1016_GrantAccess__Base",
+  "_extends_": "Grant_Access__PositiveResponse_Base",
 
   "users": {
     "invokingUser": {

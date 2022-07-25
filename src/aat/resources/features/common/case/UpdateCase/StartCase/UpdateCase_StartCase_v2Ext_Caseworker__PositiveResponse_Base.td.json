@@ -1,26 +1,7 @@
 {
-  "_guid_": "F-1015_RetrieveTrigger",
+  "_guid_": "UpdateCase_StartCase_v2Ext_Caseworker__PositiveResponse_Base",
+  "_extends_": "UpdateCase_StartCase_v2Ext_Caseworker__Base",
 
-  "productName": "CCD Data Store",
-  "operationName": "Retrieve an update event trigger for case",
-
-  "method": "GET",
-  "uri": "/cases/{caseId}/event-triggers/{triggerId}",
-
-  "user": {
-    "_extends_": "BeftaMasterCaseworker"
-  },
-
-  "request": {
-    "_extends_": "Common_Request",
-    "headers": {
-      "experimental": "true"
-    },
-    "pathVariables": {
-      "caseId": "OVERRIDE",
-      "triggerId": "OVERRIDE"
-    }
-  },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
@@ -35,14 +16,21 @@
       },
       "case_details": {
         "id": "OVERRIDE",
+        "version": "OVERRIDE",
+
         "jurisdiction": "OVERRIDE",
-        "state": "CaseCreated",
-        "version": 0,
         "case_type_id": "OVERRIDE",
+
+        "state": "[[ANYTHING_PRESENT]]",
         "created_date": "[[ANY_DATE_NOT_NULLABLE]]",
         "last_modified":"[[ANY_DATE_NOT_NULLABLE]]",
         "last_state_modified_date": "[[ANY_DATE_NOT_NULLABLE]]",
         "security_classification": "PUBLIC",
+
+        "case_data": "OVERRIDE",
+        "data_classification": "OVERRIDE",
+        "security_classifications": "OVERRIDE",
+
         "supplementary_data": null,
         "after_submit_callback_response": null,
         "callback_response_status_code": null,
@@ -50,6 +38,7 @@
         "delete_draft_response_status_code": null,
         "delete_draft_response_status": null
       },
+
       "event_id": "OVERRIDE"
     }
   }

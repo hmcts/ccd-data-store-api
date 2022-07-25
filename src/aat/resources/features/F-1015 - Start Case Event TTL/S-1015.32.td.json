@@ -1,0 +1,52 @@
+{
+  "_guid_": "S-1015.32",
+  "_extends_": "F-1015_UpdateCase_TTLCaseType_v1Ext_startEventCaseworker__PositiveResponse_Base",
+
+  "title": "must successfully update a cases TTL.SystemTTL value where about to start callback has modified TTL.Suspended value (No -> NO) using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token'",
+
+  "specs": [
+    "a caseworker with an active profile in CCD",
+    "access to manage TTL properties",
+
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger an About To Start callback that changes the TTL.OverrideTTL value (null -> missing)",
+    "is configured to trigger an About To Start callback that changes the TTL.Suspended value (No -> NO)",
+
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
+    "does not contain the TTL.OverrideTTL as removed by callback (null -> missing)",
+    "contains the adjusted TTL.Suspended from the callback (No -> NO)"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "manageTTL": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateWithStartTTLToUpper"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "id": "${[scenarioContext][childContexts][F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+        "version": 1,
+        "case_data": {
+          "TTL" : {
+            "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+            "Suspended" : "NO"
+          }
+        }
+      },
+      "event_id": "updateWithStartTTLToUpper"
+    }
+  }
+}

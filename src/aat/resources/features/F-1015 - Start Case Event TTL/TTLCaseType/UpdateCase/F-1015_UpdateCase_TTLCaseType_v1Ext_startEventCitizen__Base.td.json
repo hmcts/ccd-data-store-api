@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-1015_UpdateCase_TTLCaseType_v1Ext_startEventCitizen__Base",
+  "_extends_": "UpdateCase_StartCase_1Ext_Citizen__Base",
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL",
+
+      "cid": "OVERRIDE",
+      "etid": "OVERRIDE"
+    }
+  }
+}

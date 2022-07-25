@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen",
+  "_extends_": "F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1015_CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  }
+}
