@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-1016.72.VerifyCaseDetails",
+  "_extends_": "F-1016_GetCaseDetails_Base",
+
+  "specs": [
+    "to verify that the TTL data has changed"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_type" : "FT_TTL",
+      "data": {
+        "TextField" : "Updated without supplying TTL",
+        "TTL" : {
+          "SystemTTL" : "${[scenarioContext][customValues][dateThirtyDaysFromToday]}",
+          "OverrideTTL" : "${[scenarioContext][siblingContexts][F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen][testData][actualResponse][body][case_data][TTL][OverrideTTL]}",
+          "Suspended" : "${[scenarioContext][siblingContexts][F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen][testData][actualResponse][body][case_data][TTL][Suspended]}"
+        }
+      },
+      "data_classification": {
+        "TextField" : "PUBLIC"
+      }
+    }
+  }
+}
