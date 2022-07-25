@@ -53,8 +53,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.NO;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
-import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTLTest.TTL_SUSPENSION_NO_PARAMETERS;
-import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTLTest.TTL_SUSPENSION_YES_PARAMETERS;
+import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTLTest.TTL_SUSPENDED_VALUES_FOR_IS_SUSPENDED_FALSE;
+import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTLTest.TTL_SUSPENDED_VALUES_FOR_IS_SUSPENDED_TRUE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService.TIME_TO_LIVE_GUARD_ERROR_MESSAGE;
 
@@ -645,7 +645,7 @@ class TimeToLiveServiceTest {
         @ParameterizedTest(
             name = "validateSuspensionChange generates no error if TTL.suspended changed: {0} -> Yes"
         )
-        @MethodSource(TTL_SUSPENSION_NO_PARAMETERS)
+        @MethodSource(TTL_SUSPENDED_VALUES_FOR_IS_SUSPENDED_FALSE)
         void verifyTTLSuspensionChanged_NoToYes_alternativeNos(String ttlSuspended) {
             TTL ttl = TTL
                 .builder()
@@ -657,7 +657,7 @@ class TimeToLiveServiceTest {
 
             TTL updatedTtl = TTL.builder()
                 .systemTTL(LocalDate.now())
-                .suspended(TTL.YES)
+                .suspended(TTL.YES) // i.e. false value is changing to true value
                 .overrideTTL(LocalDate.now())
                 .build();
             Map<String, JsonNode> updatedCaseData = new HashMap<>();
@@ -669,12 +669,12 @@ class TimeToLiveServiceTest {
         @ParameterizedTest(
             name = "validateSuspensionChange generates no error if TTL.suspended changed: No -> {0}"
         )
-        @MethodSource(TTL_SUSPENSION_YES_PARAMETERS)
+        @MethodSource(TTL_SUSPENDED_VALUES_FOR_IS_SUSPENDED_TRUE)
         void verifyTTLSuspensionChanged_NoToYes_alternativeYeses(String updatedTtlSuspended) {
             TTL ttl = TTL
                 .builder()
                 .systemTTL(LocalDate.now())
-                .suspended(TTL.NO)
+                .suspended(TTL.NO) // i.e. false value will be changed to true value
                 .overrideTTL(LocalDate.now())
                 .build();
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
@@ -693,14 +693,14 @@ class TimeToLiveServiceTest {
         @ParameterizedTest(
             name = "validateSuspensionChange generates error if TTL.suspended changed: Yes -> {0}"
         )
-        @MethodSource(TTL_SUSPENSION_NO_PARAMETERS)
+        @MethodSource(TTL_SUSPENDED_VALUES_FOR_IS_SUSPENDED_FALSE)
         void verifyTTLSuspensionChanged_YesToNo_alternativeNos(String updatedTtlSuspended) {
             when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
 
             TTL ttl = TTL
                 .builder()
                 .systemTTL(LocalDate.now())
-                .suspended(TTL.YES)
+                .suspended(TTL.YES) // i.e. true value will be changed to false value
                 .overrideTTL(LocalDate.now())
                 .build();
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
@@ -723,7 +723,7 @@ class TimeToLiveServiceTest {
         @ParameterizedTest(
             name = "validateSuspensionChange generates error if TTL.suspended changed: {0} -> No"
         )
-        @MethodSource(TTL_SUSPENSION_YES_PARAMETERS)
+        @MethodSource(TTL_SUSPENDED_VALUES_FOR_IS_SUSPENDED_TRUE)
         void verifyTTLSuspensionChanged_YesToNo_alternativeYeses(String ttlSuspended) {
             when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
 
@@ -738,7 +738,7 @@ class TimeToLiveServiceTest {
             TTL updatedTtl = TTL
                 .builder()
                 .systemTTL(LocalDate.now())
-                .suspended(TTL.NO)
+                .suspended(TTL.NO)  // i.e. true value is changing to false value
                 .overrideTTL(LocalDate.now())
                 .build();
             Map<String, JsonNode> updatedCaseData = new HashMap<>();
