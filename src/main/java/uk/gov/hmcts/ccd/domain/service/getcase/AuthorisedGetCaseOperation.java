@@ -61,7 +61,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
         return caseDataAccessControl.generateAccessProfilesByCaseReference(caseReference);
     }
 
-    private Optional<CaseDetails> verifyReadAccess(CaseTypeDefinition caseType, Set<AccessProfile> accessProfiles,
+    public Optional<CaseDetails> verifyReadAccess(CaseTypeDefinition caseType, Set<AccessProfile> accessProfiles,
                                                    CaseDetails caseDetails) {
 
         if (caseType == null || caseDetails == null || CollectionUtils.isEmpty(accessProfiles)) {

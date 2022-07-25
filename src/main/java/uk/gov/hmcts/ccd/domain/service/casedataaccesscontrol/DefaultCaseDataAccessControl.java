@@ -168,8 +168,6 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
                     )
                 );
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.get().getCaseTypeId());
-
-        // TODO does Access Profile need any other implementation?
         return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
             caseTypeDefinition, false));
     }
