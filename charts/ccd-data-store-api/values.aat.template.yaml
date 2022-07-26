@@ -2,5 +2,11 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  devmemoryRequests: 2048Mi
+  devcpuRequests: 2000m
+  devmemoryLimits: 4096Mi
+  devcpuLimits: 4000m
   environment:
     DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com
+    TESTING_SUPPORT_ENABLED: true
+    MIGRATIONS_ENDPOINT_ENABLED: true

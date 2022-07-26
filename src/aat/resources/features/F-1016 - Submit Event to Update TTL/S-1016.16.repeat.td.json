@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-1016.16.repeat",
+  "_extends_": "S-1016.16",
+
+  "title": "TTL.Suspended changed to null, SystemTTL and OverrideTTL set to NULL using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
+
+  "specs": [
+    "has TTL.Suspended value changed to NULL from Yes",
+    "is a repeat of S-1016.16 but with TTL.Suspended set to null"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "TTL": {
+          "Suspended": null
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "case_data" : {
+        "TTL" : {
+          "Suspended" : null
+        }
+      }
+    }
+  }
+
+}

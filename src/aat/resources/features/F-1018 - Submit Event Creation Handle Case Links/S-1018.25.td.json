@@ -1,0 +1,66 @@
+{
+  "_guid_": "S-1018.25",
+  "_extends_": "F-1018_Test_Data_Base_Citizen",
+
+  "title": "CaseLink in database Does NOT exist and CaseLink field in the Request is blank and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured CaseLink field set to blank",
+    "specifying the case to be updated, as created in F-1018_CreateCasePreRequisiteCitizenBase"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": ""
+        },
+        "TextField" : "S-1018.25"
+      },
+      "event": {
+        "id": "updateCaseCitizen",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetCitizenUpdateEventToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id": "${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type_id" : "FT_MasterCaseType",
+      "case_data" : {
+        "CaseLinkField": {
+          "CaseReference": ""
+        },
+        "TextField" : "S-1018.25"
+      },
+      "data_classification" : {
+        "TextField" : "PUBLIC",
+        "CaseLinkField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseReference" : "PUBLIC"
+          }
+        }
+      },
+      "security_classifications" : {
+        "TextField" : "PUBLIC",
+        "CaseLinkField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseReference" : "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}

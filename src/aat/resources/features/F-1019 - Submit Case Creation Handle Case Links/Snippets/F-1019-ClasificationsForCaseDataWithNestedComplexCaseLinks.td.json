@@ -1,0 +1,33 @@
+{
+  "_guid_": "F-1019-ClasificationsForCaseDataWithNestedComplexCaseLinks",
+
+  "CaseLinkCollection" : {
+    "classification" : "PUBLIC",
+    "value" : [
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "e65b6db6-0000-CollectionCase1"
+      },
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "12e28699-0000-CollectionCase2"
+      }
+    ]
+  },
+
+  "CaseLinkComplex": {
+    "classification" : "PUBLIC",
+    "value" : {
+      "CaseLinkField": {
+        "classification" : "PUBLIC",
+        "value" : {
+          "CaseReference": "PUBLIC"
+        }
+      }
+    }
+  }
+}

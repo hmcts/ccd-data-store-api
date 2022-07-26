@@ -1,0 +1,51 @@
+{
+  "_guid_": "S-1018.37",
+  "_extends_": "F-1018_Test_Data_Base_Negative_V2",
+
+  "title": "Case Link value changed and CaseLink field in the Request contains INVALID CaseReference value and Submit Event Creation is invoked on v2_external#/case-controller/createEventUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCaseworkerBase",
+    "CaseLink field has an invalid reference"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": "4444333322221111"
+        },
+        "TextField" : "S-1018.37"
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetLinkedCaseUpdateEventToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "message" : "Case data validation failed",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : {
+        "field_errors" : [ {
+          "id" : "CaseLinkField.CaseReference",
+          "message" : "4444333322221111 does not correspond to an existing CCD case."
+        } ]
+      },
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

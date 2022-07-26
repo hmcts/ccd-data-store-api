@@ -22,9 +22,9 @@ java:
   environment:
     AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "2dcb834e-768e-4429-9050-ab15af959995"
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
-    DATA_STORE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
-    DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
-    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    DATA_STORE_DB_NAME: "{{ .Values.postgresql.auth.database}}"
+    DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
     DATA_STORE_DB_MAX_POOL_SIZE: 10
     DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal/
@@ -33,6 +33,8 @@ java:
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
+    TESTING_SUPPORT_ENABLED: true
+    MIGRATIONS_ENDPOINT_ENABLED: true
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
     LOG_CALLBACK_DETAILS:
     DEFAULT_CACHE_TTL_SEC: 1

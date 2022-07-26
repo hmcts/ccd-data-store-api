@@ -1,0 +1,76 @@
+{
+  "_guid_": "S-1016.13",
+  "_extends_": "F-1016_Test_Data_Base_V2",
+
+  "title": "TTL.Suspended changed to \"Yes\" using v2 '/cases/{cid}/events'",
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1016_GetUpdateTokenCaseworker"
+  }
+  ],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker",
+    "contains an event token for the case just created above",
+    "has TTL.Suspended value changed to Yes from No"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1016_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    },
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "body": {
+      "data": {
+        "TTL": {
+          "Suspended": "Yes",
+          "SystemTTL" : null,
+          "OverrideTTL" : null
+        }
+      },
+      "event": {
+        "id": "updateCaseSubmitTTL",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body" : {
+      "_links" : "[[ANYTHING_PRESENT]]",
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_MASTER",
+      "state" : "CaseUpdated",
+      "case_type" : "FT_MasterCaseType",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "PUBLIC",
+      "data" : {
+        "TTL" : {
+          "Suspended": "Yes",
+          "SystemTTL" : null,
+          "OverrideTTL" : null
+        },
+        "SearchCriteria" : { }
+      },
+      "data_classification" : {
+        "_extends_": "TTL_Classifications",
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+}

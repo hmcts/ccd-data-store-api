@@ -1,0 +1,45 @@
+{
+  "_guid_": "S-1018.43",
+  "_extends_": "F-1018_Test_Data_Base_V2",
+
+  "title": "Standard CaseLinks field should generate caseLink records with StandardLink set to true when Submit Event Creation is invoked on v2_external#/case-controller/createEventUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains the standard CaseLinks field with Case Reference values"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "_extends_": "F-1018_CaseDataWithStandardCaseLinks_UpdateByCaseworker",
+        "TextField" : "S-1018.43"
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetUpdateEventToken_ForStandardCaseLinkTests][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id": "${}${[scenarioContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCaseworker][testData][actualResponse][body][id]}",
+      "data" : {
+        "_extends_": "F-1018_CaseDataWithStandardCaseLinks_UpdateByCaseworker",
+        "TextField" : "S-1018.43"
+      },
+      "data_classification" : {
+        "_extends_": "F-1018_ClasificationsForCaseDataWithStandardCaseLinks_Update",
+        "TextField" : "PUBLIC"
+      }
+    }
+  }
+}

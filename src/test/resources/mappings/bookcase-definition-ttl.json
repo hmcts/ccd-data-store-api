@@ -1,0 +1,295 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/case-type/TestAddressBookCaseTTL"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "TestAddressBookCaseTTL",
+      "version": {
+        "number": 1,
+        "live_from": "2017-01-01"
+      },
+      "name": "Test Address Book Case TTL",
+      "description": "Test Address Book Case TTL",
+      "jurisdiction": {
+        "id": "PROBATE",
+        "name": "Test",
+        "description": "Test Jurisdiction"
+      },
+      "security_classification": "PUBLIC",
+      "acls": [
+        {
+          "role": "caseworker-probate-public",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        }],
+      "events": [
+        {
+          "id": "HAS_PRE_STATES_EVENT",
+          "name": "HAS PRE STATES EVENT",
+          "description": "Test event for non null pre-states",
+          "order": 1,
+          "case_fields": [
+            {
+              "case_field_id": "PersonFirstName",
+              "display_context": "READONLY"
+            },
+            {
+              "case_field_id": "PersonLastName",
+              "display_context": "OPTIONAL"
+            }
+          ],
+          "pre_states": [
+            "some-state",
+            "CaseCreated"
+          ],
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state4"
+          }],
+          "security_classification": "PRIVATE",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": false,
+              "delete": false
+            }]
+        },
+        {
+          "id": "TEST_EVENT",
+          "name": "TEST EVENT NAME",
+          "description": "Just a test",
+          "case_fields": [
+          ],
+          "pre_states": [
+            "CaseCreated",
+            "CaseEnteredIntoLegacy",
+            "CaseStopped",
+            "some-state"
+          ],
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state3"
+          }],
+          "security_classification": "PRIVATE",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": false,
+              "delete": false
+            }],
+          "callback_url_about_to_start_event": "http://localhost:{{request.requestLine.port}}/callback_about_to_start_ttl",
+          "ttl_increment": "20"
+        }
+      ],
+      "states": [
+        {
+          "id": "CaseCreated",
+          "name": "Case Created",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": false,
+              "read": true,
+              "update": true,
+              "delete": false
+            }]
+        },
+        {
+          "id": "state3",
+          "name": "Case in state 3",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": false,
+              "read": true,
+              "update": true,
+              "delete": false
+            }]
+        }
+      ],
+      "case_fields": [
+        {
+          "id": "PersonFirstName",
+          "case_type_id": "TestAddressBookCaseNoReadFieldAccess",
+          "label": "First name",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Text",
+            "id": "Text"
+          }
+        },
+        {
+          "id": "PersonFirstName",
+          "case_type_id": "TestAddressBookCaseNoReadFieldAccess",
+          "label": "First name",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": false,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Text",
+            "id": "Text"
+          }
+        },
+        {
+          "id": "PersonLastName",
+          "case_type_id": "TestAddressBookCaseNoReadFieldAccess",
+          "label": "Last name",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Text",
+            "id": "Text"
+          }
+        },
+        {
+          "id": "PersonAddress",
+          "case_type_id": "TestAddressBookCase",
+          "label": "Address",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "id": "Address",
+            "type": "Complex",
+            "complex_fields": [
+              {
+                "id": "AddressLine1",
+                "label": "Line1",
+                "security_classification": "PUBLIC",
+                "field_type": {
+                  "id": "Text",
+                  "type": "Text"
+                }
+              },
+              {
+                "id": "AddressLine2",
+                "label": "Line 2",
+                "security_classification": "PUBLIC",
+                "field_type": {
+                  "id": "Text",
+                  "type": "Text"
+                }
+              },
+              {
+                "id": "AddressLine3",
+                "label": "Line 3",
+                "security_classification": "PUBLIC",
+                "field_type": {
+                  "id": "Text",
+                  "type": "Text"
+                }
+              },
+              {
+                "id": "Postcode",
+                "label": "Postcode",
+                "security_classification": "PUBLIC",
+                "field_type": {
+                  "id": "Text",
+                  "type": "Text"
+                }
+              },
+              {
+                "id": "Country",
+                "label": "Country",
+                "security_classification": "PUBLIC",
+                "field_type": {
+                  "id": "Text",
+                  "type": "Text"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "TTL",
+          "case_type_id": "FT_MasterCaseType",
+          "label": "TTL Fields",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "id": "TTL",
+            "type": "Complex",
+            "complex_fields": [
+              {
+                "id": "SystemTTL",
+                "label": "System TTL",
+                "field_type": {
+                  "id": "Date",
+                  "type": "Date"
+                },
+                "security_classification": "PUBLIC"
+              },
+              {
+                "id": "OverrideTTL",
+                "label": "Override TTL",
+                "field_type": {
+                  "id": "Date",
+                  "type": "Date"
+                },
+                "security_classification": "PUBLIC"
+              },
+              {
+                "id": "Suspended",
+                "label": "Suspended",
+                "field_type": {
+                  "id": "YesOrNo",
+                  "type": "YesOrNo"
+                },
+                "security_classification": "PUBLIC"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "transformers": ["response-template"]
+  }
+}

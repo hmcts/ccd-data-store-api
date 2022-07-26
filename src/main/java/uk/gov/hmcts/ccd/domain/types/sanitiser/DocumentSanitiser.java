@@ -30,6 +30,8 @@ public class DocumentSanitiser implements Sanitiser {
     public static final String DOCUMENT_BINARY_URL = "document_binary_url";
     public static final String DOCUMENT_FILENAME = "document_filename";
     public static final String DOCUMENT_HASH = "document_hash";
+    public static final String CATEGORY_ID = "category_id";
+    public static final String UPLOAD_TIMESTAMP = "upload_timestamp";
 
     public static final String TYPE = "Document";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -52,11 +54,6 @@ public class DocumentSanitiser implements Sanitiser {
     public JsonNode sanitise(FieldTypeDefinition fieldTypeDefinition, JsonNode fieldData) {
         final ObjectNode sanitisedData = JSON_NODE_FACTORY.objectNode();
 
-        // TODO: remove this log later
-        if (fieldData.has(DOCUMENT_BINARY_URL)
-            && fieldData.has(DOCUMENT_FILENAME) && !fieldData.has(DOCUMENT_URL)) {
-            LOG.info("Document submitted without document_url");
-        }
         if ((fieldData.has(DOCUMENT_BINARY_URL)
             && fieldData.has(DOCUMENT_FILENAME))
             || fieldData.isNull()) {
@@ -84,6 +81,14 @@ public class DocumentSanitiser implements Sanitiser {
             final JsonNode documentHashNode = fieldData.get(DOCUMENT_HASH);
             if (documentHashNode != null) {
                 sanitisedData.put(DOCUMENT_HASH, documentHashNode.textValue());
+            }
+            final JsonNode documentCategoryId = fieldData.get(CATEGORY_ID);
+            if (documentCategoryId != null) {
+                sanitisedData.put(CATEGORY_ID, documentCategoryId.textValue());
+            }
+            final JsonNode documentUploadTimeStamp = fieldData.get(UPLOAD_TIMESTAMP);
+            if (documentUploadTimeStamp != null) {
+                sanitisedData.put(UPLOAD_TIMESTAMP, documentUploadTimeStamp.textValue());
             }
 
             validateDocumentFilename(fieldTypeDefinition, document);

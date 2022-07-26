@@ -1,0 +1,25 @@
+{
+	"_guid_": "Token_Creation_Data_For_Master_Caseworker_Case_Creation",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation process to update a case",
+
+	"method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+
+	"specs": [
+    "to get an event token for the case just created"
+	],
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "etid": "updateCase"
+		}
+	}
+}

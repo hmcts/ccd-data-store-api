@@ -189,6 +189,9 @@ public class ApplicationParams {
     @Value("${document.hash.check.enabled}")
     private boolean enableDocumentHashCheck;
 
+    @Value("${ttl.guard}")
+    private Integer ttlGuard;
+
     @Value("${ccd.multiparty.fix.enabled}")
     private boolean multipartyFixEnabled;
 
@@ -538,6 +541,10 @@ public class ApplicationParams {
 
     public boolean isDocumentHashCheckingEnabled() {
         return enableDocumentHashCheck;
+    }
+
+    public Integer getTtlGuard() {
+        return ttlGuard;
     }
 
     public boolean isAttachDocumentEnabled() {

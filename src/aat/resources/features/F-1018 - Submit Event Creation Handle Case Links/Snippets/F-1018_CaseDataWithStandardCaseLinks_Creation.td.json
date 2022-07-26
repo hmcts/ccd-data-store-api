@@ -1,0 +1,55 @@
+{
+  "_guid_": "F-1018_CaseDataWithStandardCaseLinks_Creation",
+
+  "CaseLinkField": {
+    "CaseReference": "${}${[scenarioContext][childContexts][CaseLinkedViaSimpleField][testData][actualResponse][body][id]}"
+  },
+
+  "CaseLinkCollection": [
+    {
+      "id": "4aeeec22-0000-CaseLinkedViaCollection",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][CaseLinkedViaCollection][testData][actualResponse][body][id]}"
+      }
+    },
+    {
+      "id": "b8be8ac3-0000-CaseLinkedViaBothCollectionAndStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][CaseLinkedViaBothCollectionAndStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    },
+    {
+      "id": "189a64bd-0000-CaseLinkedToMigrateToStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][CaseLinkedToMigrateToStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    }
+  ],
+
+  "caseLinks": [
+    {
+      "id": "d4f4f2e2-0000-CaseLinkedViaStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][CaseLinkedViaStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    },
+    {
+      "id": "5aa2d2b2-0000-CaseLinkedViaBothCollectionAndStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][CaseLinkedViaBothCollectionAndStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    },
+    {
+      "id": "84b47d12-0000-CaseLinkedToMigrateFromStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][CaseLinkedToMigrateFromStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    },
+    {
+      "id": "522c635d-0000-CaseLinkedToRemoveFromStandardCaseLinksField",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][childContexts][CaseLinkedToRemoveFromStandardCaseLinksField][testData][actualResponse][body][id]}"
+      }
+    }
+  ]
+}

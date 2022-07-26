@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
@@ -52,6 +53,30 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
             return invokeSubmitedToCallback(caseEventResult);
         }
         return caseEventResult.getSavedCaseDetails();
+    }
+
+    @Transactional
+    @Override
+    public CaseDetails createCaseSystemEvent(final String caseReference,
+                                             final Integer version,
+                                             final String attributePath,
+                                             final String categoryId) {
+        Event event = createDocumentUpdatedEvent();
+        eventValidator.validate(event);
+
+        final CreateCaseEventResult caseEventResult = createEventService
+            .createCaseSystemEvent(caseReference, attributePath, categoryId, event);
+
+        if (!isBlank(caseEventResult.getEventTrigger().getCallBackURLSubmittedEvent())) {
+            return invokeSubmitedToCallback(caseEventResult);
+        }
+        return caseEventResult.getSavedCaseDetails();
+    }
+
+    private Event createDocumentUpdatedEvent() {
+        Event event = new Event();
+        event.setEventId("DocumentUpdated");
+        return event;
     }
 
     private CaseDetails invokeSubmitedToCallback(CreateCaseEventResult caseEventResult) {

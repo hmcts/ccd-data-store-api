@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-1015.4",
+  "_extends_": "S-1015.4__base",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_id": "${}${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "case_fields": [
+        {
+          "_extends_": "F-1015_CaseFields_TTL",
+
+          "value": {
+            "SystemTTL": "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+            "OverrideTTL": "2021-03-05",
+            "Suspended": "No"
+          },
+          "formatted_value": {
+            "SystemTTL": "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+            "OverrideTTL": "2021-03-05",
+            "Suspended": "No"
+          }
+        }
+      ]
+    }
+  }
+}

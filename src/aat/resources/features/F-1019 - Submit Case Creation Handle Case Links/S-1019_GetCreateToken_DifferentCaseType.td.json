@@ -1,0 +1,17 @@
+{
+  "_guid_": "S-1019_GetCreateToken_DifferentCaseType",
+  "_extends_": "S-1019_GetCreateToken",
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_Conditionals",
+      "etid": "createCase"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "event_id": "createCase"
+    }
+  }
+}

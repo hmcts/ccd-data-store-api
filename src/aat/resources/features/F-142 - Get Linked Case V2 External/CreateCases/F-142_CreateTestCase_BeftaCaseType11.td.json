@@ -1,0 +1,51 @@
+{
+  "_guid_": "F-142_CreateTestCase_BeftaCaseType11",
+  "_extends_": "Case_Creation_V2_Data_Base",
+
+  "specs": [
+    "to create the test case"
+  ],
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-142_GetCreateToken_BeftaCaseType11"
+    }
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "CaseTypeID": "BEFTA_CASETYPE_1_1"
+    },
+    "body": {
+      "event": {
+        "id": "CREATE",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "_links": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_JURISDICTION_1",
+      "case_type": "BEFTA_CASETYPE_1_1",
+      "state": "TODO",
+
+      "data": {
+      },
+      "data_classification": {
+      }
+    }
+  }
+}

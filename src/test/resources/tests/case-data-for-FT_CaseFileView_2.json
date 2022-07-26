@@ -1,0 +1,62 @@
+{
+  "evidenceDocuments": [
+    {
+      "id": "a0e14419-c0b0-46ea-9e41-9ed8446c9b15",
+      "value": {
+        "document_url": "http://dm-store:8080/documents/afef337a-a6d8-4c76-b74f-133395705371",
+        "document_filename": "1_0019WG_CAMB_MADINGLEY_JPG.jpeg",
+        "document_binary_url": "http://dm-store:8080/documents/afef337a-a6d8-4c76-b74f-133395705371/binary"
+      }
+    }
+  ],
+  "nationalityProof": {
+    "dateIssued": "2022-01-01",
+    "typeOfProof": "Passport",
+    "documentEvidence": [
+      {
+        "id": "cf2635fa-fd39-4a35-8e6c-0a6b00331842",
+        "value": {
+          "document_url": "http://dm-store:8080/documents/cda314f4-3987-4a58-bcbd-6768b998f440",
+          "document_filename": "805_calverton.jpeg",
+          "document_binary_url": "http://dm-store:8080/documents/cda314f4-3987-4a58-bcbd-6768b998f440/binary"
+        }
+      }
+    ]
+  },
+  "miscellaneousDocuments": [
+    {
+      "id": "6763aedb-1873-4dda-a870-711d8f23c02d",
+      "value": {
+        "document_url": "http://dm-store:8080/documents/f508b7a4-7347-4705-997e-56356b410929",
+        "document_filename": "1200px-American_military_cemetery_2003.jpeg",
+        "document_binary_url": "http://dm-store:8080/documents/f508b7a4-7347-4705-997e-56356b410929/binary"
+      }
+    }
+  ],
+  "applicationDocuments": [
+    {
+      "id": "bc99820f-218f-4710-b6a2-72e4cce01951",
+      "value": {
+        "document": {
+          "document_url": "http://dm-store:8080/documents/6874b267-7db6-4862-9e1f-e25dd982799a",
+          "document_filename": "060523-F-0000J-101.jpeg",
+          "document_binary_url": "http://dm-store:8080/documents/6874b267-7db6-4862-9e1f-e25dd982799a/binary"
+        },
+        "issuedBy": "Me",
+        "description": null
+      }
+    },
+    {
+      "id": "8d7624a8-c77d-4d27-985d-14820f0a6347",
+      "value": {
+        "document": {
+          "document_url": "http://dm-store:8080/documents/6d7aff9f-197b-4181-a2e5-3f13a72d5e9a",
+          "document_filename": "aa.jpeg",
+          "document_binary_url": "http://dm-store:8080/documents/6d7aff9f-197b-4181-a2e5-3f13a72d5e9a/binary"
+        },
+        "issuedBy": "Me",
+        "description": null
+      }
+    }
+  ]
+}
