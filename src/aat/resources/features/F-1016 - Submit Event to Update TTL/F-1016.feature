@@ -907,3 +907,147 @@ Feature: F-1016: Submit Event to Update TTL
      Then a negative response is received
       And the response has all other details as expected
       And another call [to verify that the TTL data is unchanged] will get the expected response as in [S-1016.73.VerifyTtlUnchanged]
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# CCD-3510: TTL Guard checks against OverrrideTTL when no previous TTL: v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-1016.81 #CCD-3510
+  Scenario: Set TTL Override (TTL Guard fail) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.82 #CCD-3510
+  Scenario: Set TTL Override (TTL Guard pass) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to greater than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+    Then a positive response is received
+    And the response has all other details as expected
+
+  @S-1016.83 #CCD-3510
+  Scenario: Set TTL Override and Suspend=Yes (TTL Guard pass) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And the request [has TTL.Suspended set to Yes]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+    Then a positive response is received
+    And the response has all other details as expected
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# CCD-3510: TTL Guard checks against OverrrideTTL when no previous TTL: v2_external#/case-controller/createEventUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-1016.86 #CCD-3510
+  Scenario: Set TTL Override (TTL Guard fail) for first time when TTL data not present in case data and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.87 #CCD-3510
+  Scenario: Set TTL Override (TTL Guard pass) for first time when TTL data not present in case data and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to greater than today + guard value]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+    Then a positive response is received
+    And the response has all other details as expected
+
+  @S-1016.88 #CCD-3510
+  Scenario: Set TTL Override and Suspend=Yes (TTL Guard pass) for first time when TTL data not present in case data and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker_noTTL]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And the request [has TTL.Suspended set to Yes]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+
+    Then a positive response is received
+    And the response has all other details as expected
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# CCD-3510: TTL Guard checks against OverrrideTTL when no previous TTL: v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-1016.91 #CCD-3510
+  Scenario: Set TTL Override (TTL Guard fail) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCitizen_noTTL]
+
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCitizen_noTTL]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-1016.92 #CCD-3510
+  Scenario: Set TTL Override (TTL Guard pass) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCitizen_noTTL]
+
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCitizen_noTTL]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to greater than today + guard value]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+
+    Then a positive response is received
+    And the response has all other details as expected
+
+  @S-1016.93 #CCD-3510
+  Scenario: Set TTL Override and Suspend=Yes (TTL Guard pass) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1016_CreateCasePreRequisiteCitizen_noTTL]
+
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCitizen_noTTL]
+    And the request [contains an event token for the case just created above]
+    And the request [has TTL.OverrideTTL set to less than today + guard value]
+    And the request [has TTL.Suspended set to Yes]
+    And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
+
+    Then a positive response is received
+    And the response has all other details as expected
