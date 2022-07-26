@@ -27,11 +27,13 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
+import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
@@ -67,6 +69,7 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -133,6 +136,12 @@ class AuthorisedCreateEventOperationTest {
     @Mock
     private CaseDataService caseDataService;
 
+    @Mock
+    private EventTriggerService eventTriggerService;
+
+    @Mock
+    private TimeToLiveService timeToLiveService;
+
     @InjectMocks
     private CaseService caseService;
 
@@ -159,7 +168,9 @@ class AuthorisedCreateEventOperationTest {
             caseAccessCategoriesService,
             caseDetailsJsonParser,
             getCaseOperation,
-            caseService);
+            caseService,
+            eventTriggerService,
+            timeToLiveService);
 
         mockExistingCaseDetails(Maps.newHashMap());
 
@@ -238,6 +249,60 @@ class AuthorisedCreateEventOperationTest {
 
         verify(createEventOperation).createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT);
+    }
+
+    @Test
+    @DisplayName("should make calls to increment TTL if CaseType is using TTL and event found")
+    void shouldMakeCallsToIncrementTtlIfCaseTypeUsingTtlAndEventFound() {
+
+        // GIVEN
+        doReturn(true).when(timeToLiveService).isCaseTypeUsingTTL(any());
+        doReturn(new CaseEventDefinition()).when(eventTriggerService).findCaseEvent(any(), any());
+
+        // WHEN
+        authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
+            CASE_DATA_CONTENT);
+
+        // THEN
+        verify(timeToLiveService).isCaseTypeUsingTTL(any());
+        verify(timeToLiveService).updateCaseDetailsWithTTL(any(), any(), any());
+        verify(timeToLiveService).updateCaseDataClassificationWithTTL(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should not make calls to increment TTL if CaseType is not using TTL")
+    void shouldNotMakeCallsToIncrementTtlIfCaseTypeNotUsingTtl() {
+
+        // GIVEN
+        doReturn(false).when(timeToLiveService).isCaseTypeUsingTTL(any());
+
+        // WHEN
+        authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
+            CASE_DATA_CONTENT);
+
+        // THEN
+        verify(timeToLiveService).isCaseTypeUsingTTL(any());
+        verify(eventTriggerService, never()).findCaseEvent(any(), any());
+        verify(timeToLiveService, never()).updateCaseDetailsWithTTL(any(), any(), any());
+        verify(timeToLiveService, never()).updateCaseDataClassificationWithTTL(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should not make calls to increment TTL if event not found")
+    void shouldNotMakeCallsToIncrementTtlIfEventNotFound() {
+
+        // GIVEN
+        doReturn(true).when(timeToLiveService).isCaseTypeUsingTTL(any());
+        doReturn(null).when(eventTriggerService).findCaseEvent(any(), any());
+
+        // WHEN
+        authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
+            CASE_DATA_CONTENT);
+
+        // THEN
+        verify(timeToLiveService).isCaseTypeUsingTTL(any());
+        verify(timeToLiveService, never()).updateCaseDetailsWithTTL(any(), any(), any());
+        verify(timeToLiveService, never()).updateCaseDataClassificationWithTTL(any(), any(), any(), any());
     }
 
     @Test
