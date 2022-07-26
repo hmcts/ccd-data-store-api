@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.18",
-  "_extends_": "UpdateCase_StartCase_v2Ext_Caseworker__Base",
+  "_extends_": "UpdateCase_StartEvent_v2Ext_Caseworker__Base",
 
   "title": "must error when updating a case where about to start callback has modified TTL.SystemTTL using v2 '/cases/{cid}/event-triggers/{etid}'",
 

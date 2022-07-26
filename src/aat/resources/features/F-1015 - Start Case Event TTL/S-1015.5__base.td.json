@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.5__base",
-  "_extends_": "UpdateCase_StartCase_v2Int_Caseworker__PositiveResponse_Base",
+  "_extends_": "UpdateCase_StartEvent_v2Int_Caseworker__PositiveResponse_Base",
 
   "title": "must successfully update a cases TTL.SystemTTL value using V2 'internal/cases/{cid}/event-triggers/{etid}'",
 

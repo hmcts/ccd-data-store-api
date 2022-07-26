@@ -1,6 +1,6 @@
 {
   "_guid_": "F-1015_UpdateCase_TTLCaseType_v1Int_startEventCaseworker__PositiveResponse_Base",
-  "_extends_": "UpdateCase_StartCase_v1Int_Caseworker__PositiveResponse_Base",
+  "_extends_": "UpdateCase_StartEvent_v1Int_Caseworker__PositiveResponse_Base",
 
   "request": {
     "pathVariables": {
