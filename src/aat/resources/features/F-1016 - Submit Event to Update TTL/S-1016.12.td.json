@@ -12,7 +12,7 @@
     "an active profile in CCD",
     "contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCaseworker",
     "contains an event token for the case just created above",
-    "has TTL.Suspension value changed to No from Yes",
+    "has TTL.Suspended value changed to No from Yes",
     "has TTL.SystemTTL set to less than today + TTL Guard",
     "has TTL.OverrideTTL set to greater than today + guard value"
   ],
@@ -28,8 +28,8 @@
       "data": {
         "TTL": {
           "Suspended": "No",
-          "OverrideTTL": "2030-04-30",
-          "SystemTTL": "2010-04-30"
+          "SystemTTL": "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
         }
       },
       "event": {
@@ -58,8 +58,8 @@
       "data" : {
         "TTL" : {
           "Suspended": "No",
-          "OverrideTTL": "2030-04-30",
-          "SystemTTL": "2010-04-30"
+          "SystemTTL": "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
         },
         "SearchCriteria" : { }
       },

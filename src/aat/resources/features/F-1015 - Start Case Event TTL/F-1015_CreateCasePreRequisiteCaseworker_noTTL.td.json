@@ -1,19 +1,19 @@
 {
-  "_guid_": "F-1015_CreateCasePreRequisiteCitizen",
-  "_extends_": "Befta_Jurisdiction2_Citizen_Case_Creation_Base_Data",
+  "_guid_": "F-1015_CreateCasePreRequisiteCaseworker_noTTL",
+  "_extends_": "Befta_Case_Creation_Base_Data",
 
   "specs": [
     "to create a case"
   ],
 
   "prerequisites" : [ {
-    "Token_Creation": "F-1015_Case_Data_Create_Token_Creation_Citizen"
+    "Token_Creation": "F-1015_Case_Data_Create_Token_Creation"
   }
   ],
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCitizen2"
+      "_extends_": "BeftaMasterCaseworker"
     }
   },
 
@@ -23,12 +23,8 @@
       "ctid": "FT_MasterCaseType"
     },
     "body": {
-      "data": {
-       "_extends_": "TTL_Case_Data"
-      },
-      "data_classification": {
-        "_extends_": "TTL_Case_Data_Classifications"
-      },
+      "data": { },
+      "data_classification": { },
       "event": {
         "id": "createCaseTTL",
         "summary": "",
@@ -50,13 +46,13 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "_extends_": "TTL_Case_Data"
+        "SearchCriteria" : { }
       },
       "data_classification": {
-        "_extends_": "TTL_Case_Data_Classifications"
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       },
       "security_classifications": {
-        "_extends_": "TTL_Case_Data_Classifications"
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       },
       "supplementary_data": null,
       "after_submit_callback_response": null,

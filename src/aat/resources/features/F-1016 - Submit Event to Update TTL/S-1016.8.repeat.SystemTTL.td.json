@@ -1,0 +1,23 @@
+{
+  "_guid_": "S-1016.8.repeat.SystemTTL",
+  "_extends_": "S-1016.8",
+
+  "title": "TTL.Suspended changed to \"No\", SystemTTL less than Guard value, OverrideTTL NULL using v2 '/cases/{cid}/events'",
+
+  "specs": [
+    "is a repeat of S-1016.8 but with TTL.OverrideTTL set to null",
+    "has TTL.SystemTTL set to less than today + TTL Guard",
+    "has TTL.OverrideTTL set to null"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "TTL": {
+          "SystemTTL": "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
+          "OverrideTTL": null
+        }
+      }
+    }
+  }
+}

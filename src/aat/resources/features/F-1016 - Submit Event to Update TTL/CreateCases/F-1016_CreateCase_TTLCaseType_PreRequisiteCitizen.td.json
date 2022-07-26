@@ -1,36 +1,32 @@
 {
-  "_guid_": "F-1015_CreateCasePreRequisiteCaseworker",
-  "_extends_": "Befta_Case_Creation_Base_Data",
+  "_guid_": "F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen",
+  "_extends_": "Befta_Jurisdiction2_Citizen_Case_Creation_Base_Data",
 
   "specs": [
     "to create a case"
   ],
 
   "prerequisites" : [ {
-    "Token_Creation": "F-1015_Case_Data_Create_Token_Creation"
-  }
-  ],
+    "Token_Creation": "F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen_TokenCreation"
+  } ],
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
+      "_extends_": "BeftaCitizen2"
     }
   },
 
   "request": {
     "pathVariables": {
       "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType"
+      "ctid": "FT_TTL"
     },
     "body": {
       "data": {
-       "_extends_": "TTL_Case_Data"
-      },
-      "data_classification": {
-        "_extends_": "TTL_Case_Data_Classifications"
+        "TextField": "Create Case"
       },
       "event": {
-        "id": "createCaseTTL",
+        "id": "createCase",
         "summary": "",
         "description": ""
       },
@@ -44,22 +40,19 @@
       "jurisdiction": "BEFTA_MASTER",
       "state": "CaseCreated",
       "version": 0,
-      "case_type_id": "FT_MasterCaseType",
+      "case_type_id": "FT_TTL",
       "created_date": "[[ANYTHING_PRESENT]]",
       "last_modified": "[[ANYTHING_PRESENT]]",
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "_extends_": "TTL_Case_Data",
-        "SearchCriteria" : { }
+        "TextField": "Create Case"
       },
       "data_classification": {
-        "_extends_": "TTL_Case_Data_Classifications",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        "TextField" : "PUBLIC"
       },
       "security_classifications": {
-        "_extends_": "TTL_Case_Data_Classifications",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        "TextField" : "PUBLIC"
       },
       "supplementary_data": null,
       "after_submit_callback_response": null,

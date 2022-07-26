@@ -45,14 +45,14 @@ public class CaseService {
     }
 
     /**
-     * Generate a SHA1 hash of the case data serialised as JSON.
+     * Generate a SHA256 hash of the case data serialised as JSON.
      *
      * @param caseDetails Case whose data will be hashed
-     * @return SHA1 hash of the given case data
+     * @return SHA256 hash of the given case data
      */
     public String hashData(CaseDetails caseDetails) {
         final JsonNode jsonData = JacksonUtils.convertValueJsonNode(caseDetails.getData());
-        return DigestUtils.sha1Hex(jsonData.toString());
+        return DigestUtils.sha256Hex(jsonData.toString());
     }
 
     /**

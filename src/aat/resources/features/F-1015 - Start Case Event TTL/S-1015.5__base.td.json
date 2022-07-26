@@ -1,0 +1,33 @@
+{
+  "_guid_": "S-1015.5__base",
+  "_extends_": "F-1015_RetrieveTriggerInternal",
+
+  "title": "must successfully update a cases TTL.SystemTTL value using V2 'internal/cases/{caseId}/event-triggers/{triggerId}'",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL ",
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "caseId": "OVERRIDE",
+
+      "triggerId": "updateCaseTTLInc"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "id" : "updateCaseTTLInc",
+      "name" : "Update with TTL Increment",
+      "description" : "Update a case with a TTL increment value present",
+
+      "case_id": "OVERRIDE",
+      "case_fields": "OVERRIDE"
+    }
+  }
+}

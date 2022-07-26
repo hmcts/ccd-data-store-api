@@ -126,9 +126,16 @@ public class DefaultStartEventOperation implements StartEventOperation {
             mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
         }
 
-        Map<String, JsonNode> caseDataWithTtl
-            = timeToLiveService.updateCaseDetailsWithTTL(caseDetails.getData(), caseEventDefinition);
+        // update TTL in data
+        Map<String, JsonNode> caseDataWithTtl = timeToLiveService.updateCaseDetailsWithTTL(
+            caseDetails.getData(), caseEventDefinition, caseTypeDefinition
+        );
         caseDetails.setData(caseDataWithTtl);
+        // update TTL in data classification
+        Map<String, JsonNode> caseDataClassificationWithTtl = timeToLiveService.updateCaseDataClassificationWithTTL(
+            caseDetails.getData(), caseDetails.getDataClassification(), caseEventDefinition, caseTypeDefinition
+        );
+        caseDetails.setDataClassification(caseDataClassificationWithTtl);
 
         final String eventToken = eventTokenService.generateToken(uid,
             caseDetails,

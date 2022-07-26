@@ -41,10 +41,9 @@ public class CaseDocumentAmApiClient {
             if (!(feignException instanceof FeignClientException.Forbidden)) {
                 exceptionScenarios(feignException);
             }
-            final String badDocument = feignException.getMessage();
 
             throw new DocumentTokenException(
-                String.format("The user has provided an invalid hashToken for document %s", badDocument)
+                String.format("Error from CCD CDAM api:  %s", feignException.getMessage())
             );
         }
     }
@@ -55,7 +54,7 @@ public class CaseDocumentAmApiClient {
         } else if (feignException instanceof FeignClientException.NotFound) {
             throw new ResourceNotFoundException(feignException.getMessage());
         } else {
-            throw new ServiceException("The downstream CCD AM application has failed", feignException);
+            throw new ServiceException("The downstream CCD CDAM application has failed", feignException);
         }
     }
 

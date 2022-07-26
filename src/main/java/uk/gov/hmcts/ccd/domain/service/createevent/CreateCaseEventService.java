@@ -154,6 +154,9 @@ public class CreateCaseEventService {
             caseTypeDefinition,
             content.getEvent()
         );
+
+        updateCaseDetailsWithTtlIncrement(caseDetails, caseTypeDefinition, caseEventDefinition);
+
         final CaseDetails caseDetailsInDatabase = caseService.clone(caseDetails);
         final String uid = userAuthorisation.getUserId();
 
@@ -478,6 +481,26 @@ public class CreateCaseEventService {
             auditEvent.setProxiedBy(user.getId());
             auditEvent.setProxiedByLastName(user.getSurname());
             auditEvent.setProxiedByFirstName(user.getForename());
+        }
+    }
+
+    private void updateCaseDetailsWithTtlIncrement(CaseDetails caseDetails,
+                                                   CaseTypeDefinition caseTypeDefinition,
+                                                   CaseEventDefinition caseEventDefinition) {
+
+        if (timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition)) {
+
+            // update TTL in data
+            var caseDataWithTtl = timeToLiveService.updateCaseDetailsWithTTL(
+                caseDetails.getData(), caseEventDefinition, caseTypeDefinition
+            );
+            caseDetails.setData(caseDataWithTtl);
+            // update TTL in data classification
+            var caseDataClassificationWithTtl = timeToLiveService.updateCaseDataClassificationWithTTL(
+                caseDetails.getData(), caseDetails.getDataClassification(), caseEventDefinition, caseTypeDefinition
+            );
+            caseDetails.setDataClassification(caseDataClassificationWithTtl);
+
         }
     }
 }
