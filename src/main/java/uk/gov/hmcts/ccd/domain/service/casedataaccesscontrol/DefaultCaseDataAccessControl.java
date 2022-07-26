@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
@@ -155,27 +155,26 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     }
 
     @Override
-    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference) {
-        Optional<CaseDetails> caseDetails =  caseDetailsRepository.findByReference(caseReference);
-        // TODO do we need to check for caseDetails empty() like in above method?
+    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference, CaseDetails caseDetails) {
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
-        Stream<RoleAssignment> roleAssignmentsWithGrantType = filterRoleNames(roleAssignments);
+        RoleAssignments roleAssignmentsWithGrantType = filterRoleNames(roleAssignments);
         FilteredRoleAssignments filteredRoleAssignments =
             roleAssignmentsFilteringService
-                .filter((RoleAssignments) roleAssignmentsWithGrantType, caseDetails.get(),
+                .filter(roleAssignmentsWithGrantType, caseDetails,
                     Lists.newArrayList(
                         MatcherType.SECURITYCLASSIFICATION
                     )
                 );
-        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.get().getCaseTypeId());
-        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
-            caseTypeDefinition, false));
+        CaseTypeDefinition caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+        return Sets.newHashSet(filteredAccessProfiles(
+            filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
+            caseType, false));
     }
 
-    private Stream<RoleAssignment> filterRoleNames(RoleAssignments roleAssignments) {
-        return roleAssignments.getRoleAssignments().stream()
+    private RoleAssignments filterRoleNames(RoleAssignments roleAssignments) {
+        return RoleAssignments.builder().roleAssignments(roleAssignments.getRoleAssignments().stream()
             .filter(roleAssignment -> roleAssignment.getGrantType().equals(GrantType.BASIC.name())
-                && listOfRoleNames.contains(roleAssignment.getRoleName()));
+                && listOfRoleNames.contains(roleAssignment.getRoleName())).collect(Collectors.toList())).build();
     }
 
     @Override

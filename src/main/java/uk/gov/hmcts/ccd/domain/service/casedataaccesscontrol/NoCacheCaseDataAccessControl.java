@@ -53,5 +53,5 @@ public interface NoCacheCaseDataAccessControl {
 
     Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails);
 
-    Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference);
+    Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference, CaseDetails caseDetails);
 }

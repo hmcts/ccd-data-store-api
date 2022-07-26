@@ -42,6 +42,8 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     private final Map<String, Set<SecurityClassification>> caseReferenceClassifications = newConcurrentMap();
 
+    private final Map<String, Set<AccessProfile>> caseRestrictedAccessProfiles = newConcurrentMap();
+
     @Autowired
     public CachedCaseDataAccessControlImpl(NoCacheCaseDataAccessControl noCacheCaseDataAccessControl) {
         this.noCacheCaseDataAccessControl = noCacheCaseDataAccessControl;
@@ -155,8 +157,8 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
     }
 
     @Override
-    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference) {
-        return caseReferenceAccessProfiles.computeIfAbsent(caseReference,
-            e -> noCacheCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseReference));
+    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference, CaseDetails caseDetails) {
+        return caseRestrictedAccessProfiles.computeIfAbsent(caseReference,
+            e -> noCacheCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseReference, caseDetails));
     }
 }

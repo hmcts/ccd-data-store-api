@@ -9,6 +9,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ForbiddenException;
 
 import java.util.Optional;
@@ -16,23 +17,18 @@ import java.util.Set;
 
 @Service
 @Qualifier("restricted")
-public class RestrictedGetCaseOperation implements GetCaseOperation {
+public class RestrictedGetCaseOperation extends AbstractRestrictCaseOperation implements GetCaseOperation {
 
     private final GetCaseOperation defaultGetCaseOperation;
-    private final CaseDataAccessControl caseDataAccessControl;
-    private final CaseDefinitionRepository caseDefinitionRepository;
-    private final AuthorisedGetCaseOperation authorisedGetCaseOperation;
 
     @Autowired
     public RestrictedGetCaseOperation(@Qualifier("default") final GetCaseOperation defaultGetCaseOperation,
-                                      CaseDataAccessControl caseDataAccessControl,
                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                          final CaseDefinitionRepository caseDefinitionRepository,
-                                      AuthorisedGetCaseOperation authorisedGetCaseOperation) {
+                                      final CaseDefinitionRepository caseDefinitionRepository,
+                                      final CaseDataAccessControl caseDataAccessControl,
+                                      AccessControlService accessControlService) {
+        super(caseDefinitionRepository, caseDataAccessControl, accessControlService);
         this.defaultGetCaseOperation = defaultGetCaseOperation;
-        this.caseDataAccessControl = caseDataAccessControl;
-        this.caseDefinitionRepository = caseDefinitionRepository;
-        this.authorisedGetCaseOperation = authorisedGetCaseOperation;
     }
 
     @Override
@@ -41,26 +37,19 @@ public class RestrictedGetCaseOperation implements GetCaseOperation {
     }
 
     public Optional<CaseDetails> execute(String caseReference) {
-        Optional<CaseDetails> caseDetailsFromDb = defaultGetCaseOperation.execute(caseReference);
-        if (caseDetailsFromDb.isPresent()) {
-            Optional<CaseDetails> restrictedCaseDetails = caseDetailsFromDb.flatMap(caseDetails ->
-                authorisedGetCaseOperation.verifyReadAccess(getCaseType(caseDetails.getCaseTypeId()),
-                    getAccessProfiles(caseReference),
-                    caseDetails));
-            if (!restrictedCaseDetails.isEmpty()) {
-                throw new ForbiddenException();
+        Optional<CaseDetails> caseDetails = defaultGetCaseOperation.execute(caseReference);
+
+        if (caseDetails.isPresent()) {
+            CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.get().getCaseTypeId());
+            Set<AccessProfile> accessProfiles = getAccessProfiles(caseReference, caseDetails.get());
+            if (!accessProfiles.isEmpty()) {
+                boolean hasReadAccess = verifyCaseTypeReadAccess(caseTypeDefinition, accessProfiles);
+                if (!hasReadAccess) {
+                    throw new ForbiddenException();
+                }
             }
         }
         throw new CaseNotFoundException(caseReference);
     }
-
-    private CaseTypeDefinition getCaseType(String caseTypeId) {
-        return caseDefinitionRepository.getCaseType(caseTypeId);
-    }
-
-    private Set<AccessProfile> getAccessProfiles(String caseReference) {
-        return caseDataAccessControl.generateAccessProfilesForRestrictedCase(caseReference);
-    }
-
 }
 

@@ -129,7 +129,7 @@ public class RoleBasedCaseDataAccessControl implements NoCacheCaseDataAccessCont
     }
 
     @Override
-    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference) {
+    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference, CaseDetails caseDetails) {
         Set<String> roles = Sets.union(userRepository.getUserRoles(),
             Sets.newHashSet(caseUserRepository
                 .findCaseRoles(Long.valueOf(getCaseId(caseReference)), userRepository.getUserId())));
