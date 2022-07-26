@@ -1,0 +1,20 @@
+{
+  "_guid_": "UpdateCase_MidEvent_v2Ext__Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "validation of a set of fields as Case worker (v2_ext)",
+
+  "method": "POST",
+  "uri": "/case-types/{caseTypeId}/validate",
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+      "experimental": true
+    },
+    "pathVariables": {
+      "ctid": "OVERRIDE"
+    }
+  }
+}

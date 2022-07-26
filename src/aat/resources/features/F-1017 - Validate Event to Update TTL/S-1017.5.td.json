@@ -1,13 +1,12 @@
 {
   "_guid_": "S-1017.5",
-  "_extends_": "F-1017_Test_Data_Base_Citizen",
+  "_extends_": "UpdateCase_MidEvent_v1Ext_Citizen__Base",
 
   "title": "TTL.SystemTTL changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST",
 
   "prerequisites" : [ {
     "Token_Creation": "S-1017_GetUpdateSuspendedCaseTokenCitizen"
-  }
-  ],
+  } ],
 
   "specs": [
     "an active profile in CCD",
@@ -16,10 +15,17 @@
     "has the mid event callback change the TTL.SystemTTL value changed"
   ],
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
   "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
+		"pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+		},
     "queryParams": {
       "pageId": "updateMidEventModifiedSystemTTLSingleFormPage"
     },
