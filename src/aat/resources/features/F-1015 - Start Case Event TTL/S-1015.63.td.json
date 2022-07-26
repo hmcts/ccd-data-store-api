@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.63",
-  "_extends_": "F-1015_UpdateCase_TTLCaseType_v1Int_startEventCaseworker__PositiveResponse_Base",
+  "_extends_": "UpdateCase_StartEvent_v1Int_Caseworker__PositiveResponse_Base",
 
   "title": "must successfully update a cases TTL.SystemTTL value where about to start callback has modified TTL.Suspended value (Yes -> YES) using '/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}'",
 
@@ -29,6 +29,9 @@
 
   "request": {
     "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL",
+
       "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "updateWithStartTTLToUpper"
     }
@@ -38,7 +41,12 @@
     "body": {
       "id": "updateWithStartTTLToUpper",
 
-      "case_id": "${}${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "case_id": "${}${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "case_fields": [
+        {
+          "_extends_" : "F-1015_CaseFields_TextField"
+        }
+      ]
     }
   }
 }

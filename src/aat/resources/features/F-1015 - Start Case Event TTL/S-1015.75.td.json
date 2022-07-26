@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.75",
-  "_extends_": "F-1015_UpdateCase_TTLCaseType_v2Int_startEventCaseworker__PositiveResponse_Base",
+  "_extends_": "UpdateCase_StartEvent_v2Int_Caseworker__PositiveResponse_Base",
 
   "title": "must successfully update a cases TTL.SystemTTL value where about to start callback responds with TTL missing by using V2 'internal/cases/{cid}/event-triggers/{etid}'",
 
@@ -31,7 +31,12 @@
     "body": {
       "id": "updateWithStartTTLMissing",
 
-      "case_id": "${}${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "case_id": "${}${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "case_fields": [
+        {
+          "_extends_" : "F-1015_CaseFields_TextField"
+        }
+      ]
     }
   }
 }

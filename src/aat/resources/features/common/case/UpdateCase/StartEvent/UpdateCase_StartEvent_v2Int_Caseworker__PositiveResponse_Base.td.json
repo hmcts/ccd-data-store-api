@@ -12,6 +12,9 @@
       "name": "[[ANYTHING_PRESENT]]",
       "description": "[[ANYTHING_PRESENT]]",
 
+      "case_id" : "OVERRIDE",
+      "case_fields": [],
+
       "event_token": "[[ANY_STRING_NOT_NULLABLE]]",
       "wizard_pages": "[[ANYTHING_PRESENT]]",
       "show_summary" : true,

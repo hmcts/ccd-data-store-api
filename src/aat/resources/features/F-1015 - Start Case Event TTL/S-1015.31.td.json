@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.31",
-  "_extends_": "F-1015_UpdateCase_TTLCaseType_v1Ext_startEventCaseworker__PositiveResponse_Base",
+  "_extends_": "UpdateCase_StartEvent_v1Ext_Caseworker__PositiveResponse_Base",
 
   "title": "must successfully update a cases TTL.SystemTTL value where about to start callback has modified TTL.Suspended value (null -> missing) using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token'",
 
@@ -28,6 +28,9 @@
 
   "request": {
     "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL",
+
       "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "updateWithStartTTLToUpper"
     }
@@ -38,11 +41,22 @@
       "case_details": {
         "id": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
         "version": 1,
+        "jurisdiction": "BEFTA_MASTER",
+        "case_type_id": "FT_TTL",
+
         "case_data": {
           "TTL" : {
             "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
             "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
-          }
+          },
+          "TextField" : "[[ANYTHING_PRESENT]]"
+        },
+
+        "data_classification": {
+          "TextField" : "PUBLIC"
+        },
+        "security_classifications": {
+          "TextField" : "PUBLIC"
         }
       },
       "event_id": "updateWithStartTTLToUpper"

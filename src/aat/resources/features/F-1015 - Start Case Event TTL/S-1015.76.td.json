@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.76",
-  "_extends_": "F-1015_UpdateCase_TTLCaseType_v2Int_startEventCaseworker__Base",
+  "_extends_": "UpdateCase_StartEvent_v2Int_Caseworker__Base",
 
   "title": "must error when updating updating a cases TTL.SystemTTL value where about to start callback responds with TTL set to null by using V2 'internal/cases/{cid}/event-triggers/{etid}'",
 
