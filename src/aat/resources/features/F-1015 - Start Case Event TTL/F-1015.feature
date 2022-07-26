@@ -506,9 +506,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (null -> missing) after About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -526,9 +526,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (No -> NO) after About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNo_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNo_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -547,9 +547,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (Yes -> YES) after About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -568,7 +568,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   @S-1015.35 #CCD-3572
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL missing from About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -583,7 +583,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   @S-1015.36 #CCD-3572
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL set to null from About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -605,9 +605,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCitizen]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCitizen]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -623,9 +623,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCitizen]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCitizen]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -642,9 +642,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCitizen]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCitizen]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -660,7 +660,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   @S-1015.45 #CCD-3572
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL missing from About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
     Given a user with [a caseworker with an active profile in CCD]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -674,7 +674,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   @S-1015.46 #CCD-3572
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL set to null from About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
     Given a user with [a caseworker with an active profile in CCD]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -695,9 +695,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (null -> missing) after About to Start Callback. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -715,9 +715,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (No -> NO) after About to Start Callback. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNo_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNo_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -736,9 +736,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (Yes -> YES) after About to Start Callback. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -757,7 +757,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   @S-1015.55 #CCD-3572
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL missing from About to Start Callback. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -772,7 +772,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   @S-1015.56 #CCD-3572
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL set to null from About to Start Callback. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -793,9 +793,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (null -> missing) after About to Start Callback. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -813,9 +813,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (No -> NO) after About to Start Callback. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNo_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNo_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -834,9 +834,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (Yes -> YES) after About to Start Callback. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -855,7 +855,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   @S-1015.65 #CCD-3572
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL missing from About to Start Callback. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
     Given a user with [a caseworker with an active profile in CCD]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -870,7 +870,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   @S-1015.66 #CCD-3572
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL set to null from About to Start Callback. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
     Given a user with [a caseworker with an active profile in CCD]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -891,9 +891,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (null -> missing) after About to Start Callback. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -911,9 +911,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (No -> NO) after About to Start Callback. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNo_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNo_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -932,9 +932,9 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (Yes -> YES) after About to Start Callback. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1015_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -953,7 +953,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   @S-1015.75 #CCD-3572
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL missing from About to Start Callback. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [a caseworker with an active profile in CCD]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -968,7 +968,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
   @S-1015.76 #CCD-3572
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL set to null from About to Start Callback. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [a caseworker with an active profile in CCD]
-      And a successful call [to create a case] as in [F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]

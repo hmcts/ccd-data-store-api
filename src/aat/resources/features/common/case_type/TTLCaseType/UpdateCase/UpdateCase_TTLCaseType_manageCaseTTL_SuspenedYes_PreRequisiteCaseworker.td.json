@@ -1,6 +1,6 @@
 {
-  "_guid_": "F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCitizen",
-  "_extends_": "F-1015_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen",
+  "_guid_": "UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCaseworker",
+  "_extends_": "UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker",
 
   "request": {
     "body": {

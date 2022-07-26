@@ -1,18 +1,18 @@
 {
-  "_guid_": "F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen",
-  "_extends_": "Befta_Jurisdiction2_Citizen_Case_Creation_Base_Data",
+  "_guid_": "CreateCase_TTLCaseType_PreRequisiteCaseworker",
+  "_extends_": "Case_Creation_Data_Base",
 
   "specs": [
     "to create a case"
   ],
 
   "prerequisites" : [ {
-    "Token_Creation": "F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen_TokenCreation"
+    "Token_Creation": "CreateCase_TTLCaseType_PreRequisiteCaseworker_TokenCreation"
   } ],
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCitizen2"
+      "_extends_": "BeftaMasterCaseworker"
     }
   },
 
@@ -36,31 +36,19 @@
 
   "expectedResponse": {
     "body": {
-      "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_MASTER",
       "state": "CaseCreated",
-      "version": 0,
       "case_type_id": "FT_TTL",
-      "created_date": "[[ANYTHING_PRESENT]]",
-      "last_modified": "[[ANYTHING_PRESENT]]",
-      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-      "security_classification": "PUBLIC",
       "case_data": {
         "TextField": "Create Case"
       },
       "data_classification": {
         "TextField" : "PUBLIC"
       },
+      "supplementary_data": null,
       "security_classifications": {
         "TextField" : "PUBLIC"
-      },
-      "supplementary_data": null,
-      "after_submit_callback_response": null,
-      "callback_response_status_code": null,
-      "callback_response_status": null,
-      "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null
+      }
     }
   }
 }
-

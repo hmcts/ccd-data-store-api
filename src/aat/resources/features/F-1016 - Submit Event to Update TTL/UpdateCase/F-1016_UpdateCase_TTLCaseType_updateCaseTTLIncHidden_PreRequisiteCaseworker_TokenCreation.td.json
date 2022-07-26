@@ -14,7 +14,7 @@
     "pathVariables": {
       "ctid": "FT_TTL",
       "etid": "updateCaseTTLIncHidden",
-      "cid": "${[scenarioContext][siblingContexts][F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][siblingContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
     }
   },
 

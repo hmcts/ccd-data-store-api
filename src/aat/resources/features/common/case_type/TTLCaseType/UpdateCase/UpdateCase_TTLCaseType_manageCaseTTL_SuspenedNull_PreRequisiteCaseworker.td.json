@@ -1,6 +1,6 @@
 {
-  "_guid_": "F-1015_UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCaseworker",
-  "_extends_": "F-1015_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker",
+  "_guid_": "UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCaseworker",
+  "_extends_": "UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker",
 
   "request": {
     "body": {

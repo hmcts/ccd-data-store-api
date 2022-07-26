@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1015_UpdateCase_TTLCaseType_manageCaseTTL__Base",
+  "_guid_": "UpdateCase_TTLCaseType_manageCaseTTL__Base",
   "_extends_": "Event_Creation_Caseworker_Base",
 
   "specs": [
@@ -52,6 +52,12 @@
       "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
       "security_classification" : "PUBLIC",
       "case_data" : {
+        "TextField": "Updated with TTL by manageCaseTTL",
+        "TTL" : {
+          "SystemTTL" : null,
+          "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "Suspended" : "No"
+        }
       },
       "data_classification" : {
         "TextField" : "PUBLIC"

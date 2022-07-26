@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1015_CreateCase_TTLCaseType_PreRequisiteCitizen_TokenCreation",
+  "_guid_": "CreateCase_TTLCaseType_PreRequisiteCitizen_TokenCreation",
   "_extends_": "Citizen_Token_Creation_Data_For_Case_Creation",
 
   "specs": [

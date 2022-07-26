@@ -1,0 +1,46 @@
+{
+  "_guid_": "UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker_TokenCreation",
+  "_extends_": "UpdateCase_StartEvent_v2Ext_Caseworker__PositiveResponse_Base",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "etid": "manageCaseTTL",
+      "cid": "${[scenarioContext][parentContext][siblingContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "case_details": {
+        "id": "[[ANYTHING_PRESENT]]",
+        "version": "[[ANY_INTEGER_NOT_NULLABLE]]",
+
+        "jurisdiction": "BEFTA_MASTER",
+        "case_type_id": "FT_TTL",
+
+        "case_data": {
+          "TextField" : "[[ANYTHING_PRESENT]]"
+        },
+
+        "data_classification": {
+          "TextField" : "PUBLIC"
+        },
+        "security_classifications": {
+          "TextField" : "PUBLIC"
+        }
+      },
+
+      "event_id": "manageCaseTTL"
+    }
+  }
+}

@@ -742,10 +742,10 @@ Feature: F-1016: Submit Event to Update TTL
     @S-1016.51 #CCD-3476
     Scenario: Set TTL for first time when TTL data not present in event data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
     Given a user with [an active profile in CCD]
-      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker]
       And the request [contains an event token for the case just created above]
       And the request [has no TTL data present in the submitted data]
       And the request [will create a TTL value using TTL increment of 30 days]
@@ -758,12 +758,12 @@ Feature: F-1016: Submit Event to Update TTL
     Scenario: Update TTL value when TTL data not present in event data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
     Given a user with [an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker]
       And the request [contains an event token for the case just created above]
       And the request [has no TTL data present in the submitted data]
       And the request [will update the existing TTL value with TTL increment of 30 days]
@@ -776,12 +776,12 @@ Feature: F-1016: Submit Event to Update TTL
     Scenario: Attempt to update SystemTTL without permissions and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
     Given a user with [an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker]
       And the request [contains an event token for the case just created above]
       And the request [has TTL.SystemTTL value set to a valid date]
       And the request [will fail due to lack of permissions to TTL field]
@@ -798,10 +798,10 @@ Feature: F-1016: Submit Event to Update TTL
     @S-1016.61 #CCD-3476
     Scenario: Set TTL for first time when TTL data not present in event data and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [an active profile in CCD]
-      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker]
       And the request [contains an event token for the case just created above]
       And the request [has no TTL data present in the submitted data]
       And the request [will create a TTL value using TTL increment of 30 days]
@@ -814,12 +814,12 @@ Feature: F-1016: Submit Event to Update TTL
     Scenario: Update TTL value when TTL data not present in event data and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker]
       And the request [contains an event token for the case just created above]
       And the request [has no TTL data present in the submitted data]
       And the request [will update the existing TTL value with TTL increment of 30 days]
@@ -832,12 +832,12 @@ Feature: F-1016: Submit Event to Update TTL
     Scenario: Attempt to update SystemTTL without permissions and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
-      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
-      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker]
 
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker]
+      And the request [contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker]
       And the request [contains an event token for the case just created above]
       And the request [has TTL.SystemTTL value set to a valid date]
       And the request [will fail due to lack of permissions to TTL field]
@@ -855,10 +855,10 @@ Feature: F-1016: Submit Event to Update TTL
     Scenario: Set TTL for first time when TTL data not present in event data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
-      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And the request [contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCitizen]
       And the request [contains an event token for the case just created above]
       And the request [has no TTL data present in the submitted data]
       And the request [will create a TTL value using TTL increment of 30 days]
@@ -873,12 +873,12 @@ Feature: F-1016: Submit Event to Update TTL
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
-      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
-      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And the request [contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCitizen]
       And the request [contains an event token for the case just created above]
       And the request [has no TTL data present in the submitted data]
       And the request [will update the existing TTL value with TTL increment of 30 days]
@@ -893,12 +893,12 @@ Feature: F-1016: Submit Event to Update TTL
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
-      And a successful call [to create a case] as in [F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
-      And a successful call [to grant access to a case] as in [F-1016_GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
-      And a successful call [to set TTL properties for a case] as in [F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen]
+      And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen]
+      And the request [contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCitizen]
       And the request [contains an event token for the case just created above]
       And the request [has TTL.SystemTTL value set to a valid date]
       And the request [will fail due to lack of permissions to TTL field]

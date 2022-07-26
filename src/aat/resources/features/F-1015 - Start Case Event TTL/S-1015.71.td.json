@@ -29,7 +29,7 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "updateWithStartTTLToUpper"
     }
   },
@@ -38,7 +38,7 @@
     "body": {
       "id": "updateWithStartTTLToUpper",
 
-      "case_id": "${}${[scenarioContext][childContexts][F-1015_CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "case_id": "${}${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
     }
   }
 }
