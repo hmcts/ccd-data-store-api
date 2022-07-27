@@ -1,14 +1,13 @@
 {
-  "_guid_": "UpdateCase_SubmitEvent_v1Ext_Caseworker__Base",
-  "_extends_": "Event_Creation_Caseworker_Base",
+  "_guid_": "SubmitEvent_v2Ext__Base",
+  "_extends_": "Event_Creation_Caseworker_Base_V2",
 
-  "operationName": "Submit event creation as Case worker (v1_ext caseworker)",
+  "operationName": "Submit event creation (v2_ext)",
+
+  "uri": "/cases/{cid}/events",
 
   "request": {
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "OVERRIDE",
-      "ctid": "OVERRIDE",
       "cid": "OVERRIDE"
     },
     "body": {

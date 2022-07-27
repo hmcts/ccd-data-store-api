@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.62",
-  "_extends_": "UpdateCase_SubmitEvent_v2Ext__PositiveResponse_Base",
+  "_extends_": "SubmitEvent_v2Ext__PositiveResponse_Base",
 
   "title": "Update TTL value when TTL data not present in event data using v2 '/cases/{cid}/events'",
 

@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.86",
-  "_extends_": "UpdateCase_SubmitEvent_v2Ext__Base",
+  "_extends_": "SubmitEvent_v2Ext__Base",
 
   "title": "Set TTL Override (TTL Guard fail) for first time when TTL data not present in case data and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST",
 

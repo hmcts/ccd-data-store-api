@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.71",
-  "_extends_": "UpdateCase_SubmitEvent_v1Ext_Citizen__PositiveResponse_Base",
+  "_extends_": "SubmitEvent_v1Ext_Citizen__PositiveResponse_Base",
 
   "title": "Set TTL for first time when TTL data not present in event data using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
 

@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.73",
-  "_extends_": "UpdateCase_SubmitEvent_v1Ext_Citizen__Base",
+  "_extends_": "SubmitEvent_v1Ext_Citizen__Base",
 
   "title": "Attempt to update SystemTTL without permissions using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
 

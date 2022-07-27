@@ -1,6 +1,6 @@
 {
   "_guid_": "F-1016_Test_Data_Base_Citizen",
-  "_extends_": "UpdateCase_SubmitEvent_v1Ext_Citizen__Base",
+  "_extends_": "SubmitEvent_v1Ext_Citizen__Base",
 
   "users": {
     "invokingUser": {

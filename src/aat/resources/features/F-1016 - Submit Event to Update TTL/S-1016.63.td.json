@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.63",
-  "_extends_": "UpdateCase_SubmitEvent_v2Ext__Base",
+  "_extends_": "SubmitEvent_v2Ext__Base",
 
   "title": "Attempt to update SystemTTL without permissions using v2 '/cases/{cid}/events'",
 

@@ -1,6 +1,6 @@
 {
   "_guid_": "F-1016_Test_Data_Base",
-  "_extends_": "UpdateCase_SubmitEvent_v1Ext_Caseworker__Base",
+  "_extends_": "SubmitEvent_v1Ext_Caseworker__Base",
 
   "users": {
     "invokingUser": {

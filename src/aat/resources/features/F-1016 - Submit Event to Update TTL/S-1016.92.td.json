@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.92",
-  "_extends_": "UpdateCase_SubmitEvent_v1Ext_Citizen__PositiveResponse_Base",
+  "_extends_": "SubmitEvent_v1Ext_Citizen__PositiveResponse_Base",
 
   "title": "Set TTL Override (TTL Guard pass) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST",
 

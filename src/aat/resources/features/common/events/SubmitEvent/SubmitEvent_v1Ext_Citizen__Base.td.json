@@ -1,5 +1,5 @@
 {
-  "_guid_": "UpdateCase_SubmitEvent_v1Ext_Citizen__Base",
+  "_guid_": "SubmitEvent_v1Ext_Citizen__Base",
   "_extends_": "Event_Creation_Citizen_Base",
 
   "operationName": "Submit event creation as citizen (v1_ext citizen)",
