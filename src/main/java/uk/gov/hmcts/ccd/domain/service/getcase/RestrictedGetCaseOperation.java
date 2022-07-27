@@ -43,8 +43,7 @@ public class RestrictedGetCaseOperation extends AbstractRestrictCaseOperation im
             CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.get().getCaseTypeId());
             Set<AccessProfile> accessProfiles = getAccessProfiles(caseReference, caseDetails.get());
             if (!accessProfiles.isEmpty()) {
-                boolean hasReadAccess = verifyCaseTypeReadAccess(caseTypeDefinition, accessProfiles);
-                if (!hasReadAccess) {
+                if (!verifyCaseTypeReadAccess(caseTypeDefinition, accessProfiles)) {
                     throw new ForbiddenException();
                 }
             }

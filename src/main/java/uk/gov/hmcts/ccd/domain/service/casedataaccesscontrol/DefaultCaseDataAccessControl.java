@@ -66,19 +66,19 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
     @Autowired
     public DefaultCaseDataAccessControl(RoleAssignmentService roleAssignmentService,
-                                                SecurityUtils securityUtils,
-                                                RoleAssignmentsFilteringService roleAssignmentsFilteringService,
-                                                PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator,
-                                                ApplicationParams applicationParams,
-                                                AccessProfileService accessProfileService,
-                                                PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator,
-                                                @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                        SecurityUtils securityUtils,
+                                        RoleAssignmentsFilteringService roleAssignmentsFilteringService,
+                                        PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator,
+                                        ApplicationParams applicationParams,
+                                        AccessProfileService accessProfileService,
+                                        PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator,
+                                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                             final CaseDefinitionRepository caseDefinitionRepository,
-                                                @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                                CaseDetailsRepository caseDetailsRepository,
-                                                UserAuthorisation userAuthorisation,
+                                        @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                            CaseDetailsRepository caseDetailsRepository,
+                                        UserAuthorisation userAuthorisation,
                                         @Qualifier(CachedCaseUserRepository.QUALIFIER)
-                                                CaseUserRepository caseUserRepository) {
+                                            CaseUserRepository caseUserRepository) {
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
         this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
@@ -134,7 +134,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
-        Optional<CaseDetails> caseDetails =  caseDetailsRepository.findByReference(caseReference);
+        Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(caseReference);
         // R.A uses external micro-services which referer cases by caseReference
         // Non R.A uses internal case id. Both cases should be contemplated in the code.
         if (caseDetails.isEmpty()) {
@@ -170,7 +170,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     private FilteredRoleAssignments getFilteredRoleAssignments(CaseDetails caseDetails,
                                                                RoleAssignments roleAssignmentsWithGrantType,
                                                                String caseReference) {
-        if(!roleAssignmentsWithGrantType.getRoleAssignments().isEmpty()) {
+        if (!roleAssignmentsWithGrantType.getRoleAssignments().isEmpty()) {
             FilteredRoleAssignments filteredRoleAssignments =
                 roleAssignmentsFilteringService
                     .filter(roleAssignmentsWithGrantType, caseDetails,
