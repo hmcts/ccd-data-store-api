@@ -222,16 +222,6 @@ public class CaseDetails implements Cloneable {
         this.lastStateModifiedDate = lastStateModifiedDate;
     }
 
-    /**
-     * @deprecated Will be removed in version 2.x. Use {@link CaseDetails#dataClassification} instead.
-     */
-    @Deprecated
-    @JsonGetter("security_classifications")
-    @ApiModelProperty("Deprecated. Use `data_classification` instead.")
-    public Map<String, JsonNode> getSecurityClassifications() {
-        return dataClassification;
-    }
-
     public Map<String, JsonNode> getDataClassification() {
         return dataClassification;
     }
@@ -290,13 +280,13 @@ public class CaseDetails implements Cloneable {
 
     @JsonIgnore
     public void setDeleteDraftResponseEntity(final String draftId, final ResponseEntity<Void>
-        draftResponse) {
+                                                         draftResponse) {
         if (SC_OK == draftResponse.getStatusCodeValue()) {
             setDeleteDraftResponseEntity();
         } else {
             LOG.warn("Incomplete delete draft response for draft={}, statusCode={}",
-                draftId,
-                draftResponse.getStatusCodeValue());
+                     draftId,
+                     draftResponse.getStatusCodeValue());
             setIncompleteDeleteDraftResponse();
         }
     }
@@ -314,10 +304,10 @@ public class CaseDetails implements Cloneable {
             setAfterSubmitCallbackResponseEntity(callBackResponse.getBody());
         } else {
             LOG.warn("Incomplete call back response for case {} (db id={}); status code {}, body {}",
-                reference,
-                id,
-                callBackResponse.getStatusCodeValue(),
-                callBackResponse.getBody().toJson());
+                     reference,
+                     id,
+                     callBackResponse.getStatusCodeValue(),
+                     callBackResponse.getBody().toJson());
             setIncompleteCallbackResponse();
         }
     }

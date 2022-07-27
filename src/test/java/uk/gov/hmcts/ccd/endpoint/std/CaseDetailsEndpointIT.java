@@ -244,9 +244,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Incorrect Response Content",
@@ -316,7 +316,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WhenPostCreateCaseAndSameReferenceFirstTimeButRetryIsUniqueForCaseworker()
-        throws Exception {
+                                                                                                    throws Exception {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
@@ -347,7 +347,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WhenPostCreateCaseAndSameReferenceFirstTimeButRetryIsUniqueForCitizen()
-        throws Exception {
+                                                                                                    throws Exception {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
@@ -1162,9 +1162,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
@@ -1211,9 +1211,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setData(GlobalSearchTestFixture.createCaseData());
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         CaseDetails actualData = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseDetails.class);
@@ -1230,9 +1230,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
@@ -1276,9 +1276,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -1310,9 +1310,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
@@ -1330,7 +1330,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseTypeForCaseworker()
-        throws Exception {
+                                                                                                    throws Exception {
         shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseType("caseworkers");
     }
 
@@ -1341,7 +1341,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccessForCaseworker()
-        throws Exception {
+                                                                                                    throws Exception {
         shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccess("caseworkers");
     }
 
@@ -1386,8 +1386,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave)))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave)))
             .andExpect(status().is(404));
 
         // No database entry created
@@ -1405,8 +1405,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave)))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave)))
             .andExpect(status().is(404));
 
         // No database entry created
@@ -1425,8 +1425,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(anEvent().build());
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave)))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave)))
             .andExpect(status().is(404));
 
         // No database entry created
@@ -1445,8 +1445,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(anEvent().build());
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave)))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave)))
             .andExpect(status().is(404));
 
         // No database entry created
@@ -1917,9 +1917,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Incorrect Response Content",
@@ -1981,9 +1981,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         CaseDetails actualData = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseDetails.class);
@@ -2024,12 +2024,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "    \"D8Document\":\"PUBLIC\"" +
             "}";
         final String token = generateEventToken(template,
-            UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
+                                                UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Incorrect Response Content",
@@ -2094,9 +2094,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         CaseDetails actualData = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseDetails.class);
@@ -2123,9 +2123,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
@@ -2142,7 +2142,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String caseTypeUrlPortion = "bookcase-default-post-state";
         final String caseReference = "1557845948403939";
         final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
-            + caseTypeUrlPortion + "/cases/" + caseReference + "/events";
+                + caseTypeUrlPortion + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String token = generateEventToken(template, UID, JURISDICTION, caseTypeUrlPortion, caseReference,
             TEST_EVENT_ID);
@@ -2155,9 +2155,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertNotNull(initialCaseDetails.getLastStateModifiedDate());
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
@@ -2216,9 +2216,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Incorrect Response Content",
@@ -2289,9 +2289,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Incorrect Response Content",
@@ -2359,9 +2359,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Incorrect Response Content",
@@ -2430,9 +2430,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Incorrect Response Content",
@@ -2479,7 +2479,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccessForCaseworker()
-        throws Exception {
+                                                                                                    throws Exception {
         shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess("caseworkers");
     }
 
@@ -2487,7 +2487,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccessForCitizen()
-        throws Exception {
+                                                                                                    throws Exception {
         shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess("citizens");
     }
 
@@ -2495,7 +2495,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccessForCaseworker()
-        throws Exception {
+                                                                                                    throws Exception {
         shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccess("caseworkers");
     }
 
@@ -2503,7 +2503,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccessForCitizen()
-        throws Exception {
+                                                                                                    throws Exception {
         shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccess("citizens");
     }
 
@@ -2577,9 +2577,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
@@ -2613,9 +2613,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
@@ -2649,9 +2649,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
@@ -2695,9 +2695,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
@@ -2743,9 +2743,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(422))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(422))
             .andReturn();
 
         // No database entry created
@@ -2780,9 +2780,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(422))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(422))
             .andReturn();
 
         // No database entry created
@@ -2817,9 +2817,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(422))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(422))
             .andReturn();
 
         // No database entry created
@@ -2854,9 +2854,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(422))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(422))
             .andReturn();
 
         // No database entry created
@@ -2890,9 +2890,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
 
         // No database entry created
@@ -2926,9 +2926,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
 
         // No database entry created
@@ -2960,9 +2960,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
 
         // No database entry created
@@ -2994,9 +2994,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
 
         // No database entry created
@@ -3030,9 +3030,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
 
         // No database entry created
@@ -3055,9 +3055,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
 
         // No database entry created
@@ -3081,9 +3081,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(400))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(400))
             .andReturn();
 
         // No database entry created
@@ -3107,9 +3107,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(400))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(400))
             .andReturn();
 
         // No database entry created
@@ -3128,14 +3128,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode invalidData = mapper.readTree("{ \"XXX\": \"YYY\" }");
         final JsonNode initialData = mapper.readTree("{" +
-            "\"PersonAddress\":{" +
-            "\"Country\":\"Wales\"," +
-            "\"Postcode\":\"W11 5DF\"," +
-            "\"AddressLine1\":\"Flat 9\"," +
-            "\"AddressLine2\":\"2 Hubble Avenue\"," +
-            "\"AddressLine3\":\"ButtonVillie\"}," +
-            "\"PersonLastName\":\"Roof\"," +
-            "\"PersonFirstName\":\"George\"}");
+                                                     "\"PersonAddress\":{" +
+                                                     "\"Country\":\"Wales\"," +
+                                                     "\"Postcode\":\"W11 5DF\"," +
+                                                     "\"AddressLine1\":\"Flat 9\"," +
+                                                     "\"AddressLine2\":\"2 Hubble Avenue\"," +
+                                                     "\"AddressLine3\":\"ButtonVillie\"}," +
+                                                     "\"PersonLastName\":\"Roof\"," +
+                                                     "\"PersonFirstName\":\"George\"}");
         final Map<String, JsonNode> expectedData = JacksonUtils.convertValue(initialData);
 
         caseDetailsToSave.setData(JacksonUtils.convertValue(invalidData));
@@ -3145,8 +3145,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))).andExpect(status().is(404))
             .andReturn();
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -3179,14 +3179,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode invalidData = mapper.readTree("{ \"XXX\": \"YYY\" }");
         final JsonNode initialData = mapper.readTree("{" +
-            "\"PersonAddress\":{" +
-            "\"Country\":\"Wales\"," +
-            "\"Postcode\":\"W11 5DF\"," +
-            "\"AddressLine1\":\"Flat 9\"," +
-            "\"AddressLine2\":\"2 Hubble Avenue\"," +
-            "\"AddressLine3\":\"ButtonVillie\"}," +
-            "\"PersonLastName\":\"Roof\"," +
-            "\"PersonFirstName\":\"George\"}");
+                                                     "\"PersonAddress\":{" +
+                                                     "\"Country\":\"Wales\"," +
+                                                     "\"Postcode\":\"W11 5DF\"," +
+                                                     "\"AddressLine1\":\"Flat 9\"," +
+                                                     "\"AddressLine2\":\"2 Hubble Avenue\"," +
+                                                     "\"AddressLine3\":\"ButtonVillie\"}," +
+                                                     "\"PersonLastName\":\"Roof\"," +
+                                                     "\"PersonFirstName\":\"George\"}");
         final Map<String, JsonNode> expectedData = JacksonUtils.convertValue(initialData);
 
         caseDetailsToSave.setData(JacksonUtils.convertValue(invalidData));
@@ -3196,8 +3196,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))).andExpect(status().is(404))
             .andReturn();
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -3237,9 +3237,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         template.update("UPDATE case_data SET data = '{}', version = 2 WHERE reference = ?", caseReference);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(409))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(409))
             .andReturn();
 
         // No database entry created
@@ -3265,9 +3265,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         template.update("UPDATE case_data SET data = '{}', version = 2 WHERE reference = ?", caseReference);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(409))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(409))
             .andReturn();
 
         // No database entry created
@@ -3294,9 +3294,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         template.update("UPDATE case_data SET state = 'CaseStopped', version = 2 WHERE reference = ?", caseReference);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(422))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(422))
             .andReturn();
 
         // No database entry created
@@ -3323,9 +3323,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         template.update("UPDATE case_data SET state = 'CaseStopped', version = 2 WHERE reference = ?", caseReference);
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(422))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(422))
             .andReturn();
 
         // No database entry created
@@ -3416,10 +3416,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "      },\n" +
             "      \"after_submit_callback_response\":null,\n" +
             "      \"callback_response_status_code\":null,\n" +
-            "      \"callback_response_status\":null,\n" +
-            "      \"security_classifications\":{  \n" +
-            "\n" +
-            "      }\n" +
+            "      \"callback_response_status\":null\n" +
             "   },\n" +
             "   \"event_id\":\"Create2\"\n" +
             "}";
@@ -3452,9 +3449,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
     }
 
@@ -3463,21 +3460,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(String role, String caseType)
-        throws Exception {
+                                                                                                    throws Exception {
         final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
     }
 
     private void shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccess(String userRole)
-        throws Exception {
+                                                                                                    throws Exception {
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
             + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases";
 
@@ -3502,9 +3499,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         final JsonNode sanitizedData = mapper.readTree(
@@ -3522,8 +3519,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .get("data_classification");
         Map actualData = mapper.readValue(caseData.toString(), Map.class);
         assertAll(() -> assertThat("Incorrect Response Content",
-                actualData.entrySet(),
-                everyItem(isIn(expectedSanitizedData.entrySet()))),
+            actualData.entrySet(),
+            everyItem(isIn(expectedSanitizedData.entrySet()))),
             () -> assertThat("Response contains filtered out data", caseData.has("PersonFirstName"),
                 is(false)),
             () -> assertThat(dataClassification.has("PersonFirstName"), CoreMatchers.is(false)),
@@ -3541,14 +3538,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
     }
 
     private void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseType(String role)
-        throws Exception {
+                                                                                                    throws Exception {
         final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
             + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/cases";
 
@@ -3572,16 +3569,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertThat(mvcResult.getResponse().getContentAsString(), CoreMatchers.is(isEmptyString()));
     }
 
     private void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess(String userRole)
-        throws Exception {
+                                                                                                    throws Exception {
         final String caseReference = "1504259907353610";
         final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
             + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS
@@ -3603,9 +3600,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
@@ -3614,7 +3611,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
     private void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccess(String userRole)
-        throws Exception {
+                                                                                                    throws Exception {
         final String caseReference = "1504259907353628";
         final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
             + CASE_TYPE_NO_READ_FIELD_ACCESS
@@ -3636,9 +3633,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         JsonNode nodeData = mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data");
@@ -3650,15 +3647,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             () -> assertThat(nodeData.get("PersonLastName"), CoreMatchers.is(getTextNode("_ Roof"))),
             () -> assertThat(nodeData.has("PersonAddress"), CoreMatchers.is(true)),
             () -> assertThat(nodeData.get("PersonAddress").get("Country"),
-                CoreMatchers.is(getTextNode("_ Wales"))),
+                             CoreMatchers.is(getTextNode("_ Wales"))),
             () -> assertThat(nodeData.get("PersonAddress").get("Postcode"),
-                CoreMatchers.is(getTextNode("_ WB11DDF"))),
+                             CoreMatchers.is(getTextNode("_ WB11DDF"))),
             () -> assertThat(nodeData.get("PersonAddress").get("AddressLine1"),
-                CoreMatchers.is(getTextNode("_ Flat 9"))),
+                             CoreMatchers.is(getTextNode("_ Flat 9"))),
             () -> assertThat(nodeData.get("PersonAddress").get("AddressLine2"),
-                CoreMatchers.is(getTextNode("_ 2 Hubble Avenue"))),
+                             CoreMatchers.is(getTextNode("_ 2 Hubble Avenue"))),
             () -> assertThat(nodeData.get("PersonAddress").get("AddressLine3"),
-                CoreMatchers.is(getTextNode("_ ButtonVillie"))),
+                             CoreMatchers.is(getTextNode("_ ButtonVillie"))),
             () -> assertThat(nodeClassification.has("PersonFirstName"), CoreMatchers.is(false)),
             () -> assertThat(nodeClassification.has("PersonLastName"), CoreMatchers.is(true)),
             () -> assertThat(nodeClassification.has("PersonAddress"), CoreMatchers.is(true)),
@@ -3698,9 +3695,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
     }
 
@@ -3727,9 +3724,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
     }
 
@@ -3759,10 +3756,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "      },\n" +
             "      \"after_submit_callback_response\":null,\n" +
             "      \"callback_response_status_code\":null,\n" +
-            "      \"callback_response_status\":null,\n" +
-            "      \"security_classifications\":{  \n" +
-            "\n" +
-            "      }\n" +
+            "      \"callback_response_status\":null\n" +
             "   },\n" +
             "   \"event_id\":\"TEST_EVENT\"\n" +
             "}";
@@ -3828,11 +3822,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "\"CaseLink2\": {"
                 + "     \"CaseReference\": \"" + CASE_02_REFERENCE + "\""
                 + "}"
-                + "}");
+            + "}");
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave)))
+            .content(mapper.writeValueAsBytes(caseDetailsToSave)))
             .andExpect(status().is(201))
             .andReturn();
 
@@ -3874,12 +3868,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "/events";
 
         final String callbackData =
-            " {\"data\": {"
-                + "     \"CaseLink1\": {"
-                + "         \"CaseReference\": \"" + CASE_01_REFERENCE + "\""
-                + "     }"
-                + " }"
-                + "}";
+              " {\"data\": {"
+            + "     \"CaseLink1\": {"
+            + "         \"CaseReference\": \"" + CASE_01_REFERENCE + "\""
+            + "     }"
+            + " }"
+            + "}";
 
         stubFor(WireMock.post(urlMatching("/callback_about_to_start_caselink"))
             .willReturn(okJson(callbackData).withStatus(201)));
@@ -3892,7 +3886,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave)))
+            .content(mapper.writeValueAsBytes(caseDetailsToSave)))
             .andExpect(status().is(201))
             .andReturn();
 
@@ -3994,21 +3988,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         JsonNode rootNode = mapper.readTree(mvcResult.getResponse().getContentAsString());
         assertAll(() -> assertThat(rootNode.has("case_details"), CoreMatchers.is(true)),
             () -> assertThat(rootNode.get("case_details").get("case_data").has("PersonFirstName"),
-                CoreMatchers.is(false)),
+                             CoreMatchers.is(false)),
             () -> assertThat(rootNode.get("case_details").get("case_data").has("PersonLastName"),
-                CoreMatchers.is(true)),
+                             CoreMatchers.is(true)),
             () -> assertThat(rootNode.get("case_details").get("case_data").has("PersonAddress"),
-                CoreMatchers.is(true)),
+                             CoreMatchers.is(true)),
             () -> assertThat(rootNode.get("case_details").get("case_data").has("D8Document"),
-                CoreMatchers.is(true)),
+                             CoreMatchers.is(true)),
             () -> assertThat(rootNode.get("case_details").get("data_classification").has("PersonFirstName"),
-                CoreMatchers.is(false)),
+                             CoreMatchers.is(false)),
             () -> assertThat(rootNode.get("case_details").get("data_classification").has("PersonLastName"),
-                CoreMatchers.is(true)),
+                             CoreMatchers.is(true)),
             () -> assertThat(rootNode.get("case_details").get("data_classification").has("PersonAddress"),
-                CoreMatchers.is(true)),
+                             CoreMatchers.is(true)),
             () -> assertThat(rootNode.get("case_details").get("data_classification").has("D8Document"),
-                CoreMatchers.is(true))
+                             CoreMatchers.is(true))
         );
     }
 
@@ -4035,9 +4029,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
     }
 
@@ -4064,9 +4058,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
         mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(404))
             .andReturn();
     }
 
@@ -4076,13 +4070,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/cases/" + caseReference;
 
         mockMvc.perform(get(url)
-                .contentType(JSON_CONTENT_TYPE)
-            ).andExpect(status().is(404))
+            .contentType(JSON_CONTENT_TYPE)
+        ).andExpect(status().is(404))
             .andReturn();
     }
 
     private void shouldReturn200WithFieldRemovedWhenGetValidCaseWithNoFieldReadAccess(String userRole)
-        throws Exception {
+                                                                                                    throws Exception {
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
 
@@ -4192,9 +4186,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Incorrect Response Content",
@@ -4237,8 +4231,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
         JSONAssert.assertEquals(expectedClassificationString,
-            mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(),
-            JSONCompareMode.LENIENT);
+                mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(),
+                JSONCompareMode.LENIENT);
     }
 
     private void shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinary(String userRole) throws Exception {
@@ -4280,9 +4274,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Incorrect Response Content",
@@ -4377,9 +4371,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToValidate))
-            ).andExpect(status().is(422))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(422))
             .andReturn();
 
         assertEquals("Expected field validation error is not there",
@@ -4436,9 +4430,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToValidate))
-            ).andExpect(status().is(422))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(422))
             .andReturn();
 
         assertEquals("Expected field validation error is not there",
@@ -4458,9 +4452,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
 
         final MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("state", TEST_STATE)
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("state", TEST_STATE)
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4493,9 +4487,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
 
         final MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("case.PersonFirstName", "Janet ")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case.PersonFirstName", "Janet ")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4522,9 +4516,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
 
         MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("case_reference", "1504259907353545")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case_reference", "1504259907353545")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4536,10 +4530,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(result.getResponse().getContentAsString(), containsString("George"));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("case_reference", "1504259907353545")
-                .param("case.PersonFirstName", "George ")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case_reference", "1504259907353545")
+            .param("case.PersonFirstName", "George ")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4549,10 +4543,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(result.getResponse().getContentAsString(), containsString("George"));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("case_reference", "1504259907353545")
-                .param("case.PersonFirstName", "notExisting")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case_reference", "1504259907353545")
+            .param("case.PersonFirstName", "notExisting")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4561,10 +4555,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(caseDetails, hasSize(0));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("case_reference", "1504259907353545")
-                .param("state", "notExistingState")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case_reference", "1504259907353545")
+            .param("state", "notExistingState")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4581,10 +4575,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
 
         MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("security_classification", "PRIVATE")
-                .param("state", "CaseCreated")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("security_classification", "PRIVATE")
+            .param("state", "CaseCreated")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4594,10 +4588,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(responseAsString, containsString("1504259907353598"));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("security_classification", "PUBLIC")
-                .param("state", "CaseCreated")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("security_classification", "PUBLIC")
+            .param("state", "CaseCreated")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4609,10 +4603,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("security_classification", "prIVATE")
-                .param("state", "CaseCreated")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("security_classification", "prIVATE")
+            .param("state", "CaseCreated")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4623,11 +4617,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(responseAsString, containsString("Angel"));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("security_classification", "PRIVATE")
-                .param("state", "CaseCreated")
-                .param("case.PersonFirstName", "Angel")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("security_classification", "PRIVATE")
+            .param("state", "CaseCreated")
+            .param("case.PersonFirstName", "Angel")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4638,9 +4632,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(responseAsString, containsString("Angel"));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("security_classification", "PRIVATE")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("security_classification", "PRIVATE")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4657,9 +4651,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
 
         MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("created_date", "2016-08-22")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("created_date", "2016-08-22")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4671,10 +4665,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(responseAsString, containsString("1504259907353537"));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("created_date", "2016-08-22")
-                .param("case.PersonFirstName", "Angel")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("created_date", "2016-08-22")
+            .param("case.PersonFirstName", "Angel")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4686,11 +4680,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(responseAsString, containsString("Angel"));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("created_date", "2016-08-22")
-                .param("case.PersonFirstName", "Angel")
-                .param("case.PersonLastName", "notExisting")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("created_date", "2016-08-22")
+            .param("case.PersonFirstName", "Angel")
+            .param("case.PersonLastName", "notExisting")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4700,10 +4694,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(caseDetails, hasSize(0));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("created_date", "2016-08-22")
-                .param("security_classification", "PRIVATE")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("created_date", "2016-08-22")
+            .param("security_classification", "PRIVATE")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4713,11 +4707,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("created_date", "2016-08-22")
-                .param("security_classification", "PRIVATE")
-                .param("state", "notExistingState")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("created_date", "2016-08-22")
+            .param("security_classification", "PRIVATE")
+            .param("state", "notExistingState")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4732,9 +4726,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
 
         MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("last_modified_date", "2016-08-24")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("last_modified_date", "2016-08-24")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4746,10 +4740,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(responseAsString, containsString("1504259907353537"));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("last_modified_date", "2016-08-24")
-                .param("case.PersonLastName", "Morten")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("last_modified_date", "2016-08-24")
+            .param("case.PersonLastName", "Morten")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4760,11 +4754,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(responseAsString, containsString("1504259907353598"));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("created_date", "2016-08-22")
-                .param("last_modified_date", "2016-08-24")
-                .param("security_classification", "puBLIc")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("created_date", "2016-08-22")
+            .param("last_modified_date", "2016-08-24")
+            .param("security_classification", "puBLIc")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4773,9 +4767,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(result.getResponse().getContentAsString(), containsString("1504259907353545"));
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("last_modified_date", "2016-08-27")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("last_modified_date", "2016-08-27")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4790,9 +4784,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
 
         MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("last_modified_date", "2016-08-24")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("last_modified_date", "2016-08-24")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4822,8 +4816,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         MvcResult result = mockMvc.perform(get(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4851,9 +4845,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
 
         final MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("case.PersonFirstName", "JanetX")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case.PersonFirstName", "JanetX")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4871,9 +4865,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
 
         MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("page", "1")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("page", "1")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4885,9 +4879,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         allPages.addAll(caseDetailsPage1);
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("page", "2")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("page", "2")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4898,9 +4892,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         allPages.addAll(caseDetailsPage2);
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("page", "3")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("page", "3")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4912,9 +4906,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         allPages.addAll(caseDetailsPage3);
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("page", "4")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("page", "4")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4936,8 +4930,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
 
         MvcResult result = mockMvc.perform(get(GET_PAGINATED_SEARCH_METADATA)
-                .contentType(JSON_CONTENT_TYPE)
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4949,9 +4943,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(metadata.getTotalResultsCount(), is(6));
 
         result = mockMvc.perform(get(GET_PAGINATED_SEARCH_METADATA)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("security_classification", "private")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("security_classification", "private")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4963,10 +4957,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(metadata.getTotalResultsCount(), is(2));
 
         result = mockMvc.perform(get(GET_PAGINATED_SEARCH_METADATA)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("security_classification", "private")
-                .param("case.PersonLastName", "Morten")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("security_classification", "private")
+            .param("case.PersonLastName", "Morten")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4978,10 +4972,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(metadata.getTotalResultsCount(), is(1));
 
         result = mockMvc.perform(get(GET_PAGINATED_SEARCH_METADATA)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("security_classification", "public")
-                .param("case.PersonLastName", "notExisting")
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("security_classification", "public")
+            .param("case.PersonLastName", "notExisting")
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -5002,8 +4996,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, "role-citizen");
 
         MvcResult result = mockMvc.perform(get(GET_PAGINATED_SEARCH_METADATA_CITIZENS)
-                .contentType(JSON_CONTENT_TYPE)
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -5022,8 +5016,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
 
         mockMvc.perform(get(GET_CASES_AS_CASEWORKER).contentType(JSON_CONTENT_TYPE)
-                .param("case.PersonFirstName$", "JanetX")  // bad search param here
-                .header(AUTHORIZATION, "Bearer user1"))
+            .param("case.PersonFirstName$", "JanetX")  // bad search param here
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(400))
             .andReturn();
     }
@@ -5035,10 +5029,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
 
         final MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                .contentType(JSON_CONTENT_TYPE)
-                .param("case.PersonAddress.Country", "EnglanD")  // expects this
-                // to be sanitized
-                .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case.PersonAddress.Country", "EnglanD")  // expects this
+            // to be sanitized
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -5063,9 +5057,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
@@ -5113,9 +5107,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
@@ -5238,7 +5232,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK)));
         verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK))
-            .withRequestBody(equalToJson(requestBodyJson())));
+                                              .withRequestBody(equalToJson(requestBodyJson())));
 
         final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseData() + "}");
         final String exptextedResponseValue = mapper.writeValueAsString(expectedResponse);
@@ -5382,19 +5376,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final JsonNode data = mapper.readTree(
             "{"
-                + "\"CaseLink1\": {"
-                + "     \"CaseReference\": \"" + CASE_LINKS_CASE_999_REFERENCE + "\""
-                + "},"
-                + "\"CaseLink2\": {"
-                + "     \"CaseReference\": \"" + CASE_LINKS_CASE_998_REFERENCE + "\""
-                + "}"
-                + "}");
+            + "\"CaseLink1\": {"
+            + "     \"CaseReference\": \"" + CASE_LINKS_CASE_999_REFERENCE + "\""
+            + "},"
+            + "\"CaseLink2\": {"
+            + "     \"CaseReference\": \"" + CASE_LINKS_CASE_998_REFERENCE + "\""
+            + "}"
+            + "}");
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         assertEquals("Incorrect Response Content",
@@ -5438,16 +5432,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final JsonNode data = mapper.readTree(
             " {"
-                + "    \"CaseLink1\": {"
-                + "        \"CaseReference\": \"3257164579659325\""
-                + "    }"
-                + "}");
+            + "    \"CaseLink1\": {"
+            + "        \"CaseReference\": \"3257164579659325\""
+            + "    }"
+            + "}");
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(422))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(422))
             .andReturn();
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -5491,9 +5485,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsBytes(caseDetailsToSave))
-            ).andExpect(status().is(201))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
             .andReturn();
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -5540,8 +5534,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "    \"callback_response_status_code\" : null,\n"
             + "    \"callback_response_status\" : null,\n"
             + "    \"delete_draft_response_status_code\" : null,\n"
-            + "    \"delete_draft_response_status\" : null,\n"
-            + "    \"security_classifications\" : null\n"
+            + "    \"delete_draft_response_status\" : null\n"
             + "  },\n"
             + "  \"case_details_before\" : null,\n"
             + "  \"event_id\" : \"TEST_EVENT\",\n"
@@ -5551,15 +5544,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private String requestBodyJson() {
         return "{\"case_details\":{\"id\":null,\"jurisdiction\":\"PROBATE\",\"state\":null,\"version\":null,"
-            + "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null,"
-            + "\"last_state_modified_date\":null,\"security_classification\":null,\"case_data\":{\"PersonLastName"
-            + "\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
-            + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}},"
-            + "\"data_classification\":null,\"supplementary_data\":null,\"after_submit_callback_response\":null,"
-            + "\"callback_response_status_code\":null,\"callback_response_status\":null,"
-            + "\"delete_draft_response_status_code\":null,\"delete_draft_response_status\":null,"
-            + "\"security_classifications\":null},\"case_details_before\":null,"
-            + "\"event_id\":\"TEST_EVENT\",\"ignore_warning\":false}";
+                + "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null,"
+                + "\"last_state_modified_date\":null,\"security_classification\":null,\"case_data\":{\"PersonLastName"
+                + "\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
+                + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}},"
+                + "\"data_classification\":null,\"supplementary_data\":null,\"after_submit_callback_response\":null,"
+                + "\"callback_response_status_code\":null,\"callback_response_status\":null,"
+                + "\"delete_draft_response_status_code\":null,\"delete_draft_response_status\":null},"
+                + "\"case_details_before\":null,"
+                + "\"event_id\":\"TEST_EVENT\",\"ignore_warning\":false}";
     }
 
     private WizardPageCollection createWizardPageCollection(String eventCallBackURI) {
