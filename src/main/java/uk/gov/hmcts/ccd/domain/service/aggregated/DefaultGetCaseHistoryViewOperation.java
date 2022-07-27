@@ -38,7 +38,8 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         UIDService uidService,
         DefaultObjectMapperService defaultObjectMapperService,
         CompoundFieldOrderService compoundFieldOrderService,
-        FieldProcessorService fieldProcessorService) {
+        FieldProcessorService fieldProcessorService,
+        @Qualifier("restricted") GetCaseOperation restrictedGetCaseOperation) {
 
         super(getCaseOperation,
             uiDefinitionRepository,
@@ -46,7 +47,8 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
             uidService,
             defaultObjectMapperService,
             compoundFieldOrderService,
-            fieldProcessorService);
+            fieldProcessorService,
+            restrictedGetCaseOperation);
 
         this.getEventsOperation = getEventsOperation;
     }

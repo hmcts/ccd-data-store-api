@@ -58,9 +58,10 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
                                   final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder,
                                   final ObjectMapperService objectMapperService,
                                   final CompoundFieldOrderService compoundFieldOrderService,
-                                  final FieldProcessorService fieldProcessorService) {
+                                  final FieldProcessorService fieldProcessorService,
+                                  @Qualifier("restricted") GetCaseOperation restrictedGetCaseOperation) {
         super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService,
-              compoundFieldOrderService, fieldProcessorService);
+              compoundFieldOrderService, fieldProcessorService, restrictedGetCaseOperation);
         this.draftGateway = draftGateway;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }

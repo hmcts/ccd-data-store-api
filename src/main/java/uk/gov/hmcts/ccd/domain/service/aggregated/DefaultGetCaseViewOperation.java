@@ -58,9 +58,10 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
                                        CompoundFieldOrderService compoundFieldOrderService,
                                        FieldProcessorService fieldProcessorService,
                                        CaseEventEnablingService caseEventEnablingService,
-                                       GetCaseCallback getCaseCallback) {
+                                       GetCaseCallback getCaseCallback,
+                                       @Qualifier("restricted") GetCaseOperation restrictedGetCaseOperation) {
         super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService,
-              compoundFieldOrderService, fieldProcessorService);
+              compoundFieldOrderService, fieldProcessorService, restrictedGetCaseOperation);
         this.getEventsOperation = getEventsOperation;
         this.caseTypeService = caseTypeService;
         this.eventTriggerService = eventTriggerService;
