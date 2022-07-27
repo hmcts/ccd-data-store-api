@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.73",
-  "_extends_": "F-1016_Test_Data_Base_Citizen",
+  "_extends_": "UpdateCase_SubmitEvent_v1Ext_Citizen__Base",
 
   "title": "Attempt to update SystemTTL without permissions using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
 
@@ -34,10 +34,9 @@
 
   "request": {
     "pathVariables": {
+      "jid" : "BEFTA_MASTER",
+      "ctid": "FT_TTL",
       "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
-    },
-    "headers": {
-      "_extends_": "Common_Request_Headers"
     },
     "body": {
       "data": {
@@ -47,13 +46,9 @@
         }
       },
       "event": {
-        "id": "updateCaseTTLInc",
-        "summary": "",
-        "description": ""
+        "id": "updateCaseTTLInc"
       },
-      "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": true
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 

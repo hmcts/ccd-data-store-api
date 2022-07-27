@@ -1,6 +1,6 @@
 {
-	"_guid_": "F-1016_Test_Data_Base_Citizen",
-  "_extends_": "Event_Creation_Citizen_Base",
+  "_guid_": "F-1016_Test_Data_Base_Citizen",
+  "_extends_": "UpdateCase_SubmitEvent_v1Ext_Citizen__Base",
 
   "users": {
     "invokingUser": {
@@ -8,9 +8,11 @@
     }
   },
 
-	"request": {
-		"pathVariables": {
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
       "cid": "${[scenarioContext][childContexts][F-1016_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
-		}
-	}
+    }
+  }
 }

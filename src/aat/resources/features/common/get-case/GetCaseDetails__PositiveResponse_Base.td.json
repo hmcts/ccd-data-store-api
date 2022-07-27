@@ -1,22 +1,6 @@
 {
-  "_guid_": "F-1016_GetCaseDetails_Base",
-
-  "productName": "CCD Data Store",
-  "operationName": "retrieve a case by id",
-
-  "specs": [
-    "to verify that the TTL.Suspended value has not changed in the database"
-  ],
-
-  "method": "GET",
-  "uri": "/cases/{cid}",
-
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "experimental": "true"
-    }
-  },
+  "_guid_": "GetCaseDetails__PositiveResponse_Base",
+  "_extends_": "GetCaseDetails__Base",
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
@@ -31,17 +15,21 @@
         }
       },
       "id": "[[ANYTHING_PRESENT]]",
-      "jurisdiction": "BEFTA_MASTER",
-      "case_type": "FT_MasterCaseType",
+
+      "jurisdiction": "OVERRIDE",
+      "case_type": "OVERRIDE",
+
       "created_on": "[[ANYTHING_PRESENT]]",
       "last_modified_on": "[[ANYTHING_PRESENT]]",
       "last_state_modified_on": "[[ANYTHING_PRESENT]]",
       "state": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
+
       "data": {
       },
       "data_classification": {
       },
+
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
       "callback_response_status": null,

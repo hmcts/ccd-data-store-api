@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.87",
-  "_extends_": "F-1016_Test_Data_Base_V2",
+  "_extends_": "UpdateCase_SubmitEvent_v2Ext__PositiveResponse_Base",
 
   "title": "Set TTL Override (TTL Guard pass) for first time when TTL data not present in case data and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST",
 
@@ -17,12 +17,15 @@
     "has TTL.OverrideTTL set to greater than today + guard value"
   ],
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
   "request": {
     "pathVariables": {
       "cid": "${[scenarioContext][childContexts][F-1016_CreateCasePreRequisiteCaseworker_noTTL][testData][actualResponse][body][id]}"
-    },
-    "headers": {
-      "_extends_": "Common_Request_Headers"
     },
     "body": {
       "data": {
@@ -33,28 +36,21 @@
         }
       },
       "event": {
-        "id": "updateCaseSubmitTTL",
-        "summary": "",
-        "description": ""
+        "id": "updateCaseSubmitTTL"
       },
-      "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": true
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 
   "expectedResponse": {
-    "_extends_": "Common_201_Response",
     "body" : {
-      "_links" : "[[ANYTHING_PRESENT]]",
       "id" : "[[ANYTHING_PRESENT]]",
+
       "jurisdiction" : "BEFTA_MASTER",
-      "state" : "CaseUpdated",
       "case_type" : "FT_MasterCaseType",
-      "created_on" : "[[ANYTHING_PRESENT]]",
-      "last_modified_on" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
-      "security_classification" : "PUBLIC",
+
+      "state" : "CaseUpdated",
+
       "data" : {
         "TTL" : {
           "Suspended" : "No",
@@ -66,12 +62,7 @@
       "data_classification" : {
         "_extends_": "TTL_Classifications",
         "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      },
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null
+      }
     }
   }
 }

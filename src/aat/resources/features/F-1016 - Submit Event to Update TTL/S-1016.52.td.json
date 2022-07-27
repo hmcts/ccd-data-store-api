@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.52",
-  "_extends_": "Event_Creation_Caseworker_Base",
+  "_extends_": "UpdateCase_SubmitEvent_v1Ext_Caseworker__PositiveResponse_Base",
 
   "title": "Update TTL value when TTL data not present in event data using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
 
@@ -30,39 +30,31 @@
 
   "request": {
     "pathVariables": {
+      "jid" : "BEFTA_MASTER",
       "ctid": "FT_TTL",
       "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
-    },
-    "headers": {
-      "_extends_": "Common_Request_Headers"
     },
     "body": {
       "data": {
         "TextField": "Updated without supplying TTL"
       },
       "event": {
-        "id": "updateCaseTTLIncHidden",
-        "summary": "",
-        "description": ""
+        "id": "updateCaseTTLIncHidden"
       },
-      "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": true
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 
   "expectedResponse": {
-    "_extends_": "Common_201_Response",
     "body" : {
       "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" : "BEFTA_MASTER",
-      "state" : "CaseUpdated",
       "version" : 2,
+
+      "jurisdiction" : "BEFTA_MASTER",
       "case_type_id" : "FT_TTL",
-      "created_date" : "[[ANYTHING_PRESENT]]",
-      "last_modified" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
-      "security_classification" : "PUBLIC",
+
+      "state" : "CaseUpdated",
+
       "case_data" : {
         "TextField" : "Updated without supplying TTL",
         "TTL" : {
@@ -74,12 +66,6 @@
       "data_classification" : {
         "TextField" : "PUBLIC"
       },
-      "supplementary_data" : null,
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
       "security_classifications" : {
         "TextField" : "PUBLIC"
       }

@@ -1,6 +1,6 @@
 {
   "_guid_": "UpdateCase_TTLCaseType_manageCaseTTL__Base",
-  "_extends_": "Event_Creation_Caseworker_Base",
+  "_extends_": "UpdateCase_SubmitEvent_v1Ext_Caseworker__PositiveResponse_Base",
 
   "specs": [
     "to set TTL properties for a case"
@@ -14,10 +14,8 @@
 
   "request": {
     "pathVariables": {
+      "jid" : "BEFTA_MASTER",
       "ctid": "FT_TTL"
-    },
-    "headers": {
-      "_extends_": "Common_Request_Headers"
     },
     "body": {
       "data": {
@@ -29,28 +27,20 @@
         }
       },
       "event": {
-        "id": "manageCaseTTL",
-        "summary": "",
-        "description": ""
+        "id": "manageCaseTTL"
       },
-      "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": true
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 
   "expectedResponse": {
-    "_extends_": "Common_201_Response",
     "body" : {
       "id" : "[[ANYTHING_PRESENT]]",
+      "version" : "[[ANYTHING_PRESENT]]",
+
       "jurisdiction" : "BEFTA_MASTER",
-      "state" : "CaseCreated",
-      "version" : 1,
       "case_type_id" : "FT_TTL",
-      "created_date" : "[[ANYTHING_PRESENT]]",
-      "last_modified" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
-      "security_classification" : "PUBLIC",
+
       "case_data" : {
         "TextField": "Updated with TTL by manageCaseTTL",
         "TTL" : {
@@ -62,12 +52,6 @@
       "data_classification" : {
         "TextField" : "PUBLIC"
       },
-      "supplementary_data" : null,
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
       "security_classifications" : {
         "TextField" : "PUBLIC"
       }

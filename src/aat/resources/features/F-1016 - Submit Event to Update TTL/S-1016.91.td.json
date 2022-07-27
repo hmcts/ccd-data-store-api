@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.91",
-  "_extends_": "F-1016_Test_Data_Base_Citizen",
+  "_extends_": "UpdateCase_SubmitEvent_v1Ext_Citizen__Base",
 
   "title": "Set TTL Override (TTL Guard fail) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST",
 
@@ -18,12 +18,17 @@
     "has TTL.OverrideTTL set to less than today + guard value"
   ],
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
   "request": {
     "pathVariables": {
+      "jid" : "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
       "cid": "${[scenarioContext][childContexts][F-1016_CreateCasePreRequisiteCitizen_noTTL][testData][actualResponse][body][id]}"
-    },
-    "headers": {
-      "_extends_": "Common_Request_Headers"
     },
     "body": {
       "data": {
@@ -34,13 +39,9 @@
         }
       },
       "event": {
-        "id": "updateCaseSubmitTTL",
-        "summary": "",
-        "description": ""
+        "id": "updateCaseSubmitTTL"
       },
-      "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": true
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 

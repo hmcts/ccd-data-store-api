@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.73.VerifyTtlUnchanged",
-  "_extends_": "F-1016_GetCaseDetails_Base",
+  "_extends_": "GetCaseDetails__PositiveResponse_Base",
 
   "specs": [
     "to verify that the TTL data is unchanged"
@@ -20,7 +20,9 @@
 
   "expectedResponse": {
     "body": {
+      "jurisdiction" : "BEFTA_MASTER",
       "case_type" : "FT_TTL",
+
       "data": {
         "TextField" : "${[scenarioContext][siblingContexts][UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen][testData][actualResponse][body][case_data][TextField]}",
         "TTL" : "${[scenarioContext][siblingContexts][UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen][testData][actualResponse][body][case_data][TTL]}"

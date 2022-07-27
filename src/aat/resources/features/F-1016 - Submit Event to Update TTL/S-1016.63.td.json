@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.63",
-  "_extends_": "F-1016_Test_Data_Base_V2",
+  "_extends_": "UpdateCase_SubmitEvent_v2Ext__Base",
 
   "title": "Attempt to update SystemTTL without permissions using v2 '/cases/{cid}/events'",
 
@@ -32,9 +32,6 @@
     "pathVariables": {
       "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
     },
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
     "body": {
       "data": {
         "TextField": "Attempt to update SystemTTL without permissions",
@@ -43,13 +40,9 @@
         }
       },
       "event": {
-        "id": "updateCaseTTLInc",
-        "summary": "",
-        "description": ""
+        "id": "updateCaseTTLInc"
       },
-      "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": true
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 

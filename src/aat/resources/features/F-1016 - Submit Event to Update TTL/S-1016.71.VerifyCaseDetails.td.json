@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.71.VerifyCaseDetails",
-  "_extends_": "F-1016_GetCaseDetails_Base",
+  "_extends_": "GetCaseDetails__PositiveResponse_Base",
 
   "specs": [
     "to verify that the TTL data has changed"
@@ -20,7 +20,9 @@
 
   "expectedResponse": {
     "body": {
+      "jurisdiction" : "BEFTA_MASTER",
       "case_type" : "FT_TTL",
+
       "data": {
         "TextField" : "Updated without supplying TTL",
         "TTL" : {
