@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1017.23",
-  "_extends_": "UpdateCase_MidEvent_v1Ext_Citizen__PositiveResponse_Base",
+  "_extends_": "MidEvent_v1Ext_Citizen__PositiveResponse_Base",
 
   "title": "Trigger a mid event callback that changes TTL.OverrideTTL has changed (Yes -> YES). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1",
 

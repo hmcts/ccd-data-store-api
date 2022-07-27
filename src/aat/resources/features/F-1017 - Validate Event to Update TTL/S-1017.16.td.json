@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1017.16",
-  "_extends_": "UpdateCase_MidEvent_v1Ext_Caseworker__Base",
+  "_extends_": "MidEvent_v1Ext_Caseworker__Base",
 
   "title": "Trigger a mid event callback that changes TTL set to null. Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
 

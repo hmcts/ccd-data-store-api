@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1017.1",
-  "_extends_": "UpdateCase_MidEvent_v1Ext_Caseworker__Base",
+  "_extends_": "MidEvent_v1Ext_Caseworker__Base",
 
   "title": "TTL.Suspended changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
 

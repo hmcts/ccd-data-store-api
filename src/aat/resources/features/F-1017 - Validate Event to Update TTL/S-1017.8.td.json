@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1017.8",
-  "_extends_": "UpdateCase_MidEvent_v2Ext__Base",
+  "_extends_": "MidEvent_v2Ext__Base",
 
   "title": "TTL.SystemTTL changed after returning from Mid Event Callback and Validate Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST",
 

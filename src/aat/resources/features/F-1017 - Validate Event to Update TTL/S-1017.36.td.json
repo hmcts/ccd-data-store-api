@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1017.36",
-  "_extends_": "UpdateCase_MidEvent_v2Ext__Base",
+  "_extends_": "MidEvent_v2Ext__Base",
 
   "title": "Trigger a mid event callback that changes TTL set to null. Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST",
 
