@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DownstreamIssueException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
@@ -158,17 +159,29 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     public Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference, CaseDetails caseDetails) {
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
         RoleAssignments roleAssignmentsWithGrantType = filterRoleNames(roleAssignments);
-        FilteredRoleAssignments filteredRoleAssignments =
-            roleAssignmentsFilteringService
-                .filter(roleAssignmentsWithGrantType, caseDetails,
-                    Lists.newArrayList(
-                        MatcherType.SECURITYCLASSIFICATION
-                    )
-                );
+        FilteredRoleAssignments filteredRoleAssignments = getFilteredRoleAssignments(caseDetails,
+            roleAssignmentsWithGrantType, caseReference);
         CaseTypeDefinition caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
         return Sets.newHashSet(filteredAccessProfiles(
             filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
             caseType, false));
+    }
+
+    private FilteredRoleAssignments getFilteredRoleAssignments(CaseDetails caseDetails,
+                                                               RoleAssignments roleAssignmentsWithGrantType,
+                                                               String caseReference) {
+        if(!roleAssignmentsWithGrantType.getRoleAssignments().isEmpty()) {
+            FilteredRoleAssignments filteredRoleAssignments =
+                roleAssignmentsFilteringService
+                    .filter(roleAssignmentsWithGrantType, caseDetails,
+                        Lists.newArrayList(
+                            MatcherType.SECURITYCLASSIFICATION
+                        )
+                    );
+            return filteredRoleAssignments;
+        } else {
+            throw new CaseNotFoundException(caseReference);
+        }
     }
 
     private RoleAssignments filterRoleNames(RoleAssignments roleAssignments) {
