@@ -39,6 +39,7 @@ import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.ClassifiedGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
@@ -97,6 +98,9 @@ class CaseDetailsEndpointTest {
     @Mock
     private AppInsights appInsights;
 
+    @Mock
+    private GetCaseOperation restrictedGetCaseOperation;
+
     private CaseDetailsEndpoint endpoint;
     private Map<String, String> params = newHashMap();
 
@@ -117,7 +121,8 @@ class CaseDetailsEndpointTest {
                                     documentsOperation,
                                     paginatedSearchMetaDataOperation,
                                     midEventCallback,
-                                    appInsights);
+                                    appInsights,
+                                    restrictedGetCaseOperation);
     }
 
     @Nested

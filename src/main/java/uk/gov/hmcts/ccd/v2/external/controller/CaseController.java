@@ -35,6 +35,7 @@ import uk.gov.hmcts.ccd.domain.service.caselinking.GetLinkedCasesResponseCreator
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
@@ -131,10 +132,10 @@ public class CaseController {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
-
         final Optional<CaseDetails> caseDetails = this.getCaseOperation.execute(caseId);
         if (caseDetails.isEmpty()) {
-            restrictedGetCaseOperation.execute(caseId);
+            this.restrictedGetCaseOperation.execute(caseId)
+                .orElseThrow(() -> new CaseNotFoundException(caseId));
         }
         return ResponseEntity.ok(new CaseResource(caseDetails.get()));
     }

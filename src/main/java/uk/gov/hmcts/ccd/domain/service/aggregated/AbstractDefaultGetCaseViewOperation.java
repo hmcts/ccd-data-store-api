@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -76,7 +77,8 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     CaseDetails getCaseDetails(String caseReference) {
         Optional<CaseDetails> caseDetails = getCaseOperation.execute(caseReference);
         if (caseDetails.isEmpty()) {
-            restrictedGetCaseOperation.execute(caseReference);
+            this.restrictedGetCaseOperation.execute(caseReference)
+                .orElseThrow(() -> new CaseNotFoundException(caseReference));
         }
         return caseDetails.get();
     }
