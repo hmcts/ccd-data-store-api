@@ -38,6 +38,7 @@ java:
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
     LOG_CALLBACK_DETAILS:
     DEFAULT_CACHE_TTL_SEC: 1
+    CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-pr-591.service.core-compute-preview.internal
   postgresql:
     enabled: true
 
