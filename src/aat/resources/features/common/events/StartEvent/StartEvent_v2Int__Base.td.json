@@ -1,5 +1,5 @@
 {
-  "_guid_": "UpdateCase_StartEvent_v2Int__Base",
+  "_guid_": "StartEvent_v2Int__Base",
 
   "title": "call to v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET",
 

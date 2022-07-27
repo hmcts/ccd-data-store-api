@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.46",
-  "_extends_": "UpdateCase_StartEvent_v1Ext_Citizen__Base",
+  "_extends_": "StartEvent_v1Ext_Citizen__Base",
 
   "title": "must error when updating updating a cases TTL.SystemTTL value where about to start callback responds with TTL set to null by using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token'",
 

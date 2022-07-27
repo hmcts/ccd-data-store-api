@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.1",
-  "_extends_": "UpdateCase_StartEvent_v1Ext_Caseworker__PositiveResponse_Base",
+  "_extends_": "StartEvent_v1Ext_Caseworker__PositiveResponse_Base",
 
   "title": "must successfully update a cases TTL.SystemTTL value using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token'",
 

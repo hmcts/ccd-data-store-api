@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.14",
-  "_extends_": "UpdateCase_StartEvent_v2Int__Base",
+  "_extends_": "StartEvent_v2Int__Base",
 
   "title": "must error when updating a case where about to start callback has modified TTL.OverrideTTL using V2 'internal/cases/{cid}/event-triggers/{etid}'",
 

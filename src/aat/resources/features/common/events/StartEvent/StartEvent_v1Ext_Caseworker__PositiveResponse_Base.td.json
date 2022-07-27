@@ -1,13 +1,9 @@
 {
-  "_guid_": "UpdateCase_StartEvent_v1Ext_Citizen__PositiveResponse_Base",
-  "_extends_": "UpdateCase_StartEvent_v1Ext_Citizen__Base",
+  "_guid_": "StartEvent_v1Ext_Caseworker__PositiveResponse_Base",
+  "_extends_": "StartEvent_v1Ext_Caseworker__Base",
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    },
     "body": {
       "token": "[[ANYTHING_PRESENT]]",
       "case_details": {

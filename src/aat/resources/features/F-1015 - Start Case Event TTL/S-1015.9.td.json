@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.9",
-  "_extends_": "UpdateCase_StartEvent_v1Int_Caseworker__PositiveResponse_Base",
+  "_extends_": "StartEvent_v1Int_Caseworker__PositiveResponse_Base",
 
   "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified using '/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}'",
 

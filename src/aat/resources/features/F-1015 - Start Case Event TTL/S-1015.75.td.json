@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.75",
-  "_extends_": "UpdateCase_StartEvent_v2Int__PositiveResponse_Base",
+  "_extends_": "StartEvent_v2Int__PositiveResponse_Base",
 
   "title": "must successfully update a cases TTL.SystemTTL value where about to start callback responds with TTL missing by using V2 'internal/cases/{cid}/event-triggers/{etid}'",
 

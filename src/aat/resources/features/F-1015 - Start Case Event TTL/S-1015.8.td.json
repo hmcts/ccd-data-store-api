@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.8",
-  "_extends_": "UpdateCase_StartEvent_v2Ext__PositiveResponse_Base",
+  "_extends_": "StartEvent_v2Ext__PositiveResponse_Base",
 
   "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified using v2 '/cases/{cid}/event-triggers/{etid}'",
 

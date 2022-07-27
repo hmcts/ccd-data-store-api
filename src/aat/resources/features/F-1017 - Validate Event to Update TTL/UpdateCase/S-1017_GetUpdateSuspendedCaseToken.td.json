@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1017_GetUpdateSuspendedCaseToken",
-  "_extends_": "UpdateCase_StartEvent_v1Ext_Caseworker__PositiveResponse_Base",
+  "_extends_": "StartEvent_v1Ext_Caseworker__PositiveResponse_Base",
 
   "specs": [
     "As a prerequisite"

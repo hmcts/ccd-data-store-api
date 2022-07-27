@@ -1,5 +1,5 @@
 {
-  "_guid_": "UpdateCase_StartEvent_v2Ext__Base",
+  "_guid_": "StartEvent_v2Ext__Base",
 
   "title": "call to v2_external#/start-event-controller/getStartEventTriggerUsingGET",
 
