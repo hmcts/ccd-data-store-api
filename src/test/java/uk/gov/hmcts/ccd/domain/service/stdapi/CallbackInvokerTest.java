@@ -525,7 +525,7 @@ class CallbackInvokerTest {
 
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
-                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChanged(
+                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChangedByCallback(
                         any(), eq(callbackResponse.getData())),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
                     () -> inOrder.verify(globalSearchProcessorService, never())
@@ -741,7 +741,7 @@ class CallbackInvokerTest {
                 assertAll(
                     () -> assertThat(caseDetails.getState(), is("toto")),
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
-                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChanged(
+                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChangedByCallback(
                         any(), eq(callbackResponse.getData())),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
@@ -844,7 +844,7 @@ class CallbackInvokerTest {
 
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
-                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChanged(
+                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChangedByCallback(
                         any(), eq(callbackResponse.getData())),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
                     () -> inOrder.verify(globalSearchProcessorService, never())
