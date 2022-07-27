@@ -5,7 +5,7 @@
   "title": "Trigger a mid event callback that changes TTL set to null. Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
 
   "prerequisites" : [ {
-    "Token_Creation": "UpdateCase_TTLCaseType_updateWithMidEventTTLNull_PreRequisiteCaseworker_TokenCreation"
+    "Token_Creation": "F-1017_UpdateCase_TTLCaseType_updateWithMidEventTTLNull_PreRequisiteCaseworker_TokenCreation"
   } ],
 
   "specs": [
