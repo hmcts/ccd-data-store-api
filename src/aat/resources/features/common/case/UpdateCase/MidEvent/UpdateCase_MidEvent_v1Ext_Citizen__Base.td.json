@@ -15,6 +15,20 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "OVERRIDE",
       "ctid": "OVERRIDE"
+    },
+    "queryParams": {
+      "pageId": "OVERRIDE"
+    },
+    "body": {
+      "data": {},
+      "event": {
+        "id": "OVERRIDE",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "OVERRIDE",
+      "ignore_warning": true
     }
   }
 }

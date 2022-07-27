@@ -38,13 +38,9 @@
         }
       },
       "event": {
-        "id": "updateMidEventModifiedSystemTTL",
-        "summary": "",
-        "description": ""
+        "id": "updateMidEventModifiedSystemTTL"
       },
-      "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": true
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 

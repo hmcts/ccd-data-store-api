@@ -5,7 +5,7 @@
   "operationName": "validation of a set of fields as Case worker (v2_ext)",
 
   "method": "POST",
-  "uri": "/case-types/{caseTypeId}/validate",
+  "uri": "/case-types/{ctid}/validate",
 
   "request": {
     "headers": {
@@ -15,6 +15,20 @@
     },
     "pathVariables": {
       "ctid": "OVERRIDE"
+    },
+    "queryParams": {
+      "pageId": "OVERRIDE"
+    },
+    "body": {
+      "data": {},
+      "event": {
+        "id": "OVERRIDE",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "OVERRIDE",
+      "ignore_warning": true
     }
   }
 }
