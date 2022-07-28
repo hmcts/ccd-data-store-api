@@ -73,9 +73,6 @@ public class CaseDetails implements Cloneable {
     @ApiModelProperty("Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
     private Map<String, JsonNode> data;
 
-    @JsonProperty("data_classification")
-    @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
-        + "as field's value.")
     private Map<String, JsonNode> dataClassification;
 
     @JsonProperty("supplementary_data")

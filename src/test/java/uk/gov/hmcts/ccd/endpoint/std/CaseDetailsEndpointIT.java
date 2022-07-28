@@ -3411,9 +3411,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "      \"case_data\":{  \n" +
             "\n" +
             "      },\n" +
-            "      \"data_classification\":{  \n" +
-            "\n" +
-            "      },\n" +
             "      \"after_submit_callback_response\":null,\n" +
             "      \"callback_response_status_code\":null,\n" +
             "      \"callback_response_status\":null\n" +
@@ -3515,17 +3512,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         );
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         JsonNode caseData = mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data");
-        JsonNode dataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("data_classification");
         Map actualData = mapper.readValue(caseData.toString(), Map.class);
         assertAll(() -> assertThat("Incorrect Response Content",
             actualData.entrySet(),
             everyItem(isIn(expectedSanitizedData.entrySet()))),
             () -> assertThat("Response contains filtered out data", caseData.has("PersonFirstName"),
-                is(false)),
-            () -> assertThat(dataClassification.has("PersonFirstName"), CoreMatchers.is(false)),
-            () -> assertThat(dataClassification.has("PersonLastName"), CoreMatchers.is(true)),
-            () -> assertThat(dataClassification.has("PersonAddress"), CoreMatchers.is(true))
+                is(false))
         );
     }
 
@@ -3640,8 +3632,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         JsonNode nodeData = mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data");
 
-        JsonNode nodeClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("data_classification");
         assertAll(
             () -> assertThat(nodeData.has("PersonFirstName"), CoreMatchers.is(false)),
             () -> assertThat(nodeData.get("PersonLastName"), CoreMatchers.is(getTextNode("_ Roof"))),
@@ -3655,20 +3645,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             () -> assertThat(nodeData.get("PersonAddress").get("AddressLine2"),
                              CoreMatchers.is(getTextNode("_ 2 Hubble Avenue"))),
             () -> assertThat(nodeData.get("PersonAddress").get("AddressLine3"),
-                             CoreMatchers.is(getTextNode("_ ButtonVillie"))),
-            () -> assertThat(nodeClassification.has("PersonFirstName"), CoreMatchers.is(false)),
-            () -> assertThat(nodeClassification.has("PersonLastName"), CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.has("PersonAddress"), CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("Country"),
-                CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("Postcode"),
-                CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine1"),
-                CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine2"),
-                CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine3"),
-                CoreMatchers.is(true))
+                             CoreMatchers.is(getTextNode("_ ButtonVillie")))
         );
     }
 
@@ -3749,9 +3726,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "      \"last_modified\":null,\n" +
             "      \"security_classification\":\"PUBLIC\",\n" +
             "      \"case_data\":{  \n" +
-            "\n" +
-            "      },\n" +
-            "      \"data_classification\":{  \n" +
             "\n" +
             "      },\n" +
             "      \"after_submit_callback_response\":null,\n" +
@@ -3994,14 +3968,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             () -> assertThat(rootNode.get("case_details").get("case_data").has("PersonAddress"),
                              CoreMatchers.is(true)),
             () -> assertThat(rootNode.get("case_details").get("case_data").has("D8Document"),
-                             CoreMatchers.is(true)),
-            () -> assertThat(rootNode.get("case_details").get("data_classification").has("PersonFirstName"),
-                             CoreMatchers.is(false)),
-            () -> assertThat(rootNode.get("case_details").get("data_classification").has("PersonLastName"),
-                             CoreMatchers.is(true)),
-            () -> assertThat(rootNode.get("case_details").get("data_classification").has("PersonAddress"),
-                             CoreMatchers.is(true)),
-            () -> assertThat(rootNode.get("case_details").get("data_classification").has("D8Document"),
                              CoreMatchers.is(true))
         );
     }
@@ -5512,6 +5478,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "    \"id\" : null,\n"
             + "    \"jurisdiction\" : \"PROBATE\",\n"
             + "    \"state\" : null,\n"
+            + "    \"dataClassification\" : null,\n"
             + "    \"version\" : null,\n"
             + "    \"case_type_id\" : \"TestAddressBookCaseValidateMultiPage\",\n"
             + "    \"created_date\" : null,\n"
@@ -5528,7 +5495,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"\n"
             + "      }\n"
             + "    },\n"
-            + "    \"data_classification\" : null,\n"
             + "    \"supplementary_data\" : null,\n"
             + "    \"after_submit_callback_response\" : null,\n"
             + "    \"callback_response_status_code\" : null,\n"
@@ -5543,12 +5509,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private String requestBodyJson() {
-        return "{\"case_details\":{\"id\":null,\"jurisdiction\":\"PROBATE\",\"state\":null,\"version\":null,"
-                + "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null,"
-                + "\"last_state_modified_date\":null,\"security_classification\":null,\"case_data\":{\"PersonLastName"
-                + "\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
+        return "{\"case_details\":{\"id\":null,\"jurisdiction\":\"PROBATE\",\"state\":null,\"dataClassification\":null,"
+                + "\"version\":null,\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,"
+                + "\"last_modified\":null,\"last_state_modified_date\":null,\"security_classification\":null,"
+                + "\"case_data\":{\"PersonLastName\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
                 + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}},"
-                + "\"data_classification\":null,\"supplementary_data\":null,\"after_submit_callback_response\":null,"
+                + "\"supplementary_data\":null,\"after_submit_callback_response\":null,"
                 + "\"callback_response_status_code\":null,\"callback_response_status\":null,"
                 + "\"delete_draft_response_status_code\":null,\"delete_draft_response_status\":null},"
                 + "\"case_details_before\":null,"
