@@ -92,9 +92,6 @@ class DefaultGetCaseViewFromDraftOperationTest {
     @Mock
     private FieldProcessorService fieldProcessorService;
 
-    @Mock
-    private GetCaseOperation restrictedGetCaseOperation;
-
     private uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation getDraftViewOperation;
 
     private CaseTypeDefinition caseTypeDefinition;
@@ -164,8 +161,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
                 draftResponseToCaseDetailsBuilder,
                 objectMapperService,
                 compoundFieldOrderService,
-                fieldProcessorService,
-                restrictedGetCaseOperation);
+                fieldProcessorService);
     }
 
     @Test

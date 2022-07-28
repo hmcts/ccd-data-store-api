@@ -83,7 +83,6 @@ public class CaseDetailsEndpoint {
     private final FieldMapSanitizeOperation fieldMapSanitizeOperation;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final MidEventCallback midEventCallback;
-    private final GetCaseOperation restrictedGetCaseOperation;
 
     @Autowired
     public CaseDetailsEndpoint(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
@@ -96,8 +95,7 @@ public class CaseDetailsEndpoint {
                                final DocumentsOperation documentsOperation,
                                final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation,
                                final MidEventCallback midEventCallback,
-                               final AppInsights appinsights,
-                               @Qualifier("restricted") GetCaseOperation restrictedGetCaseOperation) {
+                               final AppInsights appinsights) {
         this.getCaseOperation = getCaseOperation;
         this.createCaseOperation = createCaseOperation;
         this.createEventOperation = createEventOperation;
@@ -109,7 +107,6 @@ public class CaseDetailsEndpoint {
         this.paginatedSearchMetaDataOperation = paginatedSearchMetaDataOperation;
         this.midEventCallback = midEventCallback;
         this.appInsights = appinsights;
-        this.restrictedGetCaseOperation = restrictedGetCaseOperation;
     }
 
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")
@@ -132,15 +129,11 @@ public class CaseDetailsEndpoint {
         @PathVariable("cid") final String caseId) {
 
         final Instant start = Instant.now();
-        final Optional<CaseDetails> caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseId);
-        if (caseDetails.isEmpty()) {
-            this.restrictedGetCaseOperation.execute(caseId)
-                .orElseThrow(() -> new CaseNotFoundException(jurisdictionId, caseTypeId, caseId));
-        }
-
+        final CaseDetails caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
+            .orElseThrow(() -> new CaseNotFoundException(jurisdictionId, caseTypeId, caseId));
         final Duration duration = Duration.between(start, Instant.now());
         appInsights.trackRequest("findCaseDetailsForCaseworker", duration.toMillis(), true);
-        return caseDetails.get();
+        return caseDetails;
     }
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")

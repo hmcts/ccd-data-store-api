@@ -49,7 +49,6 @@ import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.ResponseEntity.status;
@@ -72,7 +71,6 @@ public class CaseController {
     private final SupplementaryDataUpdateRequestValidator requestValidator;
     private final CaseLinkRetrievalService caseLinkRetrievalService;
     private final GetLinkedCasesResponseCreator getLinkedCasesResponseCreator;
-    private final GetCaseOperation restrictedGetCaseOperation;
 
     @Autowired
     public CaseController(
@@ -84,8 +82,7 @@ public class CaseController {
         @Qualifier("authorised") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
         SupplementaryDataUpdateRequestValidator requestValidator,
         CaseLinkRetrievalService caseLinkRetrievalService,
-        GetLinkedCasesResponseCreator getLinkedCasesResponseCreator,
-        @Qualifier("restricted") GetCaseOperation restrictedGetCaseOperation) {
+        GetLinkedCasesResponseCreator getLinkedCasesResponseCreator) {
         this.getCaseOperation = getCaseOperation;
         this.createEventOperation = createEventOperation;
         this.createCaseOperation = createCaseOperation;
@@ -95,7 +92,6 @@ public class CaseController {
         this.requestValidator = requestValidator;
         this.caseLinkRetrievalService = caseLinkRetrievalService;
         this.getLinkedCasesResponseCreator = getLinkedCasesResponseCreator;
-        this.restrictedGetCaseOperation = restrictedGetCaseOperation;
     }
 
     @GetMapping(
@@ -132,12 +128,11 @@ public class CaseController {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
-        final Optional<CaseDetails> caseDetails = this.getCaseOperation.execute(caseId);
-        if (caseDetails.isEmpty()) {
-            this.restrictedGetCaseOperation.execute(caseId)
-                .orElseThrow(() -> new CaseNotFoundException(caseId));
-        }
-        return ResponseEntity.ok(new CaseResource(caseDetails.get()));
+
+        final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
+            .orElseThrow(() -> new CaseNotFoundException(caseId));
+
+        return ResponseEntity.ok(new CaseResource(caseDetails));
     }
 
     @ResponseStatus(code = HttpStatus.CREATED)

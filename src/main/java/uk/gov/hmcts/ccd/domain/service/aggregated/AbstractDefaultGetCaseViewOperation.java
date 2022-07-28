@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
@@ -23,7 +22,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -40,7 +38,6 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     private final ObjectMapperService objectMapperService;
     private final CompoundFieldOrderService compoundFieldOrderService;
     private final FieldProcessorService fieldProcessorService;
-    private final GetCaseOperation restrictedGetCaseOperation;
 
     AbstractDefaultGetCaseViewOperation(GetCaseOperation getCaseOperation,
                                         UIDefinitionRepository uiDefinitionRepository,
@@ -48,8 +45,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
                                         UIDService uidService,
                                         ObjectMapperService objectMapperService,
                                         CompoundFieldOrderService compoundFieldOrderService,
-                                        FieldProcessorService fieldProcessorService,
-                                        @Qualifier("restricted") GetCaseOperation restrictedGetCaseOperation) {
+                                        FieldProcessorService fieldProcessorService) {
         this.getCaseOperation = getCaseOperation;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.caseTypeService = caseTypeService;
@@ -57,7 +53,6 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         this.objectMapperService = objectMapperService;
         this.compoundFieldOrderService = compoundFieldOrderService;
         this.fieldProcessorService = fieldProcessorService;
-        this.restrictedGetCaseOperation = restrictedGetCaseOperation;
     }
 
     void validateCaseReference(String caseReference) {
@@ -75,12 +70,8 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     }
 
     CaseDetails getCaseDetails(String caseReference) {
-        Optional<CaseDetails> caseDetails = getCaseOperation.execute(caseReference);
-        if (caseDetails.isEmpty()) {
-            this.restrictedGetCaseOperation.execute(caseReference)
-                .orElseThrow(() -> new CaseNotFoundException(caseReference));
-        }
-        return caseDetails.get();
+        return getCaseOperation.execute(caseReference)
+                               .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
     CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data) {

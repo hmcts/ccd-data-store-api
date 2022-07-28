@@ -20,14 +20,17 @@ public class RestrictedGetCaseOperation extends AbstractRestrictCaseOperation im
 
     private final GetCaseOperation defaultGetCaseOperation;
     private final CaseTypeService caseTypeService;
+    private final GetCaseOperation authorisedGetCaseOperation;
 
     @Autowired
     public RestrictedGetCaseOperation(@Qualifier("default") final GetCaseOperation defaultGetCaseOperation,
+                                      @Qualifier("authorised") final GetCaseOperation authorisedGetCaseOperation,
                                       final CaseDataAccessControl caseDataAccessControl,
                                       AccessControlService accessControlService,
                                       CaseTypeService caseTypeService) {
         super(caseDataAccessControl, accessControlService);
         this.defaultGetCaseOperation = defaultGetCaseOperation;
+        this.authorisedGetCaseOperation = authorisedGetCaseOperation;
         this.caseTypeService = caseTypeService;
     }
 
@@ -48,7 +51,7 @@ public class RestrictedGetCaseOperation extends AbstractRestrictCaseOperation im
                 }
             }
         }
-        return Optional.empty();
+        return authorisedGetCaseOperation.execute(caseReference);
     }
 
     CaseTypeDefinition getCaseType(String caseTypeId) {
