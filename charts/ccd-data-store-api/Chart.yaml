@@ -11,7 +11,7 @@ dependencies:
     version: 4.0.1
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
   - name: elasticsearch
-    version: 7.8.1
+    version: 7.8.2
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: elastic.enabled
   - name: logstash
