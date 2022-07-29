@@ -25,9 +25,6 @@
 			"version": 2,
 			"case_data": {
 			},
-			"data_classification": {
-				"_extends_": "S-577_Response_Data_Classification"
-			},
 			"supplementary_data": null
 		}
 	}

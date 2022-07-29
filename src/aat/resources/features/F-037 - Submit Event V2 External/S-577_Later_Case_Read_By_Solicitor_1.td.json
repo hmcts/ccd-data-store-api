@@ -30,10 +30,6 @@
 					"document_filename": "Elastic Search test Case.png --> updated by Solicitor 2"
 				}
 			},
-			"data_classification": {
-				"_extends_": "S-577_Response_Data_Classification",
-        "DocumentField2": "PUBLIC"
-			},
 			"supplementary_data": null
 		}
 	}
