@@ -45,6 +45,7 @@ elastic:
   enabled: true # enable whenever required on a particular PR
 
 elasticsearch:
+  nameOverride: ${SERIVCE_NAME}-es
   clusterName: "es"
   imageTag: "7.11.1"
   replicas: 1
