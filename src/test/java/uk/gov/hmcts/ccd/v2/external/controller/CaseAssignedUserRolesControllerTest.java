@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
+import uk.gov.hmcts.ccd.v2.external.domain.SearchCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
 import java.util.ArrayList;
@@ -429,6 +430,106 @@ class CaseAssignedUserRolesControllerTest {
             ResponseEntity<CaseAssignedUserRolesResource> response = controller.getCaseUserRoles(
                 Lists.newArrayList(CASE_ID_GOOD),
                 Optional.empty());
+            assertNotNull(response);
+            assertNotNull(response.getBody());
+            assertEquals(2, response.getBody().getCaseAssignedUserRoles().size());
+        }
+
+    }
+
+    @Nested
+    @DisplayName("POST /case-users/search")
+    class SearchCaseUserRoles {
+
+        @BeforeEach
+        void setUp() {
+            when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList()))
+                .thenReturn(createCaseAssignedUserRoles());
+        }
+
+        private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {
+            List<CaseAssignedUserRole> userRoles = Lists.newArrayList();
+            userRoles.add(new CaseAssignedUserRole());
+            userRoles.add(new CaseAssignedUserRole());
+            return userRoles;
+        }
+
+        @Test
+        void searchCaseUserRoles_throwsExceptionWhenNullCaseIdListPassed() {
+            List<String> userIds = Lists.newArrayList();
+
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.searchCaseUserRoles(new SearchCaseAssignedUserRolesRequest(null, userIds)));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                    containsString(V2.Error.EMPTY_CASE_ID_LIST))
+            );
+        }
+
+        @Test
+        void searchCaseUserRoles_throwsExceptionWhenEmptyCaseIdListPassed() {
+            List<String> caseIds = Lists.newArrayList();
+            List<String> userIds = Lists.newArrayList();
+
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.searchCaseUserRoles(new SearchCaseAssignedUserRolesRequest(caseIds, userIds)));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                    containsString(V2.Error.EMPTY_CASE_ID_LIST))
+            );
+        }
+
+        @Test
+        void searchCaseUserRoles_throwsExceptionWhenEmptyCaseIdListContainsInvalidCaseId() {
+            List<String> caseIds = Lists.newArrayList(CASE_ID_BAD);
+            List<String> userIds = Lists.newArrayList();
+
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.searchCaseUserRoles(new SearchCaseAssignedUserRolesRequest(caseIds, userIds)));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                    containsString(V2.Error.CASE_ID_INVALID))
+            );
+        }
+
+        @Test
+        void searchCaseUserRoles_throwsExceptionWhenInvalidUserIdListPassed() {
+            List<String> caseIds = Lists.newArrayList(CASE_ID_GOOD);
+            List<String> userIds = Lists.newArrayList("8900", "", "89002");
+
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.searchCaseUserRoles(new SearchCaseAssignedUserRolesRequest(caseIds, userIds)));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                    containsString(V2.Error.USER_ID_INVALID))
+            );
+        }
+
+        @Test
+        void searchCaseUserRoles_shouldGetResponseWhenCaseIdsAndUserIdsPassed() {
+            when(caseReferenceService.validateUID(anyString())).thenReturn(true);
+            ResponseEntity<CaseAssignedUserRolesResource> response = controller.searchCaseUserRoles(
+                new SearchCaseAssignedUserRolesRequest(
+                    Lists.newArrayList(CASE_ID_GOOD),
+                    Lists.newArrayList("8900", "89002"))
+            );
+            assertNotNull(response);
+            assertNotNull(response.getBody());
+            assertEquals(2, response.getBody().getCaseAssignedUserRoles().size());
+        }
+
+        @Test
+        void getCaseUserRoles_shouldGetResponseWhenCaseIdsPassed() {
+            when(caseReferenceService.validateUID(anyString())).thenReturn(true);
+            ResponseEntity<CaseAssignedUserRolesResource> response = controller.searchCaseUserRoles(
+                new SearchCaseAssignedUserRolesRequest(
+                    Lists.newArrayList(CASE_ID_GOOD),
+                    Lists.newArrayList())
+            );
             assertNotNull(response);
             assertNotNull(response.getBody());
             assertEquals(2, response.getBody().getCaseAssignedUserRoles().size());
