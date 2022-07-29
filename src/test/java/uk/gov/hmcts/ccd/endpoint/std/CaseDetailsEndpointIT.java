@@ -10,10 +10,10 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -54,7 +54,6 @@ import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 
 import javax.inject.Inject;
-import java.rmi.server.UID;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
@@ -165,7 +164,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     private JdbcTemplate template;
 
-    @Mock
+    @MockBean
     private RoleAssignmentService roleAssignmentService;
 
     @SpyBean
@@ -4100,21 +4099,18 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
 
-        {
-            // doReturn(roleAssignmentResponse).when(roleAssignmentRepositoryMock).getRoleAssignments("123");
-            given(roleAssignmentService.getRoleAssignments("123")).willReturn(
-                RoleAssignments.builder()
-                    .roleAssignments(asList(
-                        RoleAssignment.builder()
-                            .grantType(GrantType.BASIC.name())
-                            .roleName("hmcts-judiciary")
-                            .actorId("1234")
-                            .attributes(RoleAssignmentAttributes.builder()
-                                .jurisdiction(Optional.of(JURISDICTION)).build()).build()
-                    ))
-                    .build()
-            );
-
+        given(roleAssignmentService.getRoleAssignments("123")).willReturn(
+            RoleAssignments.builder()
+                .roleAssignments(asList(
+                    RoleAssignment.builder()
+                        .grantType(GrantType.BASIC.name())
+                        .roleName("hmcts-judiciary")
+                        .actorId("1234")
+                        .attributes(RoleAssignmentAttributes.builder()
+                            .jurisdiction(Optional.of(JURISDICTION)).build()).build()
+                ))
+                .build()
+        );
             final MvcResult result = mockMvc
                 .perform(get("/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
                     + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases/1504259907353628")
@@ -4171,7 +4167,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                     .is(getTextNode("PUBLIC"))),
                 () -> assertThat(nodeClassification.get("D8Document"), CoreMatchers.is(getTextNode("PUBLIC")))
             );
-        }
     }
 
     private void shouldReturn201WhenPostCreateCaseEventWithValidData(String userRole) throws Exception {
