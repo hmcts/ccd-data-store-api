@@ -961,6 +961,60 @@ class CaseAssignedUserRolesControllerTest {
             assertEquals("1,2,3,4,5,6,7,8,9,10", resultBuildOptionalIds);
         }
 
+        @Test
+        void buildIds_shouldReturnEmptyStringWhenEmptyPassed() {
+            // ACT
+            String resultBuildIds = uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController
+                .buildIds(null);
+
+            // ASSERT
+            assertEquals("", resultBuildIds);
+        }
+
+        @Test
+        void buildIds_shouldReturnEmptyStringWhenEmptyListPassed() {
+            // ACT
+            String resultBuildIds =
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildIds(new ArrayList<>());
+
+            // ASSERT
+            assertEquals("", resultBuildIds);
+        }
+
+        @Test
+        void buildIds_shouldReturnSimpleStringWhenSingleListItemPassed() {
+            // ACT
+            String resultBuildIds =
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildIds(
+                    Lists.newArrayList("1"));
+
+            // ASSERT
+            assertEquals("1", resultBuildIds);
+        }
+
+        @Test
+        void buildIds_shouldReturnCsvStringWhenManyListItemsPassed() {
+            // ACT
+            String resultBuildIds =
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildIds(
+                    Lists.newArrayList("1", "2", "3"));
+
+            // ASSERT
+            assertEquals("1,2,3", resultBuildIds);
+        }
+
+        @Test
+        void buildIds_shouldReturnMaxCsvListWhenTooManyListItemsPassed() {
+            // ACT
+            // NB: max list size is 10 (u.g.h.c.a.a.AuditContext.MAX_CASE_IDS_LIST)
+            String resultBuildIds =
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildIds(
+                    Lists.newArrayList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"));
+
+            // ASSERT
+            assertEquals("1,2,3,4,5,6,7,8,9,10", resultBuildIds);
+        }
+
         private CaseAssignedUserRolesRequest createAddCaseAssignedUserRolesRequest(int numberRequired) {
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList();
 

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -18,4 +20,11 @@ public class SearchCaseAssignedUserRolesRequest {
     @JsonProperty("user_ids")
     private List<String> userIds;
 
+    public List<String> getCaseIds() {
+        return caseIds == null ? emptyList() : caseIds;
+    }
+
+    public List<String> getUserIds() {
+        return userIds == null ? emptyList() : userIds;
+    }
 }
