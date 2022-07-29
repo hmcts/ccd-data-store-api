@@ -36,7 +36,8 @@ public class RestrictedGetCaseOperation extends AbstractRestrictCaseOperation im
 
     @Override
     public Optional<CaseDetails> execute(String jurisdictionId, String caseTypeId, String caseReference) {
-        return Optional.empty();
+        //TODO this is temporary fix.
+        return this.execute(caseReference);
     }
 
     public Optional<CaseDetails> execute(String caseReference) {
