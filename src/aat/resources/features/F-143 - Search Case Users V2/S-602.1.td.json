@@ -3,7 +3,12 @@
 	"_guid_": "S-602.1",
 	"_extends_": "S-602",
 
+  "operationName": "Search Case-Assigned Users and Roles",
+  "method": "POST",
+  "uri": "/case-users/search",
+
   "request": {
+    "queryParams": {},
     "body": {
       "case_ids": [
         "12346657"

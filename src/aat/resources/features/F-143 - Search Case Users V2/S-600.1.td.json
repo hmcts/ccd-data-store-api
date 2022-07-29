@@ -3,7 +3,12 @@
 	"_guid_": "S-600.1",
 	"_extends_": "S-600",
 
+  "operationName": "Search Case-Assigned Users and Roles",
+  "method": "POST",
+  "uri": "/case-users/search",
+
   "request": {
+    "queryParams": {},
     "body": {
       "case_ids": [
         "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}",
