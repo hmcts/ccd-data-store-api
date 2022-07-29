@@ -219,6 +219,7 @@ public class CaseDetails implements Cloneable {
         this.lastStateModifiedDate = lastStateModifiedDate;
     }
 
+    @JsonIgnore
     public Map<String, JsonNode> getDataClassification() {
         return dataClassification;
     }
