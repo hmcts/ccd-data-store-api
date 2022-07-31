@@ -523,7 +523,7 @@ class CaseAssignedUserRolesControllerTest {
         }
 
         @Test
-        void getCaseUserRoles_shouldGetResponseWhenCaseIdsPassed() {
+        void searchCaseUserRoles_shouldGetResponseWhenCaseIdsPassed() {
             when(caseReferenceService.validateUID(anyString())).thenReturn(true);
             ResponseEntity<CaseAssignedUserRolesResource> response = controller.searchCaseUserRoles(
                 new SearchCaseAssignedUserRolesRequest(
