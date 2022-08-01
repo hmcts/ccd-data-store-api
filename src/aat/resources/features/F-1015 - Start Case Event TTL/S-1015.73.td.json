@@ -2,7 +2,7 @@
   "_guid_": "S-1015.73",
   "_extends_": "StartEvent_v2Int__PositiveResponse_Base",
 
-  "title": "must successfully update a cases TTL.SystemTTL value where about to start callback has modified TTL.Suspended value (Yes -> YES) using V2 'internal/cases/{cid}/event-triggers/{etid}'",
+  "title": "Trigger a start event callback that changes TTL.Suspended (Yes -> YES). Start event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET",
 
   "specs": [
     "a caseworker with an active profile in CCD",
@@ -40,6 +40,22 @@
 
       "case_id": "${}${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "case_fields": [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "id"
+        }, {
+          "_extends_": "F-1015_CaseFields_TTL",
+  
+          "value" : {
+            "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+            "Suspended" : "YES"
+          },
+          "formatted_value" : {
+            "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+            "Suspended" : "YES"
+          },
+          "display_context" : "READONLY"
+        },
         {
           "_extends_" : "F-1015_CaseFields_TextField"
         }

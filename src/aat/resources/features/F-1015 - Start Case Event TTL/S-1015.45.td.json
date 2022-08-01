@@ -2,7 +2,7 @@
   "_guid_": "S-1015.45",
   "_extends_": "StartEvent_v1Ext_Citizen__PositiveResponse_Base",
 
-  "title": "must successfully update a cases TTL.SystemTTL value where about to start callback responds with TTL missing by using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token'",
+  "title": "Trigger a start event callback that has TTL missing. Start event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET",
 
   "specs": [
     "a caseworker with an active profile in CCD",

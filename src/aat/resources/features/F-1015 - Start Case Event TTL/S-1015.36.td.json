@@ -2,7 +2,7 @@
   "_guid_": "S-1015.36",
   "_extends_": "StartEvent_v1Ext_Caseworker__Base",
 
-  "title": "must error when updating updating a cases TTL.SystemTTL value where about to start callback responds with TTL set to null by using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token'",
+  "title": "Trigger a start event callback that changes TTL set to null. Start event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET",
 
   "specs": [
     "a caseworker with an active profile in CCD",

@@ -146,11 +146,11 @@ Feature: F-1017: Validate Event to Update TTL
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #CCD-3535 & #CCD-3567: Trigger a mid-event callback that makes permitted changes to the TTL values: v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
+#  #CCD-3535 & #CCD-3562: Trigger a mid-event callback that makes permitted changes to the TTL values: v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @S-1017.11 #CCD-3535
-    Scenario: Trigger a mid event callback that changes TTL.OverrideTTL (null -> missing). Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
+    Scenario: Trigger a mid event callback that changes TTL.Suspended (null -> missing). Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
       Given a user with [a caseworker with an active profile in CCD]
         And a user with [access to manage TTL properties]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -171,7 +171,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
 
     @S-1017.12 #CCD-3535
-    Scenario: Trigger a mid event callback that changes TTL.OverrideTTL has changed (No -> NO). Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
+    Scenario: Trigger a mid event callback that changes TTL.Suspended (No -> NO). Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
       Given a user with [a caseworker with an active profile in CCD]
         And a user with [access to manage TTL properties]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -193,7 +193,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
 
     @S-1017.13 #CCD-3535
-    Scenario: Trigger a mid event callback that changes TTL.OverrideTTL has changed (Yes -> YES). Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
+    Scenario: Trigger a mid event callback that changes TTL.Suspended (Yes -> YES). Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
       Given a user with [a caseworker with an active profile in CCD]
         And a user with [access to manage TTL properties]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -215,7 +215,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
 
 
-    @S-1017.15 #CCD-3572
+    @S-1017.15 #CCD-3562
     Scenario: Trigger a mid event callback that has TTL missing. Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
       Given a user with [a caseworker with an active profile in CCD]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -231,7 +231,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response has all other details as expected
         And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
 
-    @S-1017.16 #CCD-3572
+    @S-1017.16 #CCD-3562
     Scenario: Trigger a mid event callback that changes TTL set to null. Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
       Given a user with [a caseworker with an active profile in CCD]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -249,11 +249,11 @@ Feature: F-1017: Validate Event to Update TTL
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #CCD-3535 & #CCD-3567: Trigger a mid-event callback that makes permitted changes to the TTL values: v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
+#  #CCD-3535 & #CCD-3562: Trigger a mid-event callback that makes permitted changes to the TTL values: v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @S-1017.21 #CCD-3535
-    Scenario: Trigger a mid event callback that changes TTL.OverrideTTL (null -> missing). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
+    Scenario: Trigger a mid event callback that changes TTL.Suspended (null -> missing). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
       Given a user with [an active profile in CCD]
         And a user with [a caseworker with an active profile in CCD]
         And a user with [access to manage TTL properties]
@@ -275,7 +275,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
 
     @S-1017.22 #CCD-3535
-    Scenario: Trigger a mid event callback that changes TTL.OverrideTTL has changed (No -> NO). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
+    Scenario: Trigger a mid event callback that changes TTL.Suspended (No -> NO). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
       Given a user with [an active profile in CCD]
         And a user with [a caseworker with an active profile in CCD]
         And a user with [access to manage TTL properties]
@@ -298,7 +298,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
 
     @S-1017.23 #CCD-3535
-    Scenario: Trigger a mid event callback that changes TTL.OverrideTTL has changed (Yes -> YES). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
+    Scenario: Trigger a mid event callback that changes TTL.Suspended (Yes -> YES). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
       Given a user with [an active profile in CCD]
         And a user with [a caseworker with an active profile in CCD]
         And a user with [access to manage TTL properties]
@@ -321,7 +321,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
 
 
-    @S-1017.25 #CCD-3572
+    @S-1017.25 #CCD-3562
     Scenario: Trigger a mid event callback that has TTL missing. Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
       Given a user with [an active profile in CCD]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
@@ -337,7 +337,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response has all other details as expected
         And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
 
-    @S-1017.26 #CCD-3572
+    @S-1017.26 #CCD-3562
     Scenario: Trigger a mid event callback that changes TTL set to null. Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
       Given a user with [an active profile in CCD]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
@@ -355,11 +355,11 @@ Feature: F-1017: Validate Event to Update TTL
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #CCD-3535 & #CCD-3567: Trigger a mid-event callback that makes permitted changes to the TTL values: v2_external#/case-data-validator-controller/validateUsingPOST
+#  #CCD-3535 & #CCD-3562: Trigger a mid-event callback that makes permitted changes to the TTL values: v2_external#/case-data-validator-controller/validateUsingPOST
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @S-1017.31 #CCD-3535
-    Scenario: Trigger a mid event callback that changes TTL.OverrideTTL (null -> missing). Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST
+    Scenario: Trigger a mid event callback that changes TTL.Suspended (null -> missing). Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST
       Given a user with [a caseworker with an active profile in CCD]
         And a user with [access to manage TTL properties]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -380,7 +380,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
 
     @S-1017.32 #CCD-3535
-    Scenario: Trigger a mid event callback that changes TTL.OverrideTTL has changed (No -> NO). Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST
+    Scenario: Trigger a mid event callback that changes TTL.Suspended (No -> NO). Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST
       Given a user with [a caseworker with an active profile in CCD]
         And a user with [access to manage TTL properties]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -402,7 +402,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
 
     @S-1017.33 #CCD-3535
-    Scenario: Trigger a mid event callback that changes TTL.OverrideTTL has changed (Yes -> YES). Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST
+    Scenario: Trigger a mid event callback that changes TTL.Suspended (Yes -> YES). Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST
       Given a user with [a caseworker with an active profile in CCD]
         And a user with [access to manage TTL properties]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -424,7 +424,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
 
 
-    @S-1017.35 #CCD-3572
+    @S-1017.35 #CCD-3562
     Scenario: Trigger a mid event callback that has TTL missing. Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST
       Given a user with [a caseworker with an active profile in CCD]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -440,7 +440,7 @@ Feature: F-1017: Validate Event to Update TTL
         And the response has all other details as expected
         And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
 
-    @S-1017.36 #CCD-3572
+    @S-1017.36 #CCD-3562
     Scenario: Trigger a mid event callback that changes TTL set to null. Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST
       Given a user with [a caseworker with an active profile in CCD]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]

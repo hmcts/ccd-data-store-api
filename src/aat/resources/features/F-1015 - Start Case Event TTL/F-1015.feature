@@ -499,11 +499,11 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #CCD-3535 & #CCD-3567: TTLIncrement is set to "20": trigger an About To Start callback that makes permitted changes to the TTL values: v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
+#  #CCD-3535 & #CCD-3562: TTLIncrement is set to "20": trigger an About To Start callback that makes permitted changes to the TTL values: v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1015.31 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (null -> missing) after About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (null -> missing). Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -523,7 +523,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
 
   @S-1015.32 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (No -> NO) after About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (No -> NO). Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -544,7 +544,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
 
   @S-1015.33 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (Yes -> YES) after About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (Yes -> YES). Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -565,8 +565,8 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
 
 
-  @S-1015.35 #CCD-3572
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL missing from About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
+  @S-1015.35 #CCD-3562
+  Scenario: Trigger a start event callback that has TTL missing. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
@@ -580,8 +580,8 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response has all other details as expected
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
 
-  @S-1015.36 #CCD-3572
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL set to null from About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
+  @S-1015.36 #CCD-3562
+  Scenario: Trigger a start event callback that changes TTL set to null. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
@@ -597,17 +597,17 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #CCD-3535 & #CCD-3567: TTLIncrement is set to "20": trigger an About To Start callback that makes permitted changes to the TTL values: v1_external#/case-details-endpoint/startEventForCitizenUsingGET
+#  #CCD-3535 & #CCD-3562: TTLIncrement is set to "20": trigger an About To Start callback that makes permitted changes to the TTL values: v1_external#/case-details-endpoint/startEventForCitizenUsingGET
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1015.41 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (null -> missing) after About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (null -> missing). Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
       And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
-      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCitizen]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -619,13 +619,13 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response has all other details as expected
 
   @S-1015.42 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (No -> NO) after About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (No -> NO). Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
       And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCitizen]
-      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCitizen]
+      And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNo_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values
       And the request [contains correctly configured event details]
@@ -638,7 +638,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response has all other details as expected
 
   @S-1015.43 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (Yes -> YES) after About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (Yes -> YES). Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
@@ -657,8 +657,8 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response has all other details as expected
 
 
-  @S-1015.45 #CCD-3572
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL missing from About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
+  @S-1015.45 #CCD-3562
+  Scenario: Trigger a start event callback that has TTL missing. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
 
@@ -671,8 +671,8 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
     Then a positive response is received
       And the response has all other details as expected
 
-  @S-1015.46 #CCD-3572
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL set to null from About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
+  @S-1015.46 #CCD-3562
+  Scenario: Trigger a start event callback that changes TTL set to null. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
 
@@ -688,11 +688,11 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #CCD-3535 & #CCD-3567: TTLIncrement is set to "20": trigger an About To Start callback that makes permitted changes to the TTL values: v2_external#/start-event-controller/getStartEventTriggerUsingGET
+#  #CCD-3535 & #CCD-3562: TTLIncrement is set to "20": trigger an About To Start callback that makes permitted changes to the TTL values: v2_external#/start-event-controller/getStartEventTriggerUsingGET
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1015.51 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (null -> missing) after About to Start Callback. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (null -> missing). Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -712,7 +712,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
 
   @S-1015.52 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (No -> NO) after About to Start Callback. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (No -> NO). Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -733,7 +733,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
 
   @S-1015.53 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (Yes -> YES) after About to Start Callback. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (Yes -> YES). Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -754,8 +754,8 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
 
 
-  @S-1015.55 #CCD-3572
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL missing from About to Start Callback. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
+  @S-1015.55 #CCD-3562
+  Scenario: Trigger a start event callback that has TTL missing. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
@@ -769,8 +769,8 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response has all other details as expected
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
 
-  @S-1015.56 #CCD-3572
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL set to null from About to Start Callback. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
+  @S-1015.56 #CCD-3562
+  Scenario: Trigger a start event callback that changes TTL set to null. Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
@@ -786,11 +786,11 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #CCD-3535 & #CCD-3567: TTLIncrement is set to "20": trigger an About To Start callback that makes permitted changes to the TTL values: v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
+#  #CCD-3535 & #CCD-3562: TTLIncrement is set to "20": trigger an About To Start callback that makes permitted changes to the TTL values: v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1015.61 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (null -> missing) after About to Start Callback. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (null -> missing). Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -810,7 +810,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
 
   @S-1015.62 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (No -> NO) after About to Start Callback. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (No -> NO). Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -831,7 +831,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
 
   @S-1015.63 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (Yes -> YES) after About to Start Callback. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (Yes -> YES). Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -852,8 +852,8 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
 
 
-  @S-1015.65 #CCD-3572
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL missing from About to Start Callback. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
+  @S-1015.65 #CCD-3562
+  Scenario: Trigger a start event callback that has TTL missing. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
@@ -867,8 +867,8 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response has all other details as expected
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
 
-  @S-1015.66 #CCD-3572
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL set to null from About to Start Callback. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
+  @S-1015.66 #CCD-3562
+  Scenario: Trigger a start event callback that changes TTL set to null. Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
@@ -884,11 +884,11 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #CCD-3535 & #CCD-3567: TTLIncrement is set to "20": trigger an About To Start callback that makes permitted changes to the TTL values: v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
+#  #CCD-3535 & #CCD-3562: TTLIncrement is set to "20": trigger an About To Start callback that makes permitted changes to the TTL values: v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1015.71 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (null -> missing) after About to Start Callback. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (null -> missing). Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -908,7 +908,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
 
   @S-1015.72 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (No -> NO) after About to Start Callback. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (No -> NO). Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -929,7 +929,7 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
 
   @S-1015.73 #CCD-3535
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed (Yes -> YES) after About to Start Callback. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
+  Scenario: Trigger a start event callback that changes TTL.Suspended (Yes -> YES). Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -950,8 +950,8 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
 
 
-  @S-1015.75 #CCD-3572
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL missing from About to Start Callback. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
+  @S-1015.75 #CCD-3562
+  Scenario: Trigger a start event callback that has TTL missing. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 
@@ -965,8 +965,8 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
       And the response has all other details as expected
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
 
-  @S-1015.76 #CCD-3572
-  Scenario: TTLIncrement is set to "20" for the Case Event, TTL set to null from About to Start Callback. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
+  @S-1015.76 #CCD-3562
+  Scenario: Trigger a start event callback that changes TTL set to null. Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
 

@@ -2,7 +2,7 @@
   "_guid_": "S-1017.11",
   "_extends_": "MidEvent_v1Ext_Caseworker__PositiveResponse_Base",
 
-  "title": "Trigger a mid event callback that changes TTL.OverrideTTL (null -> missing). Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
+  "title": "Trigger a mid event callback that changes TTL.Suspended (null -> missing). Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
 
   "prerequisites" : [ {
     "Token_Creation": "F-1017_UpdateCase_TTLCaseType_updateWithMidEventTTLToUpper_PreRequisiteCaseworker_TokenCreation"

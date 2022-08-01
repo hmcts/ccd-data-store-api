@@ -2,7 +2,7 @@
   "_guid_": "S-1016.101",
   "_extends_": "SubmitEvent_v1Ext_Caseworker__PositiveResponse_Base",
 
-  "title": "Trigger a submit event callback that changes TTL.OverrideTTL (null -> missing). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
+  "title": "Trigger a submit event callback that changes TTL.Suspended (null -> missing). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
 
   "prerequisites" : [ {
     "Token_Creation": "F-1016_UpdateCase_TTLCaseType_updateWithSubmitTTLToUpper_PreRequisiteCaseworker_TokenCreation"

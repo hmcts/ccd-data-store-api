@@ -2,7 +2,7 @@
   "_guid_": "S-1015.76",
   "_extends_": "StartEvent_v2Int__Base",
 
-  "title": "must error when updating updating a cases TTL.SystemTTL value where about to start callback responds with TTL set to null by using V2 'internal/cases/{cid}/event-triggers/{etid}'",
+  "title": "Trigger a start event callback that changes TTL set to null. Start event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET",
 
   "specs": [
     "a caseworker with an active profile in CCD",

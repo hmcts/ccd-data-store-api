@@ -2,7 +2,7 @@
   "_guid_": "S-1017.22",
   "_extends_": "MidEvent_v1Ext_Citizen__PositiveResponse_Base",
 
-  "title": "Trigger a mid event callback that changes TTL.OverrideTTL has changed (No -> NO). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1",
+  "title": "Trigger a mid event callback that changes TTL.Suspended (No -> NO). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1",
 
   "prerequisites" : [ {
     "Token_Creation": "F-1017_UpdateCase_TTLCaseType_updateWithMidEventTTLToUpper_PreRequisiteCitizen_TokenCreation"

@@ -1156,11 +1156,11 @@ Feature: F-1016: Submit Event to Update TTL
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #CCD-3535 & #CCD-3567: Trigger a submit-event callback that makes permitted changes to the TTL values: v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+#  #CCD-3535 & #CCD-3562: Trigger a submit-event callback that makes permitted changes to the TTL values: v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1016.101 #CCD-3535
-  Scenario: Trigger a submit event callback that changes TTL.OverrideTTL (null -> missing). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+  Scenario: Trigger a submit event callback that changes TTL.Suspended (null -> missing). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -1181,7 +1181,7 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
 
   @S-1016.102 #CCD-3535
-  Scenario: Trigger a submit event callback that changes TTL.OverrideTTL has changed (No -> NO). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+  Scenario: Trigger a submit event callback that changes TTL.Suspended (No -> NO). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -1203,7 +1203,7 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
 
   @S-1016.103 #CCD-3535
-  Scenario: Trigger a submit event callback that changes TTL.OverrideTTL has changed (Yes -> YES). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
+  Scenario: Trigger a submit event callback that changes TTL.Suspended (Yes -> YES). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -1225,7 +1225,7 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
 
 
-  @S-1016.105 #CCD-3572
+  @S-1016.105 #CCD-3562
   Scenario: Trigger a submit event callback that has TTL missing. Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -1241,7 +1241,7 @@ Feature: F-1016: Submit Event to Update TTL
       And the response has all other details as expected
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
 
-  @S-1016.106 #CCD-3572
+  @S-1016.106 #CCD-3562
   Scenario: Trigger a submit event callback that changes TTL set to null. Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -1259,11 +1259,11 @@ Feature: F-1016: Submit Event to Update TTL
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #CCD-3535 & #CCD-3567: Trigger a submit-event callback that makes permitted changes to the TTL values: v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+#  #CCD-3535 & #CCD-3562: Trigger a submit-event callback that makes permitted changes to the TTL values: v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1016.111 #CCD-3535
-  Scenario: Trigger a submit event callback that changes TTL.OverrideTTL (null -> missing). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+  Scenario: Trigger a submit event callback that changes TTL.Suspended (null -> missing). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
@@ -1283,7 +1283,7 @@ Feature: F-1016: Submit Event to Update TTL
       And another call [to verify that the TTL data has changed] will get the expected response as in [S-1016.111.VerifyCaseDetails]
 
   @S-1016.112 #CCD-3535
-  Scenario: Trigger a submit event callback that changes TTL.OverrideTTL has changed (No -> NO). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+  Scenario: Trigger a submit event callback that changes TTL.Suspended (No -> NO). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
@@ -1304,7 +1304,7 @@ Feature: F-1016: Submit Event to Update TTL
       And another call [to verify that the TTL data has changed] will get the expected response as in [S-1016.112.VerifyCaseDetails]
 
   @S-1016.113 #CCD-3535
-  Scenario: Trigger a submit event callback that changes TTL.OverrideTTL has changed (Yes -> YES). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
+  Scenario: Trigger a submit event callback that changes TTL.Suspended (Yes -> YES). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
     Given a user with [an active profile in CCD]
       And a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
@@ -1325,7 +1325,7 @@ Feature: F-1016: Submit Event to Update TTL
       And another call [to verify that the TTL data has changed] will get the expected response as in [S-1016.113.VerifyCaseDetails]
 
 
-  @S-1016.115 #CCD-3572
+  @S-1016.115 #CCD-3562
   Scenario: Trigger a submit event callback that has TTL missing. Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
     Given a user with [an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
@@ -1341,7 +1341,7 @@ Feature: F-1016: Submit Event to Update TTL
       And the response has all other details as expected
       And another call [to verify that the TTL data has changed] will get the expected response as in [S-1016.115.VerifyCaseDetails]
 
-  @S-1016.116 #CCD-3572
+  @S-1016.116 #CCD-3562
   Scenario: Trigger a submit event callback that changes TTL set to null. Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
     Given a user with [an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
@@ -1359,11 +1359,11 @@ Feature: F-1016: Submit Event to Update TTL
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #CCD-3535 & #CCD-3567: Trigger a submit-event callback that makes permitted changes to the TTL values: v2_external#/case-controller/createEventUsingPOST
+#  #CCD-3535 & #CCD-3562: Trigger a submit-event callback that makes permitted changes to the TTL values: v2_external#/case-controller/createEventUsingPOST
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1016.121 #CCD-3535
-  Scenario: Trigger a submit event callback that changes TTL.OverrideTTL (null -> missing). Submit event is invoked on v2_external#/case-controller/createEventUsingPOST
+  Scenario: Trigger a submit event callback that changes TTL.Suspended (null -> missing). Submit event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -1384,7 +1384,7 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
 
   @S-1016.122 #CCD-3535
-  Scenario: Trigger a submit event callback that changes TTL.OverrideTTL has changed (No -> NO). Submit event is invoked on v2_external#/case-controller/createEventUsingPOST
+  Scenario: Trigger a submit event callback that changes TTL.Suspended (No -> NO). Submit event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -1406,7 +1406,7 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
 
   @S-1016.123 #CCD-3535
-  Scenario: Trigger a submit event callback that changes TTL.OverrideTTL has changed (Yes -> YES). Submit event is invoked on v2_external#/case-controller/createEventUsingPOST
+  Scenario: Trigger a submit event callback that changes TTL.Suspended (Yes -> YES). Submit event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [a caseworker with an active profile in CCD]
       And a user with [access to manage TTL properties]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -1428,7 +1428,7 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
 
 
-  @S-1016.125 #CCD-3572
+  @S-1016.125 #CCD-3562
   Scenario: Trigger a submit event callback that has TTL missing. Submit event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
@@ -1444,7 +1444,7 @@ Feature: F-1016: Submit Event to Update TTL
       And the response has all other details as expected
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
 
-  @S-1016.126 #CCD-3572
+  @S-1016.126 #CCD-3562
   Scenario: Trigger a submit event callback that changes TTL set to null. Submit event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [a caseworker with an active profile in CCD]
       And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]

@@ -2,7 +2,7 @@
   "_guid_": "S-1015.33",
   "_extends_": "StartEvent_v1Ext_Caseworker__PositiveResponse_Base",
 
-  "title": "must successfully update a cases TTL.SystemTTL value where about to start callback has modified TTL.Suspended value (Yes -> YES) using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token'",
+  "title": "Trigger a start event callback that changes TTL.Suspended (Yes -> YES). Start event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET",
 
   "specs": [
     "a caseworker with an active profile in CCD",
