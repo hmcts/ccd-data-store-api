@@ -1,0 +1,12 @@
+{
+  "_guid_": "F-1016_Response_ErrorWhenNoWriteAccessToSystemTTL",
+  "_extends_": "Common_404_Response",
+
+  "body" : {
+    "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+    "message": "No field found",
+    "details": null,
+    "callbackErrors" : null,
+    "callbackWarnings" : null
+  }
+}

@@ -1,27 +1,8 @@
 {
   "_guid_": "F-1016_CreateCasePreRequisiteCaseworkerBase",
-  "_extends_": "Case_Creation_Data_Base",
-
-  "specs": [
-    "to create a case"
-  ],
-
-  "prerequisites" : [ {
-    "Token_Creation": "S-1016_GetCreateToken"
-  }
-  ],
-
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
-    }
-  },
+  "_extends_": "F-1016_CreateCasePreRequisiteCaseworker_noTTL",
 
   "request": {
-    "pathVariables": {
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType"
-    },
     "body": {
       "data": {
         "TTL": {
@@ -29,37 +10,25 @@
           "OverrideTTL": null,
           "SystemTTL": null
         }
-      },
-      "event": {
-        "id": "createCaseTTL",
-        "summary": "",
-        "description": ""
-      },
-      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+      }
     }
   },
 
   "expectedResponse": {
     "body": {
-      "jurisdiction": "BEFTA_MASTER",
-      "state": "CaseCreated",
-      "case_type_id": "FT_MasterCaseType",
       "case_data": {
         "TTL": {
           "SystemTTL": null,
           "OverrideTTL": null,
           "Suspended": "No"
-        },
-        "SearchCriteria" : { }
+        }
       },
       "data_classification": {
-        "_extends_" : "TTL_Classifications",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        "_extends_" : "TTL_Classifications"
       },
       "supplementary_data": null,
       "security_classifications": {
-        "_extends_" : "TTL_Classifications",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        "_extends_" : "TTL_Classifications"
       }
     }
   }

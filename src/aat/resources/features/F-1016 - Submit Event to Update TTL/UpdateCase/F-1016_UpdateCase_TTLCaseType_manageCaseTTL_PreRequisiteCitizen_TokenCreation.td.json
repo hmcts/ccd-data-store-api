@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen_TokenCreation",
+  "_extends_": "F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker_TokenCreation",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][siblingContexts][F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  }
+}
