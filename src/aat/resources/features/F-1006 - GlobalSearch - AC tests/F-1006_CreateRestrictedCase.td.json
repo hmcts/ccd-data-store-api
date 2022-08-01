@@ -47,23 +47,12 @@
           "SearchParties" : "[[ANYTHING_PRESENT]]"
         }
       },
-      "data_classification": {
-        "RestrictedTextField": "RESTRICTED",
-        "SearchCriteria" : {
-          "classification" : "RESTRICTED",
-          "value" : "[[ANYTHING_PRESENT]]"
-        }
-      },
       "supplementary_data": null,
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
       "callback_response_status": null,
       "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null,
-      "security_classifications": {
-        "RestrictedTextField" : "RESTRICTED",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      }
+      "delete_draft_response_status": null
     }
   }
 }

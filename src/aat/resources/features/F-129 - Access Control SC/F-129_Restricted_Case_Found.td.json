@@ -27,10 +27,6 @@
       "data": {
         "RestrictedTextField" : "restricted text",
         "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      },
-      "data_classification" : {
-        "RestrictedTextField" : "RESTRICTED",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       }
     }
   }

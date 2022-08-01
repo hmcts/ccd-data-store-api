@@ -90,7 +90,6 @@
             }
           ]
         },
-        "data_classification": "[[ANYTHING_PRESENT]]",
         "supplementary_data" : {
           "orgs_assigned_users" : {
             "OrgB" : 1
@@ -100,8 +99,7 @@
         "callback_response_status_code": null,
         "callback_response_status": null,
         "delete_draft_response_status_code": null,
-        "delete_draft_response_status": null,
-        "security_classifications": "[[ANYTHING_PRESENT]]"
+        "delete_draft_response_status": null
       }],
       "case_types_results" : [{
         "total" : 1,

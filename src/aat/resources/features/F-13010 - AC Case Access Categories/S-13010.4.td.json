@@ -63,14 +63,6 @@
         "TextField" : "value1",
         "SearchCriteria" : { }
       },
-      "data_classification" : {
-        "CaseAccessCategory" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "SearchCriteria" : {
-          "value" : { },
-          "classification" : "PUBLIC"
-        }
-      },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,
       "callback_response_status" : null,

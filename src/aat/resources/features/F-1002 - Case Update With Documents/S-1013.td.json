@@ -33,11 +33,6 @@
           "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_3][testData][actualResponse][body][documents][0][hashToken]}"
         }
       },
-      "data_classification": {
-        "DocumentField1": "PUBLIC",
-        "DocumentField2": "PUBLIC",
-        "DocumentField3": "PUBLIC"
-      },
       "event_token": "${[scenarioContext][childContexts][S-1013-Update_Event_Token_Creation][testData][actualResponse][body][token]}"
     }
   },
@@ -64,11 +59,6 @@
           "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_3][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_3][customValues][documentIdInTheResponse]}/binary"
         }
-      },
-      "data_classification": {
-        "DocumentField1": "PUBLIC",
-        "DocumentField2": "PUBLIC",
-        "DocumentField3": "PUBLIC"
       }
     }
   }

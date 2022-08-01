@@ -51,9 +51,6 @@
           "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
         }
       },
-      "data_classification" : {
-        "DocumentField1" : "PUBLIC"
-      },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,
       "callback_response_status" : null,
@@ -61,6 +58,4 @@
       "delete_draft_response_status" : null
     }
   }
-}
-
 }

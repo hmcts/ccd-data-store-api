@@ -20,7 +20,6 @@
       "state": "CaseCreated",
       "version": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
-      "security_classifications": "[[ANYTHING_PRESENT]]",
       "case_data": {
         "AddressField": {
           "AddressLine1": "[[ANYTHING_PRESENT]]",
@@ -47,51 +46,6 @@
           }
         },
         "SearchCriteria" : { }
-      },
-      "data_classification": {
-        "AddressField": {
-          "classification": "PUBLIC",
-          "value": {
-            "AddressLine1": "PUBLIC",
-            "AddressLine2": "PUBLIC",
-            "AddressLine3": "PUBLIC",
-            "Country": "PUBLIC"
-          }
-        },
-        "TextField": "PUBLIC",
-        "OrganisationPolicyField2": {
-          "classification": "PUBLIC",
-          "value": {
-            "OrgPolicyCaseAssignedRole": "PUBLIC",
-            "OrgPolicyReference": "PUBLIC",
-            "Organisation": {
-              "classification": "PUBLIC",
-              "value": {
-                "OrganisationID": "PUBLIC",
-                "OrganisationName": "PUBLIC"
-              }
-            }
-          }
-        },
-        "TextAreaField": "PUBLIC",
-        "OrganisationPolicyField1": {
-          "classification": "PUBLIC",
-          "value": {
-            "OrgPolicyCaseAssignedRole": "PUBLIC",
-            "OrgPolicyReference": "PUBLIC",
-            "Organisation": {
-              "classification": "PUBLIC",
-              "value": {
-                "OrganisationID": "PUBLIC",
-                "OrganisationName": "PUBLIC"
-              }
-            }
-          }
-        },
-        "SearchCriteria" : {
-          "classification" : "PUBLIC",
-          "value" : { }
-        }
       },
       "supplementary_data": null,
       "after_submit_callback_response": null,

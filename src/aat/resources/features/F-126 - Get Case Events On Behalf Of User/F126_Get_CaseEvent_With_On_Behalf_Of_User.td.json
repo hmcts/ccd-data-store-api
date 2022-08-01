@@ -53,13 +53,11 @@
         "state_id" : "[[ANYTHING_PRESENT]]",
         "state_name" : "[[ANYTHING_PRESENT]]",
         "data" : null,
-        "data_classification" : null,
         "security_classification" : "PUBLIC",
         "significant_item" : null,
         "proxied_by": "${[scenarioContext][childContexts][F126_Update_Case_With_On_Behalf_Of_User][testData][users][invokingUser][id]}",
         "proxied_by_last_name" : "[[ANYTHING_PRESENT]]",
-        "proxied_by_first_name" : "[[ANYTHING_PRESENT]]",
-        "security_classifications" : null
+        "proxied_by_first_name" : "[[ANYTHING_PRESENT]]"
       }, {
         "id" : "CREATE",
         "summary" : "",
@@ -74,13 +72,11 @@
         "state_id" : "[[ANYTHING_PRESENT]]",
         "state_name" : "[[ANYTHING_PRESENT]]",
         "data" : null,
-        "data_classification" : null,
         "security_classification" : "PUBLIC",
         "significant_item" : null,
         "proxied_by" : null,
         "proxied_by_last_name" : null,
-        "proxied_by_first_name" : null,
-        "security_classifications" : null
+        "proxied_by_first_name" : null
       } ],
       "_links" : {
         "self" : {

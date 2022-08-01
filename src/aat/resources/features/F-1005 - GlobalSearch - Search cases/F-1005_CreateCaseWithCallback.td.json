@@ -54,9 +54,6 @@
           "_extends_": "CaseManagementLocation_AnyValues"
         }
       },
-      "data_classification": {
-        "_extends_": "Befta_Global_Search_Data_Classifications"
-      },
       "supplementary_data": {
         "HMCTSServiceId": "${[scenarioContext][siblingContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}"
       },
@@ -64,10 +61,7 @@
       "callback_response_status_code": null,
       "callback_response_status": null,
       "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null,
-      "security_classifications": {
-        "_extends_": "Befta_Global_Search_Data_Classifications"
-      }
+      "delete_draft_response_status": null
     }
   }
 }

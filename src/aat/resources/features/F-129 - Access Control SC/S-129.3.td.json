@@ -20,11 +20,6 @@
         "PublicTextField": "public text",
         "PrivateTextField": "private text",
         "RestrictedTextField": "restricted text"
-      },
-      "data_classification" : {
-        "PublicTextField" : "PUBLIC",
-        "PrivateTextField" : "PRIVATE",
-        "RestrictedTextField" : "RESTRICTED"
       }
     }
   }

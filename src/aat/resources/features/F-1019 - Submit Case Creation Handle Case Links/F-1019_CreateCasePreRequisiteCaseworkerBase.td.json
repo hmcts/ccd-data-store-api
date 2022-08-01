@@ -45,15 +45,7 @@
         "TextField": "This is the case that will be linked to the case being updated",
         "SearchCriteria" : { }
       },
-      "data_classification" : {
-        "TextField": "PUBLIC",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      },
-      "supplementary_data" : null,
-      "security_classifications" : {
-        "TextField": "PUBLIC",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      }
+      "supplementary_data" : null
     }
   }
 }

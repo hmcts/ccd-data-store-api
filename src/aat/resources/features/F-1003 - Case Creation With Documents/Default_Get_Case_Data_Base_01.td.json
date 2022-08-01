@@ -63,43 +63,6 @@
           "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_06][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_06][customValues][documentIdInTheResponse]}/binary"
         }
-      },
-      "data_classification" : {
-        "MoneyGBPField" : "PUBLIC",
-        "FixedListField" : "PUBLIC",
-        "AddressUKField" : {
-          "value" : {
-            "County" : "PUBLIC",
-            "Country" : "PUBLIC",
-            "PostCode" : "PUBLIC",
-            "PostTown" : "PUBLIC",
-            "AddressLine1" : "PUBLIC",
-            "AddressLine2" : "PUBLIC",
-            "AddressLine3" : "PUBLIC"
-          },
-          "classification" : "PUBLIC"
-        },
-        "DocumentField1" : "PUBLIC",
-        "DocumentField2" : "PUBLIC",
-        "DocumentField3" : "PUBLIC",
-        "DocumentField4" : "PUBLIC",
-        "DocumentField5" : "PUBLIC",
-        "DocumentField6" : "PUBLIC",
-        "DocumentField7" : "PUBLIC",
-        "FixedRadioListField" : "PUBLIC",
-        "DateTimeField" : "PUBLIC",
-        "PhoneUKField" : "PUBLIC",
-        "NumberField" : "PUBLIC",
-        "MultiSelectListField" : "PUBLIC",
-        "YesOrNoField" : "PUBLIC",
-        "EmailField" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "DateField" : "PUBLIC",
-        "TextAreaField" : "PUBLIC",
-        "CollectionField" : {
-          "value" : [ ],
-          "classification" : "PUBLIC"
-        }
       }
     }
   }

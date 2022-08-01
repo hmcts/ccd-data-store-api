@@ -54,12 +54,6 @@
               "label" : " List 7"
             } ]
           }
-        },
-        "data_classification" : {
-          "DynamicList" : "PUBLIC"
-        },
-        "security_classifications" : {
-          "DynamicList" : "PUBLIC"
         }
       },
       "event_id": "createCase"

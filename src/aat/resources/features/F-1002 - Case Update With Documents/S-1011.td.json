@@ -27,9 +27,6 @@
           "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
         }
-      },
-      "data_classification": {
-        "DocumentField1": "PUBLIC"
       }
     }
   }

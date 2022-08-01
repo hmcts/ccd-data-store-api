@@ -42,13 +42,7 @@
       "case_data" : {
         "TextField": "This is the case that will be linked to the case being updated (different case_type_id)"
       },
-      "data_classification" : {
-        "TextField": "PUBLIC"
-      },
-      "supplementary_data" : null,
-      "security_classifications" : {
-        "TextField": "PUBLIC"
-      }
+      "supplementary_data" : null
     }
   }
 }
