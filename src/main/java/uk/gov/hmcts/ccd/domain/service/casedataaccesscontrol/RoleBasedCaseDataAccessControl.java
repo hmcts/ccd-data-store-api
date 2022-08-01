@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
+import static java.util.Collections.emptySet;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 /**
@@ -129,11 +130,9 @@ public class RoleBasedCaseDataAccessControl implements NoCacheCaseDataAccessCont
     }
 
     @Override
-    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference, CaseDetails caseDetails) {
-        Set<String> roles = Sets.union(userRepository.getUserRoles(),
-            Sets.newHashSet(caseUserRepository
-                .findCaseRoles(Long.valueOf(getCaseId(caseReference)), userRepository.getUserId())));
-        return userRoleToAccessProfiles(roles);
+    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(CaseDetails caseDetails) {
+        // There's no such concept with old role-based access control
+        return emptySet();
     }
 
     private Set<AccessProfile> userRoleToAccessProfiles(Set<String> roles) {

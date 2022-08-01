@@ -1,5 +1,11 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,7 +13,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -18,12 +23,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import uk.gov.hmcts.ccd.GlobalSearchTestFixture;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
@@ -36,10 +35,8 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -49,25 +46,22 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 
+import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -83,7 +77,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -100,6 +93,9 @@ import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.caseTypeRoleAssignmentJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponseJson;
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
@@ -161,9 +157,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private WebApplicationContext wac;
     private MockMvc mockMvc;
     private JdbcTemplate template;
-
-    @MockBean
-    private RoleAssignmentService roleAssignmentService;
 
     @SpyBean
     private AuditRepository auditRepository;
@@ -1151,7 +1144,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map data = JacksonUtils.convertValue(DATA);
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setData(data);
-        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SHORT_COMMENT, LONG_COMMENT));
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID,SHORT_COMMENT, LONG_COMMENT));
         caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -1831,38 +1824,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn403ForRestrictedCaseTypeWithRA_Judiciary() throws Exception {
-        shouldReturn403ForRestrictedCaseType("caseworkers", "hmcts-judiciary", "BASIC");
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn403ForRestrictedCaseTypeWithRA_LegalOperations() throws Exception {
-        shouldReturn403ForRestrictedCaseType("caseworkers", "hmcts-legal-operations",
-            "BASIC");
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404ForRestrictedCaseTypeWithRA_CREATOR() throws Exception {
-        shouldReturn404ForRestrictedCaseType("caseworkers", "Creator", "BASIC");
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404ForRestrictedCaseTypeWithRoleAssignmentsNull() throws Exception {
-        shouldReturn404ForRestrictedCaseType("caseworkers", "hmcts-legal-operations",
-            "STANDARD");
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404ForRestrictedCaseTypeWithGrantTypeNotBasic() throws Exception {
-        shouldReturn403ForRestrictedCaseType("caseworkers", "hmcts-judiciary", "STANDARD");
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn400WhenGetValidCaseWithInvalidCaseReferenceForCaseworker() throws Exception {
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
@@ -1877,6 +1838,86 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         }
 
         assertCaseDataResultSetSize();
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn403ForRestrictedCaseTypeWithRA_JudiciaryForCaseworker() throws Exception {
+        shouldReturn403ForRestrictedCaseType("caseworkers", "hmcts-judiciary");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn403ForRestrictedCaseTypeWithRA_LegalOperationsForCaseworker() throws Exception {
+        shouldReturn403ForRestrictedCaseType("caseworkers", "hmcts-legal-operations"
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn404ForRestrictedCaseTypeWithRA_CreatorForCaseworker() throws Exception {
+        shouldReturn404ForRestrictedCaseType("caseworkers", "[CREATOR]", GrantType.BASIC);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn404ForRestrictedCaseTypeWithGrantTypeNotBasicForCaseworker() throws Exception {
+        shouldReturn404ForRestrictedCaseType("caseworkers", "hmcts-judiciary", GrantType.STANDARD);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn403ForRestrictedCaseTypeWithRA_JudiciaryForCitizen() throws Exception {
+        shouldReturn403ForRestrictedCaseType("citizens", "hmcts-judiciary");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn403ForRestrictedCaseTypeWithRA_LegalOperationsForCitizen() throws Exception {
+        shouldReturn403ForRestrictedCaseType("citizens", "hmcts-legal-operations"
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn404ForRestrictedCaseTypeWithRA_CreatorForCitizen() throws Exception {
+        shouldReturn404ForRestrictedCaseType("citizens", "[CREATOR]", GrantType.BASIC);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn404ForRestrictedCaseTypeWithGrantTypeNotBasicForCitizen() throws Exception {
+        shouldReturn404ForRestrictedCaseType("citizens", "hmcts-judiciary", GrantType.STANDARD);
+    }
+
+    private void shouldReturn404ForRestrictedCaseType(String userRole, String roleName, GrantType grantType)
+        throws Exception {
+        stubRoleAssignments(roleName, grantType);
+        mockMvc.perform(get("/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE + "/cases/1658950545802810")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().is(404))
+            .andReturn();
+    }
+
+    private void shouldReturn403ForRestrictedCaseType(String userRole, String roleName)
+        throws Exception {
+        stubRoleAssignments(roleName, GrantType.BASIC);
+        mockMvc.perform(get("/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE + "/cases/1658950545802810")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().is(403))
+            .andReturn();
+    }
+
+    private void stubRoleAssignments(String roleName, GrantType grantType) {
+        String userId = "123";
+        String roleAssignmentResponseJson = roleAssignmentResponseJson(
+            caseTypeRoleAssignmentJson(userId, roleName, "1658950545802810", JURISDICTION,
+                CASE_TYPE, Classification.PUBLIC, grantType)
+        );
+        stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+            .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
     }
 
     @Test
@@ -3721,7 +3762,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private void shouldReturn404WhenPostCreateCaseEventWithNoUpdateCaseAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353578";
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
-            + CASE_TYPE_NO_UPDATE_CASE_ACCESS + "/cases/" + caseReference + "/events";
+            + CASE_TYPE_NO_UPDATE_CASE_ACCESS  + "/cases/" + caseReference + "/events";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
@@ -3750,7 +3791,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private void shouldReturn404WhenPostCreateCaseEventWithNoCreateEventAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353586";
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
-            + CASE_TYPE_NO_CREATE_EVENT_ACCESS + "/cases/" + caseReference + "/events";
+            + CASE_TYPE_NO_CREATE_EVENT_ACCESS  + "/cases/" + caseReference + "/events";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
@@ -4003,7 +4044,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         TTL timeToLive = TTL.builder()
             .systemTTL(LocalDate.now().plusDays(20))
-            .overrideTTL(LocalDate.of(2021, 8, 30))
+            .overrideTTL(LocalDate.of(2021,8,30))
             .suspended("No").build();
 
         Map<String, JsonNode> ttl = new HashMap<>();
@@ -4058,7 +4099,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private void shouldReturn404WhenPostCreateCaseEventWithNoCreateFieldAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353594";
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
-            + CASE_TYPE_NO_CREATE_FIELD_ACCESS + "/cases/" + caseReference + "/events";
+            + CASE_TYPE_NO_CREATE_FIELD_ACCESS  + "/cases/" + caseReference + "/events";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
@@ -4087,7 +4128,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private void shouldReturn404WhenPostCreateCaseEventWithNoUpdateFieldAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353602";
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
-            + CASE_TYPE_NO_UPDATE_FIELD_ACCESS + "/cases/" + caseReference + "/events";
+            + CASE_TYPE_NO_UPDATE_FIELD_ACCESS  + "/cases/" + caseReference + "/events";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
@@ -4124,102 +4165,69 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
     }
 
-    private void shouldReturn404ForRestrictedCaseType(String userRole, String roleName, String grantType)
-        throws Exception {
-        getRoleAssignments(roleName, grantType);
-        mockMvc.perform(get("/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
-            + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases/1504259907353628")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().is(404))
-            .andReturn();
-    }
-
-    private void shouldReturn403ForRestrictedCaseType(String userRole, String roleName, String grantType)
-        throws Exception {
-        getRoleAssignments(roleName, grantType);
-        mockMvc.perform(get("/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
-            + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases/1504259907353628")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().is(403))
-            .andReturn();
-    }
-
-    private void getRoleAssignments(String roleName, String grantType) {
-        given(roleAssignmentService.getRoleAssignments("123")).willReturn(
-            RoleAssignments.builder()
-                .roleAssignments(asList(
-                    RoleAssignment.builder()
-                        .grantType(grantType)
-                        .roleName(roleName)
-                        .actorId("1234")
-                        .attributes(RoleAssignmentAttributes.builder()
-                            .jurisdiction(Optional.of(JURISDICTION)).build()).build()
-                ))
-                .build()
-        );
-    }
-
-
     private void shouldReturn200WithFieldRemovedWhenGetValidCaseWithNoFieldReadAccess(String userRole)
         throws Exception {
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
-        final MvcResult result = mockMvc
-            .perform(get("/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
-                + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases/1504259907353628")
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().is(200))
-            .andReturn();
 
-        final CaseDetails caseDetails =
-            mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
+        {
+            final MvcResult result = mockMvc
+                .perform(get("/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+                    + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases/1504259907353628")
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andReturn();
 
-        assertEquals(1504259907353628L, caseDetails.getReference().longValue());
+            final CaseDetails caseDetails =
+                mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
 
-        JsonNode nodeData = JacksonUtils.convertValueJsonNode(caseDetails.getData());
-        assertAll(
-            () -> assertThat(nodeData.has("PersonFirstName"), CoreMatchers.is(false)),
-            () -> assertThat(nodeData.get("PersonLastName"), CoreMatchers.is(getTextNode("Parker"))),
-            () -> assertThat(nodeData.has("PersonAddress"), CoreMatchers.is(true)),
-            () -> assertThat(nodeData.get("PersonAddress").get("Country"), CoreMatchers
-                .is(getTextNode("England"))),
-            () -> assertThat(nodeData.get("PersonAddress").get("Postcode"), CoreMatchers
-                .is(getTextNode("HX08 5TG"))),
-            () -> assertThat(nodeData.get("PersonAddress").get("AddressLine1"), CoreMatchers
-                .is(getTextNode("123"))),
-            () -> assertThat(nodeData.get("PersonAddress").get("AddressLine2"), CoreMatchers
-                .is(getTextNode("Fake Street"))),
-            () -> assertThat(nodeData.get("PersonAddress").get("AddressLine3"), CoreMatchers
-                .is(getTextNode("Hexton"))),
-            () -> assertThat(nodeData.has("D8Document"), CoreMatchers.is(true)),
-            () -> assertThat(nodeData.get("D8Document").get("document_url"), CoreMatchers
-                .is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"))),
-            () -> assertThat(nodeData.get("D8Document").get("document_binary_url"), CoreMatchers
-                .is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"
-                    + "/binary"))),
-            () -> assertThat(nodeData.get("D8Document").get("document_filename"), CoreMatchers
-                .is(getTextNode("Seagulls_Square.jpg")))
-        );
-        JsonNode nodeClassification = JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification());
-        assertAll(
-            () -> assertThat(nodeClassification.has("PersonFirstName"), CoreMatchers.is(false)),
-            () -> assertThat(nodeClassification.get("PersonLastName"), CoreMatchers
-                .is(getTextNode("PUBLIC"))),
-            () -> assertThat(nodeClassification.has("PersonAddress"), CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("classification"), CoreMatchers
-                .is(getTextNode("PUBLIC"))),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("Country"), CoreMatchers
-                .is(getTextNode("PUBLIC"))),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("Postcode"), CoreMatchers
-                .is(getTextNode("PUBLIC"))),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine1"), CoreMatchers
-                .is(getTextNode("PUBLIC"))),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine2"), CoreMatchers
-                .is(getTextNode("PUBLIC"))),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine3"), CoreMatchers
-                .is(getTextNode("PUBLIC"))),
-            () -> assertThat(nodeClassification.get("D8Document"), CoreMatchers.is(getTextNode("PUBLIC")))
-        );
+            assertEquals(1504259907353628L, caseDetails.getReference().longValue());
+
+            JsonNode nodeData = JacksonUtils.convertValueJsonNode(caseDetails.getData());
+            assertAll(
+                () -> assertThat(nodeData.has("PersonFirstName"), CoreMatchers.is(false)),
+                () -> assertThat(nodeData.get("PersonLastName"), CoreMatchers.is(getTextNode("Parker"))),
+                () -> assertThat(nodeData.has("PersonAddress"), CoreMatchers.is(true)),
+                () -> assertThat(nodeData.get("PersonAddress").get("Country"), CoreMatchers
+                    .is(getTextNode("England"))),
+                () -> assertThat(nodeData.get("PersonAddress").get("Postcode"), CoreMatchers
+                    .is(getTextNode("HX08 5TG"))),
+                () -> assertThat(nodeData.get("PersonAddress").get("AddressLine1"), CoreMatchers
+                    .is(getTextNode("123"))),
+                () -> assertThat(nodeData.get("PersonAddress").get("AddressLine2"), CoreMatchers
+                    .is(getTextNode("Fake Street"))),
+                () -> assertThat(nodeData.get("PersonAddress").get("AddressLine3"), CoreMatchers
+                    .is(getTextNode("Hexton"))),
+                () -> assertThat(nodeData.has("D8Document"), CoreMatchers.is(true)),
+                () -> assertThat(nodeData.get("D8Document").get("document_url"), CoreMatchers
+                    .is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"))),
+                () -> assertThat(nodeData.get("D8Document").get("document_binary_url"), CoreMatchers
+                    .is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"
+                        + "/binary"))),
+                () -> assertThat(nodeData.get("D8Document").get("document_filename"), CoreMatchers
+                    .is(getTextNode("Seagulls_Square.jpg")))
+            );
+            JsonNode nodeClassification = JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification());
+            assertAll(
+                () -> assertThat(nodeClassification.has("PersonFirstName"), CoreMatchers.is(false)),
+                () -> assertThat(nodeClassification.get("PersonLastName"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.has("PersonAddress"), CoreMatchers.is(true)),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("classification"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("Country"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("Postcode"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine1"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine2"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine3"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("D8Document"), CoreMatchers.is(getTextNode("PUBLIC")))
+            );
+        }
     }
 
     private void shouldReturn201WhenPostCreateCaseEventWithValidData(String userRole) throws Exception {
@@ -4860,7 +4868,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
     public void shouldAuditLogCaseWorkerSearch() throws Exception {
 
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
@@ -4890,7 +4898,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
     public void shouldAuditLogCitizenSearch() throws Exception {
 
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
@@ -5073,7 +5081,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturnPaginatedSearchMetadataForCitizen() throws Exception {
-
         assertCaseDataResultSetSize();
         MockUtils.setSecurityAuthorities(authentication, "role-citizen");
 
@@ -5088,7 +5095,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         PaginatedSearchMetadata metadata = mapper.readValue(responseAsString, PaginatedSearchMetadata.class);
 
         assertThat(metadata.getTotalPagesCount(), is(4));
-        assertThat(metadata.getTotalResultsCount(), is(7));
+        assertThat(metadata.getTotalResultsCount(), is(8));
     }
 
     @Test
@@ -5300,10 +5307,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withDescription(description)
                 .build())
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE, TEST_EVENT_ID))
-            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {
-            }))
-            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {
-            }))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
             .withIgnoreWarning(Boolean.FALSE)
             .build();
 
@@ -5362,10 +5367,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withDescription(description)
                 .build())
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE, TEST_EVENT_ID))
-            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {
-            }))
-            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {
-            }))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
             .withIgnoreWarning(Boolean.FALSE)
             .build();
 
@@ -5407,10 +5410,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withDescription(description)
                 .build())
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE_MULTI_PAGE, TEST_EVENT_ID))
-            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {
-            }))
-            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {
-            }))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
             .withIgnoreWarning(Boolean.FALSE)
             .build();
 

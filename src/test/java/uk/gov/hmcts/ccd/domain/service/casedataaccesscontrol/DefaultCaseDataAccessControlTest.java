@@ -31,6 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -41,6 +42,7 @@ import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DownstreamIssueException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -51,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -132,6 +135,7 @@ class DefaultCaseDataAccessControlTest {
         accessMap.put("create", CAN_CREATE);
         accessMap.put("update", CAN_UPDATE);
         accessMap.put("read", CAN_READ);
+        doReturn(List.of(ROLE_NAME_3, ROLE_NAME_5)).when(applicationParams).getCcdAccessControlRestrictedRoles();
     }
 
     @Test
@@ -222,6 +226,93 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
         verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesForRestrictedCases() {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+
+        RoleAssignment roleAssignment1 = RoleAssignment.builder()
+            .grantType(BASIC.name())
+            .roleName(ROLE_NAME_3)
+            .classification(Classification.PUBLIC.name())
+            .build();
+        RoleAssignment roleAssignment2 = RoleAssignment.builder()
+            .grantType(STANDARD.name())
+            .roleName(ROLE_NAME_5)
+            .classification(Classification.PUBLIC.name())
+            .build();
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        roleAssignments.setRoleAssignments(List.of(roleAssignment1, roleAssignment2));
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class), anyList());
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_3);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(List.of(roleAssignment1)).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(List.of(ROLE_NAME_3)).when(accessProfileService)
+            .generateAccessProfiles(argThat(list -> list.size() == 1 && list.get(0) == roleAssignment1), any());
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesForRestrictedCase(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(1, accessProfiles.size());
+        assertEquals(ROLE_NAME_3, accessProfiles.iterator().next());
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class),
+                argThat(list -> list.contains(MatcherType.SECURITYCLASSIFICATION)));
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldNotGenerateAccessProfilesWithInvalidRoleAssignmentsForRestrictedCases() {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+
+        RoleAssignment roleAssignmentWithInvalidName = RoleAssignment.builder()
+            .grantType(BASIC.name())
+            .roleName(ROLE_NAME_1)
+            .classification(Classification.PUBLIC.name())
+            .build();
+        RoleAssignment roleAssignmentWithInvalidGrantType = RoleAssignment.builder()
+            .grantType(STANDARD.name())
+            .roleName(ROLE_NAME_3)
+            .classification(Classification.PUBLIC.name())
+            .build();
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        roleAssignments.setRoleAssignments(List.of(roleAssignmentWithInvalidName, roleAssignmentWithInvalidGrantType));
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class), anyList());
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1, ROLE_NAME_3);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(List.of()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesForRestrictedCase(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(0, accessProfiles.size());
+        verify(roleAssignmentsFilteringService)
+            .filter(argThat(ras -> ras.getRoleAssignments().isEmpty()), any(CaseDetails.class), any());
     }
 
     @Test

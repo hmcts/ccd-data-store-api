@@ -20,6 +20,8 @@ public interface CaseDataAccessControl {
 
     Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails);
 
+    Set<AccessProfile> generateAccessProfilesForRestrictedCase(CaseDetails caseDetails);
+
     Set<AccessProfile> getCaseUserAccessProfilesByUserId();
 
     void grantAccess(CaseDetails caseDetails, String idamUserId);
@@ -46,6 +48,4 @@ public interface CaseDataAccessControl {
 
     SecurityClassification getHighestUserClassification(CaseTypeDefinition caseTypeDefinition,
                                                         boolean isCreateProfile);
-
-    Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference, CaseDetails caseDetails);
 }

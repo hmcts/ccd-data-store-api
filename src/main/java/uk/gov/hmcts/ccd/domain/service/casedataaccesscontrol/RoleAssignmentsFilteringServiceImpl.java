@@ -59,10 +59,9 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
     }
 
     @Override
-    public FilteredRoleAssignments filter(RoleAssignments roleAssignments, CaseDetails caseDetails,
+    public FilteredRoleAssignments filter(RoleAssignments roleAssignments,
+                                          CaseDetails caseDetails,
                                           List<MatcherType> excludeMatchers) {
-        log.info("Filter role assignments for case with exclude Matcher Type {}", caseDetails.getReference());
-
         return filterMatchingRoleAssignments(roleAssignments,
             (matcher, roleAssignment) -> {
                 if (!excludeMatchers.contains(matcher.getType())) {

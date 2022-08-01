@@ -23,6 +23,8 @@ public interface NoCacheCaseDataAccessControl {
 
     Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails);
 
+    Set<AccessProfile> generateAccessProfilesForRestrictedCase(CaseDetails caseDetails);
+
     default Set<AccessProfile> getCaseUserAccessProfilesByUserId() {
         return new HashSet<>();
     }
@@ -52,6 +54,4 @@ public interface NoCacheCaseDataAccessControl {
     Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition, boolean isCreateProfile);
 
     Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails);
-
-    Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference, CaseDetails caseDetails);
 }

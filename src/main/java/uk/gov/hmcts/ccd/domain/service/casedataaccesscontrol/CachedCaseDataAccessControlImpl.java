@@ -77,6 +77,16 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
             e -> noCacheCaseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails));
     }
 
+    @Override
+    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(CaseDetails caseDetails) {
+        if (Strings.isNullOrEmpty(caseDetails.getReferenceAsString())) {
+            // Legacy cases from outside sources do NOT have a CCD case reference, so we can't cache
+            return noCacheCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseDetails);
+        }
+        return caseRestrictedAccessProfiles.computeIfAbsent(caseDetails.getReferenceAsString(),
+            e -> noCacheCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseDetails));
+    }
+
     public Set<AccessProfile> getCaseUserAccessProfilesByUserId() {
         return noCacheCaseDataAccessControl.getCaseUserAccessProfilesByUserId();
     }
@@ -154,11 +164,5 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
             .stream()
             .max(comparingInt(SecurityClassification::getRank))
             .orElseThrow(() -> new ServiceException("No security classification found for user"));
-    }
-
-    @Override
-    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(String caseReference, CaseDetails caseDetails) {
-        return caseRestrictedAccessProfiles.computeIfAbsent(caseReference,
-            e -> noCacheCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseReference, caseDetails));
     }
 }
