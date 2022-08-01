@@ -42,24 +42,6 @@
           "CaseReference": null
         },
         "TextField" : "S-1018.23"
-      },
-      "data_classification" : {
-        "TextField" : "PUBLIC",
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
-          }
-        }
-      },
-      "security_classifications" : {
-        "TextField" : "PUBLIC",
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
-          }
-        }
       }
     }
   }

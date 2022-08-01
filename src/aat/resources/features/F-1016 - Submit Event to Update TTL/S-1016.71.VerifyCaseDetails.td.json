@@ -28,9 +28,6 @@
           "OverrideTTL" : null,
           "Suspended" : "No"
         }
-      },
-      "data_classification": {
-        "TextField" : "PUBLIC"
       }
     }
   }

@@ -24,7 +24,6 @@
     },
     "body": {
       "data": { },
-      "data_classification": { },
       "event": {
         "id": "createCaseTTL",
         "summary": "",
@@ -47,12 +46,6 @@
       "security_classification": "PUBLIC",
       "case_data": {
         "SearchCriteria" : { }
-      },
-      "data_classification": {
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      },
-      "security_classifications": {
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       },
       "supplementary_data": null,
       "after_submit_callback_response": null,

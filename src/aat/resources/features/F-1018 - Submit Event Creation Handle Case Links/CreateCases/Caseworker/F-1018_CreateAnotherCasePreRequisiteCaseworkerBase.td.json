@@ -14,12 +14,6 @@
     "body": {
       "case_data" : {
         "TextField": "This is the case that will be linked to the case being updated"
-      },
-      "data_classification" : {
-        "TextField": "PUBLIC"
-      },
-      "security_classifications" : {
-        "TextField": "PUBLIC"
       }
     }
   }

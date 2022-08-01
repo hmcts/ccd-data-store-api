@@ -42,24 +42,6 @@
           "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
         },
         "TextField" : "S-1018.24"
-      },
-      "data_classification" : {
-        "TextField" : "PUBLIC",
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
-          }
-        }
-      },
-      "security_classifications" : {
-        "TextField" : "PUBLIC",
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
-          }
-        }
       }
     }
   }

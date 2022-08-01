@@ -44,7 +44,6 @@
 			"state" : "TODO",
 			"security_classification" : "PUBLIC",
 			"data" : { },
-			"data_classification" : { },
 			"after_submit_callback_response" : null,
 			"callback_response_status_code" : null,
 			"callback_response_status" : null,

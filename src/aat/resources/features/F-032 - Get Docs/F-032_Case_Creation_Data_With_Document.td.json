@@ -27,12 +27,6 @@
 					"document_binary_url": "[[ANYTHING_PRESENT]]",
 					"document_filename": "[[ANYTHING_PRESENT]]"
 				}
-			},
-			"data_classification": {
-				"DocumentField1": "PUBLIC"
-			},
-			"security_classifications": {
-				"DocumentField1": "PUBLIC"
 			}
 		}
 	}

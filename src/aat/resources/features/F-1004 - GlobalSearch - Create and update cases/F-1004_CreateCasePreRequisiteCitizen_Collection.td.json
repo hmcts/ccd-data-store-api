@@ -44,18 +44,12 @@
 			"case_data": {
         "_extends_": "Befta_Global_Search_Expected_Search_Criteria_Collection"
       },
-			"data_classification": {
-        "_extends_": "Befta_Global_Search_Data_Classifications_Collection"
-      },
 			"supplementary_data": null,
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,
 			"callback_response_status": null,
 			"delete_draft_response_status_code": null,
-			"delete_draft_response_status": null,
-			"security_classifications": {
-        "_extends_": "Befta_Global_Search_Data_Classifications_Collection"
-      }
+			"delete_draft_response_status": null
 		}
 	}
 }

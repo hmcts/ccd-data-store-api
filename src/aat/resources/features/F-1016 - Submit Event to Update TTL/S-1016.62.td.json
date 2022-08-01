@@ -70,9 +70,6 @@
           "Suspended" : "${[scenarioContext][childContexts][F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker][testData][actualResponse][body][case_data][TTL][Suspended]}"
         }
       },
-      "data_classification" : {
-        "TextField" : "PUBLIC"
-      },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,
       "callback_response_status" : null,

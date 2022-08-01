@@ -52,31 +52,6 @@
             }
           ]
         }
-      },
-      "data_classification": {
-        "dateOfBirthText": "PUBLIC",
-        "dateOfDeathText": "PUBLIC",
-        "OtherName": "PUBLIC",
-        "SearchCriteria": {
-          "classification": "PUBLIC",
-          "value": {
-            "SearchParties": {
-              "classification": "PUBLIC",
-              "value": [
-                {
-                  "__ordering__": "UNORDERED",
-                  "__elementId__": "value"
-                },
-                {
-                  "value": {
-                    "Name": "PUBLIC"
-                  },
-                  "id": "[[ANYTHING_PRESENT]]"
-                }
-              ]
-            }
-          }
-        }
       }
     }
   }

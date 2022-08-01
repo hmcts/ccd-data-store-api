@@ -52,15 +52,7 @@
         },
         "SearchCriteria" : { }
       },
-      "data_classification": {
-        "_extends_" : "TTL_Classifications",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      },
-      "supplementary_data": null,
-      "security_classifications": {
-        "_extends_" : "TTL_Classifications",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      }
+      "supplementary_data": null
     }
   }
 }

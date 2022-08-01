@@ -24,9 +24,6 @@
       "data": {
         "TextField" : "${[scenarioContext][siblingContexts][F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen][testData][actualResponse][body][case_data][TextField]}",
         "TTL" : "${[scenarioContext][siblingContexts][F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen][testData][actualResponse][body][case_data][TTL]}"
-      },
-      "data_classification": {
-        "TextField" : "PUBLIC"
       }
     }
   }

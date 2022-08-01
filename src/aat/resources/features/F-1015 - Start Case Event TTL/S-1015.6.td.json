@@ -50,20 +50,12 @@
           "_extends_": "TTL_Case_Data",
           "SearchCriteria" : { }
         },
-        "data_classification": {
-          "_extends_": "TTL_Case_Data_Classifications",
-          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-        },
         "supplementary_data": null,
         "after_submit_callback_response": null,
         "callback_response_status_code": null,
         "callback_response_status": null,
         "delete_draft_response_status_code": null,
-        "delete_draft_response_status": null,
-        "security_classifications": {
-          "_extends_": "TTL_Case_Data_Classifications",
-          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-        }
+        "delete_draft_response_status": null
       },
       "event_id": "updateCaseNoTTLInc"
     }

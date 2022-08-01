@@ -27,10 +27,6 @@
           "SystemTTL" : "2010-04-30"
         },
         "SearchCriteria" : { }
-      },
-      "data_classification": {
-        "_extends_": "TTL_Classifications",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       }
     }
   }

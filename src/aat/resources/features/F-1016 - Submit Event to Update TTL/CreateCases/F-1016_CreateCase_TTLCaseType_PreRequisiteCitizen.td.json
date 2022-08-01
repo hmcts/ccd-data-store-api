@@ -48,12 +48,6 @@
       "case_data": {
         "TextField": "Create Case"
       },
-      "data_classification": {
-        "TextField" : "PUBLIC"
-      },
-      "security_classifications": {
-        "TextField" : "PUBLIC"
-      },
       "supplementary_data": null,
       "after_submit_callback_response": null,
       "callback_response_status_code": null,

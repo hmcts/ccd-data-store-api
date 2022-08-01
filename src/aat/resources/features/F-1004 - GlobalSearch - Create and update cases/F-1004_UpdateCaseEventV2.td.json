@@ -50,7 +50,6 @@
       "last_modified_on": "[[ANYTHING_PRESENT]]",
       "last_state_modified_on": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
-      "data_classification": "[[ANYTHING_PRESENT]]",
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
       "callback_response_status": null,

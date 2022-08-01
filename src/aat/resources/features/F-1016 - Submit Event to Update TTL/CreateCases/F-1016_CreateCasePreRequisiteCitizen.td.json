@@ -23,13 +23,7 @@
           "SystemTTL" : null
         }
       },
-      "data_classification": {
-        "_extends_" : "TTL_Classifications"
-      },
-      "supplementary_data": null,
-      "security_classifications": {
-        "_extends_" : "TTL_Classifications"
-      }
+      "supplementary_data": null
     }
   }
 }

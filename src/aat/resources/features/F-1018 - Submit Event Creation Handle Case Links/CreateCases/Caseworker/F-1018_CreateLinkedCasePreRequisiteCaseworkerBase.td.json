@@ -20,24 +20,6 @@
         "CaseLinkField": {
           "CaseReference": "[[ANY_STRING_NOT_NULLABLE]]"
         }
-      },
-      "data_classification" : {
-        "TextField": "PUBLIC",
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
-          }
-        }
-      },
-      "security_classifications" : {
-        "TextField": "PUBLIC",
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
-          }
-        }
       }
     }
   }

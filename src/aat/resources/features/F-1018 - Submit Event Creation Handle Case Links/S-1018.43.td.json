@@ -35,10 +35,6 @@
       "data" : {
         "_extends_": "F-1018_CaseDataWithStandardCaseLinks_UpdateByCaseworker",
         "TextField" : "S-1018.43"
-      },
-      "data_classification" : {
-        "_extends_": "F-1018_ClasificationsForCaseDataWithStandardCaseLinks_Update",
-        "TextField" : "PUBLIC"
       }
     }
   }

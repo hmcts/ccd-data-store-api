@@ -51,56 +51,6 @@
             }
           ]
         }
-      },
-      "data_classification": {
-        "dateOfBirthText": "PUBLIC",
-        "dateOfDeathText": "PUBLIC",
-        "OtherName": "PUBLIC",
-        "SearchCriteria" : {
-          "classification" : "PUBLIC",
-          "value": {
-            "SearchParties": {
-              "classification": "PUBLIC",
-              "value": [
-                {
-                  "__ordering__": "UNORDERED",
-                  "__elementId__": "value"
-                },
-                {
-                  "id": "[[ANYTHING_PRESENT]]",
-                  "value": {
-                    "Name": "PUBLIC"
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "security_classifications": {
-        "dateOfBirthText": "PUBLIC",
-        "dateOfDeathText": "PUBLIC",
-        "OtherName": "PUBLIC",
-        "SearchCriteria": {
-          "classification": "PUBLIC",
-          "value": {
-            "SearchParties": {
-              "classification": "PUBLIC",
-              "value": [
-                {
-                  "__ordering__": "UNORDERED",
-                  "__elementId__": "value"
-                },
-                {
-                  "id": "[[ANYTHING_PRESENT]]",
-                  "value": {
-                    "Name": "PUBLIC"
-                  }
-                }
-              ]
-            }
-          }
-        }
       }
     }
   }
