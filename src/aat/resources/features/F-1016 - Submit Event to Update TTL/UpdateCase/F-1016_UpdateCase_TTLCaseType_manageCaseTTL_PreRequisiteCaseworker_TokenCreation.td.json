@@ -1,0 +1,26 @@
+{
+  "_guid_": "F-1016_UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker_TokenCreation",
+  "_extends_": "F-1016_GetEventTokenBase",
+
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_TTL",
+      "etid": "manageCaseTTL",
+      "cid": "${[scenarioContext][parentContext][siblingContexts][F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "event_id": "manageCaseTTL"
+    }
+  }
+}

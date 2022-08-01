@@ -1,0 +1,10 @@
+{
+  "_guid_": "422_TTL_Guard",
+  "_extends_": "Common_422_Response",
+
+  "body" : {
+    "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+    "message" : "Updating the TTL suspension or override values only allowed if the deletion will occur beyond the guard period.",
+    "details" : null
+  }
+}

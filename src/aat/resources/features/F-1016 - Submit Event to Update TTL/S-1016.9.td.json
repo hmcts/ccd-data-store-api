@@ -29,8 +29,8 @@
       "data": {
         "TTL": {
           "Suspended": "No",
-          "OverrideTTL": null,
-          "SystemTTL": null
+          "SystemTTL": null,
+          "OverrideTTL": null
         }
       },
       "event": {
@@ -59,8 +59,8 @@
       "data" : {
         "TTL" : {
           "Suspended" : "No",
-          "OverrideTTL" : null,
-          "SystemTTL" : null
+          "SystemTTL" : null,
+          "OverrideTTL" : null
         },
         "SearchCriteria" : { }
       },
