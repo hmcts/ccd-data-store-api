@@ -135,7 +135,6 @@ class DefaultCaseDataAccessControlTest {
         accessMap.put("create", CAN_CREATE);
         accessMap.put("update", CAN_UPDATE);
         accessMap.put("read", CAN_READ);
-        doReturn(List.of(ROLE_NAME_3, ROLE_NAME_5)).when(applicationParams).getCcdAccessControlRestrictedRoles();
     }
 
     @Test
