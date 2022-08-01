@@ -1,24 +1,25 @@
 {
-  "_guid_": "S-1016.34",
-  "_extends_": "F-1016_Test_Data_Base_Citizen",
+  "_guid_": "S-1016.81",
+  "_extends_": "F-1016_Test_Data_Base",
 
-  "title": "OverrideTTL changed to a date less than Guard value, SystemTTL is null and TTL.Suspended is \"No\" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST",
+  "title": "Set TTL Override (TTL Guard fail) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1016_GetUpdateTokenOverrideTTLCitizen"
-  }
-  ],
+    "Token_Creation": "S-1016_GetUpdateTokenCaseworker_noTTL"
+  } ],
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCitizen",
+
+    "contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker_noTTL",
     "contains an event token for the case just created above",
+
     "has TTL.OverrideTTL set to less than today + guard value"
   ],
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1016_CreateCaseOverrideTTLPreRequisiteCitizen][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1016_CreateCasePreRequisiteCaseworker_noTTL][testData][actualResponse][body][id]}"
     },
     "headers": {
       "_extends_": "Common_Request_Headers"
@@ -27,7 +28,7 @@
       "data": {
         "TTL": {
           "Suspended": "No",
-          "OverrideTTL" : "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
           "SystemTTL": null
         }
       },
@@ -43,7 +44,6 @@
   },
 
   "expectedResponse": {
-
     "_extends_": "422_TTL_Guard"
   }
 }
