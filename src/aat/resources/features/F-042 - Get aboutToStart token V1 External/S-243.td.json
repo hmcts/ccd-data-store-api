@@ -34,7 +34,7 @@
 				"security_classification": "PUBLIC",
 				"case_data": {
 					"_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role"
-				}
+				},
 				"supplementary_data": null,
 				"after_submit_callback_response": null,
 				"callback_response_status_code": null,
