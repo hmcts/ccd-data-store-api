@@ -1,0 +1,49 @@
+{
+  "_guid_": "S-1015.4__base",
+  "_extends_": "StartEvent_v1Int_Caseworker__PositiveResponse_Base",
+
+  "title": "must successfully update a cases TTL.SystemTTL value using '/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}'",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
+    "is configured to trigger an About To Start callback that does not change any of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL "
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+
+      "cid": "OVERRIDE",
+
+      "etid": "updateCaseTTLInc"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "id": "updateCaseTTLInc",
+      "name": "Update with TTL Increment",
+      "description": "Update a case with a TTL increment value present",
+
+      "case_id": "OVERRIDE",
+      "case_fields": "OVERRIDE",
+
+      "event_token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "show_summary": true,
+      "show_event_notes": null,
+      "end_button_label": null,
+      "can_save_draft": false,
+      "title_display": null
+    }
+  }
+}

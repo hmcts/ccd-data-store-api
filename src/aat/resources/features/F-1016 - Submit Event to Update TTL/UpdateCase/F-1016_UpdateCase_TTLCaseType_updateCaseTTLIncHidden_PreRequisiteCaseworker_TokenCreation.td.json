@@ -1,0 +1,28 @@
+{
+  "_guid_": "F-1016_UpdateCase_TTLCaseType_updateCaseTTLIncHidden_PreRequisiteCaseworker_TokenCreation",
+  "_extends_": "UpdateCase_TTLCaseType_TokenCreation__Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateCaseTTLIncHidden"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+
+        "case_data": {
+          "TTL": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+  }
+}

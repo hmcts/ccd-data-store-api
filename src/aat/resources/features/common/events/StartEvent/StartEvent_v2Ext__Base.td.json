@@ -1,0 +1,22 @@
+{
+  "_guid_": "StartEvent_v2Ext__Base",
+
+  "title": "call to v2_external#/start-event-controller/getStartEventTriggerUsingGET",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation process to update a case (v2_ext)",
+
+  "method": "GET",
+  "uri": "/cases/{cid}/event-triggers/{etid}",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": "true"
+    },
+    "pathVariables": {
+      "cid": "OVERRIDE",
+      "etid": "OVERRIDE"
+    }
+  }
+}

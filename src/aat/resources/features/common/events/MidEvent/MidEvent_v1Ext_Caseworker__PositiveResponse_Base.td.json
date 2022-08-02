@@ -1,0 +1,11 @@
+{
+  "_guid_": "MidEvent_v1Ext_Caseworker__PositiveResponse_Base",
+  "_extends_": "MidEvent_v1Ext_Caseworker__Base",
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "data": {}
+    }
+  }
+}

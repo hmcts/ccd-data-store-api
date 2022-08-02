@@ -1,0 +1,17 @@
+{
+  "_guid_": "MidEvent_v2Ext__PositiveResponse_Base",
+  "_extends_": "MidEvent_v2Ext__Base",
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "data": {},
+
+      "_links": {
+        "self": {
+          "href": "[[ANY_STRING_NOT_NULLABLE]]"
+        }
+      }
+    }
+  }
+}
