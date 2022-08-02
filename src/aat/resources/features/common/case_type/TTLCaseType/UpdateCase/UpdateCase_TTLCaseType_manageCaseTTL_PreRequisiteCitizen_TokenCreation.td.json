@@ -1,0 +1,17 @@
+{
+  "_guid_": "UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen_TokenCreation",
+  "_extends_": "UpdateCase_TTLCaseType_TokenCreation__Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][siblingContexts][CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}",
+      "etid": "manageCaseTTL"
+    }
+  }
+}
