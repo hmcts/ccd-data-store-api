@@ -1,0 +1,15 @@
+{
+  "_guid_": "400_TTL_Modified",
+  "_extends_": "Common_400_Response",
+
+  "body": {
+    "_extends_": "NegativeResponseBody",
+
+    "timestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+    "path" : "[[ANY_STRING_NOT_NULLABLE]]",
+    "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+    "status" : 400,
+    "error" : "Bad Request",
+    "message" : "Time to live content has been modified by callback"
+  }
+}

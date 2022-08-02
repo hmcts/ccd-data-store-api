@@ -6,6 +6,9 @@
     "body": {
       "data": {
         "_extends_": "TTL_Case_Data"
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications"
       }
     }
   },
@@ -14,6 +17,12 @@
     "body": {
       "case_data": {
         "_extends_": "TTL_Case_Data"
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications"
+      },
+      "security_classifications": {
+        "_extends_": "TTL_Classifications"
       }
     }
   }

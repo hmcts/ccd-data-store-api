@@ -1,0 +1,65 @@
+{
+  "_guid_": "S-1015.73",
+  "_extends_": "StartEvent_v2Int__PositiveResponse_Base",
+
+  "title": "Trigger a start event callback that changes TTL.Suspended (Yes -> YES). Start event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET",
+
+  "specs": [
+    "a caseworker with an active profile in CCD",
+    "access to manage TTL properties",
+
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger an About To Start callback that changes the TTL.OverrideTTL value (null -> missing)",
+    "is configured to trigger an About To Start callback that changes the TTL.Suspended value (Yes -> YES)",
+
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
+    "does not contain the TTL.OverrideTTL as removed by callback (null -> missing)",
+    "contains the adjusted TTL.Suspended from the callback (Yes -> YES)"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "manageTTL": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateWithStartTTLToUpper"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "id": "updateWithStartTTLToUpper",
+
+      "case_id": "${}${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "case_fields": [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "id"
+        }, {
+          "_extends_": "F-1015_CaseFields_TTL",
+  
+          "value" : {
+            "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+            "Suspended" : "YES"
+          },
+          "formatted_value" : {
+            "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+            "Suspended" : "YES"
+          },
+          "display_context" : "READONLY"
+        },
+        {
+          "_extends_" : "F-1015_CaseFields_TextField"
+        }
+      ]
+    }
+  }
+}
