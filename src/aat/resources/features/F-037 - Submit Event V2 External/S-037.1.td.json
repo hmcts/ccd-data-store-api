@@ -196,6 +196,99 @@
 				"DateField": "1970-01-23",
 				"DateTimeField": "2000-01-01T00:23:00.000"
 			},
+			"data_classification": {
+				"CollectionComplexDateTime": {
+					"classification": "PUBLIC",
+					"value": [
+            {
+              "__ordering__": "ordered"
+            },
+						{
+							"value": {
+								"DateField": "PUBLIC",
+								"DateTimeField": "PUBLIC",
+								"StandardDate": "PUBLIC",
+								"StandardDateTime": "PUBLIC",
+								"NestedComplex": {
+									"classification": "PUBLIC",
+									"value": {
+										"DateField": "PUBLIC",
+										"DateTimeField": "PUBLIC",
+										"StandardDate": "PUBLIC",
+										"StandardDateTime": "PUBLIC"
+									}
+								}
+							},
+							"id": "[[ANY_STRING_NOT_NULLABLE]]"
+						},
+						{
+							"value": {
+								"DateField": "PUBLIC",
+								"DateTimeField": "PUBLIC",
+								"StandardDate": "PUBLIC",
+								"StandardDateTime": "PUBLIC",
+								"NestedComplex": {
+									"classification": "PUBLIC",
+									"value": {
+										"DateField": "PUBLIC",
+										"DateTimeField": "PUBLIC",
+										"StandardDate": "PUBLIC",
+										"StandardDateTime": "PUBLIC"
+									}
+								}
+							},
+							"id": "[[ANY_STRING_NOT_NULLABLE]]"
+						}
+					]
+				},
+				"ComplexDateTime": {
+					"classification": "PUBLIC",
+					"value": {
+						"DateField": "PUBLIC",
+						"DateTimeField": "PUBLIC",
+						"StandardDate": "PUBLIC",
+						"StandardDateTime": "PUBLIC",
+						"NestedComplex": {
+							"classification": "PUBLIC",
+							"value": {
+								"DateField": "PUBLIC",
+								"DateTimeField": "PUBLIC",
+								"StandardDate": "PUBLIC",
+								"StandardDateTime": "PUBLIC"
+							}
+						}
+					}
+				},
+				"CollectionDate": {
+					"classification": "PUBLIC",
+					"value": [
+            {
+              "__ordering__": "ordered"
+            },
+						{
+							"id": "[[ANY_STRING_NOT_NULLABLE]]",
+							"classification": "PUBLIC"
+						},
+						{
+							"id": "[[ANY_STRING_NOT_NULLABLE]]",
+							"classification": "PUBLIC"
+						}
+					]
+				},
+				"CollectionDateTime": {
+					"classification": "PUBLIC",
+					"value": [
+						{
+							"id": "[[ANY_STRING_NOT_NULLABLE]]",
+							"classification": "PUBLIC"
+						}
+					]
+				},
+				"StandardDateTime": "PUBLIC",
+				"StandardDate": "PUBLIC",
+				"DateField": "PUBLIC",
+				"DateTimeField": "PUBLIC"
+			},
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,
 			"callback_response_status": null,
