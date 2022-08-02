@@ -33,6 +33,35 @@
 			"data" : {
 				"_extends_": "Standard_Full_Case_Data"
 			},
+			"data_classification" : {
+				"MoneyGBPField" : "PUBLIC",
+				"FixedListField" : "PUBLIC",
+				"AddressUKField" : {
+					"value" : {
+						"County" : "PUBLIC",
+						"Country" : "PUBLIC",
+						"PostCode" : "PUBLIC",
+						"PostTown" : "PUBLIC",
+						"AddressLine1" : "PUBLIC",
+						"AddressLine2" : "PUBLIC",
+						"AddressLine3" : "PUBLIC"
+					},
+					"classification" : "PUBLIC"
+				},
+				"DateTimeField" : "PUBLIC",
+				"PhoneUKField" : "PUBLIC",
+				"NumberField" : "PUBLIC",
+				"MultiSelectListField" : "PUBLIC",
+				"YesOrNoField" : "PUBLIC",
+				"EmailField" : "PUBLIC",
+				"TextField" : "PUBLIC",
+				"DateField" : "PUBLIC",
+				"TextAreaField" : "PUBLIC",
+				"CollectionField" : {
+					"value" : "[[ANYTHING_PRESENT]]",
+					"classification" : "PUBLIC"
+				}
+			},
 			"after_submit_callback_response" : null,
 			"callback_response_status_code" : null,
 			"callback_response_status" : null,
