@@ -294,6 +294,8 @@ dependencies {
     contractTestCompile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.6.1'
     contractTestCompile group: 'javax.inject', name: 'javax.inject', version: '1'
     contractTestCompile group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
+
+    aatCompile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 }
 // end::dependencies[]
 
