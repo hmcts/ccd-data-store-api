@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.12",
-  "_extends_": "F-1015-CreateEventTokenErrorResponse",
+  "_extends_": "StartEvent_v1Ext_Caseworker__Base",
 
   "title": "must error when updating a case where about to start callback has modified TTL.SystemTTL using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token'",
 
@@ -30,5 +30,9 @@
       "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "updateModifiedSystemTTL"
     }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
   }
 }

@@ -1,0 +1,24 @@
+{
+  "_guid_": "StartEvent_v1Ext_Caseworker__Base",
+  "_extends_": "Token_Creation_Data_For_Master_Caseworker_Case_Creation",
+
+  "title": "call to v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation process to update a case (v1_ext caseworker)",
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+
+      "jid": "OVERRIDE",
+      "ctid": "OVERRIDE",
+
+      "cid": "OVERRIDE",
+      "etid": "OVERRIDE"
+    }
+  }
+}
