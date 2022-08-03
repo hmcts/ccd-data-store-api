@@ -25,6 +25,7 @@
         "case_data": {
           "TextField": "[[ANYTHING_PRESENT]]"
         }
+
       },
 
       "event_id": "[[ANYTHING_PRESENT]]"
