@@ -879,8 +879,8 @@ def getCheckedOutGitCommitHash() {
 task runProviderPactVerification(type:Test) {
     logger.lifecycle("Runs provider pact Tests")
     useJUnitPlatform()
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
+    testClassesDirs = sourceSets.aat.output.classesDirs
+    classpath = sourceSets.aat.runtimeClasspath
     systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/ccd/v2/external/controller/**"
