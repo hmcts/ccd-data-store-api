@@ -1,0 +1,25 @@
+{
+  "_guid_": "SubmitEvent_v2Ext__Base",
+  "_extends_": "Event_Creation_Caseworker_Base_V2",
+
+  "operationName": "Submit event creation (v2_ext)",
+
+  "uri": "/cases/{cid}/events",
+
+  "request": {
+    "pathVariables": {
+      "cid": "OVERRIDE"
+    },
+    "body": {
+      "data": {},
+      "event": {
+        "id": "OVERRIDE",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "OVERRIDE",
+      "ignore_warning": true
+    }
+  }
+}
