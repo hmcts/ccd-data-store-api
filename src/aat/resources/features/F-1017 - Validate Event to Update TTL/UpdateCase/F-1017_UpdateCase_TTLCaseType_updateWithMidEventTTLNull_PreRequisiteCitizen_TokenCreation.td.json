@@ -1,0 +1,26 @@
+{
+  "_guid_": "F-1017_UpdateCase_TTLCaseType_updateWithMidEventTTLNull_PreRequisiteCitizen_TokenCreation",
+  "_extends_": "UpdateCase_TTLCaseType_TokenCreation__Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}",
+      "etid": "updateWithMidEventTTLNull"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+
+        "case_data": {}
+      }
+    }
+  }
+}

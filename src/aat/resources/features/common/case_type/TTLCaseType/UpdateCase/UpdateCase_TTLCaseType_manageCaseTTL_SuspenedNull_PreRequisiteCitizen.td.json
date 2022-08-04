@@ -1,0 +1,31 @@
+{
+  "_guid_": "UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCitizen",
+  "_extends_": "UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCitizen",
+
+  "request": {
+    "body": {
+      "data": {
+        "TextField": "Updated with TTL by manageCaseTTL",
+        "TTL" : {
+          "SystemTTL" : null,
+          "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "Suspended" : null
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body" : {
+      "case_data": {
+        "TextField": "Updated with TTL by manageCaseTTL",
+        "TTL" : {
+          "SystemTTL" : null,
+          "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "Suspended" : null
+        }
+      }
+    }
+  }
+}

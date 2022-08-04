@@ -1,0 +1,23 @@
+{
+  "_guid_": "GetCaseDetails__Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "retrieve a case by id",
+
+  "specs": [
+    "to verify that the TTL.Suspended value has not changed in the database"
+  ],
+
+  "method": "GET",
+  "uri": "/cases/{cid}",
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": "true"
+    },
+    "pathVariables": {
+      "cid": "OVERRIDE"
+    }
+  }
+}
