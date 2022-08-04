@@ -1,0 +1,22 @@
+{
+  "_guid_": "StartEvent_v2Int__Base",
+
+  "title": "call to v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation process to update a case (v2_int)",
+
+  "method": "GET",
+  "uri": "internal/cases/{cid}/event-triggers/{etid}",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": "true"
+    },
+    "pathVariables": {
+      "cid": "OVERRIDE",
+      "etid": "OVERRIDE"
+    }
+  }
+}
