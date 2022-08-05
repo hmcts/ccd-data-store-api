@@ -255,7 +255,7 @@ public class CallbackInvoker {
                                     final CaseDetails caseDetails,
                                     final Map<String, JsonNode> responseData,
                                     final boolean populateGlobalSearch) {
-        timeToLiveService.verifyTTLContentNotChanged(caseDetails.getData(), responseData);
+        timeToLiveService.verifyTTLContentNotChangedByCallback(caseDetails.getData(), responseData);
         caseTypeService.validateData(responseData, caseTypeDefinition);
 
         Map<String, JsonNode> responseDataToSanitise = responseData;

@@ -1,0 +1,68 @@
+{
+  "_guid_": "S-1016.62",
+  "_extends_": "SubmitEvent_v2Ext__PositiveResponse_Base",
+
+  "title": "Update TTL value when TTL data not present in event data using v2 '/cases/{cid}/events'",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1016_UpdateCase_TTLCaseType_updateCaseTTLIncHidden_PreRequisiteCaseworker_TokenCreation"
+  } ],
+
+  "specs": [
+    "an active profile in CCD",
+    "access to manage TTL properties",
+
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker",
+    "contains an event token for the case just created above",
+    "has no TTL data present in the submitted data",
+
+    "will update the existing TTL value with TTL increment of 30 days"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "manageTTL": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "TextField": "Updated without supplying TTL"
+      },
+      "event": {
+        "id": "updateCaseTTLIncHidden"
+      },
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id" : "[[ANYTHING_PRESENT]]",
+
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type" : "FT_TTL",
+
+      "state" : "CaseUpdated",
+
+      "data" : {
+        "TextField" : "Updated without supplying TTL",
+        "TTL" : {
+          "SystemTTL" : "${[scenarioContext][customValues][dateThirtyDaysFromToday]}",
+          "OverrideTTL" : "${[scenarioContext][childContexts][UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker][testData][actualResponse][body][case_data][TTL][OverrideTTL]}",
+          "Suspended" : "${[scenarioContext][childContexts][UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker][testData][actualResponse][body][case_data][TTL][Suspended]}"
+        }
+      },
+      "data_classification" : {
+        "TextField" : "PUBLIC"
+      }
+    }
+  }
+}

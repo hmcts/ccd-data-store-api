@@ -1,0 +1,50 @@
+{
+  "_guid_": "S-1016.81",
+  "_extends_": "SubmitEvent_v1Ext_Caseworker__Base",
+
+  "title": "Set TTL Override (TTL Guard fail) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1016_GetUpdateTokenCaseworker_noTTL"
+  } ],
+
+  "specs": [
+    "an active profile in CCD",
+
+    "contains a case Id that has just been created as in F-1016_CreateCasePreRequisiteCaseworker_noTTL",
+    "contains an event token for the case just created above",
+
+    "has TTL.OverrideTTL set to less than today + guard value"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid" : "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "cid": "${[scenarioContext][childContexts][F-1016_CreateCasePreRequisiteCaseworker_noTTL][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "TTL": {
+          "Suspended": "No",
+          "OverrideTTL": "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
+          "SystemTTL": null
+        }
+      },
+      "event": {
+        "id": "updateCaseSubmitTTL"
+      },
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "422_TTL_Guard"
+  }
+}

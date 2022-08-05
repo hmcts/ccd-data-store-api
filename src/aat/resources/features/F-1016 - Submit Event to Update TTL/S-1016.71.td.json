@@ -1,0 +1,69 @@
+{
+  "_guid_": "S-1016.71",
+  "_extends_": "SubmitEvent_v1Ext_Citizen__PositiveResponse_Base",
+
+  "title": "Set TTL for first time when TTL data not present in event data using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1016_UpdateCase_TTLCaseType_updateCaseTTLIncHidden_PreRequisiteCitizen_TokenCreation"
+  } ],
+
+  "specs": [
+    "an active profile in CCD",
+    "a caseworker with an active profile in CCD",
+
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCitizen",
+    "contains an event token for the case just created above",
+    "has no TTL data present in the submitted data",
+
+    "will create a TTL value using TTL increment of 30 days"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    },
+    "caseworker": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid" : "BEFTA_MASTER",
+      "ctid": "FT_TTL",
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "TextField": "Updated without supplying TTL"
+      },
+      "event": {
+        "id": "updateCaseTTLIncHidden"
+      },
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id" : "[[ANYTHING_PRESENT]]",
+      "version" : 1,
+
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type_id" : "FT_TTL",
+
+      "state" : "CaseUpdated",
+
+      "case_data" : {
+        "TextField": "Updated without supplying TTL"
+      },
+      "data_classification" : {
+        "TextField" : "PUBLIC"
+      },
+      "security_classifications" : {
+        "TextField" : "PUBLIC"
+      }
+    }
+  }
+}
