@@ -1,0 +1,31 @@
+{
+  "_guid_": "UpdateCase_TTLCaseType_manageCaseTTL_SuspenedYes_PreRequisiteCaseworker",
+  "_extends_": "UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker",
+
+  "request": {
+    "body": {
+      "data": {
+        "TextField": "Updated with TTL by manageCaseTTL",
+        "TTL" : {
+          "SystemTTL" : null,
+          "OverrideTTL" : null,
+          "Suspended" : "Yes"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body" : {
+      "case_data": {
+        "TextField": "Updated with TTL by manageCaseTTL",
+        "TTL" : {
+          "SystemTTL" : null,
+          "OverrideTTL" : null,
+          "Suspended" : "Yes"
+        }
+      }
+    }
+  }
+}
