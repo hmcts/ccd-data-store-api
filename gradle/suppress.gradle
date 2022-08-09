@@ -1,5 +1,14 @@
 import groovy.util.slurpersupport.GPathResult
+import groovy.xml.DOMBuilder
 import groovy.xml.XmlUtil
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
+
+import javax.xml.xpath.XPathConstants
+import javax.xml.xpath.XPathExpression
+import javax.xml.xpath.XPathFactory
 
 def suppressCves(reportName) {
     reportName  = reportName == null || reportName as String == "" ? "dependency-check-report.xml" : reportName as String
@@ -17,18 +26,43 @@ def suppressCves(reportName) {
 
     if (!unSuppressedCves.isEmpty()) {
         File suppressionsFile = project.file(dependencyCheck.getSuppressionFile())
-        GPathResult response = new XmlSlurper(false, false).parse(suppressionsFile)
-        unSuppressedCves.each {
-            String cveName = it
-            (response << {
-                suppress {
-                    notes('Ticket TBC')
-                    cve(cveName)
-                }
-            })
-        }
-        suppressionsFile.write(XmlUtil.serialize(response))
+        String suppressionXml = readFile(suppressionsFile)
+        Element suppressionsDoc = DOMBuilder.parse(new StringReader(suppressionXml)).getDocumentElement()
+        addNewSuppression(unSuppressedCves, suppressionsDoc)
+        suppressionsFile.write(XmlUtil.serialize(formatXml(suppressionsDoc)))
     }
+}
+static def addNewSuppression(unSuppressedCves, suppressions) {
+    unSuppressedCves.each {
+        String cveName = it
+        Document document = suppressions.getOwnerDocument()
+        Element notesTag = document.createElement("notes")
+        notesTag.appendChild(document.createTextNode("Ticket TBC"))
+        Element cveTag = document.createElement("cve")
+        cveTag.appendChild(document.createTextNode(cveName))
+
+        Element suppressTag = document.createElement("suppress")
+        suppressTag.appendChild(notesTag)
+        suppressTag.appendChild(cveTag)
+        suppressions.appendChild(suppressTag)
+    }
+}
+static def readFile(File file) {
+    return new String(new FileInputStream(file.path).readAllBytes(), "UTF-8")
+}
+
+static def formatXml(Element suppressions) {
+    XPathExpression xpathExp = XPathFactory.newInstance().newXPath().compile(
+            "//text()[normalize-space(.) = '']")
+
+    NodeList emptyTextNodes = xpathExp.evaluate(suppressions, XPathConstants.NODESET) as NodeList
+    if (emptyTextNodes.getLength()) {
+        for (int i = 0; i < emptyTextNodes.getLength(); i++) {
+            Node emptyTextNode = emptyTextNodes.item(i)
+            emptyTextNode.getParentNode().removeChild(emptyTextNode)
+        }
+    }
+    return suppressions
 }
 
 task suppressCves() {
