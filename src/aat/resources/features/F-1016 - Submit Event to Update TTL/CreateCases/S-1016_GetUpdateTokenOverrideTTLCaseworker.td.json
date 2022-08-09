@@ -1,0 +1,10 @@
+{
+  "_guid_": "S-1016_GetUpdateTokenOverrideTTLCaseworker",
+  "_extends_": "S-1016_GetUpdateTokenCaseworker",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  }
+}

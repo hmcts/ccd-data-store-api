@@ -43,7 +43,7 @@ public class CaseDocumentAmApiClient {
             }
 
             throw new DocumentTokenException(
-                String.format("Error from CCD AM api:  %s", feignException.getMessage())
+                String.format("Error from CCD CDAM api:  %s", feignException.getMessage())
             );
         }
     }
@@ -54,7 +54,7 @@ public class CaseDocumentAmApiClient {
         } else if (feignException instanceof FeignClientException.NotFound) {
             throw new ResourceNotFoundException(feignException.getMessage());
         } else {
-            throw new ServiceException("The downstream CCD AM application has failed", feignException);
+            throw new ServiceException("The downstream CCD CDAM application has failed", feignException);
         }
     }
 

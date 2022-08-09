@@ -49,7 +49,7 @@ apply from: './gradle/suppress.gradle'
 def versions = [
         pact_version: '4.1.7'
 ]
-ext['spring-security.version'] = '5.6.1'
+ext['spring-security.version'] = '5.6.6'
 ext['spring-framework.version'] = '5.3.20'
 
 
@@ -184,13 +184,13 @@ dependencies {
     compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     compile group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
     compile group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
-    compile "org.bouncycastle:bcprov-jdk15on:1.61", "org.bouncycastle:bcpkix-jdk15on:1.61"
+    compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
 
-    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.4.5'
-    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server' , version: '5.6.1'
-    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: '5.6.1'
-    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: '5.6.1'
+    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.6'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.5.14'
+    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server' , version: '5.6.6'
+    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: '5.6.6'
+    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: '5.6.6'
 
     implementation "io.github.openfeign:feign-httpclient:11.0"
 
@@ -222,10 +222,10 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-annotations:2.13.2"
 
     // use the latest org.springframework.security
-    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
-    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.6.1'
-    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.6.1'
-    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.6.1'
+    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.6'
+    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.6.6'
+    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.6.6'
+    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.6.6'
 
     compile group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.9.13'
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
@@ -284,7 +284,7 @@ dependencies {
     compile 'org.jooq:jool-java-8:0.9.14'
     compile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.0'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.3'
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.2-Categories'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
@@ -293,7 +293,7 @@ dependencies {
     contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
     contractTestCompile group: 'io.vavr', name: 'vavr', version: '0.10.4'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.1'
-    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
+    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.5.14'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: '5.6.1'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: '5.6.1'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: '5.6.1'
@@ -601,7 +601,7 @@ jsonSchema2Pojo {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java,**/CaseDetailsEndpoint.java,**/MidEventCallback.java,**/UIDefinitionRepository.java,**/CachedUIDefinitionGateway.java,**/CaseAccessEndpoint.java,**/UICaseSearchController.java,**/CaseSearchResultViewGenerator.java,**/CaseTypeService.java,**/DefaultCaseDefinitionRepository.java,**/JestSearchResult.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"

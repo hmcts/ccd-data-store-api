@@ -1,0 +1,30 @@
+{
+  "_guid_": "F-1015_CreateCasePreRequisiteCaseworker",
+  "_extends_": "F-1015_CreateCasePreRequisiteCaseworker_noTTL",
+
+  "request": {
+    "body": {
+      "data": {
+        "_extends_": "TTL_Case_Data"
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "_extends_": "TTL_Case_Data"
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications"
+      },
+      "security_classifications": {
+        "_extends_": "TTL_Classifications"
+      }
+    }
+  }
+}
+

@@ -60,7 +60,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
                 return (Boolean) expressionScript.execute(new MapContext(data));
             }
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+            LOG.info(e.getMessage(), e);
         }
         return false;
     }

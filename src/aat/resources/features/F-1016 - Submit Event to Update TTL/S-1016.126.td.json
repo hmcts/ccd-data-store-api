@@ -1,0 +1,46 @@
+{
+  "_guid_": "S-1016.126",
+  "_extends_": "SubmitEvent_v2Ext__Base",
+
+  "title": "Trigger a submit event callback that changes TTL set to null. Submit event is invoked on v2_external#/case-controller/createEventUsingPOST",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1016_UpdateCase_TTLCaseType_updateWithSubmitTTLNull_PreRequisiteCaseworker_TokenCreation"
+  } ],
+
+  "specs": [
+    "a caseworker with an active profile in CCD",
+
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker",
+    "contains an event token for the case just created above",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger a submit event callback that responds with TTL set to null",
+
+    "contains the error message indicating unauthorised change to the TTL values"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "TextField": "Updated submit-event"
+      },
+      "event": {
+        "id": "updateWithSubmitTTLNull"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

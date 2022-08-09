@@ -11,14 +11,17 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CreateCaseEventDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
+import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
@@ -53,6 +56,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private final CaseDetailsJsonParser caseDetailsJsonParser;
     private final GetCaseOperation authGetCaseOperation;
     private final CaseService caseService;
+    private final EventTriggerService eventTriggerService;
+    private final TimeToLiveService timeToLiveService;
 
     public AuthorisedCreateEventOperation(@Qualifier("classified") final CreateEventOperation createEventOperation,
                                           @Qualifier("default") final GetCaseOperation getCaseOperation,
@@ -63,7 +68,9 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                           CaseAccessCategoriesService caseAccessCategoriesService,
                                           CaseDetailsJsonParser caseDetailsJsonParser,
                                           @Qualifier("authorised") final GetCaseOperation authGetCaseOperation,
-                                          CaseService caseService) {
+                                          CaseService caseService,
+                                          final EventTriggerService eventTriggerService,
+                                          final TimeToLiveService timeToLiveService) {
 
         this.createEventOperation = createEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -74,6 +81,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         this.caseDetailsJsonParser = caseDetailsJsonParser;
         this.authGetCaseOperation = authGetCaseOperation;
         this.caseService = caseService;
+        this.eventTriggerService = eventTriggerService;
+        this.timeToLiveService = timeToLiveService;
     }
 
     @Override
@@ -93,6 +102,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
+
+        updateCaseDetailsWithTtlIncrement(existingCaseDetails, caseTypeDefinition, content.getEvent());
 
         verifyCaseAccessCategories(accessProfiles, existingCaseDetails);
         verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails,
@@ -260,6 +271,31 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             caseTypeDefinition.getCaseFieldDefinitions(),
             accessProfiles)) {
             throw new ResourceNotFoundException(NO_FIELD_FOUND);
+        }
+    }
+
+    private void updateCaseDetailsWithTtlIncrement(CaseDetails caseDetails,
+                                                   CaseTypeDefinition caseTypeDefinition,
+                                                   Event event) {
+
+        String eventId = event != null ? event.getEventId() : null;
+
+        if (timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition)) {
+            CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
+            if (caseEventDefinition != null) {
+
+                // update TTL in data
+                var caseDataWithTtl = timeToLiveService.updateCaseDetailsWithTTL(
+                    caseDetails.getData(), caseEventDefinition, caseTypeDefinition
+                );
+                caseDetails.setData(caseDataWithTtl);
+                // update TTL in data classification
+                var caseDataClassificationWithTtl = timeToLiveService.updateCaseDataClassificationWithTTL(
+                    caseDetails.getData(), caseDetails.getDataClassification(), caseEventDefinition, caseTypeDefinition
+                );
+                caseDetails.setDataClassification(caseDataClassificationWithTtl);
+
+            } // NB: not throwing exception for missing event ID as there are other checks elsewhere for that.
         }
     }
 

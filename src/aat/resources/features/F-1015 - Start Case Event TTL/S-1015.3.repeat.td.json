@@ -1,0 +1,29 @@
+{
+  "_guid_": "S-1015.3.repeat",
+  "_extends_": "S-1015.3",
+
+  "specs": [
+    "is a repeat of S-1015.3 but with no TTL in create case call"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker_noTTL][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "id": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker_noTTL][testData][actualResponse][body][id]}",
+        "case_data": {
+          "TTL" : {
+            "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+            "OverrideTTL" : null,
+            "Suspended" : "No"
+          }
+        }
+      }
+    }
+  }
+}
