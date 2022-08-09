@@ -1,0 +1,7 @@
+{
+  "_guid_": "S-069.1",
+  "_extends_": "F-069_Test_Data_Base",
+  "specs": [
+    "contains the event that matches the data from the Callback"
+  ]
+}
