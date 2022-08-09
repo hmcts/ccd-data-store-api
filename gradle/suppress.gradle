@@ -1,29 +1,40 @@
+import groovy.util.slurpersupport.GPathResult
 import groovy.xml.XmlUtil
 
-def suppressCves(reportPath, suppressionsPath) {
-    def report = new XmlSlurper().parse(new FileReader(reportPath))
-    def vulns = report.'**'.findAll { node -> node.name() == 'vulnerability' }.collect { it.name.text() } as Set<String>
+def suppressCves(reportName) {
+    reportName  = reportName == null || reportName as String == "" ? "dependency-check-report.xml" : reportName as String
 
-    if (vulns) {
-        def file = file(suppressionsPath)
-        def suppressions = new XmlSlurper(false, false).parse(file)
-
-        vulns.each {
-            def cveName = it
-            suppressions.appendNode {
-                suppress {
-                    notes('Ticket TBC')
-                    cve(cveName)
-                }
-            }
-        }
-
-        file.write(XmlUtil.serialize(suppressions))
+    def reportFile = new File(project.file(dependencyCheck.getOutputDirectory()), reportName)
+    if (!reportFile.isFile()) {
+        throw new FileNotFoundException("Report file not found.\n" +
+                "\nPossible Solution: run :dependencyCheckAnalyze")
     }
+
+    GPathResult report = new XmlSlurper().parse(new FileReader(reportFile))
+    Set<String> unSuppressedCves = report.'**'
+                                    .findAll { node -> node.name() == 'vulnerability' }
+                                    .collect { it.name.text() } as Set<String>
+
+    if (unSuppressedCves.isEmpty()) {
+        throw new GradleException("No new CVE to suppress")
+    }
+
+    File suppressionsFile = project.file(dependencyCheck.getSuppressionFile())
+    GPathResult response = new XmlSlurper(false, false).parse(suppressionsFile)
+
+    unSuppressedCves.each {
+        String cveName = it
+        println(it)
+        (response << {
+            suppress {
+                notes('Ticket TBC')
+                cve(cveName)
+            }
+        })
+    }
+    suppressionsFile.write(XmlUtil.serialize(response))
 }
 
 task suppressCves() {
-    doLast {
-        suppressCves('./build/reports/dependency-check-report.xml', './dependency-check-suppressions.xml')
-    }
+    doLast {suppressCves("")}
 }
