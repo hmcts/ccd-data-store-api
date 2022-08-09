@@ -34,4 +34,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           skip_dirty_check: false
-          commit_message: "Test commit"
+          commit_message: "Auto Suppress CVE"

@@ -15,24 +15,20 @@ def suppressCves(reportName) {
                                     .findAll { node -> node.name() == 'vulnerability' }
                                     .collect { it.name.text() } as Set<String>
 
-    if (unSuppressedCves.isEmpty()) {
-        throw new GradleException("No new CVE to suppress")
+    if (!unSuppressedCves.isEmpty()) {
+        File suppressionsFile = project.file(dependencyCheck.getSuppressionFile())
+        GPathResult response = new XmlSlurper(false, false).parse(suppressionsFile)
+        unSuppressedCves.each {
+            String cveName = it
+            (response << {
+                suppress {
+                    notes('Ticket TBC')
+                    cve(cveName)
+                }
+            })
+        }
+        suppressionsFile.write(XmlUtil.serialize(response))
     }
-
-    File suppressionsFile = project.file(dependencyCheck.getSuppressionFile())
-    GPathResult response = new XmlSlurper(false, false).parse(suppressionsFile)
-
-    unSuppressedCves.each {
-        String cveName = it
-        println(it)
-        (response << {
-            suppress {
-                notes('Ticket TBC')
-                cve(cveName)
-            }
-        })
-    }
-    suppressionsFile.write(XmlUtil.serialize(response))
 }
 
 task suppressCves() {
