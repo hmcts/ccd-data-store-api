@@ -8,12 +8,6 @@
     }
   },
 
-	"request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    }
-	},
-
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "headers": {

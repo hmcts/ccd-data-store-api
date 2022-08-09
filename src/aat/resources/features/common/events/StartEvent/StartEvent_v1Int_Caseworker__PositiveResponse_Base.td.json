@@ -1,0 +1,27 @@
+{
+  "_guid_": "StartEvent_v1Int_Caseworker__PositiveResponse_Base",
+  "_extends_": "StartEvent_v1Int_Caseworker__Base",
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+        "id" : "OVERRIDE",
+        "name": "[[ANYTHING_PRESENT]]",
+        "description": "[[ANYTHING_PRESENT]]",
+
+        "case_id" : "OVERRIDE",
+        "case_fields": [],
+
+        "event_token" : "[[ANY_STRING_NOT_NULLABLE]]",
+        "wizard_pages" : "[[ANYTHING_PRESENT]]",
+        "show_summary" : true,
+        "show_event_notes" : null,
+        "end_button_label" : null,
+        "can_save_draft" : false,
+        "title_display" : null,
+        "access_granted" : "[[ANY_STRING_NOT_NULLABLE]]",
+        "access_process" : "[[ANY_STRING_NOT_NULLABLE]]",
+        "supplementary_data" : null
+    }
+  }
+}
