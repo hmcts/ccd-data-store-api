@@ -193,11 +193,22 @@ public class CaseAssignedUserRolesController {
         return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse(REMOVE_SUCCESS_MESSAGE));
     }
 
+    /**
+     * Get Case-Assigned Users and Roles.
+     *
+     * @deprecated Use {@link CaseAssignedUserRolesController#searchCaseUserRoles(SearchCaseAssignedUserRolesRequest)}
+     *             instead: were query params have been moved into the request payload, to avoid hitting
+     *             `414 URI Too Long` issues, see <a href="https://tools.hmcts.net/jira/browse/CCD-3588">CCD-3588</a>.
+     */
+    @Deprecated(forRemoval = true)
     @GetMapping(
         path = "/case-users"
     )
     @ApiOperation(
-        value = "Get Case-Assigned Users and Roles"
+        value = "Get Case-Assigned Users and Roles",
+        notes = "**Deprecated**: Use <a href='#/case-assigned-user-roles-controller/searchCaseUserRolesUsingPOST'>POST "
+              + "/case-users/search</a> instead: were query params have been moved into the request payload, to avoid "
+              + "hitting *414 URI Too Long* issues."
     )
     @ApiResponses({
         @ApiResponse(
@@ -207,15 +218,10 @@ public class CaseAssignedUserRolesController {
         ),
         @ApiResponse(
             code = 400,
-            message = V2.Error.CASE_ID_INVALID
-        ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.EMPTY_CASE_ID_LIST
-        ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.USER_ID_INVALID
+            message = "One or more of the following reasons:\n"
+                + "1. " + V2.Error.CASE_ID_INVALID + ", \n"
+                + "2. " + V2.Error.EMPTY_CASE_ID_LIST + ", \n"
+                + "3. " + V2.Error.USER_ID_INVALID + "."
         ),
         @ApiResponse(
             code = 403,
@@ -229,7 +235,6 @@ public class CaseAssignedUserRolesController {
         targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
             + ".buildOptionalIds(#optionalUserIds)"
     )
-    @Deprecated(forRemoval = true)
     public ResponseEntity<CaseAssignedUserRolesResource> getCaseUserRoles(@RequestParam("case_ids")
                                                                               List<String> caseIds,
                                                                           @RequestParam(value = "user_ids",
@@ -258,15 +263,10 @@ public class CaseAssignedUserRolesController {
         ),
         @ApiResponse(
             code = 400,
-            message = V2.Error.CASE_ID_INVALID
-        ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.EMPTY_CASE_ID_LIST
-        ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.USER_ID_INVALID
+            message = "One or more of the following reasons:\n"
+                + "1. " + V2.Error.CASE_ID_INVALID + ", \n"
+                + "2. " + V2.Error.EMPTY_CASE_ID_LIST + ", \n"
+                + "3. " + V2.Error.USER_ID_INVALID + "."
         ),
         @ApiResponse(
             code = 403,
