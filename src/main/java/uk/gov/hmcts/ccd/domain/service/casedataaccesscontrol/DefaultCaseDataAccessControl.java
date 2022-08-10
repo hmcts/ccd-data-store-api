@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -33,6 +35,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.DownstreamIssueException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -123,8 +126,12 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
 
-        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
-            caseTypeDefinition, false));
+        List<AccessProfile> filteredAccessProfiles = filteredAccessProfiles(
+            filteredRoleAssignments.getFilteredMatchingRoleAssignments(), caseTypeDefinition, false);
+
+        String caseAccessCategory = getCaseAccessCategoryFromCaseData(caseDetails);
+
+        return filterAccessProfilesByCaseAccessCategory(filteredAccessProfiles, caseAccessCategory);
     }
 
     @Override
@@ -143,11 +150,33 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         FilteredRoleAssignments filteredRoleAssignments =
             roleAssignmentsFilteringService.filter(roleAssignments, caseDetails.get());
 
-
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.get().getCaseTypeId());
 
-        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
-            caseTypeDefinition, false));
+        List<AccessProfile> filteredAccessProfiles = filteredAccessProfiles(
+            filteredRoleAssignments.getFilteredMatchingRoleAssignments(), caseTypeDefinition, false);
+
+        final String caseAccessCategory = getCaseAccessCategoryFromCaseData(caseDetails.get());
+
+        return filterAccessProfilesByCaseAccessCategory(filteredAccessProfiles, caseAccessCategory);
+    }
+
+    private Set<AccessProfile> filterAccessProfilesByCaseAccessCategory(List<AccessProfile> filteredAccessProfiles,
+                                                                        final String caseAccessCategory) {
+        return filteredAccessProfiles.stream()
+            .filter(fap -> fap.getCaseAccessCategories() == null
+                || (!Strings.isEmpty(caseAccessCategory)
+                && Arrays.stream(fap.getCaseAccessCategories().split(","))
+                .map(String::trim)
+                .anyMatch(s -> s.startsWith(caseAccessCategory))))
+            .collect(Collectors.toSet());
+    }
+
+    private String getCaseAccessCategoryFromCaseData(CaseDetails caseDetails) {
+        JsonNode caseAccessCategory = null;
+        if (caseDetails.getData() != null) {
+            caseAccessCategory = caseDetails.getData().get("CaseAccessCategory");
+        }
+        return caseAccessCategory != null ? caseAccessCategory.asText().trim() : "";
     }
 
     @Override
