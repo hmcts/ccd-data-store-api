@@ -1,0 +1,17 @@
+{
+  "_guid_": "CaseUserRoles_Search__PositiveResponse_Base",
+  "_extends_": "CaseUserRoles_Search__Base",
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+  
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "case_users": []
+    }
+  }
+}

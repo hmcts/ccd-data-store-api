@@ -1,5 +1,5 @@
-@F-143
-Feature: F-143: Search Case-Assigned Users and Roles
+@F-103.1
+Feature: F-103.1: Search Case-Assigned Users and Roles
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
@@ -12,9 +12,11 @@ Feature: F-143: Search Case-Assigned Users and Roles
     And a user [Dil - with an active profile],
     And a user [Jamal - who is a privileged user with permissions to access the case assignments of other users],
     And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C1],
+
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with the Case ID of C1 & Dil's User ID],
     And it is submitted to call the [Search Case-Assigned Users and Roles] operation of [CCD Data Store api],
+
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil, as per above],
     And the response has all other details as expected.
@@ -27,9 +29,11 @@ Feature: F-143: Search Case-Assigned Users and Roles
     And a user [Dil - with an active profile],
     And a user [Jamal - who is a privileged user with permissions to access the case assignments of other users],
     And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C1],
+
     When a request is prepared with appropriate values,
     And the request [is made by Dil with the Case ID of C1 & Dil's own User ID],
     And it is submitted to call the [Search Case-Assigned Users and Roles] operation of [CCD Data Store api],
+
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil, as per above],
     And the response has all other details as expected.
@@ -44,9 +48,11 @@ Feature: F-143: Search Case-Assigned Users and Roles
     And a user [Jamal - who is a privileged user with permissions to access the case assignments of other users],
     And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C1],
     And a successful call [by Jamal to assign Steve a few case roles to access C1] as in [F-103_Jamal_Assign_Steve_Case_Role_To_C1],
+
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with the Case ID of C1 & no User ID],
     And it is submitted to call the [Search Case-Assigned Users and Roles] operation of [CCD Data Store api],
+
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil & Steve, as per above],
     And the response has all other details as expected.
@@ -67,9 +73,11 @@ Feature: F-143: Search Case-Assigned Users and Roles
     And a successful call [by Jamal to assign Steve a few case roles to access C1] as in [F-103_Jamal_Assign_Steve_Case_Role_To_C1],
     And a successful call [by Jamal to assign Steve a few case roles to access C2] as in [F-103_Jamal_Assign_Steve_Case_Role_To_C2],
     And a successful call [by Jamal to assign Steve a few case roles to access C3] as in [F-103_Jamal_Assign_Steve_Case_Role_To_C3],
+
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with Case IDs of C1, C2 & C3 & no User ID],
     And it is submitted to call the [Search Case-Assigned Users and Roles] operation of [CCD Data Store api],
+
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil & Steve for C1, C2 & C3, as per above],
     And the response has all other details as expected.
@@ -79,9 +87,11 @@ Feature: F-143: Search Case-Assigned Users and Roles
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - with a valid User ID],
     And a user [Jamal - who is a privileged user with permissions to access the case assignments of other users],
+
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with no Case ID & Dil's User ID],
     And it is submitted to call the [Search Case-Assigned Users and Roles] operation of [CCD Data Store api],
+
     Then a negative response is received,
     And the response has all other details as expected.
 
@@ -91,9 +101,11 @@ Feature: F-143: Search Case-Assigned Users and Roles
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - with a valid User ID],
     And a user [Jamal - who is a privileged user with permissions to access the case assignments of other users],
+
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with a malformed Case ID & Dil's User ID],
     And it is submitted to call the [Search Case-Assigned Users and Roles] operation of [CCD Data Store api],
+
     Then a negative response is received,
     And the response has all other details as expected.
 
@@ -103,9 +115,11 @@ Feature: F-143: Search Case-Assigned Users and Roles
     And a user [Richard - who can create a case],
     And a user [Jamal - who is a privileged user with permissions to access the case assignments of other users],
     And a case [C1, which has just been] created as in [F103_Case_Data_Create_C1],
+
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with the Case ID of C1 & a malformed User ID list],
     And it is submitted to call the [Search Case-Assigned Users and Roles] operation of [CCD Data Store api],
+
     Then a negative response is received,
     And the response has all other details as expected.
 
@@ -116,9 +130,10 @@ Feature: F-143: Search Case-Assigned Users and Roles
     And a case [C1, which has just been] created as in [F103_Case_Data_Create_C1],
     And a user [Dil - with an active profile],
     And a user [Steve - who is not a privileged user and does not have permissions to access the case assignments of other users],
+
     When a request is prepared with appropriate values,
     And the request [is made by Steve with the Case ID of C1 & Dil's User ID],
     And it is submitted to call the [Search Case-Assigned Users and Roles] operation of [CCD Data Store api],
+
     Then a negative response is received,
     And the response has all other details as expected.
-
