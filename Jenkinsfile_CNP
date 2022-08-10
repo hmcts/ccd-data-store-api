@@ -134,7 +134,7 @@ withPipeline(type, product, component) {
         env.ELASTIC_SEARCH_FTA_ENABLED = "true"
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
-        env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+        env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${definitionStoreDevelopPr}-java".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
 
