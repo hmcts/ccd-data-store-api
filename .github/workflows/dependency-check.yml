@@ -1,6 +1,17 @@
 name: Suppressions
 
-on: [pull_request, workflow_dispatch]
+on:
+  schedule:
+    - cron: "35 8-16/3 * * 1-5" # 35 minute past every 3rd hour from 8am to 4pm
+#    - cron: "30 18-24 * * *" # out of hours
+#    - cron: "* * * * 0,6" # on weekends
+#  push:
+#    branches:
+#      - master
+    branches:
+      - master
+      - develop
+      - danlysiak-patch-1
 
 jobs:
   build:
