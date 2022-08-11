@@ -160,14 +160,14 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         return filterAccessProfilesByCaseAccessCategory(filteredAccessProfiles, caseAccessCategory);
     }
 
-    private Set<AccessProfile> filterAccessProfilesByCaseAccessCategory(List<AccessProfile> filteredAccessProfiles,
+    private Set<AccessProfile> filterAccessProfilesByCaseAccessCategory(List<AccessProfile> accessProfiles,
                                                                         final String caseAccessCategory) {
-        return filteredAccessProfiles.stream()
+        return accessProfiles.stream()
             .filter(fap -> fap.getCaseAccessCategories() == null
                 || (!Strings.isEmpty(caseAccessCategory)
                 && Arrays.stream(fap.getCaseAccessCategories().split(","))
                 .map(String::trim)
-                .anyMatch(s -> s.startsWith(caseAccessCategory))))
+                .anyMatch(caseAccessCategory::startsWith)))
             .collect(Collectors.toSet());
     }
 
