@@ -2,16 +2,18 @@ name: Suppressions
 
 on:
   schedule:
-    - cron: "35 8-16/3 * * 1-5" # 35 minute past every 3rd hour from 8am to 4pm
+#    - cron: "35 8-16/3 * * 1-5" # 35 minute past every 3rd hour from 8am to 4pm
 #    - cron: "30 18-24 * * *" # out of hours
 #    - cron: "* * * * 0,6" # on weekends
+    - cron: "0 */1 * * 1-5" # every hour on weekdays
 #  push:
 #    branches:
 #      - master
     branches:
+      - danlysiak-patch-1
       - master
       - develop
-      - danlysiak-patch-1
+
 
 jobs:
   build:
