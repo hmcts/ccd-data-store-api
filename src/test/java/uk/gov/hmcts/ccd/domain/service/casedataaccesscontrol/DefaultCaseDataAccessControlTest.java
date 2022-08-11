@@ -413,6 +413,45 @@ class DefaultCaseDataAccessControlTest {
     }
 
     @Test
+    void shouldGenerateAccessProfilesByCaseAccessCategory_EmtptyCaseAccessCategoryField()
+        throws JsonProcessingException {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+        caseDetails.setData(generateCaseData(""));
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+
+        doReturn(dummyAccessProfiles).when(accessProfileService).generateAccessProfiles(anyList(), anyList());
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseDetails(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(1, accessProfiles.size());
+        Assertions.assertTrue(accessProfiles.stream().noneMatch(a -> a.getCaseAccessCategories() != null));
+
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+        verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
     void shouldGenerateAccessProfilesByCaseReference() {
 
         doReturn(USER_ID).when(securityUtils).getUserId();
