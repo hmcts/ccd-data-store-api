@@ -47,6 +47,5 @@
 		<cve>CVE-2021-22044</cve>
 		<cve>CVE-2022-31197</cve>
 	  </suppress>
-	<!--End of temporary suppression section -->
 
 </suppressions>
