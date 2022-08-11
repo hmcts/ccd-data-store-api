@@ -177,7 +177,7 @@ dependencies {
     compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     compile group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
     compile group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
-    compile "org.bouncycastle:bcprov-jdk15on:1.61", "org.bouncycastle:bcpkix-jdk15on:1.61"
+    compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
 
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.6'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.5.14'
