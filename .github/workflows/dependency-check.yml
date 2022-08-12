@@ -39,5 +39,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           skip_dirty_check: false
-          commit_message: "Suppress CVE"
+          commit_message: "Suppress CVEs"
           branch: 'develop'

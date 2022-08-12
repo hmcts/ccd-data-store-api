@@ -10,9 +10,9 @@ import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathExpression
 import javax.xml.xpath.XPathFactory
 
-def suppressCves(reportName) {
+void suppressCves(reportName) {
     reportName  = reportName == null || reportName as String == "" ? "dependency-check-report.xml" : reportName as String
-
+    logger.info("running task")
     def reportFile = new File(project.file(dependencyCheck.getOutputDirectory()), reportName)
     if (!reportFile.isFile()) {
         throw new FileNotFoundException("Report file not found.\n" +
@@ -23,17 +23,20 @@ def suppressCves(reportName) {
     Set<String> unSuppressedCves = report.'**'
                                     .findAll { node -> node.name() == 'vulnerability' }
                                     .collect { it.name.text() } as Set<String>
-
     if (!unSuppressedCves.isEmpty()) {
+        logger.info("Looping through unSuppressedCves")
         File suppressionsFile = project.file(dependencyCheck.getSuppressionFile())
         String suppressionXml = readFile(suppressionsFile)
         Element suppressionsDoc = DOMBuilder.parse(new StringReader(suppressionXml)).getDocumentElement()
-        addNewSuppression(unSuppressedCves, suppressionsDoc)
+        addNewSuppressions(unSuppressedCves, suppressionsDoc)
+        logger.info("formatXml .. ")
         suppressionsFile.write(XmlUtil.serialize(formatXml(suppressionsDoc)))
     }
 }
-static def addNewSuppression(unSuppressedCves, suppressions) {
+
+static void addNewSuppressions(unSuppressedCves, suppressions) {
     unSuppressedCves.each {
+        logger.info("addNewSuppressions .. ")
         String cveName = it
         Document document = suppressions.getOwnerDocument()
         Element notesTag = document.createElement("notes")
@@ -47,11 +50,13 @@ static def addNewSuppression(unSuppressedCves, suppressions) {
         suppressions.appendChild(suppressTag)
     }
 }
-static def readFile(File file) {
+
+static String readFile(File file) {
     return new String(new FileInputStream(file.path).readAllBytes(), "UTF-8")
 }
 
 static def formatXml(Element suppressions) {
+    // Strip out all whitespace.
     XPathExpression xpathExp = XPathFactory.newInstance().newXPath().compile(
             "//text()[normalize-space(.) = '']")
 
@@ -66,5 +71,7 @@ static def formatXml(Element suppressions) {
 }
 
 task suppressCves() {
-    doLast {suppressCves("")}
+    doLast {
+        logger.lifecycle("Starting Task :suppressCves ...")
+        suppressCves("")}
 }
