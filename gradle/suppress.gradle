@@ -12,7 +12,6 @@ import javax.xml.xpath.XPathFactory
 
 void suppressCves(reportName) {
     reportName  = reportName == null || reportName as String == "" ? "dependency-check-report.xml" : reportName as String
-    logger.info("running task")
     def reportFile = new File(project.file(dependencyCheck.getOutputDirectory()), reportName)
     if (!reportFile.isFile()) {
         throw new FileNotFoundException("Report file not found.\n" +
@@ -24,19 +23,16 @@ void suppressCves(reportName) {
                                     .findAll { node -> node.name() == 'vulnerability' }
                                     .collect { it.name.text() } as Set<String>
     if (!unSuppressedCves.isEmpty()) {
-        logger.info("Looping through unSuppressedCves")
         File suppressionsFile = project.file(dependencyCheck.getSuppressionFile())
         String suppressionXml = readFile(suppressionsFile)
         Element suppressionsDoc = DOMBuilder.parse(new StringReader(suppressionXml)).getDocumentElement()
         addNewSuppressions(unSuppressedCves, suppressionsDoc)
-        logger.info("formatXml .. ")
         suppressionsFile.write(XmlUtil.serialize(formatXml(suppressionsDoc)))
     }
 }
 
 static void addNewSuppressions(unSuppressedCves, suppressions) {
     unSuppressedCves.each {
-        logger.info("addNewSuppressions .. ")
         String cveName = it
         Document document = suppressions.getOwnerDocument()
         Element notesTag = document.createElement("notes")
@@ -71,7 +67,5 @@ static def formatXml(Element suppressions) {
 }
 
 task suppressCves() {
-    doLast {
-        logger.lifecycle("Starting Task :suppressCves ...")
-        suppressCves("")}
+    doLast {suppressCves("")}
 }
