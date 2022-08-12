@@ -2,7 +2,7 @@ name: Suppressions
 
 on:
   schedule:
-    - cron: "05 8-16/3 * * 1-5" # On the 5th minute, every 3 hours, from 8am to 4pm
+    - cron: "05 6-18/3 * * 1-5" # On the 5th minute, every 3 hours, from 6am to 6pm
   workflow_dispatch:
 
 jobs:
@@ -40,4 +40,4 @@ jobs:
         with:
           skip_dirty_check: false
           commit_message: "Suppress CVEs"
-          branch: 'develop'
+          branch: 'master'
