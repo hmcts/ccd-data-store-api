@@ -22,12 +22,13 @@ void suppressCves(reportName) {
     Set<String> unSuppressedCves = report.'**'
                                     .findAll { node -> node.name() == 'vulnerability' }
                                     .collect { it.name.text() } as Set<String>
+
     if (!unSuppressedCves.isEmpty()) {
         File suppressionsFile = project.file(dependencyCheck.getSuppressionFile())
-        String suppressionXml = readFile(suppressionsFile)
+        def suppressionXml = new String(suppressionsFile.readBytes(), "UTF-8")
         Element suppressionsDoc = DOMBuilder.parse(new StringReader(suppressionXml)).getDocumentElement()
         addNewSuppressions(unSuppressedCves, suppressionsDoc)
-        suppressionsFile.write(XmlUtil.serialize(formatXml(suppressionsDoc)))
+        suppressionsFile.write(XmlUtil.serialize(cleanXml(suppressionsDoc)))
     }
 }
 
@@ -35,24 +36,15 @@ static void addNewSuppressions(unSuppressedCves, suppressions) {
     unSuppressedCves.each {
         String cveName = it
         Document document = suppressions.getOwnerDocument()
-        Element notesTag = document.createElement("notes")
-        notesTag.appendChild(document.createTextNode("Ticket TBC"))
-        Element cveTag = document.createElement("cve")
-        cveTag.appendChild(document.createTextNode(cveName))
-
         Element suppressTag = document.createElement("suppress")
-        suppressTag.appendChild(notesTag)
-        suppressTag.appendChild(cveTag)
+        suppressTag.appendChild(document.createElement("notes")).appendChild(document.createTextNode("Ticket TBC"))
+        suppressTag.appendChild(document.createElement("cve")).appendChild(document.createTextNode(cveName))
         suppressions.appendChild(suppressTag)
     }
 }
 
-static String readFile(File file) {
-    return new String(new FileInputStream(file.path).readAllBytes(), "UTF-8")
-}
-
-static def formatXml(Element suppressions) {
-    // Strip out all whitespace.
+static def cleanXml(Element suppressions) {
+    // Strip out all empty nodes
     XPathExpression xpathExp = XPathFactory.newInstance().newXPath().compile(
             "//text()[normalize-space(.) = '']")
 
