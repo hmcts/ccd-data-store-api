@@ -1,0 +1,50 @@
+{
+  "_guid_": "S-1016.1",
+  "_extends_": "F-1016_Test_Data_Base",
+
+  "title": "TTL.Suspended changed to \"No\", SystemTTL and OverrideTTL less than Guard value using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1016_GetUpdateSuspendedCaseTokenCaseworker"
+  }
+  ],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCaseworker",
+    "contains an event token for the case just created above",
+    "has TTL.Suspended value changed to No from Yes",
+    "has TTL.SystemTTL set to less than today + TTL Guard",
+    "has TTL.OverrideTTL set to less than today + TTL Guard"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1016_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    },
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "body": {
+      "data": {
+        "TTL": {
+          "Suspended": "No",
+          "SystemTTL": "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}"
+        }
+      },
+      "event": {
+        "id": "updateCaseSubmitTTL",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "422_TTL_Guard"
+  }
+}

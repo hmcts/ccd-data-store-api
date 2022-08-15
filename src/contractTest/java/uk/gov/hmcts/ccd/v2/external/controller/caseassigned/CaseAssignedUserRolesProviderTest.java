@@ -23,6 +23,11 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController;
 import uk.gov.hmcts.ccd.v2.external.controller.TestIdamConfiguration;
 
+import java.util.Arrays;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 @Provider("ccdDataStoreAPI_caseAssignedUserRoles")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
@@ -48,7 +53,7 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
         if (context != null) {
-            // context.verifyInteraction();
+            context.verifyInteraction();
         }
     }
 
@@ -65,7 +70,7 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
 
     @State("A User Role exists for a Case")
     public void setUpUserRoleExists() {
-        //when(securityUtils.getServiceNameFromS2SToken(anyString())).thenReturn("serviceName");
-        //when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(Arrays.asList("serviceName"));
+        when(securityUtils.getServiceNameFromS2SToken(anyString())).thenReturn("serviceName");
+        when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(Arrays.asList("serviceName"));
     }
 }

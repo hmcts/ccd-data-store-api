@@ -1,0 +1,38 @@
+{
+  "_guid_": "F-1016_GetCaseDetails_Citizen",
+  "_extends_": "GetCaseDetails__PositiveResponse_Base",
+
+  "specs": [
+    "to verify that the TTL.Suspended value has not changed in the database"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1016_CreateSuspendedCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_MasterCaseType",
+
+      "data": {
+        "TTL": {
+          "Suspended" : "Yes",
+          "OverrideTTL" : "2010-04-30",
+          "SystemTTL" : "2010-04-30"
+        }
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications"
+      }
+    }
+  }
+}

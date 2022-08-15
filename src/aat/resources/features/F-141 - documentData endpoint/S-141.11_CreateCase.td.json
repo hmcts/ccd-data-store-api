@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-141.11_CreateCase",
+  "_extends_": "F-141_CreateCase",
+
+  "request": {
+    "body": {
+      "data": {
+        "Document3": {
+          "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "category_id": "CategoryID2"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "data" : {
+        "Document3" : {
+          "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "category_id": "CategoryID2"
+        }
+      }
+    }
+  }
+}

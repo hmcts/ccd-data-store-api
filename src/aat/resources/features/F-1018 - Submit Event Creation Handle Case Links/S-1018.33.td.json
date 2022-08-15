@@ -1,0 +1,55 @@
+{
+  "_guid_": "S-1018.33",
+  "_extends_": "F-1018_Test_Data_Base_V2",
+
+  "title": "CaseLink in database exists but CaseLink field in the Request contains blank/null value and Submit Event Creation is invoked on v2_external#/case-controller/createEventUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured CaseLink field with Case Reference created in F-1018_CreateLinkedCasePreRequisiteCaseworkerBase",
+    "does not specify a case to be updated"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": null
+        },
+        "TextField" : "S-1018.33"
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetLinkedCaseUpdateEventToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id": "${}${[scenarioContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+      "data" : {
+        "CaseLinkField": {
+          "CaseReference": null
+        },
+        "TextField" : "S-1018.33"
+      },
+      "data_classification" : {
+        "TextField" : "PUBLIC",
+        "CaseLinkField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseReference" : "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}

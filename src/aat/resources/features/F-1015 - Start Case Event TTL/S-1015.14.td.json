@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-1015.14",
+  "_extends_": "StartEvent_v2Int__Base",
+
+  "title": "must error when updating a case where about to start callback has modified TTL.OverrideTTL using V2 'internal/cases/{cid}/event-triggers/{etid}'",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger an About to Start callback that changes TTL.OverrideTTL",
+    "contains the error message indicating unauthorised change to the TTL values"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateModifiedOverrideTTL"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

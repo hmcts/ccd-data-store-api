@@ -1,0 +1,80 @@
+{
+  "title":"Categories defined, top-level document and document within complex types exist and User has case access BUT not to the Document permissions",
+  "_guid_": "S-140.4",
+	"_extends_": "F-140_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD and doesn't have read access permissions for most of the the Document fields",
+		"a case definition with category structure exists for the case type CT1",
+    "a case definition with Document fields in CaseField tab and ComplexTab exist with a category Id for case type CT1",
+    "a case containing the above document fields *but without* the category_id in the Document type sub-field exists",
+    "contains the given case reference C1 in the input",
+    "contains a HTTP 200 status code",
+    "contains the category hierarchy with only Document2"
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+	"request": {
+		"_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-140_CreateCase_hierarchyComplex][testData][actualResponse][body][id]}"
+    }
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "case_version": "[[ANYTHING_PRESENT]]",
+      "categories": [
+        {
+          "category_id": "CategoryID1",
+          "category_name": "Evidences",
+          "category_order": 100,
+          "documents": [],
+          "sub_categories": []
+        },
+        {
+          "category_id" : "CategoryID2",
+          "category_name" : "Supporting",
+          "category_order" : 110,
+          "documents" : [ {
+            "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+            "document_filename": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+            "document_binary_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+            "attribute_path": "Document2",
+            "upload_timestamp": "[[ANY_NULLABLE]]"
+          } ],
+          "sub_categories": []
+        },
+        {
+          "category_id": "CategoryID3",
+          "category_name": "Party Documents",
+          "category_order": 120,
+          "documents": [],
+          "sub_categories": [
+            {
+              "category_id": "SubCategoryID1",
+              "category_name": "Proof Documents",
+              "category_order": 100,
+              "documents": [],
+              "sub_categories": []
+            }
+          ]
+        }
+      ],
+      "uncategorised_documents": []
+    }
+	}
+}
+

@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-1018_VerifyRemovedCitizenCaseLinks",
+  "_extends_": "F-1018_VerifyBlankCitizenCaseLinks",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1018_CreateLinkedCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+    }
+  }
+}

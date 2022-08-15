@@ -1,0 +1,61 @@
+{
+  "_guid_": "S-1018.18",
+  "_extends_": "F-1018_Test_Data_Base_Negative",
+
+  "title": "CaseLink in database exists but CaseLink field in the Request is a collection and contains blank/null value, some invalid case data is submitted and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured CaseLink field as a collection",
+    "specifying the case to be updated, as created in F-1018_CreateAnotherCasePreRequisiteCaseworkerBase, has a different CaseLink field in CaseCollection"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "CaseLinkCollection" : [
+          {
+            "id": "90a2df83-f256-43ec-aaa0-48e127a44402",
+            "value": {
+              "CaseReference": ""
+            }
+          },
+          {
+            "id": "84e22baf-5bec-4eec-a31f-7a3954efc9c3",
+            "value": {
+              "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+            }
+          }],
+        "TextField" : 1
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetMultipleLinkedCaseUpdateEventToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "message" : "Case data validation failed",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : {
+        "field_errors" : [ {
+          "id" : "TextField",
+          "message" : "number is not a string"
+        } ]
+      },
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

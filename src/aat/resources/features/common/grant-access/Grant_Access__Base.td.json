@@ -1,0 +1,24 @@
+{
+  "_guid_": "Grant_Access__Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "Grant access to case",
+
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
+
+  "specs": [
+    "to grant access to a case"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+
+      "ctid": "OVERRIDE",
+      "cid": "OVERRIDE"
+    }
+  }
+}

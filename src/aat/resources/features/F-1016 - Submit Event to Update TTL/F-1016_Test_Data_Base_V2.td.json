@@ -1,0 +1,16 @@
+{
+  "_guid_": "F-1016_Test_Data_Base_V2",
+  "_extends_": "SubmitEvent_v2Ext__Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1016_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  }
+}

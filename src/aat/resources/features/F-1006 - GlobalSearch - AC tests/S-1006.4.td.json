@@ -30,7 +30,7 @@
       "resultInfo" : {
         "casesReturned" : 0,
         "caseStartRecord" : 1,
-        "moreResultsToGo" : false
+        "moreResultsToGo" : "[[ANYTHING_PRESENT]]"
       },
       "results" : [ ]
     }

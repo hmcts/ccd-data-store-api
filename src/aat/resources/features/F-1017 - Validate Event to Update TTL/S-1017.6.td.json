@@ -1,0 +1,50 @@
+{
+  "_guid_": "S-1017.6",
+  "_extends_": "MidEvent_v1Ext_Citizen__Base",
+
+  "title": "TTL.OverrideTTL changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST",
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1017_GetUpdateSuspendedCaseTokenCitizen"
+  } ],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created as in F-1017_CreateSuspendedCasePreRequisiteCitizen",
+    "contains an event token for the case just created above",
+    "has the mid event callback change the TTL.OverrideTTL value changed"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+		"pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+		},
+    "queryParams": {
+      "pageId": "updateMidEventModifiedOverrideTTLSingleFormPage"
+    },
+    "body": {
+      "data": {
+        "TTL": {
+          "Suspended": "Yes",
+          "OverrideTTL": "2010-04-30",
+          "SystemTTL": "2010-04-30"
+        }
+      },
+      "event": {
+        "id": "updateMidEventModifiedOverrideTTL"
+      },
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
@@ -44,6 +45,7 @@ public class CallbackInvoker {
     private final CaseSanitiser caseSanitiser;
     private final SecurityValidationService securityValidationService;
     private final GlobalSearchProcessorService globalSearchProcessorService;
+    private final TimeToLiveService timeToLiveService;
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
@@ -51,13 +53,15 @@ public class CallbackInvoker {
                            final CaseDataService caseDataService,
                            final CaseSanitiser caseSanitiser,
                            final SecurityValidationService securityValidationService,
-                           final GlobalSearchProcessorService globalSearchProcessorService) {
+                           final GlobalSearchProcessorService globalSearchProcessorService,
+                           final TimeToLiveService timeToLiveService) {
         this.callbackService = callbackService;
         this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
         this.caseSanitiser = caseSanitiser;
         this.securityValidationService = securityValidationService;
         this.globalSearchProcessorService = globalSearchProcessorService;
+        this.timeToLiveService = timeToLiveService;
     }
 
     public void invokeAboutToStartCallback(final CaseEventDefinition caseEventDefinition,
@@ -251,6 +255,7 @@ public class CallbackInvoker {
                                     final CaseDetails caseDetails,
                                     final Map<String, JsonNode> responseData,
                                     final boolean populateGlobalSearch) {
+        timeToLiveService.verifyTTLContentNotChangedByCallback(caseDetails.getData(), responseData);
         caseTypeService.validateData(responseData, caseTypeDefinition);
 
         Map<String, JsonNode> responseDataToSanitise = responseData;

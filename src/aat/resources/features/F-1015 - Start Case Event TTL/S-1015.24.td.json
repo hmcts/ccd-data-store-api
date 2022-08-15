@@ -1,0 +1,36 @@
+{
+  "_guid_": "S-1015.24",
+  "_extends_": "StartEvent_v1Int_Caseworker__Base",
+
+  "title": "must error when updating a case where about to start callback has modified TTL.SystemTTL using '/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}'",
+
+  "specs": [
+    "to create a token for case creation",
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger an About to Start callback that changes TTL.SystemTTL",
+    "contains the error message indicating unauthorised change to the TTL values"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateModifiedSystemTTL"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

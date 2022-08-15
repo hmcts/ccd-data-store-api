@@ -1,0 +1,11 @@
+{
+	"title": "should create an event token for correct inputs",
+	"_guid_": "F-1018-GetCitizenUpdateEventToken",
+  "_extends_": "F-1018-GetCitizenUpdateEventTokenBase",
+
+	"request": {
+		"pathVariables": {
+			"cid": "${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+		}
+	}
+}

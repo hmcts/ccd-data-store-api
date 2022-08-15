@@ -1,0 +1,50 @@
+{
+  "_guid_": "S-1016.21",
+  "_extends_": "F-1016_Test_Data_Base_Citizen",
+
+  "title": "TTL.Suspended changed to \"No\", SystemTTL and OverrideTTL greater than Guard value using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
+
+  "prerequisites" : [{
+    "Token_Creation": "S-1016_GetUpdateSuspendedCaseTokenCitizen"
+  }],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCitizen",
+    "contains an event token for the case just created above",
+    "has TTL.Suspended value changed to No from Yes",
+    "has TTL.SystemTTL set to greater than today + guard value",
+    "has TTL.OverrideTTL set to greater than today + guard value",
+    "callback About to submit changes TTL.Suspended value"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1016_CreateSuspendedCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
+    },
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "body": {
+      "data": {
+        "TTL": {
+          "Suspended": "Yes",
+          "SystemTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
+        }
+      },
+      "event": {
+        "id": "updateCaseSubmitSuspendedTTL",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

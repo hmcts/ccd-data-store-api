@@ -1,0 +1,128 @@
+{
+  "_guid_": "F-1015_CaseFields_TTL",
+
+  "id" : "TTL",
+  "label" : "TTL Fields",
+  "hidden" : false,
+
+  "value" : {},
+
+  "metadata" : false,
+  "hint_text" : null,
+  "field_type" : {
+    "id" : "TTL",
+    "type" : "Complex",
+    "min" : null,
+    "max" : null,
+    "regular_expression" : null,
+    "fixed_list_items" : [ ],
+    "complex_fields" : [
+      {
+        "__ordering__": "unordered",
+        "__elementId__": "id"
+      }, {
+      "id" : "SystemTTL",
+      "label" : "System TTL",
+      "hidden" : null,
+      "order" : null,
+      "metadata" : false,
+      "case_type_id" : null,
+      "hint_text" : null,
+      "field_type" : {
+        "id" : "Date",
+        "type" : "Date",
+        "min" : null,
+        "max" : null,
+        "regular_expression" : null,
+        "fixed_list_items" : [ ],
+        "complex_fields" : [ ],
+        "collection_field_type" : null
+      },
+      "security_classification" : "PUBLIC",
+      "live_from" : null,
+      "live_until" : null,
+      "show_condition" : null,
+      "acls" : "[[ANYTHING_PRESENT]]",
+      "complexACLs" : [ ],
+      "display_context" : "[[ANY_NULLABLE]]",
+      "display_context_parameter" : null,
+      "retain_hidden_value" : null,
+      "formatted_value" : null,
+      "category_id": "[[ANY_NULLABLE]]"
+    }, {
+      "id" : "OverrideTTL",
+      "label" : "Override TTL",
+      "hidden" : null,
+      "order" : null,
+      "metadata" : false,
+      "case_type_id" : null,
+      "hint_text" : null,
+      "field_type" : {
+        "id" : "Date",
+        "type" : "Date",
+        "min" : null,
+        "max" : null,
+        "regular_expression" : null,
+        "fixed_list_items" : [ ],
+        "complex_fields" : [ ],
+        "collection_field_type" : null
+      },
+      "security_classification" : "PUBLIC",
+      "live_from" : null,
+      "live_until" : null,
+      "show_condition" : null,
+      "acls" : "[[ANYTHING_PRESENT]]",
+      "complexACLs" : [ ],
+      "display_context" : "[[ANY_NULLABLE]]",
+      "display_context_parameter" : null,
+      "retain_hidden_value" : null,
+      "formatted_value" : null,
+      "category_id": "[[ANY_NULLABLE]]"
+    }, {
+      "id" : "Suspended",
+      "label" : "Suspended",
+      "hidden" : null,
+      "order" : null,
+      "metadata" : false,
+      "case_type_id" : null,
+      "hint_text" : null,
+      "field_type" : {
+        "id" : "YesOrNo",
+        "type" : "YesOrNo",
+        "min" : null,
+        "max" : null,
+        "regular_expression" : null,
+        "fixed_list_items" : [ ],
+        "complex_fields" : [ ],
+        "collection_field_type" : null
+      },
+      "security_classification" : "PUBLIC",
+      "live_from" : null,
+      "live_until" : null,
+      "show_condition" : null,
+      "acls" : "[[ANYTHING_PRESENT]]",
+      "complexACLs" : [ ],
+      "display_context" : "[[ANY_NULLABLE]]",
+      "display_context_parameter" : null,
+      "retain_hidden_value" : null,
+      "formatted_value" : null,
+      "category_id": "[[ANY_NULLABLE]]"
+    } ],
+    "collection_field_type" : null
+  },
+  "validation_expr" : null,
+  "security_label" : "PUBLIC",
+  "order" : null,
+
+  "formatted_value" : {},
+
+  "display_context" : "OPTIONAL",
+  "display_context_parameter" : null,
+  "show_condition" : null,
+  "show_summary_change_option" : true,
+  "show_summary_content_option" : null,
+  "retain_hidden_value" : null,
+  "publish" : false,
+  "publish_as" : null,
+  "acls" : "[[ANYTHING_PRESENT]]"
+}

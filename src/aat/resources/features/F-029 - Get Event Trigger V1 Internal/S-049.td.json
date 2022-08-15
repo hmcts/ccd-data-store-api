@@ -311,7 +311,8 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null
+                "formatted_value": null,
+                "category_id" : null
               },
               {
                 "id": "ComplexFixedListField",
@@ -364,7 +365,8 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null
+                "formatted_value": null,
+                "category_id" : null
               },
               {
                 "id": "ComplexNestedField",
@@ -413,7 +415,8 @@
                       "display_context": null,
                       "display_context_parameter": null,
                       "retain_hidden_value": null,
-                      "formatted_value": null
+                      "formatted_value": null,
+                      "category_id" : null
                     },
                     {
                       "id": "NestedCollectionTextField",
@@ -455,7 +458,8 @@
                       "display_context": null,
                       "display_context_parameter": "#COLLECTION(allowInsert,allowUpdate)",
                       "retain_hidden_value": null,
-                      "formatted_value": null
+                      "formatted_value": null,
+                      "category_id" : null
                     }
                   ],
                   "collection_field_type": null
@@ -474,7 +478,8 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null
+                "formatted_value": null,
+                "category_id" : null
               }
             ]
           },

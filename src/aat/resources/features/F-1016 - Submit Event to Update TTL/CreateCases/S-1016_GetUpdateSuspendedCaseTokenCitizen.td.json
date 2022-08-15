@@ -1,0 +1,16 @@
+{
+  "_guid_": "S-1016_GetUpdateSuspendedCaseTokenCitizen",
+  "_extends_": "F-1016_GetEventTokenBase",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1016_CreateSuspendedCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  }
+}

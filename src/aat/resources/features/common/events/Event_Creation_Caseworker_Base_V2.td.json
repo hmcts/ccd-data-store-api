@@ -1,0 +1,17 @@
+{
+  "_guid_": "Event_Creation_Caseworker_Base_V2",
+
+  "productName": "CCD Data Store",
+  "operationName": "Submit event creation as Case worker",
+
+  "method": "POST",
+  "uri": "/cases/{caseId}/events",
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+      "experimental": true
+    }
+  }
+}
