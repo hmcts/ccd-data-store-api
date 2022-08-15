@@ -5,8 +5,8 @@ java:
     DATA_STORE_DB_NAME: data-store
     DATA_STORE_DB_USERNAME: hmcts
     DATA_STORE_DB_PASSWORD: hmcts
-    DEFINITION_STORE_HOST: http://ccd-definition-store-${SERVICE_FQDN}
-    USER_PROFILE_HOST: http://ccd-user-profile-api-${SERVICE_FQDN}
+    DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
+    USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
     # ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-${SERVICE_FQDN} # TODO
   postgresql:
     enabled: false # CCD chart includes an instance we'll re-use
