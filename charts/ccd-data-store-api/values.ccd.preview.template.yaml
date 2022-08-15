@@ -60,11 +60,7 @@ ccd:
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
       image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
       imagePullPolicy: Always
-      keyVaults:
-        ccd:
-          secrets:
-            - name: AppInsightsInstrumentationKey
-              alias: azure.application-insights.instrumentation-key
+      keyVaults: []
         
   am-role-assignment-service:
     java:
