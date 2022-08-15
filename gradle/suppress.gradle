@@ -5,13 +5,12 @@ import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
-
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathExpression
 import javax.xml.xpath.XPathFactory
 
-void suppressCves(reportName) {
-    reportName  = reportName == null || reportName as String == "" ? "dependency-check-report.xml" : reportName as String
+void suppressCves(String reportName='dependency-check-report.xml') {
+    // Default output directory is 'build/reports'
     def reportFile = new File(project.file(dependencyCheck.getOutputDirectory()), reportName)
     if (!reportFile.isFile()) {
         throw new FileNotFoundException("Report file not found.\n" +
@@ -24,40 +23,53 @@ void suppressCves(reportName) {
                                     .collect { it.name.text() } as Set<String>
 
     if (!unSuppressedCves.isEmpty()) {
-        File suppressionsFile = project.file(dependencyCheck.getSuppressionFile())
-        def suppressionXml = new String(suppressionsFile.readBytes(), "UTF-8")
-        Element suppressionsDoc = DOMBuilder.parse(new StringReader(suppressionXml)).getDocumentElement()
-        addNewSuppressions(unSuppressedCves, suppressionsDoc)
-        suppressionsFile.write(XmlUtil.serialize(cleanXml(suppressionsDoc)))
+        // Suppression file must be specified as 'suppressionFile=...' in the build script.
+        File suppressionFile = project.file(dependencyCheck.getSuppressionFile())
+        String suppressionXml = new String(suppressionFile.readBytes(), "UTF-8")
+        Element suppressionDoc = DOMBuilder.parse(new StringReader(suppressionXml)).getDocumentElement()
+        addNewSuppression(unSuppressedCves, suppressionDoc)
+        suppressionFile.write(XmlUtil.serialize(cleanXml(suppressionDoc)))
     }
 }
 
-static void addNewSuppressions(unSuppressedCves, suppressions) {
-    unSuppressedCves.each {
-        String cveName = it
-        Document document = suppressions.getOwnerDocument()
-        Element suppressTag = document.createElement("suppress")
-        suppressTag.appendChild(document.createElement("notes")).appendChild(document.createTextNode("Ticket TBC"))
-        suppressTag.appendChild(document.createElement("cve")).appendChild(document.createTextNode(cveName))
-        suppressions.appendChild(suppressTag)
+static void addNewSuppression(unSuppressedCves, suppressionDoc) {
+    // Find 'Temporary Suppression' in note element and amend text content with new cve
+    XPathExpression xpathExp = XPathFactory.newInstance().newXPath().compile(
+            "//*[local-name()='notes']")
+    def notesNodes =  xpathExp.evaluate(suppressionDoc, XPathConstants.NODESET)
+    for (int i = 0; i < notesNodes.getLength(); i++) {
+        Node noteNode = notesNodes.item(i)
+        if (noteNode.getTextContent().contains('Temporary Suppression')) {
+            unSuppressedCves.each {
+                String whiteSpaceForIndent = "\n" + "\u0020".repeat(8) // white space for indentation
+                Document document = suppressionDoc.getOwnerDocument()
+                noteNode.appendChild(
+                        document.createTextNode(whiteSpaceForIndent + it + " refer [Ticket]"))
+                noteNode.getParentNode()
+                        .appendChild(document.createElement("cve")).appendChild(document.createTextNode(it))
+            }
+        }
     }
 }
 
-static def cleanXml(Element suppressions) {
+static def cleanXml(Element suppression) {
     // Strip out all empty nodes
     XPathExpression xpathExp = XPathFactory.newInstance().newXPath().compile(
             "//text()[normalize-space(.) = '']")
 
-    NodeList emptyTextNodes = xpathExp.evaluate(suppressions, XPathConstants.NODESET) as NodeList
+    NodeList emptyTextNodes = xpathExp.evaluate(suppression, XPathConstants.NODESET) as NodeList
     if (emptyTextNodes.getLength()) {
         for (int i = 0; i < emptyTextNodes.getLength(); i++) {
             Node emptyTextNode = emptyTextNodes.item(i)
             emptyTextNode.getParentNode().removeChild(emptyTextNode)
         }
     }
-    return suppressions
+    return suppression
 }
 
 task suppressCves() {
-    doLast {suppressCves("")}
+    doLast {
+        // Optional argument to specify the name of the report file.
+        // If no argument is specified, the default report file is 'dependency-check-report.xml'
+        suppressCves()}
 }
