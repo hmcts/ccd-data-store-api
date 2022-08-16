@@ -17,13 +17,14 @@ void suppressCves(String reportName='dependency-check-report.xml') {
                 "\nPossible Solution: run :dependencyCheckAnalyze")
     }
 
+    // Grabs the unique set of non-suppressed vulnerabilities
     GPathResult report = new XmlSlurper().parse(new FileReader(reportFile))
     Set<String> unSuppressedCves = report.'**'
                                     .findAll { node -> node.name() == 'vulnerability' }
                                     .collect { it.name.text() } as Set<String>
 
     if (!unSuppressedCves.isEmpty()) {
-        // Suppression file must be specified as 'suppressionFile=...' in the build script.
+        // Suppression file must be specified as 'suppressionFile=...' in build.gradle.
         File suppressionFile = project.file(dependencyCheck.getSuppressionFile())
         String suppressionXml = new String(suppressionFile.readBytes(), "UTF-8")
         Element suppressionDoc = DOMBuilder.parse(new StringReader(suppressionXml)).getDocumentElement()
@@ -33,23 +34,28 @@ void suppressCves(String reportName='dependency-check-report.xml') {
 }
 
 static void addNewSuppression(unSuppressedCves, suppressionDoc) {
-    // Find 'Temporary Suppression' in note element and amend text content with new cve
+    // Find a specified phrase in notes element and amend text content with new cve
     XPathExpression xpathExp = XPathFactory.newInstance().newXPath().compile(
             "//*[local-name()='notes']")
-    def notesNodes =  xpathExp.evaluate(suppressionDoc, XPathConstants.NODESET)
-    for (int i = 0; i < notesNodes.getLength(); i++) {
-        Node noteNode = notesNodes.item(i)
-        if (noteNode.getTextContent().contains('Temporary Suppression')) {
+    NodeList noteNodes =  xpathExp.evaluate(suppressionDoc, XPathConstants.NODESET) as NodeList
+    String whiteSpaceForIndent =  "\n" + "\u0020".repeat(8) // white space for indentation
+    String textToFind = "Temporary Suppression"
+
+    noteNodes.find {
+        if (it.getTextContent().contains(textToFind)) {
+            def noteNode = it
+            Document document = suppressionDoc.getOwnerDocument()
+            Node parentNode = noteNode.getParentNode()
             unSuppressedCves.each {
-                String whiteSpaceForIndent = "\n" + "\u0020".repeat(8) // white space for indentation
-                Document document = suppressionDoc.getOwnerDocument()
+                def cve = it
                 noteNode.appendChild(
-                        document.createTextNode(whiteSpaceForIndent + it + " refer [Ticket]"))
-                noteNode.getParentNode()
-                        .appendChild(document.createElement("cve")).appendChild(document.createTextNode(it))
+                        document.createTextNode(whiteSpaceForIndent + cve + " refer [Ticket]"))
+                parentNode.appendChild(
+                        document.createElement("cve")).appendChild(document.createTextNode(cve))
             }
+            return true
         }
-    }
+    } ?: {throw new GradleException(String.format("No notes element with text '%s'", textToFind))}()
 }
 
 static def cleanXml(Element suppression) {
@@ -59,6 +65,7 @@ static def cleanXml(Element suppression) {
 
     NodeList emptyTextNodes = xpathExp.evaluate(suppression, XPathConstants.NODESET) as NodeList
     if (emptyTextNodes.getLength()) {
+        println("found")
         for (int i = 0; i < emptyTextNodes.getLength(); i++) {
             Node emptyTextNode = emptyTextNodes.item(i)
             emptyTextNode.getParentNode().removeChild(emptyTextNode)
@@ -69,7 +76,7 @@ static def cleanXml(Element suppression) {
 
 task suppressCves() {
     doLast {
-        // Optional argument to specify the name of the report file.
+        // Optional argument can be added to specify the name of the report file.
         // If no argument is specified, the default report file is 'dependency-check-report.xml'
         suppressCves()}
 }
