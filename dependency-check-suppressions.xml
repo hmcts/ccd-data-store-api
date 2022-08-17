@@ -2,16 +2,16 @@
   <!--Please add all the false positives under the below section-->
   <suppress>
     <notes>False Positives
-            CVE-2020-23171 https://tools.hmcts.net/jira/browse/CCD-1871
-			CVE-2018-1258 https://tools.hmcts.net/jira/browse/CCD-765
-            CVE-2020-29242 https://tools.hmcts.net/jira/browse/CCD-92
-            CVE-2020-29243 https://tools.hmcts.net/jira/browse/CCD-70
-            CVE-2020-29244 https://tools.hmcts.net/jira/browse/CCD-104
-            CVE-2020-29245 https://tools.hmcts.net/jira/browse/CCD-287
-            CVE-2007-1651 https://tools.hmcts.net/jira/browse/CCD-125
-            CVE-2007-1652 https://tools.hmcts.net/jira/browse/CCD-115
-            CVE-2016-1000027 https://tools.hmcts.net/jira/browse/CCD-3255
-            CVE-2022-33915 https://tools.hmcts.net/jira/browse/CCD-3439</notes>
+        CVE-2020-23171 https://tools.hmcts.net/jira/browse/CCD-1871
+        CVE-2018-1258 https://tools.hmcts.net/jira/browse/CCD-765
+        CVE-2020-29242 https://tools.hmcts.net/jira/browse/CCD-92
+        CVE-2020-29243 https://tools.hmcts.net/jira/browse/CCD-70
+        CVE-2020-29244 https://tools.hmcts.net/jira/browse/CCD-104
+        CVE-2020-29245 https://tools.hmcts.net/jira/browse/CCD-287
+        CVE-2007-1651 https://tools.hmcts.net/jira/browse/CCD-125
+        CVE-2007-1652 https://tools.hmcts.net/jira/browse/CCD-115
+        CVE-2016-1000027 https://tools.hmcts.net/jira/browse/CCD-3255
+        CVE-2022-33915 https://tools.hmcts.net/jira/browse/CCD-3439</notes>
     <cve>CVE-2020-23171</cve>
     <cve>CVE-2018-1258</cve>
     <cve>CVE-2020-29242</cve>

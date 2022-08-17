@@ -5,11 +5,12 @@ import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
+
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathExpression
 import javax.xml.xpath.XPathFactory
 
-void suppressCves(String reportName='dependency-check-report.xml') {
+void suppressCves(String reportName = 'dependency-check-report.xml') {
     // Default output directory is 'build/reports'
     def reportFile = new File(project.file(dependencyCheck.getOutputDirectory()), reportName)
     if (!reportFile.isFile()) {
@@ -37,8 +38,8 @@ static void addNewSuppression(unSuppressedCves, suppressionDoc) {
     // Find a specified phrase in notes element and amend text content with new cve
     XPathExpression xpathExp = XPathFactory.newInstance().newXPath().compile(
             "//*[local-name()='notes']")
-    NodeList noteNodes =  xpathExp.evaluate(suppressionDoc, XPathConstants.NODESET) as NodeList
-    String whiteSpaceForIndent =  "\n" + "\u0020".repeat(8) // white space for indentation
+    NodeList noteNodes = xpathExp.evaluate(suppressionDoc, XPathConstants.NODESET) as NodeList
+    String whiteSpaceForIndent = "\n" + "\u0020".repeat(8) // white space for indentation
     String textToFind = "Temporary Suppression"
 
     noteNodes.find {
@@ -55,7 +56,7 @@ static void addNewSuppression(unSuppressedCves, suppressionDoc) {
             }
             return true
         }
-    } ?: {throw new GradleException(String.format("No notes element with text '%s'", textToFind))}()
+    } ?: { throw new GradleException(String.format("No notes element with text '%s'", textToFind)) }()
 }
 
 static def cleanXml(Element suppression) {
@@ -65,7 +66,6 @@ static def cleanXml(Element suppression) {
 
     NodeList emptyTextNodes = xpathExp.evaluate(suppression, XPathConstants.NODESET) as NodeList
     if (emptyTextNodes.getLength()) {
-        println("found")
         for (int i = 0; i < emptyTextNodes.getLength(); i++) {
             Node emptyTextNode = emptyTextNodes.item(i)
             emptyTextNode.getParentNode().removeChild(emptyTextNode)
@@ -78,5 +78,6 @@ task suppressCves() {
     doLast {
         // Optional argument can be added to specify the name of the report file.
         // If no argument is specified, the default report file is 'dependency-check-report.xml'
-        suppressCves()}
+        suppressCves()
+    }
 }
