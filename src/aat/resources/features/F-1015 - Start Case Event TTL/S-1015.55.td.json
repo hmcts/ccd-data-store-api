@@ -43,12 +43,6 @@
             "Suspended" : "No"
           },
           "TextField" : "[[ANYTHING_PRESENT]]"
-        },
-        "data_classification": {
-          "TextField" : "PUBLIC"
-        },
-        "security_classifications": {
-          "TextField" : "PUBLIC"
         }
       },
       "event_id": "updateWithStartTTLMissing"

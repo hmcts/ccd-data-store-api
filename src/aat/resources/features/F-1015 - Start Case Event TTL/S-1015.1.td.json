@@ -44,14 +44,6 @@
             "Suspended" : "No"
           },
           "SearchCriteria" : { }
-        },
-        "data_classification": {
-          "_extends_": "TTL_Classifications",
-          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-        },
-        "security_classifications": {
-          "_extends_": "TTL_Classifications",
-          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
         }
       },
       "event_id": "updateCaseTTLInc"

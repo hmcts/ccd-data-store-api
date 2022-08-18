@@ -24,6 +24,7 @@
     },
     "body": {
       "data": { },
+      "data_classification": { },
       "event": {
         "id": "createCaseTTL",
         "summary": "",
