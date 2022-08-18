@@ -62,12 +62,6 @@
           "OverrideTTL" : "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
           "SystemTTL" : null
         }
-      },
-      "data_classification" : {
-        "_extends_": "TTL_Classifications"
-      },
-      "security_classifications" : {
-        "_extends_": "TTL_Classifications"
       }
     }
   }

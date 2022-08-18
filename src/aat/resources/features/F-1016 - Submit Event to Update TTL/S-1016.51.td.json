@@ -58,12 +58,6 @@
           "OverrideTTL" : null,
           "Suspended" : "No"
         }
-      },
-      "data_classification" : {
-        "TextField" : "PUBLIC"
-      },
-      "security_classifications" : {
-        "TextField" : "PUBLIC"
       }
     }
   }

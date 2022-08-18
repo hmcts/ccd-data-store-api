@@ -29,6 +29,9 @@
           "OverrideTTL" : "2010-04-30",
           "SystemTTL" : "2010-04-30"
         }
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications"
       }
     }
   }
