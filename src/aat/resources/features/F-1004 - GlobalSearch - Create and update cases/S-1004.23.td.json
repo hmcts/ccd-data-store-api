@@ -58,7 +58,8 @@
             }
           ]
         }
-      }
+      },
+      "data_classification": "[[ANYTHING_PRESENT]]"
     }
   }
 }

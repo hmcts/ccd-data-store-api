@@ -64,6 +64,45 @@
             }
           ]
         }
+      },
+      "data_classification": {
+        "ListOfPeople" : {
+          "classification" : "PUBLIC",
+          "value" : [ 
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "value" : {
+                "IndividualOtherName" : "PUBLIC",
+                "IndividualDateOfBirthText" : "PUBLIC",
+                "IndividualDateOfDeathText" : "PUBLIC"
+              },
+              "id" : "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        },
+        "SearchCriteria": {
+          "classification": "PUBLIC",
+          "value": {
+            "SearchParties": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
+                {
+                  "value": {
+                    "Name": "PUBLIC"
+                  },
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
+            }
+          }
+        }
       }
     }
   }
