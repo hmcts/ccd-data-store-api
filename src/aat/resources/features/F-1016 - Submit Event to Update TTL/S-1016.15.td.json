@@ -44,6 +44,6 @@
   },
 
   "expectedResponse": {
-    "_extends_": "CommonErrorMessageTTL"
+    "_extends_": "422_TTL_Guard"
   }
 }

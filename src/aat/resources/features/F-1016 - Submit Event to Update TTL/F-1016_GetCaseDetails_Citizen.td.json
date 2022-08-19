@@ -1,6 +1,6 @@
 {
   "_guid_": "F-1016_GetCaseDetails_Citizen",
-  "_extends_": "F-1016_GetCaseDetails_Base",
+  "_extends_": "GetCaseDetails__PositiveResponse_Base",
 
   "specs": [
     "to verify that the TTL.Suspended value has not changed in the database"
@@ -20,6 +20,9 @@
 
   "expectedResponse": {
     "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_MasterCaseType",
+
       "data": {
         "TTL": {
           "Suspended" : "Yes",
