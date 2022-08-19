@@ -40,6 +40,15 @@
           "CaseReference": null
         },
         "TextField" : "S-1018.33"
+      },
+      "data_classification" : {
+        "TextField" : "PUBLIC",
+        "CaseLinkField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseReference" : "PUBLIC"
+          }
+        }
       }
     }
   }
