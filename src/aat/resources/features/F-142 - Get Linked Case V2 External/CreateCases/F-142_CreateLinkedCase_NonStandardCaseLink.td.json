@@ -22,6 +22,16 @@
         "CaseLinkField": {
           "CaseReference": "${}${[scenarioContext][parentContext][siblingContexts][F-142_CreateTestCase_BeftaCaseType11][testData][actualResponse][body][id]}"
         }
+      },
+      "data_classification": {
+        "caseNameHmctsInternal": "PUBLIC",
+
+        "CaseLinkField": {
+          "classification": "PUBLIC",
+          "value": {
+            "CaseReference": "PUBLIC"
+          }
+        }
       }
     }
   }

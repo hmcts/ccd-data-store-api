@@ -114,6 +114,20 @@
           "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
         }
       },
+      "data_classification" : {
+        "ApplicantName" : "PUBLIC",
+        "Document3" : "PUBLIC",
+        "Document2" : "PUBLIC",
+        "nationalityProof" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "typeOfProof" : "PUBLIC",
+            "dateIssued" : "PUBLIC",
+            "documentEvidence" : "PUBLIC"
+          }
+        },
+        "Document1" : "PUBLIC"
+      },
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
       "callback_response_status": null,

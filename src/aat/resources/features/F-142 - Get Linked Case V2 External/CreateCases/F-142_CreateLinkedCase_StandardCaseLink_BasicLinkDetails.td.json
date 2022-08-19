@@ -28,6 +28,19 @@
             }
           }
         ]
+      },
+      "data_classification": {
+        "caseLinks": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "CaseReference": "PUBLIC"
+              },
+              "id": "52837798-42c6-43cc-98f6-0895fdba4961"
+            }
+          ]
+        }
       }
     }
   }

@@ -56,6 +56,12 @@
         "caseNameHmctsInternal":  "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][case_details][case_data][caseNameHmctsInternal]}",
         "TextField": "UPDATED",
         "SearchCriteria": { }
+      },
+      "data_classification": {
+        "caseLinks":  "[[ANYTHING_PRESENT]]",
+        "caseNameHmctsInternal":  "PUBLIC",
+        "TextField": "PUBLIC",
+        "SearchCriteria": "[[ANYTHING_PRESENT]]"
       }
     }
   }
