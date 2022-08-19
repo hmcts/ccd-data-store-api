@@ -26,6 +26,9 @@
 
       "data": {
         "PrivateTextField" : "private text"
+      },
+      "data_classification" : {
+        "PrivateTextField" : "PRIVATE"
       }
     }
   }
