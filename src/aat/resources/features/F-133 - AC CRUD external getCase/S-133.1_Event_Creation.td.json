@@ -47,6 +47,10 @@
         "TextField4" : "value4",
         "TextField" : "value1"
       },
+      "data_classification": {
+        "TextField": "PUBLIC",
+        "TextField4": "PUBLIC"
+      },
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
       "callback_response_status": null,
