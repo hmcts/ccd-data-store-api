@@ -1,7 +1,7 @@
 {
   "title": "must return an error response when the invoker does not have the required IDAM role(s) to query the role assignments for users listed in the query",
-  "_guid_": "S-604",
-  "_extends_": "F-103_Get_Case_Assigned_User_Roles_Base",
+  "_guid_": "S-604.1",
+  "_extends_": "CaseUserRoles_Search__Base",
 
   "specs": [
     "Richard - who can create a case",
@@ -22,10 +22,14 @@
     }
   },
 
-  "request" : {
-    "queryParams": {
-      "case_ids": "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}",
-      "user_ids": "${[scenarioContext][testData][users][userDil][id]}"
+  "request": {
+    "body": {
+      "case_ids": [
+        "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+      ],
+      "user_ids": [
+        "${[scenarioContext][testData][users][userDil][id]}"
+      ]
     }
   },
 
