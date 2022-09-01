@@ -1,0 +1,13 @@
+{
+  "_guid_": "S-602_expectedResponse",
+  "_extends_": "Common_400_Response",
+
+  "body": {
+    "_extends_": "Common_400_Response_Body",
+    "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+    "message": "Invalid data provided for the following inputs to the request:\nCase ID is not valid",
+    "details": null,
+    "callbackErrors": null,
+    "callbackWarnings": null
+  }
+}
