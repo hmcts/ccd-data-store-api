@@ -85,6 +85,7 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     protected final String caseworkerCaa = "caseworker-caa";
     protected final String getCaseAssignedUserRoles = "/case-users";
     protected final String postCaseAssignedUserRoles = "/case-users";
+    protected final String searchCaseAssignedUserRoles = "/case-users/search";
 
     protected static final String PARAM_CASE_IDS = "case_ids";
     protected static final String PARAM_USER_IDS = "user_ids";
@@ -234,6 +235,24 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(captor.getValue().getHttpStatus(), is(status.value()));
         assertThat(captor.getValue().getPath(), is(getCaseAssignedUserRoles));
         assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.GET.name()));
+
+        if (caseIds != null) {
+            assertThat(captor.getValue().getCaseId(), is(trimSpacesFromCsvValues(caseIds)));
+        }
+        if (userIds != null) {
+            assertThat(captor.getValue().getTargetIdamId(), is(trimSpacesFromCsvValues(userIds)));
+        }
+    }
+
+    protected void verifyAuditForSearchCaseUserRoles(HttpStatus status, String caseIds, String userIds) {
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(),
+            is(AuditOperationType.GET_CASE_ASSIGNED_USER_ROLES.getLabel()));
+        assertThat(captor.getValue().getHttpStatus(), is(status.value()));
+        assertThat(captor.getValue().getPath(), is(searchCaseAssignedUserRoles));
+        assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.POST.name()));
 
         if (caseIds != null) {
             assertThat(captor.getValue().getCaseId(), is(trimSpacesFromCsvValues(caseIds)));
