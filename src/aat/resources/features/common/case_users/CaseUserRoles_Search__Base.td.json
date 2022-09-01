@@ -1,0 +1,19 @@
+{
+  "_guid_": "CaseUserRoles_Search__Base",
+
+  "title": "Get Case-Assigned Users and Roles",
+
+  "productName": "CCD Data Store api",
+  "operationName": "Search Case-Assigned Users and Roles",
+
+  "method": "POST",
+  "uri": "/case-users/search",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_ids": [],
+      "user_ids": []
+    }
+  }
+}
