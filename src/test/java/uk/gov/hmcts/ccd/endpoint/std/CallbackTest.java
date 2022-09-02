@@ -114,19 +114,6 @@ public class CallbackTest extends WireMockBaseTest {
         "    }\n" +
         "  }";
 
-    private static final String EXPECTED_CALLBACK_DATA_CLASSIFICATION_STRING =
-        "{\n" +
-        "    \"PersonLastName\": \"PRIVATE\",\n" +
-        "    \"PersonAddress\": {\n" +
-        "      \"classification\" : \"PRIVATE\",\n" +
-        "      \"value\" : {\n" +
-        "        \"AddressLine1\": \"PRIVATE\",\n" +
-        "        \"AddressLine2\": \"PRIVATE\"\n" +
-        "      }\n" +
-        "    },\n" +
-        "    \"D8Document\": \"PRIVATE\"" +
-        "  }";
-
     private String modifiedDataString;
 
     private static JsonNode MODIFIED_DATA = null;
