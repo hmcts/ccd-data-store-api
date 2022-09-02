@@ -2,7 +2,7 @@
   "_guid_": "S-1016.19",
   "_extends_": "F-1016_Test_Data_Base_Citizen",
 
-  "title": "TTL.Suspended changed to \"No\", SystemTTL is less than TTLGuard, OverrideTTL is greater than TTLGuard using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
+  "title": "TTL.Suspended changed to \"No\", SystemTTL is less than TTLGuard, OverrideTTL is greater than TTLGuard using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
 
   "prerequisites" : [{
     "Token_Creation": "S-1016_GetUpdateSuspendedCaseTokenCitizen"
@@ -28,8 +28,8 @@
       "data": {
         "TTL": {
           "Suspended": "No",
-          "OverrideTTL": "2030-04-30",
-          "SystemTTL": "2010-04-30"
+          "SystemTTL": "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
         }
       },
       "event": {
@@ -58,8 +58,8 @@
       "case_data" : {
         "TTL" : {
           "Suspended": "No",
-          "OverrideTTL": "2030-04-30",
-          "SystemTTL": "2010-04-30"
+          "SystemTTL": "${[scenarioContext][customValues][dateLessThanTTLGuardDate]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
         }
       },
       "data_classification" : {

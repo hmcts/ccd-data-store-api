@@ -1,0 +1,14 @@
+{
+  "_guid_": "UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker",
+  "_extends_": "UpdateCase_TTLCaseType_manageCaseTTL__Base",
+
+  "prerequisites" : [ {
+    "Token_Creation": "UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker_TokenCreation"
+  } ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  }
+}

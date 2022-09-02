@@ -1,0 +1,24 @@
+{
+  "_guid_": "StartEvent_v1Ext_Citizen__Base",
+  "_extends_": "Token_Creation_Data_For_Citizen_Case_Creation",
+
+  "title": "call to v1_external#/case-details-endpoint/startEventForCitizenUsingGET",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation process to update a case (v1_ext citizen)",
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+
+      "jid": "OVERRIDE",
+      "ctid": "OVERRIDE",
+
+      "cid": "OVERRIDE",
+      "etid": "OVERRIDE"
+    }
+  }
+}
