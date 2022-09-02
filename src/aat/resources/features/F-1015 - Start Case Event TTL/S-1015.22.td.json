@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.22",
-  "_extends_": "F-1015-CreateEventTokenErrorResponseCitizen",
+  "_extends_": "StartEvent_v1Ext_Citizen__Base",
 
   "title": "must error when updating a case where about to start callback has modified TTL.Suspended using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token'",
 
@@ -13,6 +13,12 @@
     "contains the error message indicating unauthorised change to the TTL values"
   ],
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
   "request": {
     "headers": {
       "_extends_": "Common_Request_Headers"
@@ -21,5 +27,9 @@
       "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
       "etid": "updateModifiedSuspendedTTL"
     }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
   }
 }

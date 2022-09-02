@@ -1,0 +1,13 @@
+{
+  "_guid_": "Grant_Access__PositiveResponse_Base",
+  "_extends_": "Grant_Access__Base",
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANY_STRING_NULLABLE]]",
+      "Vary": "Accept-Encoding"
+    }
+  }
+}

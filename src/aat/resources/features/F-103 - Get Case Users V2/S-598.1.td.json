@@ -1,0 +1,40 @@
+{
+  "title": "when the invoking user is not a privileged user but the request includes his/her own User ID, then the invoker's case roles for the case should be returned",
+  "_guid_": "S-598.1",
+  "_extends_": "CaseUserRoles_Search__PositiveResponse_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Dil - with an active profile",
+    "Jamal - who is a privileged user with permissions to access the case assignments of other users",
+    "is made by Dil with the Case ID of C1 & Dil's own User ID",
+    "contains the list of case roles just granted to Dil, as per above"
+  ],
+
+  "users": {
+    "userRichard": {
+      "_extends_": "F-103_User_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "F-103_User_Dil"
+    },
+    "userJamal": {
+      "_extends_": "F-103_User_Jamal"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_ids": [
+        "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+      ],
+      "user_ids": [
+        "${[scenarioContext][testData][users][invokingUser][id]}"
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "S-598_expectedResponse"
+  }
+}

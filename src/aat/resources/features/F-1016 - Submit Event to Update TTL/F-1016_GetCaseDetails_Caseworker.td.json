@@ -1,6 +1,6 @@
 {
   "_guid_": "F-1016_GetCaseDetails_Caseworker",
-  "_extends_": "F-1016_GetCaseDetails_Base",
+  "_extends_": "GetCaseDetails__PositiveResponse_Base",
 
   "specs": [
     "to verify that the TTL.Suspended value has not changed in the database"
@@ -20,10 +20,19 @@
 
   "expectedResponse": {
     "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_MasterCaseType",
+
       "data": {
+        "TTL": {
+          "Suspended" : "Yes",
+          "OverrideTTL" : "2010-04-30",
+          "SystemTTL" : "2010-04-30"
+        },
         "SearchCriteria" : { }
       },
       "data_classification": {
+        "_extends_": "TTL_Classifications",
         "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       }
     }

@@ -2,7 +2,7 @@
   "_guid_": "S-1016.21",
   "_extends_": "F-1016_Test_Data_Base_Citizen",
 
-  "title": "TTL.Suspended changed to \"No\", SystemTTL and OverrideTTL greater than Guard value using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
+  "title": "TTL.Suspended changed to \"No\", SystemTTL and OverrideTTL greater than Guard value using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
 
   "prerequisites" : [{
     "Token_Creation": "S-1016_GetUpdateSuspendedCaseTokenCitizen"
@@ -29,8 +29,8 @@
       "data": {
         "TTL": {
           "Suspended": "Yes",
-          "OverrideTTL": "2023-04-30",
-          "SystemTTL": "2023-04-30"
+          "SystemTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
         }
       },
       "event": {
@@ -45,13 +45,6 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
-    "body" : {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "message": "Time to live content has been modified by callback",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
-    }
+    "_extends_": "400_TTL_Modified"
   }
 }

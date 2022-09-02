@@ -1,8 +1,8 @@
 {
   "_guid_": "S-1015.17",
-  "_extends_": "F-1015-RetrieveTriggerErrorResponse",
+  "_extends_": "StartEvent_v2Ext__Base",
 
-  "title": "must error when updating a case where about to start callback has modified TTL.OverrideTTL using v2 '/cases/{caseId}/event-triggers/{triggerId}'",
+  "title": "must error when updating a case where about to start callback has modified TTL.OverrideTTL using v2 '/cases/{cid}/event-triggers/{etid}'",
 
   "specs": [
     "an active profile in CCD",
@@ -20,8 +20,12 @@
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
-      "triggerId": "updateModifiedOverrideTTL"
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateModifiedOverrideTTL"
     }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
   }
 }

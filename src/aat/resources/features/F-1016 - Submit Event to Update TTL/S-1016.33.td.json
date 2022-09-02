@@ -1,0 +1,77 @@
+{
+  "_guid_": "S-1016.33",
+  "_extends_": "F-1016_Test_Data_Base_V2",
+
+  "title": "OverrideTTL is removed, SystemTTL is greater than Guard value and TTL.Suspended is \"No\" and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST",
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1016_GetUpdateTokenOverrideTTLCaseworker"
+  }
+  ],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created as in F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker",
+    "contains an event token for the case just created above",
+    "has TTL.SystemTTL set to greater than today + guard value",
+    "has TTL.OverrideTTL value removed"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1016_CreateCaseOverrideTTLPreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    },
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "body": {
+      "data": {
+        "TTL": {
+          "Suspended" : "No",
+          "OverrideTTL" : null,
+          "SystemTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
+        }
+      },
+      "event": {
+        "id": "updateCaseSubmitTTL",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body" : {
+      "_links" : "[[ANYTHING_PRESENT]]",
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_MASTER",
+      "state" : "CaseUpdated",
+      "case_type" : "FT_MasterCaseType",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "PUBLIC",
+      "data" : {
+        "TTL" : {
+          "Suspended" : "No",
+          "OverrideTTL" : null,
+          "SystemTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
+        },
+        "SearchCriteria" : { }
+      },
+      "data_classification" : {
+        "_extends_": "TTL_Classifications",
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+}
