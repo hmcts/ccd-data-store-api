@@ -305,7 +305,7 @@ dependencyManagement {
 
         // CVE-2019-0232 - Java and Command Line injections in Windows (updated to version 9.0.19)
         // CVE-2021-42340 - Memory leak (updated to version 9.0.54)
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.63') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.65') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
