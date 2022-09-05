@@ -59,12 +59,14 @@ public class ElasticsearchQueryHelper {
         List<String> caseTypes = payload.getSearchCriteria().getCcdCaseTypeIds();
 
         if (CollectionUtils.isEmpty(jurisdictions) && CollectionUtils.isEmpty(caseTypes)) {
-            return caseDefinitionRepository.getAllCaseTypesIDs();
-        } else if (!CollectionUtils.isEmpty(jurisdictions) && CollectionUtils.isEmpty(caseTypes)) {
-            return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
+            throw new BadSearchRequest("At least one jurisdiction or case type must be provided");
         }
 
-        return caseTypes;
+        if (!CollectionUtils.isEmpty(caseTypes)) {
+            return caseTypes;
+        }
+
+        return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
     }
 
     public List<String> getCaseTypesAvailableToUser() {
