@@ -8,7 +8,6 @@ import io.swagger.annotations.ExampleProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -110,12 +109,9 @@ public class GlobalSearchEndpoint {
 
         requestPayload.setDefaults();
 
-        // if no CaseType filter applied :: load all case types available for user
-        if (CollectionUtils.isEmpty(requestPayload.getSearchCriteria().getCcdCaseTypeIds())) {
-            requestPayload.getSearchCriteria().setCcdCaseTypeIds(
-                elasticsearchQueryHelper.getCaseTypesAvailableToUser()
-            );
-        }
+        requestPayload.getSearchCriteria().setCcdCaseTypeIds(
+            elasticsearchQueryHelper.getGlobalSearchCaseTypes(requestPayload)
+        );
 
         CrossCaseTypeSearchRequest searchRequest = globalSearchService.assembleSearchQuery(requestPayload);
 
