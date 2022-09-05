@@ -110,12 +110,9 @@ public class GlobalSearchEndpoint {
 
         requestPayload.setDefaults();
 
-        // if no CaseType filter applied :: load all case types available for user
-        if (CollectionUtils.isEmpty(requestPayload.getSearchCriteria().getCcdCaseTypeIds())) {
-            requestPayload.getSearchCriteria().setCcdCaseTypeIds(
-                elasticsearchQueryHelper.getCaseTypesAvailableToUser()
-            );
-        }
+        requestPayload.getSearchCriteria().setCcdCaseTypeIds(
+            elasticsearchQueryHelper.getGlobalSearchCaseTypes(requestPayload)
+        );
 
         CrossCaseTypeSearchRequest searchRequest = globalSearchService.assembleSearchQuery(requestPayload);
 
