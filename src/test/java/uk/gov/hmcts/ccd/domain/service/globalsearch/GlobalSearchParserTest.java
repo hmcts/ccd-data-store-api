@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
@@ -48,8 +49,10 @@ class GlobalSearchParserTest {
     private static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
     private static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
     private static final String ROLE_IN_USER_ROLE_1 = "Role 1";
-    private static final Set<String> USER_ROLES = newHashSet(ROLE_IN_USER_ROLES,
-        ROLE_IN_USER_ROLES_2, ROLE_IN_USER_ROLE_1);
+    private static final Set<AccessProfile> USER_ACCESS_PROFILES = newHashSet(
+        new AccessProfile(ROLE_IN_USER_ROLES),
+        new AccessProfile(ROLE_IN_USER_ROLES_2),
+        new AccessProfile(ROLE_IN_USER_ROLE_1));
 
     private static final String CASE_TYPE_ID_1 = "CASE_TYPE_1";
     private static final String CASE_TYPE_ID_2 = "CASE_TYPE_2";
@@ -68,7 +71,7 @@ class GlobalSearchParserTest {
     private  CaseTypeDefinition caseTypeDefinition3;
 
     @Mock
-    private UserRepository userRepository;
+    private CaseDataAccessControl caseDataAccessControl;
     @Mock
     private CaseTypeService caseTypeService;
     @Mock
@@ -83,7 +86,7 @@ class GlobalSearchParserTest {
         Party party = new Party();
         party.setPartyName("name");
         parties = List.of(party);
-        doReturn(USER_ROLES).when(userRepository).getUserRoles();
+        doReturn(USER_ACCESS_PROFILES).when(caseDataAccessControl).generateAccessProfilesByCaseDetails(any());
 
         jurisdiction = new JurisdictionDefinition();
         jurisdiction.setId(JURISDICTION);
@@ -201,7 +204,8 @@ class GlobalSearchParserTest {
         when(caseTypeService.getCaseType(CASE_TYPE_ID_2)).thenReturn(caseTypeDefinition2);
         when(caseTypeService.getCaseType(CASE_TYPE_ID_3)).thenReturn(caseTypeDefinition3);
 
-        globalSearchParser = new GlobalSearchParser(userRepository, caseTypeService, securityClassificationService);
+        globalSearchParser =
+            new GlobalSearchParser(caseDataAccessControl, caseTypeService, securityClassificationService);
     }
 
     @Test
