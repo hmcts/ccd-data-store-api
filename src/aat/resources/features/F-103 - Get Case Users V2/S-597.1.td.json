@@ -1,7 +1,7 @@
 {
   "title": "when a specific User ID is supplied for a specific case ID, then the case roles relating only to the User ID for that specific Case ID must be returned",
-  "_guid_": "S-597",
-  "_extends_": "F-103_Get_Case_Assigned_User_Roles_Base",
+  "_guid_": "S-597.1",
+  "_extends_": "CaseUserRoles_Search__PositiveResponse_Base",
 
   "specs": [
     "Richard - who can create a case",
@@ -23,10 +23,14 @@
     }
   },
 
-  "request" : {
-    "queryParams": {
-      "case_ids": "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}",
-      "user_ids": "${[scenarioContext][testData][users][userDil][id]}"
+  "request": {
+    "body": {
+      "case_ids": [
+        "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+      ],
+      "user_ids": [
+        "${[scenarioContext][testData][users][userDil][id]}"
+      ]
     }
   },
 
