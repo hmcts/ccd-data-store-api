@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.std.validator;
+package uk.gov.hmcts.ccd.domain.model.std.validator.globalsearch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

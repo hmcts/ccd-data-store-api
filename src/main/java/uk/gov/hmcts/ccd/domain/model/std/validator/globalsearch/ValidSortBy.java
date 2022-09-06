@@ -1,4 +1,6 @@
-package uk.gov.hmcts.ccd.domain.model.std.validator;
+package uk.gov.hmcts.ccd.domain.model.std.validator.globalsearch;
+
+import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -19,6 +21,5 @@ public @interface ValidSortBy {
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
 
 }
