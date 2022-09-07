@@ -16,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface ValidSearchCriteria {
 
-    String message() default ValidationError.SEARCH_CRITERIA_MISSING;
+    String message() default ValidationError.GLOBAL_SEARCH_CRITERIA_INVALID;
 
     Class<?>[] groups() default {};
 

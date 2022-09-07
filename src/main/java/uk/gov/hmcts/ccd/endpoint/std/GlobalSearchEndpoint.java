@@ -78,7 +78,7 @@ public class GlobalSearchEndpoint {
                 + "\n2) " + ValidationError.SORT_BY_INVALID
                 + "\n3) " + ValidationError.SORT_DIRECTION_INVALID
                 + "\n4) " + ValidationError.MAX_RECORD_COUNT_INVALID
-                + "\n5) " + ValidationError.SEARCH_CRITERIA_MISSING
+                + "\n5) " + ValidationError.GLOBAL_SEARCH_CRITERIA_INVALID
                 + "\n6) " + ValidationError.JURISDICTION_ID_LENGTH_INVALID
                 + "\n7) " + ValidationError.STATE_ID_LENGTH_INVALID
                 + "\n8) " + ValidationError.CASE_TYPE_ID_LENGTH_INVALID
