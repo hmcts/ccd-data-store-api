@@ -40,7 +40,7 @@ Feature: F-1005: Global Search - Search cases
     And it is submitted to call the [Global Search] operation of [CCD Data Store]
     Then a negative response is received,
     And the response [has 400 return code],
-    And the response [contains the error message 'Must have at least one search criteria'],
+    And the response [contains the error message 'At least one jurisdiction or case type must be provided in the search criteria'],
     And the response has all other details as expected.
 
   @S-1005.4  #AC4
