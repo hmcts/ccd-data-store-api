@@ -2,7 +2,7 @@
   "_guid_": "S-1016.20",
   "_extends_": "F-1016_Test_Data_Base_Citizen",
 
-  "title": "TTL.Suspended changed to \"Yes\" using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
+  "title": "TTL.Suspended changed to \"Yes\" using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
 
   "prerequisites" : [{
     "Token_Creation": "S-1016_GetUpdateTokenCitizen"
@@ -26,8 +26,8 @@
       "data": {
         "TTL": {
           "Suspended": "Yes",
-          "OverrideTTL" : null,
-          "SystemTTL" : null
+          "SystemTTL" : null,
+          "OverrideTTL" : null
         }
       },
       "event": {
@@ -56,8 +56,8 @@
       "case_data" : {
         "TTL" : {
           "Suspended": "Yes",
-          "OverrideTTL" : null,
-          "SystemTTL" : null
+          "SystemTTL" : null,
+          "OverrideTTL" : null
         }
       },
       "data_classification" : {

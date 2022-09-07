@@ -4,7 +4,7 @@
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
     }
   },
 

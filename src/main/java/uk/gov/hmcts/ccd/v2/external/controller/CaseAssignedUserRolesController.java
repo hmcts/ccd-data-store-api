@@ -32,6 +32,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
+import uk.gov.hmcts.ccd.v2.external.domain.SearchCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
 import java.util.ArrayList;
@@ -192,11 +193,22 @@ public class CaseAssignedUserRolesController {
         return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse(REMOVE_SUCCESS_MESSAGE));
     }
 
+    /**
+     * Get Case-Assigned Users and Roles.
+     *
+     * @deprecated Use {@link CaseAssignedUserRolesController#searchCaseUserRoles(SearchCaseAssignedUserRolesRequest)}
+     *             instead: were query params have been moved into the request payload, to avoid hitting
+     *             `414 URI Too Long` issues, see <a href="https://tools.hmcts.net/jira/browse/CCD-3588">CCD-3588</a>.
+     */
+    @Deprecated(forRemoval = true)
     @GetMapping(
         path = "/case-users"
     )
     @ApiOperation(
-        value = "Get Case-Assigned Users and Roles"
+        value = "Get Case-Assigned Users and Roles",
+        notes = "**Deprecated**: Use <a href='#/case-assigned-user-roles-controller/searchCaseUserRolesUsingPOST'>POST "
+              + "/case-users/search</a> instead: were query params have been moved into the request payload, to avoid "
+              + "hitting *414 URI Too Long* issues."
     )
     @ApiResponses({
         @ApiResponse(
@@ -206,15 +218,10 @@ public class CaseAssignedUserRolesController {
         ),
         @ApiResponse(
             code = 400,
-            message = V2.Error.CASE_ID_INVALID
-        ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.EMPTY_CASE_ID_LIST
-        ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.USER_ID_INVALID
+            message = "One or more of the following reasons:\n"
+                + "1. " + V2.Error.CASE_ID_INVALID + ", \n"
+                + "2. " + V2.Error.EMPTY_CASE_ID_LIST + ", \n"
+                + "3. " + V2.Error.USER_ID_INVALID + "."
         ),
         @ApiResponse(
             code = 403,
@@ -234,6 +241,49 @@ public class CaseAssignedUserRolesController {
                                                                               required = false)
                                                                               Optional<List<String>> optionalUserIds) {
         List<String> userIds = optionalUserIds.orElseGet(Lists::newArrayList);
+        validateRequestParams(caseIds, userIds);
+        List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
+            .stream()
+            .map(Long::valueOf)
+            .collect(Collectors.toCollection(ArrayList::new)), userIds);
+        return ResponseEntity.ok(new CaseAssignedUserRolesResource(caseAssignedUserRoles));
+    }
+
+    @PostMapping(
+        path = "/case-users/search"
+    )
+    @ApiOperation(
+        value = "Get Case-Assigned Users and Roles"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Case-User-Role assignments returned successfully",
+            response = CaseAssignedUserRolesResource.class
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:\n"
+                + "1. " + V2.Error.CASE_ID_INVALID + ", \n"
+                + "2. " + V2.Error.EMPTY_CASE_ID_LIST + ", \n"
+                + "3. " + V2.Error.USER_ID_INVALID + "."
+        ),
+        @ApiResponse(
+            code = 403,
+            message = V2.Error.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED
+        )
+    })
+    @LogAudit(
+        operationType = GET_CASE_ASSIGNED_USER_ROLES,
+        caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+            + ".buildIds(#searchRequest.caseIds)",
+        targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+            + ".buildIds(#searchRequest.userIds)"
+    )
+    public ResponseEntity<CaseAssignedUserRolesResource> searchCaseUserRoles(
+            @RequestBody SearchCaseAssignedUserRolesRequest searchRequest) {
+        List<String> caseIds = searchRequest.getCaseIds();
+        List<String> userIds = searchRequest.getUserIds();
         validateRequestParams(caseIds, userIds);
         List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
             .stream()
@@ -333,6 +383,12 @@ public class CaseAssignedUserRolesController {
         // NB: match Case ID list size and separator configuration
         return userIds.stream().limit(MAX_CASE_IDS_LIST)
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
+    }
+
+    public static String buildIds(List<String> ids) {
+        return ids == null ? "" : ids.stream().limit(MAX_CASE_IDS_LIST)
+            .collect(Collectors.joining(CASE_ID_SEPARATOR))
+            .replaceAll("\\s", "");
     }
 
     private static Stream<CaseAssignedUserRoleWithOrganisation> caseAssignedUserRolesToStream(

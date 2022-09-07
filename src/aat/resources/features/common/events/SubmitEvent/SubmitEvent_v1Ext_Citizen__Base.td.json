@@ -1,0 +1,26 @@
+{
+  "_guid_": "SubmitEvent_v1Ext_Citizen__Base",
+  "_extends_": "Event_Creation_Citizen_Base",
+
+  "operationName": "Submit event creation as citizen (v1_ext citizen)",
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "OVERRIDE",
+      "ctid": "OVERRIDE",
+      "cid": "OVERRIDE"
+    },
+    "body": {
+      "data": {},
+      "event": {
+        "id": "OVERRIDE",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "OVERRIDE",
+      "ignore_warning": true
+    }
+  }
+}

@@ -27,12 +27,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
-import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
+import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -59,7 +58,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyBoolean;
@@ -67,6 +65,7 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -125,13 +124,16 @@ class AuthorisedCreateEventOperationTest {
     private CaseAccessService caseAccessService;
 
     @Mock
-    private CaseAccessCategoriesService caseAccessCategoriesService;
-
-    @Mock
     private CaseDetailsJsonParser caseDetailsJsonParser;
 
     @Mock
     private CaseDataService caseDataService;
+
+    @Mock
+    private EventTriggerService eventTriggerService;
+
+    @Mock
+    private TimeToLiveService timeToLiveService;
 
     @InjectMocks
     private CaseService caseService;
@@ -156,10 +158,11 @@ class AuthorisedCreateEventOperationTest {
             caseDefinitionRepository,
             accessControlService,
             caseAccessService,
-            caseAccessCategoriesService,
             caseDetailsJsonParser,
             getCaseOperation,
-            caseService);
+            caseService,
+            eventTriggerService,
+            timeToLiveService);
 
         mockExistingCaseDetails(Maps.newHashMap());
 
@@ -199,10 +202,6 @@ class AuthorisedCreateEventOperationTest {
             eq(CAN_READ),
             anyBoolean())).thenReturn(authorisedCaseNode);
 
-        Predicate<CaseDetails> predicate = cd -> true;
-        when(caseAccessCategoriesService
-            .caseHasMatchingCaseAccessCategories(anySet(), anyBoolean())).thenReturn(predicate);
-
         when(caseDetailsJsonParser.read(any(CaseDetails.class), anyString())).thenCallRealMethod();
         when(caseDetailsJsonParser.containsDocumentUrl(any(CaseDetails.class), anyString())).thenCallRealMethod();
         doCallRealMethod().when(caseDetailsJsonParser)
@@ -238,6 +237,60 @@ class AuthorisedCreateEventOperationTest {
 
         verify(createEventOperation).createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT);
+    }
+
+    @Test
+    @DisplayName("should make calls to increment TTL if CaseType is using TTL and event found")
+    void shouldMakeCallsToIncrementTtlIfCaseTypeUsingTtlAndEventFound() {
+
+        // GIVEN
+        doReturn(true).when(timeToLiveService).isCaseTypeUsingTTL(any());
+        doReturn(new CaseEventDefinition()).when(eventTriggerService).findCaseEvent(any(), any());
+
+        // WHEN
+        authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
+            CASE_DATA_CONTENT);
+
+        // THEN
+        verify(timeToLiveService).isCaseTypeUsingTTL(any());
+        verify(timeToLiveService).updateCaseDetailsWithTTL(any(), any(), any());
+        verify(timeToLiveService).updateCaseDataClassificationWithTTL(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should not make calls to increment TTL if CaseType is not using TTL")
+    void shouldNotMakeCallsToIncrementTtlIfCaseTypeNotUsingTtl() {
+
+        // GIVEN
+        doReturn(false).when(timeToLiveService).isCaseTypeUsingTTL(any());
+
+        // WHEN
+        authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
+            CASE_DATA_CONTENT);
+
+        // THEN
+        verify(timeToLiveService).isCaseTypeUsingTTL(any());
+        verify(eventTriggerService, never()).findCaseEvent(any(), any());
+        verify(timeToLiveService, never()).updateCaseDetailsWithTTL(any(), any(), any());
+        verify(timeToLiveService, never()).updateCaseDataClassificationWithTTL(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should not make calls to increment TTL if event not found")
+    void shouldNotMakeCallsToIncrementTtlIfEventNotFound() {
+
+        // GIVEN
+        doReturn(true).when(timeToLiveService).isCaseTypeUsingTTL(any());
+        doReturn(null).when(eventTriggerService).findCaseEvent(any(), any());
+
+        // WHEN
+        authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
+            CASE_DATA_CONTENT);
+
+        // THEN
+        verify(timeToLiveService).isCaseTypeUsingTTL(any());
+        verify(timeToLiveService, never()).updateCaseDetailsWithTTL(any(), any(), any());
+        verify(timeToLiveService, never()).updateCaseDataClassificationWithTTL(any(), any(), any(), any());
     }
 
     @Test
@@ -589,28 +642,6 @@ class AuthorisedCreateEventOperationTest {
             .createCaseSystemEvent(caseReference, 1, attributeField, categoryId));
     }
 
-
-    @Test
-    @DisplayName("should fail if case data not match with case access categories")
-    void shouldFailIfCaseAccessCategoriesNotMatchWithCaseData() {
-        Set<AccessProfile> accessProfiles =
-            createAccessProfilesWithCaseAccessCategories(Sets.newHashSet("Civil/Standard"));
-        mockAccess(accessProfiles);
-
-        Map<String, JsonNode> data = getCaseAccessCategoriesData("Civil/Test");
-        mockExistingCaseDetails(data);
-
-        CaseDataContent newCaseDataContent = createNewCaseDataContent("Civil/Test1");
-        CaseDetails classifiedCase = new CaseDetails();
-        Map<String, JsonNode> classifiedData = Maps.newHashMap();
-        classifiedCase.setData(classifiedData);
-        doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
-            newCaseDataContent);
-
-        assertThrows(CaseNotFoundException.class, () ->
-            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, newCaseDataContent));
-    }
-
     @Test
     @DisplayName("should return case details if case data match with case access categories")
     void shouldReturnCaseDetailsIfCaseAccessCategoriesMatchCaseData() {
@@ -664,9 +695,6 @@ class AuthorisedCreateEventOperationTest {
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
             eq(accessProfiles),
             eq(CAN_READ))).thenReturn(true);
-
-        when(caseAccessCategoriesService
-            .caseHasMatchingCaseAccessCategories(eq(accessProfiles), eq(false))).thenCallRealMethod();
     }
 
     private static Set<AccessProfile> createAccessProfilesWithCaseAccessCategories(Set<String> caseAccessCategories) {

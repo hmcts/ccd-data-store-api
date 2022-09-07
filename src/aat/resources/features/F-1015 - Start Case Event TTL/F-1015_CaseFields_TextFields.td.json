@@ -1,0 +1,35 @@
+{
+  "_guid_": "F-1015_CaseFields_TextField",
+
+  "id" : "TextField",
+  "label" : "TextField",
+  "hidden" : false,
+
+  "value" : "[[ANYTHING_PRESENT]]",
+
+  "metadata" : false,
+  "hint_text" : null,
+  "field_type" : {
+    "id" : "Text",
+    "type" : "Text",
+    "min" : null,
+    "max" : null,
+    "regular_expression" : null,
+    "fixed_list_items" : [ ],
+    "complex_fields" : [ ],
+    "collection_field_type" : null
+  },
+  "validation_expr" : null,
+  "security_label" : "PUBLIC",
+  "order" : null,
+  "formatted_value" : "[[ANYTHING_PRESENT]]",
+  "display_context" : "OPTIONAL",
+  "display_context_parameter" : null,
+  "show_condition" : null,
+  "show_summary_change_option" : true,
+  "show_summary_content_option" : null,
+  "retain_hidden_value" : null,
+  "publish" : false,
+  "publish_as" : null,
+  "acls" : "[[ANYTHING_PRESENT]]"
+}

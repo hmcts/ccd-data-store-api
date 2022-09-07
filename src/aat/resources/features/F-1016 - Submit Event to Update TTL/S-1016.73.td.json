@@ -1,0 +1,58 @@
+{
+  "_guid_": "S-1016.73",
+  "_extends_": "SubmitEvent_v1Ext_Citizen__Base",
+
+  "title": "Attempt to update SystemTTL without permissions using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1016_UpdateCase_TTLCaseType_updateCaseTTLInc_PreRequisiteCitizen_TokenCreation"
+  } ],
+
+  "specs": [
+    "an active profile in CCD",
+    "a caseworker with an active profile in CCD",
+    "access to manage TTL properties",
+
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCitizen",
+    "contains an event token for the case just created above",
+    "has TTL.SystemTTL value set to a valid date",
+
+    "will fail due to lack of permissions to TTL field"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    },
+    "caseworker": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "manageTTL": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid" : "BEFTA_MASTER",
+      "ctid": "FT_TTL",
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "TextField": "Attempt to update SystemTTL without permissions",
+        "TTL": {
+          "SystemTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
+        }
+      },
+      "event": {
+        "id": "updateCaseTTLInc"
+      },
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-1016_Response_ErrorWhenNoWriteAccessToSystemTTL"
+  }
+}
