@@ -12,8 +12,8 @@ public class SearchCriteriaValidator implements ConstraintValidator<ValidSearchC
     public boolean isValid(final SearchCriteria criteria, final ConstraintValidatorContext context) {
         if (criteria != null) {
             // rule: At least one jurisdiction or case type must be provided in the search criteria
-            return !(CollectionUtils.isEmpty(criteria.getCcdJurisdictionIds()))
-                || !(CollectionUtils.isEmpty(criteria.getCcdCaseTypeIds()));
+            return !CollectionUtils.isEmpty(criteria.getCcdJurisdictionIds())
+                || !CollectionUtils.isEmpty(criteria.getCcdCaseTypeIds());
         }
         return false;
     }
