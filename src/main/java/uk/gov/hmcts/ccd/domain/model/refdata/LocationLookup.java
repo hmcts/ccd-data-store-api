@@ -20,7 +20,7 @@ public class LocationLookup {
 
     public void add(final BuildingLocation buildingLocation) {
         regionsMap.put(buildingLocation.getRegionId(), buildingLocation.getRegion());
-        locationsMap.put(buildingLocation.getBuildingLocationId(), buildingLocation.getBuildingLocationName());
+        locationsMap.put(buildingLocation.getEpimmsId(), buildingLocation.getBuildingLocationName());
     }
 
     public String getLocationName(final String locationId) {
