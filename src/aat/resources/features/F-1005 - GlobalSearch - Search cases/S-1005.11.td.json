@@ -6,10 +6,8 @@
 
   "specs": [
     "an active profile in CCD",
-
     "contains at least one fields from new global search screen",
     "contains neither CaseTypes nor Jurisdictions in search criteria",
-
     "has 400 return code",
     "contains the error message 'At least one jurisdiction or case type must be provided in the search criteria'"
   ],

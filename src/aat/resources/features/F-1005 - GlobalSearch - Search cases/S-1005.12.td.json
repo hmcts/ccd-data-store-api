@@ -6,10 +6,8 @@
 
   "specs": [
     "an active profile in CCD",
-
     "contains at least one fields from new global search screen",
     "contains CaseTypes but not Jurisdictions in search criteria",
-
     "has 200 return code"
   ],
 
