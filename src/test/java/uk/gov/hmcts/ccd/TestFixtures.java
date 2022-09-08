@@ -105,13 +105,15 @@ public abstract class TestFixtures {
         .build();
 
     protected final BuildingLocation location1 = BuildingLocation.builder()
-        .buildingLocationId("321")
+        .epimmsId("321")
+        .buildingLocationId("BL-1")
         .buildingLocationName("Location 1")
         .regionId("R-1")
         .region("Region 1")
         .build();
     protected final BuildingLocation location2 = BuildingLocation.builder()
-        .buildingLocationId("L-2")
+        .epimmsId("L-2")
+        .buildingLocationId("BL-2")
         .buildingLocationName("Location 2")
         .regionId("123")
         .region("Region 2")
