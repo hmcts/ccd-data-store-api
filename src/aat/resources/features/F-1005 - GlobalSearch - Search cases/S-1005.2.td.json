@@ -27,7 +27,7 @@
           "BEFTA_MASTER"
         ],
         "caseManagementBaseLocationIds": [
-          "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][building_location_id]}"
+          "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][epimms_id]}"
         ],
         "caseManagementRegionIds": [
           "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][region_id]}"
@@ -85,7 +85,7 @@
             "FirstNameValue"
           ],
           "caseNameHmctsInternal": "Name Internal",
-          "baseLocationId": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][building_location_id]}",
+          "baseLocationId": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][epimms_id]}",
           "baseLocationName": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][building_location_name]}",
           "caseManagementCategoryId": "987",
           "caseManagementCategoryName": "Category label",

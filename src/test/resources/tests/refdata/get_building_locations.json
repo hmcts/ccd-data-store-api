@@ -1,6 +1,7 @@
 [
   {
-    "building_location_id": "123",
+    "epimms_id": "123",
+    "building_location_id": "BL-ID",
     "building_location_name": "54 TEST ROAD",
     "building_location_status": "LIVE",
     "area": "North",
