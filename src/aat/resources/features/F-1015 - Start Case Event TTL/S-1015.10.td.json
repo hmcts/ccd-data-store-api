@@ -1,7 +1,8 @@
 {
   "_guid_": "S-1015.10",
-  "_extends_": "F-1015_RetrieveTriggerInternal",
-  "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified using V2 'internal/cases/{caseId}/event-triggers/{triggerId}'",
+  "_extends_": "StartEvent_v2Int__PositiveResponse_Base",
+
+  "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified using V2 'internal/cases/{cid}/event-triggers/{etid}'",
 
   "specs": [
     "an active profile in CCD",
@@ -11,20 +12,18 @@
     "contains the TTL.SystemTTL for the case, that has not been modified"
   ],
 
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
-      "triggerId": "updateCaseNoTTLInc"
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateCaseNoTTLInc"
     }
   },
 
   "expectedResponse": {
-    "responseCode": 200,
-    "responseMessage": "OK",
-    "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Vary": "Accept-Encoding"
-    },
     "body": {
       "id" : "updateCaseNoTTLInc",
       "name" : "Update with no TTL Increment",

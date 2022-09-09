@@ -1,0 +1,40 @@
+{
+  "_guid_": "GetCaseDetails__PositiveResponse_Base",
+  "_extends_": "GetCaseDetails__Base",
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+
+      "jurisdiction": "OVERRIDE",
+      "case_type": "OVERRIDE",
+
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+
+      "data": {
+      },
+      "data_classification": {
+      },
+
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}
