@@ -215,8 +215,8 @@ class ReferenceDataRepositoryTest {
 
             // GIVEN
             BuildingLocation[] expectedResponse = new BuildingLocation[]{
-                BuildingLocation.builder().buildingLocationId("BUILDING-UPDATE-1").build(),
-                BuildingLocation.builder().buildingLocationId("BUILDING-UPDATE-2").build()
+                BuildingLocation.builder().epimmsId("BUILDING-UPDATE-1").build(),
+                BuildingLocation.builder().epimmsId("BUILDING-UPDATE-2").build()
             };
             configMockRestTemplate(ReferenceDataRepository.BUILDING_LOCATIONS_PATH, expectedResponse);
             configMockCache(BUILDING_LOCATIONS_CACHE);
@@ -230,7 +230,7 @@ class ReferenceDataRepositoryTest {
             assertNotNull(buildingLocations);
             assertEquals(expectedResponse.length, buildingLocations.size());
             assertThat(
-                buildingLocations.stream().map(BuildingLocation::getBuildingLocationId).collect(Collectors.toList()),
+                buildingLocations.stream().map(BuildingLocation::getEpimmsId).collect(Collectors.toList()),
                 containsInAnyOrder("BUILDING-UPDATE-1", "BUILDING-UPDATE-2")
             );
         }
