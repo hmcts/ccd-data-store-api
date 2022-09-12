@@ -39,7 +39,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -51,7 +50,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DownstreamIssueException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
-import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -62,7 +60,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -1140,10 +1137,10 @@ class DefaultCaseDataAccessControlTest {
 
         Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
             .generateAccessProfilesForRestrictedCase(caseDetails);
-
+        Set<String> userRole = newHashSet(ROLE_NAME_3);
         assertNotNull(accessProfiles);
         assertEquals(1, accessProfiles.size());
-        assertEquals(ROLE_NAME_3, accessProfiles.iterator().next());
+        assertTrue(userRole.contains(accessProfiles.iterator().next()));
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
