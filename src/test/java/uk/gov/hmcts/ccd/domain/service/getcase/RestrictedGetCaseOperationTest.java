@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -88,10 +87,10 @@ class RestrictedGetCaseOperationTest {
             CASE_REFERENCE);
         doReturn(caseDetailsOptional).when(defaultGetCaseOperation).execute(CASE_REFERENCE);
 
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(accessProfiles),
-            eq(CAN_READ));
-        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(caseDetails.getState()),
-            eq(caseType), eq(accessProfiles), eq(CAN_READ));
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria((caseType), (accessProfiles),
+            (CAN_READ));
+        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria((caseDetails.getState()),
+            (caseType), (accessProfiles), (CAN_READ));
         doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         when(caseDataAccessControl.generateAccessProfilesForRestrictedCase(any(CaseDetails.class)))
             .thenReturn(accessProfiles);
@@ -176,8 +175,8 @@ class RestrictedGetCaseOperationTest {
             assertAll(
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesForRestrictedCase(caseDetails),
-                () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType),
-                    eq(accessProfiles), eq(CAN_READ)),
+                () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria((caseType),
+                    (accessProfiles), (CAN_READ)),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -199,7 +198,7 @@ class RestrictedGetCaseOperationTest {
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesForRestrictedCase(caseDetails),
                 () -> inOrder.verify(accessControlService, never())
-                    .canAccessCaseTypeWithCriteria(eq(caseType), eq(accessProfiles), eq(CAN_READ)),
+                    .canAccessCaseTypeWithCriteria((caseType), (accessProfiles), (CAN_READ)),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -220,8 +219,8 @@ class RestrictedGetCaseOperationTest {
             assertAll(
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesForRestrictedCase(caseDetails),
-                () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType),
-                    eq(accessProfiles), eq(CAN_READ)),
+                () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria((caseType),
+                    (accessProfiles), (CAN_READ)),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -230,8 +229,8 @@ class RestrictedGetCaseOperationTest {
         @DisplayName("should return empty case if no case type read access")
         void shouldReturnEmptyCaseIfNoCaseTypeReadAccess() {
             doReturn(Optional.empty()).when(authorisedGetCaseOperation).execute(CASE_REFERENCE);
-            doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(accessProfiles),
-                eq(CAN_READ));
+            doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria((caseType), (accessProfiles),
+                (CAN_READ));
 
             final Optional<CaseDetails> result = restrictedGetCaseOperation.execute(JURISDICTION_ID,
                 CASE_TYPE_ID,
@@ -242,9 +241,9 @@ class RestrictedGetCaseOperationTest {
             assertAll(
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesForRestrictedCase(caseDetails),
-                () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
-                    eq(accessProfiles),
-                    eq(CAN_READ)),
+                () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria((caseType),
+                    (accessProfiles),
+                    (CAN_READ)),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -312,8 +311,8 @@ class RestrictedGetCaseOperationTest {
             assertAll(
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesForRestrictedCase(caseDetails),
-                () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType),
-                    eq(accessProfiles), eq(CAN_READ)),
+                () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria((caseType),
+                    (accessProfiles), (CAN_READ)),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -333,7 +332,7 @@ class RestrictedGetCaseOperationTest {
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesForRestrictedCase(caseDetails),
                 () -> inOrder.verify(accessControlService, never())
-                    .canAccessCaseTypeWithCriteria(eq(caseType), eq(accessProfiles), eq(CAN_READ)),
+                    .canAccessCaseTypeWithCriteria((caseType), (accessProfiles), (CAN_READ)),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -352,8 +351,8 @@ class RestrictedGetCaseOperationTest {
             assertAll(
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesForRestrictedCase(caseDetails),
-                () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType),
-                    eq(accessProfiles), eq(CAN_READ)),
+                () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria((caseType),
+                    (accessProfiles), (CAN_READ)),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -362,8 +361,8 @@ class RestrictedGetCaseOperationTest {
         @DisplayName("should return empty case if no case type read access")
         void shouldReturnEmptyCaseIfNoCaseTypeReadAccess() {
             doReturn(Optional.empty()).when(authorisedGetCaseOperation).execute(CASE_REFERENCE);
-            doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(accessProfiles),
-                eq(CAN_READ));
+            doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria((caseType), (accessProfiles),
+                (CAN_READ));
 
             final Optional<CaseDetails> result = restrictedGetCaseOperation.execute(CASE_REFERENCE);
 
@@ -372,9 +371,9 @@ class RestrictedGetCaseOperationTest {
             assertAll(
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesForRestrictedCase(caseDetails),
-                () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
-                    eq(accessProfiles),
-                    eq(CAN_READ)),
+                () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria((caseType),
+                    (accessProfiles),
+                    (CAN_READ)),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
