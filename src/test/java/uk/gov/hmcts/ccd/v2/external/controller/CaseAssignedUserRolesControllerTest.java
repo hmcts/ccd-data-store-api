@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
+import uk.gov.hmcts.ccd.v2.external.domain.SearchCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
 import java.util.ArrayList;
@@ -385,7 +388,7 @@ class CaseAssignedUserRolesControllerTest {
         }
 
         @Test
-        void getCaseUserRoles_throwsExceptionWhenEmptyCaseIdListContainsInvalidCaseId() {
+        void getCaseUserRoles_throwsExceptionWhenCaseIdListContainsInvalidCaseId() {
             List<String> caseIds = Lists.newArrayList(CASE_ID_BAD);
             Optional<List<String>> optionalUserIds = Optional.of(Lists.newArrayList());
 
@@ -429,6 +432,120 @@ class CaseAssignedUserRolesControllerTest {
             ResponseEntity<CaseAssignedUserRolesResource> response = controller.getCaseUserRoles(
                 Lists.newArrayList(CASE_ID_GOOD),
                 Optional.empty());
+            assertNotNull(response);
+            assertNotNull(response.getBody());
+            assertEquals(2, response.getBody().getCaseAssignedUserRoles().size());
+        }
+
+    }
+
+    @Nested
+    @DisplayName("POST /case-users/search")
+    class SearchCaseUserRoles {
+
+        @BeforeEach
+        void setUp() {
+            when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList()))
+                .thenReturn(createCaseAssignedUserRoles());
+        }
+
+        private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {
+            List<CaseAssignedUserRole> userRoles = Lists.newArrayList();
+            userRoles.add(new CaseAssignedUserRole());
+            userRoles.add(new CaseAssignedUserRole());
+            return userRoles;
+        }
+
+        @ParameterizedTest(name = "searchCaseUserRoles_throwsExceptionWhenNullOrEmptyCaseIdListPassed: {0}")
+        @NullAndEmptySource
+        void searchCaseUserRoles_throwsExceptionWhenNullOrEmptyCaseIdListPassed(List<String> caseIds) {
+
+            // ARRANGE
+            List<String> userIds = Lists.newArrayList();
+            var request = new SearchCaseAssignedUserRolesRequest(caseIds, userIds);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.searchCaseUserRoles(request)
+            );
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                    containsString(V2.Error.EMPTY_CASE_ID_LIST))
+            );
+        }
+
+        @Test
+        void searchCaseUserRoles_throwsExceptionWhenCaseIdListContainsInvalidCaseId() {
+
+            // ARRANGE
+            List<String> caseIds = Lists.newArrayList(CASE_ID_BAD);
+            List<String> userIds = Lists.newArrayList();
+            var request = new SearchCaseAssignedUserRolesRequest(caseIds, userIds);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.searchCaseUserRoles(request)
+            );
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                    containsString(V2.Error.CASE_ID_INVALID))
+            );
+        }
+
+        @Test
+        void searchCaseUserRoles_throwsExceptionWhenInvalidUserIdListPassed() {
+
+            // ARRANGE
+            List<String> caseIds = Lists.newArrayList(CASE_ID_GOOD);
+            List<String> userIds = Lists.newArrayList("8900", "", "89002");
+            var request = new SearchCaseAssignedUserRolesRequest(caseIds, userIds);
+
+            // ACT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.searchCaseUserRoles(request)
+            );
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                    containsString(V2.Error.USER_ID_INVALID))
+            );
+        }
+
+        @Test
+        void searchCaseUserRoles_shouldGetResponseWhenCaseIdsAndUserIdsPassed() {
+
+            // ARRANGE
+            when(caseReferenceService.validateUID(anyString())).thenReturn(true);
+            var request = new SearchCaseAssignedUserRolesRequest(
+                Lists.newArrayList(CASE_ID_GOOD),
+                Lists.newArrayList("8900", "89002")
+            );
+
+            // ACT
+            ResponseEntity<CaseAssignedUserRolesResource> response = controller.searchCaseUserRoles(request);
+
+            // ASSERT
+            assertNotNull(response);
+            assertNotNull(response.getBody());
+            assertEquals(2, response.getBody().getCaseAssignedUserRoles().size());
+        }
+
+        @Test
+        void searchCaseUserRoles_shouldGetResponseWhenCaseIdsPassed() {
+
+            // ARRANGE
+            when(caseReferenceService.validateUID(anyString())).thenReturn(true);
+            var request = new SearchCaseAssignedUserRolesRequest(
+                Lists.newArrayList(CASE_ID_GOOD),
+                Lists.newArrayList()
+            );
+
+            // ACT
+            ResponseEntity<CaseAssignedUserRolesResource> response = controller.searchCaseUserRoles(request);
+
+            // ASSERT
             assertNotNull(response);
             assertNotNull(response.getBody());
             assertEquals(2, response.getBody().getCaseAssignedUserRoles().size());
@@ -858,6 +975,60 @@ class CaseAssignedUserRolesControllerTest {
 
             // ASSERT
             assertEquals("1,2,3,4,5,6,7,8,9,10", resultBuildOptionalIds);
+        }
+
+        @Test
+        void buildIds_shouldReturnEmptyStringWhenEmptyPassed() {
+            // ACT
+            String resultBuildIds = uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController
+                .buildIds(null);
+
+            // ASSERT
+            assertEquals("", resultBuildIds);
+        }
+
+        @Test
+        void buildIds_shouldReturnEmptyStringWhenEmptyListPassed() {
+            // ACT
+            String resultBuildIds =
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildIds(new ArrayList<>());
+
+            // ASSERT
+            assertEquals("", resultBuildIds);
+        }
+
+        @Test
+        void buildIds_shouldReturnSimpleStringWhenSingleListItemPassed() {
+            // ACT
+            String resultBuildIds =
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildIds(
+                    Lists.newArrayList("1"));
+
+            // ASSERT
+            assertEquals("1", resultBuildIds);
+        }
+
+        @Test
+        void buildIds_shouldReturnCsvStringWhenManyListItemsPassed() {
+            // ACT
+            String resultBuildIds =
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildIds(
+                    Lists.newArrayList("1", "2", "3"));
+
+            // ASSERT
+            assertEquals("1,2,3", resultBuildIds);
+        }
+
+        @Test
+        void buildIds_shouldReturnMaxCsvListWhenTooManyListItemsPassed() {
+            // ACT
+            // NB: max list size is 10 (u.g.h.c.a.a.AuditContext.MAX_CASE_IDS_LIST)
+            String resultBuildIds =
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildIds(
+                    Lists.newArrayList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"));
+
+            // ASSERT
+            assertEquals("1,2,3,4,5,6,7,8,9,10", resultBuildIds);
         }
 
         private CaseAssignedUserRolesRequest createAddCaseAssignedUserRolesRequest(int numberRequired) {
