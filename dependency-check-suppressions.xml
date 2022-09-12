@@ -17,6 +17,7 @@
 		<cve>CVE-2022-22978</cve>
 		<cve>CVE-2021-22112</cve>
 		<cve>CVE-2022-22976</cve>
+
 	</suppress>
 	<!--End of false positives section -->
 
@@ -28,10 +29,12 @@
 	    </notes>
 	    <cve>CVE-2021-22044</cve>
 	    <cve>CVE-2022-25857</cve>
+	  </suppress>
+	<!--End of temporary suppression section -->
+	<suppress>
 		<cve>CVE-2022-38749</cve>
 		<cve>CVE-2022-38751</cve>
 		<cve>CVE-2022-38750</cve>
-	  </suppress>
-	<!--End of temporary suppression section -->
+	</suppress>
 
 </suppressions>
