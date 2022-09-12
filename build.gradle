@@ -903,7 +903,7 @@ task reloadEnvSecrets {
 }
 
 task runRemoteDemo(type: JavaExec) {
-    main = bootJar.mainClassName
+    main = mainClassName
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {
         configRemoteRunTask(it, 'demo')
