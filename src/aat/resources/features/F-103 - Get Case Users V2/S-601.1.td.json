@@ -1,7 +1,7 @@
 {
   "title": "must return an error response for a missing Case ID",
-  "_guid_": "S-601",
-	"_extends_": "F-103_Get_Case_Assigned_User_Roles_Base",
+  "_guid_": "S-601.1",
+  "_extends_": "CaseUserRoles_Search__Base",
 
   "specs": [
     "Dil - with a valid User ID",
@@ -18,10 +18,12 @@
     }
   },
 
-  "request" : {
-    "queryParams": {
-      "case_ids": "",
-      "user_ids": "${[scenarioContext][testData][users][userDil][id]}"
+  "request": {
+    "body": {
+      "case_ids": [],
+      "user_ids": [
+        "${[scenarioContext][testData][users][userDil][id]}"
+      ]
     }
   },
 
