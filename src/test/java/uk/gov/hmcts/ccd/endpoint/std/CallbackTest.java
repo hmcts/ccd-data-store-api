@@ -7,6 +7,8 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
@@ -113,6 +115,19 @@ public class CallbackTest extends WireMockBaseTest {
         "      }\n" +
         "    }\n" +
         "  }";
+
+    private static final String EXPECTED_CALLBACK_DATA_CLASSIFICATION_STRING =
+        "{\n" +
+            "    \"PersonLastName\": \"PRIVATE\",\n" +
+            "    \"PersonAddress\": {\n" +
+            "      \"classification\" : \"PRIVATE\",\n" +
+            "      \"value\" : {\n" +
+            "        \"AddressLine1\": \"PRIVATE\",\n" +
+            "        \"AddressLine2\": \"PRIVATE\"\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"D8Document\": \"PRIVATE\"" +
+            "  }";
 
     private String modifiedDataString;
 
@@ -535,6 +550,10 @@ public class CallbackTest extends WireMockBaseTest {
             mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
             .toString(), Map.class);
         assertThat("Incorrect Response Data Content", actualData.entrySet().size(), equalTo(0));
+        String actualDataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("data_classification").toString();
+        JSONAssert.assertEquals(EXPECTED_CALLBACK_DATA_CLASSIFICATION_STRING, actualDataClassification,
+            JSONCompareMode.LENIENT);
 
         final List<CaseDetails> caseDetailsList = jdbcTemplate.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());

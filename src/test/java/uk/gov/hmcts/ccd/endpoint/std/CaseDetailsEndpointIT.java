@@ -1590,6 +1590,22 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 caseDetails.getData().get("D8Document").get("document_binary_url").asText());
             assertEquals("Seagulls_Square.jpg",
                 caseDetails.getData().get("D8Document").get("document_filename").asText());
+            assertEquals(4, caseDetails.getDataClassification().size());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification")
+                .asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine1").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine2").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine3").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Country").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Postcode").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").asText());
         }
 
         {
@@ -1616,6 +1632,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("London", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
             assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
             assertEquals("SE1 4EE", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
+            assertEquals(3, caseDetails.getDataClassification().size());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification")
+                .asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine1").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine2").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine3").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Country").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Postcode").asText());
         }
     }
 
@@ -1695,6 +1726,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 caseDetails.getData().get("D8Document").get("document_binary_url").asText());
             assertEquals("Seagulls_Square.jpg",
                 caseDetails.getData().get("D8Document").get("document_filename").asText());
+            assertEquals(4, caseDetails.getDataClassification().size());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification")
+                .asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine1").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress")
+                .get("classification").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").asText());
         }
 
         {
@@ -1721,6 +1762,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("London", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
             assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
             assertEquals("SE1 4EE", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
+            assertEquals(3, caseDetails.getDataClassification().size());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine1").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine2").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine3").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Country").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Postcode").asText());
         }
     }
 
@@ -3357,6 +3411,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "      \"case_data\":{  \n" +
             "\n" +
             "      },\n" +
+            "      \"data_classification\":{  \n" +
+            "\n" +
+            "      },\n" +
             "      \"after_submit_callback_response\":null,\n" +
             "      \"callback_response_status_code\":null,\n" +
             "      \"callback_response_status\":null\n" +
@@ -3458,12 +3515,17 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         );
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         JsonNode caseData = mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data");
+        JsonNode dataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("data_classification");
         Map actualData = mapper.readValue(caseData.toString(), Map.class);
         assertAll(() -> assertThat("Incorrect Response Content",
             actualData.entrySet(),
             everyItem(isIn(expectedSanitizedData.entrySet()))),
             () -> assertThat("Response contains filtered out data", caseData.has("PersonFirstName"),
-                is(false))
+                is(false)),
+            () -> assertThat(dataClassification.has("PersonFirstName"), CoreMatchers.is(false)),
+            () -> assertThat(dataClassification.has("PersonLastName"), CoreMatchers.is(true)),
+            () -> assertThat(dataClassification.has("PersonAddress"), CoreMatchers.is(true))
         );
     }
 
@@ -3578,6 +3640,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         JsonNode nodeData = mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data");
 
+        JsonNode nodeClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("data_classification");
         assertAll(
             () -> assertThat(nodeData.has("PersonFirstName"), CoreMatchers.is(false)),
             () -> assertThat(nodeData.get("PersonLastName"), CoreMatchers.is(getTextNode("_ Roof"))),
@@ -3591,7 +3655,20 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             () -> assertThat(nodeData.get("PersonAddress").get("AddressLine2"),
                              CoreMatchers.is(getTextNode("_ 2 Hubble Avenue"))),
             () -> assertThat(nodeData.get("PersonAddress").get("AddressLine3"),
-                             CoreMatchers.is(getTextNode("_ ButtonVillie")))
+                             CoreMatchers.is(getTextNode("_ ButtonVillie"))),
+            () -> assertThat(nodeClassification.has("PersonFirstName"), CoreMatchers.is(false)),
+            () -> assertThat(nodeClassification.has("PersonLastName"), CoreMatchers.is(true)),
+            () -> assertThat(nodeClassification.has("PersonAddress"), CoreMatchers.is(true)),
+            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("Country"),
+                CoreMatchers.is(true)),
+            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("Postcode"),
+                CoreMatchers.is(true)),
+            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine1"),
+                CoreMatchers.is(true)),
+            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine2"),
+                CoreMatchers.is(true)),
+            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine3"),
+                CoreMatchers.is(true))
         );
     }
 
@@ -3672,6 +3749,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "      \"last_modified\":null,\n" +
             "      \"security_classification\":\"PUBLIC\",\n" +
             "      \"case_data\":{  \n" +
+            "\n" +
+            "      },\n" +
+            "      \"data_classification\":{  \n" +
             "\n" +
             "      },\n" +
             "      \"after_submit_callback_response\":null,\n" +
@@ -3914,7 +3994,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             () -> assertThat(rootNode.get("case_details").get("case_data").has("PersonAddress"),
                              CoreMatchers.is(true)),
             () -> assertThat(rootNode.get("case_details").get("case_data").has("D8Document"),
-                             CoreMatchers.is(true))
+                             CoreMatchers.is(true)),
+            () -> assertThat(rootNode.get("case_details").get("data_classification").has("PersonFirstName"),
+                CoreMatchers.is(false)),
+            () -> assertThat(rootNode.get("case_details").get("data_classification").has("PersonLastName"),
+                CoreMatchers.is(true)),
+            () -> assertThat(rootNode.get("case_details").get("data_classification").has("PersonAddress"),
+                CoreMatchers.is(true)),
+            () -> assertThat(rootNode.get("case_details").get("data_classification").has("D8Document"),
+                CoreMatchers.is(true))
         );
     }
 
@@ -4362,12 +4450,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(responseAsString, containsString("Janet"));
         assertThat(responseAsString, containsString("Parker"));
         assertThat(responseAsString, containsString("Fake Street"));
+        assertThat(responseAsString, containsString("\"PersonLastName\":\"PUBLIC\""));
         assertThat(responseAsString,
             containsString("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
 
         assertThat(responseAsString, containsString("George"));
         assertThat(responseAsString, containsString("Roof"));
         assertThat(responseAsString, containsString("2 Hubble Avenue"));
+        assertThat(responseAsString, containsString("\"AddressLine1\":\"PUBLIC\""));
     }
 
     @Test
@@ -5418,6 +5508,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"\n"
             + "      }\n"
             + "    },\n"
+            + "    \"data_classification\" : null,\n"
             + "    \"supplementary_data\" : null,\n"
             + "    \"after_submit_callback_response\" : null,\n"
             + "    \"callback_response_status_code\" : null,\n"
@@ -5437,7 +5528,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "\"last_state_modified_date\":null,\"security_classification\":null,"
                 + "\"case_data\":{\"PersonLastName\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
                 + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}},"
-                + "\"supplementary_data\":null,\"after_submit_callback_response\":null,"
+                + "\"data_classification\":null,\"supplementary_data\":null,\"after_submit_callback_response\":null,"
                 + "\"callback_response_status_code\":null,\"callback_response_status\":null,"
                 + "\"delete_draft_response_status_code\":null,\"delete_draft_response_status\":null},"
                 + "\"case_details_before\":null,"
