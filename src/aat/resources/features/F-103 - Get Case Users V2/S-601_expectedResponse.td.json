@@ -1,0 +1,13 @@
+{
+  "_guid_": "S-601_expectedResponse",
+  "_extends_": "Common_400_Response",
+
+  "body": {
+    "_extends_": "Common_400_Response_Body",
+    "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+    "message": "Invalid data provided for the following inputs to the request:\nCase ID list is empty",
+    "details": null,
+    "callbackErrors": null,
+    "callbackWarnings": null
+  }
+}

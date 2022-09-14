@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -80,9 +78,6 @@ public class SecurityClassificationServiceTest {
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
 
-    @Mock
-    private CaseAccessCategoriesService caseAccessCategoriesService;
-
     private CaseDetails caseDetails;
 
     @BeforeEach
@@ -95,11 +90,7 @@ public class SecurityClassificationServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         securityClassificationService = spy(new SecurityClassificationServiceImpl(caseDataAccessControl,
-            caseDefinitionRepository,
-            caseAccessCategoriesService));
-        Predicate<CaseDetails> predicate = cd -> true;
-        when(caseAccessCategoriesService
-            .caseHasMatchingCaseAccessCategories(anySet(), anyBoolean())).thenReturn(predicate);
+            caseDefinitionRepository));
     }
 
     @Nested
