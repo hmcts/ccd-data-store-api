@@ -36,6 +36,7 @@ import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -234,8 +235,8 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
     private List<AccessProfile> generateAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
                                                        CaseTypeDefinition caseTypeDefinition) {
-        List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings = new ArrayList<>();
-        pseudoAccessProfilesMappings.addAll(caseTypeDefinition.getRoleToAccessProfiles());
+        List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings =
+            new ArrayList<>(caseTypeDefinition.getRoleToAccessProfiles());
         if (pseudoAccessProfilesMappings.isEmpty()) {
             List<RoleToAccessProfileDefinition> generated =
                 pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition);
@@ -292,7 +293,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
                     roleAssignmentService.getRoleAssignments(securityUtils.getUserId()),
                     caseDetails.get());
 
-            populateCaseAccessMetadata(caseAccessMetadata, filteredRoleAssignments);
+            populateCaseAccessMetadata(caseDetails.get(), caseAccessMetadata, filteredRoleAssignments);
         }
         return caseAccessMetadata;
     }
@@ -345,10 +346,13 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
             .collect(Collectors.toSet());
     }
 
-    private void populateCaseAccessMetadata(CaseAccessMetadata caseAccessMetadata,
+    private void populateCaseAccessMetadata(CaseDetails caseDetails,
+                                            CaseAccessMetadata caseAccessMetadata,
                                             FilteredRoleAssignments filteredRoleAssignments) {
-        List<RoleAssignment> pseudoRoleAssignments
-            = appendGeneratedPseudoRoleAssignments(filteredRoleAssignments.getFilteredMatchingRoleAssignments());
+        List<RoleAssignment> pseudoRoleAssignments = appendGeneratedPseudoRoleAssignments(
+            caseDetails,
+            filteredRoleAssignments.getFilteredMatchingRoleAssignments()
+        );
 
         caseAccessMetadata.setAccessGrants(generatePostFilteringAccessGrants(pseudoRoleAssignments));
         caseAccessMetadata.setAccessProcess(generatePostFilteringAccessProcess(
@@ -356,13 +360,68 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
             pseudoRoleAssignments));
     }
 
-    private List<RoleAssignment> appendGeneratedPseudoRoleAssignments(List<RoleAssignment> filteringResults) {
+    private List<RoleAssignment> appendGeneratedPseudoRoleAssignments(CaseDetails caseDetails,
+                                                                      List<RoleAssignment> filteringResults) {
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
                 .createPseudoRoleAssignments(filteringResults, false);
-            filteringResults = augment(filteringResults, pseudoRoleAssignments);
+
+            List<String> pseudoRoleNamesOfInterestToCase = getPseudoRoleNamesOfInterestToCase(
+                caseDetails, pseudoRoleAssignments
+            );
+            RoleAssignments pseudoRoleAssignmentsForCase = new RoleAssignments(
+                pseudoRoleAssignments.stream()
+                    .filter(roleAssignment -> pseudoRoleNamesOfInterestToCase.contains(roleAssignment.getRoleName()))
+                    .collect(Collectors.toList())
+            );
+
+            FilteredRoleAssignments filteredPseudoRoleAssignments =
+                roleAssignmentsFilteringService.filter(pseudoRoleAssignmentsForCase, caseDetails);
+
+            filteringResults =
+                augment(filteringResults, filteredPseudoRoleAssignments.getFilteredMatchingRoleAssignments());
         }
         return filteringResults;
+    }
+
+    private List<String> getPseudoRoleNamesOfInterestToCase(CaseDetails caseDetails,
+                                                            List<RoleAssignment> pseudoRoleAssignments) {
+
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+
+        // generate list of access profiles for case from matching pseudoRoleAssignments
+        List<String> accessProfilesForPseudoRoles = generateAccessProfiles(
+            pseudoRoleAssignments,
+            caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId())
+        ).stream()
+            .map(AccessProfile::getAccessProfile)
+            .collect(Collectors.toList());
+
+        if (accessProfilesForPseudoRoles.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            var roleToAccessProfileDefinitions = caseTypeDefinition.getRoleToAccessProfiles();
+
+            if (roleToAccessProfileDefinitions.isEmpty()) {
+                // legacy processing when no access RoleToAccessProfile configured
+                return accessProfilesForPseudoRoles.stream()
+                    .map(acl -> AccessControl.IDAM_PREFIX + acl)
+                    .collect(Collectors.toList());
+            } else {
+                // get pseudo role names from RoleToAccessProfileDefinitions
+                return roleToAccessProfileDefinitions.stream()
+                    .filter(roleToAccessProfileDefinition ->
+                        !roleToAccessProfileDefinition.getDisabled()
+                        && roleToAccessProfileDefinition.getRoleName().startsWith(AccessControl.IDAM_PREFIX)
+                        // NB: AccessProfile list filter used as IDAM_PREFIX + RoleName not guaranteed to match AP name
+                        && roleToAccessProfileDefinition.getAccessProfileList().stream().anyMatch(
+                            accessProfilesForPseudoRoles::contains
+                        )
+                    )
+                    .map(RoleToAccessProfileDefinition::getRoleName)
+                    .collect(Collectors.toList());
+            }
+        }
     }
 
     private AccessProcess generatePostFilteringAccessProcess(FilteredRoleAssignments filteredRoleAssignments,
