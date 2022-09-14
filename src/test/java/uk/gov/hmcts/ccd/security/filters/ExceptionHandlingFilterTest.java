@@ -41,6 +41,7 @@ public class ExceptionHandlingFilterTest {
 
     private static final String EXCEPTION_MESSAGE = "Exception thrown in the security filter chain";
     private static final String EXCEPTION_LOGGER_TYPE = "uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter";
+
     @Before
     public void setUp() {
         filter = new ExceptionHandlingFilter();
