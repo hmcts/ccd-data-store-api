@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
@@ -354,8 +355,9 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     private void populateCaseAccessMetadata(CaseDetails caseDetails,
                                             CaseAccessMetadata caseAccessMetadata,
                                             FilteredRoleAssignments filteredRoleAssignments) {
-        List<RoleAssignment> pseudoRoleAssignments
-            = appendGeneratedPseudoRoleAssignments(filteredRoleAssignments.getFilteredMatchingRoleAssignments());
+
+        List<RoleAssignment> pseudoRoleAssignments =
+            pseudoGenerateRoleAssignments(filteredRoleAssignments.getFilteredMatchingRoleAssignments(), false);
 
         caseAccessMetadata.setAccessGrants(generatePostFilteringAccessGrants(pseudoRoleAssignments));
         caseAccessMetadata.setAccessProcess(generatePostFilteringAccessProcess(
@@ -364,50 +366,52 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
             pseudoRoleAssignments));
     }
 
-    private List<RoleAssignment> appendGeneratedPseudoRoleAssignments(List<RoleAssignment> filteringResults) {
-        if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
-            List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
-                .createPseudoRoleAssignments(filteringResults, false);
-            filteringResults = augment(filteringResults, pseudoRoleAssignments);
-        }
-        return filteringResults;
-    }
-
     private AccessProcess generatePostFilteringAccessProcess(CaseDetails caseDetails,
                                                              FilteredRoleAssignments filteredRoleAssignments,
-                                                             List<RoleAssignment> matchingAndPsuedoRoleAssignments) {
-        boolean userHasAccessToCase = userHasAccessToCaseWithGivenRoleAssignments(
+                                                             List<RoleAssignment> matchingAndPseudoRoleAssignments) {
+        boolean userHasAccessToCase = userHasAccessToCaseUsingRoleAssignments(
             caseDetails,
-            matchingAndPsuedoRoleAssignments
+            matchingAndPseudoRoleAssignments
         );
 
         if (userHasAccessToCase) {
             return AccessProcess.NONE;
-        } else if (// retry using just those RoleAssignments that failed ONLY on region/baseLocation
-            userHasAccessToCaseWithGivenRoleAssignments(
-                caseDetails,
-                filteredRoleAssignments.getFilteredRoleAssignmentsFailedOnRegionOrBaseLocationMatcher()
-            )
-        ) {
-            return AccessProcess.CHALLENGED;
         } else {
+
+            List<RoleAssignment> roleAssignmentsFailedOnRegionOrBaseLocation
+                = filteredRoleAssignments.getFilteredRoleAssignmentsFailedOnRegionOrBaseLocationMatcher();
+
+            // retry using just those RoleAssignments that failed ONLY on region/baseLocation
+            if (!roleAssignmentsFailedOnRegionOrBaseLocation.isEmpty()
+                && userHasAccessToCaseUsingRoleAssignments(caseDetails, roleAssignmentsFailedOnRegionOrBaseLocation)) {
+                return AccessProcess.CHALLENGED;
+            }
+
+            // otherwise return default
             return AccessProcess.SPECIFIC;
         }
     }
 
-    private boolean userHasAccessToCaseWithGivenRoleAssignments(CaseDetails caseDetails,
-                                                                List<RoleAssignment> roleAssignments) {
+    private boolean userHasAccessToCaseUsingRoleAssignments(CaseDetails caseDetails,
+                                                            List<RoleAssignment> roleAssignments) {
+
         List<RoleAssignment> roleAssignmentsOfInterest = roleAssignments.stream()
             .filter(DefaultCaseDataAccessControl::isRoleAssignmentsOfInterestToAccessProcessCheck)
             .collect(Collectors.toList());
 
         CaseTypeDefinition caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
-        Set<AccessProfile> accessProfiles = new HashSet<>(generateAccessProfiles(roleAssignmentsOfInterest, caseType));
+        if (caseType != null) {
+            Set<AccessProfile> accessProfiles =
+                new HashSet<>(generateAccessProfiles(roleAssignmentsOfInterest, caseType));
 
-        String caseState = caseDetails.getState();
+            String caseState = caseDetails.getState();
 
-        return accessControlService.canAccessCaseTypeWithCriteria(caseType, accessProfiles, CAN_READ)
-            && accessControlService.canAccessCaseStateWithCriteria(caseState, caseType, accessProfiles, CAN_READ);
+            return !CollectionUtils.isEmpty(accessProfiles)
+                && accessControlService.canAccessCaseTypeWithCriteria(caseType, accessProfiles, CAN_READ)
+                && accessControlService.canAccessCaseStateWithCriteria(caseState, caseType, accessProfiles, CAN_READ);
+        }
+
+        return false;
     }
 
     private static boolean isRoleAssignmentsOfInterestToAccessProcessCheck(RoleAssignment roleAssignment) {
