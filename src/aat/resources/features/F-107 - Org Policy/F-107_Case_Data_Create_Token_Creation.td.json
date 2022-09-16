@@ -62,6 +62,9 @@
             ]
           }
         },
+        "data_classification": {
+          "DynamicList": "PUBLIC"
+        },
         "supplementary_data": null
       },
       "event_id": "createCase"

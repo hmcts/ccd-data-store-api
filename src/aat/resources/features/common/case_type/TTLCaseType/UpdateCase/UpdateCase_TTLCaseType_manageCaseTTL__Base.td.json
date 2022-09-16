@@ -48,6 +48,9 @@
           "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
           "Suspended" : "No"
         }
+      },
+      "data_classification": {
+        "TextField": "PUBLIC"
       }
     }
   }

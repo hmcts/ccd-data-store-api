@@ -90,6 +90,7 @@
             }
           ]
         },
+        "data_classification": "[[ANYTHING_PRESENT]]",
         "supplementary_data" : {
           "orgs_assigned_users" : {
             "OrgB" : 1

@@ -42,6 +42,9 @@
       "case_data": {
         "TextField": "Create Case"
       },
+      "data_classification": {
+        "TextField": "PUBLIC"
+      },
       "supplementary_data": null
     }
   }

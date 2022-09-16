@@ -54,6 +54,9 @@
               "label" : " List 7"
             } ]
           }
+        },
+        "data_classification" : {
+          "DynamicList" : "PUBLIC"
         }
       },
       "event_id": "createCase"

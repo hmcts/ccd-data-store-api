@@ -99,6 +99,55 @@
             "TextAreaField": "[[ANY_NULLABLE]]",
             "CollectionField": []
           },
+          "data_classification": {
+            "MoneyGBPField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "FixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DocumentField4": "[[ANY_NULLABLE]]",
+            "DocumentField7": "[[ANY_NULLABLE]]",
+            "AddressUKField": {
+              "value": {
+                "PostCode": "[[ANY_STRING_NOT_NULLABLE]]",
+                "PostTown": "[[ANY_STRING_NOT_NULLABLE]]",
+                "County": "[[ANY_STRING_NOT_NULLABLE]]",
+                "Country": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine2": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine3": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine1": "[[ANY_STRING_NOT_NULLABLE]]"
+              },
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            },
+            "ComplexField": {
+              "value": {
+                "ComplexFixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+                "ComplexNestedField": {
+                  "value": {
+                    "NestedCollectionTextField": {
+                      "value": [],
+                      "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+                    },
+                    "NestedNumberField": "[[ANY_STRING_NOT_NULLABLE]]"
+                  },
+                  "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+                },
+                "ComplexTextField": "[[ANY_STRING_NOT_NULLABLE]]"
+              },
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            },
+            "FixedRadioListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DateTimeField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "PhoneUKField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "NumberField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "MultiSelectListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "YesOrNoField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "EmailField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "TextField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DateField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "TextAreaField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "CollectionField": {
+              "value": [],
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            }
+          },
           "supplementary_data": null,
           "after_submit_callback_response": "[[ANY_NULLABLE]]",
           "callback_response_status_code": "[[ANY_NULLABLE]]",

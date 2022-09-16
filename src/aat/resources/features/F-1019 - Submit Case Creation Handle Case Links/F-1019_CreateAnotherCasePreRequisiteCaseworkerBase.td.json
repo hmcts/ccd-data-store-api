@@ -15,6 +15,9 @@
       "case_data" : {
         "TextField": "This is the case being updated"
       }
+    },
+    "data_classification": {
+      "TextField": "PUBLIC"
     }
   }
 }

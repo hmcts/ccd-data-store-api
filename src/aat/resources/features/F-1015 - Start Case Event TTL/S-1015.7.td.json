@@ -35,6 +35,9 @@
         "case_type_id": "FT_MasterCaseType",
         "case_data": {
           "_extends_": "TTL_Case_Data"
+        },
+        "data_classification": {
+          "_extends_": "TTL_Classifications"
         }
       },
       "event_id": "updateCaseNoTTLInc"

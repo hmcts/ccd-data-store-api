@@ -59,6 +59,9 @@
 
       "case_data": {
         "TextField" : "[[ANYTHING_PRESENT]]"
+      },
+      "data_classification" : {
+        "TextField" : "PUBLIC"
       }
     }
   }

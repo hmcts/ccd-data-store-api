@@ -51,6 +51,10 @@
             "Suspended" : "NO"
           },
           "TextField" : "[[ANYTHING_PRESENT]]"
+        },
+
+        "data_classification": {
+          "TextField" : "PUBLIC"
         }
       },
       "event_id": "updateWithStartTTLToUpper"

@@ -130,6 +130,67 @@
           }
         }
       },
+      "data_classification": {
+        "Homeless": "PUBLIC",
+        "Children": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "ChildFullName": "PUBLIC",
+                "ChildGender": "PUBLIC",
+                "ChildDOB": "PUBLIC",
+                "ChildAddress": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "AddressLine1": "PUBLIC",
+                    "AddressLine2": "PUBLIC",
+                    "AddressLine3": "PUBLIC",
+                    "PostTown": "PUBLIC",
+                    "County": "PUBLIC",
+                    "PostCode": "PUBLIC",
+                    "Country": "PUBLIC"
+                  }
+                },
+                "IsAutistic": "PUBLIC",
+                "NeedsSupport": "PUBLIC",
+                "AutisticChildCaseNumber": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "CaseReference": "PUBLIC"
+                  }
+                }
+              },
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        },
+        "FamilyDetails": {
+          "classification": "PUBLIC",
+          "value": {
+            "MotherFullName": "PUBLIC",
+            "MotherAge": "PUBLIC",
+            "FatherFullName": "PUBLIC",
+            "FatherAge": "PUBLIC",
+            "Children": {
+              "classification": "PUBLIC",
+              "value": []
+            },
+            "FamilyAddress": {
+              "classification": "PUBLIC",
+              "value": {
+                "AddressLine1": "PUBLIC",
+                "AddressLine2": "PUBLIC",
+                "AddressLine3": "PUBLIC",
+                "PostTown": "PUBLIC",
+                "County": "PUBLIC",
+                "PostCode": "PUBLIC",
+                "Country": "PUBLIC"
+              }
+            }
+          }
+        }
+      },
       "supplementary_data" : null,
       "after_submit_callback_response": null,
       "callback_response_status_code": null,

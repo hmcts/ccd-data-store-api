@@ -29,6 +29,9 @@
          "case_type_id": "FT_GlobalSearch",
          "case_data": {
             "_extends_": "Befta_Global_Search_Expected_Search_Criteria"
+          },
+          "data_classification": {
+            "_extends_": "Befta_Global_Search_Data_Classifications"
           }
     }
   }

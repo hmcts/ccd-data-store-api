@@ -22,7 +22,8 @@
         "jurisdiction": "BEFTA_MASTER",
         "case_type_id": "[[ANYTHING_PRESENT]]",
 
-        "case_data": "[[ANYTHING_PRESENT]]"
+        "case_data": "[[ANYTHING_PRESENT]]",
+        "data_classification": "[[ANYTHING_PRESENT]]"
       },
 
       "event_id": "updateCaseSubmitTTL"

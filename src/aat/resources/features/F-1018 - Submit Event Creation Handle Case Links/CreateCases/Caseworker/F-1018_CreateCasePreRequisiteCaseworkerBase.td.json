@@ -45,6 +45,10 @@
         "TextField": "This is the case being updated",
         "SearchCriteria" : { }
       },
+      "data_classification": {
+        "TextField": "PUBLIC",
+        "SearchCriteria": "[[ANYTHING_PRESENT]]"
+      },
       "supplementary_data" : null
     }
   }

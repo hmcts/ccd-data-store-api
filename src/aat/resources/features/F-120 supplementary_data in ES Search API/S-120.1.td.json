@@ -87,6 +87,7 @@
             }
           ]
         },
+        "data_classification": "[[ANYTHING_PRESENT]]",
         "supplementary_data" : {
           "orgs_assigned_users" : {
             "OrgA" : 22,

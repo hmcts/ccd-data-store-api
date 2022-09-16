@@ -72,6 +72,36 @@
 				"TextAreaField": "textarea",
 				"CollectionField": []
 			},
+			"data_classification": {
+				"MoneyGBPField": "PUBLIC",
+				"FixedListField": "PUBLIC",
+				"AddressUKField": {
+					"value": {
+						"County": "PUBLIC",
+						"Country": "PUBLIC",
+						"PostCode": "PUBLIC",
+						"PostTown": "PUBLIC",
+						"AddressLine1": "PUBLIC",
+						"AddressLine2": "PUBLIC",
+						"AddressLine3": "PUBLIC"
+					},
+					"classification": "PUBLIC"
+				},
+				"FixedRadioListField": "PUBLIC",
+				"DateTimeField": "PUBLIC",
+				"PhoneUKField": "PUBLIC",
+				"NumberField": "PUBLIC",
+				"MultiSelectListField": "PUBLIC",
+				"YesOrNoField": "PUBLIC",
+				"EmailField": "PUBLIC",
+				"TextField": "PUBLIC",
+				"DateField": "PUBLIC",
+				"TextAreaField": "PUBLIC",
+				"CollectionField": {
+					"value": [],
+					"classification": "PUBLIC"
+				}
+			},
 			"supplementary_data": null,
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,

@@ -62,6 +62,9 @@
           "OverrideTTL" : "${[scenarioContext][childContexts][UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker][testData][actualResponse][body][case_data][TTL][OverrideTTL]}",
           "Suspended" : "${[scenarioContext][childContexts][UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker][testData][actualResponse][body][case_data][TTL][Suspended]}"
         }
+      },
+      "data_classification": {
+        "TextField": "PUBLIC"
       }
     }
   }

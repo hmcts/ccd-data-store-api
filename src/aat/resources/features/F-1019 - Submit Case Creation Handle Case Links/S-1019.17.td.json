@@ -33,6 +33,9 @@
     "body" : {
       "case_data" : {
         "_extends_": "F-1019-CaseDataWithStandardCaseLinks"
+      },
+      "data_classification": {
+        "_extends_": "F-1019-ClasificationsForCaseDataWithStandardCaseLinks"
       }
     }
   }

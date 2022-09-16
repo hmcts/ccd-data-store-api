@@ -114,6 +114,9 @@
           } ]
         }
       },
+			"data_classification": {
+        "_extends_": "Befta_Global_Search_Data_Classifications"
+      },
 			"supplementary_data": null,
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,

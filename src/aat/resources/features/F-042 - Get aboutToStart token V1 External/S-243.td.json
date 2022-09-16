@@ -35,6 +35,14 @@
 				"case_data": {
 					"_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role"
 				},
+				"data_classification": {
+					"MoneyGBPField": "PUBLIC",
+					"YesOrNoField": "PUBLIC",
+					"EmailField": "PUBLIC",
+					"TextField": "PUBLIC",
+					"PhoneUKField": "PUBLIC",
+					"NumberField": "PUBLIC"
+				},
 				"supplementary_data": null,
 				"after_submit_callback_response": null,
 				"callback_response_status_code": null,

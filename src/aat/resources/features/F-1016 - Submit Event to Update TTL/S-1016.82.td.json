@@ -61,6 +61,10 @@
           "SystemTTL" : null
         },
         "SearchCriteria" : { }
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications",
+        "SearchCriteria": "[[ANYTHING_PRESENT]]"
       }
     }
   }

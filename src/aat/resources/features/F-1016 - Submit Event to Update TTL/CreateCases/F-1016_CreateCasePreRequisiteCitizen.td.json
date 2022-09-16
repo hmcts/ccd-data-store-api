@@ -23,6 +23,9 @@
           "SystemTTL" : null
         }
       },
+      "data_classification": {
+        "_extends_": "TTL_Classifications"
+      },
       "supplementary_data": null
     }
   }

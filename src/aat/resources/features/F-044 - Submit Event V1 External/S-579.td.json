@@ -37,6 +37,10 @@
 					"document_filename": "Elastic Search test Case.png"
 				}
 			},
+			"data_classification": {
+				"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification",
+				"DocumentField2": "PUBLIC"
+			},
 			"supplementary_data": null,
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,

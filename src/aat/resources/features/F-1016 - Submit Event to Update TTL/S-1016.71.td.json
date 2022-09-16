@@ -57,6 +57,9 @@
 
       "case_data" : {
         "TextField": "Updated without supplying TTL"
+      },
+      "data_classification": {
+        "TextField": "PUBLIC"
       }
     }
   }

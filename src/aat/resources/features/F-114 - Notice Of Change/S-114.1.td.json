@@ -57,6 +57,40 @@
           "OrganisationName" : null
         }
       },
+      "data_classification": {
+        "ChangeOrganisationRequestField": {
+          "classification": "PUBLIC",
+          "value": {
+            "CaseRoleId": "PUBLIC",
+            "Reason": "PUBLIC",
+            "RequestTimestamp": "PUBLIC",
+            "ApprovalStatus": "PUBLIC",
+            "ApprovalRejectionTimestamp": "PUBLIC",
+            "NotesReason": "PUBLIC",
+            "OrganisationToAdd": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
+              }
+            },
+            "OrganisationToRemove": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
+              }
+            }
+          }
+        },
+        "OrganisationField": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrganisationID": "PUBLIC",
+            "OrganisationName": "PUBLIC"
+          }
+        }
+      },
       "supplementary_data": null,
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,

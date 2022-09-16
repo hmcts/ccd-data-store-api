@@ -48,6 +48,9 @@
       "case_data" : {
         "_extends_": "F-1019-CaseDataWithNestedComplexCaseLinks"
       },
+      "data_classification": {
+        "_extends_": "F-1019-ClasificationsForCaseDataWithNestedComplexCaseLinks"
+      },
       "supplementary_data" : null
     }
   }

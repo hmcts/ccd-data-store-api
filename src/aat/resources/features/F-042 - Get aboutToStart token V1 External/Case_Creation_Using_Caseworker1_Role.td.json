@@ -27,6 +27,14 @@
 			"case_data": {
 				"_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role"
 			},
+			"data_classification": {
+				"MoneyGBPField": "PUBLIC",
+				"PhoneUKField": "PUBLIC",
+				"NumberField": "PUBLIC",
+				"YesOrNoField": "PUBLIC",
+				"EmailField": "PUBLIC",
+				"TextField": "PUBLIC"
+			},
 			"supplementary_data": null
 		}
 	}

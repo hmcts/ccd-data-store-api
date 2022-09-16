@@ -32,6 +32,9 @@
 
       "case_data" : {
         "SearchCriteria" : { }
+      },
+      "data_classification": {
+        "SearchCriteria": "[[ANYTHING_PRESENT]]"
       }
     }
   }

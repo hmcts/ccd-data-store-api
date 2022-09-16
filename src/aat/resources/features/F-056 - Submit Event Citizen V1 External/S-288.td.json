@@ -73,6 +73,53 @@
           }
         ]
       },
+      "data_classification": {
+        "MoneyGBPField": "PUBLIC",
+        "FixedListField": "PUBLIC",
+        "AddressUKField": {
+          "classification": "PUBLIC",
+          "value": {
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "County": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "Country": "PUBLIC"
+          }
+        },
+        "FormattedDateTimeField": "PUBLIC",
+        "FormattedDateField": "PUBLIC",
+        "ComplexField": {
+          "classification": "PUBLIC",
+          "value": {
+            "ComplexTextField": "PUBLIC",
+            "ComplexFixedListField": "PUBLIC"
+          }
+        },
+        "DateTimeField": "PUBLIC",
+        "PhoneUKField": "PUBLIC",
+        "NumberField": "PUBLIC",
+        "MultiSelectListField": "PUBLIC",
+        "YesOrNoField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "TextAreaField": "PUBLIC",
+        "CollectionField": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "id": "CollectionField1",
+              "classification": "PUBLIC"
+            },
+            {
+              "id": "CollectionField2",
+              "classification": "PUBLIC"
+            }
+          ]
+        }
+      },
       "supplementary_data": null,
       "after_submit_callback_response": null,
       "callback_response_status_code": null,

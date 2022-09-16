@@ -20,6 +20,15 @@
         "CaseLinkField": {
           "CaseReference": "${}${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
         }
+      },
+      "data_classification": {
+        "TextField": "PUBLIC",
+        "CaseLinkField": {
+          "classification": "PUBLIC",
+          "value": {
+            "CaseReference": "PUBLIC"
+          }
+        }
       }
     }
   }

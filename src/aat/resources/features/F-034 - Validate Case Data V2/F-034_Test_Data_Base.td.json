@@ -28,6 +28,9 @@
 			"data": {
 				"_extends_": "Standard_Full_Case_Data"
 			},
+			"data_classification": {
+				"_extends_": "Standard_Full_Case_Data_Classification"
+			},
 			"security_classification": "PUBLIC",
 			"event_token": "testToken",
 			"ignore_warning": true

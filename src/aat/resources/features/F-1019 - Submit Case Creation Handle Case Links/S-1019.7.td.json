@@ -40,6 +40,15 @@
         "CaseLinkField" : {
           "CaseReference" : ""
         }
+      },
+      "data_classification": {
+        "TextField": "PUBLIC",
+        "CaseLinkField": {
+          "classification": "PUBLIC",
+          "value": {
+            "CaseReference": "PUBLIC"
+          }
+        }
       }
     }
   }

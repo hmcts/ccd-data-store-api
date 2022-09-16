@@ -80,6 +80,67 @@
               "FatherAge": "82"
             }
           },
+          "data_classification": {
+            "Homeless": "PUBLIC",
+            "Children": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "value": {
+                    "ChildFullName": "PUBLIC",
+                    "NeedsSupport": "PUBLIC",
+                    "IsAutistic": "PUBLIC",
+                    "ChildDOB": "PUBLIC",
+                    "ChildGender": "PUBLIC",
+                    "AutisticChildCaseNumber": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "CaseReference": "PUBLIC"
+                      }
+                    },
+                    "ChildAddress": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "PostTown": "PUBLIC",
+                        "AddressLine1": "PUBLIC",
+                        "County": "PUBLIC",
+                        "Country": "PUBLIC",
+                        "AddressLine2": "PUBLIC",
+                        "AddressLine3": "PUBLIC",
+                        "PostCode": "PUBLIC"
+                      }
+                    }
+                  },
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
+            },
+            "FamilyDetails": {
+              "classification": "PUBLIC",
+              "value": {
+                "FamilyAddress": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "Country": "PUBLIC",
+                    "PostCode": "PUBLIC",
+                    "AddressLine3": "PUBLIC",
+                    "AddressLine1": "PUBLIC",
+                    "AddressLine2": "PUBLIC",
+                    "County": "PUBLIC",
+                    "PostTown": "PUBLIC"
+                  }
+                },
+                "MotherFullName": "PUBLIC",
+                "Children": {
+                  "classification": "PUBLIC",
+                  "value": []
+                },
+                "MotherAge": "PUBLIC",
+                "FatherFullName": "PUBLIC",
+                "FatherAge": "PUBLIC"
+              }
+            }
+          },
           "supplementary_data": null,
           "after_submit_callback_response": null,
           "callback_response_status_code": null,

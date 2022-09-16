@@ -59,6 +59,19 @@
         "SearchCriteria" : {}
       },
 
+			"data_classification": {
+        "caseManagementLocation" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "baseLocation" : "PUBLIC",
+            "region" : "PUBLIC"
+          }
+        },
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        }
+      },
       "supplementary_data": {
         "HMCTSServiceId": "${[scenarioContext][siblingContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}"
       },

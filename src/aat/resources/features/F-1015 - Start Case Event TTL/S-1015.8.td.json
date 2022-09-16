@@ -42,6 +42,10 @@
         "case_data": {
           "_extends_": "TTL_Case_Data",
           "SearchCriteria" : { }
+        },
+        "data_classification": {
+          "_extends_": "TTL_Classifications",
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
         }
       },
       "event_id": "updateCaseNoTTLInc"
