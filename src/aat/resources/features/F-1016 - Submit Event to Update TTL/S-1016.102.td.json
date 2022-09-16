@@ -62,11 +62,11 @@
           "Suspended" : "NO"
         },
         "TextField" : "[[ANYTHING_PRESENT]]"
-      }
-    },
+      },
 
-    "data_classification": {
-      "TextField": "PUBLIC"
+      "data_classification": {
+        "TextField": "PUBLIC"
+      }
     }
   }
 }
