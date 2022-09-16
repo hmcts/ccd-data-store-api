@@ -58,15 +58,4 @@ public class AuditEvent extends Event {
 
     @JsonProperty("proxied_by_first_name")
     private String proxiedByFirstName;
-
-    /**
-     *
-     * @deprecated Will be removed in version 2.x. Use {@link AuditEvent#dataClassification} instead.
-     */
-    @Deprecated
-    @JsonGetter("security_classifications")
-    @ApiModelProperty("Deprecated. Use `data_classification` instead.")
-    public Map<String, JsonNode> getSecurityClassifications() {
-        return dataClassification;
-    }
 }
