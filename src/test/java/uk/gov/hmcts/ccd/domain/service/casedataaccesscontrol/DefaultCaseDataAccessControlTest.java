@@ -1219,7 +1219,6 @@ class DefaultCaseDataAccessControlTest {
         void generateAccessMetadata_verifyAccessProfileServiceCall_roleToAccessProfilesMappings_none() {
 
             // GIVEN
-            //caseTypeDefinition.setRoleToAccessProfiles(createRoleToAccessProfileDefinitions(roleNames));
             caseTypeDefinition.setRoleToAccessProfiles(List.of());
 
             List<RoleToAccessProfileDefinition> pseudoGeneratedR2AP =
@@ -1592,6 +1591,10 @@ class DefaultCaseDataAccessControlTest {
     @SuppressWarnings("unused")
     private static Stream<Arguments> accessProfileCheckNegativeMatchParams() {
         return Stream.of(
+            // NB: params correspond to:
+            // * outputAccessProfiles :: mock output for accessProfileService.generateAccessProfiles(...)
+            // * canAccessCaseType :: mock output for accessControlService.canAccessCaseTypeWithCriteria(...)
+            // * canAccessCaseState :: mock output for accessControlService.canAccessCaseStateWithCriteria(...)
             Arguments.of(List.of(), true, true),
             Arguments.of(List.of("AP1"), false, true),
             Arguments.of(List.of("AP2"), true, false)
