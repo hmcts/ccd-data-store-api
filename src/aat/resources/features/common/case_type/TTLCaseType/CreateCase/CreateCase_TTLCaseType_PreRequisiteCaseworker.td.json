@@ -43,7 +43,7 @@
         "TextField": "Create Case"
       },
       "data_classification": {
-        "TextField": "PUBLIC"
+        "TextField" : "PUBLIC"
       },
       "supplementary_data": null
     }

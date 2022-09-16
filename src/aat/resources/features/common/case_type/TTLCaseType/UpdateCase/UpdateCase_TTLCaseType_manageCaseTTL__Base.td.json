@@ -49,8 +49,8 @@
           "Suspended" : "No"
         }
       },
-      "data_classification": {
-        "TextField": "PUBLIC"
+      "data_classification" : {
+        "TextField" : "PUBLIC"
       }
     }
   }

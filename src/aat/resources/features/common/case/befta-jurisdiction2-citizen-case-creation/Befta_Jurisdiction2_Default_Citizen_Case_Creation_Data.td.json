@@ -68,7 +68,7 @@
           "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_3][customValues][documentIdInTheResponse]}/binary"
 				}
 			},
-			"data_classification": {
+			"data_classification" : {
 				"_extends_": "Befta_Citizen_Data_Securities_Classification"
 			},
 			"supplementary_data": null,
