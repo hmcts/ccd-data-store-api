@@ -1,7 +1,7 @@
 {
   "title": "Scenario 2 - CHALLENGED Access Process (unmatched region filter on STANDARD RoleToAccessProfile for case-type)",
   "_guid_": "S-1006.AP.2",
-  "_extends_": "F-1006_SearchCaseBase",
+  "_extends_": "GlobalSearch__Base",
 
   "specs": [
     "a caseworker with RA1: BASIC role assignment and RA2: STANDARD role assignment with region attribute with value 123",

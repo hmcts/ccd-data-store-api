@@ -1,7 +1,7 @@
 {
   "title": "Scenario 1.1 - NONE Access Process (no RoleToAccessProfiles on case-type)",
   "_guid_": "S-1006.AP.0",
-  "_extends_": "F-1006_SearchCaseBase",
+  "_extends_": "GlobalSearch__Base",
 
   "specs": [
     "a caseworker with no role assignments",
@@ -19,6 +19,7 @@
     "body": {
       "searchCriteria": {
         "CCDCaseTypeIds": [
+          "FT_GlobalSearch"
         ],
         "caseReferences": [
           "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch][testData][actualResponse][body][id]}"

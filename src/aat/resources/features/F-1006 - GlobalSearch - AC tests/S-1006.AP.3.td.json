@@ -1,7 +1,7 @@
 {
   "title": "Scenario 3 - SPECIFIC Access Process (BASIC only RoleToAccessProfile for case-type)",
   "_guid_": "S-1006.AP.3",
-  "_extends_": "F-1006_SearchCaseBase",
+  "_extends_": "GlobalSearch__Base",
 
   "specs": [
     "a caseworker with RA1: BASIC role assignment",
