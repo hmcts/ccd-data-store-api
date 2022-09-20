@@ -1,0 +1,18 @@
+{
+  "_guid_": "F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_1",
+  "_extends_": "F-1006_CreateCasePreRequisiteCitizen__Base",
+
+  "specs": [
+    "to create a case as a citizen: for case type with pseudo role assignments"
+  ],
+
+  "prerequisites": [
+    { "Token_Creation_Citizen": "F-1006_Case_Data_Create_Token_Creation_Citizen__FT_GlobalSearch_AC_1" }
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_GlobalSearch_AC_1"
+    }
+  }
+}

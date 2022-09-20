@@ -1,0 +1,56 @@
+{
+  "title": "Scenario 1.1 - NONE Access Process (no RoleToAccessProfiles on case-type)",
+  "_guid_": "S-1006.AP.0",
+  "_extends_": "F-1006_SearchCaseBase",
+
+  "specs": [
+    "a caseworker with no role assignments",
+    "search for case type with legacy IDAM AccessProfiles",
+    "contains case with Access Process value NONE"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "CCDCaseTypeIds": [
+        ],
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 1,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "caseReference"
+        },
+        {
+          "_extends_": "F-1006_ExpectedCaseSearchResult",
+
+          "caseReference" : "${}${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch][testData][actualResponse][body][id]}",
+
+          "processForAccess" : "NONE",
+
+          "CCDCaseTypeId" : "FT_GlobalSearch",
+          "CCDCaseTypeName" : "FT_GlobalSearch"
+        }
+      ]
+    }
+  }
+}

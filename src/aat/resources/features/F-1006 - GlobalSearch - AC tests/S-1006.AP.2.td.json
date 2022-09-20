@@ -1,0 +1,72 @@
+{
+  "title": "Scenario 2 - CHALLENGED Access Process (unmatched region filter on STANDARD RoleToAccessProfile for case-type)",
+  "_guid_": "S-1006.AP.2",
+  "_extends_": "F-1006_SearchCaseBase",
+
+  "specs": [
+    "a caseworker with RA1: BASIC role assignment and RA2: STANDARD role assignment with region attribute with value 123",
+    "search for case type with STANDARD RoleToAccessProfile and case has unmatched region for user",
+    "search for case type with STANDARD RoleToAccessProfile and case has matching region for user",
+    "contains case with Access Process value CHALLENGED when unmatched region",
+    "contains case with Access Process value NONE when matching region"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker_RegionalStaff"
+    }
+  },
+
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "CCDCaseTypeIds": [
+          "FT_GlobalSearch_AC_2"
+        ],
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Region_3][testData][actualResponse][body][id]}",
+          "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Region_123][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 2,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "caseReference"
+        },
+        {
+          "_extends_": "F-1006_ExpectedCaseSearchResult",
+
+          "caseReference" : "${}${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Region_3][testData][actualResponse][body][id]}",
+
+          "regionId" : "3",
+          "processForAccess" : "CHALLENGED",
+
+          "CCDCaseTypeId" : "FT_GlobalSearch_AC_2",
+          "CCDCaseTypeName" : "FT_GlobalSearch_AC_2"
+        },
+        {
+          "_extends_": "F-1006_ExpectedCaseSearchResult",
+
+          "caseReference" : "${}${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Region_123][testData][actualResponse][body][id]}",
+
+          "regionId" : "123",
+          "processForAccess" : "NONE",
+
+          "CCDCaseTypeId" : "FT_GlobalSearch_AC_2",
+          "CCDCaseTypeName" : "FT_GlobalSearch_AC_2"
+        }
+      ]
+    }
+  }
+}

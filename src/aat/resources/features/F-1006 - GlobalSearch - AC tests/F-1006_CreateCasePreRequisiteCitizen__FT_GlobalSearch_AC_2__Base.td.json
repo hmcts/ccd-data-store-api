@@ -1,0 +1,24 @@
+{
+  "_guid_": "F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Base",
+  "_extends_": "F-1006_CreateCasePreRequisiteCitizen__Base",
+
+  "prerequisites": [
+    { "Token_Creation_Citizen": "F-1006_Case_Data_Create_Token_Creation_Citizen__FT_GlobalSearch_AC_2" }
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_GlobalSearch_AC_2"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "caseManagementLocation": {
+          "region": "${[scenarioContext][testData][request][body][data][caseManagementLocation][region]}"
+        }
+      }
+    }
+  }
+}
