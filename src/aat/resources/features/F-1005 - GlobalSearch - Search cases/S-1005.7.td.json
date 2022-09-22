@@ -14,6 +14,9 @@
   "request": {
     "body": {
       "searchCriteria": {
+        "CCDCaseTypeIds": [
+          "FT_GlobalSearch"
+        ],
         "caseReferences": [
           "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
         ],
