@@ -2,7 +2,9 @@ name: Suppressions
 
 on:
   schedule:
-    - cron: "05 6-18/3 * * 1-5" # On the 5th minute, every 3 hours, from 6am to 6pm
+    # // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
+    # every 3rd hour from 6 am to 6pm on every day-of-week from Monday through Friday
+    - cron: "H 6-18/3 * * 1-5"
   workflow_dispatch:
 
 jobs:
