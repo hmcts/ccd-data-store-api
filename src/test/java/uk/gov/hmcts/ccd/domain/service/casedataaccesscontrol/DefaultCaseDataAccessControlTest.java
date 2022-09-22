@@ -1,6 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,6 +15,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +27,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -87,6 +94,10 @@ class DefaultCaseDataAccessControlTest {
     private HashMap<String, Predicate<AccessControlList>> accessMap;
     private final Set<String> userRoles = newHashSet(ROLE_NAME_1, ROLE_NAME_2, ROLE_NAME_3);
 
+    private List<AccessProfile> dummyAccessProfiles;
+
+    private final ObjectMapper mapper = JacksonUtils.MAPPER;
+
     @Mock
     private RoleAssignmentService roleAssignmentService;
 
@@ -132,6 +143,32 @@ class DefaultCaseDataAccessControlTest {
         accessMap.put("create", CAN_CREATE);
         accessMap.put("update", CAN_UPDATE);
         accessMap.put("read", CAN_READ);
+
+        dummyAccessProfiles = List.of(
+            AccessProfile.builder()
+                .accessProfile("ap_1")
+                .caseAccessCategories(null)
+                .build(),
+            AccessProfile.builder()
+                .accessProfile("ap_2")
+                .caseAccessCategories("UNSPEC_CLAIM")
+                .build(),
+            AccessProfile.builder()
+                .accessProfile("ap_3")
+                .caseAccessCategories("SPEC_CLAIM")
+                .build(),
+            AccessProfile.builder()
+                .accessProfile("ap_4")
+                .caseAccessCategories("SOME_OTHER_CLAIM,UNSPEC_CLAIM,AND_ANOTHER")
+                .build(),
+            AccessProfile.builder()
+                .accessProfile("ap_5")
+                .caseAccessCategories("SOME_CLAIM, TRIM_CLAIM")
+                .build(),
+            AccessProfile.builder()
+                .accessProfile("ap_6")
+                .caseAccessCategories("DUMMY_CLAIM_1, DUMMY_CLAIM_2")
+                .build());
     }
 
     @Test
@@ -162,7 +199,7 @@ class DefaultCaseDataAccessControlTest {
 
     @Test
     void itShouldNotRemoveCaseDefinitionBaseOnRoleTypeDueReadAccess() {
-        CaseTypeDefinition caseTypeDefinition =  createCaseTypeDefinition(ROLE_NAME_1);
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
 
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
         doReturn(USER_ID).when(securityUtils).getUserId();
@@ -215,6 +252,324 @@ class DefaultCaseDataAccessControlTest {
 
         assertNotNull(accessProfiles);
         assertEquals(0, accessProfiles.size());
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+        verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesByCaseAccessCategory_MatchCommaSeparatedLine() throws JsonProcessingException {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+        caseDetails.setData(generateCaseData("UNSPEC_CLAIM"));
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+
+        doReturn(dummyAccessProfiles).when(accessProfileService).generateAccessProfiles(anyList(), anyList());
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseDetails(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(3, accessProfiles.size());
+        Assertions.assertTrue(Stream.of("ap_1", "ap_2", "ap_4")
+            .allMatch(s -> accessProfiles.stream()
+                .anyMatch(ap -> s.equals(ap.getAccessProfile()))));
+
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+        verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesByCaseAccessCategory_NoCaseAccessCategoryMatch() throws JsonProcessingException {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+        caseDetails.setData(generateCaseData("NO_MATCH"));
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+
+        doReturn(dummyAccessProfiles).when(accessProfileService).generateAccessProfiles(anyList(), anyList());
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseDetails(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(1, accessProfiles.size());
+        Assertions.assertTrue(accessProfiles.stream().allMatch(a -> a.getAccessProfile().equals("ap_1")));
+
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+        verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesByCaseAccessCategory_MatchOnlySingleLineCaseAccessCategory()
+        throws JsonProcessingException {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+        caseDetails.setData(generateCaseData("SPEC_CLAIM"));
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+
+        doReturn(dummyAccessProfiles).when(accessProfileService).generateAccessProfiles(anyList(), anyList());
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseDetails(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(2, accessProfiles.size());
+        Assertions.assertTrue(Stream.of("ap_1", "ap_3")
+            .allMatch(s -> accessProfiles.stream()
+                .anyMatch(ap -> s.equals(ap.getAccessProfile()))));
+
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+        verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesByCaseAccessCategory_MatchTrimmedCaseAccessCategory()
+        throws JsonProcessingException {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+        caseDetails.setData(generateCaseData("TRIM_CLAIM"));
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+
+        doReturn(dummyAccessProfiles).when(accessProfileService).generateAccessProfiles(anyList(), anyList());
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseDetails(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(2, accessProfiles.size());
+        Assertions.assertTrue(Stream.of("ap_1", "ap_5")
+                .allMatch(s -> accessProfiles.stream()
+                    .anyMatch(ap -> s.equals(ap.getAccessProfile()))));
+
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+        verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesByCaseAccessCategory_EmptyCaseAccessCategoryField()
+        throws JsonProcessingException {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+        caseDetails.setData(generateCaseData(""));
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+
+        doReturn(dummyAccessProfiles).when(accessProfileService).generateAccessProfiles(anyList(), anyList());
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseDetails(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(1, accessProfiles.size());
+        Assertions.assertTrue(accessProfiles.stream().allMatch(a -> a.getAccessProfile().equals("ap_1")));
+
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+        verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesByCaseAccessCategory_NullCaseAccessCategoryField()
+        throws JsonProcessingException {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+        caseDetails.setData(generateCaseData(null));
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+
+        doReturn(dummyAccessProfiles).when(accessProfileService).generateAccessProfiles(anyList(), anyList());
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseDetails(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(1, accessProfiles.size());
+        Assertions.assertTrue(accessProfiles.stream().allMatch(a -> a.getAccessProfile().equals("ap_1")));
+
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+        verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesByCaseAccessCategory_StartWithNoMatch()
+        throws JsonProcessingException {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+        caseDetails.setData(generateCaseData("DUMMY_CLAIM"));
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+
+        doReturn(dummyAccessProfiles).when(accessProfileService).generateAccessProfiles(anyList(), anyList());
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseDetails(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(1, accessProfiles.size());
+        Assertions.assertTrue(accessProfiles.stream().allMatch(a -> a.getAccessProfile().equals("ap_1")));
+
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+        verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesByCaseAccessCategory_StartWithMatch()
+        throws JsonProcessingException {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+        caseDetails.setData(generateCaseData("DUMMY_CLAIM_2345"));
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+
+        doReturn(dummyAccessProfiles).when(accessProfileService).generateAccessProfiles(anyList(), anyList());
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseDetails(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(2, accessProfiles.size());
+        Assertions.assertTrue(Stream.of("ap_1", "ap_6")
+            .allMatch(s -> accessProfiles.stream()
+                .anyMatch(ap -> s.equals(ap.getAccessProfile()))));
+
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
@@ -765,5 +1120,12 @@ class DefaultCaseDataAccessControlTest {
                 .when(roleAssignmentsFilteringService).filter(
                     any(RoleAssignments.class), any(CaseDetails.class));
         return defaultCaseDataAccessControl.generateAccessMetadata("CASE_ID");
+    }
+
+    private Map<String, JsonNode> generateCaseData(final String value)
+        throws JsonProcessingException {
+        final String caseData = (value == null) ? "{}"
+            : "{\n" + "\"CaseAccessCategory\": \"" + value + "\"\n" + "  }";
+        return JacksonUtils.convertValue(mapper.readTree(caseData));
     }
 }

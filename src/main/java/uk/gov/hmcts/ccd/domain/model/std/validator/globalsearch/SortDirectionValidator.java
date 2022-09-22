@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.std.validator;
+package uk.gov.hmcts.ccd.domain.model.std.validator.globalsearch;
 
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortDirection;
 
