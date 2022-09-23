@@ -1119,6 +1119,11 @@ class DefaultCaseDataAccessControlTest {
             .roleName(ROLE_NAME_5)
             .classification(Classification.PUBLIC.name())
             .build();
+        dummyAccessProfiles = List.of(
+            AccessProfile.builder()
+                .accessProfile(ROLE_NAME_3)
+                .caseAccessCategories(null)
+                .build());
 
         RoleAssignments roleAssignments = new RoleAssignments();
         roleAssignments.setRoleAssignments(List.of(roleAssignment1, roleAssignment2));
@@ -1131,8 +1136,7 @@ class DefaultCaseDataAccessControlTest {
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
 
         doReturn(List.of(roleAssignment1)).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
-
-        doReturn(List.of(ROLE_NAME_3)).when(accessProfileService)
+        doReturn(dummyAccessProfiles).when(accessProfileService)
             .generateAccessProfiles(argThat(list -> list.size() == 1 && list.get(0) == roleAssignment1), any());
 
         Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
@@ -1140,7 +1144,7 @@ class DefaultCaseDataAccessControlTest {
         Set<String> userRole = newHashSet(ROLE_NAME_3);
         assertNotNull(accessProfiles);
         assertEquals(1, accessProfiles.size());
-        assertTrue(userRole.contains(accessProfiles.iterator().next()));
+        assertTrue(userRole.contains(accessProfiles.iterator().next().getAccessProfile()));
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
