@@ -199,8 +199,8 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
 
-        List<AccessProfile> filteredAccessProfiles = filteredAccessProfiles(
-            filteredRoleAssignments.getFilteredMatchingRoleAssignments(), caseTypeDefinition, false);
+        List<AccessProfile> filteredAccessProfiles = generateAccessProfiles(
+            filteredRoleAssignments.getFilteredMatchingRoleAssignments(), caseTypeDefinition);
 
         String caseAccessCategory = getCaseAccessCategoryFromCaseData(caseDetails);
 
