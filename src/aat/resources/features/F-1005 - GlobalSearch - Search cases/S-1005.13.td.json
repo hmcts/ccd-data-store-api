@@ -1,0 +1,65 @@
+{
+  "title": "Successfully search for case with Jurisdictions but not CaseTypes in search criteria",
+
+  "_guid_": "S-1005.13",
+  "_extends_": "F-1005_SearchCaseBase",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains at least one fields from new global search screen",
+    "contains Jurisdictions but not CaseTypes in search criteria",
+    "has 200 return code"
+  ],
+
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "CCDJurisdictionIds": [
+          "BEFTA_MASTER"
+        ],
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 1,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "caseReference"
+        },
+        {
+          "stateId": "CaseCreated",
+          "processForAccess" : "NONE",
+          "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+          "otherReferences": [
+            "FirstNameValue"
+          ],
+          "caseNameHmctsInternal": "Name Internal",
+          "baseLocationId": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][epimms_id]}",
+          "baseLocationName": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][building_location_name]}",
+          "caseManagementCategoryId": "987",
+          "caseManagementCategoryName": "Category label",
+          "regionId": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][region_id]}",
+          "regionName": "${[scenarioContext][childContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][region]}",
+          "CCDJurisdictionId": "BEFTA_MASTER",
+          "CCDJurisdictionName": "BEFTA Master",
+          "HMCTSServiceId" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}",
+          "HMCTSServiceShortDescription" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_short_description]}",
+          "CCDCaseTypeId": "FT_GlobalSearch",
+          "CCDCaseTypeName": "FT_GlobalSearch"
+        }
+      ]
+    }
+  }
+}
+
