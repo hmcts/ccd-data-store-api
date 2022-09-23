@@ -6,9 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -21,14 +18,12 @@ import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchParser;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchService;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,13 +35,9 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 class GlobalSearchEndpointTest {
 
     private static final String CASE_TYPE_1 = "case_type_1";
-    private static final String CASE_TYPE_2 = "case_type_2";
 
     @Mock
     private CaseSearchOperation caseSearchOperation;
-
-    @Mock
-    private ElasticsearchQueryHelper elasticsearchQueryHelper;
 
     @Mock
     private GlobalSearchService globalSearchService;
@@ -108,36 +99,6 @@ class GlobalSearchEndpointTest {
             // :: TransformResponse
             verify(globalSearchService).transformResponse(globalSearchRequestPayload,
                 searchResults.getTotal(), filteredCaseList);
-
-        }
-
-        @ParameterizedTest(name = "should populate case types in search criteria if null or empty: caseTypeIds = {0}")
-        @NullAndEmptySource
-        void shouldPopulateCaseTypesInSearchCriteriaIfNull(List<String> caseTypeIds) {
-
-            // ARRANGE
-            doReturn(List.of(CASE_TYPE_1, CASE_TYPE_2)).when(elasticsearchQueryHelper).getCaseTypesAvailableToUser();
-
-            // update mock payload with search criteria and supplied case type list
-            SearchCriteria searchCriteria = new SearchCriteria();
-            searchCriteria.setCcdCaseTypeIds(caseTypeIds);
-            doReturn(searchCriteria).when(globalSearchRequestPayload).getSearchCriteria();
-
-            // ACT
-            GlobalSearchResponsePayload output = classUnderTest.searchForCases(globalSearchRequestPayload);
-
-            // ASSERT
-            assertEquals(transformedResult, output);
-            // verify different internal calls
-            // :: load case types
-            verify(elasticsearchQueryHelper).getCaseTypesAvailableToUser();
-            // :: assemble query using loaded case types
-            ArgumentCaptor<GlobalSearchRequestPayload> captor
-                = ArgumentCaptor.forClass(GlobalSearchRequestPayload.class);
-            verify(globalSearchService).assembleSearchQuery(captor.capture());
-            assertTrue(captor.getValue().getSearchCriteria().getCcdCaseTypeIds().containsAll(
-                List.of(CASE_TYPE_1, CASE_TYPE_2)
-            ));
 
         }
 
