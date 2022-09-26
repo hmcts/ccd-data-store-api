@@ -107,7 +107,7 @@ public class DefaultUserRepository implements UserRepository {
             .collect(Collectors.toSet());
 
         String userId = getUser().getId();
-        LOG.info("User id from idam: {}. User roles in the security context: {}.", userId, userRoles);
+        LOG.debug("User id from idam: {}. User roles in the security context: {}.", userId, userRoles);
 
         return userRoles;
     }

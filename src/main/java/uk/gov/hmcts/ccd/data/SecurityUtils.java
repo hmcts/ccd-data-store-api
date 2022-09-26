@@ -63,7 +63,7 @@ public class SecurityUtils {
     public UserInfo getUserInfo() {
         UserInfo userInfo = idamRepository.getUserInfo(getUserToken());
         if (userInfo != null) {
-            log.info("SecurityUtils retrieved user info from idamRepository. User Id={}. Roles={}.",
+            log.debug("SecurityUtils retrieved user info from idamRepository. User Id={}. Roles={}.",
                 userInfo.getUid(),
                 userInfo.getRoles());
         }
