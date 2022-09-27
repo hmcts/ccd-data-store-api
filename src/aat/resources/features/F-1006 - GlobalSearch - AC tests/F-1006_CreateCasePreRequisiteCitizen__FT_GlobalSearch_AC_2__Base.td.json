@@ -16,6 +16,7 @@
     "body": {
       "case_data": {
         "caseManagementLocation": {
+          "baseLocation": "${[scenarioContext][testData][request][body][data][caseManagementLocation][baseLocation]}",
           "region": "${[scenarioContext][testData][request][body][data][caseManagementLocation][region]}"
         }
       }
