@@ -100,9 +100,13 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                             CaseTypeDefinition.class)
                     .getBody();
             if (caseTypeDefinition != null) {
+                LOG.debug("caseTypeDefinition != null, caseTypeDefinition.getName: {} "
+                        + "caseTypeDefinition.getCaseFieldDefinitions: ", caseTypeDefinition.getName(),
+                    caseTypeDefinition.getCaseFieldDefinitions());
                 caseTypeDefinition.getCaseFieldDefinitions().stream()
                         .forEach(CaseFieldDefinition::propagateACLsToNestedFields);
             }
+            LOG.debug("caseTypeDefinition == null caseTypeId: {}", caseTypeId);
             return caseTypeDefinition;
 
         } catch (Exception e) {
