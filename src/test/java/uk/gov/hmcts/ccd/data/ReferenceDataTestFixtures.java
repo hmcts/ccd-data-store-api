@@ -21,7 +21,7 @@ public interface ReferenceDataTestFixtures {
 
     static List<BuildingLocation> buildingLocations(final String id) {
         return List.of(BuildingLocation.builder()
-            .buildingLocationId(id)
+            .epimmsId(id)
             .build());
     }
 
