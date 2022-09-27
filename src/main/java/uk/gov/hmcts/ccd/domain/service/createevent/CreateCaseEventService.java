@@ -180,7 +180,7 @@ public class CreateCaseEventService {
             caseTypeDefinition
         );
 
-        timeToLiveService.validateSuspensionChange(content.getData(), caseDetailsInDatabase.getData());
+        timeToLiveService.validateTTLChangeAgainstTTLGuard(content.getData(), caseDetailsInDatabase.getData());
 
         final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
 

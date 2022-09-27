@@ -3,15 +3,14 @@ package uk.gov.hmcts.ccd.domain.service.globalsearch;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
@@ -19,6 +18,8 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -27,16 +28,15 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 public class GlobalSearchParser {
 
     private static final String FIELD_SEPARATOR = ".";
-    private final UserRepository userRepository;
+    private final CaseDataAccessControl caseDataAccessControl;
     private final CaseTypeService caseTypeService;
     private final SecurityClassificationService securityClassificationService;
 
     @Autowired
-    public GlobalSearchParser(@Qualifier(CachedUserRepository.QUALIFIER)
-                                  UserRepository userRepository,
+    public GlobalSearchParser(CaseDataAccessControl caseDataAccessControl,
                               CaseTypeService caseTypeService,
                               SecurityClassificationService securityClassificationService) {
-        this.userRepository = userRepository;
+        this.caseDataAccessControl = caseDataAccessControl;
         this.caseTypeService = caseTypeService;
         this.securityClassificationService = securityClassificationService;
     }
@@ -54,8 +54,12 @@ public class GlobalSearchParser {
             Optional<CaseFieldDefinition> caseFieldDefinition =
                 (field.contains(FIELD_SEPARATOR)) ? caseTypeDefinition.getComplexSubfieldDefinitionByPath(field)
                     : caseTypeDefinition.getCaseField(field);
+            Set<String> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails)
+                .stream()
+                .map(AccessProfile::getAccessProfile)
+                .collect(Collectors.toSet());
             if (caseFieldDefinition.isPresent() && ((!AccessControlService
-                .hasAccess(userRepository.getUserRoles(), CAN_READ,
+                .hasAccess(accessProfiles, CAN_READ,
                     caseFieldDefinition.get().getAccessControlLists()))
                 || !securityClassificationService
                 .userHasEnoughSecurityClassificationForField(caseTypeDefinition,

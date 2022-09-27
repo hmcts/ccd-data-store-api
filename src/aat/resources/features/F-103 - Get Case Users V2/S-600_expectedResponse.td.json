@@ -1,0 +1,78 @@
+{
+  "_guid_": "S-600_expectedResponse",
+  "_extends_": "Common_200_Response",
+
+  "headers": {
+    "Content-Length": "[[ANYTHING_PRESENT]]",
+    "Content-Type": "[[ANYTHING_PRESENT]]",
+    "Content-Encoding": "gzip"
+  },
+  "body": {
+    "case_users": [
+      {
+        "__ordering__": "UNORDERED",
+        "__elementId__": "case_id,user_id,case_role"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][body][case_users][0][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userDil][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][body][case_users][0][case_role]}"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][body][case_users][1][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userDil][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][body][case_users][1][case_role]}"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C2][testData][request][body][case_users][0][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userDil][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C2][testData][request][body][case_users][0][case_role]}"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C2][testData][request][body][case_users][1][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userDil][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C2][testData][request][body][case_users][1][case_role]}"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C3][testData][request][body][case_users][0][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userDil][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C3][testData][request][body][case_users][0][case_role]}"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C3][testData][request][body][case_users][1][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userDil][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C3][testData][request][body][case_users][1][case_role]}"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][body][case_users][0][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userSteve][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][body][case_users][0][case_role]}"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][body][case_users][1][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userSteve][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][body][case_users][1][case_role]}"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C2][testData][request][body][case_users][0][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userSteve][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C2][testData][request][body][case_users][0][case_role]}"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C2][testData][request][body][case_users][1][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userSteve][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C2][testData][request][body][case_users][1][case_role]}"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C3][testData][request][body][case_users][0][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userSteve][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C3][testData][request][body][case_users][0][case_role]}"
+      },
+      {
+        "case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C3][testData][request][body][case_users][1][case_id]}",
+        "user_id": "${[scenarioContext][testData][users][userSteve][id]}",
+        "case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C3][testData][request][body][case_users][1][case_role]}"
+      }
+    ]
+  }
+}

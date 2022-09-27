@@ -5,8 +5,10 @@ import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.SearchResult;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.ArgumentCaptor;
 import org.powermock.reflect.Whitebox;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -54,7 +56,7 @@ import static uk.gov.hmcts.ccd.data.ReferenceDataTestFixtures.BUILDING_LOCATIONS
 import static uk.gov.hmcts.ccd.data.ReferenceDataTestFixtures.SERVICES_STUB_ID;
 import static uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint.GLOBAL_SEARCH_PATH;
 
-public class GlobalSearchEndpointIT extends WireMockBaseTest {
+class GlobalSearchEndpointIT extends WireMockBaseTest {
 
     private static final String ADDRESS_LINE_1 = "address";
     private static final String NAME = "name";
@@ -89,8 +91,8 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     private static final String DETAILS_FIELD = "$.details";
     private static final String MESSAGE_FIELD = "$.message";
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
@@ -120,7 +122,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn200WhenRequestDataValid() throws Exception {
+    void shouldReturn200WhenRequestDataValid() throws Exception {
 
         // ARRANGE
         stubElasticSearchSearchRequestWillReturn();
@@ -153,14 +155,20 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn200WhenEmptyFieldsHaveDefaultValues() throws Exception {
+    void shouldReturn200WhenEmptyFieldsHaveDefaultValues() throws Exception {
+
+        // ARRANGE
+        stubElasticSearchSearchRequestWillReturn();
 
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
         SearchCriteria searchCriteria = new SearchCriteria();
-        searchCriteria.setCaseManagementBaseLocationIds(validFields);
-        searchCriteria.setCaseManagementRegionIds(validFields);
+        // NB: one of Jurisdiction or CaseType must be supplied
+        searchCriteria.setCcdJurisdictionIds(List.of(JURISDICTION));
+        searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE));
         payload.setSearchCriteria(searchCriteria);
+        // i.e. leave all fields that will use defaults blank (NB: case-type no longer auto-populated when blank)
 
+        // ACT / ASSERT
         mockMvc.perform(post(GLOBAL_SEARCH_PATH)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(payload)))
@@ -169,7 +177,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldThrowValidationErrorsWhenDataInvalid() throws Exception {
+    void shouldThrowValidationErrorsWhenDataInvalid() throws Exception {
 
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
         payload.setMaxReturnRecordCount(10001);
@@ -207,7 +215,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldThrowValidationErrorsWhenSearchCriteriaNull() throws Exception {
+    void shouldThrowValidationErrorsWhenSearchCriteriaIsNull() throws Exception {
 
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
         payload.setMaxReturnRecordCount(10);
@@ -219,13 +227,13 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(payload)))
             .andExpect(status().is(400))
             .andExpect(jsonPath(MESSAGE_FIELD, is(ValidationError.ARGUMENT_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.SEARCH_CRITERIA_MISSING)))
+            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.GLOBAL_SEARCH_CRITERIA_INVALID)))
             .andReturn();
     }
 
 
     @Test
-    public void shouldAuditLogSearchCases() throws Exception {
+    void shouldAuditLogSearchCases() throws Exception {
 
         // ARRANGE
         stubElasticSearchSearchRequestWillReturn();
@@ -263,7 +271,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldThrowValidationErrorsWhenSearchCriteriaEmpty() throws Exception {
+    void shouldThrowValidationErrorsWhenSearchCriteriaIsEmpty() throws Exception {
 
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
         payload.setMaxReturnRecordCount(10);
@@ -276,18 +284,22 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(payload)))
             .andExpect(status().is(400))
             .andExpect(jsonPath(MESSAGE_FIELD, is(ValidationError.ARGUMENT_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.SEARCH_CRITERIA_MISSING)))
+            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.GLOBAL_SEARCH_CRITERIA_INVALID)))
             .andReturn();
     }
 
-    @Test
-    public void shouldThrowValidationErrorsWhenSearchCriteriaPartiesIsEmpty() throws Exception {
+    @ParameterizedTest(
+        name = "Should throw ValidationError when Jurisdiction and CaseType criteria fields are null or empty: {0}"
+    )
+    @NullAndEmptySource
+    void shouldThrowValidationErrorsWhenSearchCriteriaJurisdictionAndCaseTypeAreNullOrEmpty(List<String> values)
+        throws Exception {
 
-        GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
-        SearchCriteria criteria = new SearchCriteria();
-        List<Party> partyList = new ArrayList<>();
-        partyList.add(new Party());
-        criteria.setParties(partyList);
+        GlobalSearchRequestPayload payload = createRequestPayload(2);
+
+        SearchCriteria criteria = payload.getSearchCriteria();
+        criteria.setCcdJurisdictionIds(values);
+        criteria.setCcdCaseTypeIds(values);
         payload.setSearchCriteria(new SearchCriteria());
 
         mockMvc.perform(post(GLOBAL_SEARCH_PATH)
@@ -295,29 +307,47 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(payload)))
             .andExpect(status().is(400))
             .andExpect(jsonPath(MESSAGE_FIELD, is(ValidationError.ARGUMENT_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.SEARCH_CRITERIA_MISSING)))
+            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.GLOBAL_SEARCH_CRITERIA_INVALID)))
             .andReturn();
     }
 
     @Test
-    public void shouldReturn200WhenOneValidFieldInSearchCriteria() throws Exception {
+    void shouldReturn200WhenOneValidFieldInSearchCriteria_CaseType() throws Exception {
+
+        // ARRANGE
+        stubElasticSearchSearchRequestWillReturn();
 
         SearchCriteria criteria = new SearchCriteria();
-        criteria.setCcdCaseTypeIds(null);
+        criteria.setCcdCaseTypeIds(List.of(CASE_TYPE));
         List<String> emptyList = new ArrayList<>();
         criteria.setCcdJurisdictionIds(emptyList);
-        List<Party> partyList = new ArrayList<>();
-        partyList.add(new Party());
-        Party validParty = new Party();
-        validParty.setPartyName("name");
-        partyList.add(validParty);
-        criteria.setParties(partyList);
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
         payload.setSearchCriteria(criteria);
 
+        // ACT / ASSERT
         mockMvc.perform(post(GLOBAL_SEARCH_PATH)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(payload)))
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(payload)))
+            .andExpect(status().is(200))
+            .andReturn();
+    }
+
+    @Test
+    void shouldReturn200WhenOneValidFieldInSearchCriteria_Jurisdiction() throws Exception {
+
+        // ARRANGE
+        stubElasticSearchSearchRequestWillReturn();
+
+        SearchCriteria criteria = new SearchCriteria();
+        criteria.setCcdCaseTypeIds(null);
+        criteria.setCcdJurisdictionIds(List.of(JURISDICTION));
+        GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
+        payload.setSearchCriteria(criteria);
+
+        // ACT / ASSERT
+        mockMvc.perform(post(GLOBAL_SEARCH_PATH)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(payload)))
             .andExpect(status().is(200))
             .andReturn();
     }

@@ -4,48 +4,34 @@
 	<!--Please add all the false positives under the below section-->
 	<suppress>
 		<notes>False Positives
-			CVE-2020-23171 https://tools.hmcts.net/jira/browse/CCD-1871
 			CVE-2018-1258 https://tools.hmcts.net/jira/browse/CCD-765
-			CVE-2020-29242 https://tools.hmcts.net/jira/browse/CCD-92
-			CVE-2020-29243 https://tools.hmcts.net/jira/browse/CCD-70
-			CVE-2020-29244 https://tools.hmcts.net/jira/browse/CCD-104
-			CVE-2020-29245 https://tools.hmcts.net/jira/browse/CCD-287
-			CVE-2007-1651 https://tools.hmcts.net/jira/browse/CCD-125
-			CVE-2007-1652 https://tools.hmcts.net/jira/browse/CCD-115
 			CVE-2016-1000027 https://tools.hmcts.net/jira/browse/CCD-3255
-			CVE-2022-33915 https://tools.hmcts.net/jira/browse/CCD-3439
+			CVE-2022-34305 refer https://tools.hmcts.net/jira/browse/CCD-3436
+			CVE-2022-22978 refer https://tools.hmcts.net/jira/browse/CCD-3513
+			CVE-2021-22112 refer https://tools.hmcts.net/jira/browse/CCD-3514
+			CVE-2022-22976 refer https://tools.hmcts.net/jira/browse/CCD-3515
 		</notes>
-		<cve>CVE-2020-23171</cve>
 		<cve>CVE-2018-1258</cve>
-		<cve>CVE-2020-29242</cve>
-		<cve>CVE-2020-29243</cve>
-		<cve>CVE-2020-29244</cve>
-		<cve>CVE-2020-29245</cve>
-		<cve>CVE-2007-1651</cve>
-		<cve>CVE-2007-1652</cve>
 		<cve>CVE-2016-1000027</cve>
-		<cve>CVE-2022-33915</cve>
+		<cve>CVE-2022-34305</cve>
+		<cve>CVE-2022-22978</cve>
+		<cve>CVE-2021-22112</cve>
+		<cve>CVE-2022-22976</cve>
 	</suppress>
 	<!--End of false positives section -->
 
 	<!--Please add all the temporary suppression under the below section-->
 	  <suppress>
 	    <notes>Temporary Suppression
-	      CVE-2022-34305 refer https://tools.hmcts.net/jira/browse/CCD-3436
-	      CVE-2022-31569 refer https://tools.hmcts.net/jira/browse/CCD-3536
-			CVE-2020-15522 refer https://tools.hmcts.net/jira/browse/CCD-3511
-			CVE-2022-22978 refer https://tools.hmcts.net/jira/browse/CCD-3513
-			CVE-2021-22112 refer https://tools.hmcts.net/jira/browse/CCD-3514
-			CVE-2022-22976 refer https://tools.hmcts.net/jira/browse/CCD-3515
-			CVE-2021-22044 refer https://tools.hmcts.net/jira/browse/CCD-3509
+	      CVE-2022-25857 refer https://tools.hmcts.net/jira/browse/CCD-3658
+		  CVE-2022-38751 refer https://tools.hmcts.net/jira/browse/CCD-3682
+		  CVE-2022-38750 refer https://tools.hmcts.net/jira/browse/CCD-3682
+		  CVE-2022-38749 refer https://tools.hmcts.net/jira/browse/CCD-3682
 	    </notes>
-	    <cve>CVE-2022-34305</cve>
-	    <cve>CVE-2022-31569</cve>
-		<cve>CVE-2020-15522</cve>
-		<cve>CVE-2022-22978</cve>
-		<cve>CVE-2021-22112</cve>
-		<cve>CVE-2022-22976</cve>
-		<cve>CVE-2021-22044</cve>
+	    <cve>CVE-2022-25857</cve>
+		<cve>CVE-2022-38751</cve>
+		<cve>CVE-2022-38750</cve>
+		<cve>CVE-2022-38749</cve>
 	  </suppress>
 	<!--End of temporary suppression section -->
 

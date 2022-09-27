@@ -16,7 +16,9 @@ public class RoleAssignmentFilteringResult {
 
     private static boolean isRegionOrLocationFilteringResult(Map.Entry<String, Boolean> mapEntry) {
         return mapEntry.getKey().equals(RegionMatcher.class.getSimpleName())
-            || mapEntry.getKey().equals(LocationMatcher.class.getSimpleName());
+            || mapEntry.getKey().equals(RegionMatcher.class.getName())
+            || mapEntry.getKey().equals(LocationMatcher.class.getSimpleName())
+            || mapEntry.getKey().equals(LocationMatcher.class.getName());
     }
 
     public boolean hasPassedFiltering() {
