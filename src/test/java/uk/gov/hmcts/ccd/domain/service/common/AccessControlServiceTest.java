@@ -4497,7 +4497,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("Case View Field with Criteria tests")
-    class canAccessCaseViewFieldWithCriteriaTests {
+    class CanAccessCaseViewFieldWithCriteriaTests {
 
         private Logger logger;
         private Level originalLevel;
@@ -4538,6 +4538,20 @@ public class AccessControlServiceTest {
                         .withRead(true)
                         .build())
                     .build();
+
+            // Change logger level so that message logged by canAccessCaseViewFieldWithCriteria
+            // method at debug level would present in logger.  Not expecting it to be present in this test.
+            logger.setLevel(Level.DEBUG);
+
+            boolean canAccessCaseViewField =
+                accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ);
+
+            List<ILoggingEvent> loggerList = listAppender.list;
+
+            assertAll(
+                () -> assertThat(canAccessCaseViewField, is(true)),
+                () -> assertThat(loggerList.size(), is(0))
+            );
 
             assertThat(
                 accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ),
