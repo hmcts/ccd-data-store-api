@@ -68,12 +68,14 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
         final boolean withinTimeInterval = currentHour >= fromHour  && currentHour < tillHour;
         final boolean cacheSwitchOnForCaseType = applicationParams.getRequestScopeCachedCaseTypes().stream()
             .anyMatch(ct -> ct.equalsIgnoreCase(caseTypeId));
-        LOGGER.debug("withinTimeInterval: {} cacheSwitchOnForCaseType: {} caseTypeId: {} version: {}",
-            withinTimeInterval, cacheSwitchOnForCaseType, caseTypeId, version);
         if (withinTimeInterval && cacheSwitchOnForCaseType) {
+            LOGGER.debug("withinTimeInterval: {} cacheSwitchOnForCaseType: {}",
+                withinTimeInterval, cacheSwitchOnForCaseType);
             return caseTypes.computeIfAbsent(format(CASE_TYPE_KEY_FORMAT, caseTypeId, version),
                 e -> caseDefinitionRepository.getCaseType(version, caseTypeId));
         } else {
+            LOGGER.debug("withinTimeInterval: {} cacheSwitchOnForCaseType: {}",
+                withinTimeInterval, cacheSwitchOnForCaseType);
             return caseDefinitionRepository.getCaseType(version, caseTypeId);
         }
     }
