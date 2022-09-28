@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.LocationMatcher;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.RegionMatcher;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -127,5 +129,23 @@ class RoleAssignmentFilteringResultTest {
             new RoleAssignmentFilteringResult(roleAssignment, filteringResults);
 
         assertFalse(roleAssignmentFilteringResult.hasFailedFilteringOnRegionAndBaseLocation());
+    }
+
+    @Test
+    void hasFailedFilteringBasedOnRegionAndLocationReturnsTrueWhenUsingOtherNames() {
+        Map<String, Boolean> filteringResults = new HashMap<>();
+
+        filteringResults.put("roleMatcher1", Boolean.TRUE);
+        filteringResults.put(RegionMatcher.class.getSimpleName(), Boolean.FALSE);
+        filteringResults.put(RegionMatcher.class.getName(), Boolean.FALSE);
+        filteringResults.put("roleMatcher3", Boolean.TRUE);
+        filteringResults.put("roleMatcher4", Boolean.TRUE);
+        filteringResults.put(LocationMatcher.class.getSimpleName(), Boolean.FALSE);
+        filteringResults.put(LocationMatcher.class.getName(), Boolean.FALSE);
+
+        RoleAssignmentFilteringResult roleAssignmentFilteringResult =
+            new RoleAssignmentFilteringResult(roleAssignment, filteringResults);
+
+        assertTrue(roleAssignmentFilteringResult.hasFailedFilteringOnRegionAndBaseLocation());
     }
 }
