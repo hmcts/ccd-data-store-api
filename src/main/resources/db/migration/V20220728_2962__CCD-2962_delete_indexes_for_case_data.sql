@@ -18,3 +18,5 @@ DROP INDEX IF EXISTS idx_case_data_generated_nino;
 DROP INDEX IF EXISTS idx_case_data_divorce_solpaymenthowtopay;
 DROP INDEX IF EXISTS idx_case_data_generated_surname;
 DROP INDEX IF EXISTS idx_case_data_hmctsdwpstate;
+DROP INDEX IF EXISTS idx_case_data_openingdate;
+
