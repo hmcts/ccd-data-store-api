@@ -209,9 +209,9 @@ class ReferenceDataRepositoryIT extends AbstractReferenceDataIT {
             .build();
 
         final BuildingLocation buildingLocation = BuildingLocation.builder()
-            .buildingLocationId("123")
+            .epimmsId("123")
+            .buildingLocationId("BL-ID")
             .buildingLocationName("54 HAGLEY ROAD (BIRMINGHAM OFFICES)")
-            .epimmsId("815833")
             .buildingLocationStatus("LIVE")
             .area("North")
             .region("Midlands")

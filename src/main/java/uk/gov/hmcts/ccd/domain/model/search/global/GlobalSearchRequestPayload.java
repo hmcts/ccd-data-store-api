@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
-import uk.gov.hmcts.ccd.domain.model.std.validator.ValidSearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
+import uk.gov.hmcts.ccd.domain.model.std.validator.globalsearch.ValidSearchCriteria;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
