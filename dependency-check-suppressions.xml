@@ -27,11 +27,13 @@
 		  CVE-2022-38751 refer https://tools.hmcts.net/jira/browse/CCD-3682
 		  CVE-2022-38750 refer https://tools.hmcts.net/jira/browse/CCD-3682
 		  CVE-2022-38749 refer https://tools.hmcts.net/jira/browse/CCD-3682
+		  CVE-2022-38752 refer https://tools.hmcts.net/jira/browse/CCD-3736
 	    </notes>
 	    <cve>CVE-2022-25857</cve>
 		<cve>CVE-2022-38751</cve>
 		<cve>CVE-2022-38750</cve>
 		<cve>CVE-2022-38749</cve>
+		<cve>CVE-2022-38752</cve>
 	  </suppress>
 	<!--End of temporary suppression section -->
 
