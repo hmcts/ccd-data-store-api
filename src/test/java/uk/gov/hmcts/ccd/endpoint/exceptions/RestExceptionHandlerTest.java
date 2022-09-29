@@ -38,6 +38,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -252,7 +253,7 @@ public class RestExceptionHandlerTest {
         ServiceException expectedException = new ServiceException(myUniqueExceptionMessage,
             new FeignException.FeignClientException(HttpStatus.BAD_REQUEST.value(), myUniqueExceptionMessage,
                 Request.create(Request.HttpMethod.GET, myUniqueExceptionMessage, Map.of(), new byte[0],
-                    Charset.defaultCharset(), null), new byte[0]));
+                    Charset.defaultCharset(), null), new byte[0], new HashMap<>()));
 
         setupMockServiceToThrowException(expectedException);
 
@@ -272,7 +273,7 @@ public class RestExceptionHandlerTest {
         ServiceException expectedException = new ServiceException(myUniqueExceptionMessage,
             new FeignException.FeignClientException(HttpStatus.UNAUTHORIZED.value(), myUniqueExceptionMessage,
                 Request.create(Request.HttpMethod.GET, myUniqueExceptionMessage, Map.of(), new byte[0],
-                    Charset.defaultCharset(), null), new byte[0]));
+                    Charset.defaultCharset(), null), new byte[0], new HashMap<>()));
 
         setupMockServiceToThrowException(expectedException);
 
@@ -292,7 +293,7 @@ public class RestExceptionHandlerTest {
         FeignException.FeignClientException expectedException =
             new FeignException.FeignClientException(HttpStatus.UNAUTHORIZED.value(), myUniqueExceptionMessage,
                 Request.create(Request.HttpMethod.GET, myUniqueExceptionMessage, Map.of(), new byte[0],
-                    Charset.defaultCharset(), null), new byte[0]);
+                    Charset.defaultCharset(), null), new byte[0], new HashMap<>());
 
         setupMockServiceToThrowException(expectedException);
 
@@ -313,7 +314,7 @@ public class RestExceptionHandlerTest {
         FeignException.FeignClientException expectedException =
             new FeignException.FeignClientException(HttpStatus.BAD_REQUEST.value(), myUniqueExceptionMessage,
                 Request.create(Request.HttpMethod.GET, myUniqueExceptionMessage, Map.of(), new byte[0],
-                    Charset.defaultCharset(), null), new byte[0]);
+                    Charset.defaultCharset(), null), new byte[0], new HashMap<>());
 
         setupMockServiceToThrowException(expectedException);
 
@@ -740,6 +741,6 @@ public class RestExceptionHandlerTest {
                                                                            final String message) {
         return new FeignException.FeignServerException(httpStatus.value(), message,
             Request.create(Request.HttpMethod.GET, message, Map.of(), new byte[0],
-                Charset.defaultCharset(), null), new byte[0]);
+                Charset.defaultCharset(), null), new byte[0], new HashMap<>());
     }
 }

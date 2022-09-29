@@ -23,6 +23,8 @@ import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.PatchDocumentMetaDataResponse;
 
 import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -123,16 +125,20 @@ class CaseDocumentAmApiClientTest extends TestFixtures {
         );
 
         return Stream.of(
-            Arguments.of(new FeignClientException.BadRequest(badRequestMessage, request, null),
+            Arguments.of(new FeignClientException.BadRequest(badRequestMessage, request, null,
+                new HashMap<String, Collection<String>>()),
                 badRequestMessage,
                 BadSearchRequest.class),
-            Arguments.of(new FeignClientException.NotFound(notFoundMessage, request, null),
+            Arguments.of(new FeignClientException.NotFound(notFoundMessage, request, null,
+                new HashMap<String, Collection<String>>()),
                 notFoundMessage,
                 ResourceNotFoundException.class),
-            Arguments.of(new FeignClientException.InternalServerError(serviceErrorMessage, request, null),
+            Arguments.of(new FeignClientException.InternalServerError(serviceErrorMessage, request, null,
+                new HashMap<String, Collection<String>>()),
                 serviceErrorMessage,
                 ServiceException.class),
-            Arguments.of(new FeignClientException.Forbidden(forbiddenMessage, request, null),
+            Arguments.of(new FeignClientException.Forbidden(forbiddenMessage, request, null,
+                new HashMap<String, Collection<String>>()),
                 forbiddenMessage,
                 DocumentTokenException.class)
         );
