@@ -101,7 +101,6 @@ ext {
 }
 
 group 'uk.gov.hmcts.ccd'
-version '1.2.0-SNAPSHOT'
 
 bootJar {
     baseName = 'core-case-data'
