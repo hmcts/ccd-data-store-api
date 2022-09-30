@@ -25,11 +25,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Run dependency-check
-        run: ./gradlew dependencyCheckAnalyze
+      - name: Run dependency-check and Suppress CVE
+        run: ./gradlew --no-daemon --continue dependencyCheckAnalyze suppressCves
         continue-on-error: true
-      - name: Commit new suppressed CVE
-        run: ./gradlew suppressCves
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
