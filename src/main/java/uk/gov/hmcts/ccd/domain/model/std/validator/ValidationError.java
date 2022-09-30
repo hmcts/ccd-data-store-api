@@ -6,7 +6,8 @@ public class ValidationError {
     public static final String SORT_BY_INVALID = "Sort by category invalid";
     public static final String SORT_DIRECTION_INVALID = "Sort direction invalid";
     public static final String MAX_RECORD_COUNT_INVALID = "Max return record count must be between 1 and 10000";
-    public static final String SEARCH_CRITERIA_MISSING = "Must have at least one search criteria";
+    public static final String GLOBAL_SEARCH_CRITERIA_INVALID =
+        "At least one jurisdiction or case type must be provided in the search criteria";
     public static final String JURISDICTION_ID_LENGTH_INVALID = "Jurisdiction ID exceeds maximum length of 70";
     public static final String STATE_ID_LENGTH_INVALID = "State ID exceeds maximum length of 70";
     public static final String CASE_TYPE_ID_LENGTH_INVALID = "Case type ID exceeds maximum length of 70";
