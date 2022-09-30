@@ -1,0 +1,44 @@
+{
+  "title": "when no User ID is supplied for a list of Case IDs, then the case roles relating to all users with access to all listed cases must be returned",
+  "_guid_": "S-600.1",
+  "_extends_": "CaseUserRoles_Search__PositiveResponse_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Dil - with an active profile",
+    "Steve - with an active profile",
+    "Jamal - who is a privileged user with permissions to access the case assignments of other users",
+    "is made by Jamal with Case IDs of C1, C2 & C3 & no User ID",
+    "contains the list of case roles just granted to Dil & Steve for C1, C2 & C3, as per above"
+  ],
+
+  "users": {
+    "userRichard": {
+      "_extends_": "F-103_User_Richard"
+    },
+    "userDil": {
+      "_extends_": "F-103_User_Dil"
+    },
+    "userSteve": {
+      "_extends_": "F-103_User_Steve"
+    },
+    "invokingUser": {
+      "_extends_": "F-103_User_Jamal"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_ids": [
+        "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+        "${[scenarioContext][childContexts][F103_Case_Data_Create_C2][testData][actualResponse][body][id]}",
+        "${[scenarioContext][childContexts][F103_Case_Data_Create_C3][testData][actualResponse][body][id]}"
+      ],
+      "user_ids": []
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "S-600_expectedResponse"
+  }
+}
