@@ -3,9 +3,13 @@ package uk.gov.hmcts.ccd.domain.service.search.global;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
@@ -36,6 +40,7 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
     private final GlobalSearchResponseTransformer globalSearchResponseTransformer;
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
     private final GlobalSearchQueryBuilder globalSearchQueryBuilder;
+    private final CaseDefinitionRepository caseDefinitionRepository;
 
     static final Function<List<BuildingLocation>, LocationLookup> LOCATION_LOOKUP_FUNCTION =
         locations -> locations.stream().collect(toLocationLookup());
@@ -54,13 +59,16 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
                                    final ReferenceDataRepository referenceDataRepository,
                                    final GlobalSearchResponseTransformer globalSearchResponseTransformer,
                                    final ElasticsearchQueryHelper elasticsearchQueryHelper,
-                                   final GlobalSearchQueryBuilder globalSearchQueryBuilder) {
+                                   final GlobalSearchQueryBuilder globalSearchQueryBuilder,
+                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                       final CaseDefinitionRepository caseDefinitionRepository) {
         this.applicationParams = applicationParams;
         this.objectMapperService = objectMapperService;
         this.referenceDataRepository = referenceDataRepository;
         this.globalSearchResponseTransformer = globalSearchResponseTransformer;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.globalSearchQueryBuilder = globalSearchQueryBuilder;
+        this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
     @Override
@@ -70,6 +78,16 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
 
         if (request == null || request.getSearchCriteria() == null) {
             return null;
+        }
+
+        // if no CaseType filter applied :: load all case types available for jurisdictions
+        if (CollectionUtils.isEmpty(request.getSearchCriteria().getCcdCaseTypeIds())) {
+            // NB: population of CaseTypeIds is needed to ensure the case type filters are applied to the search
+            request.getSearchCriteria().setCcdCaseTypeIds(
+                caseDefinitionRepository.getCaseTypesIDsByJurisdictions(
+                    request.getSearchCriteria().getCcdJurisdictionIds()
+                )
+            );
         }
 
         // generate ES query builder
