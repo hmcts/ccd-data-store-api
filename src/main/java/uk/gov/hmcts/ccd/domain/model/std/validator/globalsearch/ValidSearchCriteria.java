@@ -1,4 +1,6 @@
-package uk.gov.hmcts.ccd.domain.model.std.validator;
+package uk.gov.hmcts.ccd.domain.model.std.validator.globalsearch;
+
+import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -14,8 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface ValidSearchCriteria {
 
-
-    String message() default ValidationError.SEARCH_CRITERIA_MISSING;
+    String message() default ValidationError.GLOBAL_SEARCH_CRITERIA_INVALID;
 
     Class<?>[] groups() default {};
 

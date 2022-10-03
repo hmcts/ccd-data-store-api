@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
 import uk.gov.hmcts.ccd.security.filters.SecurityLoggingFilter;
 import uk.gov.hmcts.ccd.security.filters.V1EndpointsPathParamSecurityFilter;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
@@ -44,6 +45,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final ServiceAuthFilter serviceAuthFilter;
     private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
     private final SecurityLoggingFilter securityLoggingFilter;
+    private final ExceptionHandlingFilter exceptionHandlingFilter;
     private JwtAuthenticationConverter jwtAuthenticationConverter;
 
     private static final String[] AUTH_WHITELIST = {
@@ -70,6 +72,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             userIdExtractor, authorizedRolesExtractor, securityUtils);
         this.securityLoggingFilter = new SecurityLoggingFilter(securityUtils, loggingFilterPathRegex);
         this.serviceAuthFilter = serviceAuthFilter;
+        this.exceptionHandlingFilter = new ExceptionHandlingFilter();
         jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
     }
@@ -82,6 +85,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http
+            .addFilterBefore(exceptionHandlingFilter, BearerTokenAuthenticationFilter.class)
             .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
             .addFilterAfter(securityLoggingFilter, BearerTokenAuthenticationFilter.class)
             .addFilterAfter(v1EndpointsPathParamSecurityFilter, SecurityLoggingFilter.class)
