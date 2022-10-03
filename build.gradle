@@ -172,7 +172,7 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
     compile "org.flywaydb:flyway-core:6.5.7"
-    compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.32'
     compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     compile group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
     compile group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
