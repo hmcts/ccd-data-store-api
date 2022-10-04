@@ -171,7 +171,7 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
     compile "org.flywaydb:flyway-core:6.5.7"
-    compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.32'
     compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     compile group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
     compile group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
@@ -276,8 +276,8 @@ dependencies {
     implementation 'org.jooq:jool-java-8:0.9.14'
     implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.3'
-    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.2-Categories'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.4'
+    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.6'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
