@@ -113,7 +113,7 @@ class AuditCaseRemoteOperationTest {
         verify(httpClient).sendAsync(captor.capture(),any());
 
         assertThat(captor.getValue().uri().getPath(), is(equalTo("/caseAction")));
-        assertThat(captor.getValue().headers().map().size(), is(equalTo(2)));
+        assertThat(captor.getValue().headers().map().size(), is(equalTo(3)));
         assertThat(captor.getValue().headers().map().get("ServiceAuthorization").get(0), is(equalTo("Bearer 1234")));
         assertThat(captor.getValue().headers().map().get("Content-Type").get(0), is(equalTo("application/json")));
 
@@ -139,7 +139,7 @@ class AuditCaseRemoteOperationTest {
         verify(httpClient).sendAsync(captor.capture(),any());
 
         assertThat(captor.getValue().uri().getPath(), is(equalTo("/caseSearch")));
-        assertThat(captor.getValue().headers().map().size(), is(equalTo(2)));
+        assertThat(captor.getValue().headers().map().size(), is(equalTo(3)));
         assertThat(captor.getValue().headers().map().get("ServiceAuthorization").get(0), is(equalTo("Bearer 1234")));
         assertThat(captor.getValue().headers().map().get("Content-Type").get(0), is(equalTo("application/json")));
 
