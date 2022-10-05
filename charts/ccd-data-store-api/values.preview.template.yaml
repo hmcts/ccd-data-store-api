@@ -163,9 +163,9 @@ logstash:
     01_input.conf: |
       input  {
         jdbc {
-          jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/javadatabase?stringtype=unspecified"
-          jdbc_user => "javapostgres"
-          jdbc_password => "javapassword"
+          jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
+          jdbc_user => "hmcts"
+          jdbc_password => "hmcts"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
