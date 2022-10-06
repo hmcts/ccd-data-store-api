@@ -30,16 +30,13 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Run dependency-check
-        run: ./gradlew dependencyCheckAnalyze
-        continue-on-error: true
-      - name: Commit new Suppressions
-        run: ./gradlew suppressCves
+      - name: Run dependencyCheck and Suppress CVE
+        run: ./gradlew --continue dependencyCheckAnalyze suppressCves
       - name: Clean suppressions
         run: ./gradlew cleanSuppressions
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           skip_dirty_check: false
-          commit_message: "Suppress CVEs"
+          commit_message: "Suppressing CVE - Actions"
           branch: 'master'
