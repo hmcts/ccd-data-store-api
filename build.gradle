@@ -925,10 +925,15 @@ void configRemoteRunTask(Task execTask, String env) {
 }
 
 void loadEnvSecrets(String env) {
+    def azCmd = ['az', 'keyvault', 'secret', 'show', '--vault-name', "ccd-${env}", '-o', 'tsv', '--query', 'value', '--name', 'data-store-remote-env']
     if (!project.file("./.${env}-remote-env").exists()) {
         new ByteArrayOutputStream().withStream { os ->
             exec {
-                commandLine 'az', 'keyvault', 'secret', 'show', '--vault-name', "ccd-${env}", '-o', 'tsv', '--query', 'value', '--name', 'data-store-remote-env'
+                if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                    commandLine ['cmd', '/c'] + azCmd  
+                } else {
+                    commandLine azCmd
+                }
                 standardOutput = os
             }
             project.file("./.${env}-remote-env").write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
