@@ -36,10 +36,9 @@ public class SearchLog implements Serializable {
         return timestamp.format(ISO_INSTANT);
     }
 
-    public void setCaseRefs(String caseRefs) {
+    public void setCaseRefs(final String caseRefs) {
         if (!isEmpty(caseRefs)) {
             this.caseRefs = Splitter.on(AuditContext.CASE_ID_SEPARATOR).trimResults().splitToList(caseRefs);
         }
     }
-
 }
