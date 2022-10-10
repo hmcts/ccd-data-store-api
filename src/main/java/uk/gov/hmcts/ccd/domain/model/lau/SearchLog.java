@@ -24,14 +24,6 @@ public class SearchLog implements Serializable {
     private List<String> caseRefs;
     private ZonedDateTime timestamp;
 
-    public SearchLog(final String userId,
-        final List<String> caseRefs,
-        final ZonedDateTime timestamp) {
-        this.userId = userId;
-        this.caseRefs = caseRefs;
-        this.timestamp = timestamp;
-    }
-
     public String getTimestamp() {
         return timestamp.format(ISO_INSTANT);
     }

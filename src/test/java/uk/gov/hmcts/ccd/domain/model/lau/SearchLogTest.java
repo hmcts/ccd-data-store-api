@@ -3,12 +3,10 @@ package uk.gov.hmcts.ccd.domain.model.lau;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
 import static java.time.LocalDateTime.now;
 import static java.time.ZoneOffset.UTC;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SearchLogTest {
@@ -35,10 +33,13 @@ class SearchLogTest {
     @Test
     void shouldCreateSearchLogViaSearchLogConstructor() {
         final ZonedDateTime timestamp = ZonedDateTime.of(now(), UTC);
-        final List<String> caseRefs = asList("123","567","789");
+        final String caseRefs = "123,567,789";
         final String userId = "789";
 
-        final SearchLog searchLog = new SearchLog(userId, caseRefs, timestamp);
+        final SearchLog searchLog = new SearchLog();
+        searchLog.setUserId(userId);
+        searchLog.setCaseRefs(caseRefs);
+        searchLog.setTimestamp(timestamp);
 
         assertThat(searchLog.getUserId()).isEqualTo(userId);
         assertThat(searchLog.getTimestamp()).isEqualTo(timestamp.format(ISO_INSTANT));
