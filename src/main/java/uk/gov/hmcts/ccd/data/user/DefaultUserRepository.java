@@ -102,14 +102,9 @@ public class DefaultUserRepository implements UserRepository {
 
         Collection<? extends GrantedAuthority> authorities =
             SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        Set<String> userRoles = authorities.stream()
-            .map(GrantedAuthority::getAuthority)
-            .collect(Collectors.toSet());
-
-        String userId = getUser().getId();
-        LOG.debug("User id from idam: {}. User roles in the security context: {}.", userId, userRoles);
-
-        return userRoles;
+        return authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
     }
 
     @Override
