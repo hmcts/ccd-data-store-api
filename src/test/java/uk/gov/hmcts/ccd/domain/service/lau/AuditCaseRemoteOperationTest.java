@@ -116,6 +116,7 @@ class AuditCaseRemoteOperationTest {
         assertThat(captor.getValue().headers().map().size(), is(equalTo(3)));
         assertThat(captor.getValue().headers().map().get("ServiceAuthorization").get(0), is(equalTo("Bearer 1234")));
         assertThat(captor.getValue().headers().map().get("Content-Type").get(0), is(equalTo("application/json")));
+        assertThat(captor.getValue().headers().map().get("Accept").get(0), is(equalTo("application/json")));
 
         HttpRequest.BodyPublisher bodyPublisher = captor.getValue().bodyPublisher().get();
         assertThat(bodyPublisher.contentLength(), is(equalTo(2L)));
@@ -142,6 +143,7 @@ class AuditCaseRemoteOperationTest {
         assertThat(captor.getValue().headers().map().size(), is(equalTo(3)));
         assertThat(captor.getValue().headers().map().get("ServiceAuthorization").get(0), is(equalTo("Bearer 1234")));
         assertThat(captor.getValue().headers().map().get("Content-Type").get(0), is(equalTo("application/json")));
+        assertThat(captor.getValue().headers().map().get("Accept").get(0), is(equalTo("application/json")));
 
         HttpRequest.BodyPublisher bodyPublisher = captor.getValue().bodyPublisher().get();
         assertThat(bodyPublisher.contentLength(), is(equalTo(2L)));
