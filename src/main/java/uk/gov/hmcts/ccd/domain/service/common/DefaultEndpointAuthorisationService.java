@@ -33,10 +33,6 @@ public class DefaultEndpointAuthorisationService implements EndpointAuthorisatio
             return true;
         }
 
-        if (this.caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
-            return this.caseAccessService.isExplicitAccessGranted(caseDetails);
-        }
-
         return this.caseAccessService.isJurisdictionAccessAllowed(caseDetails.getJurisdiction());
     }
 }
