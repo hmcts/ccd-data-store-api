@@ -4552,11 +4552,6 @@ public class AccessControlServiceTest {
                 () -> assertThat(canAccessCaseViewField, is(true)),
                 () -> assertThat(loggerList.size(), is(0))
             );
-
-            assertThat(
-                accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ),
-                is(true)
-            );
         }
 
         @Test
