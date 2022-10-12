@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.google.common.collect.Sets;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -33,7 +32,7 @@ class DefaultEndpointAuthorisationServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         userRoleValidator = new DefaultEndpointAuthorisationService(userRepository,
             caseAccessService, applicationParams);
     }
@@ -49,14 +48,14 @@ class DefaultEndpointAuthorisationServiceTest {
         assertTrue(canAccess);
     }
 
-    @Ignore("Temp ignore for CCD-3610")
-    void shouldReturnTrueWhenUserHasSolicitorRoleAndUserHasAccessToCase() {
+    @Test
+    void shouldReturnFalseWhenUserHasSolicitorRoleAndUserHasAccessToCase() {
         CaseDetails caseDetails = mock(CaseDetails.class);
         when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-probate-solicitor"));
         when(this.caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).thenReturn(true);
         when(this.caseAccessService.isExplicitAccessGranted(caseDetails)).thenReturn(true);
         boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
-        assertTrue(canAccess);
+        assertFalse(canAccess);
     }
 
     @Test
