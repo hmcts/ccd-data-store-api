@@ -400,7 +400,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
                                                                                  List<RoleAssignment> roleAssignments) {
 
         List<RoleAssignment> roleAssignmentsOfInterest = roleAssignments.stream()
-            .filter(DefaultCaseDataAccessControl::isRoleAssignmentsOfInterestToAccessProcessCheck)
+            .filter(this::isRoleAssignmentsOfInterestToAccessProcessCheck)
             .collect(Collectors.toList());
 
         return userHasAccessToCaseUsingRoleAssignments(
@@ -426,13 +426,13 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         return false;
     }
 
-    private static boolean isRoleAssignmentsOfInterestToAccessProcessCheck(RoleAssignment roleAssignment) {
+    private boolean isRoleAssignmentsOfInterestToAccessProcessCheck(RoleAssignment roleAssignment) {
         return roleAssignment.getGrantType().equals(GrantType.STANDARD.name())
             || roleAssignment.getGrantType().equals(GrantType.SPECIFIC.name())
             || roleAssignment.getGrantType().equals(GrantType.CHALLENGED.name());
     }
 
-    private static boolean isRoleAssignmentsOfInterestToAccessGrantCheck(RoleAssignment roleAssignment) {
+    private boolean isRoleAssignmentsOfInterestToAccessGrantCheck(RoleAssignment roleAssignment) {
         return isRoleAssignmentsOfInterestToAccessProcessCheck(roleAssignment)
             || roleAssignment.getGrantType().equals(GrantType.BASIC.name());
     }
@@ -443,14 +443,12 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         CaseTypeDefinition caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
 
         return roleAssignments.stream()
-            .filter(DefaultCaseDataAccessControl::isRoleAssignmentsOfInterestToAccessGrantCheck)
+            .filter(this::isRoleAssignmentsOfInterestToAccessGrantCheck)
             .filter(roleAssignment -> userHasAccessToCaseUsingRoleAssignments(caseState,
                                                                               caseType,
                                                                               List.of(roleAssignment))
             )
             .map(roleAssignment -> GrantType.valueOf(roleAssignment.getGrantType()))
-            .distinct()
-            .sorted()
             .collect(Collectors.toList());
     }
 
