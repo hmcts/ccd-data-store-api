@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.PathNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVE
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 @Service
+@Slf4j
 @Qualifier("authorised")
 public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
@@ -255,6 +257,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             MAPPER.convertValue(existingCaseDetails.getData(), JsonNode.class),
             caseTypeDefinition.getCaseFieldDefinitions(),
             accessProfiles)) {
+            log.error("Error validating case field CRUD in case: {}",existingCaseDetails.getReference());
             throw new ResourceNotFoundException(NO_FIELD_FOUND);
         }
     }

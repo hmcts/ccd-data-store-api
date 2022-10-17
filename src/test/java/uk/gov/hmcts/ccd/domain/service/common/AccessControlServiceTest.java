@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -57,6 +56,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
@@ -1022,7 +1022,16 @@ public class AccessControlServiceTest {
                 + "  ]\n"
                 + "}");
 
+            ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+            listAppender.start();
+            setupLogging(listAppender).setLevel(Level.ERROR);
+
             assertFieldsAccess(false, caseType, newDataNode, existingDataNode);
+
+            List<ILoggingEvent> loggingEventList = listAppender.list;
+            assertSame(loggingEventList.get(0).getLevel(), Level.ERROR);
+            assertTrue(loggingEventList.get(0).getFormattedMessage()
+                                .startsWith("Missing CRUD access for caseFieldDefinition=Documents"));
         }
 
         @Test
@@ -4500,28 +4509,13 @@ public class AccessControlServiceTest {
     class CanAccessCaseViewFieldWithCriteriaTests {
 
         private Logger logger;
-        private Level originalLevel;
         private ListAppender<ILoggingEvent> listAppender;
 
         @BeforeEach
         void setUp() {
-            logger = (Logger) LoggerFactory.getLogger(AccessControlServiceImpl.class);
-
-            // Store original logger level so it can be reset after tests
-            originalLevel = logger.getLevel();
-
             listAppender = new ListAppender<>();
             listAppender.start();
-            logger.addAppender(listAppender);
-        }
-
-        @AfterEach
-        void tearDown() {
-            // Reset logging level to original value.  This ensures other tests that
-            // don't expect debug messages to be present in the log will still work.
-            logger.setLevel(originalLevel);
-
-            logger.detachAndStopAllAppenders();
+            logger = setupLogging(listAppender);
         }
 
         @Test
@@ -4539,10 +4533,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build();
 
-            // Change logger level so that message logged by canAccessCaseViewFieldWithCriteria
-            // method at debug level would present in logger.  Not expecting it to be present in this test.
             logger.setLevel(Level.DEBUG);
-
             boolean canAccessCaseViewField =
                 accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ);
 
@@ -4569,16 +4560,12 @@ public class AccessControlServiceTest {
                         .build())
                     .build();
 
-            // Change logger level so that message logged by canAccessCaseViewFieldWithCriteria
-            // method at debug level is present in logger
             logger.setLevel(Level.DEBUG);
 
             boolean canAccessCaseViewField =
                 accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ);
 
-            List<ILoggingEvent> loggerList = listAppender.list;
-            ILoggingEvent lastLogEntry = loggerList.get(loggerList.size() - 1);
-
+            List<ILoggingEvent> loggingEventList = listAppender.list;
             String expectedLogMessage =
                 "No relevant case view field access for caseViewField=NotesNoReadAccessForRole, "
                     + "caseViewFieldAcls=[ACL{accessProfile='caseworker-divorce-loa4', crud=R}], "
@@ -4586,8 +4573,8 @@ public class AccessControlServiceTest {
 
             assertAll(
                 () -> assertThat(canAccessCaseViewField, is(false)),
-                () -> assertThat(lastLogEntry.getLevel(), is(Level.DEBUG)),
-                () -> assertThat(lastLogEntry.getFormattedMessage(), is(expectedLogMessage))
+                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
+                () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
         }
     }
@@ -4606,6 +4593,13 @@ public class AccessControlServiceTest {
                 caseType.getCaseFieldDefinitions(),
                 ACCESS_PROFILES),
             is(hasFieldAccess));
+    }
+
+    private Logger setupLogging(ListAppender<ILoggingEvent> listAppender) {
+        Logger logger = (Logger) LoggerFactory.getLogger(AccessControlServiceImpl.class);
+        logger.detachAndStopAllAppenders();
+        logger.addAppender(listAppender);
+        return logger;
     }
 
     private JsonNode getTextNode(String value) {
