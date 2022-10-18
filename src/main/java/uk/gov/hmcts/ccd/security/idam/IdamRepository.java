@@ -34,12 +34,7 @@ public class IdamRepository {
     @Cacheable(value = "userInfoCache")
     public UserInfo getUserInfo(String jwtToken) {
         try {
-            UserInfo userInfo = idamClient.getUserInfo("Bearer " + jwtToken);
-            if (userInfo != null) {
-                log.info("Queried user info from IDAM API. User Id={}. Roles={}.",
-                    userInfo.getUid(), userInfo.getRoles());
-            }
-            return userInfo;
+            return idamClient.getUserInfo("Bearer " + jwtToken);
         } catch (FeignException exception) {
             log.error("FeignException: retrieve user info: {} ", exception.getMessage());
 
