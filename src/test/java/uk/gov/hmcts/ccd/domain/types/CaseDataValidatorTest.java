@@ -26,6 +26,7 @@ import java.util.Map;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -687,9 +688,6 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
     @Test
     public void fieldTypeWithNoValidator() throws Exception {
-
-        // The case field definition for this test defines Line1 as being of type 'Label'.
-        // There is no validator for this type so an exception should be thrown.
         final String DATA =
             "{\n" +
                 "  \"NoValidatorForFieldType\" : [\n" +
@@ -703,28 +701,19 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "  ]\n" +
                 "}";
 
-        final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
-        final ValidationContext validationContext = getValidationContext(values);
+        final ValidationContext validationContext = getValidationContext(caseDataFromJsonString(DATA));
 
-        // Get handle to CaseDataValidator class logger
         Logger logger = (Logger) LoggerFactory.getLogger(CaseDataValidator.class);
         ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
         listAppender.start();
         logger.addAppender(listAppender);
 
-        try {
-            final List<ValidationResult> result = caseDataValidator.validate(validationContext);
-        } catch (RuntimeException e) {
-            assertEquals("System error: No validator found for Label", e.getMessage());
-        }
+        assertThrows(RuntimeException.class, () -> caseDataValidator.validate(validationContext));
 
-        // Confirm that the last entry in the logger contains the
-        // expected message and has been logged at the expected level
         List<ILoggingEvent> loggerList = listAppender.list;
-        ILoggingEvent lastLogEntry = loggerList.get(loggerList.size() - 1);
-        assertEquals(Level.ERROR, lastLogEntry.getLevel());
+        assertEquals(Level.ERROR, loggerList.get(0).getLevel());
         assertEquals("No validator found for field NoValidatorForFieldType.0.Line1 of type Label",
-            lastLogEntry.getFormattedMessage());
+                loggerList.get(0).getFormattedMessage());
 
         logger.detachAndStopAllAppenders();
     }

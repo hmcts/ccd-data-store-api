@@ -12,8 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,7 +35,6 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 
 @Service
-@Slf4j
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "false", matchIfMissing = true)
 public class AccessControlServiceImpl implements AccessControlService {
 
@@ -407,14 +404,10 @@ public class AccessControlServiceImpl implements AccessControlService {
             if (!caseField.isCompoundFieldType()) {
                 return hasCaseFieldAccess(caseFieldDefinitions, accessProfiles, CAN_UPDATE, newFieldName);
             } else {
-                boolean hasCrudAccess = compoundAccessControlService.hasAccessForAction(newData,
-                                                                                        existingData,
-                                                                                        caseField,
-                                                                                        accessProfiles);
-                if (!hasCrudAccess) {
-                    log.error("Missing CRUD access for caseFieldDefinition={}, {}", caseField.getId(), accessProfiles);
-                }
-                return hasCrudAccess;
+                return compoundAccessControlService.hasAccessForAction(newData,
+                    existingData,
+                    caseField,
+                    accessProfiles);
             }
         } else {
             AccessControlServiceImpl.LOG.error("Data submitted for unknown field '{}'", newFieldName);

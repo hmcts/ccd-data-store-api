@@ -455,7 +455,7 @@ class AuthorisedCreateEventOperationTest {
 
         List<ILoggingEvent> loggingEventList = listAppender.list;
         assertAll(
-                () -> assertEquals(loggingEventList.get(0).getLevel(), Level.ERROR),
+                () -> assertEquals(Level.ERROR, loggingEventList.get(0).getLevel()),
                 () -> assertTrue(loggingEventList.get(0).getFormattedMessage()
                                              .startsWith("Error validating case field CRUD in case: "))
         );

@@ -56,7 +56,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
@@ -1021,17 +1020,7 @@ public class AccessControlServiceTest {
                 + "    }\n"
                 + "  ]\n"
                 + "}");
-
-            ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
-            listAppender.start();
-            setupLogging(listAppender).setLevel(Level.ERROR);
-
             assertFieldsAccess(false, caseType, newDataNode, existingDataNode);
-
-            List<ILoggingEvent> loggingEventList = listAppender.list;
-            assertSame(loggingEventList.get(0).getLevel(), Level.ERROR);
-            assertTrue(loggingEventList.get(0).getFormattedMessage()
-                                .startsWith("Missing CRUD access for caseFieldDefinition=Documents"));
         }
 
         @Test
