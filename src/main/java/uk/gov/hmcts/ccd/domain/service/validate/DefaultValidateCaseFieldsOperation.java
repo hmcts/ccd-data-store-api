@@ -49,7 +49,6 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
             throw new ValidationException("Cannot validate case field because of event " + content.getEventId()
                 + " is not found in case type definition");
         }
-        log.debug("Validating case with eventId: {}", content.getEventId());
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, content.getEventId()));
         caseTypeService.validateData(new ValidationContext(caseTypeDefinition, content.getData()));
         return content.getData();
