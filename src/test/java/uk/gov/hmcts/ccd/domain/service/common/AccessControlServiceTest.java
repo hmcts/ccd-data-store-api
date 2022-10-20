@@ -4556,8 +4556,9 @@ public class AccessControlServiceTest {
 
             List<ILoggingEvent> loggingEventList = listAppender.list;
 
-            String expectedLogMessage = "No relevant access present for caseViewField=NotesNoReadAccessForRole in userRoles="
-                    + ACCESS_PROFILES + ". Expected roles=[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]";
+            String expectedLogMessage = "No relevant access present for caseViewField=NotesNoReadAccessForRole "
+                    + "in userRoles=" + ACCESS_PROFILES
+                    + ". Expected roles=[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]";
 
             assertAll(
                 () -> assertThat(canAccessCaseViewField, is(false)),
