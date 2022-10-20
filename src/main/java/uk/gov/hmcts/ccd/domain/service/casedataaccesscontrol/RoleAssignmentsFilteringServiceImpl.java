@@ -30,7 +30,7 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
     @Override
     public FilteredRoleAssignments filter(RoleAssignments roleAssignments,
                                           CaseDetails caseDetails) {
-        log.info("Filter role assignments for case {}", caseDetails.getReference());
+        log.debug("Filter role assignments for case {}", caseDetails.getReference());
 
         return filterMatchingRoleAssignments(roleAssignments,
             (matcher, roleAssignment) -> matcher.matchAttribute(roleAssignment, caseDetails));
@@ -39,7 +39,7 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
     @Override
     public FilteredRoleAssignments filter(RoleAssignments roleAssignments,
                                                       CaseTypeDefinition caseTypeDefinition) {
-        log.info("Filter role assignments for case type {}", caseTypeDefinition.getName());
+        log.debug("Filter role assignments for case type {}", caseTypeDefinition.getName());
 
         return filterMatchingRoleAssignments(roleAssignments,
             (matcher, roleAssignment) -> matcher.matchAttribute(roleAssignment, caseTypeDefinition));
