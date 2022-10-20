@@ -4549,7 +4549,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build();
 
-            logger.setLevel(Level.ERROR);
+            logger.setLevel(Level.DEBUG);
 
             boolean canAccessCaseViewField =
                 accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ);
@@ -4562,7 +4562,7 @@ public class AccessControlServiceTest {
 
             assertAll(
                 () -> assertThat(canAccessCaseViewField, is(false)),
-                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
                 () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
         }
