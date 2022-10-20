@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -16,6 +17,7 @@ import javax.inject.Inject;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOperation {
 
     private final CaseDefinitionRepository caseDefinitionRepository;
@@ -47,6 +49,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
             throw new ValidationException("Cannot validate case field because of event " + content.getEventId()
                 + " is not found in case type definition");
         }
+        log.debug("Validating case with eventId: {}", content.getEventId());
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, content.getEventId()));
         caseTypeService.validateData(new ValidationContext(caseTypeDefinition, content.getData()));
         return content.getData();

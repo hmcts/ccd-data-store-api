@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -19,8 +15,6 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.LoggerFactory;
-
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.documentdata.CollectionData;
@@ -63,7 +57,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
@@ -436,31 +429,16 @@ class AuthorisedCreateEventOperationTest {
     }
 
     @Test
-    @DisplayName("should fail and log if no create or update field access")
-    void shouldFaiIAndLogIfNoCreateFieldAccess() {
+    @DisplayName("should fail if no create or update field access")
+    void shouldFailIfNoCreateFieldAccess() {
 
         when(accessControlService.canAccessCaseFieldsForUpsert(any(JsonNode.class),
-                any(JsonNode.class),
-                eq(caseFieldDefinitions),
-                eq(USER_ROLES))).thenReturn(false);
-
-        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
-        listAppender.start();
-        Logger logger = (Logger) LoggerFactory.getLogger(AuthorisedCreateEventOperation.class);
-        logger.addAppender(listAppender);
-        logger.setLevel(Level.ERROR);
+            any(JsonNode.class),
+            eq(caseFieldDefinitions),
+            eq(USER_ROLES))).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () ->
-                authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT));
-
-        List<ILoggingEvent> loggingEventList = listAppender.list;
-        assertAll(
-                () -> assertEquals(Level.ERROR, loggingEventList.get(0).getLevel()),
-                () -> assertTrue(loggingEventList.get(0).getFormattedMessage()
-                                             .startsWith("Error validating case field CRUD in case: "))
-        );
-
-        logger.detachAndStopAllAppenders();
+            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT));
     }
 
     @Test

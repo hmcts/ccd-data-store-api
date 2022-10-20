@@ -4549,20 +4549,19 @@ public class AccessControlServiceTest {
                         .build())
                     .build();
 
-            logger.setLevel(Level.DEBUG);
+            logger.setLevel(Level.ERROR);
 
             boolean canAccessCaseViewField =
                 accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ);
 
             List<ILoggingEvent> loggingEventList = listAppender.list;
-            String expectedLogMessage =
-                "No relevant case view field access for caseViewField=NotesNoReadAccessForRole, "
-                    + "caseViewFieldAcls=[ACL{accessProfile='caseworker-divorce-loa4', crud=R}], "
-                    + "userRoles=" + ACCESS_PROFILES.toString();
+
+            String expectedLogMessage = "No relevant access present for NotesNoReadAccessForRole in userRoles="
+                    + ACCESS_PROFILES + ". Expected roles=[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]";
 
             assertAll(
                 () -> assertThat(canAccessCaseViewField, is(false)),
-                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
+                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
                 () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
         }

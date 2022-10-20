@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,6 +37,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 
 @Service
+@Slf4j
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "false", matchIfMissing = true)
 public class AccessControlServiceImpl implements AccessControlService {
 
@@ -129,10 +132,10 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                       final Predicate<AccessControlList> criteria) {
         boolean hasAccess = hasAccessControlList(accessProfiles, criteria, caseViewField.getAccessControlLists());
         if (!hasAccess) {
-            LOG.debug("No relevant case view field access for caseViewField={}, caseViewFieldAcls={}, userRoles={}",
-                caseViewField.getId(),
-                caseViewField.getAccessControlLists(),
-                accessProfiles);
+            LOG.error("No relevant access present for {} in userRoles={}. Expected roles={}",
+                    caseViewField.getId(),
+                    accessProfiles,
+                    caseViewField.getAccessControlLists());
         }
         return hasAccess;
     }
@@ -381,7 +384,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                 return true;
             }
         }
-        AccessControlServiceImpl.LOG.debug(
+        AccessControlServiceImpl.LOG.error(
             "Field names do not match or no relevant field access for fieldName={}, "
                 + "caseFieldDefinitions={}, userRoles={}",
             fieldName,
