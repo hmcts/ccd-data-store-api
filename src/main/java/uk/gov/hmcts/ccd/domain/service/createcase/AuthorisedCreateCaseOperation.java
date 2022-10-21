@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
@@ -117,7 +116,8 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             caseTypeDefinition.getEvents(),
             accessProfiles,
             CAN_CREATE)) {
-            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS, event != null ? event.getEventId() : null,
+            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS,
+                        event != null ? event.getEventId() : null,
                         caseTypeDefinition.getId());
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }

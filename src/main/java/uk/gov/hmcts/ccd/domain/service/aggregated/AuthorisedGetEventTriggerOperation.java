@@ -177,7 +177,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         if (!accessControlService.canAccessCaseEventWithCriteria(eventId,
                                                                  caseTypeDefinition.getEvents(),
             accessProfiles, CAN_CREATE)) {
-            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS, eventId,
+            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS,
+                        eventId,
                         caseTypeDefinition.getId());
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
@@ -200,7 +201,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                                                  caseTypeDefinition.getEvents(),
             accessProfiles,
                                                                  CAN_CREATE)) {
-            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS, eventId,
+            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS,
+                        eventId,
                         caseTypeDefinition.getId());
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
