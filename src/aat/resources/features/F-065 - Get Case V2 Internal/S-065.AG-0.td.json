@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-065.AG-0",
+  "_extends_": "F-065_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 0 - User with IDAM role authorised to access case type, no RoleToAccessProfiles on case-type will return Access Granted: `STANDARD`",
+
+  "specs": [
+    "a caseworker with no role assignments",
+    "contains the case that has just been created above",
+    "contains `Access Granted` set to `STANDARD`"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][CreateCase_FT_GlobalSearch_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "metadataFields": [
+        {
+          "_extends_": "F-065_MetadataField", 
+
+          "id": "[ACCESS_GRANTED]",
+          "label": "Access Granted",
+          "value": "STANDARD"
+        },
+        { "_extends_": "F-065_MetadataField", "id": "[ACCESS_PROCESS]" }
+      ]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "_guid_": "CreateCase_PreRequisiteCitizen_TokenCreation__Base_BEFTA_MASTER",
+  "_extends_": "Citizen_Token_Creation_Data_For_Case_Creation",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "OVERRIDE"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "case_details": {
+        "jurisdiction": "BEFTA_MASTER",
+        "case_type_id": "${[scenarioContext][testData][request][pathVariables][ctid]}"
+      }
+    }
+  }
+}

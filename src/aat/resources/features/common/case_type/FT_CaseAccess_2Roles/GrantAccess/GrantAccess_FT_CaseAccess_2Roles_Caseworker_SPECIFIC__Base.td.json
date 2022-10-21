@@ -1,0 +1,13 @@
+{
+  "_guid_": "GrantAccess_FT_CaseAccess_2Roles_Caseworker_SPECIFIC__Base",
+  "_extends_": "CaseUserRoles_Add__PositiveResponse_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+    },
+    "caseworker": {
+      "_extends_": "BeftaMasterCaseworker_Role1Basic"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "_guid_": "CreateCase_FT_GlobalSearch_AC_3_PreRequisiteCitizen",
+  "_extends_": "CreateCase_PreRequisiteCitizen__Base_BEFTA_MASTER",
+
+  "specs": [
+    "to create a case as a citizen: for case type with only BASIC AccessProfile"
+  ],
+
+  "prerequisites": [
+    { "Token_Creation_Citizen": "CreateCase_FT_GlobalSearch_AC_3_PreRequisiteCitizen_TokenCreation" }
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_GlobalSearch_AC_3"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "CreateCase_expectedResponse__SearchCrtieria_empty"
+  }
+}

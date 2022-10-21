@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-065.AP.1",
+  "_extends_": "F-065_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 1.2 - NONE Access Process (pseudo role assignments on case-type)",
+
+  "specs": [
+    "a caseworker with no role assignments",
+    "contains the case that has just been created above",
+    "contains details of the case just created, along with an HTTP-200 OK",
+    "contains `Access Process` set to `NONE`"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker_Staff"
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][CreateCase_FT_GlobalSearch_AC_1_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "metadataFields": [
+        { "_extends_": "F-065_MetadataField", "id": "[ACCESS_GRANTED]"},
+        {
+          "_extends_": "F-065_MetadataField", 
+
+          "id": "[ACCESS_PROCESS]",
+          "label": "Access Process",
+          "value": "NONE"
+        }
+      ]
+    }
+  }
+}

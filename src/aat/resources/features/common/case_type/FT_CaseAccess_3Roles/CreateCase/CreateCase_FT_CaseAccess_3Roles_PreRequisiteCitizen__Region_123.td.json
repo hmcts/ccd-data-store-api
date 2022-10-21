@@ -1,0 +1,18 @@
+{
+  "_guid_": "CreateCase_FT_CaseAccess_3Roles_PreRequisiteCitizen__Region_123",
+  "_extends_": "CreateCase_FT_CaseAccess_3Roles_PreRequisiteCitizen__Base",
+
+  "specs": [
+    "to create a case as a citizen in Region 123: R2AP mappings: Role1 + Role2 + Role3 -> AP1 + AP2 + AP3, Authorised Case/State: AP1 + AP3"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "caseManagementLocation": {
+          "region" : "123"
+        }
+      }
+    }
+  }
+}

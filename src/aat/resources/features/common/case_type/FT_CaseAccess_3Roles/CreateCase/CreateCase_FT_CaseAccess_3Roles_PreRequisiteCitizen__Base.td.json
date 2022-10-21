@@ -1,0 +1,51 @@
+{
+  "_guid_": "CreateCase_FT_CaseAccess_3Roles_PreRequisiteCitizen__Base",
+  "_extends_": "CreateCase_PreRequisiteCitizen__Base_BEFTA_MASTER",
+
+  "prerequisites": [
+    { "Token_Creation_Citizen": "CreateCase_FT_CaseAccess_3Roles_PreRequisiteCitizen_TokenCreation" }
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_CaseAccess_3Roles"
+    },
+    "body": {
+      "data": {
+        "TextField": "Test case",
+        "caseManagementLocation" : {
+          "region" : "OVERRIDE"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "TextField": "Test case",
+        "caseManagementLocation" : {
+          "region" : "${[scenarioContext][testData][request][body][data][caseManagementLocation][region]}"
+        }
+      },
+      "data_classification": {
+        "TextField": "PUBLIC",
+        "caseManagementLocation": {
+          "classification": "PUBLIC",
+          "value": {
+            "region": "PUBLIC"
+          }
+        }
+      },
+      "security_classifications": {
+        "TextField": "PUBLIC",
+        "caseManagementLocation": {
+          "classification": "PUBLIC",
+          "value": {
+            "region": "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}

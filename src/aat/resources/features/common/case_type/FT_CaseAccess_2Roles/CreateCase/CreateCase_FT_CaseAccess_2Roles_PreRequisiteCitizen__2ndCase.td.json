@@ -1,0 +1,8 @@
+{
+  "_guid_": "CreateCase_FT_CaseAccess_2Roles_PreRequisiteCitizen__2ndCase",
+  "_extends_": "CreateCase_FT_CaseAccess_2Roles_PreRequisiteCitizen",
+
+  "specs": [
+    "to create a 2nd case as a citizen: R2AP mappings: Role1 + Role2 -> AP1 + AP2, Authorised Case/State: AP1 + AP2"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "_guid_": "GrantAccess_FT_CaseAccess_3Roles_Caseworker_SPECIFIC__Region_3",
+  "_extends_": "GrantAccess_FT_CaseAccess_3Roles_Caseworker_SPECIFIC__Base",
+
+  "request": {
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][siblingContexts][CreateCase_FT_CaseAccess_3Roles_PreRequisiteCitizen__Region_3][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][caseworker][id]}",
+          "case_role": "[SPECIFICACCESSPROFILE]"
+        }
+      ]
+    }
+  }
+}
