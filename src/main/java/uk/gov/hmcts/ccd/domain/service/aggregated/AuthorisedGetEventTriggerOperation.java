@@ -178,7 +178,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                                                  caseTypeDefinition.getEvents(),
             accessProfiles, CAN_CREATE)) {
             log.error(AccessControlService.NO_EVENT_FOUND_DETAILS, eventId,
-                        caseTypeDefinition.getId(), caseTypeDefinition.getJurisdictionId());
+                        caseTypeDefinition.getId());
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
     }
@@ -201,7 +201,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             accessProfiles,
                                                                  CAN_CREATE)) {
             log.error(AccessControlService.NO_EVENT_FOUND_DETAILS, eventId,
-                        caseTypeDefinition.getId(), caseTypeDefinition.getJurisdictionId());
+                        caseTypeDefinition.getId());
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
         if (!accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(),

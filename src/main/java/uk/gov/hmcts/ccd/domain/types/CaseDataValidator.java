@@ -154,7 +154,8 @@ public class CaseDataValidator {
                 .collect(Collectors.toList()))
             .orElseThrow(() -> {
                 log.error("Unable to validate {} of base-type, {}. "
-                        + "Verify base-type has write access.", fieldIdPrefix + fieldId, fieldType.getType());
+                        + "Verify the field's base-type has write access.",
+                        fieldIdPrefix + fieldId, fieldType.getType());
                 return new RuntimeException("System error: No validator found for " + fieldType.getType());
             });
     }

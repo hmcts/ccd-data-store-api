@@ -122,7 +122,9 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                       final Predicate<AccessControlList> criteria) {
         boolean hasAccess = hasAccessControlList(accessProfiles, criteria, caseViewField.getAccessControlLists());
         if (!hasAccess) {
-            LOG.debug("No relevant access present for caseViewField={} in userRoles={}. Expected roles={}",
+            LOG.debug("User may be unauthorised to access field: {}. "
+                            + "Verify both the field and the user have appropriate write access. "
+                            + "userRoles={}, requiredRoles={}",
                     caseViewField.getId(),
                     accessProfiles,
                     caseViewField.getAccessControlLists());

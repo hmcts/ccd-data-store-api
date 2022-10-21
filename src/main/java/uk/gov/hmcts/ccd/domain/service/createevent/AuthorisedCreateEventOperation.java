@@ -29,7 +29,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
@@ -225,8 +224,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             caseTypeDefinition.getEvents(),
             accessProfiles,
             CAN_CREATE)) {
-            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS, Objects.requireNonNull(event).getEventId(),
-                        caseTypeDefinition.getId(), caseTypeDefinition.getJurisdictionId());
+            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS, event != null ? event.getEventId() : null,
+                        caseTypeDefinition.getId());
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
 

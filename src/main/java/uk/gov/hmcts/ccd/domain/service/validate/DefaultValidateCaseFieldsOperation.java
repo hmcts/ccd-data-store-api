@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -17,7 +16,6 @@ import javax.inject.Inject;
 import java.util.Map;
 
 @Service
-@Slf4j
 public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOperation {
 
     private final CaseDefinitionRepository caseDefinitionRepository;
