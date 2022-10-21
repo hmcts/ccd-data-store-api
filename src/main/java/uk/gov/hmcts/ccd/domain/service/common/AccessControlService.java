@@ -57,7 +57,11 @@ public interface AccessControlService {
         + "return to the case list overview page.";
     String NO_CASE_STATE_FOUND = "Invalid event";
     String NO_EVENT_FOUND = "No event found";
+    String NO_EVENT_FOUND_DETAILS = "Event, {}, may not be present for the case-type: {} of jurisdiction {}. "
+            + "Verify event is present for the case-type and user has access to trigger the event.";
     String NO_FIELD_FOUND = "No field found";
+    String NO_FIELD_FOUND_DETAILS = "Provided fields may not be present for case-type, {}. "
+            + "Verify fields are present for the case-type and user has access to amend fields: {}";
     String VALUE = "value";
     String ALL = "*";
 

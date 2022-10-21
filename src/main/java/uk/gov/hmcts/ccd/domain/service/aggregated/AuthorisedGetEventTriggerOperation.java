@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CAS
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
 
 @Service
+@Slf4j
 @Qualifier(AuthorisedGetEventTriggerOperation.QUALIFIER)
 public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperation {
 
@@ -175,6 +177,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         if (!accessControlService.canAccessCaseEventWithCriteria(eventId,
                                                                  caseTypeDefinition.getEvents(),
             accessProfiles, CAN_CREATE)) {
+            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS, eventId,
+                        caseTypeDefinition.getId(), caseTypeDefinition.getJurisdictionId());
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
     }
@@ -196,6 +200,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                                                  caseTypeDefinition.getEvents(),
             accessProfiles,
                                                                  CAN_CREATE)) {
+            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS, eventId,
+                        caseTypeDefinition.getId(), caseTypeDefinition.getJurisdictionId());
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
         if (!accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(),

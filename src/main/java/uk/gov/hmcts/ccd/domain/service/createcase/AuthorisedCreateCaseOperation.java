@@ -2,7 +2,10 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -25,6 +28,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVE
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 @Service
+@Slf4j
 @Qualifier("authorised")
 public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
@@ -113,6 +117,8 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             caseTypeDefinition.getEvents(),
             accessProfiles,
             CAN_CREATE)) {
+            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS, Objects.requireNonNull(event).getEventId(),
+                        caseTypeDefinition.getId(), caseTypeDefinition.getJurisdictionId());
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
 
@@ -121,6 +127,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             caseTypeDefinition.getCaseFieldDefinitions(),
             accessProfiles,
             CAN_CREATE)) {
+            log.error(AccessControlService.NO_FIELD_FOUND_DETAILS, caseTypeDefinition.getId(), data.keySet());
             throw new ResourceNotFoundException(NO_FIELD_FOUND);
         }
     }

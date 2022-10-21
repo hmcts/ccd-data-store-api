@@ -97,14 +97,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                   final List<CaseEventDefinition> caseEventDefinitions,
                                                   final Set<AccessProfile> accessProfiles,
                                                   final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = hasCaseEventAccess(eventId, caseEventDefinitions, accessProfiles, criteria);
-        if (!hasAccess) {
-            LOG.debug("No relevant event access for eventId={}, eventAcls={}, userRoles={}",
-                eventId,
-                getCaseEventAcls(caseEventDefinitions, eventId),
-                accessProfiles);
-        }
-        return hasAccess;
+        return hasCaseEventAccess(eventId, caseEventDefinitions, accessProfiles, criteria);
     }
 
     @Override
@@ -381,7 +374,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                 return true;
             }
         }
-        AccessControlServiceImpl.LOG.error(
+        AccessControlServiceImpl.LOG.debug(
             "Field names do not match or no relevant field access for fieldName={}, "
                 + "caseFieldDefinitions={}, userRoles={}",
             fieldName,
