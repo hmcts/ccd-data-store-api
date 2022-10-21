@@ -1,0 +1,22 @@
+{
+  "_guid_": "CreateCase_expectedResponse__SearchCrtieria_empty",
+
+  "body": {
+    "case_data": {
+      "SearchCriteria": {
+      }
+    },
+    "data_classification": {
+      "SearchCriteria" : {
+        "classification" : "PUBLIC",
+        "value" : { }
+      }
+    },
+    "security_classifications": {
+      "SearchCriteria" : {
+        "classification" : "PUBLIC",
+        "value" : { }
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "_guid_": "CreateCase_FT_CaseAccess_1Role_PreRequisiteCitizen",
+  "_extends_": "CreateCase_PreRequisiteCitizen__Base_BEFTA_MASTER",
+
+  "specs": [
+    "to create a case as a citizen: R2AP mappings: Role1 -> AP1, Authorised Case/State: AP1"
+  ],
+
+  "prerequisites": [
+    { "Token_Creation_Citizen": "CreateCase_FT_CaseAccess_1Role_PreRequisiteCitizen_TokenCreation" }
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_CaseAccess_1Role"
+    },
+    "body": {
+      "data": {
+        "TextField": "Test case"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "TextField": "Test case"
+      },
+      "data_classification": {
+        "TextField": "PUBLIC"
+      },
+      "security_classifications": {
+        "TextField": "PUBLIC"
+      }
+    }
+  }
+}
