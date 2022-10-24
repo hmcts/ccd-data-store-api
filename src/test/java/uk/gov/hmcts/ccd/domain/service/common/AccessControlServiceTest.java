@@ -106,7 +106,6 @@ public class AccessControlServiceTest {
         ROLE_IN_USER_ROLES_2));
 
     private AccessControlService accessControlService;
-    private static final String JURISDICTION = "JURISDICTION1";
     private static final String CASE_TYPE_ID = "CASE_TYPE_ID";
     private static final String CASE_REFERENCE = "CASE_REFERENCE";
     private static final String EVENT_ID = "EVENT_ID";
@@ -607,7 +606,7 @@ public class AccessControlServiceTest {
                             .build())
                     .build();
             final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
-                    "{  \"WrongAddressesKey\": \"someText\" }"
+                    "{  \"WrongAddresses\": \"someText\" }"
             ));
             JsonNode dataNode = JacksonUtils.convertValueJsonNode(data);
 
@@ -621,8 +620,9 @@ public class AccessControlServiceTest {
                     is(false));
 
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    "caseField, WrongAddressesKey, is not present in the expected list of fields. "
-                            + "Verify the caseField is assigned to the supplied caseType");
+                    "No matching caseField, {}, present in the caseFieldDefinitions. "
+                            + "Verify the caseField is in caseFieldDefinitions={}",
+                                "WrongAddresses", caseType.getCaseFieldDefinitions());
             loggingEventList = listAppender.list;
             assertAll(
                     () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),

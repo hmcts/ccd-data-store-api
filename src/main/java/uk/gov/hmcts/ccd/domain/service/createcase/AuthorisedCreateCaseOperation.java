@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -27,7 +26,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVE
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 @Service
-@Slf4j
 @Qualifier("authorised")
 public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 

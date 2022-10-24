@@ -392,8 +392,8 @@ public class AccessControlServiceImpl implements AccessControlService {
                 .filter(caseField -> caseField.getId().equals(fieldName))
                 .findFirst();
         if (matchedField.isEmpty()) {
-            LOG.error("caseField, {}, is not present in the expected list of fields. "
-                    + "Verify the caseField is assigned to the supplied caseType", fieldName);
+            LOG.error("No matching caseField, {}, present in the caseFieldDefinitions. "
+                    + "Verify the caseField is in caseFieldDefinitions={}", fieldName, caseFieldDefinitions);
             return false;
         } else if (hasAccessControlList(accessProfiles, criteria, matchedField.get().getAccessControlLists())) {
             return true;
