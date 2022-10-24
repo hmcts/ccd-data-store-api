@@ -116,9 +116,6 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             caseTypeDefinition.getEvents(),
             accessProfiles,
             CAN_CREATE)) {
-            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS,
-                        event != null ? event.getEventId() : null,
-                        caseTypeDefinition.getId());
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
 
@@ -127,7 +124,6 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             caseTypeDefinition.getCaseFieldDefinitions(),
             accessProfiles,
             CAN_CREATE)) {
-            log.error(AccessControlService.NO_FIELD_FOUND_DETAILS, caseTypeDefinition.getId(), data.keySet());
             throw new ResourceNotFoundException(NO_FIELD_FOUND);
         }
     }

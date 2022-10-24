@@ -7,6 +7,7 @@ import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.hamcrest.MatcherAssert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -24,9 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -710,12 +714,14 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         assertThrows(RuntimeException.class, () -> caseDataValidator.validate(validationContext));
 
-        List<ILoggingEvent> loggerList = listAppender.list;
-        assertEquals(Level.ERROR, loggerList.get(0).getLevel());
-        assertEquals("Unable to validate NoValidatorForFieldType.0.Line1 of base-type, Label."
-                        + " Verify the field's base-type has write access.",
-                loggerList.get(0).getFormattedMessage());
-
+        List<ILoggingEvent> loggingEventList = listAppender.list;
+        String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                        "Unable to validate NoValidatorForFieldType.0.Line1 of base-type, Label."
+                                + " Verify the field's base-type has write access.");
+        assertAll(
+                () -> MatcherAssert.assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                () -> MatcherAssert.assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+        );
         logger.detachAndStopAllAppenders();
     }
 }

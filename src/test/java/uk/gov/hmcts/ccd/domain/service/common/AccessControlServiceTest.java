@@ -106,6 +106,7 @@ public class AccessControlServiceTest {
         ROLE_IN_USER_ROLES_2));
 
     private AccessControlService accessControlService;
+    private static final String JURISDICTION = "JURISDICTION1";
     private static final String CASE_TYPE_ID = "CASE_TYPE_ID";
     private static final String CASE_REFERENCE = "CASE_REFERENCE";
     private static final String EVENT_ID = "EVENT_ID";
@@ -249,6 +250,9 @@ public class AccessControlServiceTest {
     static final String person2 =
         p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + arrayEnd + p2Notes + p2End;
 
+    private ListAppender<ILoggingEvent> listAppender;
+    private List<ILoggingEvent> loggingEventList;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -297,6 +301,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
+            setupLogging().setLevel(Level.DEBUG);
             assertAll(
                 () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1,
                     caseType, ACCESS_PROFILES,
@@ -304,6 +309,19 @@ public class AccessControlServiceTest {
                 () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2,
                     caseType, ACCESS_PROFILES,
                     CAN_CREATE), is(false))
+            );
+
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    AccessControlService.NO_ROLE_FOR_ACCESS_WITH_JURISDICTION,
+                    "caseState", caseType.getJurisdictionId(), STATE_ID1,
+                    "[ACL{accessProfile='caseworker-probate-loa1', crud=}]", ACCESS_PROFILES
+            );
+
+            loggingEventList = listAppender.list;
+            assertAll(
+                    () -> assertTrue(loggingEventList.stream().allMatch(log -> log.getLevel() == Level.DEBUG)),
+                    () -> assertTrue(loggingEventList.stream().anyMatch(log ->
+                                                log.getFormattedMessage().equals(expectedLogMessage)))
             );
         }
 
@@ -491,6 +509,7 @@ public class AccessControlServiceTest {
             ));
             JsonNode dataNode = JacksonUtils.convertValueJsonNode(data);
 
+            setupLogging().setLevel(Level.ERROR);
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
@@ -498,6 +517,17 @@ public class AccessControlServiceTest {
                     ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseField", "Addresses2", ACCESS_PROFILES,
+                    "[ACL{accessProfile='caseworker-divorce-loa', crud=}, "
+                            + "ACL{accessProfile='caseworker-divorce-loa', crud=}]"
+                    );
+
+            loggingEventList = listAppender.list;
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
         }
 
         @Test
@@ -569,8 +599,40 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should grant access to case fields when field is no present in definition")
+        @DisplayName("Should not grant access to case fields when field is not present in definition")
         void shouldGrantAccessToFieldsIfFieldNotPresentInDefinition() throws IOException {
+            CaseTypeDefinition caseType = newCaseType()
+                    .withField(newCaseField()
+                            .withId(ADDRESSES)
+                            .build())
+                    .build();
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
+                    "{  \"WrongAddressesKey\": \"someText\" }"
+            ));
+            JsonNode dataNode = JacksonUtils.convertValueJsonNode(data);
+
+            setupLogging().setLevel(Level.ERROR);
+            assertThat(
+                    accessControlService.canAccessCaseFieldsWithCriteria(
+                            dataNode,
+                            caseType.getCaseFieldDefinitions(),
+                            ACCESS_PROFILES,
+                            CAN_CREATE),
+                    is(false));
+
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    "caseField, WrongAddressesKey, is not present in the expected list of fields. "
+                            + "Verify the caseField is assigned to the supplied caseType");
+            loggingEventList = listAppender.list;
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
+        }
+
+        @Test
+        @DisplayName("Should grant access to case fields when expected fields is empty in definition file")
+        void shouldGrantAccessToFieldsIfFieldNotPresentInDefinitionAndDefinitionIsEmpty() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .build();
             final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
@@ -1283,6 +1345,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
+            setupLogging().setLevel(Level.ERROR);
             assertThat(
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID,
@@ -1290,6 +1353,17 @@ public class AccessControlServiceTest {
                     ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
+
+            loggingEventList = listAppender.list;
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    "No relevant accessProfile to access caseEvent={}. "
+                            + "Check the definition file for at least 1 common profile in both the "
+                            + "requiredProfile and the userProfile. requiredProfile={}, userProfile={}",
+                    EVENT_ID, "[ACL{accessProfile='caseworker-probate-loa1', crud=}]", ACCESS_PROFILES);
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
         }
 
         @Test
@@ -1369,7 +1443,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case if acls are missing")
         void shouldNotGrantAccessToCaseIfMissingAcls() {
-            final CaseTypeDefinition caseType = new CaseTypeDefinition();
+            final CaseTypeDefinition caseType = newCaseType().build();
 
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
@@ -1411,12 +1485,24 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
+            setupLogging().setLevel(Level.DEBUG);
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
                     ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
+
+            loggingEventList = listAppender.list;
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    AccessControlService.NO_ROLE_FOR_ACCESS_WITH_JURISDICTION, "caseType", caseType.getId(),
+                    caseType.getJurisdictionId(),List.of(), ACCESS_PROFILES);
+
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
+
         }
 
         @Test
@@ -4497,16 +4583,6 @@ public class AccessControlServiceTest {
     @DisplayName("Case View Field with Criteria tests")
     class CanAccessCaseViewFieldWithCriteriaTests {
 
-        private Logger logger;
-        private ListAppender<ILoggingEvent> listAppender;
-
-        @BeforeEach
-        void setUp() {
-            listAppender = new ListAppender<>();
-            listAppender.start();
-            logger = setupLogging(listAppender);
-        }
-
         @Test
         @DisplayName("Should allow access when the role has read permission")
         void shouldGrantAccessWhenRoleHasReadPermissionForField() {
@@ -4522,15 +4598,15 @@ public class AccessControlServiceTest {
                         .build())
                     .build();
 
-            logger.setLevel(Level.DEBUG);
+            setupLogging().setLevel(Level.DEBUG);
             boolean canAccessCaseViewField =
                 accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ);
 
-            List<ILoggingEvent> loggerList = listAppender.list;
+            loggingEventList = listAppender.list;
 
             assertAll(
                 () -> assertThat(canAccessCaseViewField, is(true)),
-                () -> assertThat(loggerList.size(), is(0))
+                () -> assertThat(loggingEventList.size(), is(0))
             );
         }
 
@@ -4549,17 +4625,14 @@ public class AccessControlServiceTest {
                         .build())
                     .build();
 
-            logger.setLevel(Level.DEBUG);
-
+            setupLogging().setLevel(Level.DEBUG);
             boolean canAccessCaseViewField =
                 accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ);
 
-            List<ILoggingEvent> loggingEventList = listAppender.list;
-
-            String expectedLogMessage = "User may be unauthorised to access field: NotesNoReadAccessForRole. "
-                    + "Verify both the field and the user have appropriate write access. "
-                    + "userRoles=" + ACCESS_PROFILES
-                    + ", requiredRoles=[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]";
+            loggingEventList = listAppender.list;
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseViewField", "NotesNoReadAccessForRole",
+                    ACCESS_PROFILES, "[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]");
 
             assertAll(
                 () -> assertThat(canAccessCaseViewField, is(false)),
@@ -4585,12 +4658,18 @@ public class AccessControlServiceTest {
             is(hasFieldAccess));
     }
 
-    private Logger setupLogging(ListAppender<ILoggingEvent> listAppender) {
+    private Logger setupLogging() {
+        listAppender = new ListAppender<>();
+        listAppender.start();
         Logger logger = (Logger) LoggerFactory.getLogger(AccessControlServiceImpl.class);
         logger.detachAndStopAllAppenders();
+        if (loggingEventList != null && !loggingEventList.isEmpty()) {
+            loggingEventList.clear();
+        }
         logger.addAppender(listAppender);
         return logger;
     }
+
 
     private JsonNode getTextNode(String value) {
         return JSON_NODE_FACTORY.textNode(value);

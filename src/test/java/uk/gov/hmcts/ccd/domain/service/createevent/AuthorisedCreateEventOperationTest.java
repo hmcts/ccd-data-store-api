@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -15,6 +19,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.documentdata.CollectionData;
@@ -57,6 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
@@ -410,9 +416,22 @@ class AuthorisedCreateEventOperationTest {
     @Test
     @DisplayName("should fail if no event provided")
     void shouldFailIfNoEventProvided() {
+        Logger logger = (Logger) LoggerFactory.getLogger(AuthorisedCreateEventOperation.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
 
+        logger.setLevel(Level.ERROR);
         assertThrows(ResourceNotFoundException.class, () ->
             authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, INVALID_CASE_DATA_CONTENT));
+
+        List<ILoggingEvent> loggingEventList = listAppender.list;
+        assertAll(
+                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                () -> assertTrue(loggingEventList.get(0).getFormattedMessage()
+                                    .startsWith("Missing eventId. requiredEvents="))
+        );
+        logger.detachAndStopAllAppenders();
     }
 
     @Test

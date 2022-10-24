@@ -218,15 +218,14 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                     Set<AccessProfile> accessProfiles) {
 
         verifyCaseTypeAndStateAccess(existingCaseDetails, caseTypeDefinition, accessProfiles);
-
-        if (event == null || !accessControlService.canAccessCaseEventWithCriteria(
-            event.getEventId(),
-            caseTypeDefinition.getEvents(),
-            accessProfiles,
-            CAN_CREATE)) {
-            log.error(AccessControlService.NO_EVENT_FOUND_DETAILS,
-                        event != null ? event.getEventId() : null,
-                        caseTypeDefinition.getId());
+        if (event == null) {
+            log.error("Missing eventId. requiredEvents={}", caseTypeDefinition.getEvents());
+            throw new ResourceNotFoundException(NO_EVENT_FOUND);
+        } else if (!accessControlService.canAccessCaseEventWithCriteria(
+                                            event.getEventId(),
+                                            caseTypeDefinition.getEvents(),
+                                            accessProfiles,
+                                            CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
 
@@ -260,7 +259,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             MAPPER.convertValue(existingCaseDetails.getData(), JsonNode.class),
             caseTypeDefinition.getCaseFieldDefinitions(),
             accessProfiles)) {
-            log.error(AccessControlService.NO_FIELD_FOUND_DETAILS,caseTypeDefinition.getId(), newData.keySet());
             throw new ResourceNotFoundException(NO_FIELD_FOUND);
         }
     }

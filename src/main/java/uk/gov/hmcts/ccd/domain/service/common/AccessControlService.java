@@ -57,11 +57,13 @@ public interface AccessControlService {
         + "return to the case list overview page.";
     String NO_CASE_STATE_FOUND = "Invalid event";
     String NO_EVENT_FOUND = "No event found";
-    String NO_EVENT_FOUND_DETAILS = "Event, {}, may not be present for the case-type, {}. "
-            + "Verify event is present for the case-type and the user has access to trigger the event.";
     String NO_FIELD_FOUND = "No field found";
-    String NO_FIELD_FOUND_DETAILS = "Provided fields may not be present for the case-type, {}. "
-            + "Verify fields are present for the case-type and the user has access to amend fields: {}";
+    String NO_ROLE_FOR_ACCESS = "No relevant accessProfile to access {}={}. "
+            + "Check the definition file for at least 1 common profile in both the "
+            + "requiredProfile and the userProfile. requiredProfile={}, userProfile={}";
+    String NO_ROLE_FOR_ACCESS_WITH_JURISDICTION = "No relevant accessProfile to access {}={} of jurisdiction={}. "
+            + "Check the definition file for at least 1 common profile in both the "
+            + "requiredProfile and the userProfile. requiredProfile={}, userProfile={}";
     String VALUE = "value";
     String ALL = "*";
 
@@ -566,19 +568,6 @@ public interface AccessControlService {
 
     default Stream<String> getStream(JsonNode newData) {
         return StreamSupport.stream(spliteratorUnknownSize(newData.fieldNames(), Spliterator.ORDERED), false);
-    }
-
-    default boolean hasCaseEventAccess(String eventId,
-                                       List<CaseEventDefinition> caseEventDefinitions,
-                                       Set<AccessProfile> accessProfiles,
-                                       Predicate<AccessControlList> criteria) {
-        for (CaseEventDefinition caseEvent : caseEventDefinitions) {
-            if (caseEvent.getId().equals(eventId)
-                && hasAccessControlList(accessProfiles, criteria, caseEvent.getAccessControlLists())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     default Optional<CaseFieldDefinition> getCaseFieldType(List<CaseFieldDefinition> caseFieldDefinitions,
