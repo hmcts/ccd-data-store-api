@@ -32,6 +32,8 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -125,6 +127,27 @@ class AuditCaseRemoteOperationTest {
 
         HttpRequest.BodyPublisher bodyPublisher = captor.getValue().bodyPublisher().get();
         assertThat(bodyPublisher.contentLength(), is(equalTo(2L)));
+    }
+
+    @Test
+    @DisplayName("should throw an Exception post case action remote audit request")
+    void shouldThrowExceptionPostCaseActionRemoteAuditRequest() throws IOException, InterruptedException {
+
+        ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+        AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
+
+        // Setup as viewing a case
+        entry.setOperationType(AuditOperationType.CASE_ACCESSED.getLabel());
+
+        when(httpClient.send(any(HttpRequest.class),
+            any(HttpResponse.BodyHandler.class))).thenThrow(new Exception("Error sending request"));
+
+        try {
+            auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
+            fail("Should have thrown an error");
+        } catch(Exception ie) {
+            assertEquals("Error sending request", ie.getMessage() );
+        }
     }
 
     @SneakyThrows
