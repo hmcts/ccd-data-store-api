@@ -98,7 +98,7 @@ Scenario: Scenario 5 - User's assignments: Role1/BASIC + Role2/SPECIFIC (granted
       And a successful call [to grant SPECIFIC access to the caseworker] as in [GrantAccess_FT_CaseAccess_1Role_Caseworker_SPECIFIC]
 
      When a request is prepared with appropriate values,
-      And the request [uses the case-reference of the case just created
+      And the request [uses the case-reference of the case just created],
       And it is submitted to call the [Retrieve a start event trigger by ID for dynamic display] operation of [CCD Data Store],
 
      Then a positive response is received,
