@@ -1,5 +1,5 @@
 #===========================================================================
-@F-065.AP
+@F-065.AP #AccessMetadata
   Feature: F-065: Retrieve a Case by ID for Dynamic Display - Access Process
 #===========================================================================
 
@@ -14,7 +14,7 @@ Scenario: Scenario 1.1 - NONE Access Process (no RoleToAccessProfiles on case-ty
       And a successful call [to create a case as a citizen: for case type with no RoleToAccessProfiles] as in [CreateCase_FT_GlobalSearch_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values,
-      And the request [contains the case that has just been created above],
+      And the request [uses the case-reference of the case just created],
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store],
 
      Then a positive response is received,
@@ -30,7 +30,7 @@ Scenario: Scenario 1.1 - NONE Access Process (no RoleToAccessProfiles on case-ty
       And a successful call [to create a case as a citizen: for case type with pseudo role assignments] as in [CreateCase_FT_GlobalSearch_AC_1_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values,
-      And the request [contains the case that has just been created above],
+      And the request [uses the case-reference of the case just created],
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store],
 
      Then a positive response is received,
@@ -46,7 +46,7 @@ Scenario: Scenario 1.1 - NONE Access Process (no RoleToAccessProfiles on case-ty
       And a successful call [to create a case as a citizen: for case type with AccessProfile region filter: region = 3] as in [CreateCase_FT_GlobalSearch_AC_2_PreRequisiteCitizen__Region_3]
 
      When a request is prepared with appropriate values,
-      And the request [contains the case that has just been created above],
+      And the request [uses the case-reference of the case just created],
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store],
 
      Then a positive response is received,
@@ -62,7 +62,7 @@ Scenario: Scenario 1.1 - NONE Access Process (no RoleToAccessProfiles on case-ty
       And a successful call [to create a case as a citizen: for case type with AccessProfile region filter: region = 123] as in [CreateCase_FT_GlobalSearch_AC_2_PreRequisiteCitizen__Region_123]
 
      When a request is prepared with appropriate values,
-      And the request [contains the case that has just been created above],
+      And the request [uses the case-reference of the case just created],
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store],
 
      Then a positive response is received,
@@ -78,7 +78,7 @@ Scenario: Scenario 1.1 - NONE Access Process (no RoleToAccessProfiles on case-ty
       And a successful call [to create a case as a citizen: for case type with only BASIC AccessProfile] as in [CreateCase_FT_GlobalSearch_AC_3_PreRequisiteCitizen]
 
      When a request is prepared with appropriate values,
-      And the request [contains the case that has just been created above],
+      And the request [uses the case-reference of the case just created],
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store],
 
      Then a positive response is received,

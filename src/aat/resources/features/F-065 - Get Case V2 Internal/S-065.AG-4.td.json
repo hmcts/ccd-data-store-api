@@ -6,7 +6,7 @@
 
   "specs": [
     "a caseworker with RA1: BASIC role assignment",
-    "contains the first case that has just been created above",
+    "uses the case-reference of the first case created above",
     "contains `Access Granted` set to `BASIC` [Due to Role2 not passing filtering]"
   ],
 
@@ -24,13 +24,13 @@
     "body": {
       "metadataFields": [
         {
-          "_extends_": "F-065_MetadataField", 
+          "_extends_": "MetadataField", 
 
           "id": "[ACCESS_GRANTED]",
           "label": "Access Granted",
           "value": "BASIC"
         },
-        { "_extends_": "F-065_MetadataField", "id": "[ACCESS_PROCESS]" }
+        { "_extends_": "MetadataField", "id": "[ACCESS_PROCESS]" }
       ]
     }
   }

@@ -20,13 +20,13 @@
     "body": {
       "metadataFields": [
         {
-          "_extends_": "F-065_MetadataField", 
+          "_extends_": "MetadataField", 
 
           "id": "[ACCESS_GRANTED]",
           "label": "Access Granted",
           "value": "BASIC,SPECIFIC"
         },
-        { "_extends_": "F-065_MetadataField", "id": "[ACCESS_PROCESS]" }
+        { "_extends_": "MetadataField", "id": "[ACCESS_PROCESS]" }
       ]
     }
   }

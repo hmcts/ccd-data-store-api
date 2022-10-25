@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-066.AG-3",
+  "_extends_": "F-066_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 3 - User's assignments: Role1/STANDARD, R2AP mappings: Role1 -> AP1, Authorised Case/State: AP1 will return Access Granted: `STANDARD`",
+
+  "specs": [
+    "a caseworker with RA1: STANDARD role assignment",
+    "uses the case-reference of the case just created",
+    "contains `Access Granted` set to `STANDARD`"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker_Role1Standard"
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][CreateCase_FT_CaseAccess_1Role_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "access_granted": "STANDARD",
+
+      "access_process": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

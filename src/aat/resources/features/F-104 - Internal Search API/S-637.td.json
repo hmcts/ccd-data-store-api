@@ -95,7 +95,7 @@
 				} ],
 			"cases" : [
 				{
-          "_extends_": "104_Base_Case_Fields_expected",
+          "_extends_": "F-104_Base_Case_Fields_expected",
           "fields" : {
 					"NumberField" : "3",
 					"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering3_3]}",
@@ -109,7 +109,7 @@
 				}
         },
 				{
-          "_extends_": "104_Base_Case_Fields_expected",
+          "_extends_": "F-104_Base_Case_Fields_expected",
           "fields" : {
 						"NumberField" : "1",
 						"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering3_1]}",
@@ -124,7 +124,7 @@
 					}
 				},
 				{
-          "_extends_": "104_Base_Case_Fields_expected",
+          "_extends_": "F-104_Base_Case_Fields_expected",
 
           "fields" : {
 						"NumberField" : "2",
