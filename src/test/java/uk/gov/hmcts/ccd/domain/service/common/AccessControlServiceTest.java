@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
+import org.junit.After;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -68,6 +69,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.extractAccessProfileNames;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
@@ -249,8 +251,10 @@ public class AccessControlServiceTest {
     static final String person2 =
         p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + arrayEnd + p2Notes + p2End;
 
+    private Logger logger;
     private ListAppender<ILoggingEvent> listAppender;
     private List<ILoggingEvent> loggingEventList;
+    private boolean logServiceClass;
 
     @BeforeEach
     void setUp() {
@@ -276,6 +280,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
+            setupLogging().setLevel(Level.DEBUG);
             assertAll(
                 () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType,
                     ACCESS_PROFILES,
@@ -283,6 +288,18 @@ public class AccessControlServiceTest {
                 () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType,
                     ACCESS_PROFILES,
                     CAN_CREATE), is(false))
+            );
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    AccessControlService.NO_ROLE_FOR_ACCESS_WITH_JURISDICTION,
+                    "caseState", STATE_ID1, caseType.getJurisdictionId(),
+                    extractAccessProfileNames(ACCESS_PROFILES),
+                    "[ACL{accessProfile='caseworker-divorce-loa4', crud=CR}]"
+            );
+            loggingEventList = listAppender.list;
+            assertAll(
+                    () -> assertTrue(loggingEventList.stream().allMatch(log -> log.getLevel() == Level.DEBUG)),
+                    () -> assertTrue(loggingEventList.stream().anyMatch(log ->
+                            log.getFormattedMessage().equals(expectedLogMessage)))
             );
         }
 
@@ -300,7 +317,6 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            setupLogging().setLevel(Level.DEBUG);
             assertAll(
                 () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1,
                     caseType, ACCESS_PROFILES,
@@ -308,19 +324,6 @@ public class AccessControlServiceTest {
                 () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2,
                     caseType, ACCESS_PROFILES,
                     CAN_CREATE), is(false))
-            );
-
-            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    AccessControlService.NO_ROLE_FOR_ACCESS_WITH_JURISDICTION,
-                    "caseState", caseType.getJurisdictionId(), STATE_ID1,
-                    "[ACL{accessProfile='caseworker-probate-loa1', crud=}]", ACCESS_PROFILES
-            );
-
-            loggingEventList = listAppender.list;
-            assertAll(
-                    () -> assertTrue(loggingEventList.stream().allMatch(log -> log.getLevel() == Level.DEBUG)),
-                    () -> assertTrue(loggingEventList.stream().anyMatch(log ->
-                                                log.getFormattedMessage().equals(expectedLogMessage)))
             );
         }
 
@@ -469,6 +472,7 @@ public class AccessControlServiceTest {
             ));
             JsonNode dataNode = JacksonUtils.convertValueJsonNode(data);
 
+            setupLogging().setLevel(Level.ERROR);
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
@@ -476,6 +480,18 @@ public class AccessControlServiceTest {
                     ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
+
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseField", ADDRESSES,
+                    extractAccessProfileNames(ACCESS_PROFILES),
+                    "[ACL{accessProfile='caseworker-divorce-loa4', crud=CR}]"
+            );
+
+            loggingEventList = listAppender.list;
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
         }
 
         @Test
@@ -508,7 +524,6 @@ public class AccessControlServiceTest {
             ));
             JsonNode dataNode = JacksonUtils.convertValueJsonNode(data);
 
-            setupLogging().setLevel(Level.ERROR);
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
@@ -516,17 +531,6 @@ public class AccessControlServiceTest {
                     ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
-            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseField", "Addresses2", ACCESS_PROFILES,
-                    "[ACL{accessProfile='caseworker-divorce-loa', crud=}, "
-                            + "ACL{accessProfile='caseworker-divorce-loa', crud=}]"
-                    );
-
-            loggingEventList = listAppender.list;
-            assertAll(
-                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
-                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
-            );
         }
 
         @Test
@@ -620,9 +624,9 @@ public class AccessControlServiceTest {
                     is(false));
 
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    "No matching caseField, {}, present in the caseFieldDefinitions. "
-                            + "Verify the caseField is in caseFieldDefinitions={}",
-                                "WrongAddresses", caseType.getCaseFieldDefinitions());
+                    "No matching caseField={} found in caseFieldDefinitions={}",
+                                "WrongAddresses", "[Addresses]");
+
             loggingEventList = listAppender.list;
             assertAll(
                     () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
@@ -1156,7 +1160,18 @@ public class AccessControlServiceTest {
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\" }\n");
             JsonNode existingDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\" }");
 
+            setupLogging().setLevel(Level.DEBUG);
             assertFieldsAccess(true, caseType, newDataNode, existingDataNode);
+
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    "Data submitted for caseField={} already present", ADDRESSES
+            );
+
+            loggingEventList = listAppender.list;
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
         }
 
         @Test
@@ -1345,6 +1360,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
+            logServiceClass = true;
             setupLogging().setLevel(Level.ERROR);
             assertThat(
                 accessControlService.canAccessCaseEventWithCriteria(
@@ -1356,10 +1372,9 @@ public class AccessControlServiceTest {
 
             loggingEventList = listAppender.list;
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    "No relevant accessProfile to access caseEvent={}. "
-                            + "Check the definition file for at least 1 common profile in both the "
-                            + "requiredProfile and the userProfile. requiredProfile={}, userProfile={}",
-                    EVENT_ID, "[ACL{accessProfile='caseworker-probate-loa1', crud=}]", ACCESS_PROFILES);
+                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseEvent", EVENT_ID,
+                    extractAccessProfileNames(ACCESS_PROFILES),
+                    "[ACL{accessProfile='caseworker-probate-loa1', crud=}]");
             assertAll(
                     () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
                     () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
@@ -1400,6 +1415,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
+            logServiceClass = true;
+            setupLogging().setLevel(Level.ERROR);
             assertThat(
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID_LOWER_CASE,
@@ -1407,6 +1424,17 @@ public class AccessControlServiceTest {
                     ACCESS_PROFILES,
                     AccessControlList::isCreate),
                 is(false));
+
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    "No matching caseEvent={} found in caseFieldDefinitions={}",
+                        EVENT_ID_LOWER_CASE,caseType.getEvents()
+            );
+
+            loggingEventList = listAppender.list;
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
         }
 
         @Test
@@ -4631,12 +4659,13 @@ public class AccessControlServiceTest {
 
             loggingEventList = listAppender.list;
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseViewField", "NotesNoReadAccessForRole",
-                    ACCESS_PROFILES, "[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]");
+                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseField", "NotesNoReadAccessForRole",
+                    extractAccessProfileNames(ACCESS_PROFILES),
+                    "[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]");
 
             assertAll(
                 () -> assertThat(canAccessCaseViewField, is(false)),
-                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
+                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.INFO)),
                 () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
         }
@@ -4661,15 +4690,22 @@ public class AccessControlServiceTest {
     private Logger setupLogging() {
         listAppender = new ListAppender<>();
         listAppender.start();
-        Logger logger = (Logger) LoggerFactory.getLogger(AccessControlServiceImpl.class);
+        logger = (Logger) LoggerFactory.getLogger(
+                        logServiceClass ? AccessControlService.class : AccessControlServiceImpl.class);
         logger.detachAndStopAllAppenders();
         if (loggingEventList != null && !loggingEventList.isEmpty()) {
             loggingEventList.clear();
         }
         logger.addAppender(listAppender);
+        logServiceClass = false;
         return logger;
     }
 
+    @After
+    public void tearDown() {
+        listAppender.stop();
+        logger.detachAndStopAllAppenders();
+    }
 
     private JsonNode getTextNode(String value) {
         return JSON_NODE_FACTORY.textNode(value);

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -37,7 +36,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CAS
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
 
 @Service
-@Slf4j
 @Qualifier(AuthorisedGetEventTriggerOperation.QUALIFIER)
 public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperation {
 

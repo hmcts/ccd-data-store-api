@@ -58,12 +58,10 @@ public interface AccessControlService {
     String NO_CASE_STATE_FOUND = "Invalid event";
     String NO_EVENT_FOUND = "No event found";
     String NO_FIELD_FOUND = "No field found";
-    String NO_ROLE_FOR_ACCESS = "No relevant accessProfile to access {}={}. "
-            + "Check the definition file for at least 1 common profile in both the "
-            + "requiredProfile and the userProfile. requiredProfile={}, userProfile={}";
-    String NO_ROLE_FOR_ACCESS_WITH_JURISDICTION = "No relevant accessProfile to access {}={} of jurisdiction={}. "
-            + "Check the definition file for at least 1 common profile in both the "
-            + "requiredProfile and the userProfile. requiredProfile={}, userProfile={}";
+    String NO_ROLE_FOR_ACCESS = "No relevant access for {}={}. "
+            + "No matching profile found for userProfile={} in requiredProfile={}";
+    String NO_ROLE_FOR_ACCESS_WITH_JURISDICTION = "No relevant access for {}={} of jurisdiction={}. "
+            + "No matching profile found for userProfile={} in requiredProfile={}";
     String VALUE = "value";
     String ALL = "*";
 
@@ -568,6 +566,27 @@ public interface AccessControlService {
 
     default Stream<String> getStream(JsonNode newData) {
         return StreamSupport.stream(spliteratorUnknownSize(newData.fieldNames(), Spliterator.ORDERED), false);
+    }
+
+    default boolean hasCaseEventAccess(String eventId,
+                                       List<CaseEventDefinition> caseEventDefinitions,
+                                       Set<AccessProfile> accessProfiles,
+                                       Predicate<AccessControlList> criteria) {
+        Optional<CaseEventDefinition> matchedField = caseEventDefinitions.stream()
+                .filter(caseField -> caseField.getId().equals(eventId))
+                .findFirst();
+        if (matchedField.isEmpty()) {
+            LOG.error("No matching caseEvent={} found in caseFieldDefinitions={}", eventId, caseEventDefinitions);
+            return false;
+        } else if (hasAccessControlList(accessProfiles, criteria, matchedField.get().getAccessControlLists())) {
+            return true;
+        }
+
+        LOG.error(NO_ROLE_FOR_ACCESS, "caseEvent",
+                eventId,
+                extractAccessProfileNames(accessProfiles),
+                getCaseEventAcls(caseEventDefinitions, eventId));
+        return false;
     }
 
     default Optional<CaseFieldDefinition> getCaseFieldType(List<CaseFieldDefinition> caseFieldDefinitions,
