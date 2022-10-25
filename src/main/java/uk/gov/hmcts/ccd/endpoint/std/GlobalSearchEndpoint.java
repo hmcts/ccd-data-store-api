@@ -8,7 +8,6 @@ import io.swagger.annotations.ExampleProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +22,6 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchParser;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchService;
 
@@ -46,7 +44,6 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 public class GlobalSearchEndpoint {
 
     private final CaseSearchOperation caseSearchOperation;
-    private final ElasticsearchQueryHelper elasticsearchQueryHelper;
     private final GlobalSearchService globalSearchService;
     private final GlobalSearchParser globalSearchParser;
 
@@ -56,10 +53,8 @@ public class GlobalSearchEndpoint {
     @Autowired
     public GlobalSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
                                     CaseSearchOperation caseSearchOperation,
-                                ElasticsearchQueryHelper elasticsearchQueryHelper,
                                 GlobalSearchService globalSearchService, GlobalSearchParser globalSearchParser) {
         this.caseSearchOperation = caseSearchOperation;
-        this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.globalSearchService = globalSearchService;
         this.globalSearchParser = globalSearchParser;
     }
@@ -78,7 +73,7 @@ public class GlobalSearchEndpoint {
                 + "\n2) " + ValidationError.SORT_BY_INVALID
                 + "\n3) " + ValidationError.SORT_DIRECTION_INVALID
                 + "\n4) " + ValidationError.MAX_RECORD_COUNT_INVALID
-                + "\n5) " + ValidationError.SEARCH_CRITERIA_MISSING
+                + "\n5) " + ValidationError.GLOBAL_SEARCH_CRITERIA_INVALID
                 + "\n6) " + ValidationError.JURISDICTION_ID_LENGTH_INVALID
                 + "\n7) " + ValidationError.STATE_ID_LENGTH_INVALID
                 + "\n8) " + ValidationError.CASE_TYPE_ID_LENGTH_INVALID
@@ -109,13 +104,6 @@ public class GlobalSearchEndpoint {
         Instant start = Instant.now();
 
         requestPayload.setDefaults();
-
-        // if no CaseType filter applied :: load all case types available for user
-        if (CollectionUtils.isEmpty(requestPayload.getSearchCriteria().getCcdCaseTypeIds())) {
-            requestPayload.getSearchCriteria().setCcdCaseTypeIds(
-                elasticsearchQueryHelper.getCaseTypesAvailableToUser()
-            );
-        }
 
         CrossCaseTypeSearchRequest searchRequest = globalSearchService.assembleSearchQuery(requestPayload);
 
