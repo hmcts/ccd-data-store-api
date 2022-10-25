@@ -1,0 +1,51 @@
+{
+  "_guid_": "S-104.AG-3",
+  "_extends_": "F-104_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 3 - User's assignments: Role1/STANDARD, R2AP mappings: Role1 -> AP1, Authorised Case/State: AP1 will return Access Granted: `STANDARD`",
+
+  "specs": [
+    "a caseworker with RA1: STANDARD role assignment",
+    "is configured to search for the previously created case via exact match",
+    "contains `Access Granted` set to `STANDARD`"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker_Role1Standard"
+  },
+
+  "request": {
+    "queryParams": {
+      "ctid": "FT_CaseAccess_1Role"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${}${[scenarioContext][childContexts][CreateCase_FT_CaseAccess_1Role_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "cases": [ {
+        "_extends_": "F-104_Base_Case_Fields_expected__AccessMetadata",
+
+        "fields": {
+          "TextField" : "[[ANYTHING_PRESENT]]",
+
+          "[ACCESS_GRANTED]" : "STANDARD",
+          "[ACCESS_PROCESS]" : "[[ANYTHING_PRESENT]]"
+        },
+
+        "fields_formatted":  {
+          "TextField" : "[[ANYTHING_PRESENT]]",
+
+          "[ACCESS_GRANTED]" : "STANDARD",
+          "[ACCESS_PROCESS]" : "[[ANYTHING_PRESENT]]"
+        }
+      } ]
+    }
+  }
+}

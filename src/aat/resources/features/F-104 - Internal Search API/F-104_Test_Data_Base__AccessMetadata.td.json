@@ -1,0 +1,33 @@
+{
+  "_guid_": "F-104_Test_Data_Base__AccessMetadata",
+  "_extends_": "F-104_Test_Data_Base",
+
+  "specs": [
+    "contains details of the case just created, along with an HTTP-200 OK"
+  ],
+
+  "request": {
+    "queryParams": {
+      "use_case": "SEARCH",
+      "ctid": "OVERRIDE"
+    }
+  },
+
+  "expectedResponse": {
+    "headers": {
+      "Transfer-Encoding": "chunked",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "headers": "[[ANYTHING_PRESENT]]",
+
+      "cases" : [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "case_id"
+        }
+      ],
+      "total" : 1
+    }
+  }
+}

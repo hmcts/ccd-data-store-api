@@ -1,0 +1,48 @@
+{
+  "_guid_": "S-104.AP.2.1",
+  "_extends_": "F-104_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 2.1 - CHALLENGED Access Process (unmatched region filter on STANDARD RoleToAccessProfile for case-type)",
+
+  "specs": [
+    "a caseworker with no role assignments",
+    "is configured to search for the previously created case via exact match",
+    "contains details of the case just created, along with an HTTP-200 OK",
+    "contains `Access Process` set to `CHALLENGED`"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker_RegionalStaff"
+  },
+
+  "request": {
+    "queryParams": {
+      "ctid": "FT_GlobalSearch_AC_2"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${}${[scenarioContext][childContexts][CreateCase_FT_GlobalSearch_AC_2_PreRequisiteCitizen__Region_3][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "cases": [ {
+        "_extends_": "F-104_Base_Case_Fields_expected__AccessMetadata",
+
+        "fields": {
+          "[ACCESS_GRANTED]" : "[[ANYTHING_PRESENT]]",
+          "[ACCESS_PROCESS]" : "CHALLENGED"
+        },
+
+        "fields_formatted":  {
+          "[ACCESS_GRANTED]" : "[[ANYTHING_PRESENT]]",
+          "[ACCESS_PROCESS]" : "CHALLENGED"
+        }
+      } ]
+    }
+  }
+}

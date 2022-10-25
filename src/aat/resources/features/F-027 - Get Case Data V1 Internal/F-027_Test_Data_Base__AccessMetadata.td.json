@@ -1,0 +1,49 @@
+{
+  "_guid_": "F-027_Test_Data_Base__AccessMetadata",
+  "_extends_": "F-027_Test_Data_Base",
+
+  "specs": [
+    "contains details of the case just created, along with an HTTP-200 OK"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "OVERRIDE"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip",
+      "Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
+      "Strict-Transport-Security": "[[ANY_STRING_NULLABLE]]"
+    },
+    "body": {
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_type": "[[ANYTHING_PRESENT]]",
+      "tabs": "[[ANYTHING_PRESENT]]",
+
+      "metadataFields": [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "id"
+        },
+        { "_extends_": "MetadataField", "id": "[STATE]" },
+        { "_extends_": "MetadataField", "id": "[CASE_REFERENCE]" },
+        { "_extends_": "MetadataField", "id": "[LAST_STATE_MODIFIED_DATE]" },
+        { "_extends_": "MetadataField", "id": "[LAST_MODIFIED_DATE]" },
+        { "_extends_": "MetadataField", "id": "[CREATED_DATE]" },
+        { "_extends_": "MetadataField", "id": "[SECURITY_CLASSIFICATION]" },
+        { "_extends_": "MetadataField", "id": "[CASE_TYPE]" },
+        { "_extends_": "MetadataField", "id": "[JURISDICTION]" }
+      ],
+
+      "state": "[[ANYTHING_PRESENT]]",
+      "channels": "[[ANYTHING_PRESENT]]",
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

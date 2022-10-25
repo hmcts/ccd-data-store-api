@@ -1,0 +1,28 @@
+{
+  "_guid_": "S-028.AG-6.1_before_case_update",
+  "_extends_": "F-028_Test_Data_Base__AccessMetadata",
+
+  "specs": [
+    "to fetch an event trigger before case is updated to check `Access Granted` set to `BASIC,SPECIFIC` [Due to CHALLENGED in wrong region]"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker_Role1Basic_Role3Challenged_Region123"
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CaseAccess_3Roles",
+      "cid": "${[scenarioContext][siblingContexts][CreateCase_FT_CaseAccess_3Roles_PreRequisiteCitizen__Region_3][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "access_granted": "BASIC,SPECIFIC",
+
+      "access_process": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

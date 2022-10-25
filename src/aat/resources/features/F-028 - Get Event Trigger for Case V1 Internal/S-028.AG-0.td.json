@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-028.AG-0",
+  "_extends_": "F-028_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 0 - User with IDAM role authorised to access case type, no RoleToAccessProfiles on case-type will return Access Granted: `STANDARD`",
+
+  "specs": [
+    "a caseworker with no role assignments",
+    "uses the case-reference of the case just created",
+    "contains `Access Granted` set to `STANDARD`"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_GlobalSearch",
+      "cid": "${[scenarioContext][childContexts][CreateCase_FT_GlobalSearch_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "access_granted": "STANDARD",
+
+      "access_process": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

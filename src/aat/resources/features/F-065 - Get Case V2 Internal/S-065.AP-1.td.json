@@ -6,7 +6,7 @@
 
   "specs": [
     "a caseworker with no role assignments",
-    "contains the case that has just been created above",
+    "uses the case-reference of the case just created",
     "contains details of the case just created, along with an HTTP-200 OK",
     "contains `Access Process` set to `NONE`"
   ],
@@ -24,9 +24,9 @@
   "expectedResponse": {
     "body": {
       "metadataFields": [
-        { "_extends_": "F-065_MetadataField", "id": "[ACCESS_GRANTED]"},
+        { "_extends_": "MetadataField", "id": "[ACCESS_GRANTED]"},
         {
-          "_extends_": "F-065_MetadataField", 
+          "_extends_": "MetadataField", 
 
           "id": "[ACCESS_PROCESS]",
           "label": "Access Process",

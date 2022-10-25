@@ -1,0 +1,39 @@
+{
+  "_guid_": "S-027.AG-6.1",
+  "_extends_": "F-027_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 6.1 - User's assignments: Role1/BASIC + Role2/SPECIFIC (granted) + Role3/CHALLENGED (Region 123), R2AP mappings: Role1 + Role2 + Role 3 -> AP1 + AP2 + AP3, Authorised Case/State: AP1 + AP2 (state: Created only) + AP3 will return Access Granted: `BASIC` (as wrong region)",
+
+  "specs": [
+    "a caseworker with RA1: BASIC + RA3: CHALLENGED (Region 123) role assignment",
+    "uses the case-reference of the case just created",
+    "contains `Access Granted` set to `BASIC` [Due to AP2 not being authorised for case state, and CHALLENGED in wrong region]"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker_Role1Basic_Role3Challenged_Region123"
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CaseAccess_3Roles",
+      "cid": "${[scenarioContext][childContexts][CreateCase_FT_CaseAccess_3Roles_PreRequisiteCitizen__Region_3][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "metadataFields": [
+        {
+          "_extends_": "MetadataField", 
+
+          "id": "[ACCESS_GRANTED]",
+          "label": "Access Granted",
+          "value": "BASIC"
+        },
+        { "_extends_": "MetadataField", "id": "[ACCESS_PROCESS]" }
+      ]
+    }
+  }
+}

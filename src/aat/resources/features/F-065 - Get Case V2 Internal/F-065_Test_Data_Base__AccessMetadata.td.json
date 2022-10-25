@@ -6,6 +6,11 @@
     "contains details of the case just created, along with an HTTP-200 OK"
   ],
 
+  "request": {
+    "pathVariables": {
+      "cid": "OVERRIDE"
+    }
+  },
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
@@ -30,14 +35,14 @@
           "__ordering__": "unordered",
           "__elementId__": "id"
         },
-        { "_extends_": "F-065_MetadataField", "id": "[STATE]" },
-        { "_extends_": "F-065_MetadataField", "id": "[CASE_REFERENCE]" },
-        { "_extends_": "F-065_MetadataField", "id": "[LAST_STATE_MODIFIED_DATE]" },
-        { "_extends_": "F-065_MetadataField", "id": "[LAST_MODIFIED_DATE]" },
-        { "_extends_": "F-065_MetadataField", "id": "[CREATED_DATE]" },
-        { "_extends_": "F-065_MetadataField", "id": "[SECURITY_CLASSIFICATION]" },
-        { "_extends_": "F-065_MetadataField", "id": "[CASE_TYPE]" },
-        { "_extends_": "F-065_MetadataField", "id": "[JURISDICTION]" }
+        { "_extends_": "MetadataField", "id": "[STATE]" },
+        { "_extends_": "MetadataField", "id": "[CASE_REFERENCE]" },
+        { "_extends_": "MetadataField", "id": "[LAST_STATE_MODIFIED_DATE]" },
+        { "_extends_": "MetadataField", "id": "[LAST_MODIFIED_DATE]" },
+        { "_extends_": "MetadataField", "id": "[CREATED_DATE]" },
+        { "_extends_": "MetadataField", "id": "[SECURITY_CLASSIFICATION]" },
+        { "_extends_": "MetadataField", "id": "[CASE_TYPE]" },
+        { "_extends_": "MetadataField", "id": "[JURISDICTION]" }
       ],
 
       "state": "[[ANYTHING_PRESENT]]",

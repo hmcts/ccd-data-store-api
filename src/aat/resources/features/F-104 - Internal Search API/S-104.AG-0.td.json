@@ -1,0 +1,51 @@
+{
+  "_guid_": "S-104.AG-0",
+  "_extends_": "F-104_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 0 - User with IDAM role authorised to access case type, no RoleToAccessProfiles on case-type will return Access Granted: `STANDARD`",
+
+  "specs": [
+    "a caseworker with no role assignments",
+    "is configured to search for the previously created case via exact match",
+    "contains `Access Granted` set to `STANDARD`"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "queryParams": {
+      "ctid": "FT_GlobalSearch"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${}${[scenarioContext][childContexts][CreateCase_FT_GlobalSearch_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "cases": [ {
+        "_extends_": "F-104_Base_Case_Fields_expected__AccessMetadata",
+
+        "fields": {
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]",
+
+          "[ACCESS_GRANTED]" : "STANDARD",
+          "[ACCESS_PROCESS]" : "[[ANYTHING_PRESENT]]"
+        },
+
+        "fields_formatted":  {
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]",
+
+          "[ACCESS_GRANTED]" : "STANDARD",
+          "[ACCESS_PROCESS]" : "[[ANYTHING_PRESENT]]"
+        }
+      } ]
+    }
+  }
+}
