@@ -35,7 +35,7 @@ public class UIDService {
      * Validate a number string using Luhn algorithm.
      *
      * @param numberString number string to process
-     * @return
+     * @return validUID boolean
      */
     public boolean validateUID(String numberString) {
         if (numberString == null || numberString.length() != 16) {
@@ -57,7 +57,7 @@ public class UIDService {
      * holder is already appended at end of the string.
      *
      * @param numberString number string to process
-     * @return
+     * @return checkDigit int
      */
     public int checkSum(String numberString) {
         return checkSum(numberString, false);
@@ -69,7 +69,7 @@ public class UIDService {
      * @param numberString number string to process
      * @param noCheckDigit Whether check digit is present or not. True if no check Digit
      *                     is appended.
-     * @return
+     * @return checkDigit int
      */
     public int checkSum(String numberString, boolean noCheckDigit) {
         int sum = 0;
