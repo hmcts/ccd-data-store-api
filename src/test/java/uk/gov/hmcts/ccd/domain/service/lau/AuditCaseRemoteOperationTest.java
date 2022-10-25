@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.lau;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 
+import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -25,7 +27,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -64,6 +65,9 @@ class AuditCaseRemoteOperationTest {
     @Mock
     private ObjectMapper objectMapper;
 
+    @Mock
+    private HttpResponse<String> httpResponse;
+
     @Captor
     ArgumentCaptor<HttpRequest> captor;
 
@@ -98,7 +102,7 @@ class AuditCaseRemoteOperationTest {
 
     @Test
     @DisplayName("should post case action remote audit request")
-    void shouldPostCaseActionRemoteAuditRequest() {
+    void shouldPostCaseActionRemoteAuditRequest() throws IOException, InterruptedException {
 
         ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
         AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
@@ -106,11 +110,12 @@ class AuditCaseRemoteOperationTest {
         // Setup as viewing a case
         entry.setOperationType(AuditOperationType.CASE_ACCESSED.getLabel());
 
-        when(httpClient.sendAsync(any(HttpRequest.class),
-            any(HttpResponse.BodyHandler.class))).thenReturn(new CompletableFuture<Void>());
+        when(httpClient.send(any(HttpRequest.class),
+            any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
-        verify(httpClient).sendAsync(captor.capture(),any());
+        verify(httpClient).send(captor.capture(),any());
 
         assertThat(captor.getValue().uri().getPath(), is(equalTo("/caseAction")));
         assertThat(captor.getValue().headers().map().size(), is(equalTo(3)));
@@ -122,6 +127,7 @@ class AuditCaseRemoteOperationTest {
         assertThat(bodyPublisher.contentLength(), is(equalTo(2L)));
     }
 
+    @SneakyThrows
     @Test
     @DisplayName("should post case search remote audit request")
     void shouldPostCaseSearchRemoteAuditRequest() {
@@ -133,11 +139,11 @@ class AuditCaseRemoteOperationTest {
         entry.setOperationType(AuditOperationType.SEARCH_CASE.getLabel());
         entry.setCaseId(MULTIPLE_CASE_IDS);
 
-        when(httpClient.sendAsync(any(HttpRequest.class),
-            any(HttpResponse.BodyHandler.class))).thenReturn(new CompletableFuture<Void>());
+        when(httpClient.send(any(HttpRequest.class),
+            any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
-        verify(httpClient).sendAsync(captor.capture(),any());
+        verify(httpClient).send(captor.capture(),any());
 
         assertThat(captor.getValue().uri().getPath(), is(equalTo("/caseSearch")));
         assertThat(captor.getValue().headers().map().size(), is(equalTo(3)));
