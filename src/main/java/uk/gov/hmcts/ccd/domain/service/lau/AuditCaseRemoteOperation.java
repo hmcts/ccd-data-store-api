@@ -81,6 +81,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
         } catch (Exception excep) {
             log.error("Error occurred while generating remote log and audit action request. ", excep);
+            Thread.currentThread().interrupt();
         }
 
     }
@@ -108,6 +109,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
         } catch (Exception excep) {
             log.error("Error occurred while generating remote log and audit search request.", excep);
+            Thread.currentThread().interrupt();
         }
     }
 
