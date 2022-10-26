@@ -38,13 +38,9 @@
         "_extends_": "F-1018_CaseDataWithStandardCaseLinks_UpdateByCitizen",
         "TextField" : "S-1018.42"
       },
-      "data_classification" : {
+      "data_classification": {
         "_extends_": "F-1018_ClasificationsForCaseDataWithStandardCaseLinks_Update",
-        "TextField" : "PUBLIC"
-      },
-      "security_classifications" : {
-        "_extends_": "F-1018_ClasificationsForCaseDataWithStandardCaseLinks_Update",
-        "TextField" : "PUBLIC"
+        "TextField": "PUBLIC"
       }
     }
   }
