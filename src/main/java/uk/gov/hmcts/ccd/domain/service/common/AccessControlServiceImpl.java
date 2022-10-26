@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -55,15 +54,17 @@ public class AccessControlServiceImpl implements AccessControlService {
     public boolean canAccessCaseTypeWithCriteria(final CaseTypeDefinition caseType,
                                                  final Set<AccessProfile> accessProfiles,
                                                  final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = caseType != null
-            && hasAccessControlList(accessProfiles, criteria, caseType.getAccessControlLists());
+        if (caseType == null) {
+            LOG.debug("Missing caseType");
+            return false;
+        }
 
+        boolean hasAccess = hasAccessControlList(accessProfiles, criteria, caseType.getAccessControlLists());
         if (!hasAccess) {
-            LOG.debug(AccessControlService.NO_ROLE_FOR_ACCESS_WITH_JURISDICTION, "caseType",
-                    caseType != null ? caseType.getJurisdictionId() : "",
-                    caseType != null ? caseType.getId() : "",
+            LOG.debug(AccessControlService.NO_ROLE_FOR_ACCESS, "caseType",
+                    caseType.getId(),
                     AccessControlService.extractAccessProfileNames(accessProfiles),
-                    caseType != null ? caseType.getAccessControlLists() : Lists.newArrayList());
+                    caseType.getAccessControlLists());
         }
 
         return hasAccess;

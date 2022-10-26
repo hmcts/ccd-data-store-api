@@ -1523,8 +1523,7 @@ public class AccessControlServiceTest {
 
             loggingEventList = listAppender.list;
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    AccessControlService.NO_ROLE_FOR_ACCESS_WITH_JURISDICTION, "caseType", caseType.getId(),
-                    caseType.getJurisdictionId(),
+                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseType", caseType.getId(),
                     "[caseworker-divorce-loa, caseworker-probate-loa3, caseworker-probate-loa1]", List.of());
 
             assertAll(
