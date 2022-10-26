@@ -6,6 +6,7 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MaxSizePolicy;
 import com.hazelcast.config.NetworkConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +16,13 @@ import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_C
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;
 
 @Configuration
+@ConditionalOnProperty(
+    name = "spring.cache.type",
+    havingValue = "hazelcast"
+)
 @EnableCaching
 @EnableScheduling
-public class CachingConfiguration {
+public class HazelcastCachingConfiguration {
 
     @Autowired
     ApplicationParams appParams;
