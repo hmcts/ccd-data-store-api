@@ -576,7 +576,8 @@ public interface AccessControlService {
                 .filter(caseField -> caseField.getId().equals(eventId))
                 .findFirst();
         if (matchedField.isEmpty()) {
-            LOG.error("No matching caseEvent={} found in caseFieldDefinitions={}", eventId, caseEventDefinitions);
+            LOG.error("No matching caseEvent={} found in caseFieldDefinitions={}", eventId,
+                    caseEventDefinitions.stream().map(CaseEventDefinition::getId).collect(Collectors.toList()));
             return false;
         } else if (hasAccessControlList(accessProfiles, criteria, matchedField.get().getAccessControlLists())) {
             return true;

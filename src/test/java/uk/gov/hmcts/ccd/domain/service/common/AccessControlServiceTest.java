@@ -1339,27 +1339,6 @@ public class AccessControlServiceTest {
             eventDefinition.setAccessControlLists(accessControlLists);
             caseType.setEvents(singletonList(eventDefinition));
 
-            assertThat(
-                accessControlService.canAccessCaseEventWithCriteria(
-                    EVENT_ID,
-                    caseType.getEvents(),
-                    ACCESS_PROFILES,
-                    CAN_CREATE),
-                is(false));
-        }
-
-        @Test
-        @DisplayName("Should not grant access to event with relevant acl not granting access")
-        void shouldNotGrantAccessToEventIfRelevantAclNotGrantingAccess() {
-            final CaseTypeDefinition caseType = newCaseType()
-                .withEvent(newCaseEvent()
-                    .withId(EVENT_ID)
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .build())
-                    .build())
-                .build();
-
             logServiceClass = true;
             setupLogging().setLevel(Level.ERROR);
             assertThat(
@@ -1374,11 +1353,32 @@ public class AccessControlServiceTest {
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
                     AccessControlService.NO_ROLE_FOR_ACCESS, "caseEvent", EVENT_ID,
                     extractAccessProfileNames(ACCESS_PROFILES),
-                    "[ACL{accessProfile='caseworker-probate-loa1', crud=}]");
+                    "[ACL{accessProfile='caseworker-divorce-loa4', crud=C}]");
             assertAll(
                     () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
                     () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
+        }
+
+        @Test
+        @DisplayName("Should not grant access to event with relevant acl not granting access")
+        void shouldNotGrantAccessToEventIfRelevantAclNotGrantingAccess() {
+            final CaseTypeDefinition caseType = newCaseType()
+                .withEvent(newCaseEvent()
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseEventWithCriteria(
+                    EVENT_ID,
+                    caseType.getEvents(),
+                    ACCESS_PROFILES,
+                    CAN_CREATE),
+                is(false));
         }
 
         @Test
@@ -1427,7 +1427,7 @@ public class AccessControlServiceTest {
 
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
                     "No matching caseEvent={} found in caseFieldDefinitions={}",
-                        EVENT_ID_LOWER_CASE,caseType.getEvents()
+                        EVENT_ID_LOWER_CASE,"[EVENT_ID]"
             );
 
             loggingEventList = listAppender.list;
@@ -1524,7 +1524,8 @@ public class AccessControlServiceTest {
             loggingEventList = listAppender.list;
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
                     AccessControlService.NO_ROLE_FOR_ACCESS_WITH_JURISDICTION, "caseType", caseType.getId(),
-                    caseType.getJurisdictionId(),List.of(), ACCESS_PROFILES);
+                    caseType.getJurisdictionId(),
+                    "[caseworker-divorce-loa, caseworker-probate-loa3, caseworker-probate-loa1]", List.of());
 
             assertAll(
                     () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),

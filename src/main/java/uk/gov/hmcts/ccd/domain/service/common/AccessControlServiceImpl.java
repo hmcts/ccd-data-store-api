@@ -62,8 +62,8 @@ public class AccessControlServiceImpl implements AccessControlService {
             LOG.debug(AccessControlService.NO_ROLE_FOR_ACCESS_WITH_JURISDICTION, "caseType",
                     caseType != null ? caseType.getJurisdictionId() : "",
                     caseType != null ? caseType.getId() : "",
-                    caseType != null ? caseType.getAccessControlLists() : Lists.newArrayList(),
-                    accessProfiles);
+                    AccessControlService.extractAccessProfileNames(accessProfiles),
+                    caseType != null ? caseType.getAccessControlLists() : Lists.newArrayList());
         }
 
         return hasAccess;
