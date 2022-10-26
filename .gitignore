@@ -37,3 +37,6 @@ out/
 
 ### BEFTA
 befta_recent_executions_info_LOCAL.json
+
+### Remote run configs
+.*-remote-env

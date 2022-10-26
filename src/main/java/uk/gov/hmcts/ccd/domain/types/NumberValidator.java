@@ -26,7 +26,6 @@ public class NumberValidator implements BaseTypeValidator {
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
-        LOG.info("Validating Number field id {}", caseFieldDefinition.getId());
 
         final String value = dataValue.textValue();
         final BigDecimal numberValue;
@@ -41,7 +40,7 @@ public class NumberValidator implements BaseTypeValidator {
             } else {
                 numberValue = new BigDecimal(value);
             }
-            LOG.info("Number field text value {} & number value {}", value, numberValue);
+
             if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), numberValue)) {
                 return Collections.singletonList(
                     new ValidationResult("Should be less than or equal to " + caseFieldDefinition
