@@ -21,6 +21,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -114,17 +115,20 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             .uri(URI.create(url))
             .header("Content-Type", "application/json")
             .header("ServiceAuthorization", securityUtils.getServiceAuthorization())
+            .header("Accept", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .build();
 
-        logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId());
+        String auditLogId = UUID.randomUUID().toString();
+
+        logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId(), auditLogId);
 
         CompletableFuture<HttpResponse<String>> responseFuture =
             httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
 
         responseFuture.whenComplete((response, error) -> {
             if (response != null) {
-                logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri());
+                logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri(), auditLogId);
             }
             if (error != null) {
                 log.error("Error occurred while processing response for remote log and audit request. ", error);
@@ -151,19 +155,23 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         return searchLog;
     }
 
-    private void logCorrelationId(String requestId, String activity, String jurisdiction, String idamId) {
-        log.info("LAU Correlation-ID:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},jurisdiction:{},idamId:{}",
+    private void logCorrelationId(
+        String requestId, String activity, String jurisdiction, String idamId, String auditLogId) {
+        log.info("LAU Correlation-ID:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},jurisdiction:{},idamId:{}, logId:{}",
             activity,
             requestId,
             jurisdiction,
-            idamId);
+            idamId,
+            auditLogId);
     }
 
-    private void logAuditResponse(String requestId, String activity, int httpStatus, URI uri) {
-        log.info("LAU Response:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},httpStatus:{},url:{}",
+    private void logAuditResponse(
+        String requestId, String activity, int httpStatus, URI uri, String auditLogId) {
+        log.info("LAU Response:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},httpStatus:{},url:{}, logId:{}",
             activity,
             requestId,
             httpStatus,
-            uri.toString());
+            uri.toString(),
+            auditLogId);
     }
 }
