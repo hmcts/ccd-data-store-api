@@ -186,6 +186,38 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     }
 
     @Override
+    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(CaseDetails caseDetails) {
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+        RoleAssignments roleAssignmentsWithGrantType = filterRoleAssignmentsForRestrictedCases(roleAssignments);
+
+        FilteredRoleAssignments filteredRoleAssignments = roleAssignmentsFilteringService
+            .filter(roleAssignmentsWithGrantType, caseDetails,
+                Lists.newArrayList(
+                    MatcherType.SECURITYCLASSIFICATION
+                )
+            );
+
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+
+        List<AccessProfile> filteredAccessProfiles = generateAccessProfiles(
+            filteredRoleAssignments.getFilteredMatchingRoleAssignments(), caseTypeDefinition);
+
+        String caseAccessCategory = getCaseAccessCategoryFromCaseData(caseDetails);
+
+        return filterAccessProfilesByCaseAccessCategory(filteredAccessProfiles, caseAccessCategory);
+    }
+
+    private RoleAssignments filterRoleAssignmentsForRestrictedCases(RoleAssignments roleAssignments) {
+        return RoleAssignments.builder()
+            .roleAssignments(roleAssignments.getRoleAssignments().stream()
+                .filter(roleAssignment -> roleAssignment.getGrantType().equals(GrantType.BASIC.name()))
+                .filter(roleAssignment -> applicationParams.getCcdAccessControlRestrictedRoles()
+                    .contains(roleAssignment.getRoleName()))
+                .collect(Collectors.toList()))
+            .build();
+    }
+
+    @Override
     public void grantAccess(CaseDetails caseDetails, String idamUserId) {
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             roleAssignmentService.createCaseRoleAssignments(caseDetails, idamUserId, Set.of(CREATOR.getRole()), false);
