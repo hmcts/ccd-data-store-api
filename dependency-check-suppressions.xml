@@ -24,10 +24,5 @@
 <!-- 		</notes>-->
 <!-- 	</suppress>-->
 	<!--End of temporary suppression section -->
-	<suppress>
-		<cve>CVE-2022-38749</cve>
-		<cve>CVE-2022-38751</cve>
-		<cve>CVE-2022-38750</cve>
-	</suppress>
 
 </suppressions>
