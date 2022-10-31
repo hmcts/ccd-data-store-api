@@ -1350,43 +1350,6 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not grant access to event for user with Incorrect Predicate")
-        void shouldNotGrantAccessToEventForUserWithMissingCreatePredicate() {
-            final CaseTypeDefinition caseType = newCaseType()
-                    .withEvent(newCaseEvent()
-                            .withId(EVENT_ID)
-                            .withAcl(anAcl()
-                                    .withRole(ROLE_IN_USER_ROLES)
-                                    .withCreate(true)
-                                    .build())
-                            .build())
-                    .build();
-
-            AccessProfile  user = AccessProfile.builder()
-                    .accessProfile(ROLE_IN_USER_ROLES)
-                    .readOnly(false)
-                    .build();
-
-            logServiceClass = true;
-            setupLogging().setLevel(Level.ERROR);
-            assertThat(
-                    accessControlService.canAccessCaseEventWithCriteria(
-                            EVENT_ID,
-                            caseType.getEvents(),
-                            ACCESS_PROFILES,
-                            CAN_READ),
-                    is(false));
-
-            loggingEventList = listAppender.list;
-            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    NO_ROLE_FOUND, "caseEvent", EVENT_ID,
-                    extractAccessProfileNames(ACCESS_PROFILES),
-                    "[ACL{accessProfile='caseworker-divorce-loa4', crud=C}]");
-
-        }
-
-
-        @Test
         @DisplayName("Should not grant access to event with relevant acl not granting access")
         void shouldNotGrantAccessToEventIfRelevantAclNotGrantingAccess() {
             final CaseTypeDefinition caseType = newCaseType()
@@ -4929,7 +4892,7 @@ public class AccessControlServiceTest {
         return JacksonUtils.convertValueJsonNode(data);
     }
 
-    private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles, boolean... readOnly) {
+    private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
         return userRoles.stream()
             .map(userRole -> AccessProfile.builder().readOnly(false)
                 .accessProfile(userRole)
