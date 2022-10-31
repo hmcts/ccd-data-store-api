@@ -57,6 +57,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
@@ -69,6 +70,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_ROLE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.extractAccessProfileNames;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
@@ -267,8 +269,8 @@ public class AccessControlServiceTest {
     class CanAccessCaseStateWithCriteriaAclTests {
 
         @Test
-        @DisplayName("Should not grant access to case state with relevant acl missing")
-        void shouldNotGrantAccessToStateIfRelevantACLMissing() {
+        @DisplayName("Should not grant access to case state for user with missing role")
+        void shouldNotGrantAccessToStateForUserWithMissingRole() {
             CaseTypeDefinition caseType = newCaseType()
                 .withState(newState()
                     .withId(STATE_ID1)
@@ -280,7 +282,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            setupLogging().setLevel(Level.DEBUG);
+            setupLogging().setLevel(Level.ERROR);
             assertAll(
                 () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType,
                     ACCESS_PROFILES,
@@ -290,14 +292,13 @@ public class AccessControlServiceTest {
                     CAN_CREATE), is(false))
             );
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    AccessControlService.NO_ROLE_FOR_ACCESS_WITH_JURISDICTION,
-                    "caseState", STATE_ID1, caseType.getJurisdictionId(),
-                    extractAccessProfileNames(ACCESS_PROFILES),
+                    NO_ROLE_FOUND,
+                    "caseState", STATE_ID1, extractAccessProfileNames(ACCESS_PROFILES),
                     "[ACL{accessProfile='caseworker-divorce-loa4', crud=CR}]"
             );
             loggingEventList = listAppender.list;
             assertAll(
-                    () -> assertTrue(loggingEventList.stream().allMatch(log -> log.getLevel() == Level.DEBUG)),
+                    () -> assertTrue(loggingEventList.stream().allMatch(log -> log.getLevel() == Level.ERROR)),
                     () -> assertTrue(loggingEventList.stream().anyMatch(log ->
                             log.getFormattedMessage().equals(expectedLogMessage)))
             );
@@ -455,8 +456,8 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not grant access to case fields with relevant acl missing")
-        void shouldNotGrantAccessToFieldsIfRelevantAclMissing() throws IOException {
+        @DisplayName("Should not grant access to case fields for user with missing role")
+        void shouldNotGrantAccessToFieldsForUserWithMissingRole() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId(ADDRESSES)
@@ -482,7 +483,7 @@ public class AccessControlServiceTest {
                 is(false));
 
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseField", ADDRESSES,
+                    NO_ROLE_FOUND, "caseField", ADDRESSES,
                     extractAccessProfileNames(ACCESS_PROFILES),
                     "[ACL{accessProfile='caseworker-divorce-loa4', crud=CR}]"
             );
@@ -624,8 +625,7 @@ public class AccessControlServiceTest {
                     is(false));
 
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    "No matching caseField={} found in caseFieldDefinitions={}",
-                                "WrongAddresses", "[Addresses]");
+                    "No matching caseField={} in caseFieldDefinitions", "WrongAddresses");
 
             loggingEventList = listAppender.list;
             assertAll(
@@ -1160,18 +1160,7 @@ public class AccessControlServiceTest {
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\" }\n");
             JsonNode existingDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\" }");
 
-            setupLogging().setLevel(Level.DEBUG);
             assertFieldsAccess(true, caseType, newDataNode, existingDataNode);
-
-            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    "Data submitted for caseField={} already present", ADDRESSES
-            );
-
-            loggingEventList = listAppender.list;
-            assertAll(
-                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
-                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
-            );
         }
 
         @Test
@@ -1327,8 +1316,8 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not grant access to event with relevant acl missing")
-        void shouldNotGrantAccessToEventIfRelevantAclMissing() {
+        @DisplayName("Should not grant access to event for user with missing role")
+        void shouldNotGrantAccessToEventForUserWithMissingRole() {
             final CaseTypeDefinition caseType = new CaseTypeDefinition();
             CaseEventDefinition eventDefinition = new CaseEventDefinition();
             eventDefinition.setId(EVENT_ID);
@@ -1351,7 +1340,7 @@ public class AccessControlServiceTest {
 
             loggingEventList = listAppender.list;
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseEvent", EVENT_ID,
+                    NO_ROLE_FOUND, "caseEvent", EVENT_ID,
                     extractAccessProfileNames(ACCESS_PROFILES),
                     "[ACL{accessProfile='caseworker-divorce-loa4', crud=C}]");
             assertAll(
@@ -1359,6 +1348,43 @@ public class AccessControlServiceTest {
                     () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
         }
+
+        @Test
+        @DisplayName("Should not grant access to event for user with Incorrect Predicate")
+        void shouldNotGrantAccessToEventForUserWithMissingCreatePredicate() {
+            final CaseTypeDefinition caseType = newCaseType()
+                    .withEvent(newCaseEvent()
+                            .withId(EVENT_ID)
+                            .withAcl(anAcl()
+                                    .withRole(ROLE_IN_USER_ROLES)
+                                    .withCreate(true)
+                                    .build())
+                            .build())
+                    .build();
+
+            AccessProfile  user = AccessProfile.builder()
+                    .accessProfile(ROLE_IN_USER_ROLES)
+                    .readOnly(false)
+                    .build();
+
+            logServiceClass = true;
+            setupLogging().setLevel(Level.ERROR);
+            assertThat(
+                    accessControlService.canAccessCaseEventWithCriteria(
+                            EVENT_ID,
+                            caseType.getEvents(),
+                            ACCESS_PROFILES,
+                            CAN_READ),
+                    is(false));
+
+            loggingEventList = listAppender.list;
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    NO_ROLE_FOUND, "caseEvent", EVENT_ID,
+                    extractAccessProfileNames(ACCESS_PROFILES),
+                    "[ACL{accessProfile='caseworker-divorce-loa4', crud=C}]");
+
+        }
+
 
         @Test
         @DisplayName("Should not grant access to event with relevant acl not granting access")
@@ -1426,8 +1452,8 @@ public class AccessControlServiceTest {
                 is(false));
 
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    "No matching caseEvent={} found in caseFieldDefinitions={}",
-                        EVENT_ID_LOWER_CASE,"[EVENT_ID]"
+                    "No matching caseEvent={} in caseEventDefinitions",
+                        EVENT_ID_LOWER_CASE
             );
 
             loggingEventList = listAppender.list;
@@ -1482,8 +1508,8 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not grant access to case with relevant acl missing")
-        void shouldNotGrantAccessToCaseIfRelevantAclMissing() {
+        @DisplayName("Should not grant access to case for user with missing role")
+        void shouldNotGrantAccessToCaseForUserWithMissingRole() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
@@ -1513,7 +1539,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            setupLogging().setLevel(Level.DEBUG);
+            setupLogging().setLevel(Level.INFO);
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
@@ -1523,11 +1549,11 @@ public class AccessControlServiceTest {
 
             loggingEventList = listAppender.list;
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseType", caseType.getId(),
+                    NO_ROLE_FOUND, "caseType", caseType.getId(),
                     "[caseworker-divorce-loa, caseworker-probate-loa3, caseworker-probate-loa1]", List.of());
 
             assertAll(
-                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.INFO)),
                     () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
 
@@ -1583,8 +1609,8 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not return data if field with relevant acl missing")
-        void shouldNotReturnFieldIfRelevantAclMissing() throws IOException {
+        @DisplayName("Should not return data for user with missing role")
+        void shouldNotReturnFieldForUserWithMissingRole() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId(ADDRESSES)
@@ -2442,8 +2468,8 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not return audit event if relevant acl missing")
-        void shouldNotReturnEventIfRelevantAclMissing() {
+        @DisplayName("Should not return audit event for user with missing role")
+        void shouldNotReturnEventForUserWithMissingRole() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
@@ -4025,8 +4051,8 @@ public class AccessControlServiceTest {
     class ReturnsCaseEventsDataWithCaseEventAccessAclTests {
 
         @Test
-        @DisplayName("Should not return case event definition if relevant acl missing")
-        void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() {
+        @DisplayName("Should not return case event definition for user with missing role")
+        void shouldNotReturnCaseEventDefinitionForUserWithMissingRole() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
@@ -4170,8 +4196,8 @@ public class AccessControlServiceTest {
     class CaseViewFieldsAclTests {
 
         @Test
-        @DisplayName("Should not return case event definition if relevant acl missing")
-        void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() {
+        @DisplayName("Should not return case event definition for user with missing role")
+        void shouldNotReturnCaseEventDefinitionForUserWithMissingRole() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
@@ -4639,32 +4665,29 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not allow access when the role does not have read permission")
-        void shouldRejectAccessWhenRoleDoesNotHaveReadPermissionForField() {
-            final CommonField viewField =
-                newCaseField()
+        @DisplayName("Should not grant access to case view for user with missing role")
+        void shouldNotGrantAccessToCaseViewForUserWithMissingRole() {
+            final CommonField viewField = newCaseField()
                     .withId("NotesNoReadAccessForRole")
                     .withFieldType(aFieldType()
-                        .withType(TEXT)
-                        .build())
+                            .withType(TEXT)
+                            .build())
                     .withAcl(anAcl()
-                        .withRole(ROLE_NOT_IN_USER_ROLES)
-                        .withRead(true)
-                        .build())
+                            .withRole(ROLE_NOT_IN_USER_ROLES)
+                            .withRead(true)
+                            .build())
                     .build();
 
             setupLogging().setLevel(Level.DEBUG);
-            boolean canAccessCaseViewField =
-                accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ);
+            assertFalse(accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ));
 
             loggingEventList = listAppender.list;
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    AccessControlService.NO_ROLE_FOR_ACCESS, "caseField", "NotesNoReadAccessForRole",
+                    NO_ROLE_FOUND, "caseField", "NotesNoReadAccessForRole",
                     extractAccessProfileNames(ACCESS_PROFILES),
                     "[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]");
 
             assertAll(
-                () -> assertThat(canAccessCaseViewField, is(false)),
                 () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.INFO)),
                 () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
@@ -4906,7 +4929,7 @@ public class AccessControlServiceTest {
         return JacksonUtils.convertValueJsonNode(data);
     }
 
-    private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+    private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles, boolean... readOnly) {
         return userRoles.stream()
             .map(userRole -> AccessProfile.builder().readOnly(false)
                 .accessProfile(userRole)

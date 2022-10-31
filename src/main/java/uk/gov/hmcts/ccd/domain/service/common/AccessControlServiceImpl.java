@@ -55,13 +55,12 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                  final Set<AccessProfile> accessProfiles,
                                                  final Predicate<AccessControlList> criteria) {
         if (caseType == null) {
-            LOG.debug("Missing caseType");
             return false;
         }
 
         boolean hasAccess = hasAccessControlList(accessProfiles, criteria, caseType.getAccessControlLists());
         if (!hasAccess) {
-            LOG.debug(AccessControlService.NO_ROLE_FOR_ACCESS, "caseType",
+            LOG.info(NO_ROLE_FOUND, "caseType",
                     caseType.getId(),
                     AccessControlService.extractAccessProfileNames(accessProfiles),
                     caseType.getAccessControlLists());
@@ -86,9 +85,8 @@ public class AccessControlServiceImpl implements AccessControlService {
         boolean hasAccess = hasAccessControlList(accessProfiles, criteria, stateACLs);
 
         if (!hasAccess) {
-            LOG.debug(NO_ROLE_FOR_ACCESS_WITH_JURISDICTION, "caseState",
+            LOG.error(NO_ROLE_FOUND, "caseState",
                     caseState,
-                    caseType.getJurisdictionId(),
                     AccessControlService.extractAccessProfileNames(accessProfiles),
                     stateACLs);
         }
@@ -123,14 +121,14 @@ public class AccessControlServiceImpl implements AccessControlService {
     public boolean canAccessCaseViewFieldWithCriteria(final CommonField caseViewField,
                                                       final Set<AccessProfile> accessProfiles,
                                                       final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = hasAccessControlList(accessProfiles, criteria, caseViewField.getAccessControlLists());
-        if (!hasAccess) {
-            LOG.info(NO_ROLE_FOR_ACCESS, "caseField",
+        if (!hasAccessControlList(accessProfiles, criteria, caseViewField.getAccessControlLists())) {
+            LOG.info(NO_ROLE_FOUND, "caseField",
                     caseViewField.getId(),
                     AccessControlService.extractAccessProfileNames(accessProfiles),
                     caseViewField.getAccessControlLists());
+            return false;
         }
-        return hasAccess;
+        return true;
     }
 
     @Override
@@ -376,13 +374,12 @@ public class AccessControlServiceImpl implements AccessControlService {
                 .filter(caseField -> caseField.getId().equals(fieldName))
                 .findFirst();
         if (matchedField.isEmpty()) {
-            LOG.error("No matching caseField={} found in caseFieldDefinitions={}", fieldName,
-                    caseFieldDefinitions.stream().map(CaseFieldDefinition::getId).collect(Collectors.toList()));
+            LOG.error("No matching caseField={} in caseFieldDefinitions", fieldName);
             return false;
         } else if (hasAccessControlList(accessProfiles, criteria, matchedField.get().getAccessControlLists())) {
             return true;
         }
-        LOG.error(NO_ROLE_FOR_ACCESS, "caseField",
+        LOG.error(NO_ROLE_FOUND, "caseField",
                 fieldName,
                 AccessControlService.extractAccessProfileNames(accessProfiles),
                 getCaseFieldAcls(caseFieldDefinitions, fieldName));
@@ -395,7 +392,6 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                      List<CaseFieldDefinition> caseFieldDefinitions,
                                                      Set<AccessProfile> accessProfiles) {
         if (existingData.get(newFieldName).equals(newData.get(newFieldName))) {
-            LOG.debug("Data submitted for caseField={} already present", newFieldName);
             return true;
         }
         Optional<CaseFieldDefinition> fieldOptional = getCaseFieldType(caseFieldDefinitions, newFieldName);

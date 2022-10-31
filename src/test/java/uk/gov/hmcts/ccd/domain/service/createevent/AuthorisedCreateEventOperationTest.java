@@ -62,7 +62,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
@@ -428,9 +427,9 @@ class AuthorisedCreateEventOperationTest {
         List<ILoggingEvent> loggingEventList = listAppender.list;
         assertAll(
                 () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
-                () -> assertTrue(loggingEventList.get(0).getFormattedMessage()
-                                    .startsWith("Missing eventId. requiredEvents="))
+                () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is("EventId is not supplied"))
         );
+        listAppender.stop();
         logger.detachAndStopAllAppenders();
     }
 

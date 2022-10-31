@@ -218,8 +218,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                     Set<AccessProfile> accessProfiles) {
 
         verifyCaseTypeAndStateAccess(existingCaseDetails, caseTypeDefinition, accessProfiles);
-        if (event == null) {
-            log.error("Missing eventId. requiredEvents={}", caseTypeDefinition.getEvents());
+        if (event == null || event.getEventId() == null || event.getEventId().isEmpty()) {
+            log.error("EventId is not supplied");
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         } else if (!accessControlService.canAccessCaseEventWithCriteria(
                                             event.getEventId(),

@@ -58,10 +58,7 @@ public interface AccessControlService {
     String NO_CASE_STATE_FOUND = "Invalid event";
     String NO_EVENT_FOUND = "No event found";
     String NO_FIELD_FOUND = "No field found";
-    String NO_ROLE_FOR_ACCESS = "No relevant access for {}={}. "
-            + "No matching profile found for userProfile={} in requiredProfile={}";
-    String NO_ROLE_FOR_ACCESS_WITH_JURISDICTION = "No relevant access for {}={} of jurisdiction={}. "
-            + "No matching profile found for userProfile={} in requiredProfile={}";
+    String NO_ROLE_FOUND = "No relevant access for {}={}. userProfile={}, requiredProfile={}";
     String VALUE = "value";
     String ALL = "*";
 
@@ -572,18 +569,17 @@ public interface AccessControlService {
                                        List<CaseEventDefinition> caseEventDefinitions,
                                        Set<AccessProfile> accessProfiles,
                                        Predicate<AccessControlList> criteria) {
-        Optional<CaseEventDefinition> matchedField = caseEventDefinitions.stream()
+        Optional<CaseEventDefinition> matchedEvent = caseEventDefinitions.stream()
                 .filter(caseField -> caseField.getId().equals(eventId))
                 .findFirst();
-        if (matchedField.isEmpty()) {
-            LOG.error("No matching caseEvent={} found in caseFieldDefinitions={}", eventId,
-                    caseEventDefinitions.stream().map(CaseEventDefinition::getId).collect(Collectors.toList()));
+        if (matchedEvent.isEmpty()) {
+            LOG.error("No matching caseEvent={} in caseEventDefinitions", eventId);
             return false;
-        } else if (hasAccessControlList(accessProfiles, criteria, matchedField.get().getAccessControlLists())) {
+        } else if (hasAccessControlList(accessProfiles, criteria, matchedEvent.get().getAccessControlLists())) {
             return true;
         }
 
-        LOG.error(NO_ROLE_FOR_ACCESS, "caseEvent",
+        LOG.error(NO_ROLE_FOUND, "caseEvent",
                 eventId,
                 extractAccessProfileNames(accessProfiles),
                 getCaseEventAcls(caseEventDefinitions, eventId));
