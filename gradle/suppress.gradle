@@ -14,8 +14,8 @@ void suppressCves(String reportName = Globals.REPORT_NAME) {
     // Default output directory is 'build/reports'
     def reportFile = new File(project.file(dependencyCheck.getOutputDirectory()), reportName)
     if (!reportFile.isFile()) {
-        throw new FileNotFoundException("Report file not found.\n" +
-                "\nPossible Solution: run :dependencyCheckAnalyze")
+        throw new FileNotFoundException("Report file not found." +
+                "\nPossible Solution: run :dependencyCheckAggregate")
     }
 
     // Creates a unique set of non-suppressed vulnerabilities
@@ -37,7 +37,11 @@ void suppressCves(String reportName = Globals.REPORT_NAME) {
 }
 
 static void addNewSuppression(unSuppressedCves, suppressionDoc) {
-    // Find a specified phrase in notes element and amend text content with new cve
+    /*
+    * Find a specified phrase in a <notes> element
+    * Amend text content with new cve
+    * Amend suppress element with new cve tag containing cve value
+     */
     XPathExpression xpathExp = XPathFactory.newInstance().newXPath().compile(
             "//*[local-name()='notes']")
     NodeList noteNodes = xpathExp.evaluate(suppressionDoc, XPathConstants.NODESET) as NodeList
@@ -61,6 +65,7 @@ static void addNewSuppression(unSuppressedCves, suppressionDoc) {
 }
 
 static boolean validateSection(suppressionFile, suppressions) {
+    // Add section if missing
     if (suppressionFile.getText().find(Globals.TEXT_TO_FIND) == null) {
         suppressions.appendNode {
             suppress {
@@ -74,7 +79,7 @@ static boolean validateSection(suppressionFile, suppressions) {
 }
 
 static def cleanXml(Element suppressionDoc) {
-    // Strip out all empty nodes
+    // Strip out whitespace and empty nodes
     XPathExpression xpathExp = XPathFactory.newInstance().newXPath().compile(
             "//text()[normalize-space(.) = '']")
 

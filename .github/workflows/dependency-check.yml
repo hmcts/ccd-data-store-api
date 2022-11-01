@@ -2,9 +2,8 @@ name: Suppressions
 
 on:
   schedule:
-    # // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-    # every 3rd hour from 6 am to 6pm on every day-of-week from Monday through Friday
-    - cron: "H 6-18/3 * * 1-5"
+    # every 3rd hour from 10 through 12
+    - cron: "H 10-12/3 * * *"
   workflow_dispatch:
 
 jobs:
@@ -30,9 +29,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Run dependencyCheck and Suppress CVE
-        run: ./gradlew --continue dependencyCheckAnalyze suppressCves
-      - name: Clean suppressions
+      - name: Run dependencyCheck
+        run: ./gradlew dependencyCheckAggregate
+        continue-on-error: true
+      - name: Run suppressCves
+        run: ./gradlew suppressCves
+      - name: Run cleanSuppressions
         run: ./gradlew cleanSuppressions
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
