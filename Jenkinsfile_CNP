@@ -11,7 +11,7 @@ properties(
     ]
 )
 
-@Library("Infrastructure")
+@Library("Infrastructure@movehighleveldataseupinpreview")
 
 def type = "java"
 def product = "ccd"
