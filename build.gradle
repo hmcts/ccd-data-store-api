@@ -28,7 +28,6 @@ plugins {
     id "io.freefair.lombok" version "5.3.0"
     id 'uk.gov.hmcts.java' version '0.12.28'
     id 'au.com.dius.pact' version '4.1.0'
-
 }
 
 apply plugin: 'java'
@@ -47,7 +46,8 @@ apply plugin: 'se.patrikerdes.use-latest-versions'
 apply from: './gradle/suppress.gradle'
 
 def versions = [
-        pact_version: '4.1.7'
+        pact_version    : '4.1.7',
+        jackson         : '2.14.0-rc1'
 ]
 ext['spring-security.version'] = '5.6.6'
 ext['spring-framework.version'] = '5.3.20'
@@ -210,10 +210,10 @@ dependencies {
     // CVE-2021-29425
     implementation group: 'commons-io', name: 'commons-io', version: '2.8.0'
 
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
-    implementation "com.fasterxml.jackson.core:jackson-core:2.13.2"
-    implementation "com.fasterxml.jackson.core:jackson-annotations:2.13.2"
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
 
     // use the latest org.springframework.security
     implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.6'
@@ -309,9 +309,7 @@ dependencyManagement {
         // Versions prior to 30.0 vulnerable to CVE-2020-8908
         dependency 'com.google.guava:guava:30.1-jre'
 
-        // CVE-2019-0232 - Java and Command Line injections in Windows (updated to version 9.0.19)
-        // CVE-2021-42340 - Memory leak (updated to version 9.0.54)
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.63') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.65') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -900,3 +898,46 @@ cucumberReports {
     notFailingStatuses = ["skipped", "passed"]
 }
 
+task reloadEnvSecrets {
+  doFirst {
+    def env = project.findProperty('env') ?: 'demo'
+    if (project.file("./.${env}-remote-env").exists()) {
+      project.file("./.${env}-remote-env").delete()
+    }
+  }
+}
+
+task runRemoteDemo(type: JavaExec) {
+    main = mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    doFirst() {
+        configRemoteRunTask(it, 'demo')
+    }
+}
+
+void configRemoteRunTask(Task execTask, String env) {
+    loadEnvSecrets(env)
+    project.file("./.${env}-remote-env").readLines().each() {
+        def index = it.indexOf("=")
+        def key = it.substring(0, index)
+        def value = it.substring(index + 1)
+        execTask.environment(key, value)
+    }
+}
+
+void loadEnvSecrets(String env) {
+    def azCmd = ['az', 'keyvault', 'secret', 'show', '--vault-name', "ccd-${env}", '-o', 'tsv', '--query', 'value', '--name', 'data-store-remote-env']
+    if (!project.file("./.${env}-remote-env").exists()) {
+        new ByteArrayOutputStream().withStream { os ->
+            exec {
+                if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                    commandLine ['cmd', '/c'] + azCmd  
+                } else {
+                    commandLine azCmd
+                }
+                standardOutput = os
+            }
+            project.file("./.${env}-remote-env").write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
+        }
+    }
+}
