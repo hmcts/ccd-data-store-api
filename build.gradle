@@ -165,7 +165,6 @@ dependencies {
     implementation group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
     implementation group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis'
-//    implementation group: 'org.redisson', name: 'redisson-spring-data-26', version: '3.17.7'
     implementation group: 'org.redisson', name: 'redisson-spring-boot-starter', version: '3.17.7'
 
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
@@ -245,8 +244,7 @@ dependencies {
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.22.0'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.2'
     testImplementation("org.testcontainers:postgresql:1.15.2")
-    testImplementation("org.testcontainers:testcontainers:1.17.5") //todo var
-//    testImplementation("org.testcontainers:junit-jupiter:1.17.5")
+    testImplementation("org.testcontainers:testcontainers:1.17.5")
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
     testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
