@@ -22,9 +22,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.utility.DockerImageName;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
@@ -93,6 +97,13 @@ public abstract class AbstractBaseIntegrationTest {
 
     protected final CallbackResponse wizardStructureResponse = new CallbackResponse();
 
+    static GenericContainer<?> REDIS_CONTAINER =
+        new GenericContainer(DockerImageName.parse("redis:7.0.5")).withExposedPorts(6379);
+
+    static {
+        REDIS_CONTAINER.start();
+    }
+
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Inject
     protected DataSource db;
@@ -137,6 +148,12 @@ public abstract class AbstractBaseIntegrationTest {
     protected Authentication authentication;
     @Mock
     protected SecurityContext securityContext;
+
+    @DynamicPropertySource
+    static void registerMySQLProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.redis.host", REDIS_CONTAINER::getHost);
+        registry.add("spring.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379).toString());
+    }
 
     @Before
     @BeforeEach

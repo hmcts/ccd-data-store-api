@@ -37,7 +37,6 @@ public class RedisCachingConfiguration {
     private ApplicationParams appParams;
 
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
-        RedisCacheConfiguration.defaultCacheConfig().
         return (builder) -> builder
             .withCacheConfiguration("itemCache",
                 RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(10)))

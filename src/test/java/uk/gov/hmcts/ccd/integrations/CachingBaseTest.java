@@ -16,6 +16,8 @@ import org.testcontainers.utility.DockerImageName;
 @TestPropertySource(locations = "classpath:test.properties")
 public abstract class CachingBaseTest {
 
+    public static final String LEGACY_CACHE_PROPERTIES = "spring.cache.type=hazelcast";
+
     static GenericContainer<?> REDIS_CONTAINER =
         new GenericContainer(DockerImageName.parse("redis:7.0.5")).withExposedPorts(6379);
 
