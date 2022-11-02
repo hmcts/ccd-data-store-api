@@ -59,11 +59,8 @@
           "Suspended" : "No"
         }
       },
-      "data_classification" : {
-        "TextField" : "PUBLIC"
-      },
-      "security_classifications" : {
-        "TextField" : "PUBLIC"
+      "data_classification": {
+        "TextField": "PUBLIC"
       }
     }
   }

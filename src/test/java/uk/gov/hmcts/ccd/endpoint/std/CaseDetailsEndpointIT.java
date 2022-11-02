@@ -3500,10 +3500,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "      },\n" +
             "      \"after_submit_callback_response\":null,\n" +
             "      \"callback_response_status_code\":null,\n" +
-            "      \"callback_response_status\":null,\n" +
-            "      \"security_classifications\":{  \n" +
-            "\n" +
-            "      }\n" +
+            "      \"callback_response_status\":null\n" +
             "   },\n" +
             "   \"event_id\":\"Create2\"\n" +
             "}";
@@ -3843,10 +3840,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "      },\n" +
             "      \"after_submit_callback_response\":null,\n" +
             "      \"callback_response_status_code\":null,\n" +
-            "      \"callback_response_status\":null,\n" +
-            "      \"security_classifications\":{  \n" +
-            "\n" +
-            "      }\n" +
+            "      \"callback_response_status\":null\n" +
             "   },\n" +
             "   \"event_id\":\"TEST_EVENT\"\n" +
             "}";
@@ -4206,26 +4200,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                         + "/binary"))),
                 () -> assertThat(nodeData.get("D8Document").get("document_filename"), CoreMatchers
                     .is(getTextNode("Seagulls_Square.jpg")))
-            );
-            JsonNode nodeClassification = JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification());
-            assertAll(
-                () -> assertThat(nodeClassification.has("PersonFirstName"), CoreMatchers.is(false)),
-                () -> assertThat(nodeClassification.get("PersonLastName"), CoreMatchers
-                    .is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.has("PersonAddress"), CoreMatchers.is(true)),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("classification"), CoreMatchers
-                    .is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("Country"), CoreMatchers
-                    .is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("Postcode"), CoreMatchers
-                    .is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine1"), CoreMatchers
-                    .is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine2"), CoreMatchers
-                    .is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine3"), CoreMatchers
-                    .is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("D8Document"), CoreMatchers.is(getTextNode("PUBLIC")))
             );
         }
     }
@@ -5623,8 +5597,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "    \"callback_response_status_code\" : null,\n"
             + "    \"callback_response_status\" : null,\n"
             + "    \"delete_draft_response_status_code\" : null,\n"
-            + "    \"delete_draft_response_status\" : null,\n"
-            + "    \"security_classifications\" : null\n"
+            + "    \"delete_draft_response_status\" : null\n"
             + "  },\n"
             + "  \"case_details_before\" : null,\n"
             + "  \"event_id\" : \"TEST_EVENT\",\n"
@@ -5635,13 +5608,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private String requestBodyJson() {
         return "{\"case_details\":{\"id\":null,\"jurisdiction\":\"PROBATE\",\"state\":null,\"version\":null,"
             + "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null,"
-            + "\"last_state_modified_date\":null,\"security_classification\":null,\"case_data\":{\"PersonLastName"
-            + "\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
+            + "\"last_state_modified_date\":null,\"security_classification\":null,"
+            + "\"case_data\":{\"PersonLastName\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
             + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}},"
             + "\"data_classification\":null,\"supplementary_data\":null,\"after_submit_callback_response\":null,"
             + "\"callback_response_status_code\":null,\"callback_response_status\":null,"
-            + "\"delete_draft_response_status_code\":null,\"delete_draft_response_status\":null,"
-            + "\"security_classifications\":null},\"case_details_before\":null,"
+            + "\"delete_draft_response_status_code\":null,\"delete_draft_response_status\":null},"
+            + "\"case_details_before\":null,"
             + "\"event_id\":\"TEST_EVENT\",\"ignore_warning\":false}";
     }
 

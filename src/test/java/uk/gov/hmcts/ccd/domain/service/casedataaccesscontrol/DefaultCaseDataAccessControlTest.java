@@ -4,6 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +52,7 @@ import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,6 +76,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -90,6 +96,26 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 
 @ExtendWith(MockitoExtension.class)
 class DefaultCaseDataAccessControlTest {
+
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    static class AccessProfileServiceCalls {
+        private List<List<RoleAssignment>> accessGrantedChecks;
+        private List<List<RoleAssignment>> accessProcessChecks;
+
+        public List<RoleAssignment> accessProcessRoleAssignmentsCheckedInFirstCall() {
+            // NB: first AP check contains all relevant RAs.
+            return this.accessProcessChecks.get(0);
+        }
+
+        public List<RoleAssignment> allAccessGrantedRoleAssignmentsChecked() {
+            // NB: AG checks are against individual RAs: so flatten list of lists for easier processing.
+            return this.accessGrantedChecks.stream()
+                .flatMap(Collection::stream).collect(Collectors.toList());
+        }
+    }
 
     private static final String ROLE_NAME_1 = "TEST_ROLE_1";
     private static final String ROLE_NAME_2 = "TEST_ROLE_2";
@@ -1220,7 +1246,7 @@ class DefaultCaseDataAccessControlTest {
         }
 
         @Test
-        void generateAccessMetadata_verifyAccessProfileServiceCall_onlyProcessesRAsThatAreStandardSpecificChallenged() {
+        void generateAccessMetadata_verifyAccessProfileServiceCall_onlyProcessesRAsThatAreRelevantForAGOrAPChecks() {
 
             // GIVEN
             Map<String, String> roleAndGrantType = Maps.newHashMap();
@@ -1231,11 +1257,11 @@ class DefaultCaseDataAccessControlTest {
             setupStandardMocks(roleAndGrantType, false);
 
             // NB: now filter RAs down to those the AccessProfile checks use
-            List<RoleAssignment> expectedRoleAssignments
+            List<RoleAssignment> expectedAccessProcessRoleAssignments
                 = filterRoleAssignmentsForAccessProfileServiceCall(filteredMatchingRoleAssignments);
 
-            // make the first AP check SUCCEED
-            setupAccessProfileCheckMocks(expectedRoleAssignments, List.of("AP1", "AP2"), true, true);
+            setupAccessGrantedCheckMocks_allSuccess(filteredMatchingRoleAssignments);
+            setupAccessProfileCheckMocks_firstSucceeds(expectedAccessProcessRoleAssignments);
 
             // WHEN
             CaseAccessMetadata caseAccessMetadata = defaultCaseDataAccessControl.generateAccessMetadata(CASE_ID);
@@ -1244,11 +1270,21 @@ class DefaultCaseDataAccessControlTest {
             assertNotNull(caseAccessMetadata);
             verifyNoInteractions(pseudoRoleAssignmentsGenerator);
 
-            // verify used RAs contain only filtered+matched RAs that are Standard / Specific / Challenged
-            verify(accessProfileService).generateAccessProfiles(roleAssignmentListCaptor.capture(), any());
-            List<RoleAssignment> roleAssignmentList = roleAssignmentListCaptor.getValue();
-            assertEquals(expectedRoleAssignments.size(), roleAssignmentList.size());
-            assertTrue(roleAssignmentList.containsAll(expectedRoleAssignments));
+            AccessProfileServiceCalls apServiceCalls = verifyAccessProfileServiceCalls();
+
+            // verify AccessGranted check only use filtered+matched RAs that are Basic, Standard, Specific or Challenged
+            // NB: filter RAs down to those the AccessGranted checks use
+            List<RoleAssignment> expectedAccessGrantedRoleAssignments
+                = filterRoleAssignmentsForAccessGrantedServiceCall(filteredMatchingRoleAssignments);
+            List<RoleAssignment> roleAssignmentAGList = apServiceCalls.allAccessGrantedRoleAssignmentsChecked();
+            assertEquals(expectedAccessGrantedRoleAssignments.size(), roleAssignmentAGList.size());
+            assertTrue(roleAssignmentAGList.containsAll(expectedAccessGrantedRoleAssignments));
+
+            // verify AccessProcess check only use filtered+matched RAs that are Standard, Specific or Challenged
+            assertEquals(1, apServiceCalls.accessProcessChecks.size());
+            List<RoleAssignment> roleAssignmentAPList = apServiceCalls.accessProcessRoleAssignmentsCheckedInFirstCall();
+            assertEquals(expectedAccessProcessRoleAssignments.size(), roleAssignmentAPList.size());
+            assertTrue(roleAssignmentAPList.containsAll(expectedAccessProcessRoleAssignments));
         }
 
         @Test
@@ -1260,8 +1296,8 @@ class DefaultCaseDataAccessControlTest {
             roleAndGrantType.put(ROLE_NAME_2, STANDARD.name());
             setupStandardMocks(roleAndGrantType, false);
 
-            // make the first AP check SUCCEED
-            setupAccessProfileCheckMocks(filteredMatchingRoleAssignments, List.of("AP1", "AP2"), true, true);
+            setupAccessGrantedCheckMocks_allSuccess(filteredMatchingRoleAssignments);
+            setupAccessProfileCheckMocks_firstSucceeds(filteredMatchingRoleAssignments);
 
             // WHEN
             CaseAccessMetadata caseAccessMetadata = defaultCaseDataAccessControl.generateAccessMetadata(CASE_ID);
@@ -1270,11 +1306,17 @@ class DefaultCaseDataAccessControlTest {
             assertNotNull(caseAccessMetadata);
             verifyNoInteractions(pseudoRoleAssignmentsGenerator);
 
-            // verify used RAs contain only filtered+matched RAs (i.e. no pseudo RAs)
-            verify(accessProfileService).generateAccessProfiles(roleAssignmentListCaptor.capture(), any());
-            List<RoleAssignment> roleAssignmentList = roleAssignmentListCaptor.getValue();
-            assertEquals(filteredMatchingRoleAssignments.size(), roleAssignmentList.size());
-            assertTrue(roleAssignmentList.containsAll(filteredMatchingRoleAssignments));
+            AccessProfileServiceCalls apServiceCalls = verifyAccessProfileServiceCalls();
+
+            // verify AccessGranted check used RAs contain only filtered+matched RAs (i.e. no pseudo RAs)
+            List<RoleAssignment> roleAssignmentAGList = apServiceCalls.allAccessGrantedRoleAssignmentsChecked();
+            assertEquals(filteredMatchingRoleAssignments.size(), roleAssignmentAGList.size());
+            assertTrue(roleAssignmentAGList.containsAll(filteredMatchingRoleAssignments));
+
+            // verify AccessProcess check used RAs contain only filtered+matched RAs (i.e. no pseudo RAs)
+            List<RoleAssignment> roleAssignmentAPList = apServiceCalls.accessProcessRoleAssignmentsCheckedInFirstCall();
+            assertEquals(filteredMatchingRoleAssignments.size(), roleAssignmentAPList.size());
+            assertTrue(roleAssignmentAPList.containsAll(filteredMatchingRoleAssignments));
         }
 
         @Test
@@ -1292,8 +1334,8 @@ class DefaultCaseDataAccessControlTest {
             filteredAndPseudoRolesAssignments.addAll(filteredMatchingRoleAssignments);
             filteredAndPseudoRolesAssignments.addAll(pseudoRoleAssignments);
 
-            // make the first AP check SUCCEED
-            setupAccessProfileCheckMocks(filteredAndPseudoRolesAssignments, List.of("AP1", "AP2"), true, true);
+            setupAccessGrantedCheckMocks_allSuccess(filteredAndPseudoRolesAssignments);
+            setupAccessProfileCheckMocks_firstSucceeds(filteredMatchingRoleAssignments);
 
             // WHEN
             CaseAccessMetadata caseAccessMetadata = defaultCaseDataAccessControl.generateAccessMetadata(CASE_ID);
@@ -1302,11 +1344,17 @@ class DefaultCaseDataAccessControlTest {
             assertNotNull(caseAccessMetadata);
             verify(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(filteredMatchingRoleAssignments, false);
 
-            // verify used RAs contain only filtered+matched RAs & pseudo RAs
-            verify(accessProfileService).generateAccessProfiles(roleAssignmentListCaptor.capture(), any());
-            List<RoleAssignment> roleAssignmentList = roleAssignmentListCaptor.getValue();
-            assertEquals(filteredAndPseudoRolesAssignments.size(), roleAssignmentList.size());
-            assertTrue(roleAssignmentList.containsAll(filteredAndPseudoRolesAssignments));
+            AccessProfileServiceCalls apServiceCalls = verifyAccessProfileServiceCalls();
+
+            // verify AccessGranted check used RAs contain only filtered+matched RAs & pseudo RAs
+            List<RoleAssignment> roleAssignmentAGList = apServiceCalls.allAccessGrantedRoleAssignmentsChecked();
+            assertEquals(filteredAndPseudoRolesAssignments.size(), roleAssignmentAGList.size());
+            assertTrue(roleAssignmentAGList.containsAll(filteredAndPseudoRolesAssignments));
+
+            // verify AccessProcess check used RAs contain only filtered+matched RAs & pseudo RAs
+            List<RoleAssignment> roleAssignmentAPList = apServiceCalls.accessProcessRoleAssignmentsCheckedInFirstCall();
+            assertEquals(filteredAndPseudoRolesAssignments.size(), roleAssignmentAPList.size());
+            assertTrue(roleAssignmentAPList.containsAll(filteredAndPseudoRolesAssignments));
         }
 
         @Test
@@ -1324,8 +1372,8 @@ class DefaultCaseDataAccessControlTest {
             roleAndGrantType.put(ROLE_NAME_2, STANDARD.name());
             setupStandardMocks(roleAndGrantType, false);
 
-            // make the first AP check SUCCEED
-            setupAccessProfileCheckMocks(filteredMatchingRoleAssignments, List.of("AP1", "AP2"), true, true);
+            setupAccessGrantedCheckMocks_allSuccess(filteredMatchingRoleAssignments);
+            setupAccessProfileCheckMocks_firstSucceeds(filteredMatchingRoleAssignments);
 
             // WHEN
             CaseAccessMetadata caseAccessMetadata = defaultCaseDataAccessControl.generateAccessMetadata(CASE_ID);
@@ -1335,7 +1383,8 @@ class DefaultCaseDataAccessControlTest {
             verifyNoInteractions(pseudoRoleAssignmentsGenerator);
 
             // verify Pseudo RoleToAccessProfilesMappings passed to AccessProfileService
-            verify(accessProfileService).generateAccessProfiles(any(), eq(pseudoGeneratedR2AP));
+            int numberOfCalls = numberOfExpectedGenerateAccessProfileCalls(filteredMatchingRoleAssignments);
+            verify(accessProfileService, times(numberOfCalls)).generateAccessProfiles(any(), eq(pseudoGeneratedR2AP));
         }
 
         @Test
@@ -1351,8 +1400,8 @@ class DefaultCaseDataAccessControlTest {
             roleAndGrantType.put(ROLE_NAME_2, STANDARD.name());
             setupStandardMocks(roleAndGrantType, false);
 
-            // make the first AP check SUCCEED
-            setupAccessProfileCheckMocks(filteredMatchingRoleAssignments, List.of("AP1", "AP2"), true, true);
+            setupAccessGrantedCheckMocks_allSuccess(filteredMatchingRoleAssignments);
+            setupAccessProfileCheckMocks_firstSucceeds(filteredMatchingRoleAssignments);
 
             // WHEN
             CaseAccessMetadata caseAccessMetadata = defaultCaseDataAccessControl.generateAccessMetadata(CASE_ID);
@@ -1362,7 +1411,8 @@ class DefaultCaseDataAccessControlTest {
             verifyNoInteractions(pseudoRoleToAccessProfileGenerator);
 
             // verify CaseType RoleToAccessProfilesMappings passed to AccessProfileService
-            verify(accessProfileService).generateAccessProfiles(any(), eq(caseTypeR2AP));
+            int numberOfCalls = numberOfExpectedGenerateAccessProfileCalls(filteredMatchingRoleAssignments);
+            verify(accessProfileService, times(numberOfCalls)).generateAccessProfiles(any(), eq(caseTypeR2AP));
         }
 
         @ParameterizedTest(
@@ -1381,6 +1431,7 @@ class DefaultCaseDataAccessControlTest {
             roleAndGrantType.put(ROLE_NAME_2, STANDARD.name());
             setupStandardMocks(roleAndGrantType, false);
 
+            setupAccessGrantedCheckMocks_allSuccess(filteredMatchingRoleAssignments);
             // make the first AP check FAIL
             setupAccessProfileCheckMocks(
                 filteredMatchingRoleAssignments, outputAccessProfiles, canAccessCaseType, canAccessCaseState
@@ -1398,19 +1449,112 @@ class DefaultCaseDataAccessControlTest {
             assertNotNull(caseAccessMetadata);
             verifyNoInteractions(pseudoRoleAssignmentsGenerator);
 
-            // verify AccessProfileService Called twice
-            verify(accessProfileService, times(2)).generateAccessProfiles(roleAssignmentListCaptor.capture(), any());
+            AccessProfileServiceCalls apServiceCalls = verifyAccessProfileServiceCalls();
+
+            // verify AccessProfileService Called twice for AccessProcess Checks
             // call 1
-            List<List<RoleAssignment>> roleAssignmentListValues = roleAssignmentListCaptor.getAllValues();
-            List<RoleAssignment> roleAssignmentList1 = roleAssignmentListValues.get(0);
+            List<RoleAssignment> roleAssignmentList1 = apServiceCalls.accessProcessRoleAssignmentsCheckedInFirstCall();
             assertEquals(filteredMatchingRoleAssignments.size(), roleAssignmentList1.size());
             assertTrue(roleAssignmentList1.containsAll(filteredMatchingRoleAssignments));
             // call 2
-            List<RoleAssignment> roleAssignmentList2 = roleAssignmentListValues.get(1);
+            List<RoleAssignment> roleAssignmentList2 = apServiceCalls.accessProcessChecks.get(1);
             assertEquals(roleAssignmentsRegionOrLocation.size(), roleAssignmentList2.size());
             assertTrue(roleAssignmentList2.containsAll(roleAssignmentsRegionOrLocation));
         }
 
+        @ParameterizedTest(
+            name = "generateAccessMetadata_returnsAccessGrantedList_excludingThoseWhenAGChecksFail: {0}, {1}, {2}"
+        )
+        @MethodSource(ACCESS_GRANTED_CHECK_NEGATIVE_MATCH_PARAMS)
+        void generateAccessMetadata_returnsAccessGrantedList_excludingThoseWhenAGChecksFail(
+            List<String> outputAccessProfiles,
+            boolean canAccessCaseType,
+            boolean canAccessCaseState
+        ) {
+
+            // GIVEN
+            Map<String, String> roleAndGrantType = Maps.newHashMap();
+            roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
+            roleAndGrantType.put(ROLE_NAME_2, CHALLENGED.name());
+            roleAndGrantType.put(ROLE_NAME_3, SPECIFIC.name());
+            roleAndGrantType.put(ROLE_NAME_4, STANDARD.name());
+            setupStandardMocks(roleAndGrantType, false);
+
+            // SUCCESS for role 1
+            RoleAssignment roleAssignment1 = filteredMatchingRoleAssignments.get(0);
+            setupAccessGrantedCheckMocks(roleAssignment1, List.of("AG1"), true, true);
+            // FAIL for role 2
+            RoleAssignment roleAssignment2 = filteredMatchingRoleAssignments.get(1);
+            setupAccessGrantedCheckMocks(roleAssignment2, outputAccessProfiles, canAccessCaseType, canAccessCaseState);
+            // SUCCESS for role 3
+            RoleAssignment roleAssignment3 = filteredMatchingRoleAssignments.get(2);
+            setupAccessGrantedCheckMocks(roleAssignment3, List.of("AG3"), true, true);
+            // FAIL for role 4
+            RoleAssignment roleAssignment4 = filteredMatchingRoleAssignments.get(3);
+            setupAccessGrantedCheckMocks(roleAssignment4, outputAccessProfiles, canAccessCaseType, canAccessCaseState);
+
+            setupAccessProfileCheckMocks_firstSucceeds(filteredMatchingRoleAssignments);
+
+            // WHEN
+            CaseAccessMetadata caseAccessMetadata = defaultCaseDataAccessControl.generateAccessMetadata(CASE_ID);
+
+            // THEN
+            assertNotNull(caseAccessMetadata);
+            verifyNoInteractions(pseudoRoleAssignmentsGenerator);
+
+            // only 2 grantTypes should have made it
+            assertEquals(2, caseAccessMetadata.getAccessGrants().size());
+
+            // check grant type for role 1 present
+            GrantType grantType1 = GrantType.valueOf(roleAssignment1.getGrantType());
+            assertTrue(caseAccessMetadata.getAccessGrants().contains(grantType1));
+            // check grant type for role 2 NOT present
+            GrantType grantType2 = GrantType.valueOf(roleAssignment2.getGrantType());
+            assertFalse(caseAccessMetadata.getAccessGrants().contains(grantType2));
+            // check grant type for role 3 present
+            GrantType grantType3 = GrantType.valueOf(roleAssignment3.getGrantType());
+            assertTrue(caseAccessMetadata.getAccessGrants().contains(grantType3));
+            // check grant type for role 4 NOT present
+            GrantType grantType4 = GrantType.valueOf(roleAssignment4.getGrantType());
+            assertFalse(caseAccessMetadata.getAccessGrants().contains(grantType4));
+        }
+
+        @ParameterizedTest(
+            name = "generateAccessMetadata_returnsAccessGrantedList_includingWhenAGChecksFailsThenPasses: {0}, {1}, {2}"
+        )
+        @MethodSource(ACCESS_GRANTED_CHECK_NEGATIVE_MATCH_PARAMS)
+        void generateAccessMetadata_returnsAccessGrantedList_includingWhenAGChecksFailsThenPasses(
+            List<String> outputAccessProfiles,
+            boolean canAccessCaseType,
+            boolean canAccessCaseState
+        ) {
+
+            // GIVEN
+            Map<String, String> roleAndGrantType = Maps.newHashMap();
+            roleAndGrantType.put(ROLE_NAME_1, STANDARD.name());
+            roleAndGrantType.put(ROLE_NAME_2, STANDARD.name());
+            setupStandardMocks(roleAndGrantType, false);
+
+            // FAIL for role 1
+            RoleAssignment roleAssignment1 = filteredMatchingRoleAssignments.get(0);
+            setupAccessGrantedCheckMocks(roleAssignment1, outputAccessProfiles, canAccessCaseType, canAccessCaseState);
+            // SUCCESS for role 2
+            RoleAssignment roleAssignment2 = filteredMatchingRoleAssignments.get(1);
+            setupAccessGrantedCheckMocks(roleAssignment2, List.of("AG2"), true, true);
+
+            setupAccessProfileCheckMocks_firstSucceeds(filteredMatchingRoleAssignments);
+
+            // WHEN
+            CaseAccessMetadata caseAccessMetadata = defaultCaseDataAccessControl.generateAccessMetadata(CASE_ID);
+
+            // THEN
+            assertNotNull(caseAccessMetadata);
+            verifyNoInteractions(pseudoRoleAssignmentsGenerator);
+
+            // expecting only 1 grantType of type STANDARD (as failed once but also passed at least once)
+            assertEquals(1, caseAccessMetadata.getAccessGrants().size());
+            assertEquals(STANDARD, caseAccessMetadata.getAccessGrants().get(0));
+        }
 
         @Test
         void generateAccessMetadata_returnsAccessProcessValueOf_none() {
@@ -1421,21 +1565,14 @@ class DefaultCaseDataAccessControlTest {
             roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
             setupStandardMocks(roleAndGrantType, false);
 
-            // make the first AP check SUCCEED
-            setupAccessProfileCheckMocks(
-                filterRoleAssignmentsForAccessProfileServiceCall(filteredMatchingRoleAssignments),
-                List.of("AP1", "AP2"),
-                true,
-                true
-            );
+            setupAccessGrantedCheckMocks_allSuccess(filteredMatchingRoleAssignments);
+            setupAccessProfileCheckMocks_firstSucceeds(filteredMatchingRoleAssignments);
 
             // WHEN
             CaseAccessMetadata caseAccessMetadata = defaultCaseDataAccessControl.generateAccessMetadata(CASE_ID);
 
             // THEN
             assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
-            assertEquals(String.join(",", BASIC.name(), STANDARD.name()),
-                caseAccessMetadata.getAccessGrantsString());
         }
 
         @ParameterizedTest(
@@ -1451,8 +1588,10 @@ class DefaultCaseDataAccessControlTest {
             // GIVEN
             Map<String, String> roleAndGrantType = Maps.newHashMap();
             roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
+            roleAndGrantType.put(ROLE_NAME_3, BASIC.name());
             setupStandardMocks(roleAndGrantType, false);
 
+            setupAccessGrantedCheckMocks_allSuccess(filteredMatchingRoleAssignments);
             // make the first AP check FAIL
             setupAccessProfileCheckMocks(
                 filteredMatchingRoleAssignments, outputAccessProfiles, canAccessCaseType, canAccessCaseState
@@ -1466,7 +1605,6 @@ class DefaultCaseDataAccessControlTest {
 
             // THEN
             assertEquals(AccessProcess.CHALLENGED.name(), caseAccessMetadata.getAccessProcessString());
-            assertEquals(BASIC.name(), caseAccessMetadata.getAccessGrantsString());
         }
 
         @ParameterizedTest(
@@ -1482,8 +1620,10 @@ class DefaultCaseDataAccessControlTest {
             // GIVEN
             Map<String, String> roleAndGrantType = Maps.newHashMap();
             roleAndGrantType.put(ROLE_NAME_2, STANDARD.name());
+            roleAndGrantType.put(ROLE_NAME_3, STANDARD.name());
             setupStandardMocks(roleAndGrantType, false);
 
+            setupAccessGrantedCheckMocks_allSuccess(filteredMatchingRoleAssignments);
             // make the first AP check FAIL
             setupAccessProfileCheckMocks(
                 filteredMatchingRoleAssignments, outputAccessProfiles, canAccessCaseType, canAccessCaseState
@@ -1499,7 +1639,6 @@ class DefaultCaseDataAccessControlTest {
 
             // THEN
             assertEquals(AccessProcess.SPECIFIC.name(), caseAccessMetadata.getAccessProcessString());
-            assertEquals(STANDARD.name(), caseAccessMetadata.getAccessGrantsString());
         }
 
         @ParameterizedTest(
@@ -1517,8 +1656,10 @@ class DefaultCaseDataAccessControlTest {
             // GIVEN
             Map<String, String> roleAndGrantType = Maps.newHashMap();
             roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
+            roleAndGrantType.put(ROLE_NAME_3, BASIC.name());
             setupStandardMocks(roleAndGrantType, false);
 
+            setupAccessGrantedCheckMocks_allSuccess(filteredMatchingRoleAssignments);
             // make the first AP check FAIL
             setupAccessProfileCheckMocks(
                 filteredMatchingRoleAssignments, outputAccessProfiles, canAccessCaseType, canAccessCaseState
@@ -1532,10 +1673,12 @@ class DefaultCaseDataAccessControlTest {
 
             // THEN
             assertEquals(AccessProcess.SPECIFIC.name(), caseAccessMetadata.getAccessProcessString());
-            assertEquals(BASIC.name(), caseAccessMetadata.getAccessGrantsString());
 
-            // verify lookup only once: i.e. second call skipped as no region or location RoleAssignments exist
-            verify(accessProfileService, times(1)).generateAccessProfiles(any(), any());
+            AccessProfileServiceCalls apServiceCalls = verifyAccessProfileServiceCalls();
+
+            // verify AccessProcess check lookup only once:
+            //    i.e. second call skipped as no region or location RoleAssignments exist
+            assertEquals(1, apServiceCalls.accessProcessChecks.size());
         }
 
         @Test
@@ -1550,15 +1693,19 @@ class DefaultCaseDataAccessControlTest {
             roleAndGrantType.put(ROLE_NAME_4, BASIC.name());
             setupStandardMocks(roleAndGrantType, true);
 
-            List<RoleAssignment> filteredAndPseudoRolesAssignments = new ArrayList<>();
-            filteredAndPseudoRolesAssignments.addAll(
-                // NB: must filter out BASiC here but will see it again in output: caseAccessMetadata.getAccessGrants()
+            List<RoleAssignment> filteredForAGChecksAndPseudoRolesAssignments = new ArrayList<>();
+            filteredForAGChecksAndPseudoRolesAssignments.addAll(filteredMatchingRoleAssignments);
+            filteredForAGChecksAndPseudoRolesAssignments.addAll(pseudoRoleAssignments);
+
+            List<RoleAssignment> filteredForAPChecksAndPseudoRolesAssignments = new ArrayList<>();
+            filteredForAPChecksAndPseudoRolesAssignments.addAll(
+                // NB: must filter out BASIC here but will see it again in output: caseAccessMetadata.getAccessGrants()
                 filterRoleAssignmentsForAccessProfileServiceCall(filteredMatchingRoleAssignments)
             );
-            filteredAndPseudoRolesAssignments.addAll(pseudoRoleAssignments);
+            filteredForAPChecksAndPseudoRolesAssignments.addAll(pseudoRoleAssignments);
 
-            // make the first AP check SUCCEED
-            setupAccessProfileCheckMocks(filteredAndPseudoRolesAssignments, List.of("AP1", "AP2"), true, true);
+            setupAccessGrantedCheckMocks_allSuccess(filteredForAGChecksAndPseudoRolesAssignments);
+            setupAccessProfileCheckMocks_firstSucceeds(filteredForAPChecksAndPseudoRolesAssignments);
 
             // WHEN
             CaseAccessMetadata caseAccessMetadata = defaultCaseDataAccessControl.generateAccessMetadata(CASE_ID);
@@ -1597,6 +1744,33 @@ class DefaultCaseDataAccessControlTest {
                 doReturn(pseudoRoleAssignments).when(pseudoRoleAssignmentsGenerator)
                     .createPseudoRoleAssignments(filteredMatchingRoleAssignments, false);
             }
+        }
+
+        private void setupAccessGrantedCheckMocks_allSuccess(List<RoleAssignment> inputRoleAssignments) {
+            List<RoleAssignment> roleAssignments
+                = filterRoleAssignmentsForAccessGrantedServiceCall(inputRoleAssignments);
+
+            for (int i = 0; i < roleAssignments.size(); i++) {
+                setupAccessGrantedCheckMocks(roleAssignments.get(i), List.of("AG" + (i + 1)), true, true);
+            }
+        }
+
+        private void setupAccessGrantedCheckMocks(RoleAssignment roleAssignment,
+                                                List<String> outputAccessProfiles,
+                                                boolean canAccessCaseType,
+                                                boolean canAccessCaseState) {
+
+            // NB: same mocks as AP checks but each RA checked separately
+            setupAccessProfileCheckMocks(
+                List.of(roleAssignment),
+                outputAccessProfiles,
+                canAccessCaseType,
+                canAccessCaseState
+            );
+        }
+
+        private void setupAccessProfileCheckMocks_firstSucceeds(List<RoleAssignment> inputRoleAssignments) {
+            setupAccessProfileCheckMocks(inputRoleAssignments, List.of("AP1", "AP2"), true, true);
         }
 
         private void setupAccessProfileCheckMocks(List<RoleAssignment> inputRoleAssignments,
@@ -1654,19 +1828,55 @@ class DefaultCaseDataAccessControlTest {
             );
         }
 
-        private List<RoleAssignment> filterRoleAssignmentsForAccessProfileServiceCall(
-            List<RoleAssignment> roleAssignments
-        ) {
+        private List<RoleAssignment> filterRoleAssignments(List<RoleAssignment> roleAssignments,
+                                                           List<GrantType> grantTypeFilter) {
+            List<String> grantTypeString = grantTypeFilter.stream().map(GrantType::name).collect(Collectors.toList());
             return  roleAssignments.stream()
-                .filter(roleAssignment ->
-                    List.of(
-                        STANDARD.name(),
-                        SPECIFIC.name(),
-                        CHALLENGED.name()
-                    ).contains(roleAssignment.getGrantType())
+                .filter(roleAssignment -> grantTypeString.contains(roleAssignment.getGrantType())
                 ).collect(Collectors.toList());
         }
 
+        private List<RoleAssignment> filterRoleAssignmentsForAccessGrantedServiceCall(
+            List<RoleAssignment> roleAssignments
+        ) {
+            return  filterRoleAssignments(roleAssignments, List.of(BASIC, STANDARD, SPECIFIC, CHALLENGED));
+        }
+
+        private List<RoleAssignment> filterRoleAssignmentsForAccessProfileServiceCall(
+            List<RoleAssignment> roleAssignments
+        ) {
+            return filterRoleAssignments(roleAssignments, List.of(STANDARD, SPECIFIC, CHALLENGED));
+        }
+
+        private int numberOfExpectedGenerateAccessProfileCalls(List<RoleAssignment> roleAssignments) {
+            // number of AG calls + number of AP calls (usually 1)
+            return filterRoleAssignmentsForAccessGrantedServiceCall(roleAssignments).size() + 1;
+        }
+
+        private AccessProfileServiceCalls verifyAccessProfileServiceCalls() {
+            verify(accessProfileService, atLeast(1)).generateAccessProfiles(roleAssignmentListCaptor.capture(), any());
+            List<List<RoleAssignment>> roleAssignmentListValues = roleAssignmentListCaptor.getAllValues();
+            List<List<RoleAssignment>> accessGrantedChecks = new ArrayList<>();
+            List<List<RoleAssignment>> accessProcessChecks = new ArrayList<>();
+
+            boolean searchingForAccessGrantedCalls = true;
+            // Sort calls in to AccessGrant and AccessProcess checks:
+            //    The AG calls will come first and will always be for singular RoleAssignments (i.e. size() = 1)
+            //    NB: Our test data will always use multiple RAs so we have a safe cut-over once size() > 1.
+            for (List<RoleAssignment> roleAssignmentList : roleAssignmentListValues) {
+                if (searchingForAccessGrantedCalls && roleAssignmentList.size() == 1) {
+                    accessGrantedChecks.add(roleAssignmentList);
+                } else {
+                    searchingForAccessGrantedCalls = false;
+                    accessProcessChecks.add(roleAssignmentList);
+                }
+            }
+
+            return AccessProfileServiceCalls.builder()
+                .accessGrantedChecks(accessGrantedChecks)
+                .accessProcessChecks(accessProcessChecks)
+                .build();
+        }
     }
 
 
@@ -1677,6 +1887,22 @@ class DefaultCaseDataAccessControlTest {
         return JacksonUtils.convertValue(mapper.readTree(caseData));
     }
 
+    private static final String ACCESS_GRANTED_CHECK_NEGATIVE_MATCH_PARAMS
+        = "uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControlTest"
+        + "#accessGrantedCheckNegativeMatchParams";
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> accessGrantedCheckNegativeMatchParams() {
+        return Stream.of(
+            // NB: params correspond to:
+            // * outputAccessProfiles :: mock output for accessProfileService.generateAccessProfiles(...)
+            // * canAccessCaseType :: mock output for accessControlService.canAccessCaseTypeWithCriteria(...)
+            // * canAccessCaseState :: mock output for accessControlService.canAccessCaseStateWithCriteria(...)
+            Arguments.of(List.of(), true, true),
+            Arguments.of(List.of("AG1", "AG2"), false, true),
+            Arguments.of(List.of("AG1", "AG2"), true, false)
+        );
+    }
 
     private static final String ACCESS_PROFILE_CHECK_NEGATIVE_MATCH_PARAMS
         = "uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControlTest"
