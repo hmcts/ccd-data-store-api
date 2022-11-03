@@ -153,8 +153,7 @@ public class CaseDataValidator {
                     new ValidationResult(result.getErrorMessage(), fieldIdPrefix + result.getFieldId()))
                 .collect(Collectors.toList()))
             .orElseThrow(() -> {
-                log.error("Error validating caseField={} of baseType={}. "
-                        + "Verify the baseType has write access.",
+                log.error("CaseField={} of baseType={} doesn't have write access",
                         fieldIdPrefix + fieldId, fieldType.getType());
                 return new RuntimeException("System error: No validator found for " + fieldType.getType());
             });

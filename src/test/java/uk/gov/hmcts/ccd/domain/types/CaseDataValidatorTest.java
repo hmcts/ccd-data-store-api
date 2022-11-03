@@ -716,12 +716,12 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         List<ILoggingEvent> loggingEventList = listAppender.list;
         String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                        "Error validating caseField=NoValidatorForFieldType.0.Line1 of baseType=Label. "
-                                + "Verify the baseType has write access.");
+                        "CaseField=NoValidatorForFieldType.0.Line1 of baseType=Label doesn't have write access");
         assertAll(
                 () -> MatcherAssert.assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
                 () -> MatcherAssert.assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
         );
+        listAppender.stop();
         logger.detachAndStopAllAppenders();
     }
 }

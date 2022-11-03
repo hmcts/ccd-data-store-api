@@ -58,7 +58,7 @@ public interface AccessControlService {
     String NO_CASE_STATE_FOUND = "Invalid event";
     String NO_EVENT_FOUND = "No event found";
     String NO_FIELD_FOUND = "No field found";
-    String NO_ROLE_FOUND = "No relevant access for {}={}. userProfile={}, requiredProfile={}";
+    String NO_ROLE_FOUND = "User doesn't have required access for {}={}. userRoles={}, caseFieldACL={}";
     String VALUE = "value";
     String ALL = "*";
 
