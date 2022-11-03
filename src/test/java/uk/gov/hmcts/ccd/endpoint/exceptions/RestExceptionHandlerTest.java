@@ -37,6 +37,7 @@ import uk.gov.hmcts.ccd.endpoint.ui.UserProfileEndpoint;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -367,6 +368,23 @@ public class RestExceptionHandlerTest {
 
         // ASSERT
         assertHttpErrorResponse(result, expectedException, HttpStatus.GATEWAY_TIMEOUT);
+    }
+
+    @Test
+    public void handleUnknownHostException_shouldReturnBadGateway() throws Exception {
+
+        // ARRANGE
+        String myUniqueExceptionMessage = "My unique generic runtime exception message";
+        UnknownHostException unknownHostException = new UnknownHostException("some unknownHostException error");
+        ServiceException expectedException = new ServiceException(myUniqueExceptionMessage, unknownHostException);
+
+        setupMockServiceToThrowException(expectedException);
+
+        // ACT
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
+
+        // ASSERT
+        assertHttpErrorResponse(result, expectedException, HttpStatus.BAD_GATEWAY);
     }
 
     @Test
