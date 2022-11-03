@@ -292,9 +292,9 @@ public class AccessControlServiceTest {
                     CAN_CREATE), is(false))
             );
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
-                    NO_ROLE_FOUND,
-                    "caseState", STATE_ID1, extractAccessProfileNames(ACCESS_PROFILES),
-                    "[ACL{accessProfile='caseworker-divorce-loa4', crud=CR}]"
+                    NO_ROLE_FOUND, "caseState", STATE_ID1,
+                    extractAccessProfileNames(ACCESS_PROFILES),
+                    "caseStateACL", "[ACL{accessProfile='caseworker-divorce-loa4', crud=CR}]"
             );
             loggingEventList = listAppender.list;
             assertAll(
@@ -484,7 +484,7 @@ public class AccessControlServiceTest {
 
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
                     NO_ROLE_FOUND, "caseField", ADDRESSES,
-                    extractAccessProfileNames(ACCESS_PROFILES),
+                    extractAccessProfileNames(ACCESS_PROFILES), "caseFieldACL",
                     "[ACL{accessProfile='caseworker-divorce-loa4', crud=CR}]"
             );
 
@@ -1342,7 +1342,7 @@ public class AccessControlServiceTest {
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
                     NO_ROLE_FOUND, "caseEvent", EVENT_ID,
                     extractAccessProfileNames(ACCESS_PROFILES),
-                    "[ACL{accessProfile='caseworker-divorce-loa4', crud=C}]");
+                    "caseEventACL", "[ACL{accessProfile='caseworker-divorce-loa4', crud=C}]");
             assertAll(
                     () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
                     () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
@@ -1513,7 +1513,8 @@ public class AccessControlServiceTest {
             loggingEventList = listAppender.list;
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
                     NO_ROLE_FOUND, "caseType", caseType.getId(),
-                    "[caseworker-divorce-loa, caseworker-probate-loa3, caseworker-probate-loa1]", List.of());
+                    "[caseworker-divorce-loa, caseworker-probate-loa3, caseworker-probate-loa1]",
+                    "caseTypeACL", List.of());
 
             assertAll(
                     () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.INFO)),
@@ -4647,7 +4648,7 @@ public class AccessControlServiceTest {
             loggingEventList = listAppender.list;
             String expectedLogMessage = TestBuildersUtil.formatLogMessage(
                     NO_ROLE_FOUND, "caseField", "NotesNoReadAccessForRole",
-                    extractAccessProfileNames(ACCESS_PROFILES),
+                    extractAccessProfileNames(ACCESS_PROFILES), "caseFieldACL",
                     "[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]");
 
             assertAll(
@@ -4689,8 +4690,12 @@ public class AccessControlServiceTest {
 
     @After
     public void tearDown() {
-        listAppender.stop();
-        logger.detachAndStopAllAppenders();
+        if (listAppender != null) {
+            listAppender.stop();
+        }
+        if (logger != null) {
+            logger.detachAndStopAllAppenders();
+        }
     }
 
     private JsonNode getTextNode(String value) {

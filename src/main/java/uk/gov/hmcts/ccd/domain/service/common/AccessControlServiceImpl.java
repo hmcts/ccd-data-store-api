@@ -63,6 +63,7 @@ public class AccessControlServiceImpl implements AccessControlService {
             LOG.info(NO_ROLE_FOUND, "caseType",
                     caseType.getId(),
                     AccessControlService.extractAccessProfileNames(accessProfiles),
+                    "caseTypeACL",
                     caseType.getAccessControlLists());
         }
 
@@ -88,6 +89,7 @@ public class AccessControlServiceImpl implements AccessControlService {
             LOG.error(NO_ROLE_FOUND, "caseState",
                     caseState,
                     AccessControlService.extractAccessProfileNames(accessProfiles),
+                    "caseStateACL",
                     stateACLs);
         }
         return hasAccess;
@@ -125,6 +127,7 @@ public class AccessControlServiceImpl implements AccessControlService {
             LOG.info(NO_ROLE_FOUND, "caseField",
                     caseViewField.getId(),
                     AccessControlService.extractAccessProfileNames(accessProfiles),
+                    "caseFieldACL",
                     caseViewField.getAccessControlLists());
             return false;
         }
@@ -382,6 +385,7 @@ public class AccessControlServiceImpl implements AccessControlService {
         LOG.error(NO_ROLE_FOUND, "caseField",
                 fieldName,
                 AccessControlService.extractAccessProfileNames(accessProfiles),
+                "caseFieldACL",
                 getCaseFieldAcls(caseFieldDefinitions, fieldName));
         return false;
     }
