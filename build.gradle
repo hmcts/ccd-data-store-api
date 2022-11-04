@@ -258,7 +258,7 @@ dependencies {
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'
     testCompile 'pl.allegro.tech:embedded-elasticsearch:2.7.0'
-    testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
+    testCompile 'com.github.hmcts:fortify-client:1.3.0:all'
     testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
     // for sonar analysis
