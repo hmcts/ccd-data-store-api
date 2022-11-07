@@ -46,8 +46,8 @@ The following environment variables are required:
 | HTTP_CLIENT_CONNECTION_DRAFTS_TIMEOUT | 500 | 500 milliseconds, Used for Pooling connection manager for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html                       |
 | DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance.                                                                                                     |
 | DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with.                                                                                                              |
-| DRAFT_TTL_DAYS | - | It used to define the cache type, possible cache values 1) hazelcast or 2) redis.                                                                                                                    |
-| CACHE_TYPE     | - | Number of days after which the saved draft will be deleted if unmodified.                                                                                                                            |
+| DRAFT_TTL_DAYS | - | Number of days after which the saved draft will be deleted if unmodified.                                                                                                                            |
+| CACHE_TYPE     | - | It used to define the cache type, possible cache values 1) hazelcast or 2) redis.                                                                                                                    |
 | REDIS_HOST     | - | Redis url (only used for cache type redis).                                                                                                                                                          |
 | REDIS_PORT     | - | Redis port (only used for cache type redis).                                                                                                                                                         |
 ### Building
@@ -98,7 +98,7 @@ You don't need to migrate database manually since migrations are executed every 
 
 You can connect to the database at `http://localhost:5452` with the username and password set in the environment variables.
 
-### Applicaition cache
+### Application cache
 In the property file application.properties we have the following settings to define the cache mechanism. **Distributed Redis or hazelcast**.
 We can used the env vars (CACHE_TYPE, REDIS_HOST and REDIS_PORT) to define the cache settings.
 
