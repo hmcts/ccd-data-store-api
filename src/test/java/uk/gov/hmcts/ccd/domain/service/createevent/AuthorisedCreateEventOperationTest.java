@@ -61,7 +61,9 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
@@ -415,6 +417,30 @@ class AuthorisedCreateEventOperationTest {
     @Test
     @DisplayName("should fail if no event provided")
     void shouldFailIfNoEventProvided() {
+        assertCreateEventLogs(INVALID_CASE_DATA_CONTENT);
+    }
+
+    @Test
+    @DisplayName("should fail if eventId is null")
+    void shouldFailIfEventIdIsNull() {
+        Event event = new Event();
+        event.setEventId(null);
+        INVALID_CASE_DATA_CONTENT.setEvent(event);
+        assertCreateEventLogs(INVALID_CASE_DATA_CONTENT);
+        assertNull(INVALID_CASE_DATA_CONTENT.getEvent().getEventId());
+    }
+
+    @Test
+    @DisplayName("should fail if eventId is empty")
+    void shouldFailIfEventIdIsEmpty() {
+        Event event = new Event();
+        event.setEventId("");
+        INVALID_CASE_DATA_CONTENT.setEvent(event);
+        assertCreateEventLogs(INVALID_CASE_DATA_CONTENT);
+        assertTrue(INVALID_CASE_DATA_CONTENT.getEvent().getEventId().isEmpty());
+    }
+
+    private void assertCreateEventLogs(CaseDataContent caseDataContent) {
         Logger logger = (Logger) LoggerFactory.getLogger(AuthorisedCreateEventOperation.class);
         ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
         listAppender.start();
@@ -422,7 +448,7 @@ class AuthorisedCreateEventOperationTest {
 
         logger.setLevel(Level.ERROR);
         assertThrows(ResourceNotFoundException.class, () ->
-            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, INVALID_CASE_DATA_CONTENT));
+                authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent));
 
         List<ILoggingEvent> loggingEventList = listAppender.list;
         assertAll(

@@ -1464,7 +1464,7 @@ public class AccessControlServiceTest {
 
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
-                    caseType,
+                    null,
                     ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
@@ -1521,6 +1521,19 @@ public class AccessControlServiceTest {
                     () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
 
+        }
+
+        @Test
+        @DisplayName("Should not grant access to case if caseType is null")
+        void shouldNotGrantAccessToCaseIfCaseTypeIsNull() {
+            final CaseTypeDefinition caseType = newCaseType().build();
+
+            assertThat(
+                    accessControlService.canAccessCaseTypeWithCriteria(
+                            null,
+                            ACCESS_PROFILES,
+                            CAN_CREATE),
+                    is(false));
         }
 
         @Test
