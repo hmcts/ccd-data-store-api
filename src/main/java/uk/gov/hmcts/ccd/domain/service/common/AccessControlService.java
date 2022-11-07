@@ -570,7 +570,7 @@ public interface AccessControlService {
                                        Set<AccessProfile> accessProfiles,
                                        Predicate<AccessControlList> criteria) {
         Optional<CaseEventDefinition> matchedEvent = caseEventDefinitions.stream()
-                .filter(caseField -> caseField.getId().equals(eventId))
+                .filter(caseEvent -> caseEvent.getId().equals(eventId))
                 .findFirst();
         if (matchedEvent.isEmpty()) {
             LOG.error("No matching caseEvent={} in caseEventDefinitions", eventId);
