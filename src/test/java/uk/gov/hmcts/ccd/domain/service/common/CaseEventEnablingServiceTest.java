@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ class CaseEventEnablingServiceTest {
     @Test
     void shouldReturnTrueWhenEnablingConditionIsNull() {
         Boolean value = this.caseEventEnablingService.isEventEnabled(
-            null, new CaseDetails());
+            null, new CaseDetails(), Collections.emptyList());
 
         assertTrue(value);
     }
@@ -39,7 +40,7 @@ class CaseEventEnablingServiceTest {
     @Test
     void shouldReturnTrueWhenEnablingConditionIsEmpty() {
         Boolean value = this.caseEventEnablingService.isEventEnabled(
-            "",  new CaseDetails());
+            "",  new CaseDetails(), Collections.emptyList());
 
         assertTrue(value);
     }
@@ -49,7 +50,7 @@ class CaseEventEnablingServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setData(new HashMap<>());
         this.caseEventEnablingService.isEventEnabled(
-            "FieldA='Test' AND FieldB='Test1'",  caseDetails);
+            "FieldA='Test' AND FieldB='Test1'",  caseDetails, Collections.emptyList());
 
         verify(this.enablingConditionParser,
             times(1)).evaluate(any(String.class), any(Map.class));

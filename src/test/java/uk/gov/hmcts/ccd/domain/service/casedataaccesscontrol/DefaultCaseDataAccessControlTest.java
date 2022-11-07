@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.assertj.core.util.Lists;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -46,6 +48,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DownstreamIssueException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1060,6 +1063,97 @@ class DefaultCaseDataAccessControlTest {
         assertThatExceptionOfType(DownstreamIssueException.class)
             .isThrownBy(() -> defaultCaseDataAccessControl.getUserClassifications(caseDetails))
             .withMessage("null SecurityClassification for role: TEST_ROLE_1");
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesForRestrictedCases() {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+
+        RoleAssignment roleAssignment1 = RoleAssignment.builder()
+            .grantType(BASIC.name())
+            .roleName(ROLE_NAME_3)
+            .classification(Classification.PUBLIC.name())
+            .build();
+        RoleAssignment roleAssignment2 = RoleAssignment.builder()
+            .grantType(STANDARD.name())
+            .roleName(ROLE_NAME_5)
+            .classification(Classification.PUBLIC.name())
+            .build();
+        dummyAccessProfiles = List.of(
+            AccessProfile.builder()
+                .accessProfile(ROLE_NAME_3)
+                .caseAccessCategories(null)
+                .build());
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        roleAssignments.setRoleAssignments(List.of(roleAssignment1, roleAssignment2));
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class), anyList());
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_3);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(List.of(roleAssignment1)).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+        doReturn(dummyAccessProfiles).when(accessProfileService)
+            .generateAccessProfiles(argThat(list -> list.size() == 1 && list.get(0) == roleAssignment1), any());
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesForRestrictedCase(caseDetails);
+        Set<String> userRole = newHashSet(ROLE_NAME_3);
+        assertNotNull(accessProfiles);
+        assertEquals(1, accessProfiles.size());
+        Assert.assertTrue(userRole.contains(accessProfiles.iterator().next().getAccessProfile()));
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class),
+                argThat(list -> list.contains(MatcherType.SECURITYCLASSIFICATION)));
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldNotGenerateAccessProfilesWithInvalidRoleAssignmentsForRestrictedCases() {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+
+        RoleAssignment roleAssignmentWithInvalidName = RoleAssignment.builder()
+            .grantType(BASIC.name())
+            .roleName(ROLE_NAME_1)
+            .classification(Classification.PUBLIC.name())
+            .build();
+        RoleAssignment roleAssignmentWithInvalidGrantType = RoleAssignment.builder()
+            .grantType(STANDARD.name())
+            .roleName(ROLE_NAME_3)
+            .classification(Classification.PUBLIC.name())
+            .build();
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        roleAssignments.setRoleAssignments(List.of(roleAssignmentWithInvalidName, roleAssignmentWithInvalidGrantType));
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class), anyList());
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1, ROLE_NAME_3);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        doReturn(List.of()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesForRestrictedCase(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(0, accessProfiles.size());
+        verify(roleAssignmentsFilteringService)
+            .filter(argThat(ras -> ras.getRoleAssignments().isEmpty()), any(CaseDetails.class), any());
     }
 
 

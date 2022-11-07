@@ -311,7 +311,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         final PaginatedSearchMetadata byMetaData =
             caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
-        assertThat(byMetaData.getTotalResultsCount(), is(7));
+        assertThat(byMetaData.getTotalResultsCount(), is(8));
     }
 
     @Test
@@ -409,7 +409,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             caseDetailsRepository.getPaginatedSearchMetadata(metadata,
             new HashMap<>());
         assertAll(
-            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(5)),
+            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(6)),
             () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(3))
         );
     }
