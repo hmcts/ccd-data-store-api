@@ -102,18 +102,6 @@ You can connect to the database at `http://localhost:5452` with the username and
 In the property file application.properties we have the following settings to define the cache mechanism. **Distributed Redis or hazelcast**.
 We can used the env vars (CACHE_TYPE, REDIS_HOST and REDIS_PORT) to define the cache settings.
 
-Please note that we have to comment in the application.properties **spring.autoconfigure.exclude** for redis settings. 
-
-A) Redis settings 
-```aidl
-#spring.autoconfigure.exclude= org.springframework.boot.actuate.autoconfigure.redis.RedisHealthContributorAutoConfiguration, org.springframework.boot.actuate.autoconfigure.redis.RedisReactiveHealthContributorAutoConfiguration, org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration, org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration,org.redisson.spring.starter.RedissonAutoConfiguration
-```
-B) hazelcast settings
-```aidl
-spring.autoconfigure.exclude= org.springframework.boot.actuate.autoconfigure.redis.RedisHealthContributorAutoConfiguration, org.springframework.boot.actuate.autoconfigure.redis.RedisReactiveHealthContributorAutoConfiguration, org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration, org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration,org.redisson.spring.starter.RedissonAutoConfiguration
-
-```
-
 ### Functional Tests
 The functional tests are located in `aat` folder. Most of the tests are written using 
 befta-fw library, while there are also quite a number of them written using RestAssured. 
