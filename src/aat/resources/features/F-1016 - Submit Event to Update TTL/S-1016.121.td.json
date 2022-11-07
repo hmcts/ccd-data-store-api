@@ -50,7 +50,7 @@
     "body": {
       "id": "${}${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "jurisdiction": "BEFTA_MASTER",
-      "case_type": "FT_TTL",
+      "case_type": "FT_TTL_v2",
 
       "data": {
         "TTL" : {

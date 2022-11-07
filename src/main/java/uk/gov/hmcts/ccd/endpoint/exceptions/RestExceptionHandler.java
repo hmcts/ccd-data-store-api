@@ -146,6 +146,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             return HttpStatus.GATEWAY_TIMEOUT;
         }
 
+        if (isUnknownHostException(causeOfException)) {
+            return HttpStatus.BAD_GATEWAY;
+        }
+
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
@@ -182,6 +186,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         Throwable innerException = causeOfException.getCause();
         return innerException instanceof java.net.SocketTimeoutException
             && innerException.getMessage().contains("Read timed out");
+    }
+
+    private boolean isUnknownHostException(final Throwable causeOfException) {
+        return causeOfException instanceof java.net.UnknownHostException;
     }
 
 }

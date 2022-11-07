@@ -16,7 +16,7 @@
   "request": {
     "pathVariables": {
       "jid": "BEFTA_MASTER",
-      "ctid": "FT_TTL",
+      "ctid": "FT_TTL_v2",
       "etid": "createCase"
     }
   },

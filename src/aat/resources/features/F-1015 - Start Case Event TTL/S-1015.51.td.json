@@ -40,7 +40,7 @@
         "version": 1,
 
         "jurisdiction": "BEFTA_MASTER",
-        "case_type_id": "FT_TTL",
+        "case_type_id": "FT_TTL_v2",
 
         "case_data": {
           "TTL" : {

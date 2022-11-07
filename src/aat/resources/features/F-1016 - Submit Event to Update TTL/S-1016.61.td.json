@@ -44,7 +44,7 @@
       "id" : "[[ANYTHING_PRESENT]]",
 
       "jurisdiction" : "BEFTA_MASTER",
-      "case_type" : "FT_TTL",
+      "case_type" : "FT_TTL_v2",
 
       "state" : "CaseUpdated",
 

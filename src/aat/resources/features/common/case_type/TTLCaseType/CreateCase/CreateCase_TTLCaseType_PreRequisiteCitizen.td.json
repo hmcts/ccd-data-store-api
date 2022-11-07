@@ -19,7 +19,7 @@
   "request": {
     "pathVariables": {
       "jid": "BEFTA_MASTER",
-      "ctid": "FT_TTL"
+      "ctid": "FT_TTL_v2"
     },
     "body": {
       "data": {
@@ -40,7 +40,7 @@
       "jurisdiction": "BEFTA_MASTER",
       "state": "CaseCreated",
       "version": 0,
-      "case_type_id": "FT_TTL",
+      "case_type_id": "FT_TTL_v2",
       "created_date": "[[ANYTHING_PRESENT]]",
       "last_modified": "[[ANYTHING_PRESENT]]",
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
