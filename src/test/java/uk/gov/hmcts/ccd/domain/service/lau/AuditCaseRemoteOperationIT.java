@@ -37,7 +37,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -105,7 +104,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private static final int AUDIT_NOT_FOUND_HTTP_STATUS = 404;
 
     private static final String SEARCH_LOG_USER_ID = IDAM_ID;
-    private static final List<String> SEARCH_LOG_CASE_REFS = Arrays.asList(CASE_ID);
+    private static final String SEARCH_LOG_CASE_REFS = CASE_ID;
 
     private static final String ACTION_LOG_USER_ID = IDAM_ID;
     private static final String ACTION_LOG_CASE_REF = CASE_ID;
@@ -136,20 +135,13 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
 
     @Test
     public void shouldMakeAuditRequestWhenPerformingCaseSearch() throws JsonProcessingException, InterruptedException {
-        AuditContext auditContext = AuditContext.auditContextWith()
-            .caseId(CASE_ID)
-            .auditOperationType(AuditOperationType.SEARCH_CASE)
-            .jurisdiction(JURISDICTION)
-            .caseType(CASE_TYPE)
-            .httpStatus(200)
-            .build();
 
-        CaseSearchPostRequest caseSearchPostRequest = new CaseSearchPostRequest(
-            new SearchLog(
-                SEARCH_LOG_USER_ID,
-                SEARCH_LOG_CASE_REFS,
-                LOG_TIMESTAMP)
-        );
+        final SearchLog searchLog = new SearchLog();
+        searchLog.setUserId(SEARCH_LOG_USER_ID);
+        searchLog.setCaseRefs(SEARCH_LOG_CASE_REFS);
+        searchLog.setTimestamp(LOG_TIMESTAMP);
+
+        CaseSearchPostRequest caseSearchPostRequest = new CaseSearchPostRequest(searchLog);
 
         stubFor(WireMock.post(urlMatching(SEARCH_AUDIT_ENDPOINT))
             .withHeader(SERVICE_AUTHORIZATION_HEADER, matching("Bearer .+"))
@@ -158,6 +150,14 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
                 .withStatus(SEARCH_AUDIT_HTTP_STATUS)));
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+
+        AuditContext auditContext = AuditContext.auditContextWith()
+                .caseId(CASE_ID)
+                .auditOperationType(AuditOperationType.SEARCH_CASE)
+                .jurisdiction(JURISDICTION)
+                .caseType(CASE_TYPE)
+                .httpStatus(200)
+                .build();
 
         auditService.audit(auditContext);
         waitForPossibleAuditResponse(SEARCH_AUDIT_ENDPOINT);
