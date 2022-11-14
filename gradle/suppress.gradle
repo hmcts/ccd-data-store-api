@@ -54,7 +54,7 @@ static void addNewSuppression(unSuppressedCves, suppressionDoc) {
                 String cveValue = it
                 if (cveValue.contains("CVE")) {
                     noteNode.appendChild(
-                            document.createTextNode(Globals.WHITE_NAME_FOR_INDENT + cveValue + " refer [Ticket]"))
+                            document.createTextNode(Globals.WHITE_SPACE_FOR_INDENT + cveValue + " refer [Ticket]"))
                     parentNode.appendChild(
                             document.createElement("cve")).appendChild(document.createTextNode(cveValue))
                 }
@@ -96,7 +96,7 @@ static def cleanXml(Element suppressionDoc) {
 class Globals {
     static String TEXT_TO_FIND = "Temporary Suppression"
     static String REPORT_NAME = "dependency-check-report.xml"
-    static String WHITE_NAME_FOR_INDENT = "\n" + "\u0020".repeat(8) // white space for indentation
+    static String WHITE_SPACE_FOR_INDENT = "\n" + "\u0020".repeat(8) // white space for indentation
 }
 
 task suppressCves() {
