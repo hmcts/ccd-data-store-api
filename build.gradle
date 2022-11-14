@@ -277,7 +277,7 @@ dependencies {
     implementation 'org.jooq:jool-java-8:0.9.14'
     implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.7'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.9'
 
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.6'
 
@@ -930,7 +930,7 @@ void loadEnvSecrets(String env) {
         new ByteArrayOutputStream().withStream { os ->
             exec {
                 if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-                    commandLine ['cmd', '/c'] + azCmd  
+                    commandLine ['cmd', '/c'] + azCmd
                 } else {
                     commandLine azCmd
                 }
