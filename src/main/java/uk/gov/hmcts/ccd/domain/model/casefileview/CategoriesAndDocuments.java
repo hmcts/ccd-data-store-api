@@ -11,5 +11,5 @@ import java.util.List;
 public class CategoriesAndDocuments {
     Integer caseVersion;
     List<Category> categories;
-    List<Document> uncategorisedDocuments;
+    List<uk.gov.hmcts.ccd.domain.model.casefileview.Document> uncategorisedDocuments;
 }
