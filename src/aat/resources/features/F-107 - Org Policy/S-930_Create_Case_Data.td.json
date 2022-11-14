@@ -20,7 +20,6 @@
       "state": "CaseCreated",
       "version": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
-      "security_classifications": "[[ANYTHING_PRESENT]]",
       "case_data": {
         "AddressField": {
           "AddressLine1": "[[ANYTHING_PRESENT]]",
@@ -88,9 +87,9 @@
             }
           }
         },
-        "SearchCriteria" : {
-          "classification" : "PUBLIC",
-          "value" : { }
+        "SearchCriteria": {
+          "classification": "PUBLIC",
+          "value": {}
         }
       },
       "supplementary_data": null,

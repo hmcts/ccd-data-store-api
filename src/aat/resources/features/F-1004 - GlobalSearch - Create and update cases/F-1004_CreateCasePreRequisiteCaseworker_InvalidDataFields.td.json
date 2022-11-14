@@ -46,7 +46,7 @@
         "dateOfBirthText" : "2012-04-21",
         "dateOfDeathText" : "2020-04-21",
         "SearchCriteria" : {
-          "SearchParties" : [ 
+          "SearchParties" : [
             {
               "__ordering__": "UNORDERED",
               "__elementId__": "value"
@@ -74,17 +74,7 @@
 			"callback_response_status_code": null,
 			"callback_response_status": null,
 			"delete_draft_response_status_code": null,
-			"delete_draft_response_status": null,
-			"security_classifications": {
-        "dateOfBirthText" : "PUBLIC",
-        "dateOfDeathText" : "PUBLIC",
-        "SearchCriteria" : {
-          "classification": "PUBLIC",
-          "value": {
-            "SearchParties": "[[ANYTHING_PRESENT]]"
-          }
-        }
-      }
+			"delete_draft_response_status": null
 		}
 	}
 }

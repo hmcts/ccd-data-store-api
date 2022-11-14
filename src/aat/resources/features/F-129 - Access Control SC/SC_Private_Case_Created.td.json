@@ -40,17 +40,14 @@
         "PrivateTextField": "private text"
       },
 			"data_classification": {
-        "PrivateTextField": "PRIVATE"
-      },
+		"PrivateTextField": "PRIVATE"
+		},
 			"supplementary_data": null,
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,
 			"callback_response_status": null,
 			"delete_draft_response_status_code": null,
-			"delete_draft_response_status": null,
-			"security_classifications": {
-        "PrivateTextField" : "PRIVATE"
-      }
+			"delete_draft_response_status": null
 		}
 	}
 }

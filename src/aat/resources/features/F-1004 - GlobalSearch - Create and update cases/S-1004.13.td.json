@@ -85,33 +85,6 @@
             }
           }
         }
-      },
-      "security_classifications": {
-        "dateOfBirthText": "PUBLIC",
-        "dateOfDeathText": "PUBLIC",
-        "OtherName": "PUBLIC",
-        "SearchCriteria": {
-          "classification": "PUBLIC",
-          "value": {
-            "SearchParties": {
-              "classification": "PUBLIC",
-              "value": [
-                {
-                  "__ordering__": "UNORDERED",
-                  "__elementId__": "value"
-                },
-                {
-                  "value": {
-                    "Name": "PUBLIC",
-                    "DateOfBirth": "PUBLIC",
-                    "DateOfDeath": "PUBLIC"
-                  },
-                  "id": "[[ANYTHING_PRESENT]]"
-                }
-              ]
-            }
-          }
-        }
       }
     }
   }

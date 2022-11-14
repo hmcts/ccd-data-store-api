@@ -44,9 +44,9 @@
       },
       "data_classification": {
         "RestrictedTextField": "RESTRICTED",
-        "SearchCriteria" : {
-          "classification" : "RESTRICTED",
-          "value" : "[[ANYTHING_PRESENT]]"
+        "SearchCriteria": {
+          "classification": "RESTRICTED",
+          "value": "[[ANYTHING_PRESENT]]"
         }
       },
       "supplementary_data": null,
@@ -54,11 +54,7 @@
       "callback_response_status_code": null,
       "callback_response_status": null,
       "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null,
-      "security_classifications": {
-        "RestrictedTextField" : "RESTRICTED",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      }
+      "delete_draft_response_status": null
     }
   }
 }

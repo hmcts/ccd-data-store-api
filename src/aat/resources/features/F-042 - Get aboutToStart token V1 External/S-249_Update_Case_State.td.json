@@ -62,15 +62,7 @@
 				"callback_response_status_code": null,
 				"callback_response_status": null,
 				"delete_draft_response_status_code": null,
-				"delete_draft_response_status": null,
-				"security_classifications": {
-					"MoneyGBPField": "PUBLIC",
-					"YesOrNoField": "PUBLIC",
-					"EmailField": "PUBLIC",
-					"TextField": "PUBLIC",
-					"PhoneUKField": "PUBLIC",
-					"NumberField": "PUBLIC"
-				}
+				"delete_draft_response_status": null
 			},
 			"event_id": "START_PROGRESS"
 		}

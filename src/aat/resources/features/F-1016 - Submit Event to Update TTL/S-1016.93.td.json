@@ -63,10 +63,7 @@
           "SystemTTL" : null
         }
       },
-      "data_classification" : {
-        "_extends_": "TTL_Classifications"
-      },
-      "security_classifications" : {
+      "data_classification": {
         "_extends_": "TTL_Classifications"
       }
     }

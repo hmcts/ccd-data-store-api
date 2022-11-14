@@ -67,79 +67,79 @@
         },
         "CollectionField" : [ ]
       },
-      "data_classification" : {
-        "AddressField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "AddressLine1" : "PUBLIC",
-            "AddressLine2" : "PUBLIC",
-            "AddressLine3" : "PUBLIC",
-            "Country" : "PUBLIC"
+      "data_classification": {
+        "AddressField": {
+          "classification": "PUBLIC",
+          "value": {
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC",
+            "Country": "PUBLIC"
           }
         },
-        "AddressUKField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "AddressLine1" : "PUBLIC",
-            "AddressLine2" : "PUBLIC",
-            "AddressLine3" : "PUBLIC",
-            "PostTown" : "PUBLIC",
-            "County" : "PUBLIC",
-            "PostCode" : "PUBLIC",
-            "Country" : "PUBLIC"
+        "AddressUKField": {
+          "classification": "PUBLIC",
+          "value": {
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "County": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "Country": "PUBLIC"
           }
         },
-        "MoneyField" : "PUBLIC",
-        "MarritalStatus" : "PUBLIC",
-        "NumberField" : "PUBLIC",
-        "SearchCriteria" : {
-          "classification" : "PUBLIC",
-          "value" : { }
+        "MoneyField": "PUBLIC",
+        "MarritalStatus": "PUBLIC",
+        "NumberField": "PUBLIC",
+        "SearchCriteria": {
+          "classification": "PUBLIC",
+          "value": {}
         },
-        "MultiSelectField" : "PUBLIC",
-        "YesNoField" : "PUBLIC",
-        "EmailField" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "PhoneField" : "PUBLIC",
-        "DateField" : "PUBLIC",
-        "OrganisationPolicyField2" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "OrgPolicyCaseAssignedRole" : "PUBLIC",
-            "OrgPolicyReference" : "PUBLIC",
-            "Organisation" : {
-              "classification" : "PUBLIC",
-              "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+        "MultiSelectField": "PUBLIC",
+        "YesNoField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "PhoneField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "OrganisationPolicyField2": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "OrgPolicyReference": "PUBLIC",
+            "Organisation": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
               }
             }
           }
         },
-        "TextAreaField" : "PUBLIC",
-        "OrganisationPolicyField1" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "OrgPolicyCaseAssignedRole" : "PUBLIC",
-            "OrgPolicyReference" : "PUBLIC",
-            "Organisation" : {
-              "classification" : "PUBLIC",
-              "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+        "TextAreaField": "PUBLIC",
+        "OrganisationPolicyField1": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "OrgPolicyReference": "PUBLIC",
+            "Organisation": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
               }
             }
           }
         },
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
+        "CaseLinkField": {
+          "classification": "PUBLIC",
+          "value": {
+            "CaseReference": "PUBLIC"
           }
         },
-        "CollectionField" : {
-          "classification" : "PUBLIC",
-          "value" : [ ]
+        "CollectionField": {
+          "classification": "PUBLIC",
+          "value": []
         }
       },
       "supplementary_data": null,
@@ -147,82 +147,7 @@
       "callback_response_status_code" : null,
       "callback_response_status" : null,
       "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
-      "security_classifications" : {
-        "AddressField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "AddressLine1" : "PUBLIC",
-            "AddressLine2" : "PUBLIC",
-            "AddressLine3" : "PUBLIC",
-            "Country" : "PUBLIC"
-          }
-        },
-        "AddressUKField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "AddressLine1" : "PUBLIC",
-            "AddressLine2" : "PUBLIC",
-            "AddressLine3" : "PUBLIC",
-            "PostTown" : "PUBLIC",
-            "County" : "PUBLIC",
-            "PostCode" : "PUBLIC",
-            "Country" : "PUBLIC"
-          }
-        },
-        "MoneyField" : "PUBLIC",
-        "MarritalStatus" : "PUBLIC",
-        "NumberField" : "PUBLIC",
-        "SearchCriteria" : {
-          "classification" : "PUBLIC",
-          "value" : { }
-        },
-        "MultiSelectField" : "PUBLIC",
-        "YesNoField" : "PUBLIC",
-        "EmailField" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "PhoneField" : "PUBLIC",
-        "DateField" : "PUBLIC",
-        "OrganisationPolicyField2" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "OrgPolicyCaseAssignedRole" : "PUBLIC",
-            "OrgPolicyReference" : "PUBLIC",
-            "Organisation" : {
-              "classification" : "PUBLIC",
-              "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
-              }
-            }
-          }
-        },
-        "TextAreaField" : "PUBLIC",
-        "OrganisationPolicyField1" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "OrgPolicyCaseAssignedRole" : "PUBLIC",
-            "OrgPolicyReference" : "PUBLIC",
-            "Organisation" : {
-              "classification" : "PUBLIC",
-              "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
-              }
-            }
-          }
-        },
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
-          }
-        },
-        "CollectionField" : {
-          "classification" : "PUBLIC",
-          "value" : [ ]
-        }
-      }
+      "delete_draft_response_status" : null
     }
   }
 }

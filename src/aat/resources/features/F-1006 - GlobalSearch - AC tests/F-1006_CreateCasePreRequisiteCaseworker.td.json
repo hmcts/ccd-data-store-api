@@ -122,10 +122,7 @@
 			"callback_response_status_code": null,
 			"callback_response_status": null,
 			"delete_draft_response_status_code": null,
-			"delete_draft_response_status": null,
-			"security_classifications": {
-        "_extends_": "Befta_Global_Search_Data_Classifications"
-      }
+			"delete_draft_response_status": null
 		}
 	}
 }

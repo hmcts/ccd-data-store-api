@@ -76,8 +76,7 @@
       "created_date": "[[ANYTHING_PRESENT]]",
       "last_modified": "[[ANYTHING_PRESENT]]",
       "security_classification": "PRIVATE",
-      "security_classifications": "[[ANYTHING_PRESENT]]",
-      "data_classification" : "[[ANYTHING_PRESENT]]",
+      "data_classification": "[[ANYTHING_PRESENT]]",
       "supplementary_data": null,
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
@@ -85,8 +84,7 @@
       "delete_draft_response_status_code": null,
       "delete_draft_response_status": null
     },
-    "data_classification": "[[ANYTHING_PRESENT]]",
-    "security_classifications": "[[ANYTHING_PRESENT]]"
+    "data_classification": "[[ANYTHING_PRESENT]]"
   }
 
 }

@@ -62,10 +62,7 @@
         "data_classification": {
           "DynamicList": "PUBLIC"
         },
-        "supplementary_data": null,
-        "security_classifications": {
-          "DynamicList": "PUBLIC"
-        }
+        "supplementary_data": null
       },
       "event_id": "createCase"
     }

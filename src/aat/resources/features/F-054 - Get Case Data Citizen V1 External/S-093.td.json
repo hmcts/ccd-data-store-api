@@ -32,10 +32,7 @@
 			"callback_response_status_code" : null,
 			"callback_response_status" : null,
 			"delete_draft_response_status_code" : null,
-			"delete_draft_response_status" : null,
-			"security_classifications": {
-				"_extends_": "Standard_Full_Case_Data_Classification"
-			}
+			"delete_draft_response_status" : null
 		}
 	}
 }

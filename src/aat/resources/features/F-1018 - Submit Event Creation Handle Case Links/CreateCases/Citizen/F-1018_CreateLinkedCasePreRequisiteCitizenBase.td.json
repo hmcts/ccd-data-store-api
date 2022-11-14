@@ -21,21 +21,12 @@
           "CaseReference": "${}${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
         }
       },
-      "data_classification" : {
+      "data_classification": {
         "TextField": "PUBLIC",
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
-          }
-        }
-      },
-      "security_classifications" : {
-        "TextField": "PUBLIC",
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
+        "CaseLinkField": {
+          "classification": "PUBLIC",
+          "value": {
+            "CaseReference": "PUBLIC"
           }
         }
       }

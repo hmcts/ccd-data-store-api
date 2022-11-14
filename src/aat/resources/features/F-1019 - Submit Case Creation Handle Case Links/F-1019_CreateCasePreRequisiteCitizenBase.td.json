@@ -40,8 +40,7 @@
       "case_type_id" : "FT_MasterCaseType",
       "case_data" : { },
       "data_classification" : { },
-      "supplementary_data" : null,
-      "security_classifications" : { }
+      "supplementary_data" : null
     }
   }
 }
