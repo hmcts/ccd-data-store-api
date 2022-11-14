@@ -14,8 +14,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -138,30 +136,60 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .body(error);
     }
 
-    private HttpStatus getHttpStatus(Throwable causeOfException) {
+    private HttpStatus getHttpStatus(final Throwable causeOfException) {
+        HttpStatus httpStatus = checkAndRetrieveExceptionStatusCode(causeOfException);
+        if (httpStatus != null) {
+            return assignExceptionHttpCode(httpStatus);
+        }
+
+        if (isReadTimeoutException(causeOfException)) {
+            return HttpStatus.GATEWAY_TIMEOUT;
+        }
+
+        if (isUnknownHostException(causeOfException)) {
+            return HttpStatus.BAD_GATEWAY;
+        }
+
+        return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    private HttpStatus checkAndRetrieveExceptionStatusCode(final Throwable causeOfException) {
         HttpStatus httpStatus = null;
-        if (causeOfException instanceof HttpServerErrorException) {
-            httpStatus = ((HttpServerErrorException) causeOfException).getStatusCode();
-            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
-                httpStatus = HttpStatus.BAD_GATEWAY;
-            }
-        } else if (causeOfException instanceof FeignException.FeignServerException) {
+        if (causeOfException instanceof HttpStatusCodeException) {
+            httpStatus = HttpStatus.valueOf(((HttpStatusCodeException) causeOfException).getRawStatusCode());
+        } else if (causeOfException instanceof FeignException) {
             httpStatus = HttpStatus.valueOf(((FeignException) causeOfException).status());
-            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
-                httpStatus = HttpStatus.BAD_GATEWAY;
-            }
-        } else if (causeOfException instanceof HttpClientErrorException) {
-            httpStatus = ((HttpClientErrorException) causeOfException).getStatusCode();
-            if (httpStatus != HttpStatus.UNAUTHORIZED) {
-                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            }
-        } else if (causeOfException instanceof FeignException.FeignClientException) {
-            httpStatus = HttpStatus.valueOf(((FeignException) causeOfException).status());
-            if (httpStatus != HttpStatus.UNAUTHORIZED) {
-                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            }
         }
 
         return httpStatus;
     }
+
+    // return BAD_GATEWAY for INTERNAL_SERVER_ERROR status code, other ServerErrors will be kept as is
+    // return UNAUTHORIZED for UNAUTHORIZED status code, other ClientErrors will return 500
+    private HttpStatus assignExceptionHttpCode(final HttpStatus httpStatus) {
+        if (httpStatus.is5xxServerError()) {
+            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
+                return HttpStatus.BAD_GATEWAY;
+            }
+
+            return httpStatus;
+        }
+
+        if (httpStatus == HttpStatus.UNAUTHORIZED) {
+            return HttpStatus.UNAUTHORIZED;
+        }
+
+        return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    private boolean isReadTimeoutException(final Throwable causeOfException) {
+        Throwable innerException = causeOfException.getCause();
+        return innerException instanceof java.net.SocketTimeoutException
+            && innerException.getMessage().contains("Read timed out");
+    }
+
+    private boolean isUnknownHostException(final Throwable causeOfException) {
+        return causeOfException instanceof java.net.UnknownHostException;
+    }
+
 }

@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
@@ -35,6 +36,8 @@ import uk.gov.hmcts.ccd.endpoint.ui.UserProfileEndpoint;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -323,6 +326,65 @@ public class RestExceptionHandlerTest {
 
         // ASSERT
         assertHttpErrorResponse(result, expectedException, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long method name
+    public void handleSocketTimeoutException_shouldReturnInternalServerErrorIfTypeNotReadTimedOut() throws Exception {
+
+        // ARRANGE
+        String myUniqueExceptionMessage = "My unique generic runtime exception message";
+
+        SocketTimeoutException socketTimeoutException = new SocketTimeoutException("some timeout error");
+        ResourceAccessException resourceAccessException = new ResourceAccessException(myUniqueExceptionMessage,
+            socketTimeoutException);
+        ServiceException expectedException = new ServiceException(myUniqueExceptionMessage, resourceAccessException);
+
+        setupMockServiceToThrowException(expectedException);
+
+        // ACT
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
+
+        // ASSERT
+        assertHttpErrorResponse(result, expectedException, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long method name
+    public void handleSocketTimeoutException_shouldReturnBadGatewayIfTypeReadTimedOut() throws Exception {
+
+        // ARRANGE
+        String myUniqueExceptionMessage = "My unique generic runtime exception message";
+
+        SocketTimeoutException socketTimeoutException = new SocketTimeoutException("Read timed out");
+        ResourceAccessException resourceAccessException = new ResourceAccessException(myUniqueExceptionMessage,
+            socketTimeoutException);
+        ServiceException expectedException = new ServiceException(myUniqueExceptionMessage, resourceAccessException);
+
+        setupMockServiceToThrowException(expectedException);
+
+        // ACT
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
+
+        // ASSERT
+        assertHttpErrorResponse(result, expectedException, HttpStatus.GATEWAY_TIMEOUT);
+    }
+
+    @Test
+    public void handleUnknownHostException_shouldReturnBadGateway() throws Exception {
+
+        // ARRANGE
+        String myUniqueExceptionMessage = "My unique generic runtime exception message";
+        UnknownHostException unknownHostException = new UnknownHostException("some unknownHostException error");
+        ServiceException expectedException = new ServiceException(myUniqueExceptionMessage, unknownHostException);
+
+        setupMockServiceToThrowException(expectedException);
+
+        // ACT
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
+
+        // ASSERT
+        assertHttpErrorResponse(result, expectedException, HttpStatus.BAD_GATEWAY);
     }
 
     @Test
