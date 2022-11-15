@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Value
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@ApiModel(value="DifferentModel", description="Sample model for the documentation")
+@ApiModel(value="this annotation and value property required to make swagger use this class")
 public class Document {
     String documentURL;
     String documentFilename;
