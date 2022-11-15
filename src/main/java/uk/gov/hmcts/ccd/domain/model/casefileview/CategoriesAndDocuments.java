@@ -13,8 +13,16 @@ public class CategoriesAndDocuments {
     Integer caseVersion;
     List<Category> categories;
     List<uk.gov.hmcts.ccd.domain.model.casefileview.Document> uncategorisedDocuments;
+    Document theDocument;
 
-    uk.gov.hmcts.ccd.domain.model.casefileview.Document uncategorisedDocumentTest;
+    public CategoriesAndDocuments(Integer caseVersion,
+        List<Category> categories,
+        List<uk.gov.hmcts.ccd.domain.model.casefileview.Document> uncategorisedDocuments) {
+        this.caseVersion = caseVersion;
+        this.categories = categories;
+        this.uncategorisedDocuments = uncategorisedDocuments;
+        this.theDocument = null;
+    }
 
     @ApiModelProperty(dataType = "java.util.List<uk.gov.hmcts.ccd.domain.model.casefileview.Document>")
     public List<Document> getUncategorisedDocuments() {
@@ -22,8 +30,8 @@ public class CategoriesAndDocuments {
     }
 
     @ApiModelProperty(dataType = "uk.gov.hmcts.ccd.domain.model.casefileview.Document")
-    public Document getUncategorisedDocumentTest() {
-        return this.uncategorisedDocumentTest;
+    public Document getTheDocument() {
+        return this.theDocument;
     }
 
 }
