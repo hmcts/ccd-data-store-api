@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
@@ -22,16 +24,22 @@ public class CollectionValidator implements BaseTypeValidator {
     public static final String VALUE = "value";
     public static final String ID = "id";
     private static final String FIELD_SEPARATOR = ".";
+    private static final Logger LOG = LoggerFactory.getLogger(CollectionValidator.class);
 
     @Override
     public BaseType getType() {
         return BaseType.get(COLLECTION);
     }
 
+    public CollectionValidator() {
+    }
+
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
+
+        LOG.info("DataField ID: "+ dataFieldId +" :dataValue:"+dataValue.asText());
 
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
@@ -45,6 +53,7 @@ public class CollectionValidator implements BaseTypeValidator {
         final ArrayNode arrayValue = (ArrayNode) dataValue;
         final Integer collectionSize = arrayValue.size();
         final FieldTypeDefinition fieldTypeDefinition = caseFieldDefinition.getFieldTypeDefinition();
+        LOG.info("fieldTypeDefinition: "+fieldTypeDefinition.toString());
 
         final ArrayList<ValidationResult> validationResults = new ArrayList<>();
 
@@ -78,6 +87,7 @@ public class CollectionValidator implements BaseTypeValidator {
             final String itemFieldId = dataFieldId + FIELD_SEPARATOR + index;
 
             final JsonNode item = items.next();
+            LOG.info("itemFieldId: "+itemFieldId  +", item"+ item.toPrettyString());
 
             if (!item.hasNonNull(VALUE)) {
                 final ValidationResult result =
