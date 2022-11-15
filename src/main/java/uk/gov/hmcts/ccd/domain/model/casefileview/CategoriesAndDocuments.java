@@ -13,7 +13,7 @@ public class CategoriesAndDocuments {
     Integer caseVersion;
     List<Category> categories;
     List<uk.gov.hmcts.ccd.domain.model.casefileview.Document> uncategorisedDocuments;
-    uk.gov.hmcts.ccd.domain.model.casefileview.Document theDocument;
+    Document theDocument;
 
     public CategoriesAndDocuments(Integer caseVersion,
         List<Category> categories,
@@ -29,8 +29,8 @@ public class CategoriesAndDocuments {
         return this.uncategorisedDocuments;
     }
 
-    @ApiModelProperty(dataType = "uk.gov.hmcts.ccd.domain.model.casefileview.Document")
-    public uk.gov.hmcts.ccd.domain.model.casefileview.Document getTheDocument() {
+//    @ApiModelProperty(dataType = "uk.gov.hmcts.ccd.domain.model.casefileview.Document")
+    public Document getTheDocument() {
         return this.theDocument;
     }
 
