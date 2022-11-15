@@ -39,7 +39,7 @@ public class CollectionValidator implements BaseTypeValidator {
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
 
-        LOG.info("DataField ID: " + dataFieldId + " :dataValue:" + dataValue.asText());
+        LOG.info("DataField ID: " + dataFieldId + " :dataValue:" + dataValue.toPrettyString());
 
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
@@ -53,7 +53,6 @@ public class CollectionValidator implements BaseTypeValidator {
         final ArrayNode arrayValue = (ArrayNode) dataValue;
         final Integer collectionSize = arrayValue.size();
         final FieldTypeDefinition fieldTypeDefinition = caseFieldDefinition.getFieldTypeDefinition();
-        LOG.info("fieldTypeDefinition: " + fieldTypeDefinition.toString());
 
         final ArrayList<ValidationResult> validationResults = new ArrayList<>();
 
