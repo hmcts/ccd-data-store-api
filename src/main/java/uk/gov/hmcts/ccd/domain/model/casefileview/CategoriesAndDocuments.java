@@ -14,8 +14,16 @@ public class CategoriesAndDocuments {
     List<Category> categories;
     List<uk.gov.hmcts.ccd.domain.model.casefileview.Document> uncategorisedDocuments;
 
+    uk.gov.hmcts.ccd.domain.model.casefileview.Document uncategorisedDocumentTest;
+
     @ApiModelProperty(dataType = "java.util.List<uk.gov.hmcts.ccd.domain.model.casefileview.Document>")
     public List<Document> getUncategorisedDocuments() {
         return this.uncategorisedDocuments;
     }
+
+    @ApiModelProperty(dataType = "uk.gov.hmcts.ccd.domain.model.casefileview.Document")
+    public Document getUncategorisedDocumentTest() {
+        return this.uncategorisedDocumentTest;
+    }
+
 }
