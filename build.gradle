@@ -597,7 +597,7 @@ jsonSchema2Pojo {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/CollectionValidator.java "
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
@@ -930,7 +930,7 @@ void loadEnvSecrets(String env) {
         new ByteArrayOutputStream().withStream { os ->
             exec {
                 if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-                    commandLine ['cmd', '/c'] + azCmd  
+                    commandLine ['cmd', '/c'] + azCmd
                 } else {
                     commandLine azCmd
                 }
