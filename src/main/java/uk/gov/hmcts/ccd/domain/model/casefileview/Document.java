@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Value
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@ApiModel(description = "")
+@ApiModel(value = "")
 public class Document {
     String documentURL;
     String documentFilename;
