@@ -897,13 +897,22 @@ cucumberReports {
     notFailingStatuses = ["skipped", "passed"]
 }
 
-task reloadEnvSecrets {
-  doFirst {
-    def env = project.findProperty('env') ?: 'demo'
-    if (project.file("./.${env}-remote-env").exists()) {
-      project.file("./.${env}-remote-env").delete()
+task reloadEnvSecretsDemo {
+    doFirst {
+        reloadEnvSecrets("demo")
     }
-  }
+}
+
+task reloadEnvSecretsAAT {
+    doFirst {
+        reloadEnvSecrets("aat")
+    }
+}
+
+void reloadEnvSecrets(String env) {
+    if (project.file("./.${env}-remote-env").exists()) {
+        project.file("./.${env}-remote-env").delete()
+    }
 }
 
 task runRemoteDemo(type: JavaExec) {
@@ -911,6 +920,14 @@ task runRemoteDemo(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {
         configRemoteRunTask(it, 'demo')
+    }
+}
+
+task runRemoteAAT(type: JavaExec) {
+    main = mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    doFirst() {
+        configRemoteRunTask(it, 'aat')
     }
 }
 
@@ -930,7 +947,7 @@ void loadEnvSecrets(String env) {
         new ByteArrayOutputStream().withStream { os ->
             exec {
                 if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-                    commandLine ['cmd', '/c'] + azCmd  
+                    commandLine ['cmd', '/c'] + azCmd
                 } else {
                     commandLine azCmd
                 }
