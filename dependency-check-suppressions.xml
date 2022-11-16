@@ -18,15 +18,17 @@
 	</suppress>
 	<!--End of false positives section -->
 
-	<!--Please add all the temporary suppression under the below section-->
-	  <suppress>
-	    <notes>Temporary Suppression
-	      CVE-2021-22044 refer https://tools.hmcts.net/jira/browse/CCD-3509
-	      CVE-2022-25857 refer https://tools.hmcts.net/jira/browse/CCD-3658
-	    </notes>
-	    <cve>CVE-2021-22044</cve>
-	    <cve>CVE-2022-25857</cve>
-	  </suppress>
+	<!--Please add all the temporary suppression under the below section -->
+	<suppress>
+		<notes>Temporary Suppression
+			CVE-2022-31690 refer https://tools.hmcts.net/jira/browse/CCD-3917
+			CVE-2022-31692 refer https://tools.hmcts.net/jira/browse/CCD-3917
+			CVE-2022-42252 refer https://tools.hmcts.net/jira/browse/CCD-3918
+		</notes>
+		<cve>CVE-2022-31690</cve>
+		<cve>CVE-2022-31692</cve>
+		<cve>CVE-2022-42252</cve>
+	</suppress>
 	<!--End of temporary suppression section -->
 
 </suppressions>

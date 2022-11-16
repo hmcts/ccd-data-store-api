@@ -16,6 +16,9 @@
   "request": {
     "body": {
       "searchCriteria": {
+        "CCDCaseTypeIds": [
+          "${[scenarioContext][childContexts][S-1007.5_CreateCase][testData][actualResponse][body][case_type]}" 
+        ],
         "caseReferences": [
           "${[scenarioContext][childContexts][S-1007.5_CreateCase][testData][actualResponse][body][id]}"
         ]

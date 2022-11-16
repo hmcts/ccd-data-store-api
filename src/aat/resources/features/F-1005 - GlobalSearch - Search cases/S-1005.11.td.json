@@ -1,0 +1,38 @@
+{
+  "title": "Unsuccessful search for case with neither CaseTypes or Jurisdictions in search criteria",
+
+  "_guid_": "S-1005.11",
+  "_extends_": "F-1005_SearchCaseBase",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains at least one fields from new global search screen",
+    "contains neither CaseTypes nor Jurisdictions in search criteria",
+    "has 400 return code",
+    "contains the error message 'At least one jurisdiction or case type must be provided in the search criteria'"
+  ],
+
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body" : {
+      "exception" : "org.springframework.web.bind.MethodArgumentNotValidException",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "Input not valid",
+      "path" : "/globalSearch",
+      "details" : [ "At least one jurisdiction or case type must be provided in the search criteria" ],
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
