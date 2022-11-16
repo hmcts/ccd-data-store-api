@@ -3,6 +3,7 @@
 - [ ] commit messages are meaningful and follow good commit message guidelines
 - [ ] README and other documentation has been updated / added (if needed)
 - [ ] tests have been updated / new tests has been added (if needed)
+- [ ] the `keep-helm` label has been added, if the helm release should be persisted after a successful build
 
 Please remove this line and everything above and fill the following sections:
 
