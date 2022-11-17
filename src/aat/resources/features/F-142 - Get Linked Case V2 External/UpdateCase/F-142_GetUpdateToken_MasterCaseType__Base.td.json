@@ -28,8 +28,7 @@
         "state": "CaseCreated",
 
         "case_data": "[[ANYTHING_PRESENT]]",
-        "data_classification": "[[ANYTHING_PRESENT]]",
-        "security_classifications": "[[ANYTHING_PRESENT]]"
+        "data_classification": "[[ANYTHING_PRESENT]]"
       }
     }
   }
