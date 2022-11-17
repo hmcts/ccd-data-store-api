@@ -842,12 +842,7 @@ task functional() {
                     '--threads', '1',
                     '--plugin', "json:${rootDir}/target/cucumber.json",
                     '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-                    //'--tags', 'not @Ignore',
-                    '--tags', '(not @Ignore) and (@F-1004 or @F-1005 or @F-1006 or @F-1007 or @F-1006.AP)',// or @F-065 or @F-027 or @F-104 or @F-109 or @F-120)',
-                    //'--tags', '(not @Ignore) and (@F-1006.APx or @F-065x or @F-065.AP or @F-065.AG or @F-027x or @F-104x or @F-109x or @F-120x)',
-                    //'--tags', '(not @Ignore) and (@F-027 or @F-027.AP or @F-027.AG or @F-028 or @F-028.AP or @F-028.AG or @F-065 or @F-065.AP or @F-065.AG or @F-066 or @F-066.AP or @F-066.AG or @F-104 or @F-104.AP or @F-104.AG or @F-109 or @F-120)',
-                    //'--tags', '(not @Ignore) and (@F-027 or @F-028 or @F-065 or @F-066 or @F-104 or @F-109x or @F-120x or @F-1006x or #AccessMetadata)',
-                    //'--tags', '@S-028.AG-7',
+                    '--tags', 'not @Ignore',
                     '--glue', 'uk.gov.hmcts.befta.player',
                     '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
             ]
