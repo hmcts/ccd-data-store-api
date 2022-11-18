@@ -45,10 +45,7 @@
       "data_classification": {
         "TextField" : "PUBLIC"
       },
-      "supplementary_data": null,
-      "security_classifications": {
-        "TextField" : "PUBLIC"
-      }
+      "supplementary_data": null
     }
   }
 }
