@@ -776,7 +776,7 @@
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.UPRN",
-                  "display_context": "MANDATORY",
+                  "display_context": "HIDDEN",
                   "_extends_": "WizardPageComplexFieldOverride"
                 },
                 {

@@ -384,7 +384,7 @@
                 },
                 {
                 "complex_field_element_id": "Address1.UPRN",
-                "display_context": "MANDATORY",
+                "display_context": "HIDDEN",
                 "_extends_": "WizardPageComplexFieldOverride"
                 },
                 {
