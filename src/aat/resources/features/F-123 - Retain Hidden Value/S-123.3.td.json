@@ -557,6 +557,35 @@
                                 "retain_hidden_value": null,
                                 "formatted_value": null,
                                 "category_id": null
+                              },
+                              {
+                                "id": "UPRN",
+                                "label": "UPRN",
+                                "hidden": null,
+                                "order": null,
+                                "metadata": false,
+                                "case_type_id": null,
+                                "hint_text": null,
+                                "field_type": {
+                                  "_extends_": "BaseTextFieldType",
+                                  "id": "Text",
+                                  "max": null
+                                },
+                                "security_classification": "PUBLIC",
+                                "live_from": null,
+                                "live_until": null,
+                                "show_condition": null,
+                                "acls": [
+                                  {
+                                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
+                                  }
+                                ],
+                                "complexACLs": [],
+                                "display_context": null,
+                                "display_context_parameter": null,
+                                "retain_hidden_value": null,
+                                "formatted_value": null,
+                                "category_id": null
                               }
                             ],
                             "collection_field_type": null
@@ -917,6 +946,35 @@
                           "_extends_": "BaseTextFieldType",
                           "id": "TextMax50",
                           "max": 50
+                        },
+                        "security_classification": "PUBLIC",
+                        "live_from": null,
+                        "live_until": null,
+                        "show_condition": null,
+                        "acls": [
+                          {
+                            "_extends_": "CaseworkerBeftaMasterAccessControlList"
+                          }
+                        ],
+                        "complexACLs": [],
+                        "display_context": null,
+                        "display_context_parameter": null,
+                        "retain_hidden_value": null,
+                        "formatted_value": null,
+                        "category_id": null
+                      },
+                      {
+                        "id": "UPRN",
+                        "label": "UPRN",
+                        "hidden": null,
+                        "order": null,
+                        "metadata": false,
+                        "case_type_id": null,
+                        "hint_text": null,
+                        "field_type": {
+                          "_extends_": "BaseTextFieldType",
+                          "id": "Text",
+                          "max": null
                         },
                         "security_classification": "PUBLIC",
                         "live_from": null,

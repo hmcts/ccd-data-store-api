@@ -106,6 +106,40 @@
                       "category_id": null
                     },
                     {
+                      "id": "UPRN",
+                      "label": "UPRN",
+                      "hidden": null,
+                      "order": null,
+                      "metadata": false,
+                      "case_type_id": null,
+                      "hint_text": null,
+                      "field_type": {
+                        "id": "Text",
+                        "type": "Text",
+                        "min": null,
+                        "max": null,
+                        "regular_expression": null,
+                        "fixed_list_items": [],
+                        "complex_fields": [],
+                        "collection_field_type": null
+                      },
+                      "security_classification": "PUBLIC",
+                      "live_from": null,
+                      "live_until": null,
+                      "show_condition": null,
+                      "acls": [
+                        {
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
+                        }
+                      ],
+                      "complexACLs": [],
+                      "display_context": null,
+                      "display_context_parameter": null,
+                      "retain_hidden_value": null,
+                      "formatted_value": null,
+                      "category_id": null
+                    },
+                    {
                       "id": "PostCode",
                       "label": "Postcode/Zipcode",
                       "hidden": null,
@@ -618,6 +652,40 @@
                       "retain_hidden_value": null,
                       "formatted_value": null,
                       "category_id": null
+                    },
+                    {
+                      "id": "UPRN",
+                      "label": "UPRN",
+                      "hidden": null,
+                      "order": null,
+                      "metadata": false,
+                      "case_type_id": null,
+                      "hint_text": null,
+                      "field_type": {
+                        "id": "Text",
+                        "type": "Text",
+                        "min": null,
+                        "max": null,
+                        "regular_expression": null,
+                        "fixed_list_items": [],
+                        "complex_fields": [],
+                        "collection_field_type": null
+                      },
+                      "security_classification": "PUBLIC",
+                      "live_from": null,
+                      "live_until": null,
+                      "show_condition": null,
+                      "acls": [
+                        {
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
+                        }
+                      ],
+                      "complexACLs": [],
+                      "display_context": null,
+                      "display_context_parameter": null,
+                      "retain_hidden_value": null,
+                      "formatted_value": null,
+                      "category_id": null
                     }
                   ],
                   "collection_field_type": null
@@ -707,6 +775,11 @@
                   "_extends_": "WizardPageComplexFieldOverride"
                 },
                 {
+                  "complex_field_element_id": "RespondentDetails.RespAddress4.UPRN",
+                  "display_context": "MANDATORY",
+                  "_extends_": "WizardPageComplexFieldOverride"
+                },
+                {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.PostCode",
                   "display_context": "MANDATORY",
                   "_extends_": "WizardPageComplexFieldOverride"
@@ -733,6 +806,11 @@
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.Country",
+                  "display_context": "HIDDEN",
+                  "_extends_": "WizardPageComplexFieldOverride"
+                },
+                {
+                  "complex_field_element_id": "RespondentDetails.RespAddress3.UPRN",
                   "display_context": "HIDDEN",
                   "_extends_": "WizardPageComplexFieldOverride"
                 },
