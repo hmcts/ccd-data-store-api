@@ -39,9 +39,6 @@
       },
       "data_classification": {
         "_extends_": "Befta_Global_Search_Data_Classifications"
-      },
-      "security_classifications": {
-        "_extends_": "Befta_Global_Search_Data_Classifications"
       }
     }
   }
