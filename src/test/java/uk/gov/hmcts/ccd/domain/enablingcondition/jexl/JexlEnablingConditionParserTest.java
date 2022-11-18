@@ -10,7 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -123,6 +125,32 @@ class JexlEnablingConditionParserTest {
 
         assertNotNull(isValid);
         assertEquals(false, isValid);
+    }
+
+    @Test
+    void shouldReturnTrueWhenEnablingConditionInjectedDataMatches() {
+        String enablingCondition = "[INJECTED_DATA__gsData]=\"myValue\"";
+
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("[INJECTED_DATA__gsData]", JSON_NODE_FACTORY.textNode("myValue"));
+
+        Boolean isValid = enablingConditionParser.evaluate(enablingCondition, data);
+
+        assertNotNull(isValid);
+        assertTrue(isValid);
+    }
+
+    @Test
+    void shouldReturnFalseWhenEnablingConditionInjectedDataWithDotDelimeters() {
+        String enablingCondition = "[INJECTED_DATA.gsData]=\"myValue\"";
+
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("[INJECTED_DATA.gsData]", JSON_NODE_FACTORY.textNode("myValue"));
+
+        Boolean isValid = enablingConditionParser.evaluate(enablingCondition, data);
+
+        assertNotNull(isValid);
+        assertFalse(isValid);
     }
 
     private Map<String, JsonNode> createCaseData(String fieldA,

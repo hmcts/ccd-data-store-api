@@ -61,7 +61,6 @@
       "last_modified": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
       "last_state_modified_date": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
       "security_classification": "PUBLIC",
-      "security_classifications": "[[ANYTHING_PRESENT]]",
       "case_data": {
         "_extends_": "FT_EventEnablingCondition_Base_Case_Data",
         "TextField": "amended2",
