@@ -61,8 +61,7 @@
         "callback_response_status_code" : null,
         "callback_response_status" : null,
         "delete_draft_response_status_code" : null,
-        "delete_draft_response_status" : null,
-        "security_classifications" : "[[ANYTHING_PRESENT]]"
+        "delete_draft_response_status" : null
       },
       "event_id" : "event2"
     }
