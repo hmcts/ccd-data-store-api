@@ -29,14 +29,7 @@ public class DefaultEndpointAuthorisationService implements EndpointAuthorisatio
     @Override
     public boolean isAccessAllowed(CaseDetails caseDetails) {
 
-        if (userRepository.anyRoleEqualsAnyOf(applicationParams.getCcdAccessControlCrossJurisdictionRoles())) {
-            return true;
-        }
-
-        if (this.caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
-            return this.caseAccessService.isExplicitAccessGranted(caseDetails);
-        }
-
-        return this.caseAccessService.isJurisdictionAccessAllowed(caseDetails.getJurisdiction());
+        return userRepository.anyRoleEqualsAnyOf(applicationParams.getCcdAccessControlCrossJurisdictionRoles())
+                || this.caseAccessService.isJurisdictionAccessAllowed(caseDetails.getJurisdiction());
     }
 }

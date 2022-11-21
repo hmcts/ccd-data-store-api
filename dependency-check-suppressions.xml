@@ -19,10 +19,6 @@
 	<!--End of false positives section -->
 
 	<!--Please add all the temporary suppression under the below section -->
-	<!-- <suppress>
-		<notes>Temporary Suppression
-		</notes>
-	</suppress> -->
 	<!--End of temporary suppression section -->
 
 </suppressions>
