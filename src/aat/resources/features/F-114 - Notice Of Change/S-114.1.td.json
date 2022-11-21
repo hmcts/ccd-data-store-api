@@ -57,37 +57,37 @@
           "OrganisationName" : null
         }
       },
-      "data_classification" : {
-        "ChangeOrganisationRequestField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseRoleId" : "PUBLIC",
-            "Reason" : "PUBLIC",
-            "RequestTimestamp" : "PUBLIC",
-            "ApprovalStatus" : "PUBLIC",
-            "ApprovalRejectionTimestamp" : "PUBLIC",
-            "NotesReason" : "PUBLIC",
-            "OrganisationToAdd" : {
-              "classification" : "PUBLIC",
-              "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+      "data_classification": {
+        "ChangeOrganisationRequestField": {
+          "classification": "PUBLIC",
+          "value": {
+            "CaseRoleId": "PUBLIC",
+            "Reason": "PUBLIC",
+            "RequestTimestamp": "PUBLIC",
+            "ApprovalStatus": "PUBLIC",
+            "ApprovalRejectionTimestamp": "PUBLIC",
+            "NotesReason": "PUBLIC",
+            "OrganisationToAdd": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
               }
             },
-            "OrganisationToRemove" : {
-              "classification" : "PUBLIC",
-              "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+            "OrganisationToRemove": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
               }
             }
           }
         },
-        "OrganisationField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "OrganisationID" : "PUBLIC",
-            "OrganisationName" : "PUBLIC"
+        "OrganisationField": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrganisationID": "PUBLIC",
+            "OrganisationName": "PUBLIC"
           }
         }
       },
@@ -96,41 +96,7 @@
       "callback_response_status_code" : null,
       "callback_response_status" : null,
       "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
-      "security_classifications" : {
-        "ChangeOrganisationRequestField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseRoleId" : "PUBLIC",
-            "Reason" : "PUBLIC",
-            "RequestTimestamp" : "PUBLIC",
-            "ApprovalStatus" : "PUBLIC",
-            "ApprovalRejectionTimestamp" : "PUBLIC",
-            "NotesReason" : "PUBLIC",
-            "OrganisationToAdd" : {
-              "classification" : "PUBLIC",
-              "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
-              }
-            },
-            "OrganisationToRemove" : {
-              "classification" : "PUBLIC",
-              "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
-              }
-            }
-          }
-        },
-        "OrganisationField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "OrganisationID" : "PUBLIC",
-            "OrganisationName" : "PUBLIC"
-          }
-        }
-      }
+      "delete_draft_response_status" : null
     }
   }
 }
