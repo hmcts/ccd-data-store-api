@@ -62,13 +62,9 @@
         },
         "SearchCriteria" : { }
       },
-      "data_classification" : {
+      "data_classification": {
         "_extends_": "TTL_Classifications",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      },
-      "security_classifications" : {
-        "_extends_": "TTL_Classifications",
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        "SearchCriteria": "[[ANYTHING_PRESENT]]"
       }
     }
   }
