@@ -308,7 +308,7 @@ dependencyManagement {
         // Versions prior to 30.0 vulnerable to CVE-2020-8908
         dependency 'com.google.guava:guava:30.1-jre'
 
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.65') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.68') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
