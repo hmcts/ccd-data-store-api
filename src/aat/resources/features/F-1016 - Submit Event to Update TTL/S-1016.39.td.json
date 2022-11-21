@@ -62,7 +62,7 @@
           "SystemTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
         }
       },
-      "data_classification" : {
+      "data_classification": {
         "_extends_": "TTL_Classifications"
       },
       "supplementary_data" : null,
@@ -70,10 +70,7 @@
       "callback_response_status_code" : null,
       "callback_response_status" : null,
       "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
-      "security_classifications" : {
-        "_extends_": "TTL_Classifications"
-      }
+      "delete_draft_response_status" : null
     }
   }
 }
