@@ -11,12 +11,6 @@
         "classification" : "PUBLIC",
         "value" : { }
       }
-    },
-    "security_classifications": {
-      "SearchCriteria" : {
-        "classification" : "PUBLIC",
-        "value" : { }
-      }
     }
   }
 }
