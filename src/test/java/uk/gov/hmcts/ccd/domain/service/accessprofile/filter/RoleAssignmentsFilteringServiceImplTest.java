@@ -157,7 +157,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
     }
 
     @Test
-    void shouldNotInvokeExcludedMatcher() {
+    void shouldNotInvokeExcludedMatcherForCaseType() {
         RoleAssignments roleAssignments = mockRoleAssignmentsWithExcludedGrantType();
         CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
         List<RoleAssignment> filteredRoleAssignments = classUnderTest
@@ -167,11 +167,33 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
     }
 
     @Test
-    void shouldInvokeMatchersWhenExcludeMatchingListIsEmpty() {
+    void shouldInvokeMatchersWhenExcludeMatchingListIsEmptyForCaseType() {
         RoleAssignments roleAssignments = mockRoleAssignmentsWithExcludedGrantType();
         CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
         List<RoleAssignment> filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseTypeDefinition,
+                Lists.newArrayList()).getFilteredMatchingRoleAssignments();
+        assertEquals(0, filteredRoleAssignments.size());
+    }
+
+    @Test
+    void shouldNotInvokeExcludedMatcherForCase() {
+        RoleAssignments roleAssignments = mockRoleAssignmentsDatesNotMatching();
+        CaseDetails caseDetails = mockCaseDetails();
+
+        List<RoleAssignment> filteredRoleAssignments = classUnderTest
+            .filter(roleAssignments, caseDetails,
+                Arrays.asList(MatcherType.BEGINENDDATE, MatcherType.CASEID, MatcherType.JURISDICTION))
+            .getFilteredMatchingRoleAssignments();
+        assertEquals(2, filteredRoleAssignments.size());
+    }
+
+    @Test
+    void shouldInvokeMatchersWhenExcludeMatchingListIsEmptyForCase() {
+        RoleAssignments roleAssignments = mockRoleAssignmentsDatesNotMatching();
+        CaseDetails caseDetails = mockCaseDetails();
+        List<RoleAssignment> filteredRoleAssignments = classUnderTest
+            .filter(roleAssignments, caseDetails,
                 Lists.newArrayList()).getFilteredMatchingRoleAssignments();
         assertEquals(0, filteredRoleAssignments.size());
     }

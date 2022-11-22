@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CachedCaseDataAccessControlImplTest {
@@ -67,6 +68,31 @@ class CachedCaseDataAccessControlImplTest {
         assertAll(
             () -> verify(noCacheCaseDataAccessControl,
                 times(1)).generateAccessProfilesByCaseReference(CASE_ID)
+        );
+    }
+
+    @Test
+    @DisplayName("Should call Generate Access Profiles for restricted case twice when no case reference")
+    void shouldCallGenerateAccessProfilesForRestrictedCaseTwiceWhenNoCaseReference() {
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        cachedCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseDetails);
+        cachedCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseDetails);
+        assertAll(
+            () -> verify(noCacheCaseDataAccessControl,
+                times(2)).generateAccessProfilesForRestrictedCase(caseDetails)
+        );
+    }
+
+    @Test
+    @DisplayName("Should call Generate Access Profiles for restricted case only once")
+    void shouldCallGenerateAccessProfilesForRestrictedCaseOnlyOnceWithCaseReference() {
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        when(caseDetails.getReferenceAsString()).thenReturn(CASE_ID);
+        cachedCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseDetails);
+        cachedCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseDetails);
+        assertAll(
+            () -> verify(noCacheCaseDataAccessControl,
+                times(1)).generateAccessProfilesForRestrictedCase(caseDetails)
         );
     }
 

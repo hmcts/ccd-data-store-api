@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -96,6 +97,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .body(Collections.singletonMap("errorMessage", errorMsg));
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseBody
+    public ResponseEntity<HttpError> handleConstraintViolationException(final HttpServletRequest request,
+                                                                        final Exception exception) {
+        LOG.error(exception.getMessage());
+        appInsights.trackException(exception);
+
+        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
+            .withDetails(exception.getCause());
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<HttpError> handleException(final HttpServletRequest request, final Exception exception) {
@@ -112,7 +127,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         HttpStatus httpStatus = (targetException != null) ? getHttpStatus(targetException) : null;
 
-        final HttpError<Serializable> error = new HttpError<>(httpStatus, exception, request);
+        final HttpError<Serializable> error = new HttpError<>(exception, request, httpStatus);
 
         return ResponseEntity
             .status(error.getStatus())

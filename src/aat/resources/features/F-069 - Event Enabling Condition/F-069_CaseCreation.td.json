@@ -1,0 +1,57 @@
+{
+	"_guid_": "F-069_CaseCreation",
+	"_extends_": "Case_Creation_Data_Base",
+
+  "specs": [
+    "to create a case"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-069_CreateCaseTokenCreation"
+    }
+   ],
+
+  "users": {
+		"invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+		}
+	},
+
+  "request": {
+		"pathVariables": {
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_EventEnablingCondition"
+		},
+		"body": {
+      "data": {
+        "TextField": "Testing Event Enabling Condition"
+      },
+			"event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+	},
+
+	"expectedResponse": {
+		"body": {
+			"id": "[[ANYTHING_PRESENT]]",
+			"jurisdiction": "BEFTA_MASTER",
+			"state": "CaseCreated",
+			"version": 0,
+			"case_type_id": "FT_EventEnablingCondition",
+			"created_date": "[[ANYTHING_PRESENT]]",
+			"last_modified": "[[ANYTHING_PRESENT]]",
+			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+			"case_data": {
+        "TextField": "Testing Event Enabling Condition"
+      },
+			"data_classification": {
+        "TextField": "PUBLIC"
+      },
+			"supplementary_data": null,
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null
+		}
+	}
+}

@@ -15,10 +15,7 @@
       "case_data" : {
         "TextField": "This is the case being updated"
       },
-      "data_classification" : {
-        "TextField": "PUBLIC"
-      },
-      "security_classifications" : {
+      "data_classification": {
         "TextField": "PUBLIC"
       }
     }

@@ -103,38 +103,7 @@
 			"callback_response_status_code": null,
 			"callback_response_status": null,
 			"delete_draft_response_status_code": null,
-			"delete_draft_response_status": null,
-			"security_classifications": {
-				"MoneyGBPField": "PUBLIC",
-				"FixedListField": "PUBLIC",
-				"AddressUKField": {
-					"value": {
-						"County": "PUBLIC",
-						"Country": "PUBLIC",
-						"PostCode": "PUBLIC",
-						"PostTown": "PUBLIC",
-						"AddressLine1": "PUBLIC",
-						"AddressLine2": "PUBLIC",
-						"AddressLine3": "PUBLIC"
-					},
-					"classification": "PUBLIC"
-				},
-				"DocumentField2": "PUBLIC",
-				"FixedRadioListField": "PUBLIC",
-				"DateTimeField": "PUBLIC",
-				"PhoneUKField": "PUBLIC",
-				"NumberField": "PUBLIC",
-				"MultiSelectListField": "PUBLIC",
-				"YesOrNoField": "PUBLIC",
-				"EmailField": "PUBLIC",
-				"TextField": "PUBLIC",
-				"DateField": "PUBLIC",
-				"TextAreaField": "PUBLIC",
-				"CollectionField": {
-					"value": [],
-					"classification": "PUBLIC"
-				}
-			}
+			"delete_draft_response_status": null
 		}
 	}
 }

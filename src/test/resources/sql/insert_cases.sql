@@ -633,6 +633,19 @@ VALUES (16, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '2019-08-24 20:44:53.824'
 );
 
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
+VALUES (23, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'RESTRICTED',
+        '{
+          "PersonFirstName": "Jerry",
+          "PersonLastName": "Restricted"
+        }',
+        '{
+          "PersonFirstName": "PUBLIC",
+          "PersonLastName": "PUBLIC"
+        }',
+        '1658950545802810'
+);
+
 INSERT INTO case_event (
         case_data_id,
         case_type_id,

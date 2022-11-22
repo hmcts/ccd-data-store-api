@@ -42,21 +42,16 @@
         "PublicTextField": "public text"
       },
 			"data_classification": {
-        "PrivateTextField": "PRIVATE",
-        "PublicTextField": "PUBLIC",
-        "RestrictedTextField": "RESTRICTED"
-      },
+		"PrivateTextField": "PRIVATE",
+		"PublicTextField": "PUBLIC",
+		"RestrictedTextField": "RESTRICTED"
+		},
 			"supplementary_data": null,
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,
 			"callback_response_status": null,
 			"delete_draft_response_status_code": null,
-			"delete_draft_response_status": null,
-			"security_classifications": {
-        "PublicTextField" : "PUBLIC",
-        "PrivateTextField" : "PRIVATE",
-        "RestrictedTextField" : "RESTRICTED"
-      }
+			"delete_draft_response_status": null
 		}
 	}
 }

@@ -1,0 +1,32 @@
+{
+  "_guid_": "F-069_CreateCaseTokenCreation",
+  "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
+  "specs": [
+    "to create a token for case creation as a caseworker",
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_EventEnablingCondition",
+      "etid": "CREATE"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "case_details" : {
+        "jurisdiction" : "BEFTA_MASTER",
+        "case_type_id" : "FT_EventEnablingCondition"
+      },
+      "event_id": "CREATE"
+    }
+  }
+}

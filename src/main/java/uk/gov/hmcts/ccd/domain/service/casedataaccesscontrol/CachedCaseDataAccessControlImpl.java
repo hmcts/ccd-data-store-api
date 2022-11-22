@@ -42,6 +42,8 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     private final Map<String, Set<SecurityClassification>> caseReferenceClassifications = newConcurrentMap();
 
+    private final Map<String, Set<AccessProfile>> caseRestrictedAccessProfiles = newConcurrentMap();
+
     @Autowired
     public CachedCaseDataAccessControlImpl(NoCacheCaseDataAccessControl noCacheCaseDataAccessControl) {
         this.noCacheCaseDataAccessControl = noCacheCaseDataAccessControl;
@@ -73,6 +75,16 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
         }
         return caseReferenceAccessProfiles.computeIfAbsent(caseDetails.getReferenceAsString(),
             e -> noCacheCaseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails));
+    }
+
+    @Override
+    public Set<AccessProfile> generateAccessProfilesForRestrictedCase(CaseDetails caseDetails) {
+        if (Strings.isNullOrEmpty(caseDetails.getReferenceAsString())) {
+            // Legacy cases from outside sources do NOT have a CCD case reference, so we can't cache
+            return noCacheCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseDetails);
+        }
+        return caseRestrictedAccessProfiles.computeIfAbsent(caseDetails.getReferenceAsString(),
+            e -> noCacheCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseDetails));
     }
 
     public Set<AccessProfile> getCaseUserAccessProfilesByUserId() {

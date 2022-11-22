@@ -32,7 +32,7 @@ class DefaultEndpointAuthorisationServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         userRoleValidator = new DefaultEndpointAuthorisationService(userRepository,
             caseAccessService, applicationParams);
     }
@@ -49,21 +49,10 @@ class DefaultEndpointAuthorisationServiceTest {
     }
 
     @Test
-    void shouldReturnTrueWhenUserHasSolicitorRoleAndUserHasAccessToCase() {
-        CaseDetails caseDetails = mock(CaseDetails.class);
-        when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-probate-solicitor"));
-        when(this.caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).thenReturn(true);
-        when(this.caseAccessService.isExplicitAccessGranted(caseDetails)).thenReturn(true);
-        boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
-        assertTrue(canAccess);
-    }
-
-    @Test
     void shouldReturnTrueWhenUserHasAccessToJurisdictions() {
         CaseDetails caseDetails = mock(CaseDetails.class);
         when(caseDetails.getJurisdiction()).thenReturn("PROBATE");
         when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-probate-solicitor"));
-        when(this.caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).thenReturn(false);
         when(this.caseAccessService.isJurisdictionAccessAllowed(anyString())).thenReturn(true);
         boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
         assertTrue(canAccess);
@@ -74,7 +63,6 @@ class DefaultEndpointAuthorisationServiceTest {
         CaseDetails caseDetails = mock(CaseDetails.class);
         when(caseDetails.getJurisdiction()).thenReturn("PROBATE");
         when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-probate-solicitor"));
-        when(this.caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).thenReturn(false);
         when(this.caseAccessService.isJurisdictionAccessAllowed(anyString())).thenReturn(false);
         boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
         assertFalse(canAccess);

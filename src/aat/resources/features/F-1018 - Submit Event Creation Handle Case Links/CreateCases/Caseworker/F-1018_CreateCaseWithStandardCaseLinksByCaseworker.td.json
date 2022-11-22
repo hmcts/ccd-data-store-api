@@ -32,10 +32,7 @@
       "case_data" : {
         "_extends_": "F-1018_CaseDataWithStandardCaseLinks_Creation"
       },
-      "data_classification" : {
-        "_extends_": "F-1018_ClasificationsForCaseDataWithStandardCaseLinks_Creation"
-      },
-      "security_classifications" : {
+      "data_classification": {
         "_extends_": "F-1018_ClasificationsForCaseDataWithStandardCaseLinks_Creation"
       }
     }

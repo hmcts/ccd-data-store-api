@@ -58,6 +58,19 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
             });
     }
 
+    @Override
+    public FilteredRoleAssignments filter(RoleAssignments roleAssignments,
+                                          CaseDetails caseDetails,
+                                          List<MatcherType> excludeMatchers) {
+        return filterMatchingRoleAssignments(roleAssignments,
+            (matcher, roleAssignment) -> {
+                if (!excludeMatchers.contains(matcher.getType())) {
+                    return matcher.matchAttribute(roleAssignment, caseDetails);
+                }
+                return true;
+            });
+    }
+
     private FilteredRoleAssignments filterMatchingRoleAssignments(
         RoleAssignments roleAssignments,
         BiPredicate<RoleAttributeMatcher, RoleAssignment> hasMatch) {

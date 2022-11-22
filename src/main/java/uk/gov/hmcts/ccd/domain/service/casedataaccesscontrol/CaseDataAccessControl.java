@@ -20,6 +20,8 @@ public interface CaseDataAccessControl {
 
     Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails);
 
+    Set<AccessProfile> generateAccessProfilesForRestrictedCase(CaseDetails caseDetails);
+
     Set<AccessProfile> getCaseUserAccessProfilesByUserId();
 
     void grantAccess(CaseDetails caseDetails, String idamUserId);

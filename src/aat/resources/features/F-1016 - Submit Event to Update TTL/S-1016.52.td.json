@@ -63,11 +63,8 @@
           "Suspended" : "${[scenarioContext][childContexts][UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker][testData][actualResponse][body][case_data][TTL][Suspended]}"
         }
       },
-      "data_classification" : {
-        "TextField" : "PUBLIC"
-      },
-      "security_classifications" : {
-        "TextField" : "PUBLIC"
+      "data_classification": {
+        "TextField": "PUBLIC"
       }
     }
   }

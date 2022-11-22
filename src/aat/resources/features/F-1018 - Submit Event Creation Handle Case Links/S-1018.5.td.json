@@ -43,21 +43,12 @@
         },
         "TextField" : "S-1018.5"
       },
-      "data_classification" : {
-        "TextField" : "PUBLIC",
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
-          }
-        }
-      },
-      "security_classifications" : {
-        "TextField" : "PUBLIC",
-        "CaseLinkField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "CaseReference" : "PUBLIC"
+      "data_classification": {
+        "TextField": "PUBLIC",
+        "CaseLinkField": {
+          "classification": "PUBLIC",
+          "value": {
+            "CaseReference": "PUBLIC"
           }
         }
       }

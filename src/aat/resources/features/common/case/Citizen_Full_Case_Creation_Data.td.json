@@ -25,9 +25,6 @@
 			},
 			"data_classification": {
 				"_extends_": "Standard_Full_Case_Data_Classification"
-			},
-			"security_classifications": {
-				"_extends_": "Standard_Full_Case_Data_Classification"
 			}
 		}
 	}

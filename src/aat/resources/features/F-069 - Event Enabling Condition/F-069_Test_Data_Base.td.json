@@ -1,0 +1,65 @@
+{
+	"_guid_": "F-069_Test_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a case by ID for dynamic display",
+
+  "method": "GET",
+  "uri": "/internal/cases/{cid}",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case that has just been created as in F-069_CaseCreation",
+    "contains HTTP 200 OK"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": true
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-069_CaseCreation][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "case_id": "${}${[scenarioContext][childContexts][F-069_CaseCreation][testData][actualResponse][body][id]}",
+      "case_type": {
+        "id": "FT_EventEnablingCondition",
+        "name": "FT_EventEnablingCondition",
+        "description": "Case Type for testing Event Enabling Condition",
+        "jurisdiction": {
+          "id": "BEFTA_MASTER",
+          "name": "BEFTA Master",
+          "description": "Content for the BEFTA Master Jurisdiction."
+        },
+        "printEnabled": false
+      },
+      "tabs": "[[ANYTHING_PRESENT]]",
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "triggers": [
+        {
+          "id": "updateEventEnablingMatch",
+          "name": "Update a case",
+          "description": "Update a case with event enabling condition",
+          "order": 1
+        }
+      ],
+      "events": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

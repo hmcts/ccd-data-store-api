@@ -23,6 +23,8 @@ public interface NoCacheCaseDataAccessControl {
 
     Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails);
 
+    Set<AccessProfile> generateAccessProfilesForRestrictedCase(CaseDetails caseDetails);
+
     default Set<AccessProfile> getCaseUserAccessProfilesByUserId() {
         return new HashSet<>();
     }
