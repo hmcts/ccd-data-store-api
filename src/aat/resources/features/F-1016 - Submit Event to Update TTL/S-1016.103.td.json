@@ -65,10 +65,7 @@
       },
 
       "data_classification": {
-        "TextField" : "PUBLIC"
-      },
-      "security_classifications": {
-        "TextField" : "PUBLIC"
+        "TextField": "PUBLIC"
       }
     }
   }
