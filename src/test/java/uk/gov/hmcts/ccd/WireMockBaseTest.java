@@ -68,7 +68,7 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
     public static final String CASE_01_TYPE = "TestAddressBookCase";
     public static final String CASE_02_TYPE = "TestAddressBookCase";
     public static final String CASE_03_TYPE = "TestAddressBookCase";
-    public static final int NUMBER_OF_CASES = 22;
+    public static final int NUMBER_OF_CASES = 23;
 
     private static final String BEARER = "Bearer ";
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";

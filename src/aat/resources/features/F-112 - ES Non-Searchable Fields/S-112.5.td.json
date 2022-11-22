@@ -83,36 +83,38 @@
           },
           "data_classification": {
             "Homeless": "PUBLIC",
-            "Children" : {
-              "classification" : "PUBLIC",
-              "value" : [ {
-                "value" : {
-                  "ChildFullName" : "PUBLIC",
-                  "NeedsSupport" : "PUBLIC",
-                  "IsAutistic" : "PUBLIC",
-                  "ChildDOB" : "PUBLIC",
-                  "ChildGender" : "PUBLIC",
-                  "AutisticChildCaseNumber" : {
-                    "classification" : "PUBLIC",
-                    "value" : {
-                      "CaseReference" : "PUBLIC"
+            "Children": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "value": {
+                    "ChildFullName": "PUBLIC",
+                    "NeedsSupport": "PUBLIC",
+                    "IsAutistic": "PUBLIC",
+                    "ChildDOB": "PUBLIC",
+                    "ChildGender": "PUBLIC",
+                    "AutisticChildCaseNumber": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "CaseReference": "PUBLIC"
+                      }
+                    },
+                    "ChildAddress": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "PostTown": "PUBLIC",
+                        "AddressLine1": "PUBLIC",
+                        "County": "PUBLIC",
+                        "Country": "PUBLIC",
+                        "AddressLine2": "PUBLIC",
+                        "AddressLine3": "PUBLIC",
+                        "PostCode": "PUBLIC"
+                      }
                     }
                   },
-                  "ChildAddress" : {
-                    "classification" : "PUBLIC",
-                    "value" : {
-                      "PostTown" : "PUBLIC",
-                      "AddressLine1" : "PUBLIC",
-                      "County" : "PUBLIC",
-                      "Country" : "PUBLIC",
-                      "AddressLine2" : "PUBLIC",
-                      "AddressLine3" : "PUBLIC",
-                      "PostCode" : "PUBLIC"
-                    }
-                  }
-                },
-                "id" : "[[ANYTHING_PRESENT]]"
-              } ]
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
             },
             "FamilyDetails": {
               "classification": "PUBLIC",
@@ -145,66 +147,7 @@
           "callback_response_status_code": null,
           "callback_response_status": null,
           "delete_draft_response_status_code": null,
-          "delete_draft_response_status": null,
-          "security_classifications": {
-            "Homeless": "PUBLIC",
-            "Children" : {
-              "classification" : "PUBLIC",
-              "value" : [ {
-                "value" : {
-                  "ChildFullName" : "PUBLIC",
-                  "ChildGender" : "PUBLIC",
-                  "ChildDOB" : "PUBLIC",
-                  "ChildAddress" : {
-                    "classification" : "PUBLIC",
-                    "value" : {
-                      "AddressLine1" : "PUBLIC",
-                      "AddressLine2" : "PUBLIC",
-                      "AddressLine3" : "PUBLIC",
-                      "PostTown" : "PUBLIC",
-                      "County" : "PUBLIC",
-                      "PostCode" : "PUBLIC",
-                      "Country" : "PUBLIC"
-                    }
-                  },
-                  "IsAutistic" : "PUBLIC",
-                  "NeedsSupport" : "PUBLIC",
-                  "AutisticChildCaseNumber" : {
-                    "classification" : "PUBLIC",
-                    "value" : {
-                      "CaseReference" : "PUBLIC"
-                    }
-                  }
-                },
-                "id" : "[[ANYTHING_PRESENT]]"
-              } ]
-            },
-            "FamilyDetails": {
-              "classification": "PUBLIC",
-              "value": {
-                "FamilyAddress": {
-                  "classification": "PUBLIC",
-                  "value": {
-                    "Country": "PUBLIC",
-                    "PostCode": "PUBLIC",
-                    "AddressLine3": "PUBLIC",
-                    "AddressLine1": "PUBLIC",
-                    "AddressLine2": "PUBLIC",
-                    "County": "PUBLIC",
-                    "PostTown": "PUBLIC"
-                  }
-                },
-                "MotherFullName": "PUBLIC",
-                "Children": {
-                  "classification": "PUBLIC",
-                  "value": []
-                },
-                "MotherAge": "PUBLIC",
-                "FatherFullName": "PUBLIC",
-                "FatherAge": "PUBLIC"
-              }
-            }
-          }
+          "delete_draft_response_status": null
         }
       ],
       "case_types_results": [
