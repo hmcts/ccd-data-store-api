@@ -44,9 +44,7 @@
       "callback_response_status_code": null,
       "callback_response_status": null,
       "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null,
-      "security_classifications": {
-      }
+      "delete_draft_response_status": null
     }
   }
 }

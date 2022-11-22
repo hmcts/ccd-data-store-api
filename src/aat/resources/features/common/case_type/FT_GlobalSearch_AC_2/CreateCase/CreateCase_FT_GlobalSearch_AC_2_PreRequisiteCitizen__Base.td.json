@@ -30,15 +30,6 @@
             "region": "PUBLIC"
           }
         }
-      },
-      "security_classifications": {
-        "caseManagementLocation": {
-          "classification": "PUBLIC",
-          "value": {
-            "baseLocation": "PUBLIC",
-            "region": "PUBLIC"
-          }
-        }
       }
     }
   }

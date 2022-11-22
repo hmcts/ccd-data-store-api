@@ -43,16 +43,6 @@
               "region": "PUBLIC"
             }
           }
-        },
-
-        "security_classifications": {
-          "TextField": "PUBLIC",
-          "caseManagementLocation": {
-            "classification": "PUBLIC",
-            "value": {
-              "region": "PUBLIC"
-            }
-          }
         }
       },
       "event_id": "[[ANYTHING_PRESENT]]"
