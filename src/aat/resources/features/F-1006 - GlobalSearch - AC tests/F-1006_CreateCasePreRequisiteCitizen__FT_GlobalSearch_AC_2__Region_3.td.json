@@ -1,6 +1,6 @@
 {
-  "_guid_": "CreateCase_FT_GlobalSearch_AC_2_PreRequisiteCitizen__Region_3",
-  "_extends_": "CreateCase_FT_GlobalSearch_AC_2_PreRequisiteCitizen__Base",
+  "_guid_": "F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Region_3",
+  "_extends_": "F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Base",
 
   "specs": [
     "to create a case as a citizen: for case type with AccessProfile region filter: region = 3"
@@ -10,7 +10,6 @@
     "body": {
       "data": {
         "caseManagementLocation" : {
-          "baseLocation" : "1",
           "region" : "3"
         }
       }

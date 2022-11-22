@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1006_CreateCasePreRequisiteCitizen__Base",
+  "_guid_": "CreateCase_PreRequisiteCitizen__Base_BEFTA_MASTER",
   "_extends_": "Citizen_Case_Creation_Base",
 
   "specs": [
@@ -19,9 +19,6 @@
     },
     "body": {
       "data": {
-        "_extends_": "F-1006_CaseData_Without_SearchCriteria",
-
-        "Email": "${[scenarioContext][customValues][UniqueString]}@mail.com"
       },
       "event_token": "${[scenarioContext][childContexts][Token_Creation_Citizen][testData][actualResponse][body][token]}"
     }
@@ -39,10 +36,8 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "_extends_": "F-1006_CaseData_With_SearchCriteria"
       },
       "data_classification": {
-        "_extends_": "Befta_Global_Search_Data_Classifications"
       },
       "supplementary_data": null,
       "after_submit_callback_response": null,

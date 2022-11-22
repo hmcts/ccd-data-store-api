@@ -1,9 +1,9 @@
 {
-  "_guid_": "F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Base",
-  "_extends_": "F-1006_CreateCasePreRequisiteCitizen__Base",
+  "_guid_": "CreateCase_FT_GlobalSearch_AC_2_PreRequisiteCitizen__Base",
+  "_extends_": "CreateCase_PreRequisiteCitizen__Base_BEFTA_MASTER",
 
   "prerequisites": [
-    { "Token_Creation_Citizen": "F-1006_Case_Data_Create_Token_Creation_Citizen__FT_GlobalSearch_AC_2" }
+    { "Token_Creation_Citizen": "CreateCase_FT_GlobalSearch_AC_2_PreRequisiteCitizen_TokenCreation" }
   ],
 
   "request": {
@@ -13,11 +13,22 @@
   },
 
   "expectedResponse": {
+    "_extends_": "CreateCase_expectedResponse__SearchCrtieria_empty",
+
     "body": {
       "case_data": {
-        "caseManagementLocation": {
+        "caseManagementLocation" : {
           "baseLocation": "${[scenarioContext][testData][request][body][data][caseManagementLocation][baseLocation]}",
-          "region": "${[scenarioContext][testData][request][body][data][caseManagementLocation][region]}"
+          "region" : "${[scenarioContext][testData][request][body][data][caseManagementLocation][region]}"
+        }
+      },
+      "data_classification": {
+        "caseManagementLocation": {
+          "classification": "PUBLIC",
+          "value": {
+            "baseLocation": "PUBLIC",
+            "region": "PUBLIC"
+          }
         }
       }
     }
