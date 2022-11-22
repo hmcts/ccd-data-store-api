@@ -2,7 +2,7 @@ name: Publish Swagger Specs
 on:
   push:
     branches:
-      - master
+      - CCD-3916_Github_Actions
 jobs:
   build:
     runs-on: ubuntu-latest
