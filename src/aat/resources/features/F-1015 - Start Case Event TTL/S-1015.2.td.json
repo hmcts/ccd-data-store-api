@@ -45,10 +45,6 @@
         },
         "data_classification": {
           "_extends_": "TTL_Classifications"
-        },
-
-        "security_classifications": {
-          "_extends_": "TTL_Classifications"
         }
       },
       "event_id": "updateCaseTTLInc"

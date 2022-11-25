@@ -45,10 +45,7 @@
       "data_classification": {
         "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       },
-      "supplementary_data": null,
-      "security_classifications": {
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      }
+      "supplementary_data": null
     }
   }
 }

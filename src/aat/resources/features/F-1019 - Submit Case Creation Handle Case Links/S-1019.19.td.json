@@ -48,10 +48,7 @@
       "case_data" : {
         "_extends_": "F-1019-CaseDataWithCollectionOfComplexCaseLinks"
       },
-      "data_classification" : {
-        "_extends_": "F-1019-ClasificationsForCaseDataWithCollectionOfComplexCaseLinks"
-      },
-      "security_classifications" : {
+      "data_classification": {
         "_extends_": "F-1019-ClasificationsForCaseDataWithCollectionOfComplexCaseLinks"
       },
       "supplementary_data" : null
