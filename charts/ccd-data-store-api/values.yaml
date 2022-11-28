@@ -35,6 +35,9 @@ java:
           alias: IDAM_DATA_STORE_SYSTEM_USER_USERNAME
         - name: idam-data-store-system-user-password
           alias: IDAM_DATA_STORE_SYSTEM_USER_PASSWORD
+        - name: ccd-redis-password
+          alias: REDIS_PASS
+
 
   environment:
     DATA_STORE_DB_PORT: 5432
