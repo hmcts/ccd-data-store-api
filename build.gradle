@@ -699,9 +699,6 @@ jacocoTestReport {
 }
 
 test {
-    filter{
-        includeTestsMatching "*.callbacks.*InvokerWireMockTest*"
-    }
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = true
