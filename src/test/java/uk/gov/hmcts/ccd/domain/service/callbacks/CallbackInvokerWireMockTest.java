@@ -61,7 +61,8 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     @Test
     public void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
 
-        for (int i=0; i<=10; i++) {
+        for (int i = 0; i <= 10; i++) {
+
             stubFor(post(urlMatching("/test-callbackGrrrr.*"))
                 .inScenario("CallbackRetry")
                 .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500).withFixedDelay(501))
