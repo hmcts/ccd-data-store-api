@@ -116,5 +116,32 @@
         }
       ]
     }
+  },
+  {
+    "id": "NoValidatorForFieldType",
+    "case_type_id": "TestAddressBookCase",
+    "field_type": {
+      "type": "Collection",
+      "id": "Address",
+      "max": 1,
+      "collection_field_type": {
+        "type": "Complex",
+        "complex_fields": [
+          {
+            "id": "Line1",
+            "label": "Line1",
+            "field_type": {
+              "type": "Label"
+            }
+          },
+          {
+            "id": "Line2",
+            "field_type": {
+              "type": "Text"
+            }
+          }
+        ]
+      }
+    }
   }
 ]

@@ -23,7 +23,7 @@
   "request": {
     "pathVariables": {
       "jid": "BEFTA_MASTER",
-      "ctid": "FT_TTL",
+      "ctid": "FT_TTL_v2",
 
       "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "updateWithStartTTLMissing"
@@ -36,7 +36,7 @@
         "id": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
         "version": 0,
         "jurisdiction": "BEFTA_MASTER",
-        "case_type_id": "FT_TTL",
+        "case_type_id": "FT_TTL_v2",
 
         "case_data": {
           "TTL" : {
@@ -48,9 +48,6 @@
         },
 
         "data_classification": {
-          "TextField" : "PUBLIC"
-        },
-        "security_classifications": {
           "TextField" : "PUBLIC"
         }
       },

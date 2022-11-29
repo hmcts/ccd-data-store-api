@@ -32,13 +32,9 @@
 			},
 			"data_classification": {
 				"_extends_": "S-577_Response_Data_Classification",
-        "DocumentField2": "PUBLIC"
-			},
-			"supplementary_data": null,
-			"security_classifications": {
-				"_extends_": "S-577_Response_Data_Classification",
 				"DocumentField2": "PUBLIC"
-			}
+			},
+			"supplementary_data": null
 		}
 	}
 }

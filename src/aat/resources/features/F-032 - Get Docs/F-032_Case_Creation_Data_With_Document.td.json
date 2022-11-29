@@ -30,9 +30,6 @@
 			},
 			"data_classification": {
 				"DocumentField1": "PUBLIC"
-			},
-			"security_classifications": {
-				"DocumentField1": "PUBLIC"
 			}
 		}
 	}

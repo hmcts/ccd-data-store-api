@@ -29,7 +29,7 @@
   "request": {
     "pathVariables": {
       "jid": "BEFTA_MASTER",
-      "ctid": "FT_TTL",
+      "ctid": "FT_TTL_v2",
       "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
     },
     "body": {
