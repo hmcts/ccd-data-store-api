@@ -39,7 +39,8 @@
 						"PostTown": "PUBLIC",
 						"County": "PUBLIC",
 						"PostCode": "PUBLIC",
-						"Country": "PUBLIC"
+						"Country": "PUBLIC",
+						"UPRN": "PUBLIC"
 					}
 				},
 				"DateTimeField": "PUBLIC",
