@@ -49,7 +49,13 @@
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "[[ANYTHING_PRESENT]]",
-            "OrganisationName": "[[ANYTHING_PRESENT]]"
+            "OrganisationName": "[[ANYTHING_PRESENT]]",
+            "OrganisationAddress": {
+              "AddressLine1": "[[ANYTHING_PRESENT]]",
+              "AddressLine2": "[[ANYTHING_PRESENT]]",
+              "AddressLine3": "[[ANYTHING_PRESENT]]",
+              "Country": "[[ANYTHING_PRESENT]]"
+            }
           }
         },
         "SearchCriteria" : { }
@@ -89,7 +95,13 @@
               "classification": "PUBLIC",
               "value": {
                 "OrganisationID": "PUBLIC",
-                "OrganisationName": "PUBLIC"
+                "OrganisationName": "PUBLIC",
+                "OrganisationAddress": {
+                  "AddressLine1": "PUBLIC",
+                  "AddressLine2": "PUBLIC",
+                  "AddressLine3": "PUBLIC",
+                  "Country": "PUBLIC"
+                }
               }
             }
           }
