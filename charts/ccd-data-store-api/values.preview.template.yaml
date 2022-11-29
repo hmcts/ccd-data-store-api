@@ -57,7 +57,7 @@ ccd:
     apiGatewayWeb:
       enabled: false
     ras:
-      enabled: false # TODO
+      enabled: true
     elastic:
       enabled: false
 
