@@ -96,11 +96,14 @@
               "value": {
                 "OrganisationID": "PUBLIC",
                 "OrganisationName": "PUBLIC",
-                "OrganisationAddress": {
-                  "AddressLine1": "PUBLIC",
-                  "AddressLine2": "PUBLIC",
-                  "AddressLine3": "PUBLIC",
-                  "Country": "PUBLIC"
+                "OrganisationAddress" : {
+                  "classification" : "PUBLIC",
+                  "value" : {
+                    "AddressLine1" : "PUBLIC",
+                    "AddressLine2" : "PUBLIC",
+                    "AddressLine3" : "PUBLIC",
+                    "Country" : "PUBLIC"
+                  }
                 }
               }
             }
