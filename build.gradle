@@ -244,8 +244,7 @@ dependencies {
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.22.0'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.2'
     testImplementation("org.testcontainers:postgresql:1.15.2")
-    testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
-    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE')
+    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
