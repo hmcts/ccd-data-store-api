@@ -36,7 +36,7 @@ java:
         - name: idam-data-store-system-user-password
           alias: IDAM_DATA_STORE_SYSTEM_USER_PASSWORD
         - name: ccd-redis-password
-          alias: REDIS_PASS
+          alias: SPRING_REDIS_PASSWORD
 
 
   environment:
