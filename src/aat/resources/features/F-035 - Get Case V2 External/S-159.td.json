@@ -44,7 +44,8 @@
 						"PostTown" : "PUBLIC",
 						"AddressLine1" : "PUBLIC",
 						"AddressLine2" : "PUBLIC",
-						"AddressLine3" : "PUBLIC"
+						"AddressLine3" : "PUBLIC",
+						"UPRN": "PUBLIC"
 					},
 					"classification" : "PUBLIC"
 				},

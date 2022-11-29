@@ -1030,7 +1030,8 @@
             "PostTown": "[[ANYTHING_PRESENT]]",
             "AddressLine1": "[[ANYTHING_PRESENT]]",
             "AddressLine2": "[[ANYTHING_PRESENT]]",
-            "AddressLine3": "[[ANYTHING_PRESENT]]"
+            "AddressLine3": "[[ANYTHING_PRESENT]]",
+            "UPRN" : "[[ANYTHING_PRESENT]]"
           },
           "metadata": false,
           "hint_text": "A UK address.",
@@ -1436,7 +1437,8 @@
             "PostTown" : "Westminster",
             "County" : "Greater London",
             "PostCode" : "SW1H 9AJ",
-            "Country" : "UK"
+            "Country" : "UK",
+            "UPRN" : "UPRN number"
           },
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
