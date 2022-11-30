@@ -244,7 +244,8 @@ dependencies {
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.22.0'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.2'
     testImplementation("org.testcontainers:postgresql:1.15.2")
-    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock')
+    testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
+    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
@@ -278,7 +279,7 @@ dependencies {
     implementation 'org.jooq:jool-java-8:0.9.14'
     implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.7'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.9'
 
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.6'
 
@@ -898,13 +899,22 @@ cucumberReports {
     notFailingStatuses = ["skipped", "passed"]
 }
 
-task reloadEnvSecrets {
-  doFirst {
-    def env = project.findProperty('env') ?: 'demo'
-    if (project.file("./.${env}-remote-env").exists()) {
-      project.file("./.${env}-remote-env").delete()
+task reloadEnvSecretsDemo {
+    doFirst {
+        reloadEnvSecrets("demo")
     }
-  }
+}
+
+task reloadEnvSecretsAAT {
+    doFirst {
+        reloadEnvSecrets("aat")
+    }
+}
+
+void reloadEnvSecrets(String env) {
+    if (project.file("./.${env}-remote-env").exists()) {
+        project.file("./.${env}-remote-env").delete()
+    }
 }
 
 task runRemoteDemo(type: JavaExec) {
@@ -912,6 +922,14 @@ task runRemoteDemo(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {
         configRemoteRunTask(it, 'demo')
+    }
+}
+
+task runRemoteAAT(type: JavaExec) {
+    main = mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    doFirst() {
+        configRemoteRunTask(it, 'aat')
     }
 }
 
