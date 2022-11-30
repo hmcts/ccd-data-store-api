@@ -33,7 +33,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @TestPropertySource(properties =
     {
-        "http.client.read.timeout=1000",
+        "http.client.read.timeout=500",
         "logging.level.com.github.tomakehurst.wiremock=TRACE",
         "logging.level.org.springframework.web=DEBUG"
     })
