@@ -2,20 +2,20 @@ name: Publish Swagger Specs
 on:
   push:
     branches:
-      - CCD-3916_Github_Actions
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
       - name: Set up Cache
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle-
       - name: Set up JDK 11
-        uses: actions/setup-java@v3.6.0
+        uses: actions/setup-java@v3
         with:
           java-version: 11
           distribution: 'temurin'

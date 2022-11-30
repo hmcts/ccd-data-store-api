@@ -1,12 +1,8 @@
 name: Scheduled Dummy Commit to develop Branch
 
-#on:
-#  schedule:
-#    - cron: "30 7 */3 * *"
 on:
-  push:
-    branches:
-      - CCD-3916_Github_Actions
+  schedule:
+    - cron: "30 7 */3 * *"
   workflow_dispatch:
 
 jobs:
@@ -19,7 +15,7 @@ jobs:
           app_id: ${{ secrets.HMCTS_GITHUB_CCD_APP_ID }}
           private_key: ${{ secrets.HMCTS_GITHUB_CCD_PRIVATE_KEY }}
 
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
         with:
           token: ${{ steps.generate-token.outputs.token }}
           ref: develop
