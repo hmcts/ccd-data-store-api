@@ -26,7 +26,7 @@ plugins {
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
     id "info.solidsoft.pitest" version '1.4.0'
     id "io.freefair.lombok" version "5.3.0"
-    id 'uk.gov.hmcts.java' version '0.12.27'
+    id 'uk.gov.hmcts.java' version '0.12.28'
     id 'au.com.dius.pact' version '4.1.0'
 }
 
@@ -42,6 +42,8 @@ apply plugin: 'jsonschema2pojo'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'se.patrikerdes.use-latest-versions'
+
+apply from: './gradle/suppress.gradle'
 
 def versions = [
         pact_version    : '4.1.7',
@@ -277,7 +279,7 @@ dependencies {
     implementation 'org.jooq:jool-java-8:0.9.14'
     implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.7'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.9'
 
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.6'
 
@@ -897,13 +899,22 @@ cucumberReports {
     notFailingStatuses = ["skipped", "passed"]
 }
 
-task reloadEnvSecrets {
-  doFirst {
-    def env = project.findProperty('env') ?: 'demo'
-    if (project.file("./.${env}-remote-env").exists()) {
-      project.file("./.${env}-remote-env").delete()
+task reloadEnvSecretsDemo {
+    doFirst {
+        reloadEnvSecrets("demo")
     }
-  }
+}
+
+task reloadEnvSecretsAAT {
+    doFirst {
+        reloadEnvSecrets("aat")
+    }
+}
+
+void reloadEnvSecrets(String env) {
+    if (project.file("./.${env}-remote-env").exists()) {
+        project.file("./.${env}-remote-env").delete()
+    }
 }
 
 task runRemoteDemo(type: JavaExec) {
@@ -911,6 +922,14 @@ task runRemoteDemo(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {
         configRemoteRunTask(it, 'demo')
+    }
+}
+
+task runRemoteAAT(type: JavaExec) {
+    main = mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    doFirst() {
+        configRemoteRunTask(it, 'aat')
     }
 }
 
@@ -930,7 +949,7 @@ void loadEnvSecrets(String env) {
         new ByteArrayOutputStream().withStream { os ->
             exec {
                 if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-                    commandLine ['cmd', '/c'] + azCmd  
+                    commandLine ['cmd', '/c'] + azCmd
                 } else {
                     commandLine azCmd
                 }
