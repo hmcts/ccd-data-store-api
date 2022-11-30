@@ -63,24 +63,24 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     @Test
     public void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
 
-            stubFor(post(urlMatching("/test-callbackGrrrr.*"))
-                .inScenario("CallbackRetry")
-                .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500).withFixedDelay(501))
-                .willSetStateTo("FirstFailedAttempt"));
-            stubFor(post(urlMatching("/test-callbackGrrrr.*"))
-                .inScenario("CallbackRetry")
-                .whenScenarioStateIs("FirstFailedAttempt")
-                .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500).withFixedDelay(501))
-                .willSetStateTo("SecondFailedAttempt"));
-            stubFor(post(urlMatching("/test-callbackGrrrr.*"))
-                .inScenario("CallbackRetry")
-                .whenScenarioStateIs("SecondFailedAttempt")
-                .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(490))
-                .willSetStateTo("SuccessfulAttempt"));
+        stubFor(post(urlMatching("/test-callbackGrrrr.*"))
+            .inScenario("CallbackRetry")
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500).withFixedDelay(501))
+            .willSetStateTo("FirstFailedAttempt"));
+        stubFor(post(urlMatching("/test-callbackGrrrr.*"))
+            .inScenario("CallbackRetry")
+            .whenScenarioStateIs("FirstFailedAttempt")
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500).withFixedDelay(501))
+            .willSetStateTo("SecondFailedAttempt"));
+        stubFor(post(urlMatching("/test-callbackGrrrr.*"))
+            .inScenario("CallbackRetry")
+            .whenScenarioStateIs("SecondFailedAttempt")
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(490))
+            .willSetStateTo("SuccessfulAttempt"));
 
-            callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false);
+        callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false);
 
-            verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
+        verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
     @Test
