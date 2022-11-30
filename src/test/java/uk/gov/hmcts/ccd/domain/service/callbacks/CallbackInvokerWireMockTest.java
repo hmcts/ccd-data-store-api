@@ -33,7 +33,9 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @TestPropertySource(properties =
     {
-        "http.client.read.timeout=500"
+        "http.client.read.timeout=1000",
+        "logging.level.com.github.tomakehurst.wiremock=TRACE",
+        "logging.level.org.springframework.web=DEBUG"
     })
 public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
@@ -61,8 +63,6 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     @Test
     public void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
 
-        for (int i = 0; i <= 10; i++) {
-
             stubFor(post(urlMatching("/test-callbackGrrrr.*"))
                 .inScenario("CallbackRetry")
                 .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500).withFixedDelay(501))
@@ -81,8 +81,6 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false);
 
             verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
-            wireMockServer.resetAll();
-        }
     }
 
     @Test
