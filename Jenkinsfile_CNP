@@ -18,9 +18,6 @@ def product = "ccd"
 def component = "data-store-api"
 def branchesToSync = ['demo', 'ithc', 'perftest']
 
-// Variables to switch pipeline logic and wiring per type of build
-def prsToUseAat              = "PR-1793,PR-1888" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
-
 def secrets = [
     'ccd-${env}': [
         secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
@@ -131,7 +128,7 @@ withPipeline(type, product, component) {
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
-    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
+    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
         env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.service.core-compute-preview.internal".toLowerCase()
