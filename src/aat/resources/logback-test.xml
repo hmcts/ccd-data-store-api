@@ -7,9 +7,10 @@
         </encoder>
     </appender>
 
-    <logger name="ccd" level="debug" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
+    <logger name="org.apache" level="ERROR"/>
+    <logger name="httpclient" level="ERROR"/>
+
+    <logger name="uk.gov.hmcts" level="DEBUG"/>
 
     <!-- LOG everything at INFO level -->
     <root level="info">
