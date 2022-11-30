@@ -50,7 +50,94 @@
           "read": true,
           "update": true,
           "delete": false
-        }],
+        },
+        {
+          "role": "basic-profile",
+          "create": false,
+          "read": true,
+          "update": false,
+          "delete": false
+        }
+      ],
+      "roleToAccessProfiles": [
+        {
+          "case_type_id": "TestAddressBookCase",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "caseworker-probate-public",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "idam:caseworker-probate-public",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCase",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "caseworker-probate-private",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "idam:caseworker-probate-private",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCase",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "caseworker-test-public",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "idam:caseworker-test-public",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCase",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "citizen",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "idam:citizen",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCase",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "[CREATOR]",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "[CREATOR]",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCase",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "basic-profile",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "hmcts-legal-operations",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCase",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "basic-profile",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "hmcts-judiciary",
+          "case_access_categories": null
+        }
+      ],
       "events": [
         {
           "id": "HAS_PRE_STATES_EVENT",
@@ -218,6 +305,13 @@
               "create": false,
               "read": true,
               "update": true,
+              "delete": false
+            },
+            {
+              "role": "basic-profile",
+              "create": false,
+              "read": true,
+              "update": false,
               "delete": false
             }]
         },

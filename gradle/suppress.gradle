@@ -1,0 +1,108 @@
+import groovy.util.slurpersupport.GPathResult
+import groovy.xml.DOMBuilder
+import groovy.xml.XmlUtil
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
+
+import javax.xml.xpath.XPathConstants
+import javax.xml.xpath.XPathExpression
+import javax.xml.xpath.XPathFactory
+
+void suppressCves(String reportName = Globals.REPORT_NAME) {
+    // Default output directory is 'build/reports'
+    def reportFile = new File(project.file(dependencyCheck.getOutputDirectory()), reportName)
+    if (!reportFile.isFile()) {
+        throw new FileNotFoundException("Report file not found." +
+                "\nPossible Solution: run :dependencyCheckAggregate")
+    }
+
+    // Creates a unique set of non-suppressed vulnerabilities
+    GPathResult vulnerabilityReport = new XmlSlurper().parse(new FileReader(reportFile))
+    Set<String> unSuppressedCves = vulnerabilityReport.'**'
+                                    .findAll { node -> node.name() == 'vulnerability' }
+                                    .collect { it.name.text() } as Set<String>
+
+    if (!unSuppressedCves.isEmpty()) {
+        // Suppression file must be specified as 'suppressionFile=...' in build.gradle.
+        File suppressionFile = project.file(dependencyCheck.getSuppressionFile())
+        validateSection(suppressionFile, new XmlSlurper(false, false).parse(suppressionFile))
+
+        String suppressionXml = new String(suppressionFile.readBytes(), "UTF-8")
+        Element suppressionDoc = DOMBuilder.parse(new StringReader(suppressionXml)).getDocumentElement()
+        addNewSuppression(unSuppressedCves, suppressionDoc)
+        suppressionFile.write(XmlUtil.serialize(cleanXml(suppressionDoc)))
+    }
+}
+
+static void addNewSuppression(unSuppressedCves, suppressionDoc) {
+    /*
+    * Find a specified phrase in a <notes> element
+    * Amend text content with new cve
+    * Amend suppress element with new cve tag containing cve value
+     */
+    XPathExpression xpathExp = XPathFactory.newInstance().newXPath().compile(
+            "//*[local-name()='notes']")
+    NodeList noteNodes = xpathExp.evaluate(suppressionDoc, XPathConstants.NODESET) as NodeList
+    noteNodes.find {
+        if (it.getTextContent().contains(Globals.TEXT_TO_FIND)) {
+            def noteNode = it
+            Document document = suppressionDoc.getOwnerDocument()
+            Node parentNode = noteNode.getParentNode()
+            unSuppressedCves.each {
+                String cveValue = it
+                if (cveValue.contains("CVE")) {
+                    noteNode.appendChild(
+                            document.createTextNode(Globals.WHITE_SPACE_FOR_INDENT + cveValue + " refer [Ticket]"))
+                    parentNode.appendChild(
+                            document.createElement("cve")).appendChild(document.createTextNode(cveValue))
+                }
+            }
+            return true
+        }
+    } ?: { throw new GradleException(String.format("Error adding cve to '%s' section", Globals.TEXT_TO_FIND)) }()
+}
+
+static boolean validateSection(suppressionFile, suppressions) {
+    // Add section if missing
+    if (suppressionFile.getText().find(Globals.TEXT_TO_FIND) == null) {
+        suppressions.appendNode {
+            suppress {
+                notes(Globals.TEXT_TO_FIND)
+            }
+        }
+        suppressionFile.write(XmlUtil.serialize(suppressions))
+        return true
+    }
+    return false
+}
+
+static def cleanXml(Element suppressionDoc) {
+    // Strip out whitespace and empty nodes
+    XPathExpression xpathExp = XPathFactory.newInstance().newXPath().compile(
+            "//text()[normalize-space(.) = '']")
+
+    NodeList emptyTextNodes = xpathExp.evaluate(suppressionDoc, XPathConstants.NODESET) as NodeList
+    if (emptyTextNodes.getLength()) {
+        for (int i = 0; i < emptyTextNodes.getLength(); i++) {
+            Node emptyTextNode = emptyTextNodes.item(i)
+            emptyTextNode.getParentNode().removeChild(emptyTextNode)
+        }
+    }
+    return suppressionDoc
+}
+
+class Globals {
+    static String TEXT_TO_FIND = "Temporary Suppression"
+    static String REPORT_NAME = "dependency-check-report.xml"
+    static String WHITE_SPACE_FOR_INDENT = "\n" + "\u0020".repeat(8) // white space for indentation
+}
+
+task suppressCves() {
+    doLast {
+        // Optional argument can be added to specify the name of the report file.
+        // If no argument is specified, the default report file is 'dependency-check-report.xml'
+        suppressCves()
+    }
+}
