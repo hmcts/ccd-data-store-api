@@ -109,9 +109,6 @@ withPipeline(type, product, component) {
                 AppPipelineDsl.PactRoles.PROVIDER
         ])
     }
-    if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
-        enableSlackNotifications('#ccd-develop-builds')
-    }
     onDemo {
         enableSlackNotifications('#ccd-demo-builds')
     }
