@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -15,6 +19,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.documentdata.CollectionData;
@@ -56,7 +61,9 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
@@ -410,9 +417,46 @@ class AuthorisedCreateEventOperationTest {
     @Test
     @DisplayName("should fail if no event provided")
     void shouldFailIfNoEventProvided() {
+        assertCreateEventLogs(INVALID_CASE_DATA_CONTENT);
+    }
 
+    @Test
+    @DisplayName("should fail if eventId is null")
+    void shouldFailIfEventIdIsNull() {
+        Event event = new Event();
+        event.setEventId(null);
+        INVALID_CASE_DATA_CONTENT.setEvent(event);
+        assertCreateEventLogs(INVALID_CASE_DATA_CONTENT);
+        assertNull(INVALID_CASE_DATA_CONTENT.getEvent().getEventId());
+    }
+
+    @Test
+    @DisplayName("should fail if eventId is empty")
+    void shouldFailIfEventIdIsEmpty() {
+        Event event = new Event();
+        event.setEventId("");
+        INVALID_CASE_DATA_CONTENT.setEvent(event);
+        assertCreateEventLogs(INVALID_CASE_DATA_CONTENT);
+        assertTrue(INVALID_CASE_DATA_CONTENT.getEvent().getEventId().isEmpty());
+    }
+
+    private void assertCreateEventLogs(CaseDataContent caseDataContent) {
+        Logger logger = (Logger) LoggerFactory.getLogger(AuthorisedCreateEventOperation.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+
+        logger.setLevel(Level.ERROR);
         assertThrows(ResourceNotFoundException.class, () ->
-            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, INVALID_CASE_DATA_CONTENT));
+                authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent));
+
+        List<ILoggingEvent> loggingEventList = listAppender.list;
+        assertAll(
+                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is("EventId is not supplied"))
+        );
+        listAppender.stop();
+        logger.detachAndStopAllAppenders();
     }
 
     @Test
