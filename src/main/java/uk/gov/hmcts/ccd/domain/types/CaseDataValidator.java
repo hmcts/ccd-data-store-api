@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPL
 
 @Named
 @Singleton
+@Slf4j
 public class CaseDataValidator {
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
@@ -150,8 +152,11 @@ public class CaseDataValidator {
                 .map(result ->
                     new ValidationResult(result.getErrorMessage(), fieldIdPrefix + result.getFieldId()))
                 .collect(Collectors.toList()))
-                .orElseThrow(() ->
-                    new RuntimeException("System error: No validator found for " + fieldType.getType()));
+            .orElseThrow(() -> {
+                log.error("CaseField={} of baseType={} doesn't have write access",
+                        fieldIdPrefix + fieldId, fieldType.getType());
+                return new RuntimeException("System error: No validator found for " + fieldType.getType());
+            });
     }
 
     private boolean isCustomTypeValidator(FieldValidator validator, String fieldTypeId) {
