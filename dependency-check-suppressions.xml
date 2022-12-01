@@ -15,7 +15,7 @@
   </suppress>
   <suppress>
     <notes>Temporary Suppression
-        CVE-2022-41946 refer [Ticket]</notes>
+        CVE-2022-41946 refer https://tools.hmcts.net/jira/browse/CCD-4047</notes>
     <cve>CVE-2022-41946</cve>
   </suppress>
 </suppressions>
