@@ -1,0 +1,45 @@
+name: Suppressions
+
+on:
+  schedule:
+    # At 12 midnight and every 3rd hour from 10am through 11pm
+    - cron: "0 0,10-23/3 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.HMCTS_GITHUB_CCD_APP_ID }}
+          private_key: ${{ secrets.HMCTS_GITHUB_CCD_PRIVATE_KEY }}
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          ref: master
+      - name: Set up Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle-
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: 'zulu'
+      - name: Run dependencyCheck
+        run: ./gradlew dependencyCheckAggregate
+        continue-on-error: true
+      - name: Run suppressCves
+        run: ./gradlew suppressCves
+      - name: Run cleanSuppressions
+        run: ./gradlew cleanSuppressions
+      - name: Commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          skip_dirty_check: false
+          commit_message: "Suppressing CVE - Actions"
+          branch: master
