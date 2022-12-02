@@ -1,32 +1,41 @@
 package uk.gov.hmcts.ccd.domain.types;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.hamcrest.MatcherAssert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.TestFixtures.caseDataFromJsonString;
-
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
@@ -42,7 +51,6 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
     @Mock
     private TextCaseReferenceCaseLinkValidator textCaseReferenceCaseLinkValidator;
-
 
     @BeforeClass
     public static void setUpClass() throws IOException {
@@ -680,5 +688,40 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         final Map<String, JsonNode> invalidMinVal = caseDataFromJsonString("{\"PersonFirstName\" : \"Test\"}");
         final ValidationContext validationContext1 = new ValidationContext(caseTypeDefinition, invalidMinVal);
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(validationContext1).size());
+    }
+
+    @Test
+    public void fieldTypeWithNoValidator() throws Exception {
+        final String DATA =
+            "{\n" +
+                "  \"NoValidatorForFieldType\" : [\n" +
+                "    {\n" +
+                "      \"value\": \n" +
+                "        {\n" +
+                "          \"Line1\": \"Address Line 1\",\n" +
+                "          \"Line2\": \"Address Line 2\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        final ValidationContext validationContext = getValidationContext(caseDataFromJsonString(DATA));
+
+        Logger logger = (Logger) LoggerFactory.getLogger(CaseDataValidator.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+
+        assertThrows(RuntimeException.class, () -> caseDataValidator.validate(validationContext));
+
+        List<ILoggingEvent> loggingEventList = listAppender.list;
+        String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                        "CaseField=NoValidatorForFieldType.0.Line1 of baseType=Label doesn't have write access");
+        assertAll(
+                () -> MatcherAssert.assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                () -> MatcherAssert.assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+        );
+        listAppender.stop();
+        logger.detachAndStopAllAppenders();
     }
 }
