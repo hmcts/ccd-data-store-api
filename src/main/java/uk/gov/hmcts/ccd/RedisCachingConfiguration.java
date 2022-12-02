@@ -26,6 +26,7 @@ import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;
 @EnableScheduling
 public class RedisCachingConfiguration {
 
+    public static final long CONFIG_VALUE = 1000L;
     @Autowired
     private ApplicationParams appParams;
 
@@ -65,11 +66,11 @@ public class RedisCachingConfiguration {
     }
 
     private CacheConfig maxIdleConfig(Integer maxIdle) {
-        return new CacheConfig(0, maxIdle * 1000);
+        return new CacheConfig(0, maxIdle * CONFIG_VALUE);
     }
 
     private CacheConfig ttlConfig(Integer ttl) {
         long defaultCacheMaxIdle = appParams.getDefaultCacheMaxIdleSecs();
-        return new CacheConfig(ttl * 1000, defaultCacheMaxIdle * 1000);
+        return new CacheConfig(ttl * CONFIG_VALUE, defaultCacheMaxIdle * CONFIG_VALUE);
     }
 }
