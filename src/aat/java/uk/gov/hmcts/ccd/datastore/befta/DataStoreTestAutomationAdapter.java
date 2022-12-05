@@ -50,19 +50,19 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             .orElse("error cant find tag");
     }
 
-    @Override
-    protected BeftaTestDataLoader buildTestDataLoader() {
-        return new DataLoaderToDefinitionStore(this,
-            DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH) {
-
-            @Override
-            protected void createRoleAssignment(String resource, String filename) {
-                // Do not create role assignments.
-                BeftaUtils.defaultLog("Will NOT create role assignments!");
-            }
-
-        };
-    }
+//    @Override
+//    protected BeftaTestDataLoader buildTestDataLoader() {
+//        return new DataLoaderToDefinitionStore(this,
+//            DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH) {
+//
+//            @Override
+//            protected void createRoleAssignment(String resource, String filename) {
+//                // Do not create role assignments.
+//                BeftaUtils.defaultLog("Will NOT create role assignments!");
+//            }
+//
+//        };
+//    }
 
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {

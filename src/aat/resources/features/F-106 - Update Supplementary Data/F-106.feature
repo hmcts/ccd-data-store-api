@@ -38,7 +38,7 @@ Feature: F-106: Update Supplementary Data
     Then a positive response is received,
     And the response has all the details as expected.
 
-  @S-608 @elasticsearch @Ignore #wait for RDM-10885 ro run this
+  @S-608 @elasticsearch #wait for RDM-10885 ro run this
   Scenario: Must return the updated supplementary data values from Data store and search through elastic search
     Given a case [C1, which has just been] created as in [F106_Case_Data_Create_C1],
     And a successful call [by Dil to update supplementary_data] as in [F-106_Set_Supplementary_Data_C1],
@@ -62,3 +62,47 @@ Feature: F-106: Update Supplementary Data
     When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then the response [contains the previously created case],
     And the response has all other details as expected.
+
+  @S-610 @elasticsearch #positive scenario already covered by S-608/609, AC - checking different jurisdictions
+  Scenario: Must NOT be able to see updated supplementary data of a case from different jurisdiction
+    Given a user [CaseworkerA - who can create a case],
+    And a case [C2, which has just been] created as in [F106_Case_Data_Create_C2],
+    And a successful call [by CaseworkerA to update supplementary_data] as in [F-106_Set_Supplementary_Data_C2],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
+    And a user with [a valid profile with different Jurisdiction],
+    And the request [is configured to search for the previously created case by the updated supplementary data value],
+    When a request is prepared with appropriate values,
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
+    Then the response [does NOT contain the previously created case],
+    And the response has all the details as expected.
+
+#  @S-611  # AC - checking different jurisdictions with CAA role
+#  Scenario: CAA must be able to see updated supplementary data of a case from different jurisdiction
+#    Given an appropriate test context as detailed in the test data source,
+#    And a user [CaseworkerA - who can create a case],
+#    And a case [C2, which has just been] created as in [F106_Case_Data_Create_C2],
+#    When a request is prepared with appropriate values,
+#    And it is submitted by [by Caseworker-caa] to call the [external search query] operation of [CCD Data Store Elastic Search API],
+#    Then the response [contains the previously created case from a different jurisdiction],
+#    And the response has all the details as expected.
+#
+#  @S-612  # AC - Users without explicit access should have READ ONLY access
+#  Scenario: CAA must NOT be able to Update supplementary data of any case that requires explicit access
+#    Given an appropriate test context as detailed in the test data source,
+#    And a user [SolicitorA - who can create a case],
+#    And a case [C3, which has just been] created as in [F106_Case_Data_Create_C3],
+#    When a request is prepared with appropriate values,
+#    And it is submitted by [by Caseworker-caa] to call the [Update Supplementary Data] operation of [CCD Data Store api],
+#    Then a negative response is received,
+#    And the response has all the details as expected.
+#
+#  @S-613  # AC - PRIVATE case
+#  Scenario: CAA must NOT be able to Update supplementary data of any case that requires explicit access
+#    Given an appropriate test context as detailed in the test data source,
+#    And a user [CaseworkerPRIVATE - who can create a case],
+#    And a case [C4, which has just been] created as in [F106_Case_Data_Create_C4],
+#    When a request is prepared with appropriate values,
+#    And it is submitted by [by Caseworker-caa] to call the [external search query] operation of [CCD Data Store Elastic Search API],
+#    Then the response [contains the previously created PRIVATE case from a different jurisdiction],
+#    And the response has all the details as expected.
+
