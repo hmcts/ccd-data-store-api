@@ -116,10 +116,10 @@ env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.servic
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 
+// Env variables needed to add Role Assignments.
 env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
 env.ROLE_ASSIGNMENT_HOST="http://am-role-assignment-service-aat.service.core-compute-aat.internal"
 env.ROLE_ASSIGNMENT_CASEWORKER_STAFF="master.caseworker.staff@gmail.com"
-env.ROLE_ASSIGNMENT_CASEWORKER_STAFF_PWD="PesZvqrb78"
 env.ROLE_ASSIGNMENT_CASEWORKER_REGIONAL_STAFF="master.caseworker.regional-staff@gmail.com"
 
 withPipeline(type, product, component) {
