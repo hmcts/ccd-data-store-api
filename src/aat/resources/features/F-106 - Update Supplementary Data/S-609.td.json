@@ -150,9 +150,10 @@
           },
           "supplementary_data" : {
             "orgs_assigned_users" : {
-              "OrgZ" : 2500
+              "OrgZ" : 2499
             }
-          },"after_submit_callback_response": "[[ANY_NULLABLE]]",
+          },
+          "after_submit_callback_response": "[[ANY_NULLABLE]]",
           "callback_response_status_code": "[[ANY_NULLABLE]]",
           "callback_response_status": "[[ANY_NULLABLE]]",
           "delete_draft_response_status_code": "[[ANY_NULLABLE]]",
