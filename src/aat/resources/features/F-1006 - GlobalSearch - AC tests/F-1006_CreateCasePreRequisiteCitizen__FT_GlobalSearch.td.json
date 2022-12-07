@@ -1,0 +1,26 @@
+{
+  "_guid_": "F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch",
+  "_extends_": "CreateCase_FT_GlobalSearch_PreRequisiteCitizen",
+
+  "request": {
+    "body": {
+      "data": {
+        "_extends_": "F-1006_CaseData_Without_SearchCriteria",
+
+        "Email": "${[scenarioContext][customValues][UniqueString]}@mail.com"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "_extends_": "F-1006_CaseData_With_SearchCriteria"
+      },
+
+      "data_classification": {
+        "_extends_": "Befta_Global_Search_Data_Classifications"
+      }
+    }
+  }
+}

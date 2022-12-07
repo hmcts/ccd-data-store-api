@@ -1,0 +1,10 @@
+{
+  "_guid_": "CreateCase_FT_GlobalSearch_AC_2_PreRequisiteCitizen_TokenCreation",
+  "_extends_": "CreateCase_PreRequisiteCitizen_TokenCreation__Base_BEFTA_MASTER",
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_GlobalSearch_AC_2"
+    }
+  }
+}

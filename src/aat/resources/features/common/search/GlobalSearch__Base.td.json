@@ -1,0 +1,23 @@
+{
+  "_guid_": "GlobalSearch__Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "Global Search",
+
+  "method": "POST",
+  "uri": "/globalSearch",
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    }
+  },
+
+  "expectedResponse": {
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

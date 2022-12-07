@@ -1,0 +1,30 @@
+{
+  "_guid_": "F-1006_CaseData_With_SearchCriteria",
+  "_extends_": "F-1006_CaseData_Without_SearchCriteria",
+
+  "SearchCriteria": {
+    "OtherCaseReferences": [
+      {
+        "value": "FirstNameValue",
+        "id": "[[ANYTHING_PRESENT]]"
+      }
+    ],
+    "SearchParties": [
+      {
+        "__ordering__": "UNORDERED",
+        "__elementId__": "value"
+      },
+      {
+        "value": {
+          "Name": "FirstNameValue LastNameValue",
+          "EmailAddress": "${[scenarioContext][testData][request][body][data][Email]}",
+          "AddressLine1": "Address Value",
+          "PostCode": "BH1 7BP",
+          "DateOfBirth": "2012-04-21",
+          "DateOfDeath": "2020-04-21"
+        },
+        "id": "[[ANYTHING_PRESENT]]"
+      }
+    ]
+  }
+}
