@@ -119,6 +119,8 @@ env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 // Env variables needed to add Role Assignments.
 env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
 env.ROLE_ASSIGNMENT_HOST="http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+env.ROLE_ASSIGNMENT_USER_EMAIL="ccd.ac.solicitor1@gmail.com"
+env.ROLE_ASSIGNMENT_USER_PASSWORD="Pa55word11"
 env.ROLE_ASSIGNMENT_CASEWORKER_STAFF="master.caseworker.staff@gmail.com"
 env.ROLE_ASSIGNMENT_CASEWORKER_REGIONAL_STAFF="master.caseworker.regional-staff@gmail.com"
 
