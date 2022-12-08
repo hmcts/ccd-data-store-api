@@ -690,6 +690,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(validationContext1).size());
     }
 
+
     @Test
     public void fieldTypeWithNoValidator() throws Exception {
         final String DATA =

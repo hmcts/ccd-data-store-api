@@ -28,6 +28,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,6 +157,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata,
                                                         final Map<String, String> dataSearchParams) {
         final Query query = getQuery(metadata, dataSearchParams, false);
+        if (query == null) {
+            return Collections.emptyList();
+        }
+
         paginate(query, metadata.getPage());
         return caseDetailsMapper.entityToModel(query.getResultList());
     }
@@ -175,6 +180,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData,
                                                               Map<String, String> dataSearchParams) {
         final Query query = getQuery(metaData, dataSearchParams, true);
+        if (query == null) {
+            return PaginatedSearchMetadata.EMPTY;
+        }
+
         Integer totalResults = ((Number) query.getSingleResult()).intValue();
         int pageSize = applicationParams.getPaginationPageSize();
         PaginatedSearchMetadata sr = new PaginatedSearchMetadata();

@@ -35,8 +35,8 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -5064,12 +5064,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-
         String responseAsString = result.getResponse().getContentAsString();
         PaginatedSearchMetadata metadata = mapper.readValue(responseAsString, PaginatedSearchMetadata.class);
 
-        assertThat(metadata.getTotalPagesCount(), is(4));
-        assertThat(metadata.getTotalResultsCount(), is(8));
+        assertThat(metadata.getTotalPagesCount(), is(3));
+        assertThat(metadata.getTotalResultsCount(), is(6));
     }
 
     @Test
