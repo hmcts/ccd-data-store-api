@@ -1,13 +1,13 @@
 {
-	"_guid_": "F-106_Set_Supplementary_Data_C2",
-	"_extends_": "F-106_Update_Supplementary_Data_Base_C2",
+	"_guid_": "F-106_Set_Supplementary_Data_CAA",
+	"_extends_": "F-106_Update_Supplementary_Data_Base",
 	"specs": [
-		"by CaseworkerA to update supplementary_data"
+		"by CAA to update supplementary_data"
 	],
 	"request": {
 		"_extends_": "Common_Request",
 		"pathVariables": {
-			"caseId": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C2][testData][actualResponse][body][id]}"
+			"caseId": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
 		},
 		"body": {
 			"supplementary_data_updates": {
@@ -18,7 +18,7 @@
     }
 	},
 	"expectedResponse": {
-    "_extends_": "Common_200_Response",
+    "_extends_": "Common_200_Response", //need to change response, shouldn't have access 403?
     "headers": {
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Type": "[[ANYTHING_PRESENT]]",

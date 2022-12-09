@@ -1,5 +1,5 @@
 {
-	"_guid_": "F-106_Update_Supplementary_Data_Base_C2",
+	"_guid_": "F-106_Update_Supplementary_Data_Base_C2_PRIVATE",
 	"title": "Update Supplementary Data Base",
 	"productName": "CCD Data Store",
 	"operationName": "Update Supplementary Data",
@@ -7,13 +7,13 @@
 	"uri": "/cases/{caseId}/supplementary-data",
 	"users": {
 		"invokingUser": {
-      "_extends_": "BeftaCaseworker2Solicitor2"
+      "_extends_": "PrivateCaseworker"
 		}
 	},
 	"request": {
 		"_extends_": "Common_Request",
     "pathVariables": {
-			"caseId": "${[scenarioContext][childContexts][F106_Case_Data_Create_C2][testData][actualResponse][body][id]}"
+			"caseId": "${[scenarioContext][childContexts][F106_Case_Data_Create_C2_PRIVATE][testData][actualResponse][body][id]}"
 		}
 	},
 	"expectedResponse": {

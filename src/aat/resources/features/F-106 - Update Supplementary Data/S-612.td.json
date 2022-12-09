@@ -1,11 +1,10 @@
 {
-  "title": "Must NOT be able to see updated supplementary data of a case from different jurisdiction",
-  "_guid_": "S-610",
-  "_extends_": "F-106_Test_Data_Base",
+  "title": "CAA must NOT be able to Update supplementary data of any case that requires explicit access",
+  "_guid_": "S-612",
+  "_extends_": "F-106_Test_Data_Base_CAA",
   "specs": [
-    "is configured to search for the previously created case by the updated supplementary data value",
-    "a valid profile with different Jurisdiction",
-    "does NOT contain the previously created case"
+    "a valid CAA profile",
+    "contains the previously created case"
   ],
   "users": {
     "invokingUser": {
