@@ -75,7 +75,7 @@ Feature: F-106: Update Supplementary Data
     Then the response [does NOT contain the previously created case],
     And the response has all the details as expected.
 
-  @S-611  # AC - checking different jurisdiction with CAA role
+  @S-611 @elasticsearch # AC - checking different jurisdiction with CAA role
   Scenario: CAA must be able to see updated supplementary data of a case from different jurisdiction
     Given a case [C1, which has just been] created as in [F106_Case_Data_Create_C1],
     And a successful call [by Dil to update supplementary_data] as in [F-106_Set_Supplementary_Data_C1],
@@ -93,17 +93,17 @@ Feature: F-106: Update Supplementary Data
     And a successful call [by Dil to update supplementary_data] as in [F-106_Set_Supplementary_Data_C1],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     When a request is prepared with appropriate values,
-    And a user with [a valid CAA profile] submit a successful call [by CAA to update supplementary_data],
+    And a user with [a valid CAA profile] submit a successful call [by CAA to update supplementary_data] as in [F-106_Modify_Supplementary_Data_CAA],
     Then a negative response is received,
     And the response has all the details as expected.
 
   @S-613  # AC - similar to S-612 but PRIVATE case
   Scenario: CAA must NOT be able to Update supplementary data of any PRIVATE case that requires explicit access
     Given a case [C2_PRIVATE, which has just been] created as in [F-106_Case_Data_Create_C2_PRIVATE],
-    And a successful call [by CaseworkerPRIVATE to update supplementary_data] as in [F-106_Set_Supplementary_Data_C2_PRIVATE],
+    And a successful call [by CaseworkerPRIVATE to update supplementary_data] as in [F-106_Update_Supplementary_Data_C2_PRIVATE],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     When a request is prepared with appropriate values,
-    And a user with [a valid CAA profile] submit a successful call [by CAA to update supplementary_data],
+    And a user with [a valid CAA profile] submit a successful call [by CAA to update supplementary_data from PRIVATE case] as in [F-106_Modify_Supplementary_Data_CAA_C2_PRIVATE],
     Then a negative response is received,
     And the response has all the details as expected.
 

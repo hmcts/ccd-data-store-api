@@ -1,15 +1,9 @@
 {
-  "title": "CAA must NOT be able to Update supplementary data of any case that requires explicit access",
-  "_guid_": "S-612",
-  "_extends_": "F-106_Modify_Supplementary_Data_CAA",
+  "_guid_": "F-106_Modify_Supplementary_Data_CAA",
+  "_extends_": "F-106_Update_Supplementary_Data_Base",
   "specs": [
-    "a valid CAA profile"
+    "by CAA to update supplementary_data"
   ],
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaCaseworkerCaa"
-    }
-  },
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
