@@ -4,9 +4,14 @@
   "specs": [
     "C2_PRIVATE, which has just been"
   ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "PrivateCaseworker"
+    }
+  },
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C1_Token_Creation][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C2_PRIVATE_Token_Creation][testData][actualResponse][body][token]}"
     }
   }
 }

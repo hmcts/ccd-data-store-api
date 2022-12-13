@@ -1,19 +1,21 @@
 {
   "title": "CAA must NOT be able to Update supplementary data of any case that requires explicit access",
   "_guid_": "S-612",
-  "_extends_": "F-106_Modify_Supplementary_Data_CAA",
+  "productName": "CCD Data Store api",
+  "operationName": "Update Supplementary Data",
+  "_extends_": "F-106_Update_Supplementary_Data_Base",
   "specs": [
-    "a valid CAA profile"
+    "a valid Jurisdiction 3 profile"
   ],
+
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCaseworkerCaa"
+      "_extends_": "BeftaCaseworker3"
     }
   },
   "request": {
-    "_extends_": "Common_Request",
     "pathVariables": {
-      "caseId": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+      "caseId": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
     },
     "body": {
       "supplementary_data_updates": {
@@ -29,6 +31,17 @@
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Type": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseAccessException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Not authorised to update case supplementary data",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
     }
   }
 }

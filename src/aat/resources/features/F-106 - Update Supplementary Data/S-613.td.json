@@ -1,16 +1,21 @@
 {
   "title": "CAA must NOT be able to Update supplementary data of any PRIVATE case that requires explicit access",
   "_guid_": "S-613",
-  "_extends_": "F-106_Test_Data_Base_CAA",
+  "productName": "CCD Data Store api",
+  "operationName": "Update Supplementary Data",
+  "_extends_": "F-106_Update_Supplementary_Data_Base",
   "specs": [
-    "a valid CAA profile",
-    "contains the previously created case"
+    "a valid PUBLIC profile"
   ],
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "CaseworkerAutotest"
+    }
+  },
   "request": {
-    "_extends_": "Common_Request",
     "pathVariables": {
-      "caseId": "${[scenarioContext][siblingContexts][F-106_Case_Data_Create_C2_PRIVATE][testData][actualResponse][body][id]}"
+      "caseId": "${[scenarioContext][childContexts][F106_Case_Data_Create_C2_PRIVATE][testData][actualResponse][body][id]}"
     },
     "body": {
       "supplementary_data_updates": {

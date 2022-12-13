@@ -45,11 +45,16 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "Common_200_Response",
     "headers": {
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Type": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip"
+    },
+    "body" : {
+      "total" : 0,
+      "cases" : [ ],
+      "case_types_results" : [ ]
     }
   }
 }
