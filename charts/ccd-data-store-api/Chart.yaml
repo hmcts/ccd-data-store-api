@@ -8,7 +8,7 @@ maintainers:
     email: ccd-devops@HMCTS.NET
 dependencies:
   - name: java
-    version: 4.0.3
+    version: 4.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
   - name: elasticsearch
     version: 7.8.2
