@@ -7,10 +7,8 @@
     "a valid profile with different Jurisdiction",
     "does NOT contain the previously created case"
   ],
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaCaseworker3"
-    }
+  "user" : {
+    "_extends_": "BeftaCaseworker3"
   },
   "request": {
     "queryParams": {
