@@ -19,6 +19,16 @@
     "body": {
       "query":{
         "bool":{
+          "must": [
+            {
+              "match": {
+                "reference": {
+                  "operator": "and",
+                  "query": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+                }
+              }
+            }
+          ],
           "filter":[
             { "bool":{
               "should": [
@@ -42,7 +52,7 @@
 
   "expectedResponse": {
     "body": {
-      "total": 3,
+      "total": 1,
       "cases": [
         {
           "id": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}",
@@ -155,7 +165,7 @@
       ],
       "case_types_results": [
         {
-          "total": 3,
+          "total": 1,
           "case_type_id": "BEFTA_CASETYPE_2_1"
         }
       ]
