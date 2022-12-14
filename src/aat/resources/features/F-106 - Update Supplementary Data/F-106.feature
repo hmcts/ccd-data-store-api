@@ -63,7 +63,7 @@ Feature: F-106: Update Supplementary Data
     Then the response [contains the previously created case],
     And the response has all other details as expected.
 
-  @S-610 @elasticsearch #positive scenario already covered by S-608/609, AC - checking different jurisdictions
+  @S-610 @elasticsearch
   Scenario: Must NOT be able to see updated supplementary data of a case from different jurisdiction
     Given a case [C1, which has just been] created as in [F106_Case_Data_Create_C1],
     And a successful call [by Dil to update supplementary_data] as in [F-106_Set_Supplementary_Data_C1],
@@ -75,7 +75,7 @@ Feature: F-106: Update Supplementary Data
     Then the response [does NOT contain the previously created case],
     And the response has all the details as expected.
 
-  @S-611 @elasticsearch # AC - checking different jurisdiction with CAA role
+  @S-611 @elasticsearch
   Scenario: CAA must be able to see updated supplementary data of a case from any jurisdiction
     Given a case [C1, which has just been] created as in [F106_Case_Data_Create_C1],
     And a successful call [by Dil to update supplementary_data] as in [F-106_Set_Supplementary_Data_C1],
@@ -87,7 +87,7 @@ Feature: F-106: Update Supplementary Data
     Then the response [contains the previously created case],
     And the response has all the details as expected.
 
-  @S-612  # AC - Users without explicit access should have READ ONLY access
+  @S-612 @elasticsearch
   Scenario: Must NOT be able to Update supplementary data of a case of a different Jurisdiction
     Given a case [C1, which has just been] created as in [F-106_Case_Data_Create_C1],
     And a successful call [by Dil to update supplementary_data] as in [F-106_Set_Supplementary_Data_C1],
@@ -98,7 +98,7 @@ Feature: F-106: Update Supplementary Data
     Then a negative response is received,
     And the response has all the details as expected.
 
-  @S-613  # AC - similar to S-612 but PRIVATE case
+  @S-613 @elasticsearch
   Scenario: Must NOT be able to Update supplementary data of any PRIVATE case that requires explicit access
     Given a case [C2_PRIVATE, which has just been] created as in [F106_Case_Data_Create_C2_PRIVATE],
     And a successful call [by CaseworkerPRIVATE to update supplementary_data] as in [F-106_Update_Supplementary_Data_C2_PRIVATE],
