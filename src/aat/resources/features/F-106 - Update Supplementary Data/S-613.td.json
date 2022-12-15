@@ -10,7 +10,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "CaseworkerAutotest"
+      "_extends_": "BeftaCaseworker2Solicitor1"
     }
   },
   "request": {
@@ -20,7 +20,7 @@
     "body": {
       "supplementary_data_updates": {
         "$inc": {
-          "orgs_assigned_users.OrgZ": -1
+          "orgs_assigned_users.OrgA": -1
         }
       }
     }
