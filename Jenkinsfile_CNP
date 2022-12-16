@@ -153,28 +153,28 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
     enableHighLevelDataSetup()
 
-    after('test') {
+    afterAlways('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
 
-    after('smoketest:preview') {
+    afterAlways('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     }
 
-    after('smoketest:aat') {
+    afterAlways('smoketest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     }
 
-    after('functionalTest:preview') {
+    afterAlways('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     }
 
-    after('functionalTest:aat') {
+    afterAlways('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     }
 
-    after('pact-provider-verification') {
+    afterAlways('pact-provider-verification') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
 }
