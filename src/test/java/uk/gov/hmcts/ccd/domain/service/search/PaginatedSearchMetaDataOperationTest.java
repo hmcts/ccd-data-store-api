@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.google.common.collect.Maps;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -13,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
@@ -57,9 +57,10 @@ class PaginatedSearchMetaDataOperationTest {
         metadata.setCaseReference(Optional.of("BBBBBB"));
         PaginatedSearchMetadata paginatedSearchMetadata = paginatedSearchMetaDataOperation.execute(metadata, criteria);
 
+        Integer expectedValue = 0;
         assertAll(
-            () -> assertNull(paginatedSearchMetadata.getTotalResultsCount()),
-            () -> assertNull(paginatedSearchMetadata.getTotalPagesCount())
+            () -> Assertions.assertEquals(expectedValue, paginatedSearchMetadata.getTotalResultsCount()),
+            () -> Assertions.assertEquals(expectedValue, paginatedSearchMetadata.getTotalPagesCount())
         );
     }
 
