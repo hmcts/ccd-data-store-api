@@ -353,6 +353,43 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void getPaginatedSearchMetadataReturnEmptyResult() {
+        assumeDataInitialised();
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final PaginatedSearchMetadata byMetaData =
+            caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
+        assertAll(
+            () -> assertThat(byMetaData.getTotalResultsCount(), is(0)),
+            () -> assertThat(byMetaData.getTotalPagesCount(), is(0))
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByMetaDataAndFieldDataReturnEmtyCaseDetailsList() {
+        assumeDataInitialised();
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        metadata.setSortDirection(Optional.of("Asc"));
+        SortOrderField sortOrderField = SortOrderField.sortOrderWith()
+            .caseFieldId("[LAST_MODIFIED_DATE]")
+            .metadata(true)
+            .direction("DESC")
+            .build();
+        metadata.addSortOrderField(sortOrderField);
+
+        HashMap<String, String> searchParams = new HashMap<>();
+        searchParams.put("PersonFirstName", "Janet");
+
+        final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
+            searchParams);
+
+        assertEquals(0, byMetaDataAndFieldData.size());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void getFindByMetadataAndFieldDataSortDescByMetaDataField() {
         assumeDataInitialised();
 

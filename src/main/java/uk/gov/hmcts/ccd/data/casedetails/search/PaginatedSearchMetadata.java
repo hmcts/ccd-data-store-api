@@ -13,7 +13,7 @@ public class PaginatedSearchMetadata {
     public PaginatedSearchMetadata() {
     }
 
-    public PaginatedSearchMetadata(int totalResultsCount, int totalPagesCount) {
+    public PaginatedSearchMetadata(final int totalResultsCount, final int totalPagesCount) {
         this.totalResultsCount = totalResultsCount;
         this.totalPagesCount = totalPagesCount;
     }

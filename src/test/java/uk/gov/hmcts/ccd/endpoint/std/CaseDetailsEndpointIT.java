@@ -5051,7 +5051,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(metadata.getTotalResultsCount(), is(0));
     }
 
-
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturnPaginatedSearchMetadataForCitizen() throws Exception {
@@ -5069,6 +5068,27 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         assertThat(metadata.getTotalPagesCount(), is(3));
         assertThat(metadata.getTotalResultsCount(), is(6));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturnEmptyPaginatedSearchMetadataForCitizenWithUnassignedRole() throws Exception {
+        assertCaseDataResultSetSize();
+        MockUtils.setSecurityAuthorities(authentication, "unassigned-role-citizen");
+
+        MvcResult result = mockMvc.perform(get(GET_PAGINATED_SEARCH_METADATA_CITIZENS)
+                .contentType(JSON_CONTENT_TYPE)
+                .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        PaginatedSearchMetadata metadata = mapper.readValue(responseAsString, PaginatedSearchMetadata.class);
+
+        assertAll(
+            () -> assertThat(metadata.getTotalPagesCount(), is(0)),
+            () -> assertThat(metadata.getTotalResultsCount(), is(0))
+        );
     }
 
     @Test
