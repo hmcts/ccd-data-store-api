@@ -12,9 +12,4 @@
     <cve>CVE-2021-22112</cve>
     <cve>CVE-2022-22976</cve>
   </suppress>
-  <suppress>
-    <notes>Temporary Suppression
-        CVE-2021-37533 refer [Ticket]</notes>
-    <cve>CVE-2021-37533</cve>
-  </suppress>
 </suppressions>
