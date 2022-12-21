@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are  by default assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %-5level [%thread] %logger{36} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.apache" level="ERROR"/>
+    <logger name="httpclient" level="ERROR"/>
+
+    <logger name="uk.gov.hmcts" level="DEBUG"/>
+
+    <!-- LOG everything at INFO level -->
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

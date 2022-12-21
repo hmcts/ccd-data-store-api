@@ -31,7 +31,7 @@
   "request": {
     "pathVariables": {
       "jid" : "BEFTA_MASTER",
-      "ctid": "FT_TTL",
+      "ctid": "FT_TTL_v2",
       "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
     },
     "body": {
@@ -51,18 +51,15 @@
       "version" : 1,
 
       "jurisdiction" : "BEFTA_MASTER",
-      "case_type_id" : "FT_TTL",
+      "case_type_id" : "FT_TTL_v2",
 
       "state" : "CaseUpdated",
 
       "case_data" : {
         "TextField": "Updated without supplying TTL"
       },
-      "data_classification" : {
-        "TextField" : "PUBLIC"
-      },
-      "security_classifications" : {
-        "TextField" : "PUBLIC"
+      "data_classification": {
+        "TextField": "PUBLIC"
       }
     }
   }

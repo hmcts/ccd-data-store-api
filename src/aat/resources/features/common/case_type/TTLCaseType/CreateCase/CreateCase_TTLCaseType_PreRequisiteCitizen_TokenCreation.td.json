@@ -17,7 +17,7 @@
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
-      "ctid": "FT_TTL",
+      "ctid": "FT_TTL_v2",
       "etid": "createCase"
     }
   },
@@ -25,7 +25,7 @@
     "body": {
       "case_details" : {
         "jurisdiction" : "BEFTA_MASTER",
-        "case_type_id" : "FT_TTL"
+        "case_type_id" : "FT_TTL_v2"
       },
       "event_id": "createCase"
     }

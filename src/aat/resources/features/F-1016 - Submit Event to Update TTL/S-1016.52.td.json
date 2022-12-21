@@ -31,7 +31,7 @@
   "request": {
     "pathVariables": {
       "jid" : "BEFTA_MASTER",
-      "ctid": "FT_TTL",
+      "ctid": "FT_TTL_v2",
       "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
     },
     "body": {
@@ -51,7 +51,7 @@
       "version" : 2,
 
       "jurisdiction" : "BEFTA_MASTER",
-      "case_type_id" : "FT_TTL",
+      "case_type_id" : "FT_TTL_v2",
 
       "state" : "CaseUpdated",
 
@@ -63,11 +63,8 @@
           "Suspended" : "${[scenarioContext][childContexts][UpdateCase_TTLCaseType_manageCaseTTL_PreRequisiteCaseworker][testData][actualResponse][body][case_data][TTL][Suspended]}"
         }
       },
-      "data_classification" : {
-        "TextField" : "PUBLIC"
-      },
-      "security_classifications" : {
-        "TextField" : "PUBLIC"
+      "data_classification": {
+        "TextField": "PUBLIC"
       }
     }
   }

@@ -14,6 +14,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
@@ -29,6 +30,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -177,14 +179,112 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
             .andReturn();
     }
 
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = { "classpath:sql/insert_cases.sql" })
+    public void shouldReturn200WithTriggerWhenInjectedDataMetadataFieldsMatchGetCaseCallbackResponse()
+        throws Exception {
+
+        WireMock.resetAllRequests();
+
+        final String jsonString = TestFixtures
+            .fromFileAsString("__files/test-addressbook-get-case-callback_injected_data.json")
+            .replace("${GET_CASE_CALLBACK_URL}", hostUrl + GET_CASE_CALLBACK);
+
+        stubFor(WireMock.get(urlMatching("/api/data/case-type/" + TEST_CASE_TYPE))
+            .willReturn(okJson(jsonString).withStatus(200)));
+
+        stubFor(post(urlMatching(GET_CASE_CALLBACK + ".*"))
+            .willReturn(okJson(getCaseCallbackJsonResponse("[INJECTED_DATA.myVar]"))));
+
+        final MvcResult result = mockMvc.perform(get(GET_CASE)
+            .contentType(JSON_CONTENT_TYPE)
+            .headers(headers))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
+
+        String content = result.getResponse().getContentAsString();
+        assertNotNull("Content Should not be null", content);
+        CaseViewResource savedCaseResource = mapper.readValue(content, CaseViewResource.class);
+        assertNotNull("Saved Case Details should not be null", savedCaseResource);
+        assertEquals("Should contain events with case role access", 5, savedCaseResource.getMetadataFields().size());
+        List<String> metadataIds = savedCaseResource.getMetadataFields().stream()
+            .map(CaseViewField::getId)
+            .collect(Collectors.toList());
+        assertTrue(metadataIds.contains("[CREATED_DATE]"));
+        assertTrue(metadataIds.contains("[JURISDICTION]"));
+        assertTrue(metadataIds.contains("[ACCESS_GRANTED]"));
+        assertTrue(metadataIds.contains("[ACCESS_PROCESS]"));
+        assertTrue(metadataIds.contains("[INJECTED_DATA.myVar]"));
+
+        final List<CaseViewActionableEvent> caseViewActionableEvents =
+            List.of(savedCaseResource.getCaseViewActionableEvents());
+        assertEquals(2, caseViewActionableEvents.size());
+        assertTrue(caseViewActionableEvents.stream()
+            .anyMatch(caseViewActionableEvent -> caseViewActionableEvent.getId().equals("START_PROGRESS")));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = { "classpath:sql/insert_cases.sql" })
+    public void shouldReturn200WithoutTriggerWhenInjectedDataMetadataFieldsMatchGetCaseCallbackResponse()
+        throws Exception {
+
+        WireMock.resetAllRequests();
+
+        final String jsonString = TestFixtures
+            .fromFileAsString("__files/test-addressbook-get-case-callback_injected_data.json")
+            .replace("${GET_CASE_CALLBACK_URL}", hostUrl + GET_CASE_CALLBACK);
+
+        stubFor(WireMock.get(urlMatching("/api/data/case-type/" + TEST_CASE_TYPE))
+            .willReturn(okJson(jsonString).withStatus(200)));
+
+        stubFor(post(urlMatching(GET_CASE_CALLBACK + ".*"))
+            .willReturn(okJson(getCaseCallbackJsonResponseWithValue("[INJECTED_DATA.myVar]", "noMatchValue"))));
+
+        final MvcResult result = mockMvc.perform(get(GET_CASE)
+            .contentType(JSON_CONTENT_TYPE)
+            .headers(headers))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
+
+        String content = result.getResponse().getContentAsString();
+        assertNotNull("Content Should not be null", content);
+        CaseViewResource savedCaseResource = mapper.readValue(content, CaseViewResource.class);
+        assertNotNull("Saved Case Details should not be null", savedCaseResource);
+        assertEquals("Should contain events with case role access", 5, savedCaseResource.getMetadataFields().size());
+        List<String> metadataIds = savedCaseResource.getMetadataFields().stream()
+            .map(CaseViewField::getId)
+            .collect(Collectors.toList());
+        assertTrue(metadataIds.contains("[CREATED_DATE]"));
+        assertTrue(metadataIds.contains("[JURISDICTION]"));
+        assertTrue(metadataIds.contains("[ACCESS_GRANTED]"));
+        assertTrue(metadataIds.contains("[ACCESS_PROCESS]"));
+        assertTrue(metadataIds.contains("[INJECTED_DATA.myVar]"));
+
+        final List<CaseViewActionableEvent> caseViewActionableEvents =
+            List.of(savedCaseResource.getCaseViewActionableEvents());
+        assertEquals(1, caseViewActionableEvents.size());
+        assertFalse(caseViewActionableEvents.stream()
+            .anyMatch(caseViewActionableEvent -> caseViewActionableEvent.getId().equals("START_PROGRESS")));
+    }
+
     private String getCaseCallbackJsonResponse(String metadataFieldId) {
+        return getCaseCallbackJsonResponseWithValue(metadataFieldId, "TODO");
+    }
+
+    private String getCaseCallbackJsonResponseWithValue(String metadataFieldId, String metadataFieldValue) {
         return "{\n"
             + "      \"metadataFields\": [\n"
             + "        {\n"
             + "          \"id\": \"" + metadataFieldId + "\",\n"
             + "          \"label\": \"fieldA\",\n"
             + "          \"hidden\": false,\n"
-            + "          \"value\": \"TODO\",\n"
+            + "          \"value\": \"" + metadataFieldValue + "\",\n"
             + "          \"metadata\": true,\n"
             + "          \"hint_text\": null,\n"
             + "          \"field_type\" : {\n"

@@ -19,7 +19,6 @@
 
       "case_data": "OVERRIDE",
       "data_classification": "OVERRIDE",
-      "security_classifications":  "OVERRIDE",
 
       "supplementary_data": null,
       "after_submit_callback_response": null,
