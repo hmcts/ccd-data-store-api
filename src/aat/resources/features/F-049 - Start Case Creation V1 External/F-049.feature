@@ -76,7 +76,7 @@ Scenario: must return 403 when request contains a malformed user ID
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-234 @Ignore
+@S-234
 Scenario: must return 400 when request contains a malformed Case Type ID
 
     Given a user with [an active profile in CCD],
