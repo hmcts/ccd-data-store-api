@@ -62,7 +62,7 @@ Scenario: must return 403 when request provides authentic credentials without au
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-076 @Ignore #This scenario is not returning http 412 code. Jira: RDM-6879
+@S-076
 Scenario: must return 412 when the case type is not present in Definition store workbasket input fields
 
     Given a user with [an active profile in CCD],
