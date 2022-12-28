@@ -102,7 +102,7 @@ Scenario: must return 422 when event submission has failed
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-277 @Ignore # This scenario is returning 403 instead of expected 404, linked to defect JIRA-6917
+@S-277 # This scenario is returning 403 instead of expected 404, linked to defect JIRA-6917
 Scenario: must return 404 when request contains a non-existing jurisdiction Id
 
     Given a user with [an active profile in CCD],
@@ -116,7 +116,7 @@ Scenario: must return 404 when request contains a non-existing jurisdiction Id
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-560 @Ignore # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6918
+@S-560 # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6918
 Scenario: must return 404 when request contains a non-existing case type
 
     Given a user with [an active profile in CCD],
