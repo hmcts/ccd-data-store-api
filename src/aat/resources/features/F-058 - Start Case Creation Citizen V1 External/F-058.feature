@@ -20,7 +20,7 @@ Scenario: must start case creation process successfully for correct inputs
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-237 @Ignore # Response code mismatch, expected: 401, actual: 403
+@S-237 # Response code mismatch, expected: 401, actual: 403
 Scenario: must return 401 when request provides invalid authentication credentials
 
     Given a user with [an active profile in CCD],
@@ -48,7 +48,7 @@ Scenario: must return 403 when the request contains a dummy user id
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-238 @Ignore # Response code mismatch, expected: 403, actual: 200
+@S-238 # Response code mismatch, expected: 403, actual: 200
 Scenario: must return 403 when the request contains a jurisdiction id that the user is unauthorized to access
 
     Given a user with [an active profile in CCD],
@@ -76,7 +76,7 @@ Scenario: must return 403 when request contains a malformed user ID
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-240 @Ignore # Response code mismatch, expected: 400, actual: 500
+@S-240 # Response code mismatch, expected: 400, actual: 500
 Scenario: must return 400 when request contains a malformed Case Type ID
 
     Given a user with [an active profile in CCD],
@@ -90,7 +90,7 @@ Scenario: must return 400 when request contains a malformed Case Type ID
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-517 @Ignore # Response code mismatch, expected: 404, actual: 200
+@S-517 # Response code mismatch, expected: 404, actual: 200
 Scenario: must return 404 when request contains a non-existing jurisdiction ID
 
     Given a user with [an active profile in CCD],
