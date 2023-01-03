@@ -97,7 +97,11 @@ public class CallbackService {
         return responseEntity.map(re -> Optional.of(re.getBody())).orElseThrow(() -> {
             LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(),
                 caseEvent.getId());
-            return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
+//            return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
+            String callbackTypeString = callbackType != null ? callbackType.getValue() : "null";
+            return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName() +
+                "url " + url + " caseTypeId " + caseDetails.getCaseTypeId() + " caseEvent Id " + caseEvent.getId() +
+                " callbackType " + callbackTypeString);
         });
     }
 
