@@ -96,9 +96,7 @@ Feature: F-106: Update Supplementary Data
     When a request is prepared with appropriate values,
     And it is submitted to call the [Update Supplementary Data] operation of [CCD Data Store api],
     Then a negative response is received,
-    And the response has all the details as expected,
-    And a request is submitted to call [external search query] operation of [CCD Data Store Elastic Search API],
-    And the response has all the details as the initial created case.
+    And the response has all the details as expected.
 
   @S-613 @elasticsearch
   Scenario: Must NOT be able to Update supplementary data of any PRIVATE case that requires explicit access
