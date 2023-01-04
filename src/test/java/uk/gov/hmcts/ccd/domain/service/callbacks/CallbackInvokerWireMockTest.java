@@ -56,6 +56,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         String testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
         caseEventDefinition.setCallBackURLAboutToStartEvent(testUrl);
         caseEventDefinition.setName("Test");
+        wireMockServer.resetAll();
     }
 
     @Test
