@@ -15,10 +15,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -139,6 +136,7 @@ public class CategoriesAndDocumentsService {
 
         return caseFieldExtracts.stream()
             .map(caseFieldExtract -> transformDocument(caseFieldExtract, caseData))
+            .filter(Objects::nonNull)
             .collect(Collectors.groupingBy(tuple -> tuple._1,
                 collectingAndThen(toUnmodifiableList(), DOCUMENTS_FUNCTION)));
     }
@@ -147,6 +145,10 @@ public class CategoriesAndDocumentsService {
                                                          @NonNull final Map<String, JsonNode> caseData) {
         final Tuple2<String, Map<String, String>> documentNode =
             fileViewDocumentService.getDocumentNode(caseFieldMetadata.getPath(), caseData);
+
+        if (documentNode._2 == null) {
+            return null;
+        }
 
         final Document document = buildDocument(documentNode._1, documentNode._2);
 
