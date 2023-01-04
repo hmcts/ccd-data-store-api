@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -66,13 +67,13 @@ public class SearchQueryFactoryOperation {
         this.caseTypeService = caseTypeService;
     }
 
-    public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
+    public Optional<Query> build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criterionFactory.build(metadata, params);
 
         Map<String, Object> parametersToBind = Maps.newHashMap();
         String whereClausePart = secure(toClauses(criteria), metadata, parametersToBind);
         if (whereClausePart.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
 
         String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
@@ -88,7 +89,7 @@ public class SearchQueryFactoryOperation {
         parametersToBind.forEach(query::setParameter);
         addParameters(query, criteria);
         log.debug("[SQL Query ]] : " + queryString);
-        return query;
+        return Optional.of(query);
     }
 
     private String secure(String clauses, MetaData metadata, Map<String, Object> params) {
