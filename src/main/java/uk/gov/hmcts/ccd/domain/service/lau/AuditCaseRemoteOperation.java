@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.SearchLog;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -110,6 +112,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         }
     }
 
+    @Async
     private void postAsyncAuditRequestAndHandleResponse(AuditEntry entry, String activity, String body, String url) {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
@@ -118,22 +121,15 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             .header("Accept", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .build();
-
         String auditLogId = UUID.randomUUID().toString();
 
-        logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId(), auditLogId);
-
-        CompletableFuture<HttpResponse<String>> responseFuture =
-            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-
-        responseFuture.whenComplete((response, error) -> {
-            if (response != null) {
-                logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri(), auditLogId);
-            }
-            if (error != null) {
-                log.error("Error occurred while processing response for remote log and audit request. ", error);
-            }
-        });
+        try {
+            logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId(), auditLogId);
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri(), auditLogId);
+        } catch (IOException|InterruptedException error) {
+            log.error("Error occurred while processing response for remote log and audit request. ", error);
+        }
     }
 
     private ActionLog createActionLogFromAuditEntry(AuditEntry entry, ZonedDateTime zonedDateTime) {
