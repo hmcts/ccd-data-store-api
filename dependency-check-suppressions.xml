@@ -14,7 +14,9 @@
   </suppress>
   <suppress>
     <notes>Temporary Suppression
-        CVE-2021-37533 refer [Ticket]</notes>
+        CVE-2021-37533 refer [Ticket]
+        CVE-2021-4277 refer [Ticket]</notes>
     <cve>CVE-2021-37533</cve>
+    <cve>CVE-2021-4277</cve>
   </suppress>
 </suppressions>
