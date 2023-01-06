@@ -27,13 +27,6 @@
   },
   "expectedResponse": {
     "_extends_": "Common_403_Response",
-    "headers" : {
-      "Content-Encoding" : "gzip",
-      "Expires" : "0",
-      "Pragma" : "no-cache",
-      "Transfer-Encoding" : "chunked",
-      "Vary" : "accept-encoding"
-    },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseAccessException",
       "status" : 403,
