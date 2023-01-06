@@ -73,7 +73,7 @@ Scenario: should get 400 when request contains non-existing case reference
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-210  @Ignore # Response code mismatch, expected: 400, actual: 500 /RDM-7085
+@S-210 # Response code mismatch, expected: 400, actual: 500 /RDM-7085
 Scenario: should get 400 when request contains non-existing event Id
 
     Given a user with [an active profile in CCD],
