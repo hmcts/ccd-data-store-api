@@ -23,8 +23,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -45,6 +45,8 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
     private final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
     private final HttpClient httpClient;
+
+    private int randomNumber = new Random().nextInt(10);
 
     private final ObjectMapper objectMapper;
 
@@ -127,7 +129,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId(), auditLogId);
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri(), auditLogId);
-        } catch (IOException|InterruptedException error) {
+        } catch (IOException | InterruptedException error) {
             log.error("Error occurred while processing response for remote log and audit request. ", error);
         }
     }
