@@ -11,7 +11,7 @@ properties(
     ]
 )
 
-@Library("Infrastructure")
+@Library("Infrastructure@hlds-secrets-test")
 
 def type = "java"
 def product = "ccd"
