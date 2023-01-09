@@ -15,8 +15,12 @@
   <suppress>
     <notes>Temporary Suppression
         CVE-2021-37533 refer [Ticket]
-        CVE-2021-4277 refer [Ticket]</notes>
+        CVE-2021-4277 refer [Ticket]
+	CVE-2022-3064 refer https://tools.hmcts.net/jira/browse/CCD-4157
+        CVE-2021-4235 refer https://tools.hmcts.net/jira/browse/CCD-4157</notes>
     <cve>CVE-2021-37533</cve>
     <cve>CVE-2021-4277</cve>
+    <cve>CVE-2022-3064</cve>
+    <cve>CVE-2021-4235</cve>
   </suppress>
 </suppressions>
