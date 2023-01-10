@@ -17,10 +17,14 @@
         CVE-2021-37533 refer [Ticket]
         CVE-2021-4277 refer [Ticket]
 	CVE-2022-3064 refer https://tools.hmcts.net/jira/browse/CCD-4157
-        CVE-2021-4235 refer https://tools.hmcts.net/jira/browse/CCD-4157</notes>
+        CVE-2021-4235 refer https://tools.hmcts.net/jira/browse/CCD-4157
+        CVE-2022-36437 refer [Ticket]
+        CVE-2022-45143 refer [Ticket]</notes>
     <cve>CVE-2021-37533</cve>
     <cve>CVE-2021-4277</cve>
     <cve>CVE-2022-3064</cve>
     <cve>CVE-2021-4235</cve>
+    <cve>CVE-2022-36437</cve>
+    <cve>CVE-2022-45143</cve>
   </suppress>
 </suppressions>
