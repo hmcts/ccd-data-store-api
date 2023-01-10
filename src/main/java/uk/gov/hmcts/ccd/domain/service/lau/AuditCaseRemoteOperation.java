@@ -110,8 +110,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         }
     }
 
-    //@Async
-    private void postAsyncAuditRequestAndHandleResponse(AuditEntry entry, String activity, String body, String url) {
+    private void postAsyncAuditRequestAndHandleResponse(AuditEntry entry, String activity, String body, String url) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .header("Content-Type", "application/json")
@@ -120,14 +119,9 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .build();
         String auditLogId = UUID.randomUUID().toString();
-
-        try {
-            logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId(), auditLogId);
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri(), auditLogId);
-        } catch (IOException | InterruptedException error) {
-            log.error("Error occurred while processing response for remote log and audit request. ", error);
-        }
+        logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId(), auditLogId);
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri(), auditLogId);
     }
 
     private ActionLog createActionLogFromAuditEntry(AuditEntry entry, ZonedDateTime zonedDateTime) {

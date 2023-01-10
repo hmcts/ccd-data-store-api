@@ -26,7 +26,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -34,6 +33,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -109,8 +109,8 @@ class AuditCaseRemoteOperationTest {
         // Setup as viewing a case
         entry.setOperationType(AuditOperationType.CASE_ACCESSED.getLabel());
 
-        when(httpClient.sendAsync(any(HttpRequest.class),
-            any(HttpResponse.BodyHandler.class))).thenReturn(new CompletableFuture<Void>());
+        when(httpClient.send(any(HttpRequest.class),
+            any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
         verify(httpClient).send(captor.capture(),any());
@@ -150,6 +150,37 @@ class AuditCaseRemoteOperationTest {
 
         HttpRequest.BodyPublisher bodyPublisher = captor.getValue().bodyPublisher().get();
         assertThat(bodyPublisher.contentLength(), is(equalTo(2L)));
+    }
+
+    @Test
+    @DisplayName("should not attempt search audit if case type doesn't match")
+    void shouldNotAuditIfCaseTypeIncorrectForPostCaseSearchRemoteAuditRequest() throws InterruptedException, IOException {
+
+        ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+        AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
+
+        auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
+
+        verify(httpClient, times(0));
+    }
+
+    @Test
+    @DisplayName("should throw ioexception when posting case search remote audit request")
+    void shouldThrowIOErrorForPostCaseSearchRemoteAuditRequest() throws InterruptedException, IOException {
+
+        ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+        AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
+
+        // Setup as searching a case
+        entry.setOperationType(AuditOperationType.SEARCH_CASE.getLabel());
+        entry.setCaseId(MULTIPLE_CASE_IDS);
+
+        when(httpClient.send(any(HttpRequest.class),
+            any(HttpResponse.BodyHandler.class))).thenThrow(new IOException("An error has occured."));
+
+        auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
+
+        verify(httpClient, times(1));
     }
 
     @Test
