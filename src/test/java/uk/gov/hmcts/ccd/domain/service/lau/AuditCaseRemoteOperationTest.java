@@ -166,6 +166,24 @@ class AuditCaseRemoteOperationTest {
     }
 
     @Test
+    @DisplayName("should throw ioexception when posting case action remote audit request")
+    void shouldThrowIOErrorForPostCaseActionRemoteAuditRequest() throws InterruptedException, IOException {
+
+        ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+        AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
+
+        // Setup as reading a case
+        entry.setOperationType(AuditOperationType.CASE_ACCESSED.getLabel());
+
+        when(httpClient.send(any(HttpRequest.class),
+            any(HttpResponse.BodyHandler.class))).thenThrow(new IOException("An error has occured."));
+
+        auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
+
+        verify(httpClient).send(captor.capture(),any());
+    }
+
+    @Test
     @DisplayName("should throw ioexception when posting case search remote audit request")
     void shouldThrowIOErrorForPostCaseSearchRemoteAuditRequest() throws InterruptedException, IOException {
 
@@ -182,6 +200,21 @@ class AuditCaseRemoteOperationTest {
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
         verify(httpClient).send(captor.capture(),any());
+    }
+
+    @Test
+    @DisplayName("should not post case action remote audit request if operational type not assess, update or create")
+    void shouldNotPostCaseActionRemoteAuditRequest() {
+
+        ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+        AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
+
+        // Setup as non action operational type.
+        entry.setOperationType(AuditOperationType.SEARCH_CASE.getLabel());
+
+        auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
+
+        verifyNoInteractions(httpClient);
     }
 
     @Test
