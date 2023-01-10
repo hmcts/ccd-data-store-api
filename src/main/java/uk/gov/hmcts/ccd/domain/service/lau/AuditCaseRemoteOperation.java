@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
@@ -23,7 +22,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.ZonedDateTime;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -45,8 +43,6 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
     private final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
     private final HttpClient httpClient;
-
-    private int randomNumber = new Random().nextInt(10);
 
     private final ObjectMapper objectMapper;
 
@@ -114,7 +110,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         }
     }
 
-    @Async
+    //@Async
     private void postAsyncAuditRequestAndHandleResponse(AuditEntry entry, String activity, String body, String url) {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
