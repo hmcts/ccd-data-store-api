@@ -232,6 +232,25 @@ class AuditCaseRemoteOperationTest {
         verifyNoInteractions(httpClient);
     }
 
+    @Test
+    @DisplayName("should throw interruptedexception when posting case search remote audit request")
+    void shouldThrowInterruptedErrorForPostCaseSearchRemoteAuditRequest() throws InterruptedException, IOException {
+
+        ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+        AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
+
+        // Setup as searching a case
+        entry.setOperationType(AuditOperationType.SEARCH_CASE.getLabel());
+        entry.setCaseId(MULTIPLE_CASE_IDS);
+
+        when(httpClient.send(any(HttpRequest.class),
+            any(HttpResponse.BodyHandler.class))).thenThrow(new InterruptedException("An error has occured."));
+
+        auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
+
+        verify(httpClient).send(captor.capture(),any());
+    }
+
     private AuditEntry createBaseAuditEntryData(ZonedDateTime fixedDateTime) {
         AuditEntry entry = new AuditEntry();
 
