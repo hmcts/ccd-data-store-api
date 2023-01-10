@@ -98,9 +98,9 @@ public class CallbackService {
             LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(),
                 caseEvent.getId());
             String callbackTypeString = callbackType != null ? callbackType.getValue() : "null";
-            return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName() +
-                "url " + url + " caseTypeId " + caseDetails.getCaseTypeId() + " caseEvent Id " + caseEvent.getId() +
-                " callbackType " + callbackTypeString);
+            return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName()
+                + "url " + url + " caseTypeId " + caseDetails.getCaseTypeId() + " caseEvent Id " + caseEvent.getId()
+                + " callbackType " + callbackTypeString);
         });
     }
 
