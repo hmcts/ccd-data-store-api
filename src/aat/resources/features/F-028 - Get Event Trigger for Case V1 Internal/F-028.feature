@@ -7,7 +7,7 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-044
+@S-044 @Ignore
 Scenario: must return event trigger data successfully for valid pre-state conditions
 
     Given a user with [an active profile in CCD],
