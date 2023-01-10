@@ -96,7 +96,8 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
         CallbackException callbackException = assertThrows(CallbackException.class, () ->
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false));
-        MatcherAssert.assertThat(callbackException.getMessage(), CoreMatchers.containsString("Callback to service has been unsuccessful for event Test url"));
+        MatcherAssert.assertThat(callbackException.getMessage(),
+            CoreMatchers.containsString("Callback to service has been unsuccessful for event Test url"));
         verify(exactly(1), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
