@@ -110,7 +110,8 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         }
     }
 
-    private void postAsyncAuditRequestAndHandleResponse(AuditEntry entry, String activity, String body, String url) throws IOException, InterruptedException {
+    private void postAsyncAuditRequestAndHandleResponse(AuditEntry entry, String activity, String body, String url)
+        throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .header("Content-Type", "application/json")
