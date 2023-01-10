@@ -154,7 +154,8 @@ class AuditCaseRemoteOperationTest {
 
     @Test
     @DisplayName("should not attempt search audit if case type doesn't match")
-    void shouldNotAuditIfCaseTypeIncorrectForPostCaseSearchRemoteAuditRequest() throws InterruptedException, IOException {
+    void shouldNotAuditIfCaseTypeIncorrectForPostCaseSearchRemoteAuditRequest()
+        throws InterruptedException, IOException {
 
         ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
         AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
