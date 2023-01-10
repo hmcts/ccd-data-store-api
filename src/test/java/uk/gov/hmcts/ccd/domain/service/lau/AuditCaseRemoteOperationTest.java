@@ -161,7 +161,7 @@ class AuditCaseRemoteOperationTest {
 
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
-        verify(httpClient, times(0));
+        verify(httpClient, times(0)).send(captor.capture(),any());
     }
 
     @Test
@@ -180,7 +180,7 @@ class AuditCaseRemoteOperationTest {
 
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
-        verify(httpClient, times(1));
+        verify(httpClient).send(captor.capture(),any());
     }
 
     @Test
