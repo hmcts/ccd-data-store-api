@@ -83,7 +83,7 @@
       ],
       "cases": [
         {
-          "_extends_": "104_Base_Case_Fields_expected",
+          "_extends_": "F-104_Base_Case_Fields_expected",
           "fields": {
             "EmailField": "fuctional@test.com",
             "TextField": "text"

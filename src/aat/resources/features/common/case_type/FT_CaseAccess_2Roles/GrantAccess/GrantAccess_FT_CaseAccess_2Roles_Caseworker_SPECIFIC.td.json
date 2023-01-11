@@ -1,0 +1,20 @@
+{
+  "_guid_": "GrantAccess_FT_CaseAccess_2Roles_Caseworker_SPECIFIC",
+  "_extends_": "GrantAccess_FT_CaseAccess_2Roles_Caseworker_SPECIFIC__Base",
+
+  "specs": [
+    "to grant SPECIFIC access to the caseworker"
+  ],
+
+  "request": {
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][siblingContexts][CreateCase_FT_CaseAccess_2Roles_PreRequisiteCitizen][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][caseworker][id]}",
+          "case_role": "[SPECIFICACCESSPROFILE]"
+        }
+      ]
+    }
+  }
+}
