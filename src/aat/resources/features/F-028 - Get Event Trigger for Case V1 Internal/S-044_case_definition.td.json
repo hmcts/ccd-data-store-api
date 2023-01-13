@@ -61,8 +61,8 @@
       "categories" : [ ],
       "searchCriterias" : [ ],
       "case_fields": "[[ANYTHING_PRESENT]]",
-      "printable_document_url": "[[ANYTHING_PRESENT]]",
-      "callback_get_case_url" : null,
+      "printable_document_url": null,
+      "callback_get_case_url" : "[[ANYTHING_PRESENT]]",
       "retries_get_case_url" : [],
       "security_classification": "PUBLIC"
     }
