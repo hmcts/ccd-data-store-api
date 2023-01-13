@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
-    private static final int NUMBER_OF_CASES = 4;
+    private static final int NUMBER_OF_CASES = 6;
     private JdbcTemplate template;
 
     @Inject
@@ -184,6 +184,80 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         Map<String, Object> responseMap = supplementaryData.getResponse();
         assertTrue(responseMap.keySet().contains("orgs_assigned_users"));
     }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldSetSupplementaryDataWhenSupplementaryDataHasOtherParent() {
+        assumeDataInitialised();
+        supplementaryDataRepository.setSupplementaryData("1504259907311111",
+            "orgs_assigned_users.organisationC",
+            23);
+
+        SupplementaryData supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907311111",
+                Sets.newHashSet("orgs_assigned_users.organisationC"));
+        assertNotNull(supplementaryData);
+        Map<String, Object> response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("orgs_assigned_users.organisationC"));
+        assertEquals(23, response.get("orgs_assigned_users.organisationC"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldSetSupplementaryDataWhenSupplementaryDataHasSameParentAndOtherParent() {
+        assumeDataInitialised();
+        supplementaryDataRepository.setSupplementaryData("1504259907322222",
+            "orgs_assigned_users.organisationC",
+            23);
+
+        SupplementaryData supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907322222",
+                Sets.newHashSet("orgs_assigned_users.organisationC"));
+        assertNotNull(supplementaryData);
+        Map<String, Object> response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("orgs_assigned_users.organisationC"));
+        assertEquals(23, response.get("orgs_assigned_users.organisationC"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldIncrementSupplementaryDataWhenSupplementaryDataHasOtherParent() {
+        assumeDataInitialised();
+        supplementaryDataRepository.incrementSupplementaryData("1504259907311111",
+            "orgs_assigned_users.organisationC",
+            1);
+
+        SupplementaryData supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907311111",
+                Sets.newHashSet("orgs_assigned_users.organisationC"));
+        assertNotNull(supplementaryData);
+        Map<String, Object> response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("orgs_assigned_users.organisationC"));
+        assertEquals(1, response.get("orgs_assigned_users.organisationC"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldIncrementSupplementaryDataWhenSupplementaryDataHasSameParentAndOtherParent() {
+        assumeDataInitialised();
+        supplementaryDataRepository.incrementSupplementaryData("1504259907322222",
+            "orgs_assigned_users.organisationB",
+            2);
+
+        SupplementaryData supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907322222",
+                Sets.newHashSet("orgs_assigned_users.organisationB"));
+        assertNotNull(supplementaryData);
+        Map<String, Object> response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("orgs_assigned_users.organisationB"));
+        assertEquals(5, response.get("orgs_assigned_users.organisationB"));
+    }
+
+
 
     private void assumeDataInitialised() {
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
