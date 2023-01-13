@@ -12,8 +12,11 @@ import org.springframework.test.context.jdbc.Sql;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
@@ -135,6 +138,20 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         assertEquals(-1, responseMap.get("orgs_assigned_users.organisationA"));
     }
 
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void decrementSupplementaryDataWhenSupplementaryDataDoNotHaveTheParent() {
+        assumeDataInitialised();
+
+        supplementaryDataRepository.incrementSupplementaryData("1504259907311111",
+            "orgs_assigned_users.organisationA",
+            -1);
+
+        assertThrows(ServiceException.class,
+            () -> supplementaryDataRepository.findSupplementaryData("1504259907311111",
+            Sets.newHashSet("orgs_assigned_users.organisationA")));
+    }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
