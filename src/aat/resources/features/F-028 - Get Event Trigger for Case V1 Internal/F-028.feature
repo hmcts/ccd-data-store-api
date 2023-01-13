@@ -12,6 +12,7 @@ Scenario: must return event trigger data successfully for valid pre-state condit
 
     Given a user with [an active profile in CCD],
       And a case that has just been created as in [Standard_Full_Case_Creation_Data],
+      And a successful call [test123] as in [S-044_v2_external]
 
      When a request is prepared with appropriate values,
       And the request [is prepared with valid Jurisdiction, Case ID and User ID],
