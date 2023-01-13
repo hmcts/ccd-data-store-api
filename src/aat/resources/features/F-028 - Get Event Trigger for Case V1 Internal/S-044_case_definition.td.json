@@ -53,7 +53,35 @@
         "case_types": []
       },
       "events": "[[ANYTHING_PRESENT]]",
-      "states": "[[ANYTHING_PRESENT]]",
+
+      "states" : [ {
+        "__operator__": "equivalent",
+        "__ordering__": "unordered",
+        "__elementId__": "id"
+      },
+        {
+        "id" : "TODO",
+        "name" : "To do",
+        "description" : null,
+        "order" : 1,
+        "title_display" : "CUSTOM  TITLE DISPLAY",
+        "acls" : "[[ANYTHING_PRESENT]]"
+      }, {
+        "id" : "IN_PROGRESS",
+        "name" : "In progress",
+        "description" : null,
+        "order" : 2,
+        "title_display" : null,
+        "acls" : "[[ANYTHING_PRESENT]]"
+      }, {
+        "id" : "DONE",
+        "name" : "Done",
+        "description" : null,
+        "order" : 3,
+        "title_display" : null,
+        "acls" : "[[ANYTHING_PRESENT]]"
+      } ],
+
       "acls": "[[ANYTHING_PRESENT]]",
       "searchAliasFields": "[[ANYTHING_PRESENT]]",
       "roleToAccessProfiles" : [ ],
