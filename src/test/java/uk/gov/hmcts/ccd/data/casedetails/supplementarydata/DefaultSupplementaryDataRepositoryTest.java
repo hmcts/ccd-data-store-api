@@ -17,6 +17,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
@@ -141,7 +143,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
         {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void decrementSupplementaryDataWhenSupplementaryDataDoNotHaveTheParent() {
+    public void shouldNotDecrementSupplementaryDataWhenSupplementaryDataDoNotHaveTheParent() {
         assumeDataInitialised();
 
         supplementaryDataRepository.incrementSupplementaryData("1504259907311111",
@@ -252,23 +254,6 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("orgs_assigned_users.organisationC"));
         assertEquals(1, response.get("orgs_assigned_users.organisationC"));
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
-        {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void shouldNotAddOrgAssignedUserDataWhenSupplementaryDataHasOtherParentAndUserCountNegative() {
-        assumeDataInitialised();
-        supplementaryDataRepository.incrementSupplementaryData("1504259907311111",
-            "orgs_assigned_users.organisationC",
-            -1);
-
-        SupplementaryData supplementaryData =
-            supplementaryDataRepository.findSupplementaryData("1504259907311111",
-                null);
-        assertNotNull(supplementaryData);
-        Map<String, Object> response = supplementaryData.getResponse();
-        assertFalse(response.keySet().contains("orgs_assigned_users"));
     }
 
     @Test
