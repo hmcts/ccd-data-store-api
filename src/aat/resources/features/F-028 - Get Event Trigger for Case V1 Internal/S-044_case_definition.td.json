@@ -1,0 +1,70 @@
+{
+  "_guid_": "S-044_case_definition",
+  "title": "must return the case type for an appropriate request",
+  "specs": [
+    "an active profile in CCD",
+    "contains a valid case type id",
+    "has the 200 OK code",
+    "test123"
+  ],
+
+  "productName": "CCD Definition Store",
+  "method": "GET",
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+
+
+  "operationName": "fetch a Case Type Schema",
+  "uri": "{{DEFINITION_STORE_HOST}}/api/data/case-type/{id}",
+  "request": {
+    "pathVariables": {
+      "id": "AAT_AUTH_15"
+    },
+    "headers": {
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+      "Content-Type": "application/json"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked"
+    },
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "description": "[[ANYTHING_PRESENT]]",
+      "version": {
+        "number": "[[ANY_INTEGER_NOT_NULLABLE]]",
+        "live_from": "[[ANYTHING_PRESENT]]",
+        "live_until": null
+      },
+      "name": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": {
+        "id": "[[ANYTHING_PRESENT]]",
+        "name": "[[ANYTHING_PRESENT]]",
+        "description": "[[ANYTHING_PRESENT]]",
+        "live_from": "[[ANYTHING_PRESENT]]",
+        "live_until": null,
+        "case_types": []
+      },
+      "events": "[[ANYTHING_PRESENT]]",
+      "states": "[[ANYTHING_PRESENT]]",
+      "acls": "[[ANYTHING_PRESENT]]",
+      "searchAliasFields": "[[ANYTHING_PRESENT]]",
+      "roleToAccessProfiles" : [ ],
+      "searchParties" : [ ],
+      "categories" : [ ],
+      "searchCriterias" : [ ],
+      "case_fields": "[[ANYTHING_PRESENT]]",
+      "printable_document_url": "[[ANYTHING_PRESENT]]",
+      "callback_get_case_url" : null,
+      "retries_get_case_url" : [],
+      "security_classification": "PUBLIC"
+    }
+  }
+}
