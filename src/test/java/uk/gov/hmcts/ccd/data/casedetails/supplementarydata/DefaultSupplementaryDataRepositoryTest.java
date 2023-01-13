@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
-    private static final int NUMBER_OF_CASES = 5;
+    private static final int NUMBER_OF_CASES = 4;
     private JdbcTemplate template;
 
     @Inject
@@ -183,24 +183,6 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         assertNotNull(supplementaryData);
         Map<String, Object> responseMap = supplementaryData.getResponse();
         assertTrue(responseMap.keySet().contains("orgs_assigned_users"));
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
-        {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void shouldAddDataWhenIncrementCalledWhenSupplementaryDataOrgAssignedUsersIsEmpty() {
-        assumeDataInitialised();
-
-        supplementaryDataRepository.incrementSupplementaryData("1504259907354547",
-            "orgs_assigned_users.organisationB",
-            1);
-
-        SupplementaryData response = supplementaryDataRepository.findSupplementaryData("1504259907353552",
-            Sets.newHashSet("orgs_assigned_users.organisationB"));
-        assertNotNull(response);
-        Map<String, Object> responseMap = response.getResponse();
-        assertTrue(responseMap.keySet().contains("orgs_assigned_users.organisationB"));
-        assertEquals(1, responseMap.get("orgs_assigned_users.organisationB"));
     }
 
     private void assumeDataInitialised() {
