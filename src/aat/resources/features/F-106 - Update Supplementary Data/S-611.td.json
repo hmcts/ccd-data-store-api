@@ -1,7 +1,7 @@
 {
   "title": "CAA must be able to see updated supplementary data of a case from different jurisdiction",
   "_guid_": "S-611",
-  "_extends_": "F-106_Test_Data_Base_CAA",
+  "_extends_": "F-106_Test_Data_Base",
   "specs": [
     "is configured to search for the previously created case by the updated supplementary data value",
     "a valid CAA profile",
@@ -14,7 +14,8 @@
   },
   "request": {
     "queryParams": {
-      "usecase": "workbasket"
+      "usecase": "workbasket",
+      "ctid": "BEFTA_CASETYPE_2_1"
     },
     "body": {
       "query":{

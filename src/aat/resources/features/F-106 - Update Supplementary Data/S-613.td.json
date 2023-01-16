@@ -3,7 +3,7 @@
   "_guid_": "S-613",
   "productName": "CCD Data Store api",
   "operationName": "Update Supplementary Data",
-  "_extends_": "F-106_Update_Supplementary_Data_Base",
+  "_extends_": "S-613_Update_Supplementary_Data_C2_PRIVATE",
   "specs": [
     "a valid PUBLIC profile"
   ],
@@ -15,7 +15,7 @@
   },
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F106_Case_Data_Create_C2_PRIVATE][testData][actualResponse][body][id]}"
+      "caseId": "${[scenarioContext][childContexts][S-613_Case_Data_Create_C2_PRIVATE][testData][actualResponse][body][id]}"
     },
     "body": {
       "supplementary_data_updates": {

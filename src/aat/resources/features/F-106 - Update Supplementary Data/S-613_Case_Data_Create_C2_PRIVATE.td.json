@@ -1,5 +1,5 @@
 {
-  "_guid_": "F106_Case_Data_Create_C2_PRIVATE",
+  "_guid_": "S-613_Case_Data_Create_C2_PRIVATE",
   "_extends_": "Private_Case_Creation_Autotest1_Data_1",
   "specs": [
     "C2_PRIVATE, which has just been"
@@ -11,7 +11,7 @@
   },
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C2_PRIVATE_Token_Creation][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][siblingContexts][S-613_Case_Data_Create_C2_PRIVATE_Token_Creation][testData][actualResponse][body][token]}"
     }
   }
 }
