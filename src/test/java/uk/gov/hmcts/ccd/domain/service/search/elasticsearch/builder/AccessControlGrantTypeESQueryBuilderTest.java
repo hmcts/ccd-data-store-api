@@ -55,7 +55,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
             new ExcludedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl),
             caseDefinitionRepository,
             caseDataAccessControl);
-        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder().build();
         when(caseDefinitionRepository.getCaseType(anyString())).thenReturn(caseTypeDefinition);
         when(caseStateDefinition.getId()).thenReturn("TestState");
         when(accessControlService.filterCaseStatesByAccess(Mockito.anyList(), any(), any()))

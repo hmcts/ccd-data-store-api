@@ -651,18 +651,15 @@ class DefaultCreateCaseOperationTest {
     }
 
     private static CaseTypeDefinition buildCaseType() {
-        final JurisdictionDefinition j = buildJurisdiction();
         final Version version = new Version();
         version.setNumber(67);
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId("caseTypeId");
-        caseTypeDefinition.setName("case type name");
-        caseTypeDefinition.setJurisdictionDefinition(j);
-        caseTypeDefinition.setVersion(version);
-        caseTypeDefinition.setCaseFieldDefinitions(List.of(
-            new CaseFieldDefinition()
-        ));
-        return caseTypeDefinition;
+        return CaseTypeDefinition.builder()
+            .id("caseTypeId")
+            .name("case type name")
+            .jurisdictionDefinition(buildJurisdiction())
+            .version(version)
+            .caseFieldDefinitions(List.of(new CaseFieldDefinition()))
+            .build();
     }
 
     private static JurisdictionDefinition buildJurisdiction() {

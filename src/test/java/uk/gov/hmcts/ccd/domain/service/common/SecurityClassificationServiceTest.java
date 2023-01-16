@@ -4,12 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Sets;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,6 +23,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.CoreMatchers.is;
@@ -54,7 +54,6 @@ import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
@@ -105,10 +104,9 @@ public class SecurityClassificationServiceTest {
             newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
         private final CaseFieldDefinition testCaseField12 =
             newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
-        private final CaseTypeDefinition testCaseTypeDefinition = newCaseType()
-            .withId(CASE_TYPE_ONE)
-            .withField(testCaseField11)
-            .withField(testCaseField12)
+        private final CaseTypeDefinition testCaseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ONE)
+            .caseFieldDefinitions(List.of(testCaseField11, testCaseField12))
             .build();
 
         @Test
@@ -143,7 +141,7 @@ public class SecurityClassificationServiceTest {
         public void shouldRetrieveClassificationsFromRepository() {
             when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(newHashSet(PUBLIC, PRIVATE));
-            securityClassificationService.getUserClassification(new CaseTypeDefinition(), true);
+            securityClassificationService.getUserClassification(CaseTypeDefinition.builder().build(), true);
 
             verify(caseDataAccessControl, times(1))
                 .getUserClassifications(any(CaseTypeDefinition.class), anyBoolean());
@@ -156,7 +154,7 @@ public class SecurityClassificationServiceTest {
                 .thenReturn(newHashSet(PUBLIC, PRIVATE));
 
             Optional<SecurityClassification> userClassification = securityClassificationService
-                .getUserClassification(new CaseTypeDefinition(), true);
+                .getUserClassification(CaseTypeDefinition.builder().build(), true);
 
             assertEquals(PRIVATE,
                 userClassification.get(),
@@ -173,7 +171,7 @@ public class SecurityClassificationServiceTest {
                 .thenReturn(newHashSet());
 
             Optional<SecurityClassification> userClassification = securityClassificationService.getUserClassification(
-                new CaseTypeDefinition(), true);
+                CaseTypeDefinition.builder().build(), true);
 
             assertFalse(userClassification.isPresent(), "Should not have classification");
         }
@@ -371,7 +369,7 @@ public class SecurityClassificationServiceTest {
     @DisplayName("getClassificationForEvent()")
     class GetSecurityClassificationForEvent {
 
-        private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        private CaseTypeDefinition caseTypeDefinition;
 
         @BeforeEach
         void setUp() throws IOException {
@@ -382,7 +380,9 @@ public class SecurityClassificationServiceTest {
             updateEvent.setId("updateEvent");
             updateEvent.setSecurityClassification(PRIVATE);
             List<CaseEventDefinition> events = Arrays.asList(createEvent, updateEvent);
-            caseTypeDefinition.setEvents(events);
+            caseTypeDefinition = CaseTypeDefinition.builder()
+                .events(events)
+                .build();
         }
 
         @Test

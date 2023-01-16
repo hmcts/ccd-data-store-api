@@ -1272,8 +1272,9 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenPostCreateEventWithInvalidCallbackDataForCaseworker() throws Exception {
-        final CaseTypeDefinition caseType = new CaseTypeDefinition();
-        caseType.setId(CASE_TYPE_ID);
+        final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .build();
         final JurisdictionDefinition jurisdiction = new JurisdictionDefinition();
         jurisdiction.setId(JURISDICTION_ID);
         final String URL =
@@ -1312,8 +1313,9 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenPostCreateEventWithInvalidCallbackDataForCitizen() throws Exception {
-        final CaseTypeDefinition caseType = new CaseTypeDefinition();
-        caseType.setId(CASE_TYPE_ID);
+        final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .build();
         final JurisdictionDefinition jurisdiction = new JurisdictionDefinition();
         jurisdiction.setId(JURISDICTION_ID);
         final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID,

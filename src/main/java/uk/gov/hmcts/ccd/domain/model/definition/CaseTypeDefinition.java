@@ -4,7 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.Value;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
@@ -20,65 +25,61 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
 @ToString
+@Builder
+@AllArgsConstructor
+@Value
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 public class CaseTypeDefinition implements Serializable {
     private static final long serialVersionUID = 5688786015302840008L;
-    private String id;
-    private String description;
-    private Version version;
-    private String name;
+    String id;         // TODO: make final
+    String description;
+    Version version;
+    String name;
     @JsonProperty("jurisdiction")
-    private JurisdictionDefinition jurisdictionDefinition;
+    JurisdictionDefinition jurisdictionDefinition;
     @JsonProperty("security_classification")
-    private SecurityClassification securityClassification;
-    private List<CaseEventDefinition> events = new ArrayList<>();
-    private List<CaseStateDefinition> states = new ArrayList<>();
+    SecurityClassification securityClassification;
+    @Builder.Default
+    List<CaseEventDefinition> events = new ArrayList<>();
+    @Builder.Default
+    List<CaseStateDefinition> states = new ArrayList<>();
     @JsonProperty("case_fields")
-    private List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
+    @Builder.Default
+    List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
     @JsonProperty("printable_document_url")
-    private String printableDocumentsUrl;
+    String printableDocumentsUrl;
     @JsonProperty("acls")
-    private List<AccessControlList> accessControlLists;
+    List<AccessControlList> accessControlLists;
     @JsonProperty("callback_get_case_url")
-    private String callbackGetCaseUrl;
+    String callbackGetCaseUrl;
     @JsonProperty("retries_get_case_url")
-    private List<Integer> retriesGetCaseUrl;
-    private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
-    private final List<SearchParty> searchParties = new ArrayList<>();
-    private final List<SearchCriteria> searchCriterias = new ArrayList<>();
-    private final List<CategoryDefinition> categories = new ArrayList<>();
+    List<Integer> retriesGetCaseUrl;
+    @Builder.Default
+    List<SearchAliasField> searchAliasFields = new ArrayList<>();
+    @Builder.Default
+    List<SearchParty> searchParties = new ArrayList<>();
+    @Builder.Default
+    List<SearchCriteria> searchCriterias = new ArrayList<>();
+    @Builder.Default
+    List<CategoryDefinition> categories = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
-    private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
+    @Builder.Default
+    List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
 
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public Version getVersion() {
         return version;
     }
 
-    public void setVersion(Version version) {
-        this.version = version;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @JsonIgnore
@@ -90,56 +91,28 @@ public class CaseTypeDefinition implements Serializable {
         return jurisdictionDefinition;
     }
 
-    public void setJurisdictionDefinition(JurisdictionDefinition jurisdictionDefinition) {
-        this.jurisdictionDefinition = jurisdictionDefinition;
-    }
-
     public SecurityClassification getSecurityClassification() {
         return securityClassification;
-    }
-
-    public void setSecurityClassification(SecurityClassification securityClassification) {
-        this.securityClassification = securityClassification;
     }
 
     public List<CaseEventDefinition> getEvents() {
         return events;
     }
 
-    public void setEvents(List<CaseEventDefinition> events) {
-        this.events = events;
-    }
-
     public List<CaseStateDefinition> getStates() {
         return states;
-    }
-
-    public void setStates(List<CaseStateDefinition> states) {
-        this.states = states;
     }
 
     public List<CaseFieldDefinition> getCaseFieldDefinitions() {
         return caseFieldDefinitions;
     }
 
-    public void setCaseFieldDefinitions(List<CaseFieldDefinition> caseFieldDefinitions) {
-        this.caseFieldDefinitions = caseFieldDefinitions;
-    }
-
     public String getPrintableDocumentsUrl() {
         return printableDocumentsUrl;
     }
 
-    public void setPrintableDocumentsUrl(String printableDocumentsUrl) {
-        this.printableDocumentsUrl = printableDocumentsUrl;
-    }
-
     public List<AccessControlList> getAccessControlLists() {
         return accessControlLists;
-    }
-
-    public void setAccessControlLists(List<AccessControlList> accessControlLists) {
-        this.accessControlLists = accessControlLists;
     }
 
     public SecurityClassification getClassificationForField(String fieldId) {
@@ -172,16 +145,8 @@ public class CaseTypeDefinition implements Serializable {
         return callbackGetCaseUrl;
     }
 
-    public void setCallbackGetCaseUrl(String callbackGetCaseUrl) {
-        this.callbackGetCaseUrl = callbackGetCaseUrl;
-    }
-
     public List<Integer> getRetriesGetCaseUrl() {
         return retriesGetCaseUrl == null ? Collections.emptyList() : retriesGetCaseUrl;
-    }
-
-    public void setRetriesGetCaseUrl(List<Integer> retriesGetCaseUrl) {
-        this.retriesGetCaseUrl = retriesGetCaseUrl;
     }
 
     public List<SearchAliasField> getSearchAliasFields() {
@@ -223,10 +188,6 @@ public class CaseTypeDefinition implements Serializable {
         return roleToAccessProfiles;
     }
 
-    public void setRoleToAccessProfiles(List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
-        this.roleToAccessProfiles = roleToAccessProfiles;
-    }
-
     public List<SearchParty> getSearchParties() {
         return searchParties;
     }
@@ -255,5 +216,31 @@ public class CaseTypeDefinition implements Serializable {
 
     public List<CategoryDefinition> getCategories() {
         return categories;
+    }
+
+    public static CaseTypeDefinition caseTypeDefinitionCopy(CaseTypeDefinition caseType,
+                                                            List<CaseEventDefinition> events,
+                                                            List<CaseStateDefinition> states,
+                                                            List<CaseFieldDefinition> caseFieldDefinitions) {
+        return CaseTypeDefinition.builder()
+            .events(events)
+            .states(states)
+            .caseFieldDefinitions(caseFieldDefinitions)
+            .id(caseType.getId())
+            .description(caseType.getDescription())
+            .version(caseType.getVersion())
+            .name(caseType.getName())
+            .jurisdictionDefinition(caseType.getJurisdictionDefinition())
+            .securityClassification(caseType.getSecurityClassification())
+            .printableDocumentsUrl(caseType.getPrintableDocumentsUrl())
+            .accessControlLists(caseType.getAccessControlLists())
+            .callbackGetCaseUrl(caseType.getCallbackGetCaseUrl())
+            .retriesGetCaseUrl(caseType.getRetriesGetCaseUrl())
+            .searchAliasFields(caseType.getSearchAliasFields())
+            .searchParties(caseType.getSearchParties())
+            .searchCriterias(caseType.getSearchCriterias())
+            .categories(caseType.getCategories())
+            .roleToAccessProfiles(caseType.getRoleToAccessProfiles())
+            .build();
     }
 }

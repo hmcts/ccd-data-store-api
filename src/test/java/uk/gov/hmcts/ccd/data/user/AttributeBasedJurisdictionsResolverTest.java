@@ -210,8 +210,9 @@ class AttributeBasedJurisdictionsResolverTest {
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId("jurisdictionId");
 
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .jurisdictionDefinition(jurisdictionDefinition)
+            .build();
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType("caseTypeId");
 
         given(roleAssignmentService.getRoleAssignments(USER_ID)).willReturn(

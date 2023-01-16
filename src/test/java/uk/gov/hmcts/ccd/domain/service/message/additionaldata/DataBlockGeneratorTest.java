@@ -41,7 +41,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.message.additionaldata.PublishableField.FIELD_SEPARATOR;
 
@@ -89,8 +88,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(aFieldType()
@@ -140,8 +139,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(aFieldType()
@@ -189,8 +188,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(aFieldType()
@@ -232,8 +231,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(aFieldType()
@@ -284,8 +283,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(aFieldType()
@@ -341,8 +340,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(
@@ -410,8 +409,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(
@@ -487,8 +486,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(
@@ -558,8 +557,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(
@@ -634,8 +633,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(
@@ -723,8 +722,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(
@@ -798,8 +797,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(
@@ -879,8 +878,8 @@ class DataBlockGeneratorTest {
                     .build()
             ))
             .build();
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(
@@ -958,8 +957,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(
@@ -1035,8 +1034,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(
@@ -1100,8 +1099,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(aFieldType()
@@ -1140,8 +1139,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(aFieldType()
@@ -1179,8 +1178,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(aFieldType()
@@ -1219,8 +1218,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(aFieldType()
@@ -1259,8 +1258,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(aFieldType()
@@ -1317,8 +1316,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID)
                     .withFieldType(

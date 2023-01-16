@@ -71,14 +71,13 @@ class GlobalSearchProcessorServiceTest {
     void setup() throws JsonProcessingException {
 
         globalSearchProcessorService = new GlobalSearchProcessorService(objectMapperService);
-        caseTypeDefinition = new CaseTypeDefinition();
 
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setId(SEARCH_CRITERIA);
 
-        List<CaseFieldDefinition> caseFieldDefinitions = List.of(caseFieldDefinition);
-
-        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(caseFieldDefinition))
+            .build();
 
         caseData = new HashMap<>();
         caseData.put("PersonFirstName", JacksonUtils.MAPPER.readTree("\"FirstNameValue\""));

@@ -9,8 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
-import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkTestFixtures;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,7 +74,7 @@ class CaseLinkMigrationServiceTest extends CaseLinkTestFixtures {
 
         // GIVEN
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseTypeDefinition);
-        CaseTypeDefinition caseTypeDefinition2 = new CaseTypeDefinition();
+        CaseTypeDefinition caseTypeDefinition2 = CaseTypeDefinition.builder().build();
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID_02)).willReturn(caseTypeDefinition2);
 
         List<CaseDetails> cases = new ArrayList<>();

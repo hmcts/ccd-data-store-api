@@ -334,10 +334,10 @@ class SubmitCaseTransactionTest {
     private CaseTypeDefinition buildCaseType() {
         final Version version = new Version();
         version.setNumber(VERSION);
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(CASE_TYPE_ID);
-        caseTypeDefinition.setVersion(version);
-        return caseTypeDefinition;
+        return CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .version(version)
+            .build();
     }
 
     private CaseEventDefinition buildEventTrigger() {

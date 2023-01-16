@@ -1,9 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Lists;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +23,10 @@ import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItem;
@@ -56,7 +57,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 public class SearchQueryOperationTest {
     private static final String CASE_TYPE_ID = "GrantOnly";
@@ -113,13 +113,12 @@ public class SearchQueryOperationTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseTypeDefinition = newCaseType()
-            .withId(CASE_TYPE_ID)
-            .withField(CASE_FIELD_1_1)
-            .withField(CASE_FIELD_1_2)
-            .withField(CASE_FIELD_1_3)
-            .withEvent(newCaseEvent().withId(EVENT_ID).withCanSaveDraft(true).build())
+        testCaseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .caseFieldDefinitions(List.of(CASE_FIELD_1_1, CASE_FIELD_1_2, CASE_FIELD_1_3))
+            .events(List.of(newCaseEvent().withId(EVENT_ID).withCanSaveDraft(true).build()))
             .build();
+
         Optional<CaseTypeDefinition> testCaseTypeOpt = Optional.of(testCaseTypeDefinition);
 
         doReturn(testCaseTypeOpt).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);

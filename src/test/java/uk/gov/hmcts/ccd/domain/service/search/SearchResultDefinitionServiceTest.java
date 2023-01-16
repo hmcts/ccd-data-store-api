@@ -12,22 +12,22 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.SEARCH;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class SearchResultDefinitionServiceTest {
@@ -63,12 +63,12 @@ class SearchResultDefinitionServiceTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseTypeDefinition = newCaseType()
-            .withId(CASE_TYPE_ID)
-            .withField(CASE_FIELD_1_1)
-            .withField(CASE_FIELD_1_2)
-            .withField(CASE_FIELD_1_3)
-            .withEvent(newCaseEvent().withId(EVENT_ID).withCanSaveDraft(true).build())
+        testCaseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .caseFieldDefinitions(List.of(
+                CASE_FIELD_1_1, CASE_FIELD_1_2, CASE_FIELD_1_3
+            ))
+            .events(List.of(newCaseEvent().withId(EVENT_ID).withCanSaveDraft(true).build()))
             .build();
     }
 
@@ -125,9 +125,9 @@ class SearchResultDefinitionServiceTest {
 
     @Test
     void shouldGetSearchResultDefinitionForDefaultUseCase() {
-        CaseTypeDefinition caseTypeDefinition = newCaseType()
-            .withId(CASE_TYPE_ID)
-            .withField(CASE_FIELD_1_1)
+        CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .caseFieldDefinitions(List.of(CASE_FIELD_1_1))
             .build();
 
         SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition,

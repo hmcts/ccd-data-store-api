@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -84,7 +85,7 @@ class AuthorisedCreateCaseOperationTest {
 
     private AuthorisedCreateCaseOperation authorisedCreateCaseOperation;
     private CaseDetails classifiedCase;
-    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+    private CaseTypeDefinition caseTypeDefinition;
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
     private final Set<AccessProfile> accessProfiles =
         createAccessProfiles(Sets.newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA3));
@@ -102,9 +103,11 @@ class AuthorisedCreateCaseOperationTest {
         doReturn(classifiedCase).when(classifiedCreateCaseOperation).createCaseDetails(CASE_TYPE_ID,
                                                                                        EVENT_DATA,
                                                                                        IGNORE);
-        caseTypeDefinition.setEvents(events);
-        caseTypeDefinition.setJurisdictionDefinition(newJurisdiction().withJurisdictionId(JURISDICTION_ID).build());
-        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .events(events)
+            .jurisdictionDefinition(newJurisdiction().withJurisdictionId(JURISDICTION_ID).build())
+            .caseFieldDefinitions(caseFieldDefinitions)
+            .build();
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getCaseCreationRoles(anyString())).thenReturn(accessProfiles);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),

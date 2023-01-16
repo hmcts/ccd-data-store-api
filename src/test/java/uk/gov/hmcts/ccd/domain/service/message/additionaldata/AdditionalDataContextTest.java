@@ -22,7 +22,6 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class AdditionalDataContextTest {
@@ -70,8 +69,8 @@ class AdditionalDataContextTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID_1)
                     .withFieldType(textField())
@@ -84,14 +83,15 @@ class AdditionalDataContextTest {
                     .withId(FIELD_ID_2)
                     .withFieldType(textField())
                     .build()
-            ))
+                ))
             .build();
+
 
         AdditionalDataContext result = new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
         PublishableField publishableField1 = result.getPublishableFields().get(0);
         PublishableField publishableField2 = result.getPublishableFields().get(1);
-        
+
         assertAll(
             () -> assertThat(result.getPublishableFields().size(), is(2)),
             () -> assertThat(publishableField1.getKey(), is(FIELD_ID_1)),
@@ -119,8 +119,8 @@ class AdditionalDataContextTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID_1)
                     .withFieldType(
@@ -186,8 +186,8 @@ class AdditionalDataContextTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID_1)
                     .withFieldType(
@@ -263,8 +263,8 @@ class AdditionalDataContextTest {
             ))
             .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
                 newCaseField()
                     .withId(FIELD_ID_1)
                     .withFieldType(textField())

@@ -29,6 +29,8 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.DefaultRoleAssignmentRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -36,8 +38,6 @@ import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.DefaultRoleAssignmentRepository;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -340,8 +340,8 @@ public abstract class AbstractBaseIntegrationTest {
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId(jurisdictionId);
 
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+                .id(caseTypeId).build();
 
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId(eventId);
@@ -355,8 +355,8 @@ public abstract class AbstractBaseIntegrationTest {
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId(jurisdictionId);
 
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .id(caseTypeId).build();
 
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId(eventId);

@@ -65,7 +65,7 @@ class RestrictedGetCaseOperationTest {
 
     private RestrictedGetCaseOperation restrictedGetCaseOperation;
     private CaseDetails caseDetails;
-    private final CaseTypeDefinition caseType = new CaseTypeDefinition();
+    private final CaseTypeDefinition caseType = CaseTypeDefinition.builder().build();
     private final Set<String> userRoles = Sets.newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1,
         CASEWORKER_PROBATE_LOA3);
     private final List<String> caseRoles = Collections.emptyList();

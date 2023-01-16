@@ -1,5 +1,22 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
+import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
+import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -8,28 +25,9 @@ import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
-
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
-import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 class ClassifiedGetCriteriaOperationTest {
     private static final String JURISDICTION_ID = "TEST";
@@ -76,16 +74,13 @@ class ClassifiedGetCriteriaOperationTest {
         );
 
         MockitoAnnotations.initMocks(this);
-        testCaseTypeDefinition = newCaseType()
-            .withJurisdiction(newJurisdiction()
-                                  .withJurisdictionId(JURISDICTION_ID)
-                                  .build())
-            .withField(CASE_FIELD_1_1)
-            .withField(CASE_FIELD_1_2)
-            .withField(CASE_FIELD_1_3)
-            .withField(CASE_FIELD_1_4)
+        testCaseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ONE)
+            .jurisdictionDefinition(newJurisdiction()
+                .withJurisdictionId(JURISDICTION_ID)
+                .build())
+            .caseFieldDefinitions(List.of(CASE_FIELD_1_1, CASE_FIELD_1_2, CASE_FIELD_1_3, CASE_FIELD_1_4))
             .build();
-        testCaseTypeDefinition.setId(CASE_TYPE_ONE);
 
         doReturn(testCaseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ONE);
 

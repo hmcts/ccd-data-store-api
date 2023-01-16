@@ -7,11 +7,14 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -76,11 +79,12 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
         Set<AccessProfile> caseAndUserRoles = Sets.union(accessProfiles,
             caseDataAccessControl.getCaseUserAccessProfilesByUserId());
 
-        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
-            caseAndUserRoles, access));
-        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition,
-            caseAndUserRoles, access));
+        List<CaseStateDefinition> caseStateDefinitions = accessControlService
+            .filterCaseStatesByAccess(caseTypeDefinition, caseAndUserRoles, access);
+        List<CaseEventDefinition> caseEventDefinitions = accessControlService
+            .filterCaseEventsByAccess(caseTypeDefinition, caseAndUserRoles, access);
 
-        return Optional.of(caseTypeDefinition);
+        return Optional.of(CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition,
+            caseEventDefinitions, caseStateDefinitions, caseTypeDefinition.getCaseFieldDefinitions()));
     }
 }

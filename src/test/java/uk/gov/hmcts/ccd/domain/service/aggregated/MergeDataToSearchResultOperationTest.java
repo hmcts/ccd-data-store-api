@@ -4,11 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +23,12 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -44,7 +45,6 @@ import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.Search
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
@@ -144,23 +144,27 @@ class MergeDataToSearchResultOperationTest {
                 .withComplexField(familyAddress)
                 .build();
 
-        caseTypeDefinition = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build())
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).build())
-            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType()).build())
-            .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).build())
-            .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build())
-            .withField(newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldTypeDefinition).build())
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .caseFieldDefinitions(List.of(
+                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build(),
+                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).build(),
+                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType()).build(),
+                newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).build(),
+                newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build(),
+                newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldTypeDefinition).build()
+            ))
             .build();
 
         final CaseFieldDefinition labelField = buildLabelCaseField(LABEL_ID, LABEL_TEXT);
-        caseTypeDefinitionWithLabels = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build())
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).build())
-            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType()).build())
-            .withField(labelField)
+        caseTypeDefinitionWithLabels = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .caseFieldDefinitions(List.of(
+                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build(),
+                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).build(),
+                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType()).build(),
+                labelField
+            ))
             .build();
 
         doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(Mockito.any(),
@@ -526,8 +530,10 @@ class MergeDataToSearchResultOperationTest {
                 FAMILY_DETAILS, "", ""))
             .build();
 
-        CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build()).build();
+        CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .caseFieldDefinitions(List.of(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build()))
+            .build();
         final SearchResultView searchResultView  = classUnderTest.execute(caseTypeWithoutCaseFieldDefinition,
                                                                             searchResult, caseDetailsList, NO_ERROR);
 

@@ -19,7 +19,6 @@ import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 class DefaultGetCaseTypesOperationTestDefinition {
 
@@ -38,9 +37,9 @@ class DefaultGetCaseTypesOperationTestDefinition {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        testCaseTypeDefinition1 = newCaseType().build();
-        testCaseTypeDefinition2 = newCaseType().build();
-        testCaseTypeDefinition3 = newCaseType().build();
+        testCaseTypeDefinition1 = CaseTypeDefinition.builder().build();
+        testCaseTypeDefinition2 = CaseTypeDefinition.builder().build();
+        testCaseTypeDefinition3 = CaseTypeDefinition.builder().build();
         defaultGetCaseTypesOperation =
                 new uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseTypesOperation(caseTypeService);
         testCaseTypeDefinitions = Lists.newArrayList(testCaseTypeDefinition1, testCaseTypeDefinition2,

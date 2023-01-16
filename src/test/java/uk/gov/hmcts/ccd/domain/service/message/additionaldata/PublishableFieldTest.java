@@ -23,7 +23,6 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class PublishableFieldTest {
@@ -50,8 +49,8 @@ class PublishableFieldTest {
 
         @Test
         void shouldCreatePublishableFieldForTopLevelField() {
-            caseTypeDefinition = newCaseType()
-                .withCaseFields(List.of(
+            caseTypeDefinition = CaseTypeDefinition.builder()
+                .caseFieldDefinitions(List.of(
                     newCaseField()
                         .withId(FIELD_ID)
                         .withFieldType(textField())
@@ -83,8 +82,8 @@ class PublishableFieldTest {
 
         @Test
         void shouldCreatePublishableFieldForTopLevelFieldWithAlias() {
-            caseTypeDefinition = newCaseType()
-                .withCaseFields(List.of(
+            caseTypeDefinition = CaseTypeDefinition.builder()
+                .caseFieldDefinitions(List.of(
                     newCaseField()
                         .withId(FIELD_ID)
                         .withFieldType(textField())
@@ -117,8 +116,8 @@ class PublishableFieldTest {
 
         @Test
         void shouldCreatePublishableFieldForNestedField() {
-            caseTypeDefinition = newCaseType()
-                .withCaseFields(List.of(
+            caseTypeDefinition = CaseTypeDefinition.builder()
+                .caseFieldDefinitions(List.of(
                     newCaseField()
                         .withId(FIELD_ID)
                         .withFieldType(
@@ -160,8 +159,8 @@ class PublishableFieldTest {
 
         @Test
         void shouldCreatePublishableFieldForNestedFieldWithAlias() {
-            caseTypeDefinition = newCaseType()
-                .withCaseFields(List.of(
+            caseTypeDefinition = CaseTypeDefinition.builder()
+                .caseFieldDefinitions(List.of(
                     newCaseField()
                         .withId(FIELD_ID)
                         .withFieldType(
@@ -204,9 +203,9 @@ class PublishableFieldTest {
 
         @Test
         void shouldThrowExceptionWhenFieldIdCannotBeFoundInCaseType() {
-            caseTypeDefinition = newCaseType()
-                .withCaseTypeId("CaseTypeId")
-                .withCaseFields(List.of(
+            caseTypeDefinition = CaseTypeDefinition.builder()
+                .id("CaseTypeId")
+                .caseFieldDefinitions(List.of(
                     newCaseField()
                         .withId(FIELD_ID)
                         .withFieldType(textField())

@@ -46,7 +46,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     private CallbackResponse callbackResponse;
     private CaseDetails caseDetails = new CaseDetails();
     private final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+    private final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder().build();
 
     @Before
     public void setUp() throws Exception {

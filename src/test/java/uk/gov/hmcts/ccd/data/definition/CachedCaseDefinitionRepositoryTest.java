@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -60,7 +58,7 @@ class CachedCaseDefinitionRepositoryTest {
         @DisplayName("should initially retrieve case types from decorated repository")
         void shouldRetrieveCaseTypesFromDecorated() {
             final List<CaseTypeDefinition> expectedCaseTypes =
-                Lists.newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition());
+                List.of(CaseTypeDefinition.builder().build(), CaseTypeDefinition.builder().build());
             doReturn(expectedCaseTypes).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             final List<CaseTypeDefinition> caseTypes =
@@ -77,7 +75,7 @@ class CachedCaseDefinitionRepositoryTest {
         @DisplayName("should cache case types for subsequent calls")
         void shouldCacheCaseTypesForSubsequentCalls() {
             final List<CaseTypeDefinition> expectedCaseTypes =
-                Lists.newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition());
+                List.of(CaseTypeDefinition.builder().build(), CaseTypeDefinition.builder().build());
             doReturn(expectedCaseTypes).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
@@ -85,8 +83,7 @@ class CachedCaseDefinitionRepositoryTest {
             verify(caseDefinitionRepository, times(1)).getCaseTypesForJurisdiction(
                 JURISDICTION_ID);
 
-            doReturn(newArrayList(new CaseTypeDefinition(),
-                new CaseTypeDefinition()))
+            doReturn(List.of(CaseTypeDefinition.builder().build()), CaseTypeDefinition.builder().build())
                 .when(caseDefinitionRepository)
                 .getCaseTypesForJurisdiction(JURISDICTION_ID);
 
@@ -108,7 +105,7 @@ class CachedCaseDefinitionRepositoryTest {
         @DisplayName("should initially retrieve base types from decorated repository")
         void shouldRetrieveBaseTypesFromDecorated() {
             final List<FieldTypeDefinition> expectedBaseTypes =
-                newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition());
+                List.of(new FieldTypeDefinition(), new FieldTypeDefinition());
             doReturn(expectedBaseTypes).when(caseDefinitionRepository).getBaseTypes();
 
             final List<FieldTypeDefinition> baseTypes = cachedCaseDefinitionRepository.getBaseTypes();
@@ -123,14 +120,14 @@ class CachedCaseDefinitionRepositoryTest {
         @DisplayName("should cache base types for subsequent calls")
         void shouldCacheBaseTypesForSubsequentCalls() {
             final List<FieldTypeDefinition> expectedBaseTypes =
-                newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition());
+                List.of(new FieldTypeDefinition(), new FieldTypeDefinition());
             doReturn(expectedBaseTypes).when(caseDefinitionRepository).getBaseTypes();
 
             cachedCaseDefinitionRepository.getBaseTypes();
 
             verify(caseDefinitionRepository, times(1)).getBaseTypes();
 
-            doReturn(newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition())).when(caseDefinitionRepository)
+            doReturn(List.of(new FieldTypeDefinition(), new FieldTypeDefinition())).when(caseDefinitionRepository)
                 .getBaseTypes();
 
             final List<FieldTypeDefinition> baseTypes = cachedCaseDefinitionRepository.getBaseTypes();
@@ -149,7 +146,7 @@ class CachedCaseDefinitionRepositoryTest {
         @Test
         @DisplayName("should retrieve all Case types IDs from decorated repository")
         void shouldRetrieveAllCaseTypesIDs() {
-            final List<String> expectedBaseTypes = newArrayList("caseTypeId1", "caseTypeId2");
+            final List<String> expectedBaseTypes = List.of("caseTypeId1", "caseTypeId2");
             doReturn(expectedBaseTypes).when(caseDefinitionRepository).getAllCaseTypesIDs();
 
             final List<String> caseTypesIDs = cachedCaseDefinitionRepository.getAllCaseTypesIDs();
@@ -167,16 +164,16 @@ class CachedCaseDefinitionRepositoryTest {
         @Test
         @DisplayName("should retrieve latest version of case type hit at request scope cache")
         void shouldRetrieveLatestVersionCaseTypeByCaseTypeIdWithoutAndWithRequestScopeCacheForAnEnabledCaseType() {
-            CaseTypeDefinition expected = new CaseTypeDefinition();
-            expected.setId("GrantOfRepresentation");
+            final CaseTypeDefinition expected = CaseTypeDefinition.builder()
+                .id("GrantOfRepresentation").build();
             testCachingOfCaseType(expected, 1, 0);
         }
 
         @Test
         @DisplayName("should retrieve latest version of case type missed at request scope cache")
         void shouldRetrieveLatestVersionCaseTypeByCaseTypeIdWithoutRequestScopeCacheForAnExcludedCaseType() {
-            CaseTypeDefinition expected = new CaseTypeDefinition();
-            expected.setId("DummyCaseType_1");
+            final CaseTypeDefinition expected = CaseTypeDefinition.builder()
+                .id("DummyCaseType_1").build();
             testCachingOfCaseType(expected, 1, 1);
         }
 
@@ -200,8 +197,8 @@ class CachedCaseDefinitionRepositoryTest {
         @Test
         @DisplayName("should retrieve all Case types IDs by Jurisdictions.")
         void shouldRetrieveCaseTypesIDsByJurisdictions() {
-            final List<String> expectedBaseTypes = newArrayList("caseTypeId1", "caseTypeId2");
-            final List<String> jurisdictions = newArrayList("jurisdiction1", "jurisdiction2");
+            final List<String> expectedBaseTypes = List.of("caseTypeId1", "caseTypeId2");
+            final List<String> jurisdictions = List.of("jurisdiction1", "jurisdiction2");
             doReturn(expectedBaseTypes).when(caseDefinitionRepository).getCaseTypesIDsByJurisdictions(jurisdictions);
 
             final List<String> caseTypesIDs =

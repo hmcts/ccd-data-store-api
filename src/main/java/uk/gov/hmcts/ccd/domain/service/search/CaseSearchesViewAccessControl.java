@@ -18,7 +18,7 @@ import java.util.Set;
 @Service
 public class CaseSearchesViewAccessControl {
 
-    private final CaseTypeService caseTypeService;
+    private final CaseTypeService caseTypeService; // TODO: why it is not used?
     private final SearchResultDefinitionService searchResultDefinitionService;
     private final SecurityClassificationServiceImpl securityClassificationService;
     private final CaseDataAccessControl caseDataAccessControl;

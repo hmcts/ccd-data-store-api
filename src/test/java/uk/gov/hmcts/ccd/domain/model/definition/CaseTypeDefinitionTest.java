@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
@@ -27,7 +27,7 @@ class CaseTypeDefinitionTest {
             newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build())
                     .build();
 
-    private uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition caseTypeDefinition;
+    private CaseTypeDefinition caseTypeDefinition;
 
     @Nested
     @DisplayName("CaseField tests")
@@ -35,8 +35,9 @@ class CaseTypeDefinitionTest {
 
         @BeforeEach
         void setUp() {
-            caseTypeDefinition = new uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition();
-            caseTypeDefinition.setCaseFieldDefinitions(Arrays.asList(name, surname));
+            caseTypeDefinition = CaseTypeDefinition.builder()
+                .caseFieldDefinitions(List.of(name, surname))
+                .build();
         }
 
         @Test

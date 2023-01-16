@@ -840,14 +840,15 @@ class DefaultCaseDataAccessControlTest {
     }
 
     private CaseTypeDefinition createCaseTypeDefinition(String... roleNames) {
-        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(CASE_TYPE_1);
-        caseTypeDefinition.setAccessControlLists(createAccessControlList());
-        caseTypeDefinition.setRoleToAccessProfiles(createRoleToAccessProfileDefinitions(roleNames));
         Version version = new Version();
         version.setNumber(1);
-        caseTypeDefinition.setVersion(version);
-        return caseTypeDefinition;
+
+        return CaseTypeDefinition.builder()
+            .id(CASE_TYPE_1)
+            .accessControlLists(createAccessControlList())
+            .roleToAccessProfiles(createRoleToAccessProfileDefinitions(roleNames))
+            .version(version)
+            .build();
     }
 
     private List<RoleToAccessProfileDefinition> createRoleToAccessProfileDefinitions(String... roleNames) {

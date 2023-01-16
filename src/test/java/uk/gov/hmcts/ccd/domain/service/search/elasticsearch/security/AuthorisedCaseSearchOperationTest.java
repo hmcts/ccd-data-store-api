@@ -4,13 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +31,14 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchIndex;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -84,12 +85,14 @@ class AuthorisedCaseSearchOperationTest {
     @InjectMocks
     private AuthorisedCaseSearchOperation authorisedCaseDetailsSearchOperation;
 
-    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+    private CaseTypeDefinition caseTypeDefinition;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        caseTypeDefinition.setId(CASE_TYPE_ID_1);
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID_1)
+            .build();
         searchRequestJsonNode.set(QUERY, mock(ObjectNode.class));
         when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ))
             .thenReturn(Optional.of(caseTypeDefinition));
@@ -121,7 +124,6 @@ class AuthorisedCaseSearchOperationTest {
                 .thenReturn(accessProfiles);
 
             when(objectMapperService.convertObjectToJsonNode(unFilteredData)).thenReturn(jsonNode);
-            CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
             when(accessControlService.filterCaseFieldsByAccess(jsonNode,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 accessProfiles, CAN_READ, false)).thenReturn(jsonNode);
