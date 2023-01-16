@@ -50,12 +50,21 @@ class PseudoRoleToAccessProfileGeneratorTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        caseTypeDefinition = new CaseTypeDefinition();
-
-        addCaseTypeAcls(caseTypeDefinition);
-        addStateAcls(caseTypeDefinition);
-        addEventAcls(caseTypeDefinition);
-        addCaseFieldAcls(caseTypeDefinition);
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .accessControlLists(List.of(
+                aclWithRole(IDAM_ROLE1),
+                aclWithRole(IDAM_ROLE2),
+                aclWithRole(CASE_ROLE1)))
+            .states(List.of(
+                caseStateWithAcl(asList(aclWithRole(IDAM_ROLE3), aclWithRole(CASE_ROLE1))),
+                caseStateWithAcl(List.of(aclWithRole(CASE_ROLE2)))))
+            .events(List.of(
+                createEventWithAcl(asList(aclWithRole(IDAM_ROLE4), aclWithRole(CASE_ROLE3))),
+                createEventWithAcl(asList(aclWithRole(IDAM_ROLE3), aclWithRole(CASE_ROLE1)))))
+            .caseFieldDefinitions(List.of(
+                createCaseField(asList(aclWithRole(IDAM_ROLE5), aclWithRole(CASE_ROLE4)),
+                    asList(complexAclWithRole(IDAM_ROLE6), complexAclWithRole(CASE_ROLE5)))))
+            .build();
     }
 
     @Nested
@@ -93,32 +102,10 @@ class PseudoRoleToAccessProfileGeneratorTest {
             .findAny();
     }
 
-    private void addCaseTypeAcls(CaseTypeDefinition caseTypeDefinition) {
-        caseTypeDefinition.setAccessControlLists(asList(aclWithRole(IDAM_ROLE1),
-                                                        aclWithRole(IDAM_ROLE2),
-                                                        aclWithRole(CASE_ROLE1),
-                                                        aclWithRole(CASE_ROLE6)));
-    }
-
-    private void addStateAcls(CaseTypeDefinition caseTypeDefinition) {
-        caseTypeDefinition.setStates(asList(
-            caseStateWithAcl(asList(aclWithRole(IDAM_ROLE3),
-                                    aclWithRole(CASE_ROLE1))),
-            caseStateWithAcl(List.of(aclWithRole(CASE_ROLE2)))
-        ));
-    }
-
     private CaseStateDefinition caseStateWithAcl(List<AccessControlList> acls) {
         CaseStateDefinition state = new CaseStateDefinition();
         state.setAccessControlLists(acls);
         return state;
-    }
-
-    private void addEventAcls(CaseTypeDefinition caseTypeDefinition) {
-        caseTypeDefinition.setEvents(asList(createEventWithAcl(asList(aclWithRole(IDAM_ROLE4),
-                                                                      aclWithRole(CASE_ROLE3))),
-                                            createEventWithAcl(asList(aclWithRole(IDAM_ROLE3),
-                                                                      aclWithRole(CASE_ROLE1)))));
     }
 
     private CaseEventDefinition createEventWithAcl(List<AccessControlList> acls) {
@@ -127,18 +114,9 @@ class PseudoRoleToAccessProfileGeneratorTest {
         return event;
     }
 
-    private void addCaseFieldAcls(CaseTypeDefinition caseTypeDefinition) {
-        List<AccessControlList> acls = asList(aclWithRole(IDAM_ROLE5),
-                                              aclWithRole(CASE_ROLE4));
-        List<ComplexACL> complexAcls = asList(complexAclWithRole(IDAM_ROLE6),
-                                              complexAclWithRole(CASE_ROLE5));
-        caseTypeDefinition.setCaseFieldDefinitions(List.of(createCaseField(acls, complexAcls)));
-    }
-
     private CaseFieldDefinition createCaseField(List<AccessControlList> acls, List<ComplexACL> complexAcls) {
         CaseFieldDefinition caseField = new CaseFieldDefinition();
         caseField.setAccessControlLists(acls);
-
         caseField.setComplexACLs(complexAcls);
         return caseField;
     }

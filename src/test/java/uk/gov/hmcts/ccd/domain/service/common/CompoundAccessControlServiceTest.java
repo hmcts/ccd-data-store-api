@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
@@ -19,8 +20,8 @@ import static org.hamcrest.Matchers.is;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DOCUMENT;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_IN_USER_ROLES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ACCESS_PROFILES;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_IN_USER_ROLES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.addressesStart;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getPeopleCollectionFieldDefinition;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getTagFieldDefinition;
@@ -34,7 +35,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.pe
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.person2;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
@@ -324,7 +324,7 @@ class CompoundAccessControlServiceTest {
                     .withCreate(true)
                     .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -346,7 +346,7 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -366,7 +366,7 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -397,7 +397,7 @@ class CompoundAccessControlServiceTest {
                     .withCreate(false)
                     .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -422,7 +422,7 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -452,7 +452,7 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -483,7 +483,7 @@ class CompoundAccessControlServiceTest {
                 .withCreate(false)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -514,7 +514,7 @@ class CompoundAccessControlServiceTest {
                 .withCreate(false)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -550,7 +550,7 @@ class CompoundAccessControlServiceTest {
                     .withCreate(true)
                     .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -567,6 +567,7 @@ class CompoundAccessControlServiceTest {
     @Nested
     @DisplayName("Compound Field - Update Tests")
     class CompoundFieldUpdateTests {
+
         @Test
         @DisplayName("Should grant access when nothing changes even when U doesn't exist")
         void shouldGrantAccessWhenNoUpdates() throws IOException {
@@ -576,7 +577,7 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(false)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -585,7 +586,6 @@ class CompoundAccessControlServiceTest {
             assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1),
                 dataNode, people, ACCESS_PROFILES), is(true));
         }
-
         @Test
         @DisplayName("Should grant access when child field updated and U exists- name change")
         void shouldGrantAccessWhenChildFieldUpdatedAndACLExists() throws IOException {
@@ -595,7 +595,7 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -616,7 +616,7 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(false)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -638,7 +638,7 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -663,7 +663,7 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -696,7 +696,7 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(false)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -732,7 +732,7 @@ class CompoundAccessControlServiceTest {
                     .withUpdate(false)
                     .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -773,7 +773,7 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -820,7 +820,7 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -876,7 +876,7 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -922,7 +922,7 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -968,7 +968,7 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1015,7 +1015,7 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1061,7 +1061,7 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1103,7 +1103,7 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1124,25 +1124,27 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case field if ACL false for collection of Document Type")
         void shouldNotGrantAccessToFieldWithAclAccessNotGrantedForCollectionOfDocuments() throws IOException {
-            CaseTypeDefinition caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("Documents")
-                    .withFieldType(aFieldType()
-                        .withType(COLLECTION)
-                        .withCollectionFieldType(aFieldType()
-                            .withType(DOCUMENT)
-                            .withId(DOCUMENT)
+            CaseTypeDefinition caseType = CaseTypeDefinition.builder()
+                .caseFieldDefinitions(List.of(
+                    newCaseField()
+                        .withId("Documents")
+                        .withFieldType(aFieldType()
+                            .withType(COLLECTION)
+                            .withCollectionFieldType(aFieldType()
+                                .withType(DOCUMENT)
+                                .withId(DOCUMENT)
+                                .build())
                             .build())
-                        .build())
-                    .withOrder(1)
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withCreate(false)
-                        .withUpdate(false)
-                        .withDelete(false)
-                        .withRead(true)
-                        .build())
-                    .build())
+                        .withOrder(1)
+                        .withAcl(anAcl()
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(false)
+                            .withUpdate(false)
+                            .withDelete(false)
+                            .withRead(true)
+                            .build())
+                        .build()
+                ))
                 .build();
             JsonNode newDataNode = getJsonNode("{\n"
                 + "  \"Documents\": [\n"
@@ -1197,11 +1199,12 @@ class CompoundAccessControlServiceTest {
                 newDataNode, existingDataNode, caseType.getCaseFieldDefinitions().get(0), ACCESS_PROFILES), is(false));
 
         }
-    }
 
+    }
     @Nested
     @DisplayName("Compound Field - Delete Tests")
     class CompoundFieldDeleteTests {
+
         @Test
         @DisplayName("Should grant access when a root node is deleted and D exists")
         void shouldGrantAccessWhenRootDeletedAndACLExist() throws IOException {
@@ -1211,7 +1214,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1220,7 +1223,6 @@ class CompoundAccessControlServiceTest {
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(person1), dataNode, people, ACCESS_PROFILES), is(true));
         }
-
         @Test
         @DisplayName("Should deny access when a root node is deleted and No D")
         void shouldDenyAccessWhenRootDeletedAndNoACL() throws IOException {
@@ -1230,7 +1232,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(false)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1249,7 +1251,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1272,7 +1274,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(false)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1301,7 +1303,7 @@ class CompoundAccessControlServiceTest {
                     .withDelete(false)
                     .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1329,7 +1331,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1360,7 +1362,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(false)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1376,8 +1378,8 @@ class CompoundAccessControlServiceTest {
                 is(false)
             );
         }
-    }
 
+    }
     @Nested
     @DisplayName("Compound Field - nested complex fields")
     class CompoundFieldComplexUnderCollectionFieldTests {
@@ -1392,7 +1394,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1422,7 +1424,7 @@ class CompoundAccessControlServiceTest {
                     .withDelete(true)
                     .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1445,7 +1447,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1468,7 +1470,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1491,7 +1493,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1514,7 +1516,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
@@ -1527,11 +1529,13 @@ class CompoundAccessControlServiceTest {
             assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, ACCESS_PROFILES),
                 is(true));
         }
+
     }
 
     @Nested
     @DisplayName("Compound Field - Collection Under Complex Tests")
     class CompoundFieldCollectionUnderComplexFieldTests {
+
         private final String noteWOutTags = "{\n"
             + "   \"Txt\": \"someNote11\"\n"
             + "}";
@@ -1679,7 +1683,7 @@ class CompoundAccessControlServiceTest {
                     .withComplexField(getTagFieldDefinition())
                     .build())
                 .build();
-            caseTypeDefinition = newCaseType().withField(note).build();
+            caseTypeDefinition = caseTypeDefinitionWithField(note);
         }
 
         @Test
@@ -1874,6 +1878,10 @@ class CompoundAccessControlServiceTest {
                 is(false)
             );
         }
+    }
+
+    static CaseTypeDefinition caseTypeDefinitionWithField(CaseFieldDefinition people) {
+        return CaseTypeDefinition.builder().caseFieldDefinitions(List.of(people)).build();
     }
 
     static JsonNode generatePeopleDataWithPerson(String... args) throws IOException {

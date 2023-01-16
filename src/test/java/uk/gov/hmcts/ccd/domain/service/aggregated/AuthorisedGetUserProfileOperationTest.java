@@ -1,17 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Sets;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.User;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
@@ -21,6 +15,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.isIn;
@@ -53,10 +52,7 @@ class AuthorisedGetUserProfileOperationTest {
         new CaseEventDefinition(),
         new CaseEventDefinition());
 
-    private CaseTypeDefinition notAllowedCaseTypeDefinition = new CaseTypeDefinition();
-
-    @Mock
-    private UserRepository userRepository;
+    private CaseTypeDefinition notAllowedCaseTypeDefinition = CaseTypeDefinition.builder().build();
 
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
@@ -69,9 +65,6 @@ class AuthorisedGetUserProfileOperationTest {
 
     private AuthorisedGetUserProfileOperation classUnderTest;
 
-    @Mock
-    private CaseUserRepository caseUserRepository;
-
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -80,9 +73,9 @@ class AuthorisedGetUserProfileOperationTest {
             test2JurisdictionDisplayProperties});
 
         List<CaseTypeDefinition> caseTypes1Definition =
-            Arrays.asList(notAllowedCaseTypeDefinition, new CaseTypeDefinition());
-        List<CaseTypeDefinition> caseTypes2Definition =
-            Arrays.asList(new CaseTypeDefinition(), notAllowedCaseTypeDefinition, new CaseTypeDefinition());
+            Arrays.asList(notAllowedCaseTypeDefinition, CaseTypeDefinition.builder().build());
+        List<CaseTypeDefinition> caseTypes2Definition = Arrays.asList(CaseTypeDefinition.builder().build(),
+            notAllowedCaseTypeDefinition, CaseTypeDefinition.builder().build());
 
         test1JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes1Definition);
         test2JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes2Definition);

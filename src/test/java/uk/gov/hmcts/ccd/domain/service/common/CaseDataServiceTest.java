@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,9 +25,7 @@ import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
-
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
-
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
@@ -116,50 +115,51 @@ class CaseDataServiceTest {
                     .build())
                 .build();
 
-        caseTypeDefinition = TestBuildersUtil.CaseTypeBuilder.newCaseType()
-            .withField(newCaseField()
-                .withId("ClientsAddresses")
-                .withSC(PRIVATE.name())
-                .withFieldType(aFieldType()
-                    .withType(COLLECTION)
-                    .withCollectionFieldType(aFieldType()
-                        .withId("Address")
-                        .withType("Complex")
-                        .withComplexField(postalAddress)
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(List.of(
+                newCaseField()
+                    .withId("ClientsAddresses")
+                    .withSC(PRIVATE.name())
+                    .withFieldType(aFieldType()
+                        .withType(COLLECTION)
+                        .withCollectionFieldType(aFieldType()
+                            .withId("Address")
+                            .withType("Complex")
+                            .withComplexField(postalAddress)
+                            .build()
+                        )
+                        .build())
+                    .build(),
+
+                newCaseField()
+                    .withId("Company")
+                    .withSC(PUBLIC.name())
+                    .withFieldType(
+                        aFieldType()
+                            .withType("Complex")
+                            .withComplexField(newCaseField()
+                                .withId("Name")
+                                .withFieldType(textFieldTypeDefinition)
+                                .withSC(PRIVATE.name())
+                                .build())
+                            .withComplexField(postalAddress)
+                            .build()
+                    )
+                    .build(),
+
+                newCaseField()
+                    .withId("OtherInfo")
+                    .withFieldType(textFieldTypeDefinition)
+                    .withSC(PRIVATE.name())
+                    .build(),
+                newCaseField().withId("simple_collection")
+                    .withSC("PUBLIC")
+                    .withFieldType(aFieldType().withType(COLLECTION)
+                        .withCollectionFieldType(textFieldTypeDefinition)
                         .build()
                     )
-                    .build())
-                .build()
-            )
-            .withField(newCaseField()
-                           .withId("Company")
-                           .withSC(PUBLIC.name())
-                           .withFieldType(
-                               aFieldType()
-                                   .withType("Complex")
-                                   .withComplexField(newCaseField()
-                                                         .withId("Name")
-                                                         .withFieldType(textFieldTypeDefinition)
-                                                         .withSC(PRIVATE.name())
-                                                         .build())
-                                   .withComplexField(postalAddress)
-                                   .build()
-                           )
-                           .build()
-            )
-            .withField(newCaseField()
-                           .withId("OtherInfo")
-                           .withFieldType(textFieldTypeDefinition)
-                           .withSC(PRIVATE.name())
-                           .build())
-            .withField(newCaseField().withId("simple_collection")
-                                   .withSC("PUBLIC")
-                                   .withFieldType(aFieldType().withType(COLLECTION)
-                                                              .withCollectionFieldType(textFieldTypeDefinition)
-                                                              .build()
-                                   )
-                                   .build()
-            )
+                    .build()
+            ))
             .build();
     }
 

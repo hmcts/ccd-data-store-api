@@ -5,11 +5,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +27,12 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -96,7 +97,7 @@ class AuthorisedStartEventOperationTest {
     private JsonNode classifiedCaseDetailsNode;
     private JsonNode classifiedCaseDetailsClassificationNode;
     private StartEventResult classifiedStartEvent;
-    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+    private CaseTypeDefinition caseTypeDefinition;
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
     private final Set<AccessProfile> accessProfiles = createAccessProfiles(Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
@@ -145,8 +146,10 @@ class AuthorisedStartEventOperationTest {
             uidService,
             draftGateway,
             caseAccessService);
-        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
-        caseTypeDefinition.setId(CASE_TYPE_ID);
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .caseFieldDefinitions(caseFieldDefinitions)
+            .build();
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getAccessProfiles(anyString())).thenReturn(accessProfiles);
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(accessProfiles);

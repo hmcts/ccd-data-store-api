@@ -2,8 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import java.time.LocalDateTime;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,6 +23,9 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+
+import java.time.LocalDateTime;
+import java.util.Map;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -142,10 +143,13 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                   .build();
         doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
-        caseTypeDefinition = new CaseTypeDefinition();
         JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setName(JURISDICTION_ID);
-        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .jurisdictionDefinition(jurisdictionDefinition)
+            .build();
+
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseType(CASE_TYPE_ID);
 
         doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(anyObject());

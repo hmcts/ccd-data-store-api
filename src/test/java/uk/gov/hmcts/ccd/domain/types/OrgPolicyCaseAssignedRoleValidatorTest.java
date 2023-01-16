@@ -102,8 +102,7 @@ class OrgPolicyCaseAssignedRoleValidatorTest {
     }
 
     private ValidationContext createValidationContext(CaseFieldDefinition caseFieldDefinition, JsonNode validValue) {
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId("TEST");
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder().id("TEST").build();
         final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, null);
         validationContext.setFieldValue(validValue);
         validationContext.setCaseFieldDefinition(caseFieldDefinition);

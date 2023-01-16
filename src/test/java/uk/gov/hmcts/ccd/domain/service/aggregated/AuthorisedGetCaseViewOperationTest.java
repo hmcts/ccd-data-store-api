@@ -61,7 +61,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewActionableEventBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewBuilder.aCaseView;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
@@ -101,13 +100,11 @@ class AuthorisedGetCaseViewOperationTest {
         .withCreate(true).withRead(true).withUpdate(true).withDelete(true).build();
     private static final AccessControlList acl2 = anAcl().withRole("caseworker-sscs-clerk")
         .withCreate(false).withRead(true).withUpdate(false).withDelete(false).build();
-    private static final CaseTypeDefinition TEST_CASE_TYPE = newCaseType()
-        .withId(CASE_TYPE_ID)
-        .withJurisdiction(jurisdiction)
-        .withEvent(CASE_EVENT)
-        .withEvent(CASE_EVENT_2)
-        .withAcl(acl1)
-        .withAcl(acl2)
+    private static final CaseTypeDefinition TEST_CASE_TYPE = CaseTypeDefinition.builder()
+        .id(CASE_TYPE_ID)
+        .jurisdictionDefinition(jurisdiction)
+        .events(List.of(CASE_EVENT, CASE_EVENT_2))
+        .accessControlLists(List.of(acl1, acl2))
         .build();
     private static final CaseViewType TEST_CASE_VIEW_TYPE = CaseViewType.createFrom(TEST_CASE_TYPE);
     private static final CaseViewField FIELD_1 = aViewField().withId("FIELD_1").build();

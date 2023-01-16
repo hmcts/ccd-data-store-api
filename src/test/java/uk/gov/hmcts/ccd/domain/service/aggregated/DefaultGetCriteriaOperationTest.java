@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +16,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+
+import java.util.Collections;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -48,7 +49,7 @@ public class DefaultGetCriteriaOperationTest {
     private static final String DISPLAY_CONTEXT_PARAMETER = "#KEY(Value)";
     private static final String SHOW_CONDITION = "some show condition";
 
-    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+    private CaseTypeDefinition caseTypeDefinition;
     private final CaseFieldDefinition caseFieldDefinition1 = new CaseFieldDefinition();
     private final CaseFieldDefinition caseFieldDefinition2 = new CaseFieldDefinition();
     private final CaseFieldDefinition caseFieldDefinition3 = new CaseFieldDefinition();
@@ -75,8 +76,6 @@ public class DefaultGetCriteriaOperationTest {
     private CaseFieldDefinition dob =
         newCaseField().withId(DOB).withFieldType(aFieldType().withId(DATE_TYPE).withType(DATE_TYPE).build())
         .withDisplayContextParameter(DISPLAY_CONTEXT_PARAMETER).build();
-    private FieldTypeDefinition personFieldType = aFieldType().withId(PERSON).withType(COMPLEX)
-        .withComplexField(name).withComplexField(surname).withComplexField(dob).build();
 
     private FieldTypeDefinition debtorFieldTypeDefinition =
         aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
@@ -96,10 +95,11 @@ public class DefaultGetCriteriaOperationTest {
         caseFieldDefinition4.setId("field4");
         caseFieldDefinition4.setFieldTypeDefinition(fieldTypeDefinition);
         caseFieldDefinition4.setMetadata(true);
-        caseTypeDefinition.setId("Test case type");
-        caseTypeDefinition.setCaseFieldDefinitions(asList(caseFieldDefinition1,
-                                                    caseFieldDefinition2, caseFieldDefinition3,
-                                                    caseFieldDefinition4, debtorDetails));
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .id("Test case type")
+            .caseFieldDefinitions(List.of(caseFieldDefinition1, caseFieldDefinition2, caseFieldDefinition3,
+                caseFieldDefinition4, debtorDetails))
+            .build();
 
         defaultGetCriteriaOperation =
             new DefaultGetCriteriaOperation(uiDefinitionRepository, caseDefinitionRepository);

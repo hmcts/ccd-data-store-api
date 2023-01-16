@@ -2,10 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +24,11 @@ import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -105,10 +106,13 @@ class DefaultGetCaseHistoryViewOperationTest {
                                                                                   "dataTestField2").build();
         doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
-        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setName(JURISDICTION_ID);
-        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+
+        CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .jurisdictionDefinition(jurisdictionDefinition)
+            .build();
+
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
         CaseStateDefinition caseStateDefinition = new CaseStateDefinition();

@@ -1,17 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
-import java.util.Optional;
-
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
-
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +12,18 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+
+import java.util.Optional;
+
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 
 class ElasticsearchSecurityClassificationFilterTest {
 
@@ -49,10 +49,11 @@ class ElasticsearchSecurityClassificationFilterTest {
     void shouldCreateTermsQueryBuilder() {
         final String jurisdictionId = "jurisdiction";
         when(userRepository.getHighestUserClassification(jurisdictionId)).thenReturn(PRIVATE);
-        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId(jurisdictionId);
-        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+        CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .jurisdictionDefinition(jurisdictionDefinition)
+            .build();
         String caseTypeId = "caseType";
         when(caseTypeService.getCaseType(caseTypeId)).thenReturn(caseTypeDefinition);
 

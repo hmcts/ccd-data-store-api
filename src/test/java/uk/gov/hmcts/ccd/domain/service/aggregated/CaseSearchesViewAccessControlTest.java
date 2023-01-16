@@ -4,19 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -30,6 +22,13 @@ import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProces
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchesViewAccessControl;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -42,13 +41,11 @@ import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildD
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class CaseSearchesViewAccessControlTest {
 
     private static final String CASE_TYPE_ID_1 = "CASE_TYPE_1";
-    private static final String CASE_TYPE_ID_2 = "CASE_TYPE_2";
     private static final String JURISDICTION = "JURISDICTION";
     private static final String CASE_FIELD_1 = "Case field 1";
     private static final String CASE_FIELD_2 = "Case field 2";
@@ -57,7 +54,6 @@ class CaseSearchesViewAccessControlTest {
     private static final String CASE_FIELD_5 = "Case field 5";
     private static final String ROLE_IN_USER_ROLE_1 = "Role 1";
     private static final String ROLE_IN_USER_ROLE_2 = "Role 2";
-    private static final String ROLE_NOT_IN_USER_ROLE = "Role X";
 
     private static final String FAMILY_DETAILS = "FamilyDetails";
     private static final String FATHER_NAME_VALUE = "Simmon";
@@ -73,25 +69,11 @@ class CaseSearchesViewAccessControlTest {
         + "\"AddressLine1\":\"40 Edric House\","
         + "\"AddressLine2\":\"\",\"AddressLine3\":\"\"}"
         + "}";
-    private static final String FAMILY_DETAILS_PATH = "FatherName";
-    private static final String FAMILY_DETAILS_PATH_NESTED = "FamilyAddress.PostCode";
-    private static final String FAMILY = "FamilyDetails";
-    private static final String FATHER_NAME = "FatherName";
-    private static final String MOTHER_NAME = "MotherName";
-    private static final String FAMILY_ADDRESS = "FamilyAddress";
-    private static final String ADDRESS_LINE_1 = "AddressLine1";
     private static final String POSTCODE = "PostCode";
 
     private static final String TEXT_TYPE = "Text";
-    private static final String SEPARATOR = ".";
 
-    private static final LocalDateTime CREATED_DATE = LocalDateTime.of(2000, 1, 2, 12, 0);
-    private static final LocalDateTime LAST_MODIFIED_DATE = LocalDateTime.of(1987, 12, 4, 17, 30);
-    private static final LocalDateTime LAST_STATE_MODIFIED_DATE = LocalDateTime.of(2015, 6, 17, 20, 45);
     private static final SecurityClassification SECURITY_CLASSIFICATION = SecurityClassification.PUBLIC;
-
-    @Mock
-    private UserRepository userRepository;
 
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
@@ -112,7 +94,6 @@ class CaseSearchesViewAccessControlTest {
 
     private Map<String, JsonNode> dataMap;
     private JurisdictionDefinition jurisdiction;
-    private static Long CASE_REFERENCE = 1234567890123456L;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -124,28 +105,7 @@ class CaseSearchesViewAccessControlTest {
 
         jurisdiction = new JurisdictionDefinition();
         jurisdiction.setId(JURISDICTION);
-        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .build();
+        CaseTypeDefinition caseTypeDefinition1 = caseTypeDefinitionWithThreeFieldsAndReadACLs();
 
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition1);
 
@@ -168,30 +128,30 @@ class CaseSearchesViewAccessControlTest {
 
     @Test
     void shouldReturnTrueForFilterResultsBySearchResultsDefinition() {
-        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
+        CaseTypeDefinition caseTypeDefinition1 = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID_1)
+            .jurisdictionDefinition(jurisdiction)
+            .securityClassification(SecurityClassification.PUBLIC)
+            .caseFieldDefinitions(List.of(
+                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build()
+            ))
             .build();
 
         mockAccessProfiles();
@@ -203,28 +163,7 @@ class CaseSearchesViewAccessControlTest {
 
     @Test
     void shouldReturnTrueForFilterResultsBySearchResultsDefinitionWhenUseCaseIsNull() {
-        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .build();
+        CaseTypeDefinition caseTypeDefinition1 = caseTypeDefinitionWithThreeFieldsAndReadACLs();
 
         mockAccessProfiles();
         List<String> requestedFields = new ArrayList<>();
@@ -235,28 +174,7 @@ class CaseSearchesViewAccessControlTest {
 
     @Test
     void shouldReturnFalseForFilterResultsBySearchResultsDefinition() {
-        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .build();
+        CaseTypeDefinition caseTypeDefinition1 = caseTypeDefinitionWithThreeFieldsAndReadACLs();
 
         mockAccessProfiles();
         List<String> requestedFields = new ArrayList<>();
@@ -306,28 +224,7 @@ class CaseSearchesViewAccessControlTest {
                 .withRead(true)
                 .build()).build();
 
-        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .build();
+        CaseTypeDefinition caseTypeDefinition1 = caseTypeDefinitionWithThreeFieldsAndReadACLs();
 
         mockAccessProfiles();
 
@@ -344,34 +241,38 @@ class CaseSearchesViewAccessControlTest {
                 .withRead(true)
                 .build()).build();
 
-        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .build();
+        CaseTypeDefinition caseTypeDefinition1 = caseTypeDefinitionWithThreeFieldsAndReadACLs();
 
 
         mockAccessProfiles();
         when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any()))
             .thenReturn(false);
         assertFalse(classUnderTest.filterResultsBySecurityClassification(caseFieldDefinition1, caseTypeDefinition1));
+    }
+
+    private CaseTypeDefinition caseTypeDefinitionWithThreeFieldsAndReadACLs() {
+        return CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID_1)
+            .jurisdictionDefinition(jurisdiction)
+            .securityClassification(SecurityClassification.PUBLIC)
+            .caseFieldDefinitions(List.of(
+                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build()
+            ))
+            .build();
     }
 
     private void mockAccessProfiles() {

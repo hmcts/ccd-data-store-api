@@ -83,7 +83,7 @@ class TextCaseReferenceCaseLinkValidatorTest {
     }
 
     private ValidationContext createValidationContext(CaseFieldDefinition caseFieldDefinition, JsonNode validValue) {
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder().build();
         final ValidationContext validationContext  = new ValidationContext(caseTypeDefinition,null);
         validationContext.setFieldValue(validValue);
         validationContext.setCaseFieldDefinition(caseFieldDefinition);

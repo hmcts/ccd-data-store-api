@@ -40,7 +40,7 @@ class DocumentSanitiserTest {
 
     private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
 
-    private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
+    private static final CaseTypeDefinition CASE_TYPE;
 
     private static final String TYPE_DOCUMENT = "Document";
     private static final FieldTypeDefinition DOCUMENT_FIELD_TYPE = new FieldTypeDefinition();
@@ -63,7 +63,9 @@ class DocumentSanitiserTest {
         DOCUMENT_FIELD.setId(DOCUMENT_FIELD_ID);
         DOCUMENT_FIELD.setFieldTypeDefinition(DOCUMENT_FIELD_TYPE);
 
-        CASE_TYPE.setCaseFieldDefinitions(Collections.singletonList(DOCUMENT_FIELD));
+        CASE_TYPE = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(Collections.singletonList(DOCUMENT_FIELD))
+            .build();
     }
 
     @Mock

@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,6 +13,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
@@ -37,7 +39,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessCont
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 class AuthorisedGetCaseTypeDefinitionOperationTest {
 
@@ -187,79 +188,75 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseTypeDefinition1 = newCaseType()
-            .withId(CASE_TYPE_ID)
-            .withAcl(anAcl()
+        testCaseTypeDefinition1 = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .accessControlLists(List.of(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
-                .build())
-            .withState(CASE_STATE_1_1)
-            .withState(CASE_STATE_1_2)
-            .withEvent(CASE_EVENT_1_1)
-            .withEvent(newCaseEvent()
-                .withId(EVENT_ID_1_2)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .build())
-                .build())
-            .withEvent(CASE_EVENT_1_3)
-            .withField(CASE_FIELD_1_1)
-            .withField(CASE_FIELD_1_2)
-            .withField(CASE_FIELD_1_3)
+                .build()))
+            .states(List.of(CASE_STATE_1_1, CASE_STATE_1_2))
+            .events(List.of(
+                CASE_EVENT_1_1,
+                newCaseEvent()
+                    .withId(EVENT_ID_1_2)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build(),
+                CASE_EVENT_1_3))
+            .caseFieldDefinitions(List.of(CASE_FIELD_1_1, CASE_FIELD_1_2, CASE_FIELD_1_3))
             .build();
 
-        testCaseTypeDefinition2 = newCaseType()
-            .withId(CASE_TYPE_ID)
-            .withAcl(anAcl()
+        testCaseTypeDefinition2 = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .accessControlLists(List.of(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
-                .build())
-            .withState(CASE_STATE_2_1)
-            .withState(CASE_STATE_2_2)
-            .withEvent(newCaseEvent()
-                .withId(EVENT_ID_2_1)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withRead(true)
-                    .build())
-                .build())
-            .withEvent(newCaseEvent().withId(EVENT_ID_2_2)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withRead(true)
-                    .build())
-                .build())
-            .withEvent(CASE_EVENT_2_3)
-            .withField(newCaseField().withId(CASE_FIELD_ID_2_1)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withRead(true)
-                    .build())
-                .build())
-            .withField(newCaseField().withId(CASE_FIELD_ID_2_2)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .build())
-                .build())
-            .withField(CASE_FIELD_2_3)
+                .build()))
+            .states(List.of(CASE_STATE_2_1, CASE_STATE_2_2))
+            .events(List.of(
+                newCaseEvent()
+                    .withId(EVENT_ID_2_1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build(),
+                newCaseEvent().withId(EVENT_ID_2_2)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build(),
+                CASE_EVENT_2_3
+            ))
+            .caseFieldDefinitions(List.of(
+                newCaseField().withId(CASE_FIELD_ID_2_1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build(),
+                newCaseField().withId(CASE_FIELD_ID_2_2)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build(),
+                CASE_FIELD_2_3
+            ))
             .build();
 
-        testCaseTypeDefinition3 = newCaseType()
-            .withId(CASE_TYPE_ID)
-            .withAcl(anAcl()
+        testCaseTypeDefinition3 = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .accessControlLists(List.of(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .withRead(true)
                 .withUpdate(true)
-                .build())
-            .withState(CASE_STATE_3_1)
-            .withState(CASE_STATE_3_2)
-            .withEvent(CASE_EVENT_3_1)
-            .withEvent(CASE_EVENT_3_2)
-            .withEvent(CASE_EVENT_3_3)
-            .withField(CASE_FIELD_3_1)
-            .withField(CASE_FIELD_3_2)
-            .withField(CASE_FIELD_3_3)
+                .build()))
+            .states(List.of(CASE_STATE_3_1, CASE_STATE_3_2))
+            .events(List.of(CASE_EVENT_3_1, CASE_EVENT_3_2, CASE_EVENT_3_3))
+            .caseFieldDefinitions(List.of(CASE_FIELD_3_1, CASE_FIELD_3_2, CASE_FIELD_3_3))
             .build();
 
         Set<AccessProfile> accessProfiles = createAccessProfiles(USER_ROLES);

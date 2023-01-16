@@ -2,11 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.getevents;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +17,12 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.util.Lists.newArrayList;
@@ -85,9 +86,10 @@ class AuthorisedGetEventsOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        caseType = new CaseTypeDefinition();
         List<CaseEventDefinition> eventsDefinition = new ArrayList<>();
-        caseType.setEvents(eventsDefinition);
+        caseType = CaseTypeDefinition.builder()
+            .events(eventsDefinition)
+            .build();
         caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);

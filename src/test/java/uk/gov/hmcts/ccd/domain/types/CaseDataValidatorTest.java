@@ -79,17 +79,18 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     }
 
     private ValidationContext getValidationContext(Map<String, JsonNode> values) {
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setCaseFieldDefinitions(caseFields);
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(caseFields)
+            .build();
         return new ValidationContext(caseTypeDefinition, values);
     }
 
     private ValidationContext getValidationContextDynamicFields(Map<String, JsonNode> values) {
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setCaseFieldDefinitions(dynamicCaseFields);
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(dynamicCaseFields)
+            .build();
         return new ValidationContext(caseTypeDefinition, values);
     }
-
 
     @Test
     public void unrecognisedValueComplex() throws Exception {
@@ -650,8 +651,9 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         final String DATA = "{\"PersonFirstName\" : \"Test Name Test Name\"}";
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
 
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setCaseFieldDefinitions(caseFields);
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(caseFields)
+            .build();
         final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, values);
         assertEquals(0, caseDataValidator.validate(validationContext).size());
     }
@@ -680,8 +682,9 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         final String DATA = "{\"PersonFirstName\" : \"Test Name Test Name\"}";
         final Map<String, JsonNode> invalidMaxVal = caseDataFromJsonString(DATA);
 
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setCaseFieldDefinitions(caseFields);
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(caseFields)
+            .build();
         final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, invalidMaxVal);
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(validationContext).size());
 

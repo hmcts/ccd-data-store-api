@@ -24,7 +24,7 @@ public class CaseSanitiserTest {
 
     private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
 
-    private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
+    private static final CaseTypeDefinition CASE_TYPE;
 
     private static final String TYPE_SIMPLE = "Simple";
     private static final FieldTypeDefinition SIMPLE_FIELD_TYPE = new FieldTypeDefinition();
@@ -40,7 +40,9 @@ public class CaseSanitiserTest {
         SIMPLE_FIELD.setId(SIMPLE_FIELD_ID);
         SIMPLE_FIELD.setFieldTypeDefinition(SIMPLE_FIELD_TYPE);
 
-        CASE_TYPE.setCaseFieldDefinitions(Collections.singletonList(SIMPLE_FIELD));
+        CASE_TYPE = CaseTypeDefinition.builder()
+            .caseFieldDefinitions(Collections.singletonList(SIMPLE_FIELD))
+            .build();
     }
 
     private CaseSanitiser caseSanitiser;

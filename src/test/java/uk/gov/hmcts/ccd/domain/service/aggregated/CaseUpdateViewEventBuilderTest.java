@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.List;
-import java.util.Map;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +27,9 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.equalTo;
@@ -47,7 +48,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.StartEventResultBuilder.newStartEventTrigger;
 
 class CaseUpdateViewEventBuilderTest {
@@ -69,10 +69,11 @@ class CaseUpdateViewEventBuilderTest {
     private final List<CaseEventDefinition> events = Lists.newArrayList(newCaseEvent().build());
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList(newCaseField().build());
     private final List<CaseEventFieldDefinition> eventFields = Lists.newArrayList();
-    private final CaseTypeDefinition caseTypeDefinition = newCaseType()
-                                                            .withCaseTypeId(CASE_TYPE_ID)
-                                                            .withEvents(events)
-                                                            .withCaseFields(caseFieldDefinitions).build();
+    private final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+        .id(CASE_TYPE_ID)
+        .events(events)
+        .caseFieldDefinitions(caseFieldDefinitions)
+        .build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
     private final StartEventResult startEventResult = newStartEventTrigger().withCaseDetails(caseDetails)
         .withEventToken(TOKEN).build();

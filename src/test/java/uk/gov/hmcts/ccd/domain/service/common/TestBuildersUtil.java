@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.helpers.MessageFormatter;
-
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
@@ -441,76 +440,6 @@ public class TestBuildersUtil {
 
         public JsonNode buildAsNode() {
             return JacksonUtils.convertValueJsonNode(dataClassification);
-        }
-    }
-
-    public static class CaseTypeBuilder {
-        private final CaseTypeDefinition caseTypeDefinition;
-        private final List<AccessControlList> acls = newArrayList();
-
-        private CaseTypeBuilder() {
-            this.caseTypeDefinition = new CaseTypeDefinition();
-            caseTypeDefinition.setJurisdictionDefinition(new JurisdictionDefinition());
-        }
-
-        public static CaseTypeBuilder newCaseType() {
-            return new CaseTypeBuilder();
-        }
-
-        public CaseTypeBuilder withId(String id) {
-            caseTypeDefinition.setId(id);
-            return this;
-
-        }
-
-        public CaseTypeBuilder withJurisdiction(JurisdictionDefinition jurisdictionDefinition) {
-            caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
-            return this;
-        }
-
-        public CaseTypeBuilder withCaseTypeId(String caseTypeId) {
-            caseTypeDefinition.setId(caseTypeId);
-            return this;
-        }
-
-        public CaseTypeBuilder withEvent(CaseEventDefinition event) {
-            caseTypeDefinition.getEvents().add(event);
-            return this;
-        }
-
-        public CaseTypeBuilder withEvents(List<CaseEventDefinition> event) {
-            caseTypeDefinition.getEvents().addAll(event);
-            return this;
-        }
-
-        public CaseTypeBuilder withCaseFields(List<CaseFieldDefinition> fields) {
-            caseTypeDefinition.getCaseFieldDefinitions().addAll(fields);
-            return this;
-        }
-
-        public CaseTypeBuilder withState(CaseStateDefinition state) {
-            caseTypeDefinition.getStates().add(state);
-            return this;
-        }
-
-        public CaseTypeBuilder withField(CaseFieldDefinition field) {
-            caseTypeDefinition.getCaseFieldDefinitions().add(field);
-            return this;
-        }
-
-        public CaseTypeBuilder withAcl(AccessControlList accessControlList) {
-            this.acls.add(accessControlList);
-            return this;
-        }
-
-        public CaseTypeDefinition build() {
-            caseTypeDefinition.setAccessControlLists(this.acls);
-            return caseTypeDefinition;
-        }
-
-        public CaseTypeBuilder withSecurityClassification(SecurityClassification securityClassification) {
-            caseTypeDefinition.setSecurityClassification(securityClassification);
-            return this;
         }
     }
 

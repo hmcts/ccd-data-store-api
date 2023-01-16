@@ -117,7 +117,7 @@ class CallbackInvokerTest {
         caseEventDefinition.setCallBackURLAboutToStartEvent(URL_ABOUT_TO_START);
         caseEventDefinition.setCallBackURLAboutToSubmitEvent(URL_ABOUT_TO_SUBMIT);
         caseEventDefinition.setCallBackURLSubmittedEvent(URL_AFTER_SUBMIT);
-        caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition = CaseTypeDefinition.builder().build();
         caseDetailsBefore = new CaseDetails();
         caseDetails = new CaseDetails();
         wizardPage = new WizardPage();

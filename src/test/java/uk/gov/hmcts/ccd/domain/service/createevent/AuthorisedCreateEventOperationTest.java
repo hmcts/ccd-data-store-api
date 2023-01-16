@@ -149,7 +149,7 @@ class AuthorisedCreateEventOperationTest {
     private CaseDetails classifiedCase;
     private CaseDetails documentFieldsCase;
     private JsonNode authorisedCaseNode;
-    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+    private CaseTypeDefinition caseTypeDefinition;
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
     private final List<CaseEventDefinition> events = Lists.newArrayList();
     private final String categoryId = "categoryId";
@@ -178,11 +178,14 @@ class AuthorisedCreateEventOperationTest {
         classifiedCase.setData(classifiedData);
         doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT);
-        caseTypeDefinition.setEvents(events);
+
         CategoryDefinition categoryDefinition = new CategoryDefinition();
         categoryDefinition.setCategoryId(categoryId);
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .events(events)
+            .caseFieldDefinitions(caseFieldDefinitions)
+            .build();
         caseTypeDefinition.setCategories(Lists.newArrayList(categoryDefinition));
-        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getAccessProfiles(anyString())).thenReturn(USER_ROLES);
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(USER_ROLES);

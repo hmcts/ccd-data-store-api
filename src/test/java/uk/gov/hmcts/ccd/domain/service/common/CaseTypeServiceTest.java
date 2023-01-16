@@ -19,7 +19,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,9 +56,10 @@ class CaseTypeServiceTest {
         @Test
         @DisplayName("happy path finding a state")
         void happyPathFindState() {
-            final CaseTypeDefinition c = new CaseTypeDefinition();
             final CaseStateDefinition caseStateDefinition = buildCaseState("ngitb");
-            c.setStates(Arrays.asList(buildCaseState("hemanth"), caseStateDefinition));
+            final CaseTypeDefinition c = CaseTypeDefinition.builder()
+                .states(List.of(buildCaseState("hemanth"), caseStateDefinition))
+                .build();
             final CaseStateDefinition found = subject.findState(c, "ngitb");
             assertThat(found, is(caseStateDefinition));
         }
@@ -67,9 +67,10 @@ class CaseTypeServiceTest {
         @Test
         @DisplayName("cannot find state by id")
         void cannotFindState() {
-            final CaseTypeDefinition c = new CaseTypeDefinition();
-            c.setId("nOonEhaStimEtodomYcodEreview");
-            c.setStates(Arrays.asList(buildCaseState("hemanth"), buildCaseState("ngitw")));
+            final CaseTypeDefinition c = CaseTypeDefinition.builder()
+                .id("nOonEhaStimEtodomYcodEreview")
+                .states(List.of(buildCaseState("hemanth"), buildCaseState("ngitw")))
+                .build();
             final ResourceNotFoundException
                 exception = assertThrows(ResourceNotFoundException.class, () -> subject.findState(c, "ngitb"));
             assertThat(exception.getMessage(),
@@ -90,7 +91,7 @@ class CaseTypeServiceTest {
         @Test
         @DisplayName("should return case type when case type is found for id")
         void shouldReturnCaseType() {
-            CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+            CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder().build();
             when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
 
             CaseTypeDefinition result = subject.getCaseType(CASE_TYPE_ID);
@@ -121,8 +122,9 @@ class CaseTypeServiceTest {
 
             Map<String, JsonNode> data = new HashMap<>();
             List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
-            CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-            caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
+            CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+                .caseFieldDefinitions(caseFieldDefinitions)
+                .build();
 
             // ACT
             subject.validateData(data, caseTypeDefinition);
@@ -147,20 +149,13 @@ class CaseTypeServiceTest {
 
             Map<String, JsonNode> data = new HashMap<>();
             List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
-            CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-            caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
+            CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+                .caseFieldDefinitions(caseFieldDefinitions)
+                .build();
 
             // ASSERT (() -> ACT))
             assertThrows(CaseValidationException.class, () -> subject.validateData(data, caseTypeDefinition));
         }
-    }
-
-    private ValidationContext getValidationContext(
-        Map<String, JsonNode> values, List<CaseFieldDefinition> caseFieldDefinitions) {
-
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
-        return new ValidationContext(caseTypeDefinition, values);
     }
 }
 

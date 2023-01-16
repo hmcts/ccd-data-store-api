@@ -55,8 +55,9 @@ public class DocumentsOperationTest extends WireMockBaseTest {
         Mockito.when(mockCaseDetailsRepository.findByReference(TEST_CASE_REFERENCE)).thenReturn(caseDetailsOptional);
         ReflectionTestUtils.setField(documentsOperation, "caseDetailsRepository", mockCaseDetailsRepository);
 
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setPrintableDocumentsUrl("http://localhost:" + wiremockPort + TEST_URL);
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .printableDocumentsUrl("http://localhost:" + wiremockPort + TEST_URL)
+            .build();
         final CaseTypeService mockCaseTypeService = Mockito.mock(CaseTypeService.class);
         Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION))
                 .thenReturn(caseTypeDefinition);

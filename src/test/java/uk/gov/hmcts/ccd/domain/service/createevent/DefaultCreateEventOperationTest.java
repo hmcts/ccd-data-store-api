@@ -101,10 +101,11 @@ class DefaultCreateEventOperationTest {
         jurisdictionDefinition.setId(JURISDICTION_ID);
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
-        caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(CASE_TYPE_ID);
-        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
-        caseTypeDefinition.setVersion(version);
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .jurisdictionDefinition(jurisdictionDefinition)
+            .version(version)
+            .build();
 
         caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setPostStates(getEventPostStates(POST_STATE));

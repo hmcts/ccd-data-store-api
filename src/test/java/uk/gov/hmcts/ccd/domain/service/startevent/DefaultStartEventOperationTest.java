@@ -59,7 +59,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
@@ -234,8 +233,10 @@ public class DefaultStartEventOperationTest {
     private DefaultStartEventOperation defaultStartEventOperation;
 
     private final CaseDetails caseDetails = newCaseDetails().withData(null).build();
-    private final CaseTypeDefinition caseTypeDefinition = newCaseType().withCaseTypeId(TEST_CASE_TYPE_ID)
-        .withJurisdiction(newJurisdiction().withJurisdictionId(TEST_JURISDICTION_ID).build()).build();
+    private final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+        .id(TEST_CASE_TYPE_ID)
+        .jurisdictionDefinition(newJurisdiction().withJurisdictionId(TEST_JURISDICTION_ID).build())
+        .build();
     private final CaseEventDefinition caseEventDefinition = newCaseEvent().withTTLIncrement(TTL_INCREMENT)
         .withCaseFields(
             Arrays.asList(newCaseEventField()

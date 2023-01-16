@@ -6,15 +6,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -45,6 +36,16 @@ import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -67,7 +68,6 @@ import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildD
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
@@ -239,63 +239,64 @@ class CaseSearchResultViewGeneratorTest {
 
         jurisdiction = new JurisdictionDefinition();
         jurisdiction.setId(JURISDICTION);
-        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldTypeDefinition)
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build())
-                .withComplexACL(aComplexACL()
-                    .withListElementCode("Line1")
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .withUpdate(false)
-                    .build())
-                .build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
+        CaseTypeDefinition caseTypeDefinition1 = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID_1)
+            .jurisdictionDefinition(jurisdiction)
+            .securityClassification(SecurityClassification.PUBLIC)
+            .caseFieldDefinitions(List.of(
+                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldTypeDefinition)
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build())
+                    .withComplexACL(aComplexACL()
+                        .withListElementCode("Line1")
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .withUpdate(false)
+                        .build())
+                    .build()
+            ))
             .build();
 
-        CaseTypeDefinition caseTypeDefinition2 = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_2)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType())
-                .withCaseTypeId(CASE_TYPE_ID_2)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType())
-                .withCaseTypeId(CASE_TYPE_ID_2)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
+
+        CaseTypeDefinition caseTypeDefinition2 = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID_2)
+            .jurisdictionDefinition(jurisdiction)
+            .securityClassification(SecurityClassification.PUBLIC)
+            .caseFieldDefinitions(List.of(
+                newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType())
+                    .withCaseTypeId(CASE_TYPE_ID_2)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType())
+                    .withCaseTypeId(CASE_TYPE_ID_2)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build()
+            ))
             .build();
 
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition1);
@@ -433,38 +434,38 @@ class CaseSearchResultViewGeneratorTest {
 
     @Test
     void shouldBuildHeaderFieldsForPermittedRoles() {
-        CaseTypeDefinition caseTypeDefinition = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1)
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withFieldType(textFieldType()).withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
-                .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2)
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withFieldType(textFieldType()).withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
-                .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_4)
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withFieldType(textFieldType()).withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
-                .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_5)
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withFieldType(textFieldType()).withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
-                .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
+        CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID_1)
+            .jurisdictionDefinition(jurisdiction)
+            .securityClassification(SecurityClassification.PUBLIC)
+            .caseFieldDefinitions(List.of(
+                newCaseField().withId(CASE_FIELD_1)
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_2)
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_4)
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_5)
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build()
+            ))
             .build();
+
         SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_4,
             "", CASE_FIELD_4, "", "");
         searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_1);
@@ -530,38 +531,38 @@ class CaseSearchResultViewGeneratorTest {
                 searchResultFieldWithValidRole2,
                 searchResultFieldWithInvalidRole)
             .build();
-        CaseTypeDefinition caseTypeDefinition = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2)
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withFieldType(textFieldType()).withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
-                .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_4)
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withFieldType(textFieldType()).withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
-                .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_5)
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withFieldType(textFieldType()).withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
-                .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
+        CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID_1)
+            .jurisdictionDefinition(jurisdiction)
+            .securityClassification(SecurityClassification.PUBLIC)
+            .caseFieldDefinitions(List.of(
+                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_2)
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_4)
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build(),
+                newCaseField().withId(CASE_FIELD_5)
+                    .withCaseTypeId(CASE_TYPE_ID_1)
+                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLE_1)
+                        .withRead(true)
+                        .build()).build()
+                ))
             .build();
+
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
@@ -696,13 +697,18 @@ class CaseSearchResultViewGeneratorTest {
                 FAMILY_DETAILS, "InvalidElementPath",
                 FAMILY_DETAILS, "", ""))
             .build();
-        CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
-                .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC).build();
+        CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID_1)
+            .jurisdictionDefinition(jurisdiction)
+            .securityClassification(SecurityClassification.PUBLIC)
+            .caseFieldDefinitions(List.of(
+                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLE_1)
+                    .withRead(true)
+                    .build()).build()
+            ))
+            .build();
+
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeWithoutCaseFieldDefinition);
 

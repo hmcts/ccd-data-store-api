@@ -117,8 +117,9 @@ class TimeToLiveServiceTest {
         void isCaseTypeUsingTTL_falseWhenCaseFieldDefinitionsNullOrEmpty(List<CaseFieldDefinition> caseFields) {
 
             // GIVEN
-            var caseTypeDefinition = new CaseTypeDefinition();
-            caseTypeDefinition.setCaseFieldDefinitions(caseFields);
+            var caseTypeDefinition = CaseTypeDefinition.builder()
+                .caseFieldDefinitions(caseFields)
+                .build();
 
             // WHEN
             var output = timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition);
@@ -1259,10 +1260,8 @@ class TimeToLiveServiceTest {
         List<CaseFieldDefinition> caseFields = new ArrayList<>();
         caseFields.add(caseFieldDefinition);
 
-        var newCaseTypeDefinition = new CaseTypeDefinition();
-        newCaseTypeDefinition.setCaseFieldDefinitions(caseFields);
-
-        return newCaseTypeDefinition;
+        return CaseTypeDefinition.builder()
+            .caseFieldDefinitions(caseFields).build();
     }
 
     private CaseTypeDefinition createCaseTypeDefinitionWithTTL() {

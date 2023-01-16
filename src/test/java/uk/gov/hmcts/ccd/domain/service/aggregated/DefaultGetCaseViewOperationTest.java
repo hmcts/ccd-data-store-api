@@ -153,15 +153,18 @@ class DefaultGetCaseViewOperationTest {
         caseTypeTabsDefinition = newCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
         doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
-        caseTypeDefinition = new CaseTypeDefinition();
         JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setName(JURISDICTION_ID);
-        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setId(MetaData.CaseField.CASE_TYPE.getReference());
         caseFieldDefinition.setMetadata(true);
         caseFieldDefinition.setFieldTypeDefinition(new FieldTypeDefinition());
-        caseTypeDefinition.setCaseFieldDefinitions(singletonList(caseFieldDefinition));
+
+        caseTypeDefinition = CaseTypeDefinition.builder()
+            .jurisdictionDefinition(jurisdictionDefinition)
+            .caseFieldDefinitions(singletonList(caseFieldDefinition))
+            .build();
 
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 

@@ -217,11 +217,12 @@ public abstract class TestFixtures {
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
 
-        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(CASE_TYPE_ID);
-        caseTypeDefinition.setName(CASE_TYPE_NAME);
-        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
-        caseTypeDefinition.setVersion(version);
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .name(CASE_TYPE_NAME)
+            .jurisdictionDefinition(jurisdictionDefinition)
+            .version(version)
+            .build();
 
         return caseTypeDefinition;
     }

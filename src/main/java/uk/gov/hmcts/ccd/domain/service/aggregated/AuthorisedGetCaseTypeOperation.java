@@ -1,18 +1,23 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 
 @Service
 @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER)
@@ -60,19 +65,18 @@ public class AuthorisedGetCaseTypeOperation implements GetCaseTypeOperation {
             return Optional.empty();
         }
 
-        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
-                                                                         accessProfiles,
-                                                                         access));
-        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition,
-            accessProfiles, access));
+        List<CaseEventDefinition> caseEventDefinitions = accessControlService.filterCaseEventsByAccess(caseTypeDefinition,
+            accessProfiles, access);
+        List<CaseStateDefinition> caseStateDefinitions = accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
+            accessProfiles,
+            access);
+        List<CaseFieldDefinition> caseFieldDefinitions = accessControlService.filterCaseFieldsByAccess(
+            caseTypeDefinition.getCaseFieldDefinitions(),
+            accessProfiles,
+            access);
 
-        caseTypeDefinition.setCaseFieldDefinitions(accessControlService.filterCaseFieldsByAccess(
-                                                    caseTypeDefinition.getCaseFieldDefinitions(),
-                                                    accessProfiles,
-                                                    access));
-
-
-        return Optional.of(caseTypeDefinition);
+        return Optional.of(CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition,
+            caseEventDefinitions, caseStateDefinitions, caseFieldDefinitions));
     }
 
 }

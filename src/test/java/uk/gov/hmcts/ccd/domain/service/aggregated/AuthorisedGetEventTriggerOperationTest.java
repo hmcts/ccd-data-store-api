@@ -45,8 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -98,7 +98,7 @@ class AuthorisedGetEventTriggerOperationTest {
     private AuthorisedGetEventTriggerOperation authorisedGetEventTriggerOperation;
     private CaseUpdateViewEvent caseEventTrigger;
     private final CaseDetails caseDetails = new CaseDetails();
-    private final CaseTypeDefinition caseType = new CaseTypeDefinition();
+    private CaseTypeDefinition caseType;
     private final List<CaseFieldDefinition> caseFields = Lists.newArrayList();
     private final Set<AccessProfile> accessProfiles = createAccessProfiles(Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
@@ -125,9 +125,11 @@ class AuthorisedGetEventTriggerOperationTest {
         caseEventTrigger = new CaseUpdateViewEvent();
         caseEventTrigger.setCaseId(CASE_ID);
 
-        caseType.setId(CASE_TYPE_ID);
-        caseType.setEvents(events);
-        caseType.setCaseFieldDefinitions(caseFields);
+        caseType = CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .events(events)
+            .caseFieldDefinitions(caseFields)
+            .build();
         caseDetails.setReference(CASE_REFERENCE_LONG);
         caseDetails.setState(STATE);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);

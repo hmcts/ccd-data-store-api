@@ -20,7 +20,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
@@ -41,7 +40,6 @@ import static com.xebialabs.restito.semantics.Condition.get;
 import static com.xebialabs.restito.semantics.Condition.method;
 import static com.xebialabs.restito.semantics.Condition.uri;
 import static com.xebialabs.restito.semantics.Condition.withHeader;
-
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -58,7 +56,6 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
     private static final String DOCUMENT_FIELD_ID = "D8Document";
     private static final FieldTypeDefinition DOCUMENT_FIELD_TYPE = new FieldTypeDefinition();
     private static final CaseFieldDefinition DOCUMENT_FIELD = new CaseFieldDefinition();
-    private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
     private static final ObjectNode DOCUMENT_VALUE_INITIAL = JSON_FACTORY.objectNode();
     private static final ObjectNode DOCUMENT_VALUE_SANITISED = JSON_FACTORY.objectNode();
     private static final String BEARER_TEST_JWT = "Bearer testJwt";
@@ -79,7 +76,6 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         DOCUMENT_FIELD.setId(DOCUMENT_FIELD_ID);
         DOCUMENT_FIELD.setFieldTypeDefinition(DOCUMENT_FIELD_TYPE);
 
-        CASE_TYPE.setCaseFieldDefinitions(Collections.singletonList(DOCUMENT_FIELD));
         DOCUMENT_VALUE_INITIAL.put("document_url", DOCUMENT_URL);
         DOCUMENT_VALUE_SANITISED.put("document_url", DOCUMENT_URL);
         DOCUMENT_VALUE_SANITISED.put("document_binary_url", BINARY_URL);

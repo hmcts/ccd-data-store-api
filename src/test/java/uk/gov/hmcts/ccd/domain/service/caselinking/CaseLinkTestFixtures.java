@@ -108,13 +108,10 @@ public abstract class CaseLinkTestFixtures {
     }
 
     protected CaseTypeDefinition createCaseTypeDefinition() {
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(CASE_TYPE_ID);
-        caseTypeDefinition.setCaseFieldDefinitions(List.of(
-            new CaseFieldDefinition(),
-            new CaseFieldDefinition()
-        ));
-        return caseTypeDefinition;
+        return CaseTypeDefinition.builder()
+            .id(CASE_TYPE_ID)
+            .caseFieldDefinitions(List.of(new CaseFieldDefinition(), new CaseFieldDefinition()))
+            .build();
     }
 
 }

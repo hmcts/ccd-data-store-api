@@ -397,13 +397,12 @@ class DefaultValidateCaseFieldsOperationTest {
     }
 
     private static CaseTypeDefinition buildCaseType() {
-        final List<CaseEventDefinition> CaseEventDefinitions = new ArrayList<>();
+        final List<CaseEventDefinition> caseEventDefinitions = new ArrayList<>();
         final List<CaseEventFieldDefinition> caseEventFieldDefinitions = new ArrayList<>();
         final List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
-        final JurisdictionDefinition j = buildJurisdiction();
         final Version version = new Version();
         version.setNumber(67);
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+
         final CaseEventFieldDefinition caseEventFieldDefinition = new CaseEventFieldDefinition();
         caseEventFieldDefinition.setCaseFieldId("OrganisationPolicyField");
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
@@ -417,14 +416,14 @@ class DefaultValidateCaseFieldsOperationTest {
 
         caseEventDefinition.setId("eventId");
         caseEventDefinition.setCaseFields(caseEventFieldDefinitions);
-
-        caseTypeDefinition.setId("caseTypeId");
-        caseTypeDefinition.setName("case type name");
-        caseTypeDefinition.setJurisdictionDefinition(j);
-        caseTypeDefinition.setVersion(version);
-        CaseEventDefinitions.add(caseEventDefinition);
-        caseTypeDefinition.setEvents(CaseEventDefinitions);
-        return caseTypeDefinition;
+        caseEventDefinitions.add(caseEventDefinition);
+        return CaseTypeDefinition.builder()
+            .id("caseTypeId")
+            .name("case type name")
+            .jurisdictionDefinition(buildJurisdiction())
+            .version(version)
+            .events(caseEventDefinitions)
+            .build();
     }
 
     private CaseTypeDefinition buildCaseTypeWithTwoDefaultValues(String defaultValue1, String defaultValue2) {
@@ -449,7 +448,6 @@ class DefaultValidateCaseFieldsOperationTest {
         final JurisdictionDefinition j = buildJurisdiction();
         final Version version = new Version();
         version.setNumber(67);
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
 
         //---1 ---/
         final CaseEventFieldDefinition caseEventFieldDefinition1 = new CaseEventFieldDefinition();
@@ -483,13 +481,14 @@ class DefaultValidateCaseFieldsOperationTest {
         //---General ---/
         caseEventDefinition.setId("eventId");
         caseEventDefinition.setCaseFields(caseEventFieldDefinitions);
-        caseTypeDefinition.setId("caseTypeId");
-        caseTypeDefinition.setName("case type name");
-        caseTypeDefinition.setJurisdictionDefinition(j);
-        caseTypeDefinition.setVersion(version);
         caseEventDefinitions.add(caseEventDefinition);
-        caseTypeDefinition.setEvents(caseEventDefinitions);
-        return caseTypeDefinition;
+        return CaseTypeDefinition.builder()
+            .id("caseTypeId")
+            .name("case type name")
+            .jurisdictionDefinition(j)
+            .version(version)
+            .events(caseEventDefinitions)
+            .build();
     }
 
     private static JurisdictionDefinition buildJurisdiction() {
