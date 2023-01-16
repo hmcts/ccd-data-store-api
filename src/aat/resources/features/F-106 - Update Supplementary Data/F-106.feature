@@ -99,8 +99,8 @@ Feature: F-106: Update Supplementary Data
 
   @S-613
   Scenario: Must NOT be able to Update supplementary data of any PRIVATE case that requires explicit access
-    Given a case [C2_PRIVATE, which has just been] created as in [F106_Case_Data_Create_C2_PRIVATE],
-    And a successful call [by CaseworkerPRIVATE to update supplementary_data] as in [F-106_Update_Supplementary_Data_C2_PRIVATE],
+    Given a case [C2_PRIVATE, which has just been] created as in [S-613_Case_Data_Create_C2_PRIVATE],
+    And a successful call [by CaseworkerPRIVATE to update supplementary_data] as in [S-613_Update_Supplementary_Data_C2_PRIVATE],
     And a user with [a valid PUBLIC profile],
     When a request is prepared with appropriate values,
     And it is submitted to call the [Update Supplementary Data] operation of [CCD Data Store api],
