@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.ToString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
@@ -48,6 +50,8 @@ public class CaseTypeDefinition implements Serializable {
     private final List<CategoryDefinition> categories = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaseTypeDefinition.class);
 
     public String getId() {
         return id;
@@ -199,8 +203,23 @@ public class CaseTypeDefinition implements Serializable {
         return getCaseField(caseFieldId).map(CaseFieldDefinition::isCollectionFieldType).orElse(false);
     }
 
+    private void jcdebug(String message) {
+        LOG.info("CaseTypeDefinition: info: " + message);
+        LOG.warn("CaseTypeDefinition: warn: " + message);
+        LOG.error("CaseTypeDefinition: error: " + message);
+        LOG.debug("CaseTypeDefinition: debug: " + message);
+    }
+
+    /**
+     * Returns a CaseFieldDefinition from @JsonProperty("case_fields") List<CaseFieldDefinition> caseFieldDefinitions.
+     */
     @JsonIgnore
     public Optional<CaseFieldDefinition> getCaseField(String caseFieldId) {
+        jcdebug("getCaseField(): caseFieldDefinitions.size = " + caseFieldDefinitions.size());
+        for (CaseFieldDefinition definition : caseFieldDefinitions) {
+            jcdebug("getCaseField(): " + definition.toString());
+        }
+
         return caseFieldDefinitions.stream().filter(caseField ->
             caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
     }
