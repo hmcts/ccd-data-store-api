@@ -204,10 +204,10 @@ public class CaseTypeDefinition implements Serializable {
     }
 
     private void jcdebug(String message) {
-        LOG.info("CaseTypeDefinition: info: " + message);
-        LOG.warn("CaseTypeDefinition: warn: " + message);
-        LOG.error("CaseTypeDefinition: error: " + message);
-        LOG.debug("CaseTypeDefinition: debug: " + message);
+        LOG.info("CaseTypeDefinition: info: %s", message);
+        LOG.warn("CaseTypeDefinition: warn: %s", message);
+        LOG.error("CaseTypeDefinition: error: %s", message);
+        LOG.debug("CaseTypeDefinition: debug: %s", message);
     }
 
     // Returns a CaseFieldDefinition from @JsonProperty("case_fields") List<CaseFieldDefinition> caseFieldDefinitions.
