@@ -210,9 +210,7 @@ public class CaseTypeDefinition implements Serializable {
         LOG.debug("CaseTypeDefinition: debug: " + message);
     }
 
-    /**
-     * Returns a CaseFieldDefinition from @JsonProperty("case_fields") List<CaseFieldDefinition> caseFieldDefinitions.
-     */
+    // Returns a CaseFieldDefinition from @JsonProperty("case_fields") List<CaseFieldDefinition> caseFieldDefinitions.
     @JsonIgnore
     public Optional<CaseFieldDefinition> getCaseField(String caseFieldId) {
         jcdebug("getCaseField(): caseFieldDefinitions.size = " + caseFieldDefinitions.size());
