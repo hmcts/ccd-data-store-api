@@ -98,7 +98,7 @@ Scenario: must return negative response HTTP-400 when request contains a malform
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-572 @Ignore # Response code mismatch, expected: 400, actual: 403 / RDM-7106
+@S-572 # Response code mismatch, expected: 400, actual: 403 / RDM-7106
 Scenario: must return negative response HTTP-400 when request contains a malformed jurisdiction ID
 
     Given a user with [an active profile in CCD],
@@ -113,7 +113,7 @@ Scenario: must return negative response HTTP-400 when request contains a malfor
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-573 @Ignore # Response code mismatch, expected: 400, actual: 403 / RDM-7106
+@S-573 # Response code mismatch, expected: 400, actual: 403 / RDM-7106
 Scenario: must return negative response HTTP-400 when request contains a non-existing jurisdiction ID
 
     Given a user with [an active profile in CCD],
