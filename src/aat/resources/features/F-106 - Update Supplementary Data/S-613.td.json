@@ -34,7 +34,11 @@
       "message" : "Not authorised to update case supplementary data",
       "details" : null,
       "callbackErrors" : null,
-      "callbackWarnings" : null
+      "callbackWarnings" : null,
+      "supplementary_data": {
+        "orgs_assigned_users.OrgA": 25,
+        "orgs_assigned_users.OrgB": 1
+      }
     }
   }
 }
