@@ -11,7 +11,10 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -83,6 +86,19 @@ public class CaseTypeDefinition implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    // Constructor
+    public CaseTypeDefinition() {
+        jcdebug("Constructor");
+        // Log stack trace
+        Writer buffer = new StringWriter();
+        new RuntimeException().printStackTrace(new PrintWriter(buffer));
+        jcdebug(buffer.toString());
+    }
+
+    private void jcdebug(String message) {
+        LOG.info("JCDEBUG: CaseTypeDefinition: {}", message);
     }
 
     @JsonIgnore
@@ -201,13 +217,6 @@ public class CaseTypeDefinition implements Serializable {
     @JsonIgnore
     public boolean isCaseFieldACollection(String caseFieldId) {
         return getCaseField(caseFieldId).map(CaseFieldDefinition::isCollectionFieldType).orElse(false);
-    }
-
-    private void jcdebug(String message) {
-        LOG.info("CaseTypeDefinition: info: {}", message);
-        LOG.warn("CaseTypeDefinition: warn: {}", message);
-        LOG.error("CaseTypeDefinition: error: {}", message);
-        LOG.debug("CaseTypeDefinition: debug: {}", message);
     }
 
     // Returns a CaseFieldDefinition from @JsonProperty("case_fields") List<CaseFieldDefinition> caseFieldDefinitions.

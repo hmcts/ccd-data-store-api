@@ -4,9 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import lombok.ToString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +62,21 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private Object formattedValue;
     @JsonProperty("category_id")
     private String categoryId;
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaseFieldDefinition.class);
+
+    // Constructor
+    public CaseFieldDefinition() {
+        jcdebug("Constructor");
+        // Log stack trace
+        Writer buffer = new StringWriter();
+        new RuntimeException().printStackTrace(new PrintWriter(buffer));
+        jcdebug(buffer.toString());
+    }
+
+    private void jcdebug(String message) {
+        LOG.info("JCDEBUG: CaseFieldDefinition: {}", message);
+    }
 
     @Override
     public String getId() {
