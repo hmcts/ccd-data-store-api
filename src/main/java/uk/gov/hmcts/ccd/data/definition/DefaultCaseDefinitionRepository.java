@@ -60,6 +60,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         this.restTemplate = restTemplate;
     }
 
+    private void jcdebug(String message) {
+        LOG.info("JCDEBUG: DefaultCaseDefinitionRepository: {}", message);
+    }
+
     /**
      * @deprecated current implementation has serious performance issues
      */
@@ -69,6 +73,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+
+            jcdebug("getCaseTypesForJurisdiction(): " + applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId));
             return Arrays.asList(restTemplate.exchange(applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId),
                     HttpMethod.GET, requestEntity, CaseTypeDefinition[].class).getBody());
         } catch (Exception e) {
