@@ -73,7 +73,7 @@ public class FileViewDocumentService {
         for (Tuple2<Integer, Integer> index : indices) {
             final String substring = documentPath.substring(idx, index._1);
             sb.append(substring);
-            idx = idx + index._2;
+            idx = index._2;
             final String idPath = documentPath.substring(0, index._2) + ID;
             final String nodeId = documentContext.read(idPath);
             sb.append(String.format("[%s].", nodeId));
