@@ -21,12 +21,12 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static org.springframework.http.HttpHeaders.ETAG;
@@ -217,6 +217,11 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
             );
             throw mapException(exception, resourceNotFoundException);
         }
+    }
+
+    @Override
+    public RoleAssignmentResponse findRoleAssignmentsByCases(List<String> caseIds) {
+        return findRoleAssignmentsByCasesAndUsers(caseIds, null);
     }
 
     private RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(RoleAssignmentQuery roleAssignmentQuery) {

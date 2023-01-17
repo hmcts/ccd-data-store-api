@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
-import java.util.Set;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
+
+import java.util.List;
+import java.util.Set;
 
 public interface SupplementaryDataRepository {
 
@@ -18,4 +20,6 @@ public interface SupplementaryDataRepository {
      * @return SupplementaryData
      */
     SupplementaryData findSupplementaryData(String caseReference, Set<String> requestedProperties);
+
+    List<String> findCasesWithSupplementaryDataHMCTSServiceIdButNoOrgsAssignedUsers();
 }

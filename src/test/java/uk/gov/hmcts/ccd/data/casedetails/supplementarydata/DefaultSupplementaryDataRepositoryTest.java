@@ -1,9 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
 import com.google.common.collect.Sets;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,6 +10,10 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -120,6 +121,19 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         Map<String, Object> responseMap = response.getResponse();
         assertTrue(responseMap.keySet().contains("orgs_assigned_users.organisationA"));
         assertEquals(13, responseMap.get("orgs_assigned_users.organisationA"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void findCasesWithSupplementaryDataHavingHMCTSServiceIdButNoOrgsAssignedUsers() {
+        assumeDataInitialised();
+
+        List<String> response = supplementaryDataRepository
+            .findCasesWithSupplementaryDataHMCTSServiceIdButNoOrgsAssignedUsers();
+        assertNotNull(response);
+        assertEquals(1, response.size());
+        assertEquals("1504259907311111", response.get(0));
     }
 
     @Test
@@ -234,8 +248,14 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
                 Sets.newHashSet("orgs_assigned_users.organisationC"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("orgs_assigned_users.organisationA"));
+        assertEquals(15, response.get("orgs_assigned_users.organisationA"));
+        assertTrue(response.keySet().contains("orgs_assigned_users.organisationB"));
+        assertEquals(3, response.get("orgs_assigned_users.organisationB"));
         assertTrue(response.keySet().contains("orgs_assigned_users.organisationC"));
         assertEquals(23, response.get("orgs_assigned_users.organisationC"));
+//        assertTrue(response.keySet().contains("HMCTSServiceId"));
+//        assertEquals("BBA3", response.get("HMCTSServiceId"));
     }
 
     @Test
