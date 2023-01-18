@@ -17,7 +17,9 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.InvalidCaseSupplementaryDataRequest;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/")
@@ -64,9 +66,12 @@ public class InvalidCaseSupplementaryDataController {
     private void validateRequestParams(InvalidCaseSupplementaryDataRequest request) {
         if (request.getDateFrom() == null) {
             throw new BadRequestException("Invalid parameters: 'date_from' has to be defined");
-        } else if (request.getDateTo().isPresent()) {
-            if (request.getDateFrom().isAfter(request.getDateTo().get())) {
-                throw new BadRequestException("Invalid parameters: 'date_from' has to be before 'date_to'");
+        } else {
+            Optional<LocalDateTime> dateTo = request.getDateTo();
+            if (dateTo.isPresent()) {
+                if (request.getDateFrom().isAfter(dateTo.get())) {
+                    throw new BadRequestException("Invalid parameters: 'date_from' has to be before 'date_to'");
+                }
             }
         }
     }
