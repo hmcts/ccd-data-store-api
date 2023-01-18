@@ -171,7 +171,7 @@
                 {
                   "id": "2c003bf7-e879-4a79-9a50-a24de3c71047",
                   "value": {
-                    "sourceDocument": {
+                    "type": {
                       "document_url": "http://dm-store:8080//documents/1d1f4521-3ab7-4257-a887-340d021c6de8",
                       "document_filename": "test-a5.pdf",
                       "document_binary_url": "http://dm-store:8080//documents/1d1f4521-3ab7-4257-a887-340d021c6de8/binary"
@@ -181,7 +181,7 @@
                 {
                   "id": "a2398363-51af-4ba8-bdfd-d00bee5a3560",
                   "value": {
-                    "sourceDocument": {
+                    "type": {
                       "document_url": "http://dm-store:8080//documents/c1c12494-73f5-4c7a-a92d-afdd4e254917",
                       "document_filename": "test-a5-document.pdf",
                       "document_binary_url": "http://dm-store:8080//documents/c1c12494-73f5-4c7a-a92d-afdd4e254917/binary"
@@ -202,7 +202,7 @@
                       {
                         "id": "20ea77f0-c588-4fb5-86fe-16984449c73b",
                         "value": {
-                          "sourceDocument": {
+                          "type": {
                             "document_url": "http://dm-store:8080//documents/dd1088dc-a2e1-4e2a-bea5-53f0596a808c",
                             "document_filename": "E_402 evidence.pdf",
                             "document_binary_url": "http://dm-store:8080//documents/dd1088dc-a2e1-4e2a-bea5-53f0596a808c/binary"
