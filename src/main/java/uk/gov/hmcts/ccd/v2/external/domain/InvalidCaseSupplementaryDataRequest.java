@@ -24,6 +24,9 @@ public class InvalidCaseSupplementaryDataRequest implements Serializable {
     @JsonProperty("limit")
     private Integer limit;
 
+    @JsonProperty("search_ras")
+    private Boolean searchRas;
+
     public Optional<LocalDateTime> getDateTo() {
         return Optional.ofNullable(dateTo);
     }

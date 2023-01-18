@@ -5,21 +5,28 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.InvalidSupplementaryDataOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.InvalidCaseSupplementaryDataRequest;
-import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
+import uk.gov.hmcts.ccd.v2.external.domain.InvalidCaseSupplementaryDataResponse;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
 
 @RestController
 @RequestMapping(path = "/")
@@ -27,10 +34,14 @@ import java.util.Optional;
     havingValue = "true")
 public class InvalidCaseSupplementaryDataController {
     private final InvalidSupplementaryDataOperation invalidSupplementaryDataOperation;
+    private final CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
 
     @Autowired
-    public InvalidCaseSupplementaryDataController(InvalidSupplementaryDataOperation invalidSupplementaryDataOperation) {
+    public InvalidCaseSupplementaryDataController(InvalidSupplementaryDataOperation invalidSupplementaryDataOperation,
+                                                  @Qualifier("authorised") CaseAssignedUserRolesOperation
+                                                      caseAssignedUserRolesOperation) {
         this.invalidSupplementaryDataOperation = invalidSupplementaryDataOperation;
+        this.caseAssignedUserRolesOperation = caseAssignedUserRolesOperation;
     }
 
     @PostMapping(
@@ -49,18 +60,32 @@ public class InvalidCaseSupplementaryDataController {
         @ApiResponse(
             code = 200,
             message = "Cases returned successfully",
-            response = CaseAssignedUserRolesResource.class
+            response = InvalidCaseSupplementaryDataResponse.class
         ),
         @ApiResponse(
             code = 400,
             message = "Invalid request parameters. "
         )
     })
-    public @ResponseBody List<String> getInvalidSupplementaryData(@ApiParam(value = "Parameters to filter on",
-        required = true) @RequestBody InvalidCaseSupplementaryDataRequest request) {
+    public ResponseEntity<InvalidCaseSupplementaryDataResponse> getInvalidSupplementaryData(
+        @ApiParam(value = "Parameters to filter on", required = true)
+        @RequestBody InvalidCaseSupplementaryDataRequest request) {
+
         validateRequestParams(request);
-        return invalidSupplementaryDataOperation.getInvalidSupplementaryDataCases(request.getDateFrom(),
-            request.getDateTo(), request.getLimit());
+
+        List<String> casesList = invalidSupplementaryDataOperation.getInvalidSupplementaryDataCases(
+            request.getDateFrom(), request.getDateTo(), request.getLimit());
+
+        if (request.getSearchRas()) {
+            List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(casesList
+                .stream()
+                .map(Long::valueOf)
+                .collect(Collectors.toCollection(ArrayList::new)), emptyList());
+
+            return ResponseEntity.ok(new InvalidCaseSupplementaryDataResponse(casesList, caseAssignedUserRoles));
+        } else {
+            return  ResponseEntity.ok(new InvalidCaseSupplementaryDataResponse(casesList, emptyList()));
+        }
     }
 
     private void validateRequestParams(InvalidCaseSupplementaryDataRequest request) {

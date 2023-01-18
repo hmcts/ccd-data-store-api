@@ -1,25 +1,34 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import org.junit.jupiter.api.Assertions;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.InvalidSupplementaryDataOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.InvalidCaseSupplementaryDataRequest;
+import uk.gov.hmcts.ccd.v2.external.domain.InvalidCaseSupplementaryDataResponse;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class InvalidCaseSupplementaryDataControllerTest {
@@ -33,7 +42,13 @@ class InvalidCaseSupplementaryDataControllerTest {
     private InvalidSupplementaryDataOperation invalidSupplementaryDataOperation;
 
     @Mock
+    private CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
+
+    @Mock
     private InvalidCaseSupplementaryDataRequest request;
+
+    @Mock
+    public CaseAssignedUserRole caseAssignedUserRole;
 
     private InvalidCaseSupplementaryDataController controller;
 
@@ -44,8 +59,10 @@ class InvalidCaseSupplementaryDataControllerTest {
         when(request.getDateFrom()).thenReturn(DATE_10_DAYS_AGO);
         when(request.getDateTo()).thenReturn(Optional.of(DATE_5_DAYS_AHEAD));
         when(request.getLimit()).thenReturn(DEFAULT_LIMIT);
+        when(request.getSearchRas()).thenReturn(Boolean.TRUE);
 
-        controller = new InvalidCaseSupplementaryDataController(invalidSupplementaryDataOperation);
+        controller = new InvalidCaseSupplementaryDataController(invalidSupplementaryDataOperation,
+            caseAssignedUserRolesOperation);
     }
 
     @Test
@@ -55,13 +72,23 @@ class InvalidCaseSupplementaryDataControllerTest {
             DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT
         );
 
-        List<String> result = controller.getInvalidSupplementaryData(request);
+        List<Long> casesAsLong = cases.stream().map(Long::parseLong).collect(Collectors.toList());
+        List<String> userIds = Collections.emptyList();
+        doReturn(createCaseAssignedUserRoles()).when(caseAssignedUserRolesOperation)
+            .findCaseUserRoles(casesAsLong, userIds);
 
-        Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals(CASE_ID, result.get(0));
+        ResponseEntity<InvalidCaseSupplementaryDataResponse> response = controller.getInvalidSupplementaryData(request);
+
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().getCaseIds().size());
+        assertEquals(CASE_ID, response.getBody().getCaseIds().get(0));
+        assertEquals(1, response.getBody().getCaseAssignedUserRoles().size());
+        assertEquals(caseAssignedUserRole, response.getBody().getCaseAssignedUserRoles().get(0));
 
         verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
             DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
+        verify(caseAssignedUserRolesOperation, times(1)).findCaseUserRoles(casesAsLong, userIds);
     }
 
     @Test
@@ -100,12 +127,42 @@ class InvalidCaseSupplementaryDataControllerTest {
             DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT
         );
 
-        List<String> result = controller.getInvalidSupplementaryData(request);
+        ResponseEntity<InvalidCaseSupplementaryDataResponse> response = controller.getInvalidSupplementaryData(request);
 
-        Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals(CASE_ID, result.get(0));
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().getCaseIds().size());
+        assertEquals(CASE_ID, response.getBody().getCaseIds().get(0));
 
         verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
             DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT);
+    }
+
+    @Test
+    void shouldProcessValidRequestWhenSearchRasIsFalse() {
+        when(request.getSearchRas()).thenReturn(Boolean.FALSE);
+
+        List<String> cases = List.of(CASE_ID);
+        doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(
+            DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT
+        );
+
+        ResponseEntity<InvalidCaseSupplementaryDataResponse> response = controller.getInvalidSupplementaryData(request);
+
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().getCaseIds().size());
+        assertEquals(CASE_ID, response.getBody().getCaseIds().get(0));
+        assertEquals(0, response.getBody().getCaseAssignedUserRoles().size());
+
+        verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
+            DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
+        verifyNoInteractions(caseAssignedUserRolesOperation);
+    }
+
+    private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {
+        List<CaseAssignedUserRole> userRoles = Lists.newArrayList();
+        userRoles.add(caseAssignedUserRole);
+        return userRoles;
     }
 }
