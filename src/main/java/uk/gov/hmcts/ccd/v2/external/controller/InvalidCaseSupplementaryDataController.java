@@ -64,8 +64,10 @@ public class InvalidCaseSupplementaryDataController {
     private void validateRequestParams(InvalidCaseSupplementaryDataRequest request) {
         if (request.getDateFrom() == null) {
             throw new BadRequestException("Invalid parameters: 'date_from' has to be defined");
-        } else if (request.getDateTo().isPresent() && request.getDateFrom().isAfter(request.getDateTo().get())) {
-            throw new BadRequestException("Invalid parameters: 'date_from' has to be before 'date_to'");
+        } else if (request.getDateTo().isPresent()) {
+            if (request.getDateFrom().isAfter(request.getDateTo().get())) {
+                throw new BadRequestException("Invalid parameters: 'date_from' has to be before 'date_to'");
+            }
         }
     }
 }

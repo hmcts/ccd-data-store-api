@@ -90,4 +90,22 @@ class InvalidCaseSupplementaryDataControllerTest {
                 containsString("Invalid parameters: 'date_from' has to be before 'date_to'"))
         );
     }
+
+    @Test
+    void shouldProcessValidRequestWhenDateToIsEmpty() {
+        when(request.getDateTo()).thenReturn(Optional.empty());
+
+        List<String> cases = List.of(CASE_ID);
+        doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(
+            DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT
+        );
+
+        List<String> result = controller.getInvalidSupplementaryData(request);
+
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(CASE_ID, result.get(0));
+
+        verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
+            DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT);
+    }
 }
