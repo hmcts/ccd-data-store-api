@@ -84,6 +84,14 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("orgs_assigned_users.organisationB"));
         assertEquals(3, response.get("orgs_assigned_users.organisationB"));
+
+        supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907353529",
+                Sets.newHashSet("orgs_assigned_users.organisationA"));
+        assertNotNull(supplementaryData);
+        response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("orgs_assigned_users.organisationA"));
+        assertEquals(10, response.get("orgs_assigned_users.organisationA"));
     }
 
     @Test
@@ -102,6 +110,14 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("orgs_assigned_users.organisationC"));
         assertEquals(23, response.get("orgs_assigned_users.organisationC"));
+
+        supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907353529",
+                Sets.newHashSet("orgs_assigned_users.organisationA"));
+        assertNotNull(supplementaryData);
+        response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("orgs_assigned_users.organisationA"));
+        assertEquals(10, response.get("orgs_assigned_users.organisationA"));
     }
 
     @Test
@@ -188,6 +204,13 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         Map<String, Object> responseMap = response.getResponse();
         assertTrue(responseMap.keySet().contains("orgs_assigned_users.organisationB"));
         assertEquals(3, responseMap.get("orgs_assigned_users.organisationB"));
+
+        response = supplementaryDataRepository.findSupplementaryData("1504259907353529",
+            Sets.newHashSet("orgs_assigned_users.organisationA"));
+        assertNotNull(response);
+        responseMap = response.getResponse();
+        assertTrue(responseMap.keySet().contains("orgs_assigned_users.organisationA"));
+        assertEquals(10, responseMap.get("orgs_assigned_users.organisationA"));
     }
 
     @Test
@@ -218,6 +241,13 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("orgs_assigned_users.organisationC"));
         assertEquals(23, response.get("orgs_assigned_users.organisationC"));
+
+        supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907311111", Sets.newHashSet("HMCTSServiceId"));
+        assertNotNull(supplementaryData);
+        response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("HMCTSServiceId"));
+        assertEquals("BBA3", response.get("HMCTSServiceId"));
     }
 
     @Test
@@ -236,6 +266,20 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("orgs_assigned_users.organisationC"));
         assertEquals(23, response.get("orgs_assigned_users.organisationC"));
+
+        supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907322222", Sets.newHashSet("HMCTSServiceId"));
+        assertNotNull(supplementaryData);
+        response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("HMCTSServiceId"));
+        assertEquals("BBA3", response.get("HMCTSServiceId"));
+
+        supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907322222", Sets.newHashSet("orgs_assigned_users.organisationA"));
+        assertNotNull(supplementaryData);
+        response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("orgs_assigned_users.organisationA"));
+        assertEquals(15, response.get("orgs_assigned_users.organisationA"));
     }
 
     @Test
@@ -254,6 +298,13 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("orgs_assigned_users.organisationC"));
         assertEquals(1, response.get("orgs_assigned_users.organisationC"));
+
+        supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907311111", Sets.newHashSet("HMCTSServiceId"));
+        assertNotNull(supplementaryData);
+        response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("HMCTSServiceId"));
+        assertEquals("BBA3", response.get("HMCTSServiceId"));
     }
 
     @Test
@@ -272,6 +323,20 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("orgs_assigned_users.organisationB"));
         assertEquals(5, response.get("orgs_assigned_users.organisationB"));
+
+        supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907322222", Sets.newHashSet("HMCTSServiceId"));
+        assertNotNull(supplementaryData);
+        response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("HMCTSServiceId"));
+        assertEquals("BBA3", response.get("HMCTSServiceId"));
+
+        supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907322222", Sets.newHashSet("orgs_assigned_users.organisationA"));
+        assertNotNull(supplementaryData);
+        response = supplementaryData.getResponse();
+        assertTrue(response.keySet().contains("orgs_assigned_users.organisationA"));
+        assertEquals(15, response.get("orgs_assigned_users.organisationA"));
     }
 
 
