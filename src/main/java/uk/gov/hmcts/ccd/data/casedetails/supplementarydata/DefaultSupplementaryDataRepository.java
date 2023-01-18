@@ -11,7 +11,9 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -67,10 +69,11 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
     }
 
     @Override
-    public List<String> findCasesWithSupplementaryDataHMCTSServiceIdButNoOrgsAssignedUsers() {
-        Query query = findCasesWithSupplementaryDataQueryBuilder.build(em);
-        List<String> response = query.getResultList();
-        return response;
+    public List<String> findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(LocalDateTime from,
+                                                                                           Optional<LocalDateTime> to,
+                                                                                           Integer limit) {
+        Query query = findCasesWithSupplementaryDataQueryBuilder.build(em, from, to, limit);
+        return query.getResultList();
     }
 
     private SupplementaryDataQueryBuilder queryBuilder(final SupplementaryDataOperation supplementaryDataOperation) {

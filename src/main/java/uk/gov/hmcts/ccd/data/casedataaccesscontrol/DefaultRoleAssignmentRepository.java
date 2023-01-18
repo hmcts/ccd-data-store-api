@@ -219,11 +219,6 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         }
     }
 
-    @Override
-    public RoleAssignmentResponse findRoleAssignmentsByCases(List<String> caseIds) {
-        return findRoleAssignmentsByCasesAndUsers(caseIds, null);
-    }
-
     private RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(RoleAssignmentQuery roleAssignmentQuery) {
         int pageNumber = ROLE_ASSIGNMENT_STARTING_PAGE_NUMBER;
         int pageSize = Integer.parseInt(applicationParams.getRoleAssignmentPageSize());

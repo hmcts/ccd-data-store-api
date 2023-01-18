@@ -14,6 +14,4 @@ public interface RoleAssignmentRepository {
 
     RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds);
 
-    RoleAssignmentResponse findRoleAssignmentsByCases(List<String> caseIds);
-
 }

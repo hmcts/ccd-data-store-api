@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,18 +14,20 @@ import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
-    private static final int NUMBER_OF_CASES = 6;
+    private static final int NUMBER_OF_CASES = 8;
     private JdbcTemplate template;
 
     @Inject
@@ -123,17 +127,91 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         assertEquals(13, responseMap.get("orgs_assigned_users.organisationA"));
     }
 
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
-        {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void findCasesWithSupplementaryDataHavingHMCTSServiceIdButNoOrgsAssignedUsers() {
-        assumeDataInitialised();
+    @Nested
+    @DisplayName("find casese with invalid supplementary data test")
+    class FindCasesWithInvalidSupplementaryData {
 
-        List<String> response = supplementaryDataRepository
-            .findCasesWithSupplementaryDataHMCTSServiceIdButNoOrgsAssignedUsers();
-        assertNotNull(response);
-        assertEquals(1, response.size());
-        assertEquals("1504259907311111", response.get(0));
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+            {"classpath:sql/insert_cases_supplementary_data.sql"})
+        public void findCasesWithSupplementaryDataHavingHmctsServiceIdButNoOrgsAssignedUsers() {
+            assumeDataInitialised();
+
+            LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
+            LocalDateTime to = LocalDateTime.of(2020, 1, 1, 8, 55);
+            Integer limit = 5;
+            List<String> response = supplementaryDataRepository
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(from, Optional.of(to), limit);
+            assertNotNull(response);
+            assertEquals(3, response.size());
+            assertTrue(response.contains("1504259907311111"));
+            assertTrue(response.contains("1504259907311112"));
+            assertTrue(response.contains("1504259907311113"));
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+            {"classpath:sql/insert_cases_supplementary_data.sql"})
+        public void findCasesFilteredByDateFrom() {
+            assumeDataInitialised();
+
+            LocalDateTime from = LocalDateTime.of(2016, 9, 24, 20, 41);
+            Integer limit = 10;
+            List<String> response = supplementaryDataRepository
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(from, Optional.empty(), limit);
+            assertNotNull(response);
+            assertEquals(1, response.size());
+            assertEquals("1504259907311113", response.get(0));
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+            {"classpath:sql/insert_cases_supplementary_data.sql"})
+        public void findCasesFilteredByLimit() {
+            assumeDataInitialised();
+
+            LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
+            Integer limit = 1;
+            List<String> response = supplementaryDataRepository
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(from, Optional.empty(), limit);
+            assertNotNull(response);
+            assertEquals(1, response.size());
+            assertEquals("1504259907311111", response.get(0));
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+            {"classpath:sql/insert_cases_supplementary_data.sql"})
+        public void findCasesFilteredWithEmptyDateTo() {
+            assumeDataInitialised();
+
+            LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
+            Integer limit = 100;
+            List<String> response = supplementaryDataRepository
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(from, Optional.empty(), limit);
+            assertNotNull(response);
+            assertEquals(3, response.size());
+            assertTrue(response.contains("1504259907311111"));
+            assertTrue(response.contains("1504259907311112"));
+            assertTrue(response.contains("1504259907311113"));
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+            {"classpath:sql/insert_cases_supplementary_data.sql"})
+        public void findCasesFilteredByDateTo() {
+            assumeDataInitialised();
+
+            LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
+            LocalDateTime to = LocalDateTime.of(2016, 9, 24, 20, 41);
+            Integer limit = 5;
+            List<String> response = supplementaryDataRepository
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(from, Optional.of(to), limit);
+            assertNotNull(response);
+            assertEquals(2, response.size());
+            assertTrue(response.contains("1504259907311111"));
+            assertTrue(response.contains("1504259907311112"));
+        }
     }
 
     @Test
@@ -248,14 +326,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
                 Sets.newHashSet("orgs_assigned_users.organisationC"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
-        assertTrue(response.keySet().contains("orgs_assigned_users.organisationA"));
-        assertEquals(15, response.get("orgs_assigned_users.organisationA"));
-        assertTrue(response.keySet().contains("orgs_assigned_users.organisationB"));
-        assertEquals(3, response.get("orgs_assigned_users.organisationB"));
         assertTrue(response.keySet().contains("orgs_assigned_users.organisationC"));
         assertEquals(23, response.get("orgs_assigned_users.organisationC"));
-//        assertTrue(response.keySet().contains("HMCTSServiceId"));
-//        assertEquals("BBA3", response.get("HMCTSServiceId"));
     }
 
     @Test
@@ -298,6 +370,6 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
     private void assumeDataInitialised() {
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
+        assertEquals(NUMBER_OF_CASES, resultList.size(), "Incorrect data initiation");
     }
 }

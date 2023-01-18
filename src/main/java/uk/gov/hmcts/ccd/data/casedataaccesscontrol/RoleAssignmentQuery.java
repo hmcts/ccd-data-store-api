@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 
-import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -29,7 +28,7 @@ public class RoleAssignmentQuery {
     }
 
     public RoleAssignmentQuery(String caseId, String userId, List<String> roleNames) {
-        this.actorId = userId == null ? Collections.emptyList() : List.of(userId);
+        this.actorId = List.of(userId);
         this.attributes = Attributes.builder().caseId(List.of(caseId)).build();
         this.roleType = List.of(RoleType.CASE.name());
         this.roleName = roleNames;
