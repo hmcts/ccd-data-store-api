@@ -158,7 +158,7 @@
       }
     }
   ],
-  "nestedDocuments": [
+  "caseBundles": [
     {
       "id": "efc3f6bb-7e8c-4313-9433-a5e6a186f079",
       "value": {
@@ -181,11 +181,25 @@
                 {
                   "id": "a2398363-51af-4ba8-bdfd-d00bee5a3560",
                   "value": {
-                    "type": {
-                      "document_url": "http://dm-store:8080//documents/c1c12494-73f5-4c7a-a92d-afdd4e254917",
-                      "document_filename": "test-a5-document.pdf",
-                      "document_binary_url": "http://dm-store:8080//documents/c1c12494-73f5-4c7a-a92d-afdd4e254917/binary"
-                    }
+                    "supportDocuments": [
+                      {
+                        "id": "20ea77f0-c588-4fb5-86fe-16984449c73b",
+                        "value": {
+                          "extra": [
+                            {
+                              "id": "263dd0f2-20fb-41aa-8b01-6f8453aa86eb",
+                              "value": {
+                                "type": {
+                                  "document_url": "http://dm-store:8080//documents/c1c12494-73f5-4c7a-a92d-afdd4e254917",
+                                  "document_filename": "test-a5-document.pdf",
+                                  "document_binary_url": "http://dm-store:8080//documents/c1c12494-73f5-4c7a-a92d-afdd4e254917/binary"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
                   }
                 }
               ]
