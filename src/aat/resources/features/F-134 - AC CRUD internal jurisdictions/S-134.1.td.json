@@ -1,23 +1,4 @@
 {
   "_guid_": "S-134.1",
-  "_extends_": "F-134_Test_Data_Base",
-
-  "expectedResponse": {
-    "responseCode": 200,
-    "responseMessage": "OK",
-    "headers": {
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-jurisdictions.v2+json;charset=UTF-8",
-      "Date" : "[[ANYTHING_PRESENT]]",
-      "Expires" : "0",
-      "Pragma" : "no-cache",
-      "Strict-Transport-Security" : "max-age=31536000 ; includeSubDomains",
-      "Transfer-Encoding" : "chunked",
-      "X-Content-Type-Options" : "nosniff",
-      "X-Frame-Options" : "DENY",
-      "X-Xss-Protection" : "1; mode=block"
-    },
-    "body": {
-  }
-  }
+  "_extends_": "F-134_Test_Data_Base"
 }
