@@ -77,9 +77,8 @@ public class InvalidCaseSupplementaryDataController {
             request.getDateFrom(), request.getDateTo(), request.getLimit());
 
         if (request.getSearchRas()) {
-            List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(casesList
-                .stream()
-                .map(Long::valueOf)
+            List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation
+                .findCaseUserRoles(casesList.stream().map(Long::valueOf)
                 .collect(Collectors.toCollection(ArrayList::new)), emptyList());
 
             return ResponseEntity.ok(new InvalidCaseSupplementaryDataResponse(casesList, caseAssignedUserRoles));
