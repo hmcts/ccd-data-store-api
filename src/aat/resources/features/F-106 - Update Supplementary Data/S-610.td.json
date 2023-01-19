@@ -45,7 +45,6 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_200_Response",
     "body" : {
       "total" : 0,
       "cases" : [ ],

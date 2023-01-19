@@ -1,8 +1,6 @@
 {
   "title": "CAA must NOT be able to Update supplementary data of any PRIVATE case that requires explicit access",
   "_guid_": "S-613",
-  "productName": "CCD Data Store api",
-  "operationName": "Update Supplementary Data",
   "_extends_": "F-106_Update_Supplementary_Data_Base",
   "specs": [
     "a valid PUBLIC profile"
