@@ -24,6 +24,17 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
+/*
+  Files within directory "src/test/resources/mappings" which contain JsonProperty names below :-
+  grep -I -R "jurisdiction" * | grep "src/test/resources/mappings"                  Many
+  grep -I -R "security_classification" * | grep "src/test/resources/mappings"       Many
+  grep -I -R "case_fields" * | grep "src/test/resources/mappings"                   Many
+  grep -I -R "printable_document_url" * | grep "src/test/resources/mappings"        8
+  grep -I -R "acls" * | grep "src/test/resources/mappings"                          Many
+  grep -I -R "callback_get_case_url" * | grep "src/test/resources/mappings"         1
+  grep -I -R "retries_get_case_url" * | grep "src/test/resources/mappings"          1
+  grep -I -R "roleToAccessProfiles" * | grep "src/test/resources/mappings"          6
+ */
 @ToString
 public class CaseTypeDefinition implements Serializable {
     private static final long serialVersionUID = 5688786015302840008L;
@@ -222,7 +233,8 @@ public class CaseTypeDefinition implements Serializable {
     // Returns a CaseFieldDefinition from @JsonProperty("case_fields") List<CaseFieldDefinition> caseFieldDefinitions.
     @JsonIgnore
     public Optional<CaseFieldDefinition> getCaseField(String caseFieldId) {
-        jcdebug("getCaseField(): caseFieldDefinitions.size = " + caseFieldDefinitions.size());
+        jcdebug("getCaseField(): caseFieldDefinitions.size = " + caseFieldDefinitions.size()
+            + " caseFieldId = " + (caseFieldId == null ? "NULL" : caseFieldId));
         for (CaseFieldDefinition definition : caseFieldDefinitions) {
             jcdebug("getCaseField(): " + definition.toString());
         }
