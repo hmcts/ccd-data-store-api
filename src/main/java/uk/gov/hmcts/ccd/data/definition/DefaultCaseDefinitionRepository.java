@@ -98,6 +98,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
+        jcdebug("******************** getCaseType(): URL = " + applicationParams.caseTypeDefURL(caseTypeId));
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
             final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
