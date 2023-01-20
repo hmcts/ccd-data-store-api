@@ -1,0 +1,130 @@
+{
+  "title": "must return list of audit events successfully for a case",
+  "_guid_": "S-116.1",
+  "_extends_": "F-116_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "uses the case-reference of the case just created",
+    "contains a token created as in S-597-Prerequisite",
+    "contains the Id of the case just created",
+    "Retrieve audit events by case ID",
+    "contains all audit event details under the case"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-events.v2+json;charset=UTF-8"
+    },
+    "body": {
+      "auditEvents": [
+        {
+          "id": "CREATE",
+          "summary": "",
+          "description": "",
+          "user_id": "95f3608d-1912-46fa-b2d3-152807cb600c",
+          "user_last_name": "testsurname",
+          "user_first_name": "testfirstname",
+          "event_name": "Create a new case",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "case_type_id": "AAT_AUTH_15",
+          "case_type_version": "[[ANY_INTEGER_NOT_NULLABLE]]",
+          "state_id": "TODO",
+          "state_name": "To do",
+          "data": {
+            "MoneyGBPField": "4200",
+            "FixedListField": "VALUE3",
+            "AddressUKField": {
+              "County": "Greater London",
+              "Country": "UK",
+              "PostCode": "SW1H 9AJ",
+              "PostTown": "Westminster",
+              "AddressLine1": "102 Petty France",
+              "AddressLine2": "CCD",
+              "AddressLine3": "c/o HMCTS Reform"
+            },
+            "ComplexField": {
+              "ComplexTextField": "Nested text",
+              "ComplexFixedListField": "VALUE2"
+            },
+            "DateTimeField": "1988-07-07T22:20:00",
+            "PhoneUKField": "07123456789",
+            "NumberField": "164528",
+            "MultiSelectListField" : [ "OPTION2", "OPTION4" ],
+            "YesOrNoField": "Yes",
+            "EmailField": "ccd@hmcts.net",
+            "TextField": "Some Text",
+            "DateField": "2017-02-13",
+            "TextAreaField": "Line1\nLine2",
+            "CollectionField": [
+              {
+                "id": "CollectionField1",
+                "value": "Alias 1"
+              },
+              {
+                "id": "CollectionField2",
+                "value": "Alias 2"
+              }
+            ]
+          },
+          "data_classification": {
+            "MoneyGBPField": "PUBLIC",
+            "FixedListField": "PUBLIC",
+            "AddressUKField": {
+              "value": {
+                "County": "PUBLIC",
+                "Country": "PUBLIC",
+                "PostCode": "PUBLIC",
+                "PostTown": "PUBLIC",
+                "AddressLine1": "PUBLIC",
+                "AddressLine2": "PUBLIC",
+                "AddressLine3": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "ComplexField": {
+              "value": {
+                "ComplexTextField": "PUBLIC",
+                "ComplexFixedListField": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "DateTimeField": "PUBLIC",
+            "PhoneUKField": "PUBLIC",
+            "NumberField": "PUBLIC",
+            "MultiSelectListField": "PUBLIC",
+            "YesOrNoField": "PUBLIC",
+            "EmailField": "PUBLIC",
+            "TextField": "PUBLIC",
+            "DateField": "PUBLIC",
+            "TextAreaField": "PUBLIC",
+            "CollectionField": {
+              "value": [
+                {
+                  "id": "[[ANYTHING_PRESENT]]",
+                  "classification": "PUBLIC"
+                },
+                {
+                  "id": "[[ANYTHING_PRESENT]]",
+                  "classification": "PUBLIC"
+                }
+              ],
+              "classification": "PUBLIC"
+            }
+          },
+          "security_classification": "PUBLIC",
+          "significant_item": null
+        }
+      ],
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+  }
+}
