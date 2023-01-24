@@ -4,9 +4,9 @@
   "title": "should retrieve search inputs for dynamic display",
 
   "specs": [
-    "an active profile in CCD",
-    "contains a valid case type",
-    "contains the correct search inputs for the given case type, along with an HTTP 200 OK"
+    "an active Private profile in CCD",
+    "contains a valid Private case type",
+    "contains the correct search inputs for the given Private case type, along with an HTTP 200 OK"
   ],
 
   "users": {

@@ -5,8 +5,8 @@
 
   "specs": [
     "an active Public profile in CCD",
-    "contains a valid case type",
-    "contains the correct search inputs for the given case type, along with an HTTP 200 OK"
+    "contains a valid Private case type",
+    "does not contain the search inputs for the given Private case type, along with an HTTP 200 OK"
   ],
 
   "users": {
@@ -21,29 +21,7 @@
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-search-input-details.v2+json;charset=UTF-8"
     },
     "body": {
-      "searchInputs": [
-        {
-          "label": "Search `Text` field",
-          "order": 1,
-          "field": {
-            "id": "TextField",
-            "elementPath": null,
-            "metadata": false,
-            "show_condition": null,
-            "field_type": {
-              "id": "Text",
-              "type": "Text",
-              "min": null,
-              "max": null,
-              "regular_expression": null,
-              "fixed_list_items": [],
-              "complex_fields": [],
-              "collection_field_type": null
-            }
-          },
-          "display_context_parameter": null
-        }
-      ],
+      "searchInputs": [ ],
       "_links": {
         "self": {
           "href": "[[ANYTHING_PRESENT]]"
