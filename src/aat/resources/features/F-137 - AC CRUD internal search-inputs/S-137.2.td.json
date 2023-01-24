@@ -7,12 +7,6 @@
     "does not contain the case field with no R CRUD access"
 	],
 
-  "users": {
-    "invokingUser": {
-      "_extends_": "PrivateCaseworker"
-    }
-  },
-
 	"request": {
 		"_extends_": "Common_Request",
     "pathVariables": {

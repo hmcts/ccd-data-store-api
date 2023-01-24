@@ -6,12 +6,6 @@
 		"contains a HTTP 404 Not Found"
 	],
 
-  "users": {
-    "invokingUser": {
-      "_extends_": "PrivateCaseworker"
-    }
-  },
-
 	"request": {
 		"_extends_": "Common_Request",
     "pathVariables": {
