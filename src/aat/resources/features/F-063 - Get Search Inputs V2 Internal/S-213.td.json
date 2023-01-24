@@ -11,7 +11,7 @@
 
   "request": {
     "headers": {
-      "Authorization": "invalid user token"
+      "Authorization": "Bearer invalid user token"
     }
   },
 

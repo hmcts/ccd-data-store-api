@@ -21,7 +21,7 @@ Scenario: should retrieve search inputs for dynamic display
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-213 # expected 401 but actually got 403 (defect RDM-6628)
+@S-213 # now returning 401 as expected, issue of RDM-6628 doesn't exists anymore
 Scenario: must return 401 when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
