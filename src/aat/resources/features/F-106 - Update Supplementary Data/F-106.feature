@@ -93,7 +93,7 @@ Feature: F-106: Update Supplementary Data
     And a successful call [by Dil to update supplementary_data] as in [F-106_Set_Supplementary_Data_C1],
     And a user with [a valid Jurisdiction 3 profile],
     When a request is prepared with appropriate values,
-    And it is submitted to call the [Update Supplementary Data] operation of [CCD Data Store api],
+    And it is submitted to call the [Update Supplementary Data] operation of [CCD Data Store],
     Then a negative response is received,
     And the response has all the details as expected.
 
@@ -103,7 +103,7 @@ Feature: F-106: Update Supplementary Data
     And a successful call [by CaseworkerPRIVATE to update supplementary_data] as in [S-613_Update_Supplementary_Data_C2_PRIVATE],
     And a user with [a valid PUBLIC profile],
     When a request is prepared with appropriate values,
-    And it is submitted to call the [Update Supplementary Data] operation of [CCD Data Store api],
+    And it is submitted to call the [Update Supplementary Data] operation of [CCD Data Store],
     Then a negative response is received,
     And the response has all the details as expected.
 
