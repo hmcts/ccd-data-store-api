@@ -16,6 +16,7 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_401_Response"
+    "_extends_": "Common_401_Response",
+    "body" : null
   }
 }
