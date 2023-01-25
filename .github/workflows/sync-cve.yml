@@ -3,7 +3,7 @@ name: Sync to Master
 on:
   push:
     branches:
-      - master
+      - master # when a new change is pushed to the master branch
 
 jobs:
   sync-file:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get current branch name
+      - name: Get current branch name # able to find out what branch its currently on
         id: branch_name
         run: echo "::set-env name=current_branch::${{ env.GITHUB_REF }}"
 
@@ -21,7 +21,7 @@ jobs:
         run: git checkout current_branch
 
       - name: Sync file
-        run: git checkout master -- path to file goes here
+        run: git checkout master -- path to file goes here # path can be changes to different files
 
       - name: Commit and push changes
         run: |
