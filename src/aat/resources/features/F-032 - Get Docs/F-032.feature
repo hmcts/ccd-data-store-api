@@ -24,7 +24,7 @@ Scenario: must retrieve printable documents successfully for correct inputs
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-125 @Ignore #defect RDM-6628
+@S-125
 Scenario: must return 401 when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],

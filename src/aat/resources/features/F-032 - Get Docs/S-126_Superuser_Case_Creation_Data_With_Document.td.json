@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-126_Superuser_Case_Creation_Data_With_Document",
-	"_extends_": "F-032_Case_Creation_Data_With_Document",
+	"_extends_": "Befta_Case_Creation_Base_Data",
 
 	"users": {
 		"invokingUser": {
@@ -10,7 +10,19 @@
 
 	"request": {
 		"pathVariables": {
-			"caseType": "AAT_AUTH_1"
-		}
-	}
+			"ctid": "AAT_AUTH_1",
+      "jid": "AUTOTEST1"
+		},
+
+      "body": {
+        "data": {
+          "DocumentField": {
+            "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][customValues][documentIdInTheResponse]}",
+            "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][customValues][documentIdInTheResponse]}/binary",
+            "document_filename": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][originalDocumentName]}",
+            "document_hash": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][hashToken]}"
+          }
+        }
+    }
+  }
 }
