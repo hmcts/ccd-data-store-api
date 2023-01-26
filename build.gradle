@@ -291,6 +291,21 @@ dependencies {
     contractTestCompile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.6.1'
     contractTestCompile group: 'javax.inject', name: 'javax.inject', version: '1'
     contractTestCompile group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
+    contractTestCompile group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
+    contractTestCompile group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
+    contractTestCompile('org.springframework.boot:spring-boot-starter-hateoas')
+    contractTestCompile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+    }
+    contractTestCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
+        exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
+    }
+    contractTestCompile("org.springframework.boot:spring-boot-starter-data-jpa")
+    contractTestCompile group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
+    contractTestCompile(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    }
+    contractTestCompile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
     aatCompile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 }
@@ -874,8 +889,8 @@ def getCheckedOutGitCommitHash() {
 task runProviderPactVerification(type:Test) {
     logger.lifecycle("Runs provider pact Tests")
     useJUnitPlatform()
-    testClassesDirs = sourceSets.aat.output.classesDirs
-    classpath = sourceSets.aat.runtimeClasspath
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
     systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/ccd/v2/external/controller/**"
