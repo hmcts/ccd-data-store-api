@@ -141,7 +141,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             LocalDateTime to = LocalDateTime.of(2020, 1, 1, 8, 55);
             Integer limit = 5;
             List<String> response = supplementaryDataRepository
-                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(from, Optional.of(to), limit);
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("PROBATE", from, Optional.of(to), limit);
             assertNotNull(response);
             assertEquals(3, response.size());
             assertTrue(response.contains("1504259907311111"));
@@ -158,7 +158,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             LocalDateTime from = LocalDateTime.of(2016, 9, 24, 20, 41);
             Integer limit = 10;
             List<String> response = supplementaryDataRepository
-                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(from, Optional.empty(), limit);
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("PROBTE", from, Optional.empty(), limit);
             assertNotNull(response);
             assertEquals(1, response.size());
             assertEquals("1504259907311113", response.get(0));
@@ -173,7 +173,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
             Integer limit = 1;
             List<String> response = supplementaryDataRepository
-                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(from, Optional.empty(), limit);
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("PROBATE", from, Optional.empty(), limit);
             assertNotNull(response);
             assertEquals(1, response.size());
             assertEquals("1504259907311111", response.get(0));
@@ -188,7 +188,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
             Integer limit = 100;
             List<String> response = supplementaryDataRepository
-                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(from, Optional.empty(), limit);
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("PROBATE", from, Optional.empty(), limit);
             assertNotNull(response);
             assertEquals(3, response.size());
             assertTrue(response.contains("1504259907311111"));
@@ -206,7 +206,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             LocalDateTime to = LocalDateTime.of(2016, 9, 24, 20, 41);
             Integer limit = 5;
             List<String> response = supplementaryDataRepository
-                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(from, Optional.of(to), limit);
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("PROBATE", from, Optional.of(to), limit);
             assertNotNull(response);
             assertEquals(2, response.size());
             assertTrue(response.contains("1504259907311111"));

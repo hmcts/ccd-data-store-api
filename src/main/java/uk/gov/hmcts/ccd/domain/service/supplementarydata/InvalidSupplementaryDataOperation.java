@@ -17,10 +17,10 @@ public class InvalidSupplementaryDataOperation {
         this.supplementaryDataRepository = supplementaryDataRepository;
     }
 
-    public List<String> getInvalidSupplementaryDataCases(LocalDateTime from,
+    public List<String> getInvalidSupplementaryDataCases(String caseType, LocalDateTime from,
                                                          Optional<LocalDateTime> to,
                                                          Integer limit) {
         return supplementaryDataRepository.findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(
-            from, to, limit == null ? 10 : limit);
+            caseType, from, to, limit == null ? 10 : limit);
     }
 }

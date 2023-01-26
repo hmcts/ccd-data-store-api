@@ -16,6 +16,8 @@ import static org.mockito.Mockito.verify;
 class InvalidSupplementaryDataOperationTest {
     public static final LocalDateTime DATE_10_DAYS_AGO = LocalDateTime.now().minusDays(10);
     public static final LocalDateTime DATE_5_DAYS_AHEAD = LocalDateTime.now().plusDays(5);
+    public static final String CASE_TYPE = "CASE_TYPE";
+
     public static final Integer DEFAULT_LIMIT = 10;
 
     private InvalidSupplementaryDataOperation instance;
@@ -33,11 +35,11 @@ class InvalidSupplementaryDataOperationTest {
     @Test
     void shouldDelegateToSupplementaryDataRepository() {
 
-        instance.getInvalidSupplementaryDataCases(DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
+        instance.getInvalidSupplementaryDataCases(CASE_TYPE, DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
 
         assertAll(
             () -> verify(supplementaryDataRepository, times(1))
-                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(DATE_10_DAYS_AGO,
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(CASE_TYPE, DATE_10_DAYS_AGO,
                     Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT)
         );
     }
@@ -45,11 +47,11 @@ class InvalidSupplementaryDataOperationTest {
     @Test
     void shouldDelegateToSupplementaryDataRepositoryWithDefaultLimitOf10() {
 
-        instance.getInvalidSupplementaryDataCases(DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), null);
+        instance.getInvalidSupplementaryDataCases(CASE_TYPE, DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), null);
 
         assertAll(
             () -> verify(supplementaryDataRepository, times(1))
-                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(DATE_10_DAYS_AGO,
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(CASE_TYPE, DATE_10_DAYS_AGO,
                     Optional.of(DATE_5_DAYS_AHEAD), 10)
         );
     }

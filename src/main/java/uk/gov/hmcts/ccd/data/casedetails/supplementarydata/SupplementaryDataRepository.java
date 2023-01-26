@@ -23,7 +23,7 @@ public interface SupplementaryDataRepository {
      */
     SupplementaryData findSupplementaryData(String caseReference, Set<String> requestedProperties);
 
-    List<String> findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(LocalDateTime from,
+    List<String> findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(String caseType, LocalDateTime from,
                                                                                     Optional<LocalDateTime> to,
                                                                                     Integer limit);
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.InvalidSupplementaryDataOperation;
@@ -37,6 +38,8 @@ class InvalidCaseSupplementaryDataControllerTest {
     public static final LocalDateTime DATE_5_DAYS_AHEAD = LocalDateTime.now().plusDays(5);
     public static final Integer DEFAULT_LIMIT = 10;
     public static final String CASE_ID = "123";
+    public static final String CASE_TYPE = "CASE_TYPE";
+
 
     @Mock
     private InvalidSupplementaryDataOperation invalidSupplementaryDataOperation;
@@ -50,6 +53,9 @@ class InvalidCaseSupplementaryDataControllerTest {
     @Mock
     public CaseAssignedUserRole caseAssignedUserRole;
 
+    @Mock
+    private ApplicationParams applicationParams;
+
     private InvalidCaseSupplementaryDataController controller;
 
     @BeforeEach
@@ -61,14 +67,14 @@ class InvalidCaseSupplementaryDataControllerTest {
         when(request.getLimit()).thenReturn(DEFAULT_LIMIT);
         when(request.getSearchRas()).thenReturn(Boolean.TRUE);
 
-        controller = new InvalidCaseSupplementaryDataController(invalidSupplementaryDataOperation,
+        controller = new InvalidCaseSupplementaryDataController(applicationParams, invalidSupplementaryDataOperation,
             caseAssignedUserRolesOperation);
     }
 
     @Test
     void shouldProcessValidRequest() {
         List<String> cases = List.of(CASE_ID);
-        doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(
+        doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(CASE_TYPE,
             DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT
         );
 
@@ -86,7 +92,7 @@ class InvalidCaseSupplementaryDataControllerTest {
         assertEquals(1, response.getBody().getCaseAssignedUserRoles().size());
         assertEquals(caseAssignedUserRole, response.getBody().getCaseAssignedUserRoles().get(0));
 
-        verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
+        verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(CASE_TYPE,
             DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
         verify(caseAssignedUserRolesOperation, times(1)).findCaseUserRoles(casesAsLong, userIds);
     }
@@ -123,7 +129,7 @@ class InvalidCaseSupplementaryDataControllerTest {
         when(request.getDateTo()).thenReturn(Optional.empty());
 
         List<String> cases = List.of(CASE_ID);
-        doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(
+        doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(CASE_TYPE,
             DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT
         );
 
@@ -134,7 +140,7 @@ class InvalidCaseSupplementaryDataControllerTest {
         assertEquals(1, response.getBody().getCaseIds().size());
         assertEquals(CASE_ID, response.getBody().getCaseIds().get(0));
 
-        verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
+        verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(CASE_TYPE,
             DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT);
     }
 
@@ -143,8 +149,8 @@ class InvalidCaseSupplementaryDataControllerTest {
         when(request.getSearchRas()).thenReturn(Boolean.FALSE);
 
         List<String> cases = List.of(CASE_ID);
-        doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(
-            DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT
+        doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(CASE_TYPE,
+             DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT
         );
 
         ResponseEntity<InvalidCaseSupplementaryDataResponse> response = controller.getInvalidSupplementaryData(request);
@@ -155,8 +161,8 @@ class InvalidCaseSupplementaryDataControllerTest {
         assertEquals(CASE_ID, response.getBody().getCaseIds().get(0));
         assertEquals(0, response.getBody().getCaseAssignedUserRoles().size());
 
-        verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
-            DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
+        verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(CASE_TYPE,
+             DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
         verifyNoInteractions(caseAssignedUserRolesOperation);
     }
 

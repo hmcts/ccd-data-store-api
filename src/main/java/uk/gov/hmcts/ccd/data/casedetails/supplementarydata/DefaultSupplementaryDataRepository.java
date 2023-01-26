@@ -69,12 +69,13 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
     }
 
     @Override
-    public List<String> findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(LocalDateTime from,
+    public List<String> findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(String caseType, LocalDateTime from,
                                                                                            Optional<LocalDateTime> to,
                                                                                            Integer limit) {
-        Query query = findCasesWithSupplementaryDataQueryBuilder.build(em, from, to, limit);
+        Query query = findCasesWithSupplementaryDataQueryBuilder.build(em, caseType, from, to, limit);
         return query.getResultList();
     }
+
 
     private SupplementaryDataQueryBuilder queryBuilder(final SupplementaryDataOperation supplementaryDataOperation) {
         return this.queryBuilders.stream()

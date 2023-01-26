@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.InvalidSupplementaryDataOperation;
@@ -35,11 +36,15 @@ import static java.util.Collections.emptyList;
 public class InvalidCaseSupplementaryDataController {
     private final InvalidSupplementaryDataOperation invalidSupplementaryDataOperation;
     private final CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
+    private final ApplicationParams applicationParams;
+
 
     @Autowired
-    public InvalidCaseSupplementaryDataController(InvalidSupplementaryDataOperation invalidSupplementaryDataOperation,
+    public InvalidCaseSupplementaryDataController(ApplicationParams applicationParams,
+                                                  InvalidSupplementaryDataOperation invalidSupplementaryDataOperation,
                                                   @Qualifier("authorised") CaseAssignedUserRolesOperation
                                                       caseAssignedUserRolesOperation) {
+        this.applicationParams = applicationParams;
         this.invalidSupplementaryDataOperation = invalidSupplementaryDataOperation;
         this.caseAssignedUserRolesOperation = caseAssignedUserRolesOperation;
     }
@@ -70,12 +75,13 @@ public class InvalidCaseSupplementaryDataController {
     public ResponseEntity<InvalidCaseSupplementaryDataResponse> getInvalidSupplementaryData(
         @ApiParam(value = "Parameters to filter on", required = true)
         @RequestBody InvalidCaseSupplementaryDataRequest request) {
-
+        List<String> casesList = null;
         validateRequestParams(request);
 
-        List<String> casesList = invalidSupplementaryDataOperation.getInvalidSupplementaryDataCases(
-            request.getDateFrom(), request.getDateTo(), request.getLimit());
+        for (String caseType: applicationParams.getInvalidSupplementaryDataCaseTypes()) {
+            casesList.addAll(invalidSupplementaryDataOperation.getInvalidSupplementaryDataCases(caseType, request.getDateFrom(), request.getDateTo(), request.getLimit()));
 
+        }
         if (request.getSearchRas()) {
             List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation
                 .findCaseUserRoles(casesList.stream().map(Long::valueOf)

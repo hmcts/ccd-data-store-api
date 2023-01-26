@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 
@@ -224,6 +225,18 @@ public class ApplicationParams {
 
     @Value("${system.user.token.cache.ttl.secs}")
     private Integer systemUserTokenCacheTTLSecs;
+
+    @Value("#{'${ccd.conditional-apis.case-search-invalid-supplementary-data.case-types}'.split(',')}")
+    private List<String> invalidSupplementaryDataCaseTypes;
+
+    @Value("#{T(java.time.LocalDateTime).parse('${ccd.conditional-apis.case-search-invalid-supplementary-data.start_date}')}")
+    private LocalDateTime invalidSupplementaryDataStartDate;
+
+    @Value("#{T(java.time.LocalDateTime).parse('${ccd.conditional-apis.case-search-invalid-supplementary-data.end_date}')}")
+    private LocalDateTime invalidSupplementaryDataEndDate;
+
+    @Value("${ccd.conditional-apis.case-search-invalid-supplementary-data.limit}")
+    private Integer invalidSupplementaryDataLimit;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -609,5 +622,9 @@ public class ApplicationParams {
 
     public Integer getSystemUserTokenCacheTTLSecs() {
         return systemUserTokenCacheTTLSecs;
+    }
+
+    public List<String> getInvalidSupplementaryDataCaseTypes() {
+        return invalidSupplementaryDataCaseTypes;
     }
 }
