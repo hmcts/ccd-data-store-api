@@ -85,7 +85,7 @@ Feature: F-068: Validate calls for the Drafts Endpoint
     And a successful call [to create a token for case creation] as in [F-068_Get_Event_Token],
 
     When a request is prepared with appropriate values,
-    And the request [contains a valid solicitor user authentication token],
+    And the request [contains a valid user authentication token from a user that doesn't have create permission],
     And it is submitted to call the [Save draft as a caseworker] operation of [CCD Data Store],
 
     Then a negative response is received,
