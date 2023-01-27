@@ -243,7 +243,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         assertEquals(23, response.get("orgs_assigned_users.organisationC"));
 
         supplementaryData =
-            supplementaryDataRepository.findSupplementaryData("1504259907311111", Sets.newHashSet("HMCTSServiceId"));
+            supplementaryDataRepository.findSupplementaryData("1504259907311111",
+                Sets.newHashSet("HMCTSServiceId"));
         assertNotNull(supplementaryData);
         response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("HMCTSServiceId"));
@@ -268,7 +269,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         assertEquals(23, response.get("orgs_assigned_users.organisationC"));
 
         supplementaryData =
-            supplementaryDataRepository.findSupplementaryData("1504259907322222", Sets.newHashSet("HMCTSServiceId"));
+            supplementaryDataRepository.findSupplementaryData("1504259907322222",
+                Sets.newHashSet("HMCTSServiceId"));
         assertNotNull(supplementaryData);
         response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("HMCTSServiceId"));
@@ -301,7 +303,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         assertEquals(1, response.get("orgs_assigned_users.organisationC"));
 
         supplementaryData =
-            supplementaryDataRepository.findSupplementaryData("1504259907311111", Sets.newHashSet("HMCTSServiceId"));
+            supplementaryDataRepository.findSupplementaryData("1504259907311111",
+                Sets.newHashSet("HMCTSServiceId"));
         assertNotNull(supplementaryData);
         response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("HMCTSServiceId"));
@@ -326,7 +329,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         assertEquals(5, response.get("orgs_assigned_users.organisationB"));
 
         supplementaryData =
-            supplementaryDataRepository.findSupplementaryData("1504259907322222", Sets.newHashSet("HMCTSServiceId"));
+            supplementaryDataRepository.findSupplementaryData("1504259907322222",
+                Sets.newHashSet("HMCTSServiceId"));
         assertNotNull(supplementaryData);
         response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("HMCTSServiceId"));
