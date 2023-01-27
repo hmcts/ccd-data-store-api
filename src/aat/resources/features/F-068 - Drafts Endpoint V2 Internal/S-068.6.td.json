@@ -1,0 +1,42 @@
+{
+  "_guid_": "S-068.6",
+  "operationName": "Save draft as a caseworker",
+  "_extends_": "F-068_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "Save draft as a caseworker",
+    "contains a valid solicitor user authentication token",
+    "contains a HTTP 403 Forbidden"
+  ],
+  "method": "POST",
+  "uri": "/internal/case-types/{ctid}/drafts",
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker2Solicitor1"
+    }
+  },
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "ctid": "FT_CRUD"
+    },
+    "body": {
+      "data": {
+        "TextField": "field1",
+        "TextField2": "field2"
+      },
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][F-068_Get_Event_Token][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body" : null
+  }
+}
