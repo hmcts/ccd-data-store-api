@@ -1,5 +1,5 @@
 {
-  "enabledManagers": ["helm-requirements"],
+  "enabledManagers": ["helm-requirements", "terraform"],
   "helm-requirements":
     {
       "enabled": true,
