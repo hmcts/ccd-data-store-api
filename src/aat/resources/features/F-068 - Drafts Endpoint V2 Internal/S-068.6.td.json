@@ -12,7 +12,7 @@
   "uri": "/internal/case-types/{ctid}/drafts",
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCaseworker2Solicitor1"
+      "_extends_": "BeftaMasterSolicitorBecky"
     }
   },
   "request": {
