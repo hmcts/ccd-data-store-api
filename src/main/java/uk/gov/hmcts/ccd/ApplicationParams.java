@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd;
 
 import com.hazelcast.config.EvictionPolicy;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Named;
@@ -230,9 +231,11 @@ public class ApplicationParams {
     private List<String> invalidSupplementaryDataCaseTypes;
 
     @Value("#{T(java.time.LocalDateTime).parse('${ccd.conditional-apis.case-search-invalid-supplementary-data.start_date}')}")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime invalidSupplementaryDataStartDate;
 
     @Value("#{T(java.time.LocalDateTime).parse('${ccd.conditional-apis.case-search-invalid-supplementary-data.end_date}')}")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime invalidSupplementaryDataEndDate;
 
     @Value("${ccd.conditional-apis.case-search-invalid-supplementary-data.limit}")

@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.v2.external.domain.InvalidCaseSupplementaryDataRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.InvalidCaseSupplementaryDataResponse;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +67,7 @@ class InvalidCaseSupplementaryDataControllerTest {
         when(request.getDateTo()).thenReturn(Optional.of(DATE_5_DAYS_AHEAD));
         when(request.getLimit()).thenReturn(DEFAULT_LIMIT);
         when(request.getSearchRas()).thenReturn(Boolean.TRUE);
+        when(applicationParams.getInvalidSupplementaryDataCaseTypes()).thenReturn(Arrays.asList(CASE_TYPE));
 
         controller = new InvalidCaseSupplementaryDataController(applicationParams, invalidSupplementaryDataOperation,
             caseAssignedUserRolesOperation);
