@@ -17,24 +17,18 @@ import java.util.Optional;
 public class FindCasesWithSupplementaryDataQueryBuilder {
     private static final StringBuilder ORG_NODE_DATA = new StringBuilder();
     private static final String CASES_DATA_QUERY = "SELECT cd.reference, supplementary_data, case_type_id, jurisdiction,"
-        + " concat (" + ORG_NODE_DATA + ")"
+        + " concat ('''',  jsonb_extract_path_text(data, 'applicant1OrganisationPolicy', 'Organisation', 'OrganisationID'), '''', '|',"
+        + "'''',  jsonb_extract_path_text(data, 'applicant2OrganisationPolicy', 'Organisation', 'OrganisationID'), '''', '|',"
+        + "'''', jsonb_extract_path_text(data, 'respondent1OrganisationPolicy', 'Organisation', 'OrganisationID'), '''', '|',"
+        + " '''', jsonb_extract_path_text(data, 'respondent2OrganisationPolicy', 'Organisation', 'OrganisationID'), '''' )"
         + " FROM case_data cd WHERE "
         + "jsonb_extract_path_text(COALESCE(supplementary_data, '{}'), 'HMCTSServiceId') IS NOT NULL "
         + "AND jsonb_extract_path_text(COALESCE(supplementary_data, '{}'), 'orgs_assigned_users') IS NULL "
-        + "AND (cd.last_modified BETWEEN :date_from AND :date_to) ORDER BY last_modified "
-        + "AND CASE_TYPE_ID = :case_type_id "
+        + "AND (cd.last_modified BETWEEN :date_from AND :date_to) "
+        + "AND CASE_TYPE_ID = :case_type_id ORDER BY last_modified "
         + " LIMIT :limit";
 
-    private static final String CASE_TYPES_QUERY = "SELECT CF.REFERENCE FROM CASE_FIELD CF, CASE_TYPE CT WHERE "
-        + "CASE_TYPE_ID IN (SELECT MAX(ID) FROM CASE_TYPE WHERE UPPER(REFERENCE) IN (:case_type_id) "
-        + "GROUP BY REFERENCE) AND CF.FIELD_TYPE_ID = ("
-        + "SELECT ID FROM FIELD_TYPE WHERE UPPER(REFERENCE) = 'ORGANISATIONPOLICY') "
-        + "AND CF.CASE_TYPE_ID = CT.ID";
-
-
     public Query build(EntityManager entityManager, String caseType, LocalDateTime from, Optional<LocalDateTime> to, Integer limit) {
-        List<String> orgNodes = findOrgNodes(entityManager, caseType);
-        ORG_NODE_DATA.append( this.generateOrgNodeIdString(orgNodes));
         Query selectQuery;
         selectQuery = entityManager.createNativeQuery(CASES_DATA_QUERY);
         selectQuery.setParameter("date_from", Timestamp.valueOf(from), TemporalType.TIMESTAMP);
@@ -46,32 +40,11 @@ public class FindCasesWithSupplementaryDataQueryBuilder {
 
         selectQuery.unwrap(org.hibernate.query.NativeQuery.class)
             .addScalar("reference", StandardBasicTypes.STRING);
+
+
         return selectQuery;
     }
 
-    private String generateOrgNodeIdString(List<String> orgNodes) {
-        StringBuilder orgNodeStr = new StringBuilder();
-          orgNodes.forEach(orgNode ->
-              orgNodeStr.append( "'"+  "jsonb_extract_path_text(COALESCE(data, '{}'), '"+ orgNode +"')" + "'|"));
-          return orgNodeStr.toString();
-    }
 
-    public List<String> findOrgNodes(EntityManager entityManager, String caseType) {
-        Query selectQuery;
-      /*  selectQuery = entityManager.createNativeQuery(CASE_TYPES_QUERY);
-        selectQuery.setParameter("case_type_id", caseType);
-
-
-        selectQuery.unwrap(org.hibernate.query.NativeQuery.class)
-            .addScalar("reference", StandardBasicTypes.STRING);
-
-        return selectQuery.getResultList();*/
-
-        return Arrays.asList("respondent2OrganisationPolicy",
-            "respondent1OrganisationPolicy",
-            "applicant2OrganisationPolicy",
-            "applicant1OrganisationPolicy");
-
-    }
 
 }

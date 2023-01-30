@@ -230,17 +230,6 @@ public class ApplicationParams {
     @Value("#{'${ccd.conditional-apis.case-search-invalid-supplementary-data.case-types}'.split(',')}")
     private List<String> invalidSupplementaryDataCaseTypes;
 
-    @Value("#{T(java.time.LocalDateTime).parse('${ccd.conditional-apis.case-search-invalid-supplementary-data.start_date}')}")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime invalidSupplementaryDataStartDate;
-
-    @Value("#{T(java.time.LocalDateTime).parse('${ccd.conditional-apis.case-search-invalid-supplementary-data.end_date}')}")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime invalidSupplementaryDataEndDate;
-
-    @Value("${ccd.conditional-apis.case-search-invalid-supplementary-data.limit}")
-    private Integer invalidSupplementaryDataLimit;
-
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
