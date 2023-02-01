@@ -1,14 +1,32 @@
 {
-	"_guid_": "S-110",
-	"_extends_": "F-051_Test_Data_Base_V1",
+	"_guid_": "S-106",
+  "_extends_": "F-051_Test_Data_Base_V2",
 	"title": "must return default user setting successfully for a user having a profile in CCD",
+
+	"productName": "CCD Data Store",
+	"operationName": "Get default settings for user",
+
+	"method": "GET",
+	"uri": "/internal/profile",
 
 	"specs": [
 		"a detailed profile in CCD",
 		"has the 200 return code"
 	],
 
+
+	"request": {
+    "headers": {
+      "experimental": true
+    }
+	},
+
 	"expectedResponse": {
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANY_INTEGER_NULLABLE]]",
+			"Transfer-Encoding": "[[ANY_STRING_NULLABLE]]"
+		},
 		"body": {
 			"user": {
 				"idam": {
@@ -28,7 +46,12 @@
 					"case_type_id": "[[ANYTHING_PRESENT]]",
 					"state_id": "[[ANYTHING_PRESENT]]"
 				}
-			}
+			},
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      }
 		}
 	}
 }
