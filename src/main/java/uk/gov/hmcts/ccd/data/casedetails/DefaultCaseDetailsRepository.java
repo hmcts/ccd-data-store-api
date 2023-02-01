@@ -11,8 +11,8 @@ import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilderFactory;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
-import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CasePersistenceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
@@ -181,6 +181,22 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         sr.setTotalResultsCount(totalResults);
         sr.setTotalPagesCount((int) Math.ceil((double) sr.getTotalResultsCount() / pageSize));
         return sr;
+    }
+
+    @Override
+    public List<CaseDetails> findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(
+        String caseTypeId, LocalDateTime from, Optional<LocalDateTime> to, Integer limit) {
+        final Query query = em.createNamedQuery("CaseDataEntity_FIND_CASE_WITH_INVALID_SUP_DATA");
+        query.setParameter("caseTypeId", caseTypeId);
+        query.setParameter("date_from", from);
+        if (to.isPresent()) {
+            query.setParameter("date_to", to.get());
+        } else {
+            query.setParameter("date_to", LocalDateTime.now());
+        }
+
+        paginateSetLimit(query, limit);
+        return caseDetailsMapper.entityToModel(query.getResultList());
     }
 
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should

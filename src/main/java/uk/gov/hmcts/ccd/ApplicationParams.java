@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd;
 
 import com.hazelcast.config.EvictionPolicy;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.format.annotation.DateTimeFormat;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Named;
@@ -10,7 +9,6 @@ import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 

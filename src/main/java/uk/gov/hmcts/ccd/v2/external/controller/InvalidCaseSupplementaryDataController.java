@@ -12,17 +12,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.InvalidSupplementaryDataOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.v2.external.domain.InvalidCaseSupplementaryDataItem;
 import uk.gov.hmcts.ccd.v2.external.domain.InvalidCaseSupplementaryDataRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.InvalidCaseSupplementaryDataResponse;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,15 +35,12 @@ import static java.util.Collections.emptyList;
 public class InvalidCaseSupplementaryDataController {
     private final InvalidSupplementaryDataOperation invalidSupplementaryDataOperation;
     private final CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
-    private final ApplicationParams applicationParams;
-
 
     @Autowired
-    public InvalidCaseSupplementaryDataController(ApplicationParams applicationParams,
-                                                  InvalidSupplementaryDataOperation invalidSupplementaryDataOperation,
+    public InvalidCaseSupplementaryDataController(InvalidSupplementaryDataOperation invalidSupplementaryDataOperation,
                                                   @Qualifier("authorised") CaseAssignedUserRolesOperation
                                                       caseAssignedUserRolesOperation) {
-        this.applicationParams = applicationParams;
+
         this.invalidSupplementaryDataOperation = invalidSupplementaryDataOperation;
         this.caseAssignedUserRolesOperation = caseAssignedUserRolesOperation;
     }
@@ -75,21 +71,36 @@ public class InvalidCaseSupplementaryDataController {
     public ResponseEntity<InvalidCaseSupplementaryDataResponse> getInvalidSupplementaryData(
         @ApiParam(value = "Parameters to filter on", required = true)
         @RequestBody InvalidCaseSupplementaryDataRequest request) {
-        List<String> casesList = null;
         validateRequestParams(request);
 
-        for (String caseType: applicationParams.getInvalidSupplementaryDataCaseTypes()) {
-            casesList.addAll(invalidSupplementaryDataOperation.getInvalidSupplementaryDataCases(caseType, request.getDateFrom(), request.getDateTo(), request.getLimit()));
+        List<InvalidCaseSupplementaryDataItem> invalidSupplementaryDataCases = invalidSupplementaryDataOperation
+            .getInvalidSupplementaryDataCases(request.getDateFrom(), request.getDateTo(), request.getLimit());
 
-        }
         if (request.getSearchRas()) {
-            List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation
-                .findCaseUserRoles(casesList.stream().map(Long::valueOf)
-                .collect(Collectors.toCollection(ArrayList::new)), emptyList());
+            List<Long> casesList = invalidSupplementaryDataCases.stream()
+                .map(InvalidCaseSupplementaryDataItem::getCaseId).collect(Collectors.toList());
 
-            return ResponseEntity.ok(new InvalidCaseSupplementaryDataResponse(casesList, caseAssignedUserRoles));
-        } else {
-            return  ResponseEntity.ok(new InvalidCaseSupplementaryDataResponse(casesList, emptyList()));
+            List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation
+                .findCaseUserRoles(casesList, emptyList());
+
+            invalidSupplementaryDataCases.forEach(e -> enhanceWithUserRoles(e, caseAssignedUserRoles));
+        }
+
+        return ResponseEntity.ok(InvalidCaseSupplementaryDataResponse.builder()
+            .dataItems(invalidSupplementaryDataCases).build());
+    }
+
+    private void enhanceWithUserRoles(InvalidCaseSupplementaryDataItem invalidSupplementaryDataCase,
+                                      List<CaseAssignedUserRole> caseAssignedUserRoles) {
+
+        Long invalidCaseId = invalidSupplementaryDataCase.getCaseId();
+        Optional<CaseAssignedUserRole> userRole = caseAssignedUserRoles.stream()
+            .filter(e -> invalidCaseId.toString().equals(e.getCaseDataId()))
+            .findFirst();
+
+        if (userRole.isPresent()) {
+            invalidSupplementaryDataCase.setUserId(userRole.get().getUserId());
+            invalidSupplementaryDataCase.setCaseRole(userRole.get().getCaseRole());
         }
     }
 

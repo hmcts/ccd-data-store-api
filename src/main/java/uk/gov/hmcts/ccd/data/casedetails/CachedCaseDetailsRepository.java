@@ -1,25 +1,24 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import static com.google.common.collect.Maps.newHashMap;
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
-import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 
+import javax.inject.Inject;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.RequestScope;
+import static com.google.common.collect.Maps.newHashMap;
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 
 @Service
 @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -123,6 +122,14 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
         return hashToPaginatedSearchMetadata.computeIfAbsent(
             format(META_AND_FIELD_DATA_HASH_FORMAT, metadata.hashCode(), getMapHashCode(dataSearchParams)),
             hash -> caseDetailsRepository.getPaginatedSearchMetadata(metadata, dataSearchParams));
+    }
+
+    @Override
+    public List<CaseDetails> findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(
+        String caseTypeId, LocalDateTime from, Optional<LocalDateTime> to, Integer limit) {
+        return  caseDetailsRepository.findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(
+            caseTypeId, from, to, limit
+        );
     }
 
     private String getMapHashCode(Map<String, String> dataSearchParams) {

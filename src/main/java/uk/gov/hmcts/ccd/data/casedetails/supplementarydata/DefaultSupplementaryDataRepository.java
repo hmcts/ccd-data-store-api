@@ -11,9 +11,7 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -27,13 +25,9 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
 
     private List<SupplementaryDataQueryBuilder> queryBuilders;
 
-    private FindCasesWithSupplementaryDataQueryBuilder findCasesWithSupplementaryDataQueryBuilder;
-
     @Autowired
-    public DefaultSupplementaryDataRepository(final List<SupplementaryDataQueryBuilder> queryBuilders,
-                                              final FindCasesWithSupplementaryDataQueryBuilder findCasesQueryBuilder) {
+    public DefaultSupplementaryDataRepository(final List<SupplementaryDataQueryBuilder> queryBuilders) {
         this.queryBuilders = queryBuilders;
-        this.findCasesWithSupplementaryDataQueryBuilder = findCasesQueryBuilder;
     }
 
     @Override
@@ -67,15 +61,6 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
         JsonNode responseNode = (JsonNode) query.getSingleResult();
         return new SupplementaryData(responseNode, requestedProperties);
     }
-
-    @Override
-    public List<String> findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(String caseType, LocalDateTime from,
-                                                                                           Optional<LocalDateTime> to,
-                                                                                           Integer limit) {
-        Query query = findCasesWithSupplementaryDataQueryBuilder.build(em, caseType, from, to, limit);
-        return query.getResultList();
-    }
-
 
     private SupplementaryDataQueryBuilder queryBuilder(final SupplementaryDataOperation supplementaryDataOperation) {
         return this.queryBuilders.stream()
