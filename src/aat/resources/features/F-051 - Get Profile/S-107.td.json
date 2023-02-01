@@ -1,7 +1,7 @@
 {
-	"_guid_": "S-107",
+  "_guid_": "S-107",
   "_extends_": "F-051_Test_Data_Base_V1",
-	"title": "must return 401 when request does not provide valid authentication credentials",
+  "title": "must return 401 when request does not provide valid authentication credentials",
 
   "users": {
     "invokingUser": {
@@ -9,20 +9,20 @@
     }
   },
 
-	"specs": [
-		"a detailed profile in CCD",
-		"uses an invalid user token",
-		"contains a 401 return code"
-	],
+  "specs": [
+    "a detailed profile in CCD",
+    "uses an invalid user token",
+    "contains a 401 return code"
+  ],
 
-	"request": {
+  "request": {
     "headers": {
       "Authorization": "Bearer abc"
     }
   },
 
-	"expectedResponse": {
+  "expectedResponse": {
     "_extends_": "Common_401_Response",
-    "body" : null
-	}
+    "body": null
+  }
 }
