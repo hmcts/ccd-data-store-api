@@ -9,5 +9,8 @@
         CVE-2022-45143 refer [Ticket]</notes>
     <cve>CVE-2022-36437</cve>
     <cve>CVE-2022-45143</cve>
+
+    <cve>CVE-2022-41881</cve>
+    <cve>CVE-2022-41915</cve>
   </suppress>
 </suppressions>
