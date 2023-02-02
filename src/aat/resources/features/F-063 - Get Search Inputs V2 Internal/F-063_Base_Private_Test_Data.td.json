@@ -1,0 +1,25 @@
+{
+	"_guid_": "F-063_Base_Private_Test_Data",
+
+	"productName": "CCD Data Store",
+	"operationName": "Retrieve search input details for dynamic display",
+
+	"method": "GET",
+	"uri": "/internal/case-types/{ctid}/search-inputs",
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers",
+			"experimental": true
+		},
+		"pathVariables": {
+			"ctid": "AAT_PRIVATE"
+		}
+	},
+
+	"expectedResponse": {
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}
