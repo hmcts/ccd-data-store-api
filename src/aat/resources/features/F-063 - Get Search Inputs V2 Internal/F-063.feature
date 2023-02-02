@@ -21,7 +21,7 @@ Scenario: should retrieve search inputs for dynamic display
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-213 @Ignore # expected 401 but actually got 403 (defect RDM-6628)
+@S-213
 Scenario: must return 401 when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
@@ -76,5 +76,33 @@ Scenario: should retrieve search inputs for dynamic display that includes LAST_S
       And the response [contains the correct search inputs for the given case type, along with an HTTP 200 OK]
       And the response [body has LAST_STATE_MODIFIED_DATE as one of the items]
       And the response has all other details as expected
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@S-219
+ Scenario: Public_User should not retrieve search inputs for Private_CaseType's dynamic display
+
+  Given a user with [an active Public profile in CCD],
+
+  When a request is prepared with appropriate values,
+  And the request [contains a valid Private case type],
+  And it is submitted to call the [Retrieve search input details for dynamic display] operation of [CCD Data Store],
+
+  Then a positive response is received,
+  And the response [does not contain the search inputs for the given Private case type, along with an HTTP 200 OK],
+  And the response has all other details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ @S-220
+ Scenario: Private_User should retrieve search inputs for Private_CaseType's dynamic display
+
+  Given a user with [an active Private profile in CCD],
+
+  When a request is prepared with appropriate values,
+  And the request [contains a valid Private case type],
+  And it is submitted to call the [Retrieve search input details for dynamic display] operation of [CCD Data Store],
+
+  Then a positive response is received,
+  And the response [contains the correct search inputs for the given Private case type, along with an HTTP 200 OK],
+  And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
