@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,9 +39,8 @@ public class InvalidCaseSupplementaryDataController {
 
     @Autowired
     public InvalidCaseSupplementaryDataController(InvalidSupplementaryDataOperation invalidSupplementaryDataOperation,
-                                                  @Qualifier("authorised") CaseAssignedUserRolesOperation
+                                                  @Qualifier("default") CaseAssignedUserRolesOperation
                                                       caseAssignedUserRolesOperation) {
-
         this.invalidSupplementaryDataOperation = invalidSupplementaryDataOperation;
         this.caseAssignedUserRolesOperation = caseAssignedUserRolesOperation;
     }
@@ -50,9 +50,8 @@ public class InvalidCaseSupplementaryDataController {
         headers = {
             V2.EXPERIMENTAL_HEADER
         },
-        produces = {
-            V2.MediaType.CASE_DATA_VALIDATE
-        }
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = V2.MediaType.CASE_DATA_VALIDATE
     )
     @ApiOperation(
         value = "Get Cases that have HMCTSServiceId but no orgs_assigned_users in supplementary_data"
@@ -76,7 +75,7 @@ public class InvalidCaseSupplementaryDataController {
         List<InvalidCaseSupplementaryDataItem> invalidSupplementaryDataCases = invalidSupplementaryDataOperation
             .getInvalidSupplementaryDataCases(request.getDateFrom(), request.getDateTo(), request.getLimit());
 
-        if (request.getSearchRas()) {
+        if (request.getSearchRas() != null && request.getSearchRas()) {
             List<Long> casesList = invalidSupplementaryDataCases.stream()
                 .map(InvalidCaseSupplementaryDataItem::getCaseId).collect(Collectors.toList());
 
