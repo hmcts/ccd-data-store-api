@@ -78,7 +78,7 @@ Feature: F-068: Validate calls for the Drafts Endpoint
     And the response has all other details as expected.
 
   #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-068.6
+  @S-068.6 @Ignore #This should be enabled after CCD-4269 is implemented
   Scenario: Must return 403 when request provides authentic credentials without authorised access to the operation
 
     Given a user with [an active profile in CCD],
@@ -93,8 +93,8 @@ Feature: F-068: Validate calls for the Drafts Endpoint
     And the response has all other details as expected.
 
   #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-068.7
-  Scenario: Must return 500 when request provides invalid event token
+  @S-068.7 @Ignore #This should be enabled after CCD-4269 is implemented
+  Scenario: Must return 400 when request provides invalid event token
 
     Given a user with [an active profile in CCD],
     And a successful call [to create a token for case creation] as in [F-068_Get_Event_Token],
@@ -104,6 +104,6 @@ Feature: F-068: Validate calls for the Drafts Endpoint
     And it is submitted to call the [Save draft as a caseworker] operation of [CCD Data Store],
 
     Then a negative response is received,
-    And the response [contains a HTTP 403 Forbidden],
+    And the response [contains a HTTP 400 Bad Request],
     And the response has all other details as expected.
 

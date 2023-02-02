@@ -6,7 +6,7 @@
     "an active profile in CCD",
     "Save draft as a caseworker",
     "contains an invalid event token",
-    "contains a HTTP 403 Forbidden"
+    "contains a HTTP 400 Bad Request"
   ],
   "method": "POST",
   "uri": "/internal/case-types/{ctid}/drafts",
@@ -31,7 +31,10 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_403_Response",
-    "body" : null
+    "_extends_": "Common_400_Response",
+    "body" : {
+      "message" : "Token is not valid",
+      "path" : "/case-types/FT_CRUD/cases"
+    }
   }
 }
