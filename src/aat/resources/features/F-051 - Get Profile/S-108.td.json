@@ -11,7 +11,7 @@
 
   "specs": [
     "a detailed profile in CCD",
-    "uses an uid for a different user",
+    "uses an uid of a different user, with no profile access",
     "has the 403 return code"
   ],
 

@@ -38,7 +38,7 @@ Feature: F-051: Get default settings for user
     Given a user with [a detailed profile in CCD],
 
     When a request is prepared with appropriate values,
-    And the request [uses an uid for a different user],
+    And the request [uses an uid of a different user, with no profile access],
     And it is submitted to call the [Get default settings for user] operation of [CCD Data Store],
 
     Then a negative response is received,
