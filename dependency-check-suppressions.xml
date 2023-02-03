@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <suppress>
-     <notes>Temporary Suppression
-         CVE-2022-36437 refer https://tools.hmcts.net/jira/browse/CCD-4207 </notes>
-     <cve>CVE-2022-36437</cve>
-   </suppress>
+    <notes>Temporary Suppression
+        CVE-2022-36437 refer https://tools.hmcts.net/jira/browse/CCD-4207 </notes>
+    <cve>CVE-2022-36437</cve>
+  </suppress>
 </suppressions>
