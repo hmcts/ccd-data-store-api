@@ -32,9 +32,9 @@ import static org.mockito.Mockito.when;
 //@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
 //    host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
 //    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
-@PactBroker(scheme = "https}",
-    host = "pact-broker.platform.hmcts.net}",
-    port = "443}", consumerVersionSelectors = {
+@PactBroker(scheme = "https",
+    host = "pact-broker.platform.hmcts.net",
+    port = "443", consumerVersionSelectors = {
     @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @TestPropertySource(locations = "/application.properties")
 @WebMvcTest({CaseAssignedUserRolesController.class})

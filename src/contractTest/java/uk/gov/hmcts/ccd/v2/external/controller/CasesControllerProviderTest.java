@@ -42,9 +42,9 @@ import java.util.Map;
 //    host = "${PACT_BROKER_URL:localhost}",
 //    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
 //    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
-@PactBroker(scheme = "https}",
-    host = "pact-broker.platform.hmcts.net}",
-    port = "443}", consumerVersionSelectors = {
+@PactBroker(scheme = "https",
+    host = "pact-broker.platform.hmcts.net",
+    port = "443", consumerVersionSelectors = {
     @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
