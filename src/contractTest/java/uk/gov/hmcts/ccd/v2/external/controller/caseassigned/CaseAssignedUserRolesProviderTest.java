@@ -29,8 +29,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @Provider("ccdDataStoreAPI_caseAssignedUserRoles")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+//@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
+//    host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+//    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
+@PactBroker(scheme = "https}",
+    host = "pact-broker.platform.hmcts.net}",
+    port = "443}", consumerVersionSelectors = {
     @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @TestPropertySource(locations = "/application.properties")
 @WebMvcTest({CaseAssignedUserRolesController.class})

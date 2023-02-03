@@ -38,9 +38,13 @@ import java.util.Map;
 
 @ExtendWith(SpringExtension.class)
 @Provider("ccdDataStoreAPI_Cases")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+//@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
+//    host = "${PACT_BROKER_URL:localhost}",
+//    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+//    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
+@PactBroker(scheme = "https}",
+    host = "pact-broker.platform.hmcts.net}",
+    port = "443}", consumerVersionSelectors = {
     @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
