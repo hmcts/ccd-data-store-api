@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @Builder
@@ -33,17 +34,8 @@ public class InvalidCaseSupplementaryDataItem {
     @JsonProperty("case_access_category")
     private String caseAccessCategory;
 
-    @JsonProperty("applicant1_organisation_policy")
-    private String applicant1OrganisationPolicy;
-
-    @JsonProperty("applicant2_organisation_policy")
-    private String applicant2OrganisationPolicy;
-
-    @JsonProperty("respondent1_organisation_policy")
-    private String respondent1OrganisationPolicy;
-
-    @JsonProperty("respondent2_organisation_policy")
-    private String respondent2OrganisationPolicy;
+    @JsonProperty("organisation_policy_organisation_ids")
+    private List<String> organisationPolicyOrgIds;
 
     @JsonProperty("ras_user_id")
     private String userId;

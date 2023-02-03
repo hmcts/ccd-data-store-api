@@ -103,7 +103,7 @@ class InvalidCaseSupplementaryDataControllerTest {
             .filter(e -> e.getCaseId().equals(CASE_ID2)).findFirst();
         assertTrue(second.isPresent());
 
-        // no caseAssignedUserRoles present so not enhanced
+        // no caseAssignedUserRoles present so data not enhanced
         assertNull(first.get().getUserId());
         assertNull(first.get().getCaseRole());
 
@@ -169,7 +169,7 @@ class InvalidCaseSupplementaryDataControllerTest {
             .filter(e -> e.getCaseId().equals(CASE_ID2)).findFirst();
         assertTrue(second.isPresent());
 
-        // no caseAssignedUserRoles present so not enhanced
+        // no caseAssignedUserRoles present so data not enhanced
         assertNull(first.get().getUserId());
         assertNull(first.get().getCaseRole());
         assertNull(second.get().getUserId());
@@ -202,7 +202,7 @@ class InvalidCaseSupplementaryDataControllerTest {
             .filter(e -> e.getCaseId().equals(CASE_ID2)).findFirst();
         assertTrue(second.isPresent());
 
-        // no caseAssignedUserRoles present so not enhanced
+        // no caseAssignedUserRoles present so data not enhanced
         assertNull(first.get().getUserId());
         assertNull(first.get().getCaseRole());
         assertNull(second.get().getUserId());
@@ -217,13 +217,13 @@ class InvalidCaseSupplementaryDataControllerTest {
         InvalidCaseSupplementaryDataItem dateItem1 = InvalidCaseSupplementaryDataItem.builder()
             .caseId(CASE_ID)
             .caseTypeId(CASE_TYPE_ID)
-            .applicant1OrganisationPolicy(APPLICANT1)
+            .organisationPolicyOrgIds(List.of(APPLICANT1))
             .build();
 
         InvalidCaseSupplementaryDataItem dateItem2 = InvalidCaseSupplementaryDataItem.builder()
             .caseId(CASE_ID2)
             .caseTypeId(CASE_TYPE_ID)
-            .respondent1OrganisationPolicy(RESPONDENT1)
+            .organisationPolicyOrgIds(List.of(RESPONDENT1))
             .build();
 
         return List.of(dateItem1, dateItem2);
