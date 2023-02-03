@@ -901,7 +901,8 @@ runProviderPactVerification.finalizedBy pactVerify
 
 pact {
     broker {
-        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+//        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+        pactBrokerUrl = 'https://pact-broker.platform.hmcts.net:443'
     }
 //    publish {
 //        pactDirectory = 'pacts'
