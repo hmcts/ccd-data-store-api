@@ -899,6 +899,17 @@ task runProviderPactVerification(type:Test) {
 
 runProviderPactVerification.finalizedBy pactVerify
 
+pact {
+    broker {
+        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    }
+//    publish {
+//        pactDirectory = 'pacts'
+//        tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
+//        version = project.pacticipantVersion
+//    }
+}
+
 def timestamp() {
     def date = new Date()
     return date.format('yyyy-MM-dd HH:mm:ss')
