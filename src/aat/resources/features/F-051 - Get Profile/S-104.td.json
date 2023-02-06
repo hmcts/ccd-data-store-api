@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-107",
-  "_extends_": "F-051_Test_Data_Base_V1",
+	"_guid_": "S-104",
+  "_extends_": "F-051_Test_Data_Base_V2",
   "title": "must return 401 when request does not provide valid authentication credentials",
 
   "users": {
@@ -23,6 +23,6 @@
 
   "expectedResponse": {
     "_extends_": "Common_401_Response",
-    "body": null
+    "body" : null
   }
 }

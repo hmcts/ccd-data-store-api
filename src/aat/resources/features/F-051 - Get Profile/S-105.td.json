@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-109",
-  "_extends_": "F-051_Test_Data_Base_V1",
+  "_guid_": "S-105",
+  "_extends_": "F-051_Test_Data_Base_V2",
   "title": "must return appropriate user setting from idam role for a user not having a profile in CCD",
 
   "specs": [
@@ -319,9 +319,9 @@
                 }
               ],
               "searchAliasFields": [],
-              "searchParties" : [],
-              "searchCriterias" : [],
-              "categories" : [],
+              "searchParties": [],
+              "searchCriterias": [],
+              "categories": [],
               "roleToAccessProfiles": [],
               "security_classification": null,
               "case_fields": [],
@@ -608,9 +608,9 @@
                 }
               ],
               "searchAliasFields": [],
-              "searchParties" : [],
-              "categories" : [],
-              "searchCriterias" : [],
+              "searchParties": [],
+              "categories": [],
+              "searchCriterias": [],
               "roleToAccessProfiles": [],
               "security_classification": null,
               "case_fields": [],
@@ -632,6 +632,11 @@
       ],
       "default": {
         "workbasket": null
+      },
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
       }
     }
   }
