@@ -899,17 +899,17 @@ task runProviderPactVerification(type:Test) {
 
 runProviderPactVerification.finalizedBy pactVerify
 
-pact {
-    broker {
+//pact {
+//    broker {
 //        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
-        pactBrokerUrl = 'https://pact-broker.platform.hmcts.net:443'
-    }
+//        pactBrokerUrl = 'https://pact-broker.platform.hmcts.net:443'
+//    }
 //    publish {
 //        pactDirectory = 'pacts'
 //        tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
 //        version = project.pacticipantVersion
 //    }
-}
+//}
 
 def timestamp() {
     def date = new Date()
