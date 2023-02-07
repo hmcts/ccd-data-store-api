@@ -69,7 +69,7 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
     @BeforeEach
     void before(PactVerificationContext context) {
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
-//        System.out.println("PACT_BRANCH_NAME: " + System.getenv("PACT_BRANCH_NAME"));
+        //System.out.println("PACT_BRANCH_NAME: " + System.getenv("PACT_BRANCH_NAME"));
         LOG.error("PACT_BRANCH_NAME: " + System.getenv("PACT_BRANCH_NAME"));
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         testTarget.setControllers(
