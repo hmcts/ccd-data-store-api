@@ -11,6 +11,8 @@ import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -45,6 +47,8 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("CASE_ASSIGNED")
 public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CaseAssignedUserRolesProviderTest.class);
+
     @Autowired
     ApplicationParams applicationParams;
 
@@ -65,7 +69,8 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
     @BeforeEach
     void before(PactVerificationContext context) {
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        System.out.println("PACT_BRANCH_NAME: " + System.getenv("PACT_BRANCH_NAME"));
+//        System.out.println("PACT_BRANCH_NAME: " + System.getenv("PACT_BRANCH_NAME"));
+        LOG.error("PACT_BRANCH_NAME: " + System.getenv("PACT_BRANCH_NAME"));
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         testTarget.setControllers(
             caseAssignedUserRolesController);
