@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 @PactBroker(scheme = "https",
     host = "pact-broker.platform.hmcts.net",
     port = "443", consumerVersionSelectors = {
-    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
+    @VersionSelector(tag = "master")})
 @TestPropertySource(locations = "/application.properties")
 @WebMvcTest({CaseAssignedUserRolesController.class})
 @AutoConfigureMockMvc(addFilters = false)
@@ -63,7 +63,7 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
 
     @BeforeEach
     void before(PactVerificationContext context) {
-        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
+        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         testTarget.setControllers(
             caseAssignedUserRolesController);

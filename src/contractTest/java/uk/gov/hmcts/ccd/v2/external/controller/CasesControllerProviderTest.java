@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
@@ -45,7 +46,7 @@ import java.util.Map;
 @PactBroker(scheme = "https",
     host = "pact-broker.platform.hmcts.net",
     port = "443", consumerVersionSelectors = {
-    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
+    @VersionSelector(tag = "master")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
     "ccd.document.url.pattern=${CCD_DOCUMENT_URL_PATTERN:https?://(((?:api-gateway.preprod.dm.reform.hmcts.net|"
@@ -55,6 +56,7 @@ import java.util.Map;
         + "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/segments/[0-9]+))}"
 
 })
+@TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
 @IgnoreNoPactsToVerify
 public class CasesControllerProviderTest extends WireMockBaseTest {
@@ -126,7 +128,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     @ExtendWith(PactVerificationSpringProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
         if (context != null) {
-            //context.verifyInteraction();
+            context.verifyInteraction();
         }
     }
 
@@ -136,6 +138,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
             context.setTarget(new HttpTestTarget("localhost", 8123, "/"));
         }
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
+        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         // when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         // when(userAuthorisation.getUserId()).thenReturn("userId");
     }
