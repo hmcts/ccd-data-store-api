@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-110",
-  "_extends_": "F-051_Test_Data_Base_V1",
+  "_guid_": "S-106",
+  "_extends_": "F-051_Test_Data_Base_V2",
   "title": "must return default user setting successfully for a user having a profile in CCD",
 
   "specs": [
@@ -27,6 +27,11 @@
           "jurisdiction_id": "[[ANYTHING_PRESENT]]",
           "case_type_id": "[[ANYTHING_PRESENT]]",
           "state_id": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
         }
       }
     }
