@@ -39,13 +39,9 @@ import java.util.Map;
 
 @ExtendWith(SpringExtension.class)
 @Provider("ccdDataStoreAPI_Cases")
-//@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-//    host = "${PACT_BROKER_URL:localhost}",
-//    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-//    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
-@PactBroker(scheme = "https",
-    host = "pact-broker.platform.hmcts.net",
-    port = "443", consumerVersionSelectors = {
+@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
+    host = "${PACT_BROKER_URL:localhost}",
+    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
     @VersionSelector(tag = "master")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
@@ -138,7 +134,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
             context.setTarget(new HttpTestTarget("localhost", 8123, "/"));
         }
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
+        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
         // when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         // when(userAuthorisation.getUserId()).thenReturn("userId");
     }

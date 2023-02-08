@@ -855,8 +855,7 @@ task functional() {
                     '--threads', '1',
                     '--plugin', "json:${rootDir}/target/cucumber.json",
                     '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-//                    '--tags', 'not @Ignore',
-                    '--tags', '@F-040',
+                    '--tags', 'not @Ignore',
                     '--glue', 'uk.gov.hmcts.befta.player',
                     '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
             ]
@@ -898,18 +897,6 @@ task runProviderPactVerification(type:Test) {
 }
 
 runProviderPactVerification.finalizedBy pactVerify
-
-//pact {
-//    broker {
-//        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
-//        pactBrokerUrl = 'https://pact-broker.platform.hmcts.net:443'
-//    }
-//    publish {
-//        pactDirectory = 'pacts'
-//        tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
-//        version = project.pacticipantVersion
-//    }
-//}
 
 def timestamp() {
     def date = new Date()
