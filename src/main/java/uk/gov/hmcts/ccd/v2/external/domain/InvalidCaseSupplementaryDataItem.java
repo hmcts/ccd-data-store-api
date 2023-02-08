@@ -37,6 +37,10 @@ public class InvalidCaseSupplementaryDataItem {
     @JsonProperty("organisation_policy_organisation_ids")
     private List<String> organisationPolicyOrgIds;
 
+    @JsonProperty("organisation_policy_case_roles")
+    private List<String> orgPolicyCaseAssignedRoles;
+
+    // We just need to confirm if there are any users assigned the case roles
     @JsonProperty("ras_user_id")
     private String userId;
 

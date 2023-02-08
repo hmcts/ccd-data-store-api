@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.InvalidSupplementaryDataOperation;
@@ -36,13 +38,16 @@ import static java.util.Collections.emptyList;
 public class InvalidCaseSupplementaryDataController {
     private final InvalidSupplementaryDataOperation invalidSupplementaryDataOperation;
     private final CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
+    private final ApplicationParams applicationParams;
 
     @Autowired
     public InvalidCaseSupplementaryDataController(InvalidSupplementaryDataOperation invalidSupplementaryDataOperation,
                                                   @Qualifier("default") CaseAssignedUserRolesOperation
-                                                      caseAssignedUserRolesOperation) {
+                                                      caseAssignedUserRolesOperation,
+                                                  ApplicationParams applicationParams) {
         this.invalidSupplementaryDataOperation = invalidSupplementaryDataOperation;
         this.caseAssignedUserRolesOperation = caseAssignedUserRolesOperation;
+        this.applicationParams = applicationParams;
     }
 
     @PostMapping(
@@ -71,9 +76,12 @@ public class InvalidCaseSupplementaryDataController {
         @ApiParam(value = "Parameters to filter on", required = true)
         @RequestBody InvalidCaseSupplementaryDataRequest request) {
         validateRequestParams(request);
+        List<String> caseTypes = applicationParams.getInvalidSupplementaryDataCaseTypes().stream()
+            .filter(Strings::isNotBlank).collect(Collectors.toList());
 
         List<InvalidCaseSupplementaryDataItem> invalidSupplementaryDataCases = invalidSupplementaryDataOperation
-            .getInvalidSupplementaryDataCases(request.getDateFrom(), request.getDateTo(), request.getLimit());
+            .getInvalidSupplementaryDataCases(caseTypes, request.getDateFrom(), request.getDateTo(),
+                request.getLimit());
 
         if (request.getSearchRas() != null && request.getSearchRas()) {
             List<Long> casesList = invalidSupplementaryDataCases.stream()
@@ -93,8 +101,10 @@ public class InvalidCaseSupplementaryDataController {
                                       List<CaseAssignedUserRole> caseAssignedUserRoles) {
 
         Long invalidCaseId = invalidSupplementaryDataCase.getCaseId();
+        // We just need to confirm if there are any users assigned case roles
         Optional<CaseAssignedUserRole> userRole = caseAssignedUserRoles.stream()
             .filter(e -> invalidCaseId.toString().equals(e.getCaseDataId()))
+            .filter(e -> invalidSupplementaryDataCase.getOrgPolicyCaseAssignedRoles().contains(e.getCaseRole()))
             .findFirst();
 
         if (userRole.isPresent()) {
@@ -108,10 +118,8 @@ public class InvalidCaseSupplementaryDataController {
             throw new BadRequestException("Invalid parameters: 'date_from' has to be defined");
         } else {
             Optional<LocalDateTime> dateTo = request.getDateTo();
-            if (dateTo.isPresent()) {
-                if (request.getDateFrom().isAfter(dateTo.get())) {
-                    throw new BadRequestException("Invalid parameters: 'date_from' has to be before 'date_to'");
-                }
+            if (dateTo.isPresent() && dateTo.get().isBefore(request.getDateFrom())) {
+                throw new BadRequestException("Invalid parameters: 'date_from' has to be before 'date_to'");
             }
         }
     }

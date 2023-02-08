@@ -47,6 +47,7 @@ class InvalidCaseSupplementaryDataControllerTest {
     public static final String RESPONDENT1 = "respondent1";
     public static final String CASE_ROLE = "caseRoleA";
     public static final String USER_ID = "89000";
+    public static final List<String> CASE_TYPES = List.of(CASE_TYPE_ID);
 
     @Mock
     private InvalidSupplementaryDataOperation invalidSupplementaryDataOperation;
@@ -70,17 +71,17 @@ class InvalidCaseSupplementaryDataControllerTest {
         when(request.getDateTo()).thenReturn(Optional.of(DATE_5_DAYS_AHEAD));
         when(request.getLimit()).thenReturn(DEFAULT_LIMIT);
         when(request.getSearchRas()).thenReturn(Boolean.TRUE);
-        when(applicationParams.getInvalidSupplementaryDataCaseTypes()).thenReturn(List.of(CASE_TYPE_ID));
+        when(applicationParams.getInvalidSupplementaryDataCaseTypes()).thenReturn(List.of("", CASE_TYPE_ID));
 
         controller = new InvalidCaseSupplementaryDataController(invalidSupplementaryDataOperation,
-            caseAssignedUserRolesOperation);
+            caseAssignedUserRolesOperation, applicationParams);
     }
 
     @Test
     void shouldProcessValidRequest() {
         List<InvalidCaseSupplementaryDataItem> cases = getTwoDataItems();
         doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(
-            DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT
+            CASE_TYPES, DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT
         );
 
         List<Long> caseIdsAsLong = cases.stream().map(InvalidCaseSupplementaryDataItem::getCaseId)
@@ -112,7 +113,7 @@ class InvalidCaseSupplementaryDataControllerTest {
         assertEquals(CASE_ROLE, second.get().getCaseRole());
 
         verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
-            DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
+            CASE_TYPES, DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
         verify(caseAssignedUserRolesOperation, times(1)).findCaseUserRoles(caseIdsAsLong, userIds);
     }
 
@@ -149,7 +150,7 @@ class InvalidCaseSupplementaryDataControllerTest {
 
         List<InvalidCaseSupplementaryDataItem> cases = getTwoDataItems();
         doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(
-            DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT
+            CASE_TYPES, DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT
         );
 
         doReturn(List.of()).when(caseAssignedUserRolesOperation)
@@ -176,7 +177,7 @@ class InvalidCaseSupplementaryDataControllerTest {
         assertNull(second.get().getCaseRole());
 
         verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
-            DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT);
+            CASE_TYPES, DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT);
     }
 
     @Test
@@ -185,7 +186,7 @@ class InvalidCaseSupplementaryDataControllerTest {
 
         List<InvalidCaseSupplementaryDataItem> cases = getTwoDataItems();
         doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(
-            DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT
+            CASE_TYPES, DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT
         );
 
         ResponseEntity<InvalidCaseSupplementaryDataResponse> response = controller.getInvalidSupplementaryData(request);
@@ -209,7 +210,7 @@ class InvalidCaseSupplementaryDataControllerTest {
         assertNull(second.get().getCaseRole());
 
         verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
-            DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
+            CASE_TYPES, DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
         verifyNoInteractions(caseAssignedUserRolesOperation);
     }
 
@@ -218,12 +219,14 @@ class InvalidCaseSupplementaryDataControllerTest {
             .caseId(CASE_ID)
             .caseTypeId(CASE_TYPE_ID)
             .organisationPolicyOrgIds(List.of(APPLICANT1))
+            .orgPolicyCaseAssignedRoles(List.of(CASE_ROLE))
             .build();
 
         InvalidCaseSupplementaryDataItem dateItem2 = InvalidCaseSupplementaryDataItem.builder()
             .caseId(CASE_ID2)
             .caseTypeId(CASE_TYPE_ID)
             .organisationPolicyOrgIds(List.of(RESPONDENT1))
+            .orgPolicyCaseAssignedRoles(List.of(CASE_ROLE))
             .build();
 
         return List.of(dateItem1, dateItem2);

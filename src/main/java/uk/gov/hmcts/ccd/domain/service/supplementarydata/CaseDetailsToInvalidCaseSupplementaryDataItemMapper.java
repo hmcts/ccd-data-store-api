@@ -29,6 +29,9 @@ public class CaseDetailsToInvalidCaseSupplementaryDataItemMapper {
         Set<String> orgIds = orgPolicyNodes.stream()
             .map(e -> JacksonUtils.getValueFromPath("Organisation.OrganisationID", e))
             .filter(Objects::nonNull).collect(Collectors.toSet());
+        Set<String> orgCaseRoles = orgPolicyNodes.stream()
+            .map(e -> JacksonUtils.getValueFromPath(ORG_POLICY_CASE_ASSIGNED_ROLE, e))
+            .filter(Objects::nonNull).collect(Collectors.toSet());
 
         return InvalidCaseSupplementaryDataItem.builder()
             .caseId(caseDetails.getReference())
@@ -37,6 +40,7 @@ public class CaseDetailsToInvalidCaseSupplementaryDataItemMapper {
             .supplementaryData(caseDetails.getSupplementaryData())
             .caseAccessCategory(caseAccessCategory)
             .organisationPolicyOrgIds(new ArrayList<>(orgIds))
+            .orgPolicyCaseAssignedRoles(new ArrayList<>(orgCaseRoles))
             .build();
     }
 

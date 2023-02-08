@@ -76,13 +76,17 @@ class CaseDetailsToInvalidCaseSupplementaryDataItemMapperTest {
 
             () -> assertEquals(3, first.getOrganisationPolicyOrgIds().size()),
             () -> assertTrue(first.getOrganisationPolicyOrgIds().containsAll(List.of("QUK123N", "QUK345N", "QUK456N"))),
+            () -> assertTrue(first.getOrgPolicyCaseAssignedRoles()
+                .containsAll(List.of("[ApplicantSolicitor]", "[RespondentSolicitor]"))),
             () -> assertEquals("UNSPEC_CLAIM", first.getCaseAccessCategory()),
 
             () -> assertEquals(1, second.getOrganisationPolicyOrgIds().size()),
             () -> assertTrue(second.getOrganisationPolicyOrgIds().contains("QUK987N")),
+            () -> assertTrue(second.getOrgPolicyCaseAssignedRoles().containsAll(List.of("[ApplicantSolicitorA]"))),
             () -> assertNull(second.getCaseAccessCategory()),
 
-            () -> assertEquals(0, third.getOrganisationPolicyOrgIds().size())
+            () -> assertEquals(0, third.getOrganisationPolicyOrgIds().size()),
+            () -> assertEquals(0, third.getOrgPolicyCaseAssignedRoles().size())
         );
     }
 
@@ -144,7 +148,7 @@ class CaseDetailsToInvalidCaseSupplementaryDataItemMapperTest {
             + "\"PersonLastName\":\"Smith\","
             + "\"PersonFirstName\":\"Joe\","
             + "\"applicant2OrganisationPolicy\": {\n"
-            + "  \"OrgPolicyCaseAssignedRole\": \"[ApplicantSolicitor]\","
+            + "  \"OrgPolicyCaseAssignedRole\": \"[ApplicantSolicitorA]\","
             + "  \"OrgPolicyReference\": \"ClaimantPolicy\",\n"
             + "  \"Organisation\": {\n"
             + "    \"OrganisationID\": \"QUK987N\",\n"

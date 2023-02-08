@@ -5,6 +5,8 @@ import com.google.common.collect.Maps;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -683,94 +685,99 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         assertEquals(0, results.size());
     }
 
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
-        {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void findCasesWithSupplementaryDataHavingHmctsServiceIdButNoOrgsAssignedUsers() {
-        assumeSuplementaryDataInitialised();
+    @Nested
+    @DisplayName("findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers()")
+    class FindCasesWithInvalidSupplementaryData {
 
-        LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
-        LocalDateTime to = LocalDateTime.of(2020, 1, 1, 8, 55);
-        Integer limit = 5;
-        List<CaseDetails> response = caseDetailsRepository
-            .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("TestAddressBookCase", from,
-                Optional.of(to), limit);
-        assertNotNull(response);
-        assertEquals(3, response.size());
-        assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311111L)));
-        assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311112L)));
-        assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311113L)));
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+            {"classpath:sql/insert_cases_supplementary_data.sql"})
+        public void findCasesWithSupplementaryDataHavingHmctsServiceIdButNoOrgsAssignedUsers() {
+            assumeSupplementaryDataInitialised();
+
+            LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
+            LocalDateTime to = LocalDateTime.of(2020, 1, 1, 8, 55);
+            Integer limit = 5;
+            List<CaseDetails> response = caseDetailsRepository
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("TestAddressBookCase", from,
+                    Optional.of(to), limit);
+            assertNotNull(response);
+            assertEquals(3, response.size());
+            assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311111L)));
+            assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311112L)));
+            assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311113L)));
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+            {"classpath:sql/insert_cases_supplementary_data.sql"})
+        public void findCasesFilteredByDateFrom() {
+            assumeSupplementaryDataInitialised();
+
+            LocalDateTime from = LocalDateTime.of(2016, 9, 24, 20, 41);
+            Integer limit = 10;
+            List<CaseDetails> response = caseDetailsRepository
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("TestAddressBookCase", from,
+                    Optional.empty(), limit);
+            assertNotNull(response);
+            assertEquals(1, response.size());
+            assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311113L)));
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+            {"classpath:sql/insert_cases_supplementary_data.sql"})
+        public void findCasesFilteredByLimit() {
+            assumeSupplementaryDataInitialised();
+
+            LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
+            Integer limit = 1;
+            List<CaseDetails> response = caseDetailsRepository
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("TestAddressBookCase", from,
+                    Optional.empty(), limit);
+            assertNotNull(response);
+            assertEquals(1, response.size());
+            assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311111L)));
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+            {"classpath:sql/insert_cases_supplementary_data.sql"})
+        public void findCasesFilteredWithEmptyDateTo() {
+            assumeSupplementaryDataInitialised();
+
+            LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
+            Integer limit = 100;
+            List<CaseDetails> response = caseDetailsRepository
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("TestAddressBookCase", from,
+                    Optional.empty(), limit);
+            assertNotNull(response);
+            assertEquals(3, response.size());
+            assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311111L)));
+            assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311112L)));
+            assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311113L)));
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+            {"classpath:sql/insert_cases_supplementary_data.sql"})
+        public void findCasesFilteredByDateTo() {
+            assumeSupplementaryDataInitialised();
+
+            LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
+            LocalDateTime to = LocalDateTime.of(2016, 9, 24, 20, 41);
+            Integer limit = 5;
+            List<CaseDetails> response = caseDetailsRepository
+                .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("TestAddressBookCase", from,
+                    Optional.of(to), limit);
+            assertNotNull(response);
+            assertEquals(2, response.size());
+            assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311111L)));
+            assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311112L)));
+        }
     }
 
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
-        {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void findCasesFilteredByDateFrom() {
-        assumeSuplementaryDataInitialised();
-
-        LocalDateTime from = LocalDateTime.of(2016, 9, 24, 20, 41);
-        Integer limit = 10;
-        List<CaseDetails> response = caseDetailsRepository
-            .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("TestAddressBookCase", from,
-                Optional.empty(), limit);
-        assertNotNull(response);
-        assertEquals(1, response.size());
-        assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311113L)));
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
-        {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void findCasesFilteredByLimit() {
-        assumeSuplementaryDataInitialised();
-
-        LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
-        Integer limit = 1;
-        List<CaseDetails> response = caseDetailsRepository
-            .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("TestAddressBookCase", from,
-                Optional.empty(), limit);
-        assertNotNull(response);
-        assertEquals(1, response.size());
-        assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311111L)));
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
-        {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void findCasesFilteredWithEmptyDateTo() {
-        assumeSuplementaryDataInitialised();
-
-        LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
-        Integer limit = 100;
-        List<CaseDetails> response = caseDetailsRepository
-            .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("TestAddressBookCase", from,
-                Optional.empty(), limit);
-        assertNotNull(response);
-        assertEquals(3, response.size());
-        assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311111L)));
-        assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311112L)));
-        assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311113L)));
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
-        {"classpath:sql/insert_cases_supplementary_data.sql"})
-    public void findCasesFilteredByDateTo() {
-        assumeSuplementaryDataInitialised();
-
-        LocalDateTime from = LocalDateTime.of(2016, 1, 1, 8, 55);
-        LocalDateTime to = LocalDateTime.of(2016, 9, 24, 20, 41);
-        Integer limit = 5;
-        List<CaseDetails> response = caseDetailsRepository
-            .findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers("TestAddressBookCase", from,
-                Optional.of(to), limit);
-        assertNotNull(response);
-        assertEquals(2, response.size());
-        assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311111L)));
-        assertTrue(response.stream().anyMatch(cd -> cd.getReference().equals(1504259907311112L)));
-    }
-
-    private void assumeSuplementaryDataInitialised() {
+    private void assumeSupplementaryDataInitialised() {
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect data initiation", 8, resultList.size());
     }
