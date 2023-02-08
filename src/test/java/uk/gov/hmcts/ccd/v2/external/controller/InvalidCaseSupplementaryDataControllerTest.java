@@ -42,6 +42,7 @@ class InvalidCaseSupplementaryDataControllerTest {
     public static final Integer DEFAULT_LIMIT = 10;
     public static final Long CASE_ID = 123L;
     public static final Long CASE_ID2 = 124L;
+    public static final Long CASE_ID3 = 125L;
     public static final String CASE_TYPE_ID = "CASE_TYPE";
     public static final String APPLICANT1 = "applicant1";
     public static final String RESPONDENT1 = "respondent1";
@@ -79,7 +80,7 @@ class InvalidCaseSupplementaryDataControllerTest {
 
     @Test
     void shouldProcessValidRequest() {
-        List<InvalidCaseSupplementaryDataItem> cases = getTwoDataItems();
+        List<InvalidCaseSupplementaryDataItem> cases = getThreeDataItems();
         doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(
             CASE_TYPES, DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT
         );
@@ -94,7 +95,7 @@ class InvalidCaseSupplementaryDataControllerTest {
 
         assertNotNull(response);
         assertNotNull(response.getBody());
-        assertEquals(2, response.getBody().getDataItems().size());
+        assertEquals(3, response.getBody().getDataItems().size());
 
         List<InvalidCaseSupplementaryDataItem> dataItems = response.getBody().getDataItems();
         Optional<InvalidCaseSupplementaryDataItem> first = dataItems.stream()
@@ -103,6 +104,9 @@ class InvalidCaseSupplementaryDataControllerTest {
         Optional<InvalidCaseSupplementaryDataItem> second = dataItems.stream()
             .filter(e -> e.getCaseId().equals(CASE_ID2)).findFirst();
         assertTrue(second.isPresent());
+        Optional<InvalidCaseSupplementaryDataItem> third = dataItems.stream()
+            .filter(e -> e.getCaseId().equals(CASE_ID3)).findFirst();
+        assertTrue(third.isPresent());
 
         // no caseAssignedUserRoles present so data not enhanced
         assertNull(first.get().getUserId());
@@ -111,6 +115,10 @@ class InvalidCaseSupplementaryDataControllerTest {
         // test it has been enhanced with UserId and CaseRole
         assertEquals(USER_ID, second.get().getUserId());
         assertEquals(CASE_ROLE, second.get().getCaseRole());
+
+        // no orgPolicyCaseAssignedRoles present so data not enhanced
+        assertNull(third.get().getUserId());
+        assertNull(third.get().getCaseRole());
 
         verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
             CASE_TYPES, DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
@@ -148,7 +156,7 @@ class InvalidCaseSupplementaryDataControllerTest {
     void shouldProcessValidRequestWhenDateToIsEmpty() {
         when(request.getDateTo()).thenReturn(Optional.empty());
 
-        List<InvalidCaseSupplementaryDataItem> cases = getTwoDataItems();
+        List<InvalidCaseSupplementaryDataItem> cases = getThreeDataItems();
         doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(
             CASE_TYPES, DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT
         );
@@ -160,7 +168,7 @@ class InvalidCaseSupplementaryDataControllerTest {
 
         assertNotNull(response);
         assertNotNull(response.getBody());
-        assertEquals(2, response.getBody().getDataItems().size());
+        assertEquals(3, response.getBody().getDataItems().size());
 
         List<InvalidCaseSupplementaryDataItem> dataItems = response.getBody().getDataItems();
         Optional<InvalidCaseSupplementaryDataItem> first = dataItems.stream()
@@ -169,12 +177,18 @@ class InvalidCaseSupplementaryDataControllerTest {
         Optional<InvalidCaseSupplementaryDataItem> second = dataItems.stream()
             .filter(e -> e.getCaseId().equals(CASE_ID2)).findFirst();
         assertTrue(second.isPresent());
+        Optional<InvalidCaseSupplementaryDataItem> third = dataItems.stream()
+            .filter(e -> e.getCaseId().equals(CASE_ID3)).findFirst();
+        assertTrue(third.isPresent());
 
         // no caseAssignedUserRoles present so data not enhanced
         assertNull(first.get().getUserId());
         assertNull(first.get().getCaseRole());
         assertNull(second.get().getUserId());
         assertNull(second.get().getCaseRole());
+        // no orgPolicyCaseAssignedRoles present so data not enhanced
+        assertNull(third.get().getUserId());
+        assertNull(third.get().getCaseRole());
 
         verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
             CASE_TYPES, DATE_10_DAYS_AGO, Optional.empty(), DEFAULT_LIMIT);
@@ -184,7 +198,7 @@ class InvalidCaseSupplementaryDataControllerTest {
     void shouldProcessValidRequestWhenSearchRasIsFalse() {
         when(request.getSearchRas()).thenReturn(Boolean.FALSE);
 
-        List<InvalidCaseSupplementaryDataItem> cases = getTwoDataItems();
+        List<InvalidCaseSupplementaryDataItem> cases = getThreeDataItems();
         doReturn(cases).when(invalidSupplementaryDataOperation).getInvalidSupplementaryDataCases(
             CASE_TYPES, DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT
         );
@@ -193,7 +207,7 @@ class InvalidCaseSupplementaryDataControllerTest {
 
         assertNotNull(response);
         assertNotNull(response.getBody());
-        assertEquals(2, response.getBody().getDataItems().size());
+        assertEquals(3, response.getBody().getDataItems().size());
 
         List<InvalidCaseSupplementaryDataItem> dataItems = response.getBody().getDataItems();
         Optional<InvalidCaseSupplementaryDataItem> first = dataItems.stream()
@@ -202,19 +216,25 @@ class InvalidCaseSupplementaryDataControllerTest {
         Optional<InvalidCaseSupplementaryDataItem> second = dataItems.stream()
             .filter(e -> e.getCaseId().equals(CASE_ID2)).findFirst();
         assertTrue(second.isPresent());
+        Optional<InvalidCaseSupplementaryDataItem> third = dataItems.stream()
+            .filter(e -> e.getCaseId().equals(CASE_ID3)).findFirst();
+        assertTrue(third.isPresent());
 
         // no caseAssignedUserRoles present so data not enhanced
         assertNull(first.get().getUserId());
         assertNull(first.get().getCaseRole());
         assertNull(second.get().getUserId());
         assertNull(second.get().getCaseRole());
+        // no orgPolicyCaseAssignedRoles present so data not enhanced
+        assertNull(third.get().getUserId());
+        assertNull(third.get().getCaseRole());
 
         verify(invalidSupplementaryDataOperation, times(1)).getInvalidSupplementaryDataCases(
             CASE_TYPES, DATE_10_DAYS_AGO, Optional.of(DATE_5_DAYS_AHEAD), DEFAULT_LIMIT);
         verifyNoInteractions(caseAssignedUserRolesOperation);
     }
 
-    private List<InvalidCaseSupplementaryDataItem> getTwoDataItems() {
+    private List<InvalidCaseSupplementaryDataItem> getThreeDataItems() {
         InvalidCaseSupplementaryDataItem dateItem1 = InvalidCaseSupplementaryDataItem.builder()
             .caseId(CASE_ID)
             .caseTypeId(CASE_TYPE_ID)
@@ -229,6 +249,12 @@ class InvalidCaseSupplementaryDataControllerTest {
             .orgPolicyCaseAssignedRoles(List.of(CASE_ROLE))
             .build();
 
-        return List.of(dateItem1, dateItem2);
+        InvalidCaseSupplementaryDataItem dateItem3 = InvalidCaseSupplementaryDataItem.builder()
+            .caseId(CASE_ID3)
+            .caseTypeId(CASE_TYPE_ID)
+            .organisationPolicyOrgIds(List.of(RESPONDENT1))
+            .build();
+
+        return List.of(dateItem1, dateItem2, dateItem3);
     }
 }

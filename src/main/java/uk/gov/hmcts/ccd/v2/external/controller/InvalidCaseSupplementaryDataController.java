@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -100,16 +101,18 @@ public class InvalidCaseSupplementaryDataController {
     private void enhanceWithUserRoles(InvalidCaseSupplementaryDataItem invalidSupplementaryDataCase,
                                       List<CaseAssignedUserRole> caseAssignedUserRoles) {
 
-        Long invalidCaseId = invalidSupplementaryDataCase.getCaseId();
-        // We just need to confirm if there are any users assigned case roles
-        Optional<CaseAssignedUserRole> userRole = caseAssignedUserRoles.stream()
-            .filter(e -> invalidCaseId.toString().equals(e.getCaseDataId()))
-            .filter(e -> invalidSupplementaryDataCase.getOrgPolicyCaseAssignedRoles().contains(e.getCaseRole()))
-            .findFirst();
+        if (!Collections.isEmpty(invalidSupplementaryDataCase.getOrgPolicyCaseAssignedRoles())) {
+            Long invalidCaseId = invalidSupplementaryDataCase.getCaseId();
+            // We just need to confirm if there are any users assigned case roles
+            Optional<CaseAssignedUserRole> userRole = caseAssignedUserRoles.stream()
+                .filter(e -> invalidCaseId.toString().equals(e.getCaseDataId()))
+                .filter(e -> invalidSupplementaryDataCase.getOrgPolicyCaseAssignedRoles().contains(e.getCaseRole()))
+                .findFirst();
 
-        if (userRole.isPresent()) {
-            invalidSupplementaryDataCase.setUserId(userRole.get().getUserId());
-            invalidSupplementaryDataCase.setCaseRole(userRole.get().getCaseRole());
+            if (userRole.isPresent()) {
+                invalidSupplementaryDataCase.setUserId(userRole.get().getUserId());
+                invalidSupplementaryDataCase.setCaseRole(userRole.get().getCaseRole());
+            }
         }
     }
 
