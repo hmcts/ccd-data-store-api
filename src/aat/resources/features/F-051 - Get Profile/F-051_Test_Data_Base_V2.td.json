@@ -1,0 +1,25 @@
+{
+	"_guid_": "F-051_Test_Data_Base_V2",
+	"_extends_": "Base_Expecting_200",
+
+	"productName": "CCD Data Store",
+	"operationName": "Get default settings for user",
+
+  "method": "GET",
+  "uri": "/internal/profile",
+
+	"request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true
+    }
+	},
+
+	"expectedResponse": {
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANY_INTEGER_NULLABLE]]",
+			"Transfer-Encoding": "[[ANY_STRING_NULLABLE]]"
+		}
+	}
+}
