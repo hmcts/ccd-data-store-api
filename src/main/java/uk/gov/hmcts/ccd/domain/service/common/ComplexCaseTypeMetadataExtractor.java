@@ -5,13 +5,13 @@ import io.vavr.control.Either;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.common.CaseFieldMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldMetadata;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 
+import javax.inject.Named;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Named;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 

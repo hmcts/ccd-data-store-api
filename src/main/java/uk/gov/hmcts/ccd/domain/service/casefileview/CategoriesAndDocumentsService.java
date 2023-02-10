@@ -6,13 +6,15 @@ import lombok.NonNull;
 import uk.gov.hmcts.ccd.domain.model.casefileview.CategoriesAndDocuments;
 import uk.gov.hmcts.ccd.domain.model.casefileview.Category;
 import uk.gov.hmcts.ccd.domain.model.casefileview.Document;
+import uk.gov.hmcts.ccd.domain.model.common.CaseFieldMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataExtractor;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -22,8 +24,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.collectingAndThen;

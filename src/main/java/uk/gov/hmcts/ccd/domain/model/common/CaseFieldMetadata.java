@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.definition;
+package uk.gov.hmcts.ccd.domain.model.common;
 
 import lombok.Value;
 

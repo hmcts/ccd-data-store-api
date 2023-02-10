@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.vavr.control.Either;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.common.CaseFieldMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.service.common.CaseFieldMetadataExtractor.FIELD_SEPARATOR;
