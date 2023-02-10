@@ -9,16 +9,10 @@ import java.util.Date;
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @Data
-public class SearchParty implements Serializable {
+public class SearchCriteriaDefinition implements Serializable {
 
     private String caseTypeId;
-    private String searchPartyDob;
-    private String searchPartyDod;
-    private String searchPartyPostCode;
-    private String searchPartyAddressLine1;
-    private String searchPartyEmailAddress;
+    private String otherCaseReference;
     private Date liveFrom;
     private Date liveTo;
-    private String searchPartyName;
-    private String searchPartyCollectionFieldName;
 }

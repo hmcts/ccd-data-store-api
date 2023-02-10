@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchCriteriaDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchPartyDefinition;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.OtherCaseReference;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchParty;
@@ -54,17 +56,14 @@ public class GlobalSearchProcessorService {
                 clonedData = new HashMap<>(data);
             }
 
-            List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria> searchCriterias =
-                caseTypeDefinition.getSearchCriterias();
+            List<SearchCriteriaDefinition> searchCriteriaDefinitions = caseTypeDefinition.getSearchCriterias();
+            List<SearchPartyDefinition> searchPartyDefinitions = caseTypeDefinition.getSearchParties();
 
-            List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty> searchParties =
-                caseTypeDefinition.getSearchParties();
+            SearchCriteria searchCriteria = populateSearchCriteria(clonedData, searchCriteriaDefinitions);
+            List<SearchParty> searchParties = populateSearchParties(clonedData, searchPartyDefinitions);
 
-            SearchCriteria searchCriteria = populateSearchCriteria(clonedData, searchCriterias);
-            List<SearchParty> searchPartyList = populateSearchParties(clonedData, searchParties);
-
-            if (!searchPartyList.isEmpty()) {
-                searchCriteria.setSearchParties(searchPartyList);
+            if (!searchParties.isEmpty()) {
+                searchCriteria.setSearchParties(searchParties);
             }
 
             // NB: always output data with 'SearchCriteria' field even if empty; as used by logstash process as a
@@ -81,20 +80,19 @@ public class GlobalSearchProcessorService {
     }
 
     private SearchCriteria populateSearchCriteria(Map<String, JsonNode> data,
-                                                  List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria>
-                                                      searchCriterias) {
+                                                  List<SearchCriteriaDefinition> searchCriteriaDefinitions) {
         List<OtherCaseReference> otherCaseReferences = new ArrayList<>();
         SearchCriteria returnValue = new SearchCriteria();
 
         if (data != null) {
-            searchCriterias.forEach(currentSearchCriteria -> data.forEach((key, jsonNode) -> {
-                if (currentSearchCriteria.getOtherCaseReference().contains(".")
-                    && key.equals(currentSearchCriteria.getOtherCaseReference().split("\\.")[0])) {
+            searchCriteriaDefinitions.forEach(searchCriteriaDefinition -> data.forEach((key, jsonNode) -> {
+                if (searchCriteriaDefinition.getOtherCaseReference().contains(".")
+                    && key.equals(searchCriteriaDefinition.getOtherCaseReference().split("\\.")[0])) {
                     otherCaseReferences.add(OtherCaseReference.builder()
                         .id(UUID.randomUUID().toString())
-                        .value(getNestedValueAsString(jsonNode, currentSearchCriteria.getOtherCaseReference()))
+                        .value(getNestedValueAsString(jsonNode, searchCriteriaDefinition.getOtherCaseReference()))
                         .build());
-                } else if (key.equals(currentSearchCriteria.getOtherCaseReference())) {
+                } else if (key.equals(searchCriteriaDefinition.getOtherCaseReference())) {
                     otherCaseReferences.add(OtherCaseReference.builder()
                         .id(UUID.randomUUID().toString())
                         .value(jsonNode.textValue())
@@ -108,17 +106,15 @@ public class GlobalSearchProcessorService {
     }
 
     private List<SearchParty> populateSearchParties(Map<String, JsonNode> data,
-                                                    List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty>
-                                                        searchParties) {
-        List<SearchParty> searchPartyList = new ArrayList<>();
+                                                    List<SearchPartyDefinition> searchPartyDefinitions) {
+        List<SearchParty> searchParties = new ArrayList<>();
 
-        searchParties.forEach(searchParty -> {
-            List<SearchPartyValue> valuesToPopulate = populateSearchPartyValues(searchParty, data);
+        searchPartyDefinitions.forEach(searchPartyDefinition -> {
+            List<SearchPartyValue> valuesToPopulate = populateSearchPartyValues(searchPartyDefinition, data);
 
             valuesToPopulate.forEach(valueToPopulate -> {
                 if (!valueToPopulate.isEmpty()) {
-                    searchPartyList.add(SearchParty
-                        .builder()
+                    searchParties.add(SearchParty.builder()
                         .id(UUID.randomUUID().toString())
                         .value(valueToPopulate)
                         .build());
@@ -126,7 +122,7 @@ public class GlobalSearchProcessorService {
             });
         });
 
-        return searchPartyList;
+        return searchParties;
     }
 
     private static boolean isComplexField(String field, String key) {
@@ -142,9 +138,8 @@ public class GlobalSearchProcessorService {
         return jsonNodeObjectToText(nestedValueAsNode);
     }
 
-    private List<SearchPartyValue> populateSearchPartyValues(
-        uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
-        Map<String, JsonNode> data) {
+    private List<SearchPartyValue> populateSearchPartyValues(SearchPartyDefinition searchPartyDefinition,
+                                                             Map<String, JsonNode> data) {
 
         List<SearchPartyValue> searchPartyValues = new ArrayList<>();
 
@@ -158,9 +153,8 @@ public class GlobalSearchProcessorService {
         return searchPartyValues;
     }
 
-    private List<SearchPartyValue> populateSearchPartyValuesFromCollection(
-        uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
-                                     Map<String, JsonNode> data) {
+    private List<SearchPartyValue> populateSearchPartyValuesFromCollection(SearchPartyDefinition searchPartyDefinition,
+                                                                           Map<String, JsonNode> data) {
 
         List<JsonNode> collectionValueInMap = findCollectionValueInMap(searchPartyDefinition, data);
 
@@ -176,9 +170,8 @@ public class GlobalSearchProcessorService {
         return searchPartyValues;
     }
 
-    private SearchPartyValue populateSearchPartyWithoutCollection(
-        uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
-        Map<String, JsonNode> data) {
+    private SearchPartyValue populateSearchPartyWithoutCollection(SearchPartyDefinition searchPartyDefinition,
+                                                                  Map<String, JsonNode> data) {
 
         Map<String, String> namesToValuesMap = new LinkedHashMap<>();
         SearchPartyValue searchPartyValue = new SearchPartyValue();
@@ -238,7 +231,7 @@ public class GlobalSearchProcessorService {
         return value;
     }
 
-    private List<JsonNode> findCollectionValueInMap(uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchParty,
+    private List<JsonNode> findCollectionValueInMap(SearchPartyDefinition searchParty,
                                                     Map<String, JsonNode> mapToSearch) {
         JsonNode valueInMap = findValueInMap(searchParty.getSearchPartyCollectionFieldName(), mapToSearch);
 
@@ -306,4 +299,5 @@ public class GlobalSearchProcessorService {
     private boolean isNull(JsonNode jsonNode) {
         return jsonNode == null || jsonNode.isNull();
     }
+
 }
