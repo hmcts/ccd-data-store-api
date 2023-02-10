@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CreateCaseEventDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
@@ -141,8 +141,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private void checkCaseCategoryId(CaseTypeDefinition caseTypeDefinition, String categoryId) {
         boolean validCategoryId = categoryId == null || caseTypeDefinition.getCategories()
             .stream()
-            .map(cfd -> cfd.getCategoryId())
-            .filter(value -> StringUtils.isNotBlank(value))
+            .map(CategoryDefinition::getCategoryId)
+            .filter(StringUtils::isNotBlank)
             .anyMatch(value ->  value.equals(categoryId));
         if (!validCategoryId) {
             throw new BadRequestException("002 Invalid categoryId");
