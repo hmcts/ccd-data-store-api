@@ -820,6 +820,7 @@ task smoke() {
                     '--glue', 'uk.gov.hmcts.befta.player',
                     '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+            environment "DEFAULT_COLLECTION_ASSERTION_MODE", "UNORDERED"
         }
     }
 
@@ -860,6 +861,7 @@ task functional() {
                     '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
             ]
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+            environment "DEFAULT_COLLECTION_ASSERTION_MODE", "UNORDERED"
         }
 
     }
