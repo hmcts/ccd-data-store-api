@@ -1,0 +1,95 @@
+{
+  "title": "should create an event token for correct inputs",
+  "_guid_": "S-116.1-UpdateCase",
+  "productName": "CCD Data Store api",
+  "operationName": "Post Event Data",
+  "method": "POST",
+  "uri": "/cases/{cid}/events",
+  "specs": [
+    "to update the case"
+  ],
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": "true"
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "event": {
+        "id": "UPDATE",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][siblingContexts][S-116.1-Prerequisite][testData][actualResponse][body][token]}",
+      "ignore_warning": false
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "AUTOTEST1",
+      "case_type": "AAT_AUTH_15",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "data": {
+        "MoneyGBPField": "4200",
+        "FixedListField": "VALUE3",
+        "AddressUKField": {
+          "County": "Greater London",
+          "Country": "UK",
+          "PostCode": "SW1H 9AJ",
+          "PostTown": "Westminster",
+          "AddressLine1": "102 Petty France",
+          "AddressLine2": "CCD",
+          "AddressLine3": "c/o HMCTS Reform"
+        },
+        "ComplexField": {
+          "ComplexTextField": "Nested text",
+          "ComplexFixedListField": "VALUE2"
+        },
+        "DateTimeField": "1988-07-07T22:20:00",
+        "PhoneUKField": "07123456789",
+        "NumberField": "164528",
+        "MultiSelectListField": [
+          "OPTION2",
+          "OPTION4"
+        ],
+        "YesOrNoField": "Yes",
+        "EmailField": "ccd@hmcts.net",
+        "TextField": "Some Text",
+        "DateField": "2017-02-13",
+        "TextAreaField": "Line1\nLine2",
+        "CollectionField": [
+          {
+            "id": "CollectionField1",
+            "value": "Alias 1"
+          },
+          {
+            "id": "CollectionField2",
+            "value": "Alias 2"
+          }
+        ]
+      },
+      "data_classification": "[[ANYTHING_PRESENT]]",
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}
