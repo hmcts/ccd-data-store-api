@@ -258,8 +258,9 @@ public class RoleAssignmentsHelper {
     public static CaseTypeDefinition enhanceGetCaseTypeStubWithAccessProfiles(
         String caseTypeJsonFile, RoleToAccessProfileDefinition... accessProfiles) {
         CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("mappings/" + caseTypeJsonFile);
-        caseTypeDefinition.setRoleToAccessProfiles(Arrays.asList(accessProfiles.clone()));
-        return caseTypeDefinition;
+        return CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                .roleToAccessProfiles(Arrays.asList(accessProfiles.clone()))
+                    .build();
     }
 
     private static RoleAssignmentAttributesResource createRoleAssignmentRecordAttribute(String caseId,

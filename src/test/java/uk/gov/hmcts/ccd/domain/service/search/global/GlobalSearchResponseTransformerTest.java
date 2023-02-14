@@ -110,8 +110,9 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
         // GIVEN
         stubAccessMetadata();
         final JurisdictionDefinition jurisdictionDefinition = buildJurisdictionDefinition();
-        final CaseTypeDefinition caseTypeDefinition = buildCaseTypeDefinition();
-        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition
+            .caseTypeDefinitionCopy(buildCaseTypeDefinition())
+                .jurisdictionDefinition(jurisdictionDefinition).build();
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withJurisdiction(JURISDICTION_ID)
@@ -138,8 +139,9 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
         // GIVEN
         stubAccessMetadata();
         final JurisdictionDefinition jurisdictionDefinition = buildJurisdictionDefinition();
-        final CaseTypeDefinition caseTypeDefinition = buildCaseTypeDefinition();
-        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition
+            .caseTypeDefinitionCopy(buildCaseTypeDefinition())
+                .jurisdictionDefinition(jurisdictionDefinition).build();
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withJurisdiction(JURISDICTION_ID_DIFFERENT)

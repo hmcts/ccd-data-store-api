@@ -18,13 +18,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 class RoleBasedCaseDataAccessControlTest {
@@ -76,7 +75,7 @@ class RoleBasedCaseDataAccessControlTest {
 
         instance.grantAccess(caseDetails, IDAM_ID);
 
-        verifyZeroInteractions(caseUserRepository);
+        verifyNoInteractions(caseUserRepository);
     }
 
     @Test

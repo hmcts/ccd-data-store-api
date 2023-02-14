@@ -176,9 +176,11 @@ public class DefaultGetCriteriaOperationTest {
     void shouldThrowResourceNotFoundExceptionWhenCaseFieldNotFoundInCaseTypeForWorkbasketInput() {
         doReturn(generateWorkbasketInput()).when(uiDefinitionRepository)
             .getWorkbasketInputDefinitions(caseTypeDefinition.getId());
-        caseTypeDefinition.setCaseFieldDefinitions(Collections.emptyList());
+        caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                .caseFieldDefinitions(Collections.emptyList()).build();
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(caseTypeDefinition.getId());
 
-        final BadRequestException exception = assertThrows(BadRequestException.class,
+        BadRequestException exception = assertThrows(BadRequestException.class,
             () -> defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, WORKBASKET));
 
         assertThat(exception.getMessage(),
@@ -206,9 +208,11 @@ public class DefaultGetCriteriaOperationTest {
     void shouldThrowResourceNotFoundExceptionWhenCaseFieldNotFoundInCaseTypeForSearchInput() {
         doReturn(generateSearchInput()).when(uiDefinitionRepository)
             .getSearchInputFieldDefinitions(caseTypeDefinition.getId());
-        caseTypeDefinition.setCaseFieldDefinitions(Collections.emptyList());
+        caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                .caseFieldDefinitions(Collections.emptyList()).build();
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(caseTypeDefinition.getId());
 
-        final BadRequestException exception = assertThrows(BadRequestException.class,
+        BadRequestException exception = assertThrows(BadRequestException.class,
             () -> defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, SEARCH));
 
         assertThat(exception.getMessage(),

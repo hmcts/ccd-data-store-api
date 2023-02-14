@@ -431,7 +431,8 @@ class CallbackInvokerTest {
         @Test
         @DisplayName("should send callback")
         void shouldSendCallback() {
-            caseTypeDefinition.setCallbackGetCaseUrl(URL_GET_CASE);
+            caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                    .callbackGetCaseUrl(URL_GET_CASE).build();
 
             callbackInvoker.invokeGetCaseCallback(caseTypeDefinition, caseDetails);
 
@@ -446,8 +447,10 @@ class CallbackInvokerTest {
         @Test
         @DisplayName("should disable callback retries")
         void shouldDisableCallbackRetries() {
-            caseTypeDefinition.setCallbackGetCaseUrl(URL_GET_CASE);
-            caseTypeDefinition.setRetriesGetCaseUrl(RETRIES_DISABLED);
+            caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                .callbackGetCaseUrl(URL_GET_CASE)
+                .retriesGetCaseUrl(RETRIES_DISABLED)
+                .build();
 
             callbackInvoker.invokeGetCaseCallback(caseTypeDefinition, caseDetails);
 
@@ -692,7 +695,7 @@ class CallbackInvokerTest {
                         .setClassificationFromCallbackIfValid(any(),
                             any(),
                             any()),
-                    () -> assertEquals(callbackResponse.getState(), "ngitb")
+                    () -> assertEquals("ngitb", callbackResponse.getState())
                 );
             }
 
@@ -724,7 +727,7 @@ class CallbackInvokerTest {
                         .setClassificationFromCallbackIfValid(any(),
                             any(),
                             any()),
-                    () -> assertEquals(callbackResponse.getState(), null)
+                    () -> assertEquals(null, callbackResponse.getState())
                 );
             }
 
@@ -753,7 +756,7 @@ class CallbackInvokerTest {
                         callbackResponse), eq(caseDetails), eq(allFieldsDataClassification)),
                     () -> assertThat(argumentDataClassification.getAllValues(),
                         contains(currentDataClassification, Maps.newHashMap())),
-                    () -> assertEquals(callbackResponse.getState(), "toto"),
+                    () -> assertEquals("toto", callbackResponse.getState()),
                     () -> assertThat(caseDetails.getData().containsKey("state"), is(false))
                 );
             }
@@ -1004,7 +1007,7 @@ class CallbackInvokerTest {
             final String stateResult = callbackResponse.getState();
 
             assertAll(
-                () -> assertEquals(stateResult, null),
+                () -> assertEquals(null, stateResult),
                 () -> assertThat(callbackResponse.getData().get("blah").intValue(), is(678))
             );
         }
@@ -1018,7 +1021,7 @@ class CallbackInvokerTest {
             final String stateResult = callbackResponse.getState();
 
             assertAll(
-                () -> assertEquals(stateResult, null)
+                () -> assertEquals(null, stateResult)
             );
         }
     }

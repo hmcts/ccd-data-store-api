@@ -1,9 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getevents;
 
 import com.google.common.collect.Lists;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,13 +12,17 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.anyListOf;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
@@ -163,14 +164,14 @@ class ClassifiedGetEventsOperationTest {
     void shouldApplySecurityClassificationsForJurisdictionCaseTypeIdAndEventId() {
         doReturn(Optional.of(event)).when(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
         doReturn(classifiedEvents).when(classificationService)
-            .applyClassification(eq(caseDetails), anyListOf(AuditEvent.class));
+            .applyClassification(eq(caseDetails), anyList());
 
         Optional<AuditEvent> optionalAuditEvent = classifiedOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
 
         assertThat(optionalAuditEvent.isPresent(), is(true));
         AuditEvent output = optionalAuditEvent.get();
         assertAll(
-            () -> verify(classificationService).applyClassification(eq(caseDetails), anyListOf(AuditEvent.class)),
+            () -> verify(classificationService).applyClassification(eq(caseDetails), anyList()),
             () -> assertThat(output, sameInstance(event))
         );
     }

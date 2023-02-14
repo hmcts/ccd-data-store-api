@@ -4,18 +4,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 class JexlEnablingConditionParserTest {
 
@@ -114,7 +115,7 @@ class JexlEnablingConditionParserTest {
     @Test
     void shouldThrowExceptionWhenDataIsNotValidJson() throws JsonProcessingException {
         ObjectMapper objectMapper = mock(ObjectMapper.class);
-        when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
+        doThrow(JsonProcessingException.class).when(objectMapper).writeValueAsString(any());
         enablingConditionParser = new JexlEnablingConditionParser(new JexlEnablingConditionConverter(),
             objectMapper);
         String enablingCondition = "FieldA!=\"\" AND FieldB=\"I'm innocent\")";

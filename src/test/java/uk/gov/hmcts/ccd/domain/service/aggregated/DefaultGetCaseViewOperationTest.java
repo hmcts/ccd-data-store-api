@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -56,7 +55,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -146,7 +144,7 @@ class DefaultGetCaseViewOperationTest {
         auditEvents = asList(event1, event2);
         doReturn(auditEvents).when(getEventsOperation).getEvents(caseDetails);
 
-        doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(anyObject());
+        doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(any());
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
@@ -171,7 +169,7 @@ class DefaultGetCaseViewOperationTest {
         caseStateDefinition = new CaseStateDefinition();
         caseStateDefinition.setId(STATE);
         caseStateDefinition.setTitleDisplay(TITLE_DISPLAY);
-        doReturn(caseStateDefinition).when(caseTypeService).findState(caseTypeDefinition, STATE);
+        doReturn(caseStateDefinition).when(caseTypeService).findState(any(), any());
 
         doAnswer(invocation ->
             invocation.getArgument(0)).when(fieldProcessorService).processCaseViewField(any());
@@ -197,12 +195,13 @@ class DefaultGetCaseViewOperationTest {
                         .build())
                     .build();
             doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField()
-                .withId(CASE_HISTORY_VIEWER)
-                .withFieldType(aFieldType()
-                    .withType(CASE_HISTORY_VIEWER)
-                    .build())
-                .build()));
+            caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                .caseFieldDefinitions(singletonList(newCaseField()
+                        .withId(CASE_HISTORY_VIEWER)
+                        .withFieldType(aFieldType()
+                            .withType(CASE_HISTORY_VIEWER)
+                            .build())
+                        .build())).build();
             doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID,
                 JURISDICTION_ID);
 
@@ -240,12 +239,13 @@ class DefaultGetCaseViewOperationTest {
                          .build())
                     .build();
             doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField()
-                                                     .withId(CASE_HISTORY_VIEWER)
-                                                     .withFieldType(aFieldType()
-                                                                        .withType(CASE_HISTORY_VIEWER)
-                                                                        .build())
-                                                     .build()));
+            caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                .caseFieldDefinitions(singletonList(newCaseField()
+                        .withId(CASE_HISTORY_VIEWER)
+                        .withFieldType(aFieldType()
+                            .withType(CASE_HISTORY_VIEWER)
+                            .build())
+                        .build())).build();
             doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID,
                 JURISDICTION_ID);
 
@@ -272,7 +272,10 @@ class DefaultGetCaseViewOperationTest {
         void shouldNotFilterEventWhenEnablingConditionIsValid() {
             CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
             caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\"");
-            caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
+            caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                    .events(List.of(caseEventDefinition)).build();
+            doReturn(caseTypeDefinition).when(caseTypeService)
+                .getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
             doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
             doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class), anyList());
 
@@ -286,7 +289,10 @@ class DefaultGetCaseViewOperationTest {
         void shouldFilterEventWhenEnablingConditionIsNotValid() {
             CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
             caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\" AND dataTestField2=\"Test\"");
-            caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
+            caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                    .events(List.of(caseEventDefinition)).build();
+            doReturn(caseTypeDefinition).when(caseTypeService)
+                .getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
             doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
             doReturn(false).when(caseEventEnablingService).isEventEnabled(any(), any(CaseDetails.class), anyList());
 
@@ -341,7 +347,9 @@ class DefaultGetCaseViewOperationTest {
     @Test
     @DisplayName("should add metadata fields from the get case callback")
     void shouldAddMetadataFieldsFromTheGetCaseCallback() {
-        caseTypeDefinition.setCallbackGetCaseUrl("/callback/getCase");
+        caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+            .callbackGetCaseUrl("/callback/getCase").build();
+        doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
         GetCaseCallbackResponse callbackResponse = new GetCaseCallbackResponse();
         callbackResponse.setMetadataFields(singletonList(caseViewField()));
         doReturn(callbackResponse)

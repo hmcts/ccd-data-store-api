@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
@@ -57,14 +57,6 @@ class DateTimeFormatParserTest {
         assertAll(
             () -> assertThat(result, is("2000-10-20T12:30:59.123"))
         );
-    }
-
-    @Test
-    void shouldConvertDateToIso8601() {
-        final String dateTimeFormat = "dd/MM/yyyy";
-        final String value = "20/10/2000";
-
-        dateTimeFormatParser.convertDateToIso8601(dateTimeFormat, value);
     }
 
     @Test

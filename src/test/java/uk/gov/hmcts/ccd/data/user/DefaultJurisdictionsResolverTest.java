@@ -13,7 +13,7 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 class DefaultJurisdictionsResolverTest {
 
@@ -44,7 +44,7 @@ class DefaultJurisdictionsResolverTest {
         assertEquals(jurisdictions, jurisdictionsResolver.getJurisdictions());
 
         verify(idamJurisdictionsResolver).getJurisdictions();
-        verifyZeroInteractions(attributeBasedJurisdictionsResolver);
+        verifyNoInteractions(attributeBasedJurisdictionsResolver);
     }
 
     @Test

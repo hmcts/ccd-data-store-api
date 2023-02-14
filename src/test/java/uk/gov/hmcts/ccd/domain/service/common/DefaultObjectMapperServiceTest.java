@@ -1,16 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -21,8 +10,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 class DefaultObjectMapperServiceTest {
 
@@ -133,7 +133,7 @@ class DefaultObjectMapperServiceTest {
             ObjectMapper objectMapper = mock(ObjectMapper.class);
             DefaultObjectMapperService service = new DefaultObjectMapperService(objectMapper);
             doThrow(new IllegalArgumentException("")).when(objectMapper).convertValue(any(),
-                    Matchers.<TypeReference<HashMap<String, JsonNode>>>any());
+                    ArgumentMatchers.<TypeReference<HashMap<String, JsonNode>>>any());
 
             assertThrows(ServiceException.class, () -> service.convertJsonNodeToMap(node));
         }

@@ -85,7 +85,8 @@ repositories {
 ext {
     junitJupiterVersion = '5.8.2'
     junitVintageVersion = '5.8.2'
-    powermockVersion = '2.0.7'
+    powermockVersion = '2.0.9'
+    mockitoVersion = '3.6.0'
     reformLogging = '5.1.9'
     appInsightsVersion = '2.4.1'
     swagger2Version = '3.0.0'
@@ -245,8 +246,9 @@ dependencies {
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
     testRuntime "org.junit.platform:junit-platform-commons:1.8.1"
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
-    testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'3.6.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: mockitoVersion
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: mockitoVersion
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
     testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
