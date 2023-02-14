@@ -16,7 +16,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchParty;
 import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +87,8 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkGlobalSearchFunctionalityDisabledWithoutAppropriateCaseField() {
-        caseTypeDefinition.setCaseFieldDefinitions(new ArrayList<>());
+        caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+            .caseFieldDefinitions(List.of()).build();
         Map<String, JsonNode> globalSearchData =
             globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
         assertNull(globalSearchData.get(SEARCH_CRITERIA));

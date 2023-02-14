@@ -21,13 +21,13 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.core.IsIterableContaining.hasItems;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -75,7 +75,9 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
     private static final String CASE_FIELD_ID_3_1 = "CASE_FIELD_3_1";
     private static final String CASE_FIELD_ID_3_2 = "CASE_FIELD_3_2";
     private static final String CASE_FIELD_ID_3_3 = "CASE_FIELD_3_3";
-    private static final String CASE_TYPE_ID = "CASE_TYPE_ID";
+    private static final String CASE_TYPE_ID1 = "CASE_TYPE_ID1";
+    private static final String CASE_TYPE_ID2 = "CASE_TYPE_ID2";
+    private static final String CASE_TYPE_ID3 = "CASE_TYPE_ID3";
     private static final CaseStateDefinition CASE_STATE_1_1 = newState().withId(STATE_ID_1_1).build();
     private static final CaseStateDefinition CASE_STATE_1_2 = newState().withId(STATE_ID_1_2).build();
     private static final CaseStateDefinition CASE_STATE_2_1 = newState().withId(STATE_ID_2_1).build();
@@ -197,7 +199,7 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
         MockitoAnnotations.initMocks(this);
 
         testCaseType1 = CaseTypeDefinition.builder()
-            .id(CASE_TYPE_ID)
+            .id(CASE_TYPE_ID1)
             .accessControlLists(List.of(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
@@ -215,10 +217,10 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
             .build();
 
         testCaseType2 = CaseTypeDefinition.builder()
-            .id(CASE_TYPE_ID)
+            .id(CASE_TYPE_ID2)
             .accessControlLists(List.of(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
-                .withRead(true)
+                .withCreate(true)
                 .build()))
             .states(List.of(CASE_STATE_2_1, CASE_STATE_2_2))
             .events(List.of(
@@ -254,7 +256,7 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
             .build();
 
         testCaseType3 = CaseTypeDefinition.builder()
-            .id(CASE_TYPE_ID)
+            .id(CASE_TYPE_ID3)
             .states(List.of(CASE_STATE_3_1, CASE_STATE_3_2))
             .accessControlLists(List.of(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
@@ -316,7 +318,9 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
 
             List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
 
-            assertThat(caseTypes, hasItems(testCaseType2, testCaseType3));
+            assertThat(caseTypes.size(), is(2));
+            assertThat(caseTypes.stream().map(CaseTypeDefinition::getId).collect(Collectors.toList()),
+                hasItems(CASE_TYPE_ID2, CASE_TYPE_ID3));
         }
 
         @Test
@@ -326,7 +330,9 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
 
             List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
 
-            assertThat(caseTypes, hasItems(testCaseType1, testCaseType3));
+            assertThat(caseTypes.size(), is(2));
+            assertThat(caseTypes.stream().map(CaseTypeDefinition::getId).collect(Collectors.toList()),
+                hasItems(CASE_TYPE_ID1, CASE_TYPE_ID3));
         }
 
         @Test
@@ -336,7 +342,9 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
 
             List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
 
-            assertThat(caseTypes, hasItems(testCaseType3));
+            assertThat(caseTypes.size(), is(1));
+            assertThat(caseTypes.stream().map(CaseTypeDefinition::getId).collect(Collectors.toList()),
+                hasItems(CASE_TYPE_ID3));
         }
     }
 
@@ -358,7 +366,8 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
 
             assertAll(
                 () -> assertThat(caseTypes.size(), is(2)),
-                () -> assertThat(caseTypes, hasItems(testCaseType1, testCaseType3)),
+                () -> assertThat(caseTypes.stream().map(CaseTypeDefinition::getId).collect(Collectors.toList()),
+                    hasItems(CASE_TYPE_ID1, CASE_TYPE_ID3)),
                 () -> assertThat(caseTypes.get(0).getStates(), hasItems(CASE_STATE_1_1)),
                 () -> assertThat(caseTypes.get(0).getStates(), not(hasItems(CASE_STATE_1_2))),
                 () -> assertThat(caseTypes.get(1).getStates(), hasItems(CASE_STATE_3_1)),

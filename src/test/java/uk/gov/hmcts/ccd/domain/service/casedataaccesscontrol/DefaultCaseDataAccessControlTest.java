@@ -1362,7 +1362,8 @@ class DefaultCaseDataAccessControlTest {
         void generateAccessMetadata_verifyAccessProfileServiceCall_roleToAccessProfilesMappings_none() {
 
             // GIVEN
-            caseTypeDefinition.setRoleToAccessProfiles(List.of());
+            caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                .roleToAccessProfiles(List.of()).build();
 
             List<RoleToAccessProfileDefinition> pseudoGeneratedR2AP =
                 createRoleToAccessProfileDefinitions("PseudoRole1", "PseudoRole2");
@@ -1394,7 +1395,9 @@ class DefaultCaseDataAccessControlTest {
             // GIVEN
             List<RoleToAccessProfileDefinition> caseTypeR2AP
                 = createRoleToAccessProfileDefinitions(ROLE_NAME_1, ROLE_NAME_2);
-            caseTypeDefinition.setRoleToAccessProfiles(caseTypeR2AP);
+
+            caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                .roleToAccessProfiles(caseTypeR2AP).build();
 
             Map<String, String> roleAndGrantType = Maps.newHashMap();
             roleAndGrantType.put(ROLE_NAME_1, STANDARD.name());

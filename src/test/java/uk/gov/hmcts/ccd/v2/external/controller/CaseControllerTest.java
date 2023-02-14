@@ -58,7 +58,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -285,7 +284,7 @@ class CaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
             Map<String, Object> data = createResponseData();
             SupplementaryData supplementaryData = new SupplementaryData(data);
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any()))
                 .thenReturn(supplementaryData);
 
             final ResponseEntity<SupplementaryDataResource> response =

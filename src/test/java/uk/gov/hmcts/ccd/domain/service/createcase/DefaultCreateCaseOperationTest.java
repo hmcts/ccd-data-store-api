@@ -52,7 +52,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -65,7 +64,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -167,7 +166,7 @@ class DefaultCreateCaseOperationTest {
         CASE_TYPE = buildCaseType();
 
         SupplementaryData supplementaryData = new SupplementaryData();
-        when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+        when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any()))
             .thenReturn(supplementaryData);
     }
 
@@ -422,7 +421,7 @@ class DefaultCreateCaseOperationTest {
                                                                  caseDetailsArgumentCaptor.capture(),
                                                                  same(IGNORE_WARNING)),
             () -> order.verify(draftGateway).delete(DRAFT_ID),
-            () -> verifyZeroInteractions(callbackInvoker),
+            () -> verifyNoInteractions(callbackInvoker),
             () -> assertCaseDetails(caseDetailsArgumentCaptor.getValue()),
             () -> assertThat(caseDetails, is(savedCaseType))
         );

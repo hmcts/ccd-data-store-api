@@ -85,6 +85,6 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
             .filterCaseEventsByAccess(caseTypeDefinition, caseAndUserRoles, access);
 
         return Optional.of(CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition,
-            caseEventDefinitions, caseStateDefinitions, caseTypeDefinition.getCaseFieldDefinitions()));
+            caseEventDefinitions, caseStateDefinitions, caseTypeDefinition.getCaseFieldDefinitions()).build());
     }
 }

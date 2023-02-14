@@ -586,6 +586,7 @@ class CompoundAccessControlServiceTest {
             assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1),
                 dataNode, people, ACCESS_PROFILES), is(true));
         }
+
         @Test
         @DisplayName("Should grant access when child field updated and U exists- name change")
         void shouldGrantAccessWhenChildFieldUpdatedAndACLExists() throws IOException {
@@ -1201,6 +1202,7 @@ class CompoundAccessControlServiceTest {
         }
 
     }
+
     @Nested
     @DisplayName("Compound Field - Delete Tests")
     class CompoundFieldDeleteTests {
@@ -1223,6 +1225,7 @@ class CompoundAccessControlServiceTest {
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(person1), dataNode, people, ACCESS_PROFILES), is(true));
         }
+
         @Test
         @DisplayName("Should deny access when a root node is deleted and No D")
         void shouldDenyAccessWhenRootDeletedAndNoACL() throws IOException {
@@ -1380,6 +1383,7 @@ class CompoundAccessControlServiceTest {
         }
 
     }
+
     @Nested
     @DisplayName("Compound Field - nested complex fields")
     class CompoundFieldComplexUnderCollectionFieldTests {

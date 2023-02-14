@@ -38,7 +38,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -58,7 +57,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 
-public class SearchQueryOperationTest {
+class SearchQueryOperationTest {
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String EVENT_ID = "An event";
     private static final String JURISDICTION_ID = "Probate";
@@ -150,7 +149,7 @@ public class SearchQueryOperationTest {
 
     @Test
     @DisplayName("should search using search operation")
-    public void shouldSearchUsingSearchOperation() {
+    void shouldSearchUsingSearchOperation() {
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
         assertAll(
@@ -163,7 +162,7 @@ public class SearchQueryOperationTest {
 
     @Test
     @DisplayName("should include drafts if drafts enabled and if drafts are present")
-    public void shouldIncludeDrafts() {
+    void shouldIncludeDrafts() {
         doReturn(drafts).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
 
@@ -173,7 +172,7 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+            () -> verify(mergeDataToSearchResultOperation).execute(any(), any(), argument.capture(),
                 eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(2)),
             () -> assertThat(argument.getValue(), hasDraftItemInResults())
@@ -182,7 +181,7 @@ public class SearchQueryOperationTest {
 
     @Test
     @DisplayName("should not call draft-store if drafts are not enabled")
-    public void shouldNotCallDraftStore() {
+    void shouldNotCallDraftStore() {
         testCaseTypeDefinition.getEvents().get(0).setCanSaveDraft(false);
         doReturn(drafts).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
@@ -193,7 +192,7 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verifyNoMoreInteractions(getDraftsOperation),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+            () -> verify(mergeDataToSearchResultOperation).execute(any(), any(), argument.capture(),
                 eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(1)),
             () -> assertThat(argument.getValue(), not(hasDraftItemInResults()))
@@ -202,7 +201,7 @@ public class SearchQueryOperationTest {
 
     @Test
     @DisplayName("should not call draft-store for actual Search")
-    public void shouldNotCallDraftStoreForSearch() {
+    void shouldNotCallDraftStoreForSearch() {
         doReturn(drafts).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
 
@@ -212,7 +211,7 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verifyNoMoreInteractions(getDraftsOperation),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+            () -> verify(mergeDataToSearchResultOperation).execute(any(), any(), argument.capture(),
                 eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(1)),
             () -> assertThat(argument.getValue(), not(hasDraftItemInResults()))
@@ -221,7 +220,7 @@ public class SearchQueryOperationTest {
 
     @Test
     @DisplayName("should return cases and resultError but not drafts when draft store unresponsive")
-    public void shouldReturnCasesAndResultErrorButNoDraftsWhenDraftStoreUnresponsive() {
+    void shouldReturnCasesAndResultErrorButNoDraftsWhenDraftStoreUnresponsive() {
         DraftAccessException draftAccessException = new DraftAccessException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         doThrow(draftAccessException).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
@@ -231,14 +230,14 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), eq(cases),
+            () -> verify(mergeDataToSearchResultOperation).execute(any(), any(), eq(cases),
                 eq(DRAFT_STORE_DOWN_ERR_MESSAGE))
         );
     }
 
     @Test
     @DisplayName("should return empty when caseType is not found")
-    public void shouldReturnEmptyNoCaseTypeFound() {
+    void shouldReturnEmptyNoCaseTypeFound() {
         doReturn(Optional.empty()).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
@@ -246,13 +245,13 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation, never()).execute(metadata, criteria),
             () -> verify(getDraftsOperation, never()).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation, never()).execute(anyObject(), any(), anyList(), anyString())
+            () -> verify(mergeDataToSearchResultOperation, never()).execute(any(), any(), anyList(), anyString())
         );
     }
 
     @Test
     @DisplayName("should get workBasketResult and pass to mergeDataToSearchResultOperation")
-    public void shouldGetWorkBasketResultAndMerge() {
+    void shouldGetWorkBasketResultAndMerge() {
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
@@ -269,7 +268,7 @@ public class SearchQueryOperationTest {
 
     @Test
     @DisplayName("should get searchResult and pass to mergeDataToSearchResultOperation")
-    public void shouldGetSearchResultsAndMerge() {
+    void shouldGetSearchResultsAndMerge() {
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
@@ -285,7 +284,7 @@ public class SearchQueryOperationTest {
 
     @Test
     @DisplayName("should build sortOrderFields from sort search results fields only")
-    public void shouldBuildSortOrderFieldsFromSortResultsFieldsOnly() {
+    void shouldBuildSortOrderFieldsFromSortResultsFieldsOnly() {
         SearchResultField nonSortField = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", "");
         SearchResultField sortField = buildSortResultField(CASE_FIELD_2, "", null, ASC, 1);
         SearchResultDefinition searchResult = searchResult()
@@ -305,7 +304,7 @@ public class SearchQueryOperationTest {
 
     @Test
     @DisplayName("should build sortOrderFields based on priority order")
-    public void shouldBuildSortOrderFieldsInTheOrderOfPriority() {
+    void shouldBuildSortOrderFieldsInTheOrderOfPriority() {
         SearchResultField sortField1 = buildSortResultField(CASE_FIELD_ID_1_1, "", null, ASC, 2);
         SearchResultField sortField2 = buildSortResultField(CASE_FIELD_ID_1_2, "", null, DESC, 1);
         SearchResultDefinition searchResult = searchResult()
@@ -326,7 +325,7 @@ public class SearchQueryOperationTest {
 
     @Test
     @DisplayName("should build sortOrderFields based on user role")
-    public void shouldFilterSortOrderFieldsBasedOnUserRole() {
+    void shouldFilterSortOrderFieldsBasedOnUserRole() {
         SearchResultField sortField1 = buildSortResultField(CASE_FIELD_ID_1_1, "", USER_ROLE_1, ASC, 2);
         SearchResultField sortField2 = buildSortResultField(CASE_FIELD_ID_1_2, CASE_FIELD_PATH, USER_ROLE_2, DESC, 1);
         SearchResultDefinition searchResult = searchResult()

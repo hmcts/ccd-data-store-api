@@ -65,18 +65,17 @@ public class AuthorisedGetCaseTypeOperation implements GetCaseTypeOperation {
             return Optional.empty();
         }
 
-        List<CaseEventDefinition> caseEventDefinitions = accessControlService.filterCaseEventsByAccess(caseTypeDefinition,
-            accessProfiles, access);
-        List<CaseStateDefinition> caseStateDefinitions = accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
-            accessProfiles,
-            access);
+        List<CaseEventDefinition> caseEventDefinitions = accessControlService
+            .filterCaseEventsByAccess(caseTypeDefinition, accessProfiles, access);
+        List<CaseStateDefinition> caseStateDefinitions = accessControlService
+            .filterCaseStatesByAccess(caseTypeDefinition, accessProfiles, access);
         List<CaseFieldDefinition> caseFieldDefinitions = accessControlService.filterCaseFieldsByAccess(
             caseTypeDefinition.getCaseFieldDefinitions(),
             accessProfiles,
             access);
 
         return Optional.of(CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition,
-            caseEventDefinitions, caseStateDefinitions, caseFieldDefinitions));
+            caseEventDefinitions, caseStateDefinitions, caseFieldDefinitions).build());
     }
 
 }

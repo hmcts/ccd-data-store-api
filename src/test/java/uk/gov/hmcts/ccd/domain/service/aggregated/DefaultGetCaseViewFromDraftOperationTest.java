@@ -36,7 +36,6 @@ import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -93,10 +92,9 @@ class DefaultGetCaseViewFromDraftOperationTest {
     @Mock
     private FieldProcessorService fieldProcessorService;
 
-    private uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation getDraftViewOperation;
+    private GetCaseViewOperation getDraftViewOperation;
 
     private CaseTypeDefinition caseTypeDefinition;
-    private CaseTypeTabsDefinition caseTypeTabsDefinition;
     private DraftResponse draftResponse;
     private CaseDetails caseDetails;
     private Map<String, JsonNode> data;
@@ -139,10 +137,6 @@ class DefaultGetCaseViewFromDraftOperationTest {
             .build();
         doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
 
-        caseTypeTabsDefinition = newCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2")
-                                                  .build();
-        doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-
         JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setName(JURISDICTION_ID);
 
@@ -152,11 +146,11 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseType(CASE_TYPE_ID);
 
-        doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(anyObject());
+        doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(any());
 
         doAnswer(invocation -> invocation.getArgument(0)).when(fieldProcessorService).processCaseViewField(any());
 
-        getDraftViewOperation = new uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation(
+        getDraftViewOperation = new DefaultGetCaseViewFromDraftOperation(
                 getCaseOperation,
                 uiDefinitionRepository,
                 caseTypeService,
@@ -170,6 +164,11 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     @Test
     void shouldReturnDraftView() {
+        CaseTypeTabsDefinition caseTypeTabsDefinition = newCaseTabCollection()
+            .withFieldIds("dataTestField1", "dataTestField2")
+            .build();
+        doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
+
         CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 
         assertAll(() -> verify(draftGateway).get(DRAFT_ID),
@@ -212,10 +211,11 @@ class DefaultGetCaseViewFromDraftOperationTest {
     @Nested
     @DisplayName("field of CaseHistoryViewer field type")
     class CaseHistoryViewerFieldType {
+
         @Test
         @DisplayName("should hydrate case history viewer if CaseHistoryViewer field type present in tabs")
         void shouldHydrateCaseHistoryViewerIfFieldPresentInTabs() {
-            caseTypeTabsDefinition = newCaseTabCollection().withTab(newCaseTab()
+            CaseTypeTabsDefinition caseTypeTabsDefinition = newCaseTabCollection().withTab(newCaseTab()
                 .withTabField(newCaseTabField()
                     .withCaseField(newCaseField()
                         .withId(CASE_HISTORY_VIEWER)
@@ -230,14 +230,14 @@ class DefaultGetCaseViewFromDraftOperationTest {
                 .build())
                 .build();
             doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField()
-                .withId(CASE_HISTORY_VIEWER)
-                .withFieldType(aFieldType()
-                    .withType(CASE_HISTORY_VIEWER)
-                    .build())
-                .build()));
-            doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID,
-                    JURISDICTION_ID);
+            caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                    .caseFieldDefinitions(singletonList(newCaseField()
+                        .withId(CASE_HISTORY_VIEWER)
+                        .withFieldType(aFieldType()
+                            .withType(CASE_HISTORY_VIEWER)
+                            .build())
+                        .build())).build();
+            doReturn(caseTypeDefinition).when(caseTypeService).getCaseType(CASE_TYPE_ID);
 
             final CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 
@@ -263,7 +263,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
         @Test
         @DisplayName("should not hydrate case history viewer if CaseHistoryViewer field type is not present in tabs")
         void shouldNotHydrateCaseHistoryViewerIfFieldIsNotPresentInTabs() {
-            caseTypeTabsDefinition = newCaseTabCollection().withTab(newCaseTab()
+            CaseTypeTabsDefinition caseTypeTabsDefinition = newCaseTabCollection().withTab(newCaseTab()
                 .withTabField(newCaseTabField()
                     .withCaseField(newCaseField()
                         .withId("NotACaseHistoryViewer")
@@ -278,14 +278,14 @@ class DefaultGetCaseViewFromDraftOperationTest {
                 .build())
                 .build();
             doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField()
-                .withId(CASE_HISTORY_VIEWER)
-                .withFieldType(aFieldType()
-                    .withType(CASE_HISTORY_VIEWER)
-                    .build())
-                .build()));
-            doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID,
-                    JURISDICTION_ID);
+            caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
+                    .caseFieldDefinitions(singletonList(newCaseField()
+                        .withId(CASE_HISTORY_VIEWER)
+                        .withFieldType(aFieldType()
+                            .withType(CASE_HISTORY_VIEWER)
+                            .build())
+                        .build())).build();
+            doReturn(caseTypeDefinition).when(caseTypeService).getCaseType(CASE_TYPE_ID);
 
             final CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 

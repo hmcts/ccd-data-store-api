@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.Value;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
+@Data
 @ToString
 @Builder
 @AllArgsConstructor
@@ -49,7 +51,8 @@ public class CaseTypeDefinition implements Serializable {
     @JsonProperty("printable_document_url")
     String printableDocumentsUrl;
     @JsonProperty("acls")
-    List<AccessControlList> accessControlLists;
+    @Builder.Default
+    List<AccessControlList> accessControlLists = new ArrayList<>();
     @JsonProperty("callback_get_case_url")
     String callbackGetCaseUrl;
     @JsonProperty("retries_get_case_url")
@@ -218,29 +221,33 @@ public class CaseTypeDefinition implements Serializable {
         return categories;
     }
 
-    public static CaseTypeDefinition caseTypeDefinitionCopy(CaseTypeDefinition caseType,
-                                                            List<CaseEventDefinition> events,
-                                                            List<CaseStateDefinition> states,
-                                                            List<CaseFieldDefinition> caseFieldDefinitions) {
+    public static CaseTypeDefinitionBuilder caseTypeDefinitionCopy(CaseTypeDefinition caseType,
+                                                                   List<CaseEventDefinition> events,
+                                                                   List<CaseStateDefinition> states,
+                                                                   List<CaseFieldDefinition> caseFieldDefinitions) {
         return CaseTypeDefinition.builder()
-            .events(events)
-            .states(states)
-            .caseFieldDefinitions(caseFieldDefinitions)
             .id(caseType.getId())
             .description(caseType.getDescription())
             .version(caseType.getVersion())
             .name(caseType.getName())
             .jurisdictionDefinition(caseType.getJurisdictionDefinition())
             .securityClassification(caseType.getSecurityClassification())
+            .events(new ArrayList<>(events)) // TODO: make a deep copy
+            .states(new ArrayList<>(states)) // TODO: make a deep copy
+            .caseFieldDefinitions(new ArrayList<>(caseFieldDefinitions)) // TODO: make a deep copy
             .printableDocumentsUrl(caseType.getPrintableDocumentsUrl())
-            .accessControlLists(caseType.getAccessControlLists())
+            .accessControlLists(new ArrayList<>(caseType.getAccessControlLists())) // TODO: make a deep copy
             .callbackGetCaseUrl(caseType.getCallbackGetCaseUrl())
-            .retriesGetCaseUrl(caseType.getRetriesGetCaseUrl())
-            .searchAliasFields(caseType.getSearchAliasFields())
-            .searchParties(caseType.getSearchParties())
-            .searchCriterias(caseType.getSearchCriterias())
-            .categories(caseType.getCategories())
-            .roleToAccessProfiles(caseType.getRoleToAccessProfiles())
-            .build();
+            .retriesGetCaseUrl(new ArrayList<>(caseType.getRetriesGetCaseUrl())) // TODO: make a deep copy
+            .searchAliasFields(new ArrayList<>(caseType.getSearchAliasFields())) // TODO: make a deep copy
+            .searchParties(new ArrayList<>(caseType.getSearchParties())) // TODO: make a deep copy
+            .searchCriterias(new ArrayList<>(caseType.getSearchCriterias())) // TODO: make a deep copy
+            .categories(new ArrayList<>(caseType.getCategories())) // TODO: make a deep copy
+            .roleToAccessProfiles(new ArrayList<>(caseType.getRoleToAccessProfiles())); // TODO: make a deep copy
+    }
+
+    public static CaseTypeDefinitionBuilder caseTypeDefinitionCopy(CaseTypeDefinition caseType) {
+        return caseTypeDefinitionCopy(caseType, caseType.getEvents(), caseType.getStates(),
+            caseType.getCaseFieldDefinitions());
     }
 }
