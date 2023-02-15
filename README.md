@@ -127,7 +127,7 @@ enable the following [optional services](https://github.com/hmcts/ccd-docker/tre
 
 To enable the above in [CCD-Docker](https://github.com/hmcts/ccd-docker) execute the following in the corresponding console:
 ```bash
-./ccd enable case-document-am dm-store`
+./ccd enable case-document-am dm-store
 ```
 
 ##### Requirements for DM-Store tests
@@ -166,7 +166,7 @@ To enable the above in [CCD-Docker](https://github.com/hmcts/ccd-docker) execute
 export ELASTIC_SEARCH_ENABLED=true
 export ES_ENABLED_DOCKER=true
 
-./ccd enable elasticsearch logstash`
+./ccd enable elasticsearch logstash
 ```
 
 ###### ES tests in [Jenkins *PREVIEW* pipeline config](./Jenkinsfile_CNP)

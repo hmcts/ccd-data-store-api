@@ -61,6 +61,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             throw new AssumptionViolatedException("CDAM tests not enabled");
         }
     }
+
     @Before("@dm-store")
     public void skipDocumentUploadTestsIfNotEnabled() {
         if (!ofNullable(System.getenv("DATA_STORE_DM_STORE_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
