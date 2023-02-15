@@ -1,4 +1,4 @@
-@F-1001
+@F-1001 @cdam
 Feature: F-1001: Get Document AM Data for a given Case ID and Document ID
 
   Background: Load test data for the scenario

@@ -94,7 +94,7 @@ Scenario: must return negative response when request contains a non-existing Ev
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-577
+@S-577 @cdam
 Scenario: must update successfully all and only the respective fields with update access for a Case Worker and a Solicitor
 
     Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type],

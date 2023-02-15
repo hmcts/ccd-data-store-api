@@ -105,6 +105,77 @@ doing a lot more detailed verifications.
 
 To find out more about BEFTA Framework, see the repository and its README [here](https://github.com/hmcts/befta-fw).
 
+
+#### Environment variables for optional functional tests
+
+The following environment variables are used to control the optional functional tests:
+
+| Name                               | Description                              | Default in [CCD-Docker](https://github.com/hmcts/ccd-docker) | Default in [Jenkins config](./Jenkinsfile_CNP)                                      |
+|------------------------------------|------------------------------------------|--------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| `DATA_STORE_CDAM_FTA_ENABLED`      | Tests that require **CDAM** service.     | :x: `false`                                                  | :white_check_mark: `true`                                                           |
+| `DATA_STORE_DM_STORE_FTA_ENABLED`  | Tests that require **DM-Store** service. | :x: `false`                                                  | :white_check_mark: `true`                                                           |
+| `DATA_STORE_DRAFTS_FTA_ENABLED`    | Tests that require **Drafts** service.   | :x: `false` (NB: cannot be enabled locally)                  | :white_check_mark: `true`                                                           |
+| `ELASTIC_SEARCH_FTA_ENABLED`       | Tests that require **Elastic Search**.   | :x: `false`                                                  | :x: `false` on *PREVIEW* (NB: enabled on `develop` PR and *non-PREVIEW* pipelines). |
+
+
+##### Requirements for CDAM tests
+
+Before enabling CDAM functional tests to run locally against [CCD-Docker](https://github.com/hmcts/ccd-docker) you need to
+enable the following [optional services](https://github.com/hmcts/ccd-docker/tree/master#enabling-additional-projects):
+* case-document-am
+* dm-store
+
+To enable the above in [CCD-Docker](https://github.com/hmcts/ccd-docker) execute the following in the corresponding console:
+```bash
+./ccd enable case-document-am dm-store`
+```
+
+##### Requirements for DM-Store tests
+
+The DM-Store tests are a subset of the CDAM tests: so the initial requirements match the [requirements for CDAM tests](#requirements-for-cdam-tests).
+
+However, these few tests also require that the *Data-Store* instance being tested can resolve and connect to the *DM-Store*
+instance.  This comes for free when all elements are running inside [CCD-Docker](https://github.com/hmcts/ccd-docker) but
+require extra changes if running *Data-Store* at the console or within an IDE.   
+
+The *DM-Store* address that must be resolvable/available is set via the following environment variable `DM_STORE_BASE_URL`.
+This would usually be set to one of:
+* `http://dm-store:8080`
+* `http://host.docker.internal:8080`
+
+So if running *Data-Store* at the console or within an IDE; add the hostname from the above to your local hosts file (e.g.
+for a mac `/private/etc/hosts`), and configure it so that it will resolve to the localhost IP: `127.0.0.1`.
+
+
+##### Requirements for Drafts tests
+
+The Draft tests cannot be run against [CCD-Docker](https://github.com/hmcts/ccd-docker) as the *Drafts* service is not available. 
+
+
+##### Requirements for Elastic Search tests
+
+###### ES tests in [CCD-Docker](https://github.com/hmcts/ccd-docker)
+
+Before enabling Elastic Search functional tests to run locally against [CCD-Docker](https://github.com/hmcts/ccd-docker) you 
+need to enable the following [optional services](https://github.com/hmcts/ccd-docker/tree/master#enabling-additional-projects):
+* elasticsearch
+* logstash
+
+To enable the above in [CCD-Docker](https://github.com/hmcts/ccd-docker) execute the following in the corresponding console:
+```bash
+export ELASTIC_SEARCH_ENABLED=true
+export ES_ENABLED_DOCKER=true
+
+./ccd enable elasticsearch logstash`
+```
+
+###### ES tests in [Jenkins *PREVIEW* pipeline config](./Jenkinsfile_CNP)
+
+This requires an isolated pair of PRs for **[CCD Definition Store](https://github.com/hmcts/ccd-definition-store-api)**
+and **[CCD Data Store](https://github.com/hmcts/ccd-data-store-api)** before this can be enabled, see
+[configuring pipeline isolation](https://github.com/hmcts/ccd-test-definitions/#configuring-pipeline-isolation).
+
+
 ## LICENSE
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.

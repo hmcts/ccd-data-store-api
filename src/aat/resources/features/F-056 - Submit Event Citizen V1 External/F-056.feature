@@ -72,7 +72,7 @@ Scenario: must return 201 when start event creation process for appropriate inpu
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-584
+@S-584 @cdam
 Scenario: must update successfully the respective fields with ACL permissions for a Citizen
 
     Given a user with [an active citizen profile in CCD with update permissions for certain fields but not for others in a given case type],

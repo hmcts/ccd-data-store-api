@@ -55,10 +55,30 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         new GenerateUuidHandler()
     );
 
+    @Before("@cdam")
+    public void skipDocumentCdamTestsIfNotEnabled() {
+        if (!ofNullable(System.getenv("DATA_STORE_CDAM_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+            throw new AssumptionViolatedException("CDAM tests not enabled");
+        }
+    }
+    @Before("@dm-store")
+    public void skipDocumentUploadTestsIfNotEnabled() {
+        if (!ofNullable(System.getenv("DATA_STORE_DM_STORE_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+            throw new AssumptionViolatedException("DM Store tests not enabled");
+        }
+    }
+
+    @Before("@drafts")
+    public void skipDraftsTestsIfNotEnabled() {
+        if (!ofNullable(System.getenv("DATA_STORE_DRAFTS_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+            throw new AssumptionViolatedException("Drafts tests not enabled");
+        }
+    }
+
     @Before("@elasticsearch")
     public void skipElasticSearchTestsIfNotEnabled() {
         if (!ofNullable(System.getenv("ELASTIC_SEARCH_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
-            throw new AssumptionViolatedException("Elastic Search Enabled");
+            throw new AssumptionViolatedException("Elastic Search tests not enabled");
         }
     }
 

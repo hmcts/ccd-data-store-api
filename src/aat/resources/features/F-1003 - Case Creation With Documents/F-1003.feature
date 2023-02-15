@@ -1,4 +1,4 @@
-@F-1003
+@F-1003 @cdam
 Feature: F-1003: Submit Case Creation
 
   Background: Load test data for the scenario
@@ -130,7 +130,7 @@ Feature: F-1003: Submit Case Creation
     And   the response [contains a document attached to the case],
     And   the response has all other details as expected.
 
-  @S-1042
+  @S-1042 @dm-store
   Scenario: must successfully create a case with new document uploaded where binary_url is not specified
     Given a user with [an active caseworker profile in CCD with full permissions on a document field],
     And   a successful call [to upload a document with mandatory metadata] as in [Default_Document_Upload_Data],
@@ -143,7 +143,7 @@ Feature: F-1003: Submit Case Creation
     And   the response has all other details as expected,
     And   a call [to retrieve case details by case id] will get the expected response as in [Default_Get_Case_Data_Base_02]
 
-  @S-1043
+  @S-1043 @dm-store
   Scenario: must successfully create a case with new document uploaded where filename is not specified
     Given a user with [an active caseworker profile in CCD with full permissions on a document field],
     And   a successful call [to upload a document with mandatory metadata] as in [Default_Document_Upload_Data],

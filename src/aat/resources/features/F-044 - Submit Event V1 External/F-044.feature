@@ -130,7 +130,7 @@ Scenario: must return 404 when request contains a non-existing case type
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-579 # DM store related scenario
+@S-579 @cdam # DM store related scenario
 Scenario: must update successfully all and only the respective fields with update access for a Solicitor only
 
     Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type],
