@@ -3,14 +3,9 @@ package uk.gov.hmcts.ccd.integrations;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
@@ -36,11 +31,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureWireMock(port = 0)
-@TestPropertySource(locations = "classpath:test.properties")
-public class DefinitionsCachingIT {
+public class DefinitionsCachingIT extends CachingBaseTest {
 
     private static final String ID_1 = "case1";
     private static final String ID_2 = "case11";

@@ -4,13 +4,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository;
 
@@ -22,11 +17,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static java.util.Collections.singletonList;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureWireMock(port = 0)
-@TestPropertySource(locations = "classpath:test.properties")
-public class CaseRoleDefinitionCachingIT {
+public class CaseRoleDefinitionCachingIT extends CachingBaseTest {
 
     @Autowired
     private ApplicationParams applicationParams;

@@ -51,6 +51,10 @@ java:
 
     DEFAULT_CACHE_MAX_IDLE_SEC: 14400
     DEFAULT_CACHE_TTL_SEC: 30
+# possible cache values 1) hazelcast or 2) redis
+    CACHE_TYPE: hazelcast
+    REDIS_HOST: ccd-redis-{{ .Values.global.environment }}.redis.cache.windows.net
+    REDIS_PORT: 6380
 
     DEFINITION_CACHE_JURISDICTION_TTL_SEC: 120
 
