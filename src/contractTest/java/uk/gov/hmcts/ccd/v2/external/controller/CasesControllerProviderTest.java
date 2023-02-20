@@ -2,13 +2,15 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import au.com.dius.pact.provider.junit5.HttpTestTarget;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
-import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
+//import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.microsoft.applicationinsights.TelemetryClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
@@ -17,11 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -29,19 +34,31 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.reform.idam.client.models.AuthenticateUserResponse;
+import uk.gov.hmcts.reform.idam.client.models.TokenExchangeResponse;
 
+import java.util.Arrays;
 import java.util.Map;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @Provider("ccdDataStoreAPI_Cases")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
+//@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
+//    host = "${PACT_BROKER_URL:localhost}",
+//    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+//    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
+@PactBroker(scheme = "https",
+    host = "pact-broker.platform.hmcts.net",
+    port = "443", consumerVersionSelectors = {
+    @VersionSelector(tag = "master")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
     "ccd.document.url.pattern=${CCD_DOCUMENT_URL_PATTERN:https?://(((?:api-gateway.preprod.dm.reform.hmcts.net|"
@@ -51,8 +68,9 @@ import java.util.Map;
         + "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/segments/[0-9]+))}"
 
 })
+@TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
-@IgnoreNoPactsToVerify
+//@IgnoreNoPactsToVerify
 public class CasesControllerProviderTest extends WireMockBaseTest {
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
@@ -122,18 +140,30 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     @ExtendWith(PactVerificationSpringProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
         if (context != null) {
-            //context.verifyInteraction();
+            context.verifyInteraction();
         }
     }
 
     @BeforeEach
-    void before(PactVerificationContext context) {
+    void before(PactVerificationContext context) throws JsonProcessingException {
         if (context != null) {
             context.setTarget(new HttpTestTarget("localhost", 8123, "/"));
         }
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
-        // when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
-        // when(userAuthorisation.getUserId()).thenReturn("userId");
+        System.getProperties().setProperty("pact.verifier.publishResults", "true");
+        when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
+        when(userAuthorisation.getUserId()).thenReturn("userId");
+
+        AuthenticateUserResponse authenticateUserResponse = new AuthenticateUserResponse("200");
+
+        stubFor(WireMock.post(urlMatching("/oauth2/authorize"))
+            .willReturn(okJson(objectMapper.writeValueAsString(authenticateUserResponse)).withStatus(200)));
+
+        TokenExchangeResponse tokenExchangeResponse = new TokenExchangeResponse("some access token");
+
+        stubFor(WireMock.post(urlMatching("/oauth2/token"))
+            .willReturn(okJson(objectMapper.writeValueAsString(tokenExchangeResponse)).withStatus(200)));
+
     }
 
     @State("adoption-web makes request to get cases")
@@ -166,83 +196,83 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Get Case is requested"})
     public void toGetACase(Map<String, Object> dataMap) {
-        //CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        //getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
 
     }
 
     @State({"A Read for a Citizen is requested"})
     public void toReadForACitizen(Map<String, Object> dataMap) {
-        //toGetACase(dataMap);
+        toGetACase(dataMap);
 
     }
 
     @State({"A Read for a Caseworker is requested"})
     public void toReadForCaseworker(Map<String, Object> dataMap) {
-        // toGetACase(dataMap);
+        toGetACase(dataMap);
     }
 
     @State({"A Search for cases is requested"})
     public void toSearchCasesForACitizen(Map<String, Object> dataMap) {
-        //CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        //when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class), any()))
-        //    .thenReturn(new CaseSearchResult(1L, Arrays.asList(caseDetails), null));
+        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class), any()))
+            .thenReturn(new CaseSearchResult(1L, Arrays.asList(caseDetails), null));
     }
 
     @State({"A Search cases for a Citizen is requested"})
     public void toSearchForACitizen(Map<String, Object> dataMap) {
-        //CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        //when(authorisedSearchOperation.execute(any(MetaData.class), any(Map.class)))
-        //    .thenReturn(Arrays.asList(caseDetails));
+        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        when(authorisedSearchOperation.execute(any(MetaData.class), any(Map.class)))
+            .thenReturn(Arrays.asList(caseDetails));
 
     }
 
     @State({"A Start Event for a Caseworker is  requested"})
     public void toStartEventForACaseworker(Map<String, Object> dataMap) {
-        //CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
-        //startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
-        //    caseDetails.getReferenceAsString());
+        CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
+        startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
+            caseDetails.getReferenceAsString());
 
     }
 
     @State({"A Start Event for a Citizen is requested"})
     public void toStartEventForACitizen(Map<String, Object> dataMap) {
-        //toStartEventForACaseworker(dataMap);
+        toStartEventForACaseworker(dataMap);
 
     }
 
     @State({"A Start for a Caseworker is requested"})
     public void toStartForACaseworker(Map<String, Object> dataMap) {
-        //setUpSecurityContextForEvent(dataMap);
+        setUpSecurityContextForEvent(dataMap);
 
     }
 
     @State({"A Start for a Citizen is requested"})
     public void toStartForACitizen(Map<String, Object> dataMap) {
-        //setUpSecurityContextForEvent(dataMap);
+        setUpSecurityContextForEvent(dataMap);
 
     }
 
     @State({"A Submit Event for a Caseworker is requested"})
     public void toSubmitEventForACaseworker(Map<String, Object> dataMap) {
-        //CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
-        //createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
+        createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
     @State({"A Submit Event for a Citizen is requested"})
     public void toSubmitEventForACitizen(Map<String, Object> dataMap) {
-        // toSubmitEventForACaseworker(dataMap);
+        toSubmitEventForACaseworker(dataMap);
     }
 
     @State({"A Submit for a Caseworker is requested"})
     public void toSubmitForACaseworker(Map<String, Object> dataMap) {
-        //setUpSecurityContextForEvent(dataMap);
+        setUpSecurityContextForEvent(dataMap);
 
     }
 
     @State({"A Submit for a Citizen is requested"})
     public void toSubmitForACitizen(Map<String, Object> dataMap) {
-        //setUpSecurityContextForEvent(dataMap);
+        setUpSecurityContextForEvent(dataMap);
 
     }
 
