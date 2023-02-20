@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -86,10 +87,10 @@ public class ContractTestSecurityUtils extends SecurityUtils {
     }
 
     private void setAuthenticationOnSecurityContext(String caseworkerUserName, String caseworkerPassword) {
-    //    SecurityContextHolder.getContext()
-    //        .setAuthentication(
-    //            new UsernamePasswordAuthenticationToken(caseworkerUserName, getCaseworkerToken(caseworkerUserName,
-    //                caseworkerPassword)));
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(caseworkerUserName, getCaseworkerToken(caseworkerUserName,
+                    caseworkerPassword)));
     }
 
     private String getCaseworkerToken(String caseworkerUserName, String caseworkerPassword) {

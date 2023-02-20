@@ -63,7 +63,7 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
 
     @BeforeEach
     void before(PactVerificationContext context) {
-        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
+        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         testTarget.setControllers(
             caseAssignedUserRolesController);

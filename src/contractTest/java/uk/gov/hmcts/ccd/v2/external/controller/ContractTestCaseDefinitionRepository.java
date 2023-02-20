@@ -8,6 +8,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 @Service
 @Primary
@@ -18,5 +19,11 @@ public class ContractTestCaseDefinitionRepository extends DefaultCaseDefinitionR
                                                 SecurityUtils securityUtils,
                                                 RestTemplate restTemplate) {
         super(applicationParams, securityUtils, restTemplate);
+    }
+
+    @Override
+    public CaseTypeDefinition getCaseType(final String caseTypeId) {
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        return caseTypeDefinition;
     }
 }

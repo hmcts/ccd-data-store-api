@@ -8,7 +8,9 @@ import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.microsoft.applicationinsights.TelemetryClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
@@ -37,10 +39,13 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedC
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.reform.idam.client.models.AuthenticateUserResponse;
+import uk.gov.hmcts.reform.idam.client.models.TokenExchangeResponse;
 
 import java.util.Arrays;
 import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -140,7 +145,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     }
 
     @BeforeEach
-    void before(PactVerificationContext context) {
+    void before(PactVerificationContext context) throws JsonProcessingException {
         if (context != null) {
             context.setTarget(new HttpTestTarget("localhost", 8123, "/"));
         }
@@ -148,6 +153,17 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");
+
+        AuthenticateUserResponse authenticateUserResponse = new AuthenticateUserResponse("200");
+
+        stubFor(WireMock.post(urlMatching("/oauth2/authorize"))
+            .willReturn(okJson(objectMapper.writeValueAsString(authenticateUserResponse)).withStatus(200)));
+
+        TokenExchangeResponse tokenExchangeResponse = new TokenExchangeResponse("some access token");
+
+        stubFor(WireMock.post(urlMatching("/oauth2/token"))
+            .willReturn(okJson(objectMapper.writeValueAsString(tokenExchangeResponse)).withStatus(200)));
+
     }
 
     @State("adoption-web makes request to get cases")
