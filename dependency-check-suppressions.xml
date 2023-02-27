@@ -1,1 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd"/>
+<?xml version="1.0" encoding="UTF-8"?><suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+  <suppress>
+    <notes>Temporary Suppression
+        CVE-2022-45688 refer [Ticket]</notes>
+    <cve>CVE-2022-45688</cve>
+  </suppress>
+</suppressions>
