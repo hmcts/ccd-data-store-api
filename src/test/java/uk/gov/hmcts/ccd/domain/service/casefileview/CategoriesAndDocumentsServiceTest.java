@@ -148,6 +148,22 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
     }
 
     @Test
+    void testShouldTransformNullDocumentToNull() throws Exception {
+        final CaseFieldMetadata caseFieldExtract = new CaseFieldMetadata("draftOrderDoc", null);
+        final Tuple2<String, Map<String, String>> documentNode = new Tuple2<>(
+            "draftOrderDoc",
+            null
+        );
+
+        final Map<String, JsonNode> caseData =
+            loadCaseDataFromJson(String.format("tests/%s", "CaseDataExtractorDocumentData.json"));
+        doReturn(documentNode).when(fileViewDocumentService).getDocumentNode(caseFieldExtract.getPath(), caseData);
+
+        final Tuple2<String, Optional<Document>> actualResult = underTest.transformDocument(caseFieldExtract, caseData);
+        assertThat(actualResult).isNull();
+    }
+
+    @Test
     void testBuildCategorisedDocumentDictionary() throws Exception {
         final List<Document> expectedDocuments = getExpectedDocumentsForDocumentDictionary();
         final String documentType = "Document";
