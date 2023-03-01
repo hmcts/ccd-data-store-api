@@ -31,17 +31,14 @@ public class DocumentValidator implements BaseTypeValidator {
     private static final Logger LOG = LoggerFactory.getLogger(DocumentValidator.class);
 
     private final ApplicationParams applicationParams;
-    private final TextValidator textValidator;
     private final DateTimeValidator dateTimeValidator;
     private final CaseDefinitionRepository caseDefinitionRepository;
 
     public DocumentValidator(ApplicationParams applicationParams,
-                             @Qualifier("TextValidator") TextValidator textValidator,
                              @Qualifier("DateTimeValidator") DateTimeValidator dateTimeValidator,
                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                  CaseDefinitionRepository caseDefinitionRepository) {
         this.applicationParams = applicationParams;
-        this.textValidator = textValidator;
         this.dateTimeValidator = dateTimeValidator;
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
@@ -149,10 +146,10 @@ public class DocumentValidator implements BaseTypeValidator {
             return Collections.emptyList();
         }
 
-        List<ValidationResult> validationResults =
-            textValidator.validate(dataFieldId, categoryId, caseFieldDefinition);
-        if (!validationResults.isEmpty()) {
-            return validationResult(CATEGORY_ID,validationResults);
+        if (!categoryId.isTextual()) {
+            final String nodeType = categoryId.getNodeType().toString().toLowerCase();
+            return Collections.singletonList(new ValidationResult(nodeType + " is not a string : " + CATEGORY_ID,
+                    dataFieldId));
         }
 
         final List<CategoryDefinition> categoryList =
