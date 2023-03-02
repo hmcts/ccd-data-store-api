@@ -26,7 +26,7 @@ plugins {
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
     id "info.solidsoft.pitest" version '1.4.0'
     id "io.freefair.lombok" version "5.3.0"
-    id 'uk.gov.hmcts.java' version '0.12.28'
+    id 'uk.gov.hmcts.java' version '0.12.40'
     id 'au.com.dius.pact' version '4.1.0'
 }
 
@@ -90,7 +90,7 @@ ext {
     appInsightsVersion = '2.4.1'
     swagger2Version = '3.0.0'
     hibernateVersion = '5.6.10.Final'
-    hazelcastVersion = '4.0.3'
+    hazelcastVersion = '5.2.1'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -289,6 +289,21 @@ dependencies {
     contractTestCompile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.6.1'
     contractTestCompile group: 'javax.inject', name: 'javax.inject', version: '1'
     contractTestCompile group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
+    contractTestCompile group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
+    contractTestCompile group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
+    contractTestCompile('org.springframework.boot:spring-boot-starter-hateoas')
+    contractTestCompile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+    }
+    contractTestCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
+        exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
+    }
+    contractTestCompile("org.springframework.boot:spring-boot-starter-data-jpa")
+    contractTestCompile group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
+    contractTestCompile(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    }
+    contractTestCompile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
     aatCompile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 }
@@ -303,7 +318,7 @@ dependencyManagement {
         // Versions prior to 30.0 vulnerable to CVE-2020-8908
         dependency 'com.google.guava:guava:30.1-jre'
 
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.68') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.69') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -872,8 +887,8 @@ def getCheckedOutGitCommitHash() {
 task runProviderPactVerification(type:Test) {
     logger.lifecycle("Runs provider pact Tests")
     useJUnitPlatform()
-    testClassesDirs = sourceSets.aat.output.classesDirs
-    classpath = sourceSets.aat.runtimeClasspath
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
     systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/ccd/v2/external/controller/**"
