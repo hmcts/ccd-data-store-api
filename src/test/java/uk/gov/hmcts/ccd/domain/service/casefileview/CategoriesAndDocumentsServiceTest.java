@@ -127,7 +127,8 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
             Arguments.of(null, null, "uncategorised_documents"),
             Arguments.of(null, "def-cat", "def-cat"),
             Arguments.of("document-cat", null, "document-cat"),
-            Arguments.of("document-cat", "def-cat", "document-cat")
+            Arguments.of("document-cat", "def-cat", "document-cat"),
+            Arguments.of("document-NonCat", null, "uncategorised_documents")
         );
     }
 
