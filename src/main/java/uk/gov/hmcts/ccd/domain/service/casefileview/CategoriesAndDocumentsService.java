@@ -181,7 +181,7 @@ public class CategoriesAndDocumentsService {
     String resolveDocumentCategory(final String categoryOnDocument,
                                    final String categoryOnFieldDefinition,
                                    final List<CategoryDefinition> categories) {
-        if (!categories.stream()
+        if (categoryOnDocument != null && !categories.stream()
             .anyMatch(category ->
                 category.getCategoryId().equals(categoryOnDocument))) {
             return UNCATEGORISED_KEY;

@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.casefileview;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import io.vavr.Tuple2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,6 +8,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.vavr.Tuple2;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.domain.model.casefileview.CategoriesAndDocuments;
 import uk.gov.hmcts.ccd.domain.model.casefileview.Category;
@@ -34,6 +34,7 @@ import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -111,9 +112,10 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
     void testShouldResolveDocumentCategory(final String categoryOnDocument,
                                            final String categoryOnFieldDefinition,
                                            final String expectedCategory) {
-        final List<CategoryDefinition> categoryDefinitions = provideCategoryDefinitions();
+        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
+            "document-cat", "", null, null, 1, "");
         final String result = underTest.resolveDocumentCategory(categoryOnDocument, categoryOnFieldDefinition,
-            categoryDefinitions);
+            asList(categoryDefinition));
 
         assertThat(result)
             .isNotNull()
@@ -134,13 +136,14 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
     void testShouldTransformDocument(final CaseFieldMetadata caseFieldExtract,
                final Tuple2<String, Map<String, String>> documentNode,
                final Document expectedDocument) throws Exception {
-        final List<CategoryDefinition> categoryDefinitions = provideCategoryDefinitions();
+        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
+            "document-cat", "", null, null, 1, "");
         final Map<String, JsonNode> caseData =
             loadCaseDataFromJson(String.format("tests/%s", "CaseDataExtractorDocumentData.json"));
         doReturn(documentNode).when(fileViewDocumentService).getDocumentNode(caseFieldExtract.getPath(), caseData);
 
         final Tuple2<String, Optional<Document>> actualResult = underTest.transformDocument(caseFieldExtract, caseData,
-            categoryDefinitions);
+            asList(categoryDefinition));
 
         assertThat(actualResult)
             .isNotNull()
@@ -161,9 +164,10 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
         final Map<String, JsonNode> caseData =
             loadCaseDataFromJson(String.format("tests/%s", "CaseDataExtractorDocumentData.json"));
         doReturn(documentNode).when(fileViewDocumentService).getDocumentNode(caseFieldExtract.getPath(), caseData);
-        final List<CategoryDefinition> categoryDefinitions = provideCategoryDefinitions();
+        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
+            "document-cat", "", null, null, 1, "");
         final Tuple2<String, Optional<Document>> actualResult = underTest.transformDocument(caseFieldExtract, caseData,
-            categoryDefinitions);
+            asList(categoryDefinition));
         assertThat(actualResult).isNull();
     }
 
@@ -188,11 +192,10 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
             .extractFieldTypePaths(caseData, caseFieldDefinitions, documentType);
         primeFileViewDocumentServiceForDocumentDictionary(caseData);
 
-        CategoryDefinition category = new CategoryDefinition();
-        category.setCategoryId("Category1");
-        List<CategoryDefinition> categories = List.of(category);
+        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
+            "document-cat", "", null, null, 1, "");
         final Map<String, List<Document>> results =
-            underTest.buildCategorisedDocumentDictionary(caseData, caseFieldDefinitions, categories);
+            underTest.buildCategorisedDocumentDictionary(caseData, caseFieldDefinitions, asList(categoryDefinition));
 
         assertThat(results)
             .isNotEmpty()
