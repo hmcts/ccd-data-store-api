@@ -111,7 +111,9 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
     void testShouldResolveDocumentCategory(final String categoryOnDocument,
                                            final String categoryOnFieldDefinition,
                                            final String expectedCategory) {
-        final String result = underTest.resolveDocumentCategory(categoryOnDocument, categoryOnFieldDefinition);
+        final List<CategoryDefinition> categoryDefinitions = provideCategoryDefinitions();
+        final String result = underTest.resolveDocumentCategory(categoryOnDocument, categoryOnFieldDefinition,
+            categoryDefinitions);
 
         assertThat(result)
             .isNotNull()
@@ -132,12 +134,13 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
     void testShouldTransformDocument(final CaseFieldMetadata caseFieldExtract,
                final Tuple2<String, Map<String, String>> documentNode,
                final Document expectedDocument) throws Exception {
-
+        final List<CategoryDefinition> categoryDefinitions = provideCategoryDefinitions();
         final Map<String, JsonNode> caseData =
             loadCaseDataFromJson(String.format("tests/%s", "CaseDataExtractorDocumentData.json"));
         doReturn(documentNode).when(fileViewDocumentService).getDocumentNode(caseFieldExtract.getPath(), caseData);
 
-        final Tuple2<String, Optional<Document>> actualResult = underTest.transformDocument(caseFieldExtract, caseData);
+        final Tuple2<String, Optional<Document>> actualResult = underTest.transformDocument(caseFieldExtract, caseData,
+            categoryDefinitions);
 
         assertThat(actualResult)
             .isNotNull()
@@ -158,8 +161,9 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
         final Map<String, JsonNode> caseData =
             loadCaseDataFromJson(String.format("tests/%s", "CaseDataExtractorDocumentData.json"));
         doReturn(documentNode).when(fileViewDocumentService).getDocumentNode(caseFieldExtract.getPath(), caseData);
-
-        final Tuple2<String, Optional<Document>> actualResult = underTest.transformDocument(caseFieldExtract, caseData);
+        final List<CategoryDefinition> categoryDefinitions = provideCategoryDefinitions();
+        final Tuple2<String, Optional<Document>> actualResult = underTest.transformDocument(caseFieldExtract, caseData,
+            categoryDefinitions);
         assertThat(actualResult).isNull();
     }
 
@@ -184,8 +188,11 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
             .extractFieldTypePaths(caseData, caseFieldDefinitions, documentType);
         primeFileViewDocumentServiceForDocumentDictionary(caseData);
 
+        CategoryDefinition category = new CategoryDefinition();
+        category.setCategoryId("Category1");
+        List<CategoryDefinition> categories = List.of(category);
         final Map<String, List<Document>> results =
-            underTest.buildCategorisedDocumentDictionary(caseData, caseFieldDefinitions);
+            underTest.buildCategorisedDocumentDictionary(caseData, caseFieldDefinitions, categories);
 
         assertThat(results)
             .isNotEmpty()

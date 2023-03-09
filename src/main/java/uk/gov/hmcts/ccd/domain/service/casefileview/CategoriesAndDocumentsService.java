@@ -62,7 +62,8 @@ public class CategoriesAndDocumentsService {
 
         final Map<String, List<Document>> documentDictionary = buildCategorisedDocumentDictionary(
             caseData,
-            caseTypeDefinition.getCaseFieldDefinitions()
+            caseTypeDefinition.getCaseFieldDefinitions(),
+            caseTypeDefinition.getCategories()
         );
 
         final List<Category> categories = buildCategories(caseTypeDefinition.getCategories(), documentDictionary);
@@ -130,7 +131,8 @@ public class CategoriesAndDocumentsService {
 
     Map<String, List<Document>> buildCategorisedDocumentDictionary(
         final Map<String, JsonNode> caseData,
-        final List<CaseFieldDefinition> caseFieldDefinitions
+        final List<CaseFieldDefinition> caseFieldDefinitions,
+        List<CategoryDefinition> categories
     ) {
         final List<CaseFieldMetadata> caseFieldExtracts = caseDataExtractor.extractFieldTypePaths(
             caseData,
@@ -139,14 +141,15 @@ public class CategoriesAndDocumentsService {
         );
 
         return caseFieldExtracts.stream()
-            .map(caseFieldExtract -> transformDocument(caseFieldExtract, caseData))
+            .map(caseFieldExtract -> transformDocument(caseFieldExtract, caseData, categories))
             .filter(Objects::nonNull)
             .collect(Collectors.groupingBy(tuple -> tuple._1,
                 collectingAndThen(toUnmodifiableList(), DOCUMENTS_FUNCTION)));
     }
 
     Tuple2<String, Optional<Document>> transformDocument(@NonNull final CaseFieldMetadata caseFieldMetadata,
-                                                         @NonNull final Map<String, JsonNode> caseData) {
+                                                         @NonNull final Map<String, JsonNode> caseData,
+                                                         List<CategoryDefinition> categories) {
         final Tuple2<String, Map<String, String>> documentNode =
             fileViewDocumentService.getDocumentNode(caseFieldMetadata.getPath(), caseData);
 
@@ -158,7 +161,8 @@ public class CategoriesAndDocumentsService {
 
         final String resolvedCategory = resolveDocumentCategory(
             documentNode._2.get(CATEGORY_ID),
-            caseFieldMetadata.getCategoryId()
+            caseFieldMetadata.getCategoryId(),
+            categories
         );
 
         return new Tuple2<>(resolvedCategory, Optional.of(document));
@@ -175,9 +179,16 @@ public class CategoriesAndDocumentsService {
     }
 
     String resolveDocumentCategory(final String categoryOnDocument,
-                                   final String categoryOnFieldDefinition) {
-        return Optional.ofNullable(categoryOnDocument)
-            .orElseGet(() -> resolveDocumentCategory(categoryOnFieldDefinition));
+                                   final String categoryOnFieldDefinition,
+                                   final List<CategoryDefinition> categories) {
+        if (!categories.stream()
+            .anyMatch(category ->
+                category.getCategoryId().equals(categoryOnDocument))) {
+            return UNCATEGORISED_KEY;
+        } else {
+            return Optional.ofNullable(categoryOnDocument)
+                .orElseGet(() -> resolveDocumentCategory(categoryOnFieldDefinition));
+        }
     }
 
     private String resolveDocumentCategory(final String categoryOnFieldDefinition) {
