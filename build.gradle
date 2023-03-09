@@ -207,7 +207,7 @@ dependencies {
     // CVE-2021-28170
     implementation "org.glassfish:jakarta.el:4.0.1"
 
-    // CVE-2021-29425
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'commons-io', name: 'commons-io', version: '2.8.0'
 
     // use the latest org.springframework.security
@@ -320,7 +320,7 @@ dependencyManagement {
         // Versions prior to 30.0 vulnerable to CVE-2020-8908
         dependency 'com.google.guava:guava:30.1-jre'
 
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.69') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.73') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
