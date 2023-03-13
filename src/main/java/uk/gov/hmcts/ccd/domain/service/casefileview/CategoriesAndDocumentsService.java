@@ -181,11 +181,14 @@ public class CategoriesAndDocumentsService {
     String resolveDocumentCategory(final String categoryOnDocument,
                                    final String categoryOnFieldDefinition,
                                    final List<CategoryDefinition> categories) {
-        boolean isDocumentCategoryPresent = categoryOnDocument != null
-            && categories.stream()
-            .anyMatch(category -> category.getCategoryId().equals(categoryOnDocument));
-
-        return isDocumentCategoryPresent ? categoryOnDocument : resolveDocumentCategory(categoryOnFieldDefinition);
+        if (categoryOnDocument != null && !categories.stream()
+            .anyMatch(category ->
+                category.getCategoryId().equals(categoryOnDocument))) {
+            return UNCATEGORISED_KEY;
+        } else {
+            return Optional.ofNullable(categoryOnDocument)
+                .orElseGet(() -> resolveDocumentCategory(categoryOnFieldDefinition));
+        }
     }
 
     private String resolveDocumentCategory(final String categoryOnFieldDefinition) {
