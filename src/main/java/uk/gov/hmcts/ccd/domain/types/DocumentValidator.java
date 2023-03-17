@@ -8,7 +8,6 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -31,17 +30,14 @@ public class DocumentValidator implements BaseTypeValidator {
     private static final Logger LOG = LoggerFactory.getLogger(DocumentValidator.class);
 
     private final ApplicationParams applicationParams;
-    private final TextValidator textValidator;
     private final DateTimeValidator dateTimeValidator;
     private final CaseDefinitionRepository caseDefinitionRepository;
 
     public DocumentValidator(ApplicationParams applicationParams,
-                             @Qualifier("TextValidator") TextValidator textValidator,
                              @Qualifier("DateTimeValidator") DateTimeValidator dateTimeValidator,
                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                  CaseDefinitionRepository caseDefinitionRepository) {
         this.applicationParams = applicationParams;
-        this.textValidator = textValidator;
         this.dateTimeValidator = dateTimeValidator;
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
@@ -149,23 +145,10 @@ public class DocumentValidator implements BaseTypeValidator {
             return Collections.emptyList();
         }
 
-        List<ValidationResult> validationResults =
-            textValidator.validate(dataFieldId, categoryId, caseFieldDefinition);
-        if (!validationResults.isEmpty()) {
-            return validationResult(CATEGORY_ID,validationResults);
-        }
-
-        final List<CategoryDefinition> categoryList =
-            caseDefinitionRepository.getCaseType(caseFieldDefinition.getCaseTypeId()).getCategories();
-        String categoryIdValue = categoryId.textValue();
-        final boolean caseTypeContainsKnownCategoryId = categoryList.stream()
-            .anyMatch(category ->
-                category.getCategoryId().equals(categoryIdValue));
-
-        if (!caseTypeContainsKnownCategoryId) {
-            LOG.error("{} value not recognised as a valid Case Category", CATEGORY_ID);
-            return Collections.singletonList(new ValidationResult(
-                CATEGORY_ID + " value not found", dataFieldId));
+        if (!categoryId.isTextual()) {
+            final String nodeType = categoryId.getNodeType().toString().toLowerCase();
+            return Collections.singletonList(new ValidationResult(nodeType + " is not a string : " + CATEGORY_ID,
+                    dataFieldId));
         }
         return Collections.emptyList();
     }

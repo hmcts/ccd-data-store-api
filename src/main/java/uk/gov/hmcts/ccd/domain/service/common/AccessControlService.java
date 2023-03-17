@@ -58,6 +58,7 @@ public interface AccessControlService {
     String NO_CASE_STATE_FOUND = "Invalid event";
     String NO_EVENT_FOUND = "No event found";
     String NO_FIELD_FOUND = "No field found";
+    String NO_ROLE_FOUND = "User doesn't have required access for {}={}. userRoles={}, {}={}";
     String VALUE = "value";
     String ALL = "*";
 
@@ -568,12 +569,21 @@ public interface AccessControlService {
                                        List<CaseEventDefinition> caseEventDefinitions,
                                        Set<AccessProfile> accessProfiles,
                                        Predicate<AccessControlList> criteria) {
-        for (CaseEventDefinition caseEvent : caseEventDefinitions) {
-            if (caseEvent.getId().equals(eventId)
-                && hasAccessControlList(accessProfiles, criteria, caseEvent.getAccessControlLists())) {
-                return true;
-            }
+        Optional<CaseEventDefinition> matchedEvent = caseEventDefinitions.stream()
+                .filter(caseEvent -> caseEvent.getId().equals(eventId))
+                .findFirst();
+        if (matchedEvent.isEmpty()) {
+            LOG.error("No matching caseEvent={} in caseEventDefinitions", eventId);
+            return false;
+        } else if (hasAccessControlList(accessProfiles, criteria, matchedEvent.get().getAccessControlLists())) {
+            return true;
         }
+
+        LOG.error(NO_ROLE_FOUND, "caseEvent",
+                eventId,
+                extractAccessProfileNames(accessProfiles),
+                "caseEventACL",
+                getCaseEventAcls(caseEventDefinitions, eventId));
         return false;
     }
 
