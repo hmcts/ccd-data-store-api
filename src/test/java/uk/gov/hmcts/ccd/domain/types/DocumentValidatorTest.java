@@ -63,6 +63,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     private static final String UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL =
         "https://dm.reform.hmcts.net.example.com/documents/a1-2Z-3-x";
     private static final String VALID_CATEGORY_ID = "mainEvidence";
+    private static final String NON_EXISTENT_CATEGORY_ID = "notInCategoriesList";
     private static final String VALID_UPLOAD_TIMESTAMP = "2012-12-10T00:00:00";
     private DocumentValidator validator;
     private CaseFieldDefinition caseFieldDefinition;
@@ -428,6 +429,17 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
         setupWithCategories();
         data = createDoc(CATEGORY_ID, VALID_CATEGORY_ID);
+        caseFieldDefinition.setCaseTypeId(CASE_TYPE_ID);
+
+        validDocumentUrlResult = validator.validate(CATEGORY_ID, data, caseFieldDefinition);
+        assertThat(validDocumentUrlResult, empty());
+    }
+
+    @Test
+    public void shouldValidateNonExistentCategoryId() {
+
+        setupWithCategories();
+        data = createDoc(CATEGORY_ID, NON_EXISTENT_CATEGORY_ID);
         caseFieldDefinition.setCaseTypeId(CASE_TYPE_ID);
 
         validDocumentUrlResult = validator.validate(CATEGORY_ID, data, caseFieldDefinition);
