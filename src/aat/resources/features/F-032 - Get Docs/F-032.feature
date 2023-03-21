@@ -24,7 +24,7 @@ Scenario: must retrieve printable documents successfully for correct inputs
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-125 @Ignore #defect RDM-6628
+@S-125 #defect RDM-6628
 Scenario: must return 401 when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
@@ -38,7 +38,7 @@ Scenario: must return 401 when request does not provide valid authentication cre
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-126 @Ignore # expected 403 but got 200 (defect RDM-6881)
+@S-126 # expected 403 but got 200 (defect RDM-6881)
 Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
 
     Given a case that has just been created as in [S-126_Superuser_Case_Creation_Data_With_Document],
@@ -53,7 +53,7 @@ Scenario: must return 403 when request provides authentic credentials without au
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-127 @Ignore # expected 404 but got 200 (defect RDM-6881)
+@S-127 # expected 404 but got 200 (defect RDM-6881)
 Scenario: must return 404 for non-existing case type id
 
     Given a user with [an active profile in CCD],
@@ -67,7 +67,7 @@ Scenario: must return 404 for non-existing case type id
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-128 @Ignore # expected 404 but got 200 (defect RDM-6881)
+@S-128 # expected 404 but got 200 (defect RDM-6881)
 Scenario: must return 404 for non-existing jurisdiction id
 
     Given a user with [an active profile in CCD],

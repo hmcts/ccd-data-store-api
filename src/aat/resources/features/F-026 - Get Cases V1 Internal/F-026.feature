@@ -34,7 +34,7 @@ Scenario: must return an empty SearchResultView envelope and status code 200 if 
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-074 @Ignore # re-write as part of RDM-6847
+@S-074 # re-write as part of RDM-6847
 Scenario: must return appropriate negative response when request does not provide valid authentication credentials
 
    Given  a user with     [an active profile in CCD],
@@ -48,7 +48,7 @@ Scenario: must return appropriate negative response when request does not provid
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-075 @Ignore # re-write as part of RDM-6847
+@S-075 # re-write as part of RDM-6847
 Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
 
     Given a user with     [an active profile in CCD],
@@ -62,7 +62,7 @@ Scenario: must return 403 when request provides authentic credentials without au
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-076 @Ignore #This scenario is not returning http 412 code. Jira: RDM-6879
+@S-076 #This scenario is not returning http 412 code. Jira: RDM-6879
 Scenario: must return 412 when the case type is not present in Definition store workbasket input fields
 
     Given a user with [an active profile in CCD],
@@ -103,7 +103,7 @@ Scenario: must return the list of cases and status code 200 for correct inputs
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-588 @Ignore @RDM-7739 @RDM-7793 #Get cases list from Last State Modified Date filter - when data list 1 or more
+@S-588 @RDM-7739 @RDM-7793 #Get cases list from Last State Modified Date filter - when data list 1 or more
 # Enable this after changing it to use Dynamic date instead of a static one
 # Also update this with data ordering when FW support is available
 Scenario: must return the list of cases and status code 200 for correct inputs
