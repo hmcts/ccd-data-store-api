@@ -7,7 +7,7 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-038 @Ignore # unpredictable response ordering causes test to fail
+@S-038 # unpredictable response ordering causes test to fail
 Scenario: must return status 200 along with the case-view object successfully
 
     Given a user with [an active profile in CCD],
@@ -36,7 +36,7 @@ Scenario: must return appropriate negative response when case id is structurally
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-036 @Ignore # re-write as part of RDM-6847
+@S-036 # re-write as part of RDM-6847
 Scenario: must return appropriate negative response when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
@@ -50,7 +50,7 @@ Scenario: must return appropriate negative response when request does not provid
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-037 @Ignore # re-write as part of RDM-6847
+@S-037 # re-write as part of RDM-6847
 Scenario: must return appropriate negative response when request does not provide an authorized access
 
     Given a user with [an active profile in CCD],
