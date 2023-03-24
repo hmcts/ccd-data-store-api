@@ -137,9 +137,9 @@ withPipeline(type, product, component) {
     // Check if the build should be wired to an environment higher than 'preview'.
     if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
         env.ELASTIC_SEARCH_FTA_ENABLED = "true"
-        env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.platform.hmcts.net"
+        env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.aat.platform.hmcts.net"
     } else {
-        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.aat.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
 
