@@ -9,13 +9,11 @@
 		"has an HTTP-403 return code"
 	],
 
-	"request": {
-		"headers": {
-			"Authorization": "Bearer Dummy_Authorization"
-		}
-	},
+  "user": {
+    "_extends_": "BeftaCaseworker1"
+  },
 
-	"expectedResponse": {
+  "expectedResponse": {
 		"_extends_": "Common_403_Response",
 		"body": {
 			"message": "Access Denied"

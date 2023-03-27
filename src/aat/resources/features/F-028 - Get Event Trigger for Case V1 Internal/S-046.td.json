@@ -9,14 +9,9 @@
 		"has the 403 return code"
 	],
 
-	"request": {
-		"headers": {
-			"Authorization": "Bearer Invalid_Authorization"
-		},
-		"pathVariables": {
-			"cid": "1573751648840703"
-		}
-	},
+  "user": {
+    "_extends_": "BeftaCaseworker1"
+  },
 
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",
