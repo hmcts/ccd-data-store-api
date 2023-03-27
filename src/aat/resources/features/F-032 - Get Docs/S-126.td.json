@@ -2,7 +2,7 @@
 	"title": "must return 403 when request provides authentic credentials without authorised access to the operation",
 
 	"_guid_": "S-126",
-	"_extends_": "F-032_Base_Test_Data",
+	"_extends_": "S-126_Superuser_Case_Creation_Data_With_Document",
 
 	"specs": [
 		"an active profile in CCD but without read access to the case just created",

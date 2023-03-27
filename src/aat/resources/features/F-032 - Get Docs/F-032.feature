@@ -54,12 +54,12 @@ Scenario: must return 403 when request provides authentic credentials without au
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-127 # expected 404 but got 200 (defect RDM-6881)
-Scenario: must return 404 for non-existing case type id
+Scenario: must return 404 for non-existing jurisdiction id
 
     Given a user with [an active profile in CCD],
 
      When a request is prepared with appropriate values,
-      And the request [contains a non-existing case type id],
+      And the request [contains a non-existing jurisdiction id],
       And it is submitted to call the [get printable documents] operation of [CCD Data Store],
 
      Then a negative response is received,
@@ -68,12 +68,12 @@ Scenario: must return 404 for non-existing case type id
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-128 # expected 404 but got 200 (defect RDM-6881)
-Scenario: must return 404 for non-existing jurisdiction id
+Scenario: must return 404 for non-existing case type id
 
     Given a user with [an active profile in CCD],
 
      When a request is prepared with appropriate values,
-      And the request [contains a non-existing jurisdiction id],
+      And the request [contains a non-existing case type id],
       And it is submitted to call the [get printable documents] operation of [CCD Data Store],
 
      Then a negative response is received,

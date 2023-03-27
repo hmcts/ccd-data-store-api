@@ -12,7 +12,7 @@
 
 	"request": {
 		"headers":{
-			"Authorization": "abc"
+			"Authorization": "Bearer abc"
 		}
 	},
 
