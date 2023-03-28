@@ -44,19 +44,19 @@ public class DocumentValidatorTest implements IVallidatorTest {
             + "}";
     private static final String VALID_DOCUMENT_URL = "https://dm.reform.hmcts.net/documents/a1-2Z-3-x";
     private static final String VALID_EM_HRS_API_DOCUMENT_URL_1 =
-        "https://em-hrs-api-aat.preview.platform.hmcts.net/hearing-recordings/"
+        "https://em-hrs-api-aat.service.core-compute-aat.internal/hearing-recordings/"
             + "b10ea9c4-a116-11eb-bcbc-0242ac130002/segments/3";
     private static final String VALID_EM_HRS_API_DOCUMENT_URL_2 =
-        "https://em-hrs-api-pr-155.preview.platform.hmcts.net/hearing-recordings/"
+        "https://em-hrs-api-pr-155.service.core-compute-preview.internal/hearing-recordings/"
             + "e5b96e94-4010-43b3-9196-44d8539f32b8/segments/0";
     private static final String VALID_EM_HRS_API_DOCUMENT_URL_3 =
-        "https://em-hrs-api-aat.preview.platform.hmcts.net/hearing-recordings/"
+        "https://em-hrs-api-aat.service.core-compute-aat.internal/hearing-recordings/"
             + "b10ea9c4-a116-11eb-bcbc-0242ac130002/segments/330";
     private static final String INVALID_RECORD_ID_EM_HRS_API_DOCUMENT_URL =
-        "https://em-hrs-api.preview.platform.hmcts.net/hearing-recordings/"
+        "https://em-hrs-api.service.core-compute-aat.internal/hearing-recordings/"
             + "123456789012/segments/3";
     private static final String INVALID_EM_HRS_API_DOCUMENT_URL =
-        "https://em-hrs-api.preview.platform.hmcts.net/documents/a1-2Z-3-x";
+        "https://em-hrs-api.service.core-compute-aat.internal/documents/a1-2Z-3-x";
     private static final String MISSING_DOCUMENT_PATH_URL = "https://dm.reform.hmcts.net/docs/a1-2Z-3-x";
     private static final String UNKNOWN_DOCUMENT_DOMAIN_URL = "https://example.com/documents/a1-2Z-3-x";
     private static final String DOCUMENT_URL_WITH_PORT = "https://ng.reform.hmcts.net:6789/documents/a1-2Z-3-x-ngitb";
