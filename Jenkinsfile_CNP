@@ -90,10 +90,10 @@ def vaultOverrides = [
 ]
 // vars needed for functional tests
 // Other env variables needed for BEFTA.
-env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
-env.RD_LOCATION_REF_API_BASE_URL = "http://rd-location-ref-api-aat.service.core-compute-aat.internal"
-env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
+env.DM_STORE_BASE_URL = "http://dm-store-aat.preview.platform.hmcts.net"
+env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.preview.platform.hmcts.net"
+env.RD_LOCATION_REF_API_BASE_URL = "http://rd-location-ref-api-aat.preview.platform.hmcts.net"
+env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.preview.platform.hmcts.net"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.ELASTIC_SEARCH_FTA_ENABLED = "false"
 env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
@@ -104,7 +104,7 @@ env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
-env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.preview.platform.hmcts.net"
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 
@@ -137,9 +137,9 @@ withPipeline(type, product, component) {
     // Check if the build should be wired to an environment higher than 'preview'.
     if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
         env.ELASTIC_SEARCH_FTA_ENABLED = "true"
-        env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
+        env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.preview.platform.hmcts.net"
     } else {
-        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
 
