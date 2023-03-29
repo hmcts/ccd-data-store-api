@@ -160,7 +160,7 @@ dependencies {
         exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
     }
     implementation('org.springframework.boot:spring-boot-starter-web')
-    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.4.RELEASE'
+    implementation('org.springframework.retry:spring-retry')
     implementation('org.springframework.boot:spring-boot-starter-cache')
     implementation group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
     implementation group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
