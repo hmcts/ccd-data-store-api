@@ -6,7 +6,7 @@
   "operationName": "Get Swagger JSON",
 
   "method": "GET",
-  "uri": "https://hmcts.github.io/reform-api-docs/specs/{ccd-data-store-api-version}",
+  "uri": "https://hmcts.github.io/cnp-api-docs/specs/{ccd-data-store-api-version}",
 
   "expectedResponse": {
     "headers" : {
