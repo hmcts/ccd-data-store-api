@@ -9,11 +9,9 @@
 		"contains a HTTP 403 Forbidden"
 	],
 
-	"request": {
-		"headers": {
-			"Authorization": "Bearer invalidAuthToken"
-		}
-	},
+  "user": {
+    "_extends_": "BeftaCaseworker1"
+  },
 
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",

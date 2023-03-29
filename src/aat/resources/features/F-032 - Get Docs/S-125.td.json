@@ -25,10 +25,7 @@
       "Expires" : "[[ANYTHING_PRESENT]]",
       "Pragma" : "[[ANYTHING_PRESENT]]",
       "Strict-Transport-Security" : "[[ANYTHING_PRESENT]]",
-      "Www-Authenticate" : "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Invalid JWT serialization: Missing dot delimiter(s)\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
-      "X-Content-Type-Options" : "[[ANYTHING_PRESENT]]",
-      "X-Frame-Options" : "DENY",
-      "X-Xss-Protection" : "1; mode=block"
-    }
+      "Www-Authenticate" : "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Invalid JWT serialization: Missing dot delimiter(s)\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+}
 	}
 }

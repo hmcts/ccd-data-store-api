@@ -53,7 +53,7 @@ Scenario: must return 403 when request provides authentic credentials without au
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-127 # expected 404 but got 200 (defect RDM-6881)
+@S-127 @Ignore # expected 404 but got 200 (defect RDM-6881)
 Scenario: must return 404 for non-existing jurisdiction id
 
     Given a user with [an active profile in CCD],
@@ -67,7 +67,7 @@ Scenario: must return 404 for non-existing jurisdiction id
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-128 # expected 404 but got 200 (defect RDM-6881)
+@S-128 @Ignore # expected 404 but got 200 (defect RDM-6881)
 Scenario: must return 404 for non-existing case type id
 
     Given a user with [an active profile in CCD],

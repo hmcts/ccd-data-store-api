@@ -14,8 +14,11 @@
   },
 
 	"request": {
-    "_extends_": "Common_Request"
-	},
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "[[DEFAULT_AUTO_VALUE]]"
+    }
+  },
 
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",
