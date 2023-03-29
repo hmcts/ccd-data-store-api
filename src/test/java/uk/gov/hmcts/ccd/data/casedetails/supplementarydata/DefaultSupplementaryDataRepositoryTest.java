@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
-    private static final int NUMBER_OF_CASES = 6;
+    private static final int NUMBER_OF_CASES = 8;
     private JdbcTemplate template;
 
     private final SupplementaryDataRepository supplementaryDataRepository;
@@ -39,7 +39,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-            scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+        scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldReplaceExistingSupplementaryData() {
         assumeDataInitialised();
         supplementaryDataRepository.setSupplementaryData("1504259907353529",
@@ -64,7 +64,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
         SupplementaryData supplementaryData =
             supplementaryDataRepository.findSupplementaryData("1504259907353545",
-            Sets.newHashSet("orgs_assigned_users.organisationB"));
+                Sets.newHashSet("orgs_assigned_users.organisationB"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.containsKey("orgs_assigned_users.organisationB"));
@@ -82,7 +82,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
         SupplementaryData supplementaryData =
             supplementaryDataRepository.findSupplementaryData("1504259907353529",
-            Sets.newHashSet("orgs_assigned_users.organisationB"));
+                Sets.newHashSet("orgs_assigned_users.organisationB"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.containsKey("orgs_assigned_users.organisationB"));
@@ -108,7 +108,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
         SupplementaryData supplementaryData =
             supplementaryDataRepository.findSupplementaryData("1504259907353529",
-            Sets.newHashSet("orgs_assigned_users.organisationC"));
+                Sets.newHashSet("orgs_assigned_users.organisationC"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.containsKey("orgs_assigned_users.organisationC"));
@@ -171,7 +171,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
         assertThrows(ServiceException.class,
             () -> supplementaryDataRepository.findSupplementaryData("1504259907311111",
-            Sets.newHashSet("orgs_assigned_users.organisationA")));
+                Sets.newHashSet("orgs_assigned_users.organisationA")));
     }
 
     @Test

@@ -60,6 +60,16 @@ import java.time.LocalDateTime;
             "AND UPPER(cd.caseType) LIKE UPPER(:caseTypeId) " +
             "AND cd.id >= :caseDataId " +
             "ORDER BY cd.createdDate ASC "
+    ),
+
+    @NamedQuery(
+        name = CaseDetailsEntity.FIND_CASE_WITH_INVALID_SUP_DATA,
+        query = "SELECT cd FROM CaseDetailsEntity cd "
+            + "WHERE UPPER(cd.caseType) LIKE UPPER(:caseTypeId) "
+            + "AND jsonb_extract_path_text(COALESCE(supplementary_data, '{}'), 'HMCTSServiceId') IS NOT NULL "
+            + "AND jsonb_extract_path_text(COALESCE(supplementary_data, '{}'), 'orgs_assigned_users') IS NULL "
+            + "AND (cd.lastModified BETWEEN :date_from AND :date_to) "
+            + "ORDER BY cd.lastModified "
     )
 })
 @Table(name = "case_data")
@@ -71,6 +81,7 @@ public class CaseDetailsEntity {
     static final String FIND_BY_REF_AND_JURISDICTION = "CaseDataEntity_FIND_BY_REFERENCE_AND_JURISDICTION";
     static final String CASES_COUNT_BY_CASE_TYPE = "CaseDataEntity_CASES_COUNT_BY_CASE_TYPE";
     static final String FIND_CASE_WITH_LIMITS = "CaseDataEntity_FIND_CASE_WITH_LIMITS";
+    static final String FIND_CASE_WITH_INVALID_SUP_DATA = "CaseDataEntity_FIND_CASE_WITH_INVALID_SUP_DATA";
 
     static final String JURISDICTION_ID_PARAM = "JURISDICTION_ID_PARAM";
     static final String CASE_TYPE_PARAM = "CASE_TYPE_PARAM";

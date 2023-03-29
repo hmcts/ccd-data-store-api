@@ -2,9 +2,10 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
-import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,4 +64,9 @@ public interface CaseDetailsRepository {
     List<CaseDetails> findByParamsWithLimit(MigrationParameters migrationParameters);
 
     PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData, Map<String, String> dataSearchParams);
+
+    List<CaseDetails> findCasesWithSupplementaryDataHmctsServiceIdButNoOrgsAssignedUsers(String caseTypeId,
+                                                                                         LocalDateTime from,
+                                                                                         Optional<LocalDateTime> to,
+                                                                                         Integer limit);
 }

@@ -225,6 +225,9 @@ public class ApplicationParams {
     @Value("${system.user.token.cache.ttl.secs}")
     private Integer systemUserTokenCacheTTLSecs;
 
+    @Value("#{'${ccd.conditional-apis.case-search-invalid-supplementary-data.case-types}'.split(',')}")
+    private List<String> invalidSupplementaryDataCaseTypes;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -609,5 +612,9 @@ public class ApplicationParams {
 
     public Integer getSystemUserTokenCacheTTLSecs() {
         return systemUserTokenCacheTTLSecs;
+    }
+
+    public List<String> getInvalidSupplementaryDataCaseTypes() {
+        return invalidSupplementaryDataCaseTypes;
     }
 }
