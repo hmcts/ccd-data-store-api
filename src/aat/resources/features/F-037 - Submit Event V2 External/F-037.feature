@@ -24,7 +24,7 @@ Scenario: should create event successfully for an existing case
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-022 @Ignore # re-write as part of RDM-6847
+@S-022 # re-write as part of RDM-6847
 Scenario: must return negative response when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
@@ -38,7 +38,7 @@ Scenario: must return negative response when request does not provide valid auth
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-023 @Ignore # re-write as part of RDM-6847
+@S-023 # re-write as part of RDM-6847
 Scenario: must return negative response when request provides authentic credentials without authorised access
 
     Given a user with [an active profile in CCD],
