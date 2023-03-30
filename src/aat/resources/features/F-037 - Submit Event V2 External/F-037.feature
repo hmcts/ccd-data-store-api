@@ -34,7 +34,7 @@ Scenario: must return negative response when request does not provide valid auth
       And it is submitted to call the [submit event for an existing case (V2)] operation of [CCD data store],
 
      Then a negative response is received,
-      And the response [contains a HTTP 403 Forbidden],
+      And the response [contains a HTTP 401 unauthorized],
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -6,19 +6,16 @@
 	"specs": [
 		"an active profile in CCD",
 		"does not provide valid authentication credentials",
-		"contains a HTTP 403 Forbidden"
+		"contains a HTTP 401 unauthorized"
 	],
 
 	"request": {
 		"headers": {
-			"Authorization": "eyJhbGciOiJIUzI1NiJ9"
+			"Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9_invalid"
 		}
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_403_Response",
-		"body": {
-			"message": "Access Denied"
-		}
+		"_extends_": "Common_401_Response"
 	}
 }

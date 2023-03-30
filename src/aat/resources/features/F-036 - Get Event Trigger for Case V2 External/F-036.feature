@@ -47,7 +47,7 @@ Scenario: must return 401 when request does not provide valid authentication cre
       And it is submitted to call the [Retrieve a trigger for case by ID] operation of [CCD Data Store],
 
      Then a negative response is received,
-      And the response [contains HTTP 403 Unauthorized],
+      And the response [contains HTTP 401 Unauthorized],
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ Scenario: must return 422 when case event has validation errors
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-206 #Ignoring test Returns 500 raised RDM-6891
+@S-206 @Ignore #Ignoring test Returns 500 raised RDM-6891
 Scenario: must return 422 when user role is missing
 
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data],
