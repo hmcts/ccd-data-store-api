@@ -14,10 +14,7 @@
   },
 
   "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "triggerId": "CREATE"
-    }
+    "_extends_": "Common_Request"
   },
 
 	"expectedResponse": {

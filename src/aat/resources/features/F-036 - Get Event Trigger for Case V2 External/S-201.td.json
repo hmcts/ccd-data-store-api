@@ -21,6 +21,20 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_401_Response"
+    "responseCode": 401,
+    "responseMessage": "Unauthorized",
+    "headers": {
+      "Cache-Control": "[[ANYTHING_PRESENT]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Date": "[[ANYTHING_PRESENT]]",
+      "Expires": "[[ANYTHING_PRESENT]]",
+      "Pragma": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANYTHING_PRESENT]]",
+      "Www-Authenticate": "[[ANYTHING_PRESENT]]",
+      "X-Content-Type-Options": "[[ANYTHING_PRESENT]]",
+      "X-Frame-Options": "[[ANYTHING_PRESENT]]",
+      "X-Xss-Protection": "[[ANYTHING_PRESENT]]"
+    },
+    "body": null
   }
 }

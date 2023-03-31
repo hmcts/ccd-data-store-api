@@ -1,21 +1,32 @@
 {
-	"_guid_": "S-022",
-	"_extends_": "F-037_Test_Data_Base",
-	"title": "must return negative response when request does not provide valid authentication credentials",
-
-	"specs": [
-		"an active profile in CCD",
-		"does not provide valid authentication credentials",
-		"contains a HTTP 401 unauthorized"
-	],
-
-	"request": {
-		"headers": {
-			"Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9_invalid"
-		}
-	},
-
-	"expectedResponse": {
-		"_extends_": "Common_401_Response"
-	}
+  "_guid_": "S-022",
+  "_extends_": "F-037_Test_Data_Base",
+  "title": "must return negative response when request does not provide valid authentication credentials",
+  "specs": [
+    "an active profile in CCD",
+    "does not provide valid authentication credentials",
+    "contains a HTTP 401 unauthorized"
+  ],
+  "request": {
+    "headers": {
+      "Authorization": "Bearer Invalid_token"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 401,
+    "responseMessage": "Unauthorized",
+    "headers": {
+      "Cache-Control": "[[ANYTHING_PRESENT]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Date": "[[ANYTHING_PRESENT]]",
+      "Expires": "[[ANYTHING_PRESENT]]",
+      "Pragma": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANYTHING_PRESENT]]",
+      "Www-Authenticate": "[[ANYTHING_PRESENT]]",
+      "X-Content-Type-Options": "[[ANYTHING_PRESENT]]",
+      "X-Frame-Options": "[[ANYTHING_PRESENT]]",
+      "X-Xss-Protection": "[[ANYTHING_PRESENT]]"
+    },
+    "body": null
+  }
 }
