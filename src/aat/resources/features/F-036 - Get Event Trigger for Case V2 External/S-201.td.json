@@ -1,39 +1,40 @@
 {
-	"_guid_": "S-201",
-	"_extends_": "F-036_Base_Test_Data",
-	"title": "must return 401 when request does not provide valid authentication credentials",
-
-	"specs": [
-		"an active profile in CCD",
-		"does not provide valid authentication credentials in CCD",
-		"contains HTTP 403 Unauthorized"
-	],
-
-	"users": {
-		"invokingUser" : {
-			"password": "InvalidPassword"
-		}
-	},
-
-	"request": {
-		"headers" : {
-			"Authorization": "TokenId"
-		},
-		"pathVariables": {
-			"triggerId": "CREATE"
-		}
-	},
-
-	"expectedResponse": {
-		"_extends_": "Common_403_Response",
-		"headers": {
-			"Content-Length": "[[ANYTHING_PRESENT]]",
-			"Content-Encoding" : "gzip"
-		},
-		"body": {
-			"timestamp": "[[ANYTHING_PRESENT]]",
-			"message": "Access Denied",
-			"path": "[[ANYTHING_PRESENT]]"
-		}
-	}
+  "_guid_": "S-201",
+  "_extends_": "F-036_Base_Test_Data",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+  "specs": [
+    "an active profile in CCD",
+    "does not provide valid authentication credentials in CCD",
+    "contains HTTP 401 Unauthorized"
+  ],
+  "users": {
+    "invokingUser": {
+      "password": "InvalidPassword"
+    }
+  },
+  "request": {
+    "headers": {
+      "Authorization": "Bearer TokenId"
+    },
+    "pathVariables": {
+      "triggerId": "CREATE"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 401,
+    "responseMessage": "Unauthorized",
+    "headers": {
+      "Cache-Control": "[[ANYTHING_PRESENT]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Date": "[[ANYTHING_PRESENT]]",
+      "Expires": "[[ANYTHING_PRESENT]]",
+      "Pragma": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANYTHING_PRESENT]]",
+      "Www-Authenticate": "[[ANYTHING_PRESENT]]",
+      "X-Content-Type-Options": "[[ANYTHING_PRESENT]]",
+      "X-Frame-Options": "[[ANYTHING_PRESENT]]",
+      "X-Xss-Protection": "[[ANYTHING_PRESENT]]"
+    },
+    "body": null
+  }
 }
