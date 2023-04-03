@@ -36,7 +36,7 @@ Scenario: must return 400 when case reference does not exists
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-201 @Ignore # re-write as part of RDM-6847
+@S-201
 Scenario: must return 401 when request does not provide valid authentication credentials
 
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data],
@@ -47,7 +47,7 @@ Scenario: must return 401 when request does not provide valid authentication cre
       And it is submitted to call the [Retrieve a trigger for case by ID] operation of [CCD Data Store],
 
      Then a negative response is received,
-      And the response [contains HTTP 403 Unauthorized],
+      And the response [contains HTTP 401 Unauthorized],
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

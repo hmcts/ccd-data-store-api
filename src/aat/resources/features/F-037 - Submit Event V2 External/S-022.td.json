@@ -1,17 +1,20 @@
 {
   "_guid_": "S-022",
   "_extends_": "F-037_Test_Data_Base",
-  "title": "must return negative response when request does not provide valid authentication credentials",
+  "title": "must return negative response 401 when request does not provide valid authentication credentials",
+
   "specs": [
     "an active profile in CCD",
     "does not provide valid authentication credentials",
     "contains a HTTP 401 unauthorized"
   ],
+
   "request": {
     "headers": {
       "Authorization": "Bearer Invalid_token"
     }
   },
+
   "expectedResponse": {
     "responseCode": 401,
     "responseMessage": "Unauthorized",

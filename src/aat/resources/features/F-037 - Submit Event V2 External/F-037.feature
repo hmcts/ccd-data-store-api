@@ -24,8 +24,8 @@ Scenario: should create event successfully for an existing case
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-022 @Ignore # re-write as part of RDM-6847
-Scenario: must return negative response when request does not provide valid authentication credentials
+@S-022
+Scenario: must return negative response 401 when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
 
@@ -34,7 +34,7 @@ Scenario: must return negative response when request does not provide valid auth
       And it is submitted to call the [submit event for an existing case (V2)] operation of [CCD data store],
 
      Then a negative response is received,
-      And the response [contains a HTTP 403 Forbidden],
+      And the response [contains a HTTP 401 unauthorized],
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
