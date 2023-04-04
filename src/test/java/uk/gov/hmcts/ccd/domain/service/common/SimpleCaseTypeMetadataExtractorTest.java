@@ -77,7 +77,7 @@ class SimpleCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataE
     void testShouldEvaluatePathWithFieldIdPrefix() {
         FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
         fieldTypeDefinition.setId(FIELD_TYPE_ID);
-        fieldTypeDefinition.setType("Type-1");
+        fieldTypeDefinition.setType(BASE_FIELD_TYPE_ID);
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
 
@@ -88,7 +88,7 @@ class SimpleCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataE
                 new AbstractMap.SimpleEntry<>("type", dataValue),
                 caseFieldDefinition,
                 "timeline.0.",
-                FIELD_TYPE_ID,
+                    BASE_FIELD_TYPE_ID,
                 emptyList()
             );
 
@@ -144,18 +144,18 @@ class SimpleCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataE
     @MethodSource("provideMatchingFieldTypeParameters")
     void testShouldEvaluatePath(final List<CaseFieldMetadata> pathsBefore, final List<CaseFieldMetadata> pathsAfter) {
         FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setId(FIELD_TYPE_ID);
-        fieldTypeDefinition.setType("Type-1");
+        fieldTypeDefinition.setId(FIELD_TYPE_ID_GENERATED);
+        fieldTypeDefinition.setType(BASE_FIELD_TYPE_ID);
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
 
         final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> results =
             underTest.extractCaseFieldData(
-                nodeEntry,
-                caseFieldDefinition,
-                "",
-                FIELD_TYPE_ID,
-                pathsBefore
+                    nodeEntry,
+                    caseFieldDefinition,
+                    "",
+                    FIELD_TYPE_ID_GENERATED,
+                    pathsBefore
             );
 
         VavrAssertions.assertThat(results)
