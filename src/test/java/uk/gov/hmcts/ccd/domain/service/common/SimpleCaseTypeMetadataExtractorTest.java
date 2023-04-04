@@ -97,6 +97,29 @@ class SimpleCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataE
             .hasRightValueSatisfying(it -> assertThat(it).hasSameElementsAs(metadataList));
     }
 
+    @Test
+    void testShouldPassWithNullBaseType() {
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setId(BASE_FIELD_TYPE_ID);
+        fieldTypeDefinition.setType(null);
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+
+        final List<CaseFieldMetadata> metadataList = singletonList(new CaseFieldMetadata(FIELD_TYPE_ID, null));
+
+        final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> results =
+                underTest.extractCaseFieldData(
+                        nodeEntry,
+                        caseFieldDefinition,
+                        "",
+                        BASE_FIELD_TYPE_ID,
+                        emptyList()
+                );
+        VavrAssertions.assertThat(results)
+                .isNotNull()
+                .hasRightValueSatisfying(it -> assertThat(it).hasSameElementsAs(metadataList));
+    }
+
     @ParameterizedTest
     @MethodSource("provideNonMatchingFieldTypeParameters")
     void testShouldReturnUnchangedWhenFieldTypeDoesNotMatchFieldTypeDefinitionId(final String fieldType,
@@ -154,7 +177,7 @@ class SimpleCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataE
                     nodeEntry,
                     caseFieldDefinition,
                     "",
-                    FIELD_TYPE_ID_GENERATED,
+                    BASE_FIELD_TYPE_ID,
                     pathsBefore
             );
 
