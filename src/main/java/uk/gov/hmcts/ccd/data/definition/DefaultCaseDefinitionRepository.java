@@ -186,6 +186,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public CaseTypeDefinitionVersion getLatestVersionFromDefinitionStore(String caseTypeId) {
         try {
             final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+
+            LOG.info("JCDEBUG: getLatestVersionFromDefinitionStore: {}",
+                "applicationParams.caseTypeLatestVersionUrl(caseTypeId)");
+
             CaseTypeDefinitionVersion version = restTemplate
                     .exchange(applicationParams.caseTypeLatestVersionUrl(caseTypeId), HttpMethod.GET, requestEntity,
                             CaseTypeDefinitionVersion.class)
