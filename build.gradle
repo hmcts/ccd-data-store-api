@@ -49,7 +49,7 @@ def versions = [
         pact_version    : '4.1.7',
 ]
 ext['spring-security.version'] = '5.6.9'
-ext['spring-framework.version'] = '5.3.20'
+ext['spring-framework.version'] = '5.3.26'
 ext['jackson.version'] = '2.14.1'
 
 
