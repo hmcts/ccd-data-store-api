@@ -35,12 +35,21 @@ public class SimpleCaseTypeMetadataExtractor implements CaseFieldMetadataExtract
         @NonNull final List<CaseFieldMetadata> paths
     ) {
         final Optional<FieldTypeDefinition> optionalFieldTypeDefinition =
-            Optional.ofNullable(caseFieldDefinition.getFieldTypeDefinition());
+                Optional.ofNullable(caseFieldDefinition.getFieldTypeDefinition());
+        final Optional<CaseFieldMetadata> optionalCaseFieldMetadata;
 
-        final Optional<CaseFieldMetadata> optionalCaseFieldMetadata = optionalFieldTypeDefinition
-            .map(fieldTypeDefinition -> fieldType.equals(fieldTypeDefinition.getId())
-                ? new CaseFieldMetadata(fieldIdPrefix + nodeEntry.getKey(), caseFieldDefinition.getCategoryId())
-                : null);
+        if (FieldTypeDefinition.DOCUMENT.equals(fieldType)) {
+            optionalCaseFieldMetadata = optionalFieldTypeDefinition.map(
+                    fieldTypeDefinition -> (fieldType.equals(fieldTypeDefinition.getType())
+                                            || fieldType.equals(fieldTypeDefinition.getId()))
+                    ? new CaseFieldMetadata(fieldIdPrefix + nodeEntry.getKey(), caseFieldDefinition.getCategoryId())
+                    : null);
+        } else {
+            optionalCaseFieldMetadata = optionalFieldTypeDefinition.map(
+                    fieldTypeDefinition -> fieldType.equals(fieldTypeDefinition.getId())
+                    ? new CaseFieldMetadata(fieldIdPrefix + nodeEntry.getKey(), caseFieldDefinition.getCategoryId())
+                    : null);
+        }
 
         final List<CaseFieldMetadata> results = optionalCaseFieldMetadata
             .map(metadata -> Stream.of(paths, singletonList(metadata))

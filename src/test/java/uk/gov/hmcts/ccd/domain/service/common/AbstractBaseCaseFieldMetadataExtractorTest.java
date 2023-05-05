@@ -27,7 +27,9 @@ abstract class AbstractBaseCaseFieldMetadataExtractorTest extends TestFixtures {
         + "\"document_binary_url\": \"http://dm-store:8080/documents/a2c2f1f9-c309-4060-8f77-1800be0ca885/binary\",\n"
         + "    \"category_id\": null\n"
         + "  }";
-    protected static final String FIELD_TYPE_ID = "Document";
+    protected static final String FIELD_TYPE_ID = "DocumentField";
+    protected static final String BASE_FIELD_TYPE_ID = "Document";
+    protected static final String FIELD_TYPE_ID_GENERATED = "DocumentField-45af7864-091f-4b48-979d-1a7e5900ecd4";
 
     protected static JsonNode dataValue;
     protected static Map.Entry<String, JsonNode> nodeEntry;
