@@ -36,10 +36,10 @@ public class MockUtils {
     public static final String ROLE_TEST_PUBLIC = "caseworker-test-public";
     public static final String ROLE_CITIZEN = "citizen";
     public static final String ROLE_DCP_CASEWORKER = "caseworker-dcptest1";
-    public static final String CASE_ROLE_CAN_CREATE = "[CAN_CREATE]";
-    public static final String CASE_ROLE_CAN_READ = "[CAN_READ]";
-    public static final String CASE_ROLE_CAN_UPDATE = "[CAN_UPDATE]";
-    public static final String CASE_ROLE_CAN_DELETE = "[CAN_DELETE]";
+    public static final String CASE_ROLE_CAN_CREATE = "[01-CAN_CREATE]";
+    public static final String CASE_ROLE_CAN_READ = "[01-CAN_READ]";
+    public static final String CASE_ROLE_CAN_UPDATE = "[01-CAN_UPDATE]";
+    public static final String CASE_ROLE_CAN_DELETE = "[01-CAN_DELETE]";
 
     public static String generateDummyS2SToken(String serviceName) {
         return Jwts.builder()
