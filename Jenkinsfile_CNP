@@ -66,12 +66,16 @@ def secrets = [
         secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
         secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
 
-        secret('idam-data-store-system-user-username','ROLE_ASSIGNMENT_USER_EMAIL'),
-        secret('idam-data-store-system-user-password','ROLE_ASSIGNMENT_USER_PASSWORD')
+        secret('ccd-role-assignment-solicitor-email','ROLE_ASSIGNMENT_USER_EMAIL'),
+        secret('ccd-role-assignment-solicitor-password','ROLE_ASSIGNMENT_USER_PASSWORD'),
+
+        secret('ccd-befta-master-caseworker-staff-pwd','ROLE_ASSIGNMENT_CASEWORKER_STAFF_PWD'),
+        secret('ccd-befta-master-caseworker-regional-staff-pwd','ROLE_ASSIGNMENT_CASEWORKER_REGIONAL_STAFF_PWD'),
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY'),
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
+        secret('microservicekey-ccd-data', 'ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_KEY'),
         secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT'),
         secret('microservicekey-ccd-data', 'BEFTA_S2S_CLIENT_SECRET_OF_CCD_DATA'),
         secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP')
@@ -112,6 +116,12 @@ env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.servic
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 
+// Env variables needed to add Role Assignments.
+env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
+env.ROLE_ASSIGNMENT_HOST="http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+env.ROLE_ASSIGNMENT_CASEWORKER_STAFF="master.caseworker.staff@gmail.com"
+env.ROLE_ASSIGNMENT_CASEWORKER_REGIONAL_STAFF="master.caseworker.regional-staff@gmail.com"
+
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
@@ -143,7 +153,7 @@ withPipeline(type, product, component) {
         env.ELASTIC_SEARCH_FTA_ENABLED = "true"
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
-        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
 
@@ -156,6 +166,24 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     disableLegacyDeployment()
     enableHighLevelDataSetup()
+    
+    before('highleveldatasetup') {
+        echo 'loading vault secrets before highLevelDataSetup'
+        loadVaultSecrets(secrets)
+        echo 'completed loading vault secrets before highLevelDataSetup'
+    }
+    
+    before('loadVaultSecrets') {
+        echo 'loading vault secrets started'
+    }
+    
+    after('loadVaultSecrets') {
+        echo 'loading vault secrets completed'
+    }
+    
+    after('highLevelDataSetup') {
+        echo 'highLevelDataSetup completed'
+    }
 
     afterAlways('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)

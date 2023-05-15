@@ -1,0 +1,25 @@
+{
+  "roleRequest" : {
+    "assignerId" : "[[$ROLE_ASSIGNMENT_CASEWORKER_STAFF]]",
+    "process" : "ccd-fta-data-setup",
+    "reference" : "[[$ROLE_ASSIGNMENT_CASEWORKER_STAFF]]",
+    "replaceExisting" : true
+  },
+  "requestedRoles" : [
+    {
+      "actorId" : "[[$ROLE_ASSIGNMENT_CASEWORKER_STAFF]]",
+      "actorIdType" : "IDAM",
+      "roleType" : "ORGANISATION",
+      "roleName" : "ft_hmcts-staff",
+      "roleCategory" : "PROFESSIONAL",
+      "classification" : "PUBLIC",
+      "grantType" : "BASIC",
+      "readOnly" : false,
+      "beginTime" : "2021-01-01T00:00:00Z",
+      "attributes" : {
+        "jurisdiction": "BEFTA_MASTER"
+      }
+    }
+  ]
+}
+
