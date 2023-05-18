@@ -1,0 +1,23 @@
+{
+  "_guid_": "GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker",
+  "_extends_": "Grant_Access__PositiveResponse_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "manageTTL": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_TTL_v2",
+      "cid": "${[scenarioContext][siblingContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "id": "${[scenarioContext][testData][users][manageTTL][id]}"
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "_guid_": "S-1017.11",
+  "_extends_": "MidEvent_v1Ext_Caseworker__PositiveResponse_Base",
+
+  "title": "Trigger a mid event callback that changes TTL.Suspended (null -> missing). Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1017_UpdateCase_TTLCaseType_updateWithMidEventTTLToUpper_PreRequisiteCaseworker_TokenCreation"
+  } ],
+
+  "specs": [
+    "a caseworker with an active profile in CCD",
+    "access to manage TTL properties",
+
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker",
+    "contains an event token for the case just created above",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger a mid event callback that changes the TTL.Suspended value (null -> missing)",
+
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
+    "contains the TTL.OverrideTTL from the previouse data",
+    "does not contain the TTL.Suspended as removed by callback (null -> missing)"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "manageTTL": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+		"pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2"
+		},
+    "queryParams": {
+      "pageId": "updateWithMidEventTTLToUpperSingleFormPage"
+    },
+    "body": {
+      "data": {
+        "TextField": "Updated mid-event",
+        "TTL": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][case_details][case_data][TTL]}"
+      },
+      "event": {
+        "id": "updateWithMidEventTTLToUpper"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "data": {
+        "TTL" : {
+          "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+          "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
+        },
+        "TextField" : "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}

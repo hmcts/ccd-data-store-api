@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.PathNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,9 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -30,7 +29,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
@@ -42,6 +40,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVE
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 @Service
+@Slf4j
 @Qualifier("authorised")
 public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
@@ -52,7 +51,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private final GetCaseOperation getCaseOperation;
     private final AccessControlService accessControlService;
     private final CaseAccessService caseAccessService;
-    private final CaseAccessCategoriesService caseAccessCategoriesService;
     private final CaseDetailsJsonParser caseDetailsJsonParser;
     private final GetCaseOperation authGetCaseOperation;
     private final CaseService caseService;
@@ -65,7 +63,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                           final CaseDefinitionRepository caseDefinitionRepository,
                                           final AccessControlService accessControlService,
                                           CaseAccessService caseAccessService,
-                                          CaseAccessCategoriesService caseAccessCategoriesService,
                                           CaseDetailsJsonParser caseDetailsJsonParser,
                                           @Qualifier("authorised") final GetCaseOperation authGetCaseOperation,
                                           CaseService caseService,
@@ -77,7 +74,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         this.getCaseOperation = getCaseOperation;
         this.accessControlService = accessControlService;
         this.caseAccessService = caseAccessService;
-        this.caseAccessCategoriesService = caseAccessCategoriesService;
         this.caseDetailsJsonParser = caseDetailsJsonParser;
         this.authGetCaseOperation = authGetCaseOperation;
         this.caseService = caseService;
@@ -105,7 +101,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
         updateCaseDetailsWithTtlIncrement(existingCaseDetails, caseTypeDefinition, content.getEvent());
 
-        verifyCaseAccessCategories(accessProfiles, existingCaseDetails);
         verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails,
             caseTypeDefinition, accessProfiles);
 
@@ -186,14 +181,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         return createCaseEventDetails;
     }
 
-    private void verifyCaseAccessCategories(Set<AccessProfile> accessProfiles, CaseDetails existingCaseDetails) {
-        Optional<CaseDetails> filteredCaseDetails = Optional.of(existingCaseDetails)
-            .filter(caseAccessCategoriesService.caseHasMatchingCaseAccessCategories(accessProfiles, false));
-        if (filteredCaseDetails.isEmpty()) {
-            throw new CaseNotFoundException(existingCaseDetails.getReferenceAsString());
-        }
-    }
-
     private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition,
                                          Set<AccessProfile> accessProfiles,
                                          CaseDetails caseDetails) {
@@ -231,12 +218,14 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                     Set<AccessProfile> accessProfiles) {
 
         verifyCaseTypeAndStateAccess(existingCaseDetails, caseTypeDefinition, accessProfiles);
-
-        if (event == null || !accessControlService.canAccessCaseEventWithCriteria(
-            event.getEventId(),
-            caseTypeDefinition.getEvents(),
-            accessProfiles,
-            CAN_CREATE)) {
+        if (event == null || event.getEventId() == null || event.getEventId().isEmpty()) {
+            log.error("EventId is not supplied");
+            throw new ResourceNotFoundException(NO_EVENT_FOUND);
+        } else if (!accessControlService.canAccessCaseEventWithCriteria(
+                                            event.getEventId(),
+                                            caseTypeDefinition.getEvents(),
+                                            accessProfiles,
+                                            CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
 

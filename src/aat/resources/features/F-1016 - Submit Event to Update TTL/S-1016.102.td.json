@@ -1,0 +1,72 @@
+{
+  "_guid_": "S-1016.102",
+  "_extends_": "SubmitEvent_v1Ext_Caseworker__PositiveResponse_Base",
+
+  "title": "Trigger a submit event callback that changes TTL.Suspended (No -> NO). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1016_UpdateCase_TTLCaseType_updateWithSubmitTTLToUpper_PreRequisiteCaseworker_TokenCreation"
+  } ],
+
+  "specs": [
+    "a caseworker with an active profile in CCD",
+    "access to manage TTL properties",
+
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker",
+    "contains an event token for the case just created above",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger a submit event callback that changes the TTL.OverrideTTL value (null -> missing)",
+    "is configured to trigger a submit event callback that changes the TTL.Suspended value (No -> NO)",
+
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
+    "does not contain the TTL.OverrideTTL as removed by callback (null -> missing)",
+    "contains the adjusted TTL.Suspended from the callback (No -> NO)"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "manageTTL": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2",
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "TextField": "Updated submit-event"
+      },
+      "event": {
+        "id": "updateWithSubmitTTLToUpper"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "id": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "version": 2,
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type_id": "FT_TTL_v2",
+
+      "case_data": {
+        "TTL" : {
+          "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+          "Suspended" : "NO"
+        },
+        "TextField" : "[[ANYTHING_PRESENT]]"
+      },
+
+      "data_classification": {
+        "TextField": "PUBLIC"
+      }
+    }
+  }
+}

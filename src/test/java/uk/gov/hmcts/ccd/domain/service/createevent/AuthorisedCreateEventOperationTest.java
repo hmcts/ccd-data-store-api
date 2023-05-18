@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -15,6 +19,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.documentdata.CollectionData;
@@ -29,12 +34,10 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -48,7 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -59,9 +61,10 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyBoolean;
@@ -128,9 +131,6 @@ class AuthorisedCreateEventOperationTest {
     private CaseAccessService caseAccessService;
 
     @Mock
-    private CaseAccessCategoriesService caseAccessCategoriesService;
-
-    @Mock
     private CaseDetailsJsonParser caseDetailsJsonParser;
 
     @Mock
@@ -165,7 +165,6 @@ class AuthorisedCreateEventOperationTest {
             caseDefinitionRepository,
             accessControlService,
             caseAccessService,
-            caseAccessCategoriesService,
             caseDetailsJsonParser,
             getCaseOperation,
             caseService,
@@ -209,10 +208,6 @@ class AuthorisedCreateEventOperationTest {
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean())).thenReturn(authorisedCaseNode);
-
-        Predicate<CaseDetails> predicate = cd -> true;
-        when(caseAccessCategoriesService
-            .caseHasMatchingCaseAccessCategories(anySet(), anyBoolean())).thenReturn(predicate);
 
         when(caseDetailsJsonParser.read(any(CaseDetails.class), anyString())).thenCallRealMethod();
         when(caseDetailsJsonParser.containsDocumentUrl(any(CaseDetails.class), anyString())).thenCallRealMethod();
@@ -422,9 +417,46 @@ class AuthorisedCreateEventOperationTest {
     @Test
     @DisplayName("should fail if no event provided")
     void shouldFailIfNoEventProvided() {
+        assertCreateEventLogs(INVALID_CASE_DATA_CONTENT);
+    }
 
+    @Test
+    @DisplayName("should fail if eventId is null")
+    void shouldFailIfEventIdIsNull() {
+        Event event = new Event();
+        event.setEventId(null);
+        INVALID_CASE_DATA_CONTENT.setEvent(event);
+        assertCreateEventLogs(INVALID_CASE_DATA_CONTENT);
+        assertNull(INVALID_CASE_DATA_CONTENT.getEvent().getEventId());
+    }
+
+    @Test
+    @DisplayName("should fail if eventId is empty")
+    void shouldFailIfEventIdIsEmpty() {
+        Event event = new Event();
+        event.setEventId("");
+        INVALID_CASE_DATA_CONTENT.setEvent(event);
+        assertCreateEventLogs(INVALID_CASE_DATA_CONTENT);
+        assertTrue(INVALID_CASE_DATA_CONTENT.getEvent().getEventId().isEmpty());
+    }
+
+    private void assertCreateEventLogs(CaseDataContent caseDataContent) {
+        Logger logger = (Logger) LoggerFactory.getLogger(AuthorisedCreateEventOperation.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+
+        logger.setLevel(Level.ERROR);
         assertThrows(ResourceNotFoundException.class, () ->
-            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, INVALID_CASE_DATA_CONTENT));
+                authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent));
+
+        List<ILoggingEvent> loggingEventList = listAppender.list;
+        assertAll(
+                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is("EventId is not supplied"))
+        );
+        listAppender.stop();
+        logger.detachAndStopAllAppenders();
     }
 
     @Test
@@ -654,28 +686,6 @@ class AuthorisedCreateEventOperationTest {
             .createCaseSystemEvent(caseReference, 1, attributeField, categoryId));
     }
 
-
-    @Test
-    @DisplayName("should fail if case data not match with case access categories")
-    void shouldFailIfCaseAccessCategoriesNotMatchWithCaseData() {
-        Set<AccessProfile> accessProfiles =
-            createAccessProfilesWithCaseAccessCategories(Sets.newHashSet("Civil/Standard"));
-        mockAccess(accessProfiles);
-
-        Map<String, JsonNode> data = getCaseAccessCategoriesData("Civil/Test");
-        mockExistingCaseDetails(data);
-
-        CaseDataContent newCaseDataContent = createNewCaseDataContent("Civil/Test1");
-        CaseDetails classifiedCase = new CaseDetails();
-        Map<String, JsonNode> classifiedData = Maps.newHashMap();
-        classifiedCase.setData(classifiedData);
-        doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
-            newCaseDataContent);
-
-        assertThrows(CaseNotFoundException.class, () ->
-            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, newCaseDataContent));
-    }
-
     @Test
     @DisplayName("should return case details if case data match with case access categories")
     void shouldReturnCaseDetailsIfCaseAccessCategoriesMatchCaseData() {
@@ -729,9 +739,6 @@ class AuthorisedCreateEventOperationTest {
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
             eq(accessProfiles),
             eq(CAN_READ))).thenReturn(true);
-
-        when(caseAccessCategoriesService
-            .caseHasMatchingCaseAccessCategories(eq(accessProfiles), eq(false))).thenCallRealMethod();
     }
 
     private static Set<AccessProfile> createAccessProfilesWithCaseAccessCategories(Set<String> caseAccessCategories) {

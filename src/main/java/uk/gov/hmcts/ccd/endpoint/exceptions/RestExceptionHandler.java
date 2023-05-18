@@ -14,8 +14,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -24,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -98,6 +97,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .body(Collections.singletonMap("errorMessage", errorMsg));
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseBody
+    public ResponseEntity<HttpError> handleConstraintViolationException(final HttpServletRequest request,
+                                                                        final Exception exception) {
+        LOG.error(exception.getMessage());
+        appInsights.trackException(exception);
+
+        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
+            .withDetails(exception.getCause());
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<HttpError> handleException(final HttpServletRequest request, final Exception exception) {
@@ -114,7 +127,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         HttpStatus httpStatus = (targetException != null) ? getHttpStatus(targetException) : null;
 
-        final HttpError<Serializable> error = new HttpError<>(httpStatus, exception, request);
+        final HttpError<Serializable> error = new HttpError<>(exception, request, httpStatus);
 
         return ResponseEntity
             .status(error.getStatus())
@@ -138,30 +151,61 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .body(error);
     }
 
-    private HttpStatus getHttpStatus(Throwable causeOfException) {
+    private HttpStatus getHttpStatus(final Throwable causeOfException) {
+        HttpStatus httpStatus = checkAndRetrieveExceptionStatusCode(causeOfException);
+        if (httpStatus != null) {
+            return assignExceptionHttpCode(httpStatus);
+        }
+
+        if (isReadTimeoutException(causeOfException)) {
+            return HttpStatus.GATEWAY_TIMEOUT;
+        }
+
+        if (isUnknownHostException(causeOfException)) {
+            return HttpStatus.BAD_GATEWAY;
+        }
+
+        return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    private HttpStatus checkAndRetrieveExceptionStatusCode(final Throwable causeOfException) {
         HttpStatus httpStatus = null;
-        if (causeOfException instanceof HttpServerErrorException) {
-            httpStatus = ((HttpServerErrorException) causeOfException).getStatusCode();
-            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
-                httpStatus = HttpStatus.BAD_GATEWAY;
-            }
-        } else if (causeOfException instanceof FeignException.FeignServerException) {
+        if (causeOfException instanceof HttpStatusCodeException) {
+            httpStatus = HttpStatus.valueOf(((HttpStatusCodeException) causeOfException).getRawStatusCode());
+        } else if (causeOfException instanceof FeignException.FeignClientException
+            || causeOfException instanceof FeignException.FeignServerException) {
             httpStatus = HttpStatus.valueOf(((FeignException) causeOfException).status());
-            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
-                httpStatus = HttpStatus.BAD_GATEWAY;
-            }
-        } else if (causeOfException instanceof HttpClientErrorException) {
-            httpStatus = ((HttpClientErrorException) causeOfException).getStatusCode();
-            if (httpStatus != HttpStatus.UNAUTHORIZED) {
-                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            }
-        } else if (causeOfException instanceof FeignException.FeignClientException) {
-            httpStatus = HttpStatus.valueOf(((FeignException) causeOfException).status());
-            if (httpStatus != HttpStatus.UNAUTHORIZED) {
-                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            }
         }
 
         return httpStatus;
     }
+
+    // return BAD_GATEWAY for INTERNAL_SERVER_ERROR status code, other ServerErrors will be kept as is
+    // return UNAUTHORIZED for UNAUTHORIZED status code, other ClientErrors will return 500
+    private HttpStatus assignExceptionHttpCode(final HttpStatus httpStatus) {
+        if (httpStatus.is5xxServerError()) {
+            if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
+                return HttpStatus.BAD_GATEWAY;
+            }
+
+            return httpStatus;
+        }
+
+        if (httpStatus == HttpStatus.UNAUTHORIZED) {
+            return HttpStatus.UNAUTHORIZED;
+        }
+
+        return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    private boolean isReadTimeoutException(final Throwable causeOfException) {
+        Throwable innerException = causeOfException.getCause();
+        return innerException instanceof java.net.SocketTimeoutException
+            && innerException.getMessage().contains("Read timed out");
+    }
+
+    private boolean isUnknownHostException(final Throwable causeOfException) {
+        return causeOfException instanceof java.net.UnknownHostException;
+    }
+
 }

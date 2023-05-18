@@ -1,0 +1,62 @@
+{
+  "_guid_": "S-1015.31",
+  "_extends_": "StartEvent_v1Ext_Caseworker__PositiveResponse_Base",
+
+  "title": "Trigger a start event callback that changes TTL.Suspended (null -> missing). Start event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET",
+
+  "specs": [
+    "a caseworker with an active profile in CCD",
+    "access to manage TTL properties",
+
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger an About To Start callback that changes the TTL.Suspended value (null -> missing)",
+
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
+    "contains the TTL.OverrideTTL from the previouse data",
+    "does not contain the TTL.Suspended as removed by callback (null -> missing)"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "manageTTL": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2",
+
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateWithStartTTLToUpper"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "id": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+        "version": 1,
+        "jurisdiction": "BEFTA_MASTER",
+        "case_type_id": "FT_TTL_v2",
+
+        "case_data": {
+          "TTL" : {
+            "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+            "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
+          },
+          "TextField" : "[[ANYTHING_PRESENT]]"
+        },
+
+        "data_classification": {
+          "TextField" : "PUBLIC"
+        }
+      },
+      "event_id": "updateWithStartTTLToUpper"
+    }
+  }
+}

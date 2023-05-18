@@ -1,0 +1,57 @@
+{
+  "_guid_": "UpdateCase_TTLCaseType_manageCaseTTL__Base",
+  "_extends_": "SubmitEvent_v1Ext_Caseworker__PositiveResponse_Base",
+
+  "specs": [
+    "to set TTL properties for a case"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid" : "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2"
+    },
+    "body": {
+      "data": {
+        "TextField": "Updated with TTL by manageCaseTTL",
+        "TTL" : {
+          "SystemTTL" : null,
+          "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "Suspended" : "No"
+        }
+      },
+      "event": {
+        "id": "manageCaseTTL"
+      },
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id" : "[[ANYTHING_PRESENT]]",
+      "version" : "[[ANYTHING_PRESENT]]",
+
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type_id" : "FT_TTL_v2",
+
+      "case_data" : {
+        "TextField": "Updated with TTL by manageCaseTTL",
+        "TTL" : {
+          "SystemTTL" : null,
+          "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}",
+          "Suspended" : "No"
+        }
+      },
+      "data_classification" : {
+        "TextField" : "PUBLIC"
+      }
+    }
+  }
+}

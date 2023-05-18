@@ -1,0 +1,65 @@
+{
+  "_guid_": "S-1017.32",
+  "_extends_": "MidEvent_v2Ext__PositiveResponse_Base",
+
+  "title": "Trigger a mid event callback that changes TTL.Suspended (No -> NO). Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1017_UpdateCase_TTLCaseType_updateWithMidEventTTLToUpper_PreRequisiteCaseworker_TokenCreation"
+  } ],
+
+  "specs": [
+    "a caseworker with an active profile in CCD",
+    "access to manage TTL properties",
+
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker",
+    "contains an event token for the case just created above",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger a mid event callback that changes the TTL.OverrideTTL value (null -> missing)",
+    "is configured to trigger a mid event callback that changes the TTL.Suspended value (No -> NO)",
+
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
+    "does not contain the TTL.OverrideTTL as removed by callback (null -> missing)",
+    "contains the adjusted TTL.Suspended from the callback (No -> NO)"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "manageTTL": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+		"pathVariables": {
+      "ctid": "FT_TTL_v2"
+		},
+    "queryParams": {
+      "pageId": "updateWithMidEventTTLToUpperSingleFormPage"
+    },
+    "body": {
+      "data": {
+        "TextField": "Updated mid-event",
+        "TTL": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][case_details][case_data][TTL]}"
+      },
+      "event": {
+        "id": "updateWithMidEventTTLToUpper"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "data": {
+        "TTL" : {
+          "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+          "Suspended" : "NO"
+        },
+        "TextField" : "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}

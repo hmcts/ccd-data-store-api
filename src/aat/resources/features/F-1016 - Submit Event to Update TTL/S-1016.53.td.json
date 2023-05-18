@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.53",
-  "_extends_": "Event_Creation_Caseworker_Base",
+  "_extends_": "SubmitEvent_v1Ext_Caseworker__Base",
 
   "title": "Attempt to update SystemTTL without permissions using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
 
@@ -12,7 +12,7 @@
     "an active profile in CCD",
     "access to manage TTL properties",
 
-    "contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker",
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker",
     "contains an event token for the case just created above",
     "has TTL.SystemTTL value set to a valid date",
 
@@ -30,8 +30,9 @@
 
   "request": {
     "pathVariables": {
-      "ctid": "FT_TTL",
-      "cid": "${[scenarioContext][childContexts][F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "jid" : "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2",
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
     },
     "headers": {
       "_extends_": "Common_Request_Headers"

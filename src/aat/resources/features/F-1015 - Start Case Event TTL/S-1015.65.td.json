@@ -1,0 +1,63 @@
+{
+  "_guid_": "S-1015.65",
+  "_extends_": "StartEvent_v1Int_Caseworker__PositiveResponse_Base",
+
+  "title": "Trigger a start event callback that has TTL missing. Start event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET",
+
+  "specs": [
+    "a caseworker with an active profile in CCD",
+
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger an About To Start callback that responds with TTL missing",
+
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2",
+
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateWithStartTTLMissing"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "id": "updateWithStartTTLMissing",
+
+      "case_id": "${}${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "case_fields": [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "id"
+        }, {
+          "_extends_": "F-1015_CaseFields_TTL",
+  
+          "value" : {
+            "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+            "OverrideTTL" : null,
+            "Suspended" : "No"
+          },
+          "formatted_value" : {
+            "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+            "OverrideTTL" : null,
+            "Suspended" : "No"
+          },
+          "display_context" : "READONLY"
+        },
+        {
+          "_extends_" : "F-1015_CaseFields_TextField"
+        }
+      ]
+    }
+  }
+}

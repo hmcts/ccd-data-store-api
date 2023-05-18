@@ -1,0 +1,24 @@
+{
+  "_guid_": "S-1032.1",
+  "_extends_": "F-1003-Test_Base_data",
+  "title": "must get an error response for a malformed case type ID",
+  "specs": [
+    "contains a malformed case type ID"
+  ],
+  "request": {
+    "pathVariables": {
+      "CaseTypeID": "BEFTA_&^$£CASETYPE_2_1"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception": "javax.validation.ConstraintViolationException",
+      "message": "createCase.caseTypeId: Case Type Id is invalid",
+      "path" : "/case-types/BEFTA_%2526%255E%2524%25C2%25A3CASETYPE_2_1/cases",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

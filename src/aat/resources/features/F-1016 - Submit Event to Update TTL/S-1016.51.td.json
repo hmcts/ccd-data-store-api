@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.51",
-  "_extends_": "Event_Creation_Caseworker_Base",
+  "_extends_": "SubmitEvent_v1Ext_Caseworker__PositiveResponse_Base",
 
   "title": "Set TTL for first time when TTL data not present in event data using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
 
@@ -11,7 +11,7 @@
   "specs": [
     "an active profile in CCD",
 
-    "contains a case Id that has just been created as in F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker",
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker",
     "contains an event token for the case just created above",
     "has no TTL data present in the submitted data",
 
@@ -26,39 +26,31 @@
 
   "request": {
     "pathVariables": {
-      "ctid": "FT_TTL",
-      "cid": "${[scenarioContext][childContexts][F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
-    },
-    "headers": {
-      "_extends_": "Common_Request_Headers"
+      "jid" : "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2",
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
         "TextField": "Updated without supplying TTL"
       },
       "event": {
-        "id": "updateCaseTTLIncHidden",
-        "summary": "",
-        "description": ""
+        "id": "updateCaseTTLIncHidden"
       },
-      "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": true
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 
   "expectedResponse": {
-    "_extends_": "Common_201_Response",
     "body" : {
       "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" : "BEFTA_MASTER",
-      "state" : "CaseUpdated",
       "version" : 1,
-      "case_type_id" : "FT_TTL",
-      "created_date" : "[[ANYTHING_PRESENT]]",
-      "last_modified" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
-      "security_classification" : "PUBLIC",
+
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type_id" : "FT_TTL_v2",
+
+      "state" : "CaseUpdated",
+
       "case_data" : {
         "TextField": "Updated without supplying TTL",
         "TTL" : {
@@ -67,17 +59,8 @@
           "Suspended" : "No"
         }
       },
-      "data_classification" : {
-        "TextField" : "PUBLIC"
-      },
-      "supplementary_data" : null,
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
-      "security_classifications" : {
-        "TextField" : "PUBLIC"
+      "data_classification": {
+        "TextField": "PUBLIC"
       }
     }
   }

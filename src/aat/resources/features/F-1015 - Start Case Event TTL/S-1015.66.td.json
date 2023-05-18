@@ -1,0 +1,36 @@
+{
+  "_guid_": "S-1015.66",
+  "_extends_": "StartEvent_v1Int_Caseworker__Base",
+
+  "title": "Trigger a start event callback that changes TTL set to null. Start event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET",
+
+  "specs": [
+    "a caseworker with an active profile in CCD",
+
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger an About To Start callback that responds with TTL set to null",
+
+    "contains the error message indicating unauthorised change to the TTL values"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2",
+
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateWithStartTTLNull"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

@@ -1,8 +1,8 @@
 {
   "_guid_": "S-1015.8",
-  "_extends_": "F-1015_RetrieveTrigger",
+  "_extends_": "StartEvent_v2Ext__PositiveResponse_Base",
 
-  "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified using v2 '/cases/{caseId}/event-triggers/{triggerId}'",
+  "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified using v2 '/cases/{cid}/event-triggers/{etid}'",
 
   "specs": [
     "an active profile in CCD",
@@ -20,8 +20,8 @@
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
-      "triggerId": "updateCaseNoTTLInc"
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateCaseNoTTLInc"
     }
   },
 
@@ -44,11 +44,7 @@
           "SearchCriteria" : { }
         },
         "data_classification": {
-          "_extends_": "TTL_Case_Data_Classifications",
-          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-        },
-        "security_classifications": {
-          "_extends_": "TTL_Case_Data_Classifications",
+          "_extends_": "TTL_Classifications",
           "SearchCriteria" : "[[ANYTHING_PRESENT]]"
         }
       },

@@ -1,0 +1,39 @@
+{
+  "_guid_": "S-1016.115.VerifyCaseDetails",
+  "_extends_": "GetCaseDetails__PositiveResponse_Base",
+
+  "specs": [
+    "to verify that the TTL data has changed"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type" : "FT_TTL_v2",
+
+      "data": {
+        "TextField" : "Updated submit-event",
+        "TTL" : {
+          "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+          "OverrideTTL" : null,
+          "Suspended" : "No"
+        }
+      },
+      "data_classification": {
+        "TextField" : "PUBLIC"
+      }
+    }
+  }
+}

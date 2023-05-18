@@ -1,0 +1,39 @@
+{
+  "title": "must return an error response for a malformed User ID List (e.g. user1,user2,,user4)",
+  "_guid_": "S-603.1",
+  "_extends_": "CaseUserRoles_Search__Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Jamal - who is a privileged user with permissions to access the case assignments of other users",
+    "is made by Jamal with the Case ID of C1 & a malformed User ID list"
+  ],
+
+  "users": {
+    "userRichard": {
+      "_extends_": "F-103_User_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "F-103_User_Jamal"
+    },
+    "userDil": {
+      "_extends_": "F-103_User_Dil"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_ids": [
+        "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+      ],
+      "user_ids": [
+        "${[scenarioContext][testData][users][userRichard][id]}",
+        ""
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "S-603_expectedResponse"
+  }
+}

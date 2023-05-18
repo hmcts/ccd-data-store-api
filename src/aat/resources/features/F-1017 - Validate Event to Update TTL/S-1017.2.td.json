@@ -1,13 +1,12 @@
 {
   "_guid_": "S-1017.2",
-  "_extends_": "F-1017_Test_Data_Base",
+  "_extends_": "MidEvent_v1Ext_Caseworker__Base",
 
   "title": "TTL.SystemTTL changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
 
   "prerequisites" : [ {
     "Token_Creation": "S-1017_GetUpdateSuspendedCaseToken"
-  }
-  ],
+  } ],
 
   "specs": [
     "an active profile in CCD",
@@ -16,10 +15,17 @@
     "has the mid event callback change the TTL.SystemTTL value changed"
   ],
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
   "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
+		"pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+		},
     "queryParams": {
       "pageId": "updateMidEventModifiedSystemTTLSingleFormPage"
     },
@@ -32,24 +38,13 @@
         }
       },
       "event": {
-        "id": "updateMidEventModifiedSystemTTL",
-        "summary": "",
-        "description": ""
+        "id": "updateMidEventModifiedSystemTTL"
       },
-      "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": true
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
-    "body" : {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "message": "Time to live content has been modified by callback",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
-    }
+    "_extends_": "400_TTL_Modified"
   }
 }

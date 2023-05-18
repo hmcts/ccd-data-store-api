@@ -105,13 +105,19 @@ withNightlyPipeline(type, product, component) {
     enableHighLevelDataSetup()
     enableFortifyScan()
 
-    after('fortify-scan') {
+    afterAlways('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     }
-    after('test') {
+    afterAlways('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
-    
+  
+    enableFullFunctionalTest(200)
+
+    afterAlways('fullFunctionalTest') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
+    }
+
     enableSlackNotifications('#ccd-nightly-builds')
 }

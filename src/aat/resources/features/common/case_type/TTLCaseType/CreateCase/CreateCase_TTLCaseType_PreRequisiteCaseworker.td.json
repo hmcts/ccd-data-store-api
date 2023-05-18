@@ -1,0 +1,51 @@
+{
+  "_guid_": "CreateCase_TTLCaseType_PreRequisiteCaseworker",
+  "_extends_": "Case_Creation_Data_Base",
+
+  "specs": [
+    "to create a case"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "CreateCase_TTLCaseType_PreRequisiteCaseworker_TokenCreation"
+  } ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2"
+    },
+    "body": {
+      "data": {
+        "TextField": "Create Case"
+      },
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseCreated",
+      "case_type_id": "FT_TTL_v2",
+      "case_data": {
+        "TextField": "Create Case"
+      },
+      "data_classification": {
+        "TextField" : "PUBLIC"
+      },
+      "supplementary_data": null
+    }
+  }
+}

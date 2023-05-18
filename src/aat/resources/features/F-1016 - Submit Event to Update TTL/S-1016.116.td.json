@@ -1,0 +1,49 @@
+{
+  "_guid_": "S-1016.116",
+  "_extends_": "SubmitEvent_v1Ext_Citizen__Base",
+
+  "title": "Trigger a submit event callback that changes TTL set to null. Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1016_UpdateCase_TTLCaseType_updateWithSubmitTTLNull_PreRequisiteCitizen_TokenCreation"
+  } ],
+
+  "specs": [
+    "an active profile in CCD",
+
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCitizen",
+    "contains an event token for the case just created above",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger a submit event callback that responds with TTL set to null",
+
+    "contains the error message indicating unauthorised change to the TTL values",
+    "NB: cannot validate TTL in response as citizen user has no access"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2",
+      "cid": "${[scenarioContext][childContexts][CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "TextField": "Updated submit-event"
+      },
+      "event": {
+        "id": "updateWithSubmitTTLNull"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

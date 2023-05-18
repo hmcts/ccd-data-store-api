@@ -222,16 +222,6 @@ public class CaseDetails implements Cloneable {
         this.lastStateModifiedDate = lastStateModifiedDate;
     }
 
-    /**
-     * @deprecated Will be removed in version 2.x. Use {@link CaseDetails#dataClassification} instead.
-     */
-    @Deprecated
-    @JsonGetter("security_classifications")
-    @ApiModelProperty("Deprecated. Use `data_classification` instead.")
-    public Map<String, JsonNode> getSecurityClassifications() {
-        return dataClassification;
-    }
-
     public Map<String, JsonNode> getDataClassification() {
         return dataClassification;
     }

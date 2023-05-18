@@ -1,0 +1,33 @@
+{
+  "title": "must return an error response for a missing Case ID",
+  "_guid_": "S-601.1",
+  "_extends_": "CaseUserRoles_Search__Base",
+
+  "specs": [
+    "Dil - with a valid User ID",
+    "Jamal - who is a privileged user with permissions to access the case assignments of other users",
+    "is made by Jamal with no Case ID & Dil's User ID"
+  ],
+
+  "users": {
+    "userDil": {
+      "_extends_": "F-103_User_Dil"
+    },
+    "invokingUser": {
+      "_extends_": "F-103_User_Jamal"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_ids": [],
+      "user_ids": [
+        "${[scenarioContext][testData][users][userDil][id]}"
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "S-601_expectedResponse"
+  }
+}

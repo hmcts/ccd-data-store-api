@@ -1,0 +1,51 @@
+{
+  "_guid_": "S-1017.26",
+  "_extends_": "MidEvent_v1Ext_Citizen__Base",
+
+  "title": "Trigger a mid event callback that changes TTL set to null. Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1017_UpdateCase_TTLCaseType_updateWithMidEventTTLNull_PreRequisiteCitizen_TokenCreation"
+  } ],
+
+  "specs": [
+    "an active profile in CCD",
+
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCitizen",
+    "contains an event token for the case just created above",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger a mid event callback that responds with TTL set to null",
+
+    "contains the error message indicating unauthorised change to the TTL values"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+		"pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2"
+		},
+    "queryParams": {
+      "pageId": "updateWithMidEventTTLNullSingleFormPage"
+    },
+    "body": {
+      "data": {
+        "TextField": "Updated mid-event",
+        "TTL": {}
+      },
+      "event": {
+        "id": "updateWithMidEventTTLNull"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

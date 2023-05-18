@@ -1,0 +1,44 @@
+{
+  "_guid_": "StartEvent_v2Ext__PositiveResponse_Base",
+  "_extends_": "StartEvent_v2Ext__Base",
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-event-trigger.v2+json;charset=UTF-8"
+    },
+    "body": {
+      "token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "_links": {
+        "self": {
+          "href": "[[ANY_STRING_NOT_NULLABLE]]"
+        }
+      },
+      "case_details": {
+        "id": "OVERRIDE",
+        "version": "OVERRIDE",
+
+        "jurisdiction": "OVERRIDE",
+        "case_type_id": "OVERRIDE",
+
+        "state": "[[ANYTHING_PRESENT]]",
+        "created_date": "[[ANY_DATE_NOT_NULLABLE]]",
+        "last_modified":"[[ANY_DATE_NOT_NULLABLE]]",
+        "last_state_modified_date": "[[ANY_DATE_NOT_NULLABLE]]",
+        "security_classification": "PUBLIC",
+
+        "case_data": "OVERRIDE",
+        "data_classification": "OVERRIDE",
+
+        "supplementary_data": null,
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null
+      },
+
+      "event_id": "OVERRIDE"
+    }
+  }
+}

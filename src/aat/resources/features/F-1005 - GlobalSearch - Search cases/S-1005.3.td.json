@@ -7,7 +7,7 @@
     "contains none of the fields from new global search screen",
     "contains all the mandatory parameters",
     "has 400 return code",
-    "contains the error message 'Must have at least one search criteria'"
+    "contains the error message 'At least one jurisdiction or case type must be provided in the search criteria'"
   ],
   "request": {
     "body": {
@@ -23,7 +23,7 @@
       "error" : "Bad Request",
       "message" : "Input not valid",
       "path" : "/globalSearch",
-      "details" : [ "Must have at least one search criteria" ],
+      "details" : [ "At least one jurisdiction or case type must be provided in the search criteria" ],
       "callbackErrors" : null,
       "callbackWarnings" : null
     }

@@ -8,12 +8,6 @@
     }
   },
 
-	"request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    }
-	},
-
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "headers": {
@@ -38,10 +32,7 @@
       "case_data" : {
         "TTL": "[[ANYTHING_PRESENT]]"
       },
-      "data_classification" : {
-        "TTL": "[[ANYTHING_PRESENT]]"
-      },
-      "security_classifications" : {
+      "data_classification": {
         "TTL": "[[ANYTHING_PRESENT]]"
       }
     }

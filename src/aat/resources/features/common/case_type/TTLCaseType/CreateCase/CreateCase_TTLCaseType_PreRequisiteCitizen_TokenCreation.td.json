@@ -1,0 +1,33 @@
+{
+  "_guid_": "CreateCase_TTLCaseType_PreRequisiteCitizen_TokenCreation",
+  "_extends_": "Citizen_Token_Creation_Data_For_Case_Creation",
+
+  "specs": [
+    "to create a token for case creation as a citizen",
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_TTL_v2",
+      "etid": "createCase"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "case_details" : {
+        "jurisdiction" : "BEFTA_MASTER",
+        "case_type_id" : "FT_TTL_v2"
+      },
+      "event_id": "createCase"
+    }
+  }
+}

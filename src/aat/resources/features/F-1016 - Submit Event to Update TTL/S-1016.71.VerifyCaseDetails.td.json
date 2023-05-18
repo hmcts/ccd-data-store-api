@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.71.VerifyCaseDetails",
-  "_extends_": "F-1016_GetCaseDetails_Base",
+  "_extends_": "GetCaseDetails__PositiveResponse_Base",
 
   "specs": [
     "to verify that the TTL data has changed"
@@ -14,13 +14,15 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][siblingContexts][F-1016_CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][siblingContexts][CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}"
     }
   },
 
   "expectedResponse": {
     "body": {
-      "case_type" : "FT_TTL",
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type" : "FT_TTL_v2",
+
       "data": {
         "TextField" : "Updated without supplying TTL",
         "TTL" : {

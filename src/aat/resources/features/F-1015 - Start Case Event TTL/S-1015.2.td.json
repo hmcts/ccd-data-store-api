@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1015.2",
-  "_extends_": "F-1015_CitizenCreateUpdateEvent",
+  "_extends_": "StartEvent_v1Ext_Citizen__PositiveResponse_Base",
 
   "title": "must successfully update a cases TTL.SystemTTL value using '/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token'",
 
@@ -32,6 +32,7 @@
     "body": {
       "case_details": {
         "id": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
+        "version": 0,
         "jurisdiction": "BEFTA_MASTER",
         "state": "CaseCreated",
         "case_type_id": "FT_MasterCaseType",
@@ -43,11 +44,7 @@
           }
         },
         "data_classification": {
-          "_extends_": "TTL_Case_Data_Classifications"
-        },
-
-        "security_classifications": {
-          "_extends_": "TTL_Case_Data_Classifications"
+          "_extends_": "TTL_Classifications"
         }
       },
       "event_id": "updateCaseTTLInc"

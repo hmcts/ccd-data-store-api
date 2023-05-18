@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1016.86",
-  "_extends_": "F-1016_Test_Data_Base_V2",
+  "_extends_": "SubmitEvent_v2Ext__Base",
 
   "title": "Set TTL Override (TTL Guard fail) for first time when TTL data not present in case data and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST",
 
@@ -17,12 +17,15 @@
     "has TTL.OverrideTTL set to less than today + guard value"
   ],
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
   "request": {
     "pathVariables": {
       "cid": "${[scenarioContext][childContexts][F-1016_CreateCasePreRequisiteCaseworker_noTTL][testData][actualResponse][body][id]}"
-    },
-    "headers": {
-      "_extends_": "Common_Request_Headers"
     },
     "body": {
       "data": {
@@ -33,13 +36,9 @@
         }
       },
       "event": {
-        "id": "updateCaseSubmitTTL",
-        "summary": "",
-        "description": ""
+        "id": "updateCaseSubmitTTL"
       },
-      "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": true
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 

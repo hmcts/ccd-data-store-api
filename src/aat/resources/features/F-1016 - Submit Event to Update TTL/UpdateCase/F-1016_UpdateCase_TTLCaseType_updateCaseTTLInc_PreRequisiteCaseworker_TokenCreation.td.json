@@ -1,8 +1,6 @@
 {
   "_guid_": "F-1016_UpdateCase_TTLCaseType_updateCaseTTLInc_PreRequisiteCaseworker_TokenCreation",
-  "_extends_": "F-1016_GetEventTokenBase",
-
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "_extends_": "UpdateCase_TTLCaseType_TokenCreation__Base",
 
   "users": {
     "invokingUser": {
@@ -12,15 +10,19 @@
 
   "request": {
     "pathVariables": {
-      "ctid": "FT_TTL",
-      "etid": "updateCaseTTLInc",
-      "cid": "${[scenarioContext][siblingContexts][F-1016_CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][siblingContexts][CreateCase_TTLCaseType_PreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateCaseTTLInc"
     }
   },
 
   "expectedResponse": {
-    "body" : {
-      "event_id": "updateCaseTTLInc"
+    "body": {
+      "case_details": {
+
+        "case_data": {
+          "TTL": "[[ANYTHING_PRESENT]]"
+        }
+      }
     }
   }
 }
