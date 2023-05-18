@@ -163,25 +163,17 @@ withPipeline(type, product, component) {
     overrideVaultEnvironments(vaultOverrides)
     enableAksStagingDeployment()
     disableLegacyDeploymentOnAAT()
-    loadVaultSecrets(secrets)
     disableLegacyDeployment()
     enableHighLevelDataSetup()
     
     before('highleveldatasetup') {
         echo 'loading vault secrets before highLevelDataSetup'
+        echo 'loading vault secrets started'
         loadVaultSecrets(secrets)
         echo 'completed loading vault secrets before highLevelDataSetup'
     }
-    
-    before('loadVaultSecrets') {
-        echo 'loading vault secrets started'
-    }
-    
-    after('loadVaultSecrets') {
-        echo 'loading vault secrets completed'
-    }
-    
-    after('highLevelDataSetup') {
+
+    afterSuccess('highLevelDataSetup') {
         echo 'highLevelDataSetup completed'
     }
 
