@@ -14,9 +14,9 @@ import java.util.List;
 @Setter
 public class SearchCriteria {
 
-    private List<@Pattern(regexp = "^[\\d*?-]*$", message = ValidationError.CASE_REFERENCE_INVALID) String>
+    private List<@Pattern(regexp = "^{1,70}[\\d*?-]*$", message = ValidationError.CASE_REFERENCE_INVALID) String>
         caseReferences;
-
+// setting max to 70 for case reference but will need to check if this is correct.
     @JsonProperty("CCDJurisdictionIds")
     private List<@Size(max = 70, message = ValidationError.JURISDICTION_ID_LENGTH_INVALID) String> ccdJurisdictionIds;
 
