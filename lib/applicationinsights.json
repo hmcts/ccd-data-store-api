@@ -1,0 +1,6 @@
+{
+  "connectionString": "${file:/mnt/secrets/ccd-data-store/app-insights-connection-string}",
+  "role": {
+    "name": "CCD-DataStore"
+  }
+}
