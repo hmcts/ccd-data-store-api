@@ -1,18 +1,25 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>hmcts/.github//renovate/global"],
-  "labels": ["Renovate-dependencies"],
+  "extends": [
+    "local>hmcts/.github:renovate-config"
+  ],
+  "labels": [
+    "Renovate-dependencies"
+  ],
   "major": {
     "dependencyDashboardApproval": true
   },
   "packageRules": [
     {
       "matchUpdateTypes": [
-        "minor", "patch"
+        "minor",
+        "patch"
       ],
       "groupName": "All patch-minor dependencies",
       "groupSlug": "All-minor-patch",
-      "addLabels": ["Renovate All-minor-patch"],
+      "addLabels": [
+        "Renovate All-minor-patch"
+      ],
       "automerge": false
     }
   ]
