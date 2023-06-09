@@ -22,7 +22,7 @@ Scenario: should retrieve case when the case reference exists
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-155 @Ignore # defect RDM-6628
+@S-155 # defect RDM-6628
 Scenario: must return 401 when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],

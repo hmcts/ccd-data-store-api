@@ -36,7 +36,7 @@ Scenario: must return 400 when case reference does not exists
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-201 @Ignore # re-write as part of RDM-6847
+@S-201 # re-write as part of RDM-6847
 Scenario: must return 401 when request does not provide valid authentication credentials
 
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data],
@@ -47,11 +47,11 @@ Scenario: must return 401 when request does not provide valid authentication cre
       And it is submitted to call the [Retrieve a trigger for case by ID] operation of [CCD Data Store],
 
      Then a negative response is received,
-      And the response [contains HTTP 403 Unauthorized],
+      And the response [contains HTTP 401 Unauthorized],
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-202 @Ignore # re-write as part of RDM-6847
+@S-202 # re-write as part of RDM-6847
 Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
 
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data],
@@ -96,7 +96,7 @@ Scenario: must return 422 when case event has no pre states
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-205 @Ignore #Ignoring test whilst we determine how call back validation should work on GET cases
+@S-205 #Ignoring test whilst we determine how call back validation should work on GET cases
 Scenario: must return 422 when case event has validation errors
 
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data],
