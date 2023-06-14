@@ -4663,7 +4663,7 @@ public class AccessControlServiceTest {
                     "[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]");
 
             assertAll(
-                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.INFO)),
+                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
                 () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
         }
