@@ -21,7 +21,7 @@ public class DefinitionStoreClient {
     private final RestTemplate restTemplate;
     private final SecurityUtils securityUtils;
 
-    public DefinitionStoreClient(@Qualifier("restTemplate") RestTemplate restTemplate,
+    public DefinitionStoreClient(@Qualifier("definitionStoreRestTemplate") RestTemplate restTemplate,
                                  SecurityUtils securityUtils) {
         this.restTemplate = restTemplate;
         this.securityUtils = securityUtils;

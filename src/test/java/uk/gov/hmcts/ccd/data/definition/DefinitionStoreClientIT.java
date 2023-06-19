@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(locations = "classpath:test.properties")
 public class DefinitionStoreClientIT {
 
-    @MockBean(name = "restTemplate")
+    @MockBean(name = "definitionStoreRestTemplate")
     private RestTemplate restTemplate;
 
     @MockBean
