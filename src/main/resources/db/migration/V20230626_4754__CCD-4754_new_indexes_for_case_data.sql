@@ -1,0 +1,10 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_legacycasereference_casemanagementlocationregion ON public.case_data USING btree (btrim(upper((data #>> '{legacyCaseReference}'::text[]))), btrim(upper((data #>> '{caseManagementLocation,region}'::text[]))));
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_applicant1lastname_applicant1firstname ON public.case_data USING btree (btrim(upper((data #>> '{applicant1LastName}'::text[]))), btrim(upper((data #>> '{applicant1FirstName}'::text[]))));
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_applicant1firstname ON public.case_data USING btree (btrim(upper((data #>> '{applicant1FirstName}'::text[]))));
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_applicant1email ON public.case_data USING btree (btrim(upper((data #>> '{applicant1Email}'::text[]))));
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_marriagedate ON public.case_data USING btree (btrim(upper((data #>> '{marriageDate}'::text[]))));
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_applicant2lastname_applicant2firstname ON public.case_data USING btree (btrim(upper((data #>> '{applicant2LastName}'::text[]))), btrim(upper((data #>> '{applicant2FirstName}'::text[]))));
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_applicant2firstname ON public.case_data USING btree (btrim(upper((data #>> '{applicant2FirstName}'::text[]))));
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_applicant1hwfreferencenumber ON public.case_data USING btree (btrim(upper((data #>> '{applicant1HWFReferenceNumber}'::text[]))));
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_applicant2email ON public.case_data USING btree (btrim(upper((data #>> '{applicant2Email}'::text[]))));
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_benefitcode_isscottishcase_evidencehandled ON public.case_data USING btree (btrim(upper((data #>> '{benefitCode}'::text[]))), btrim(upper((data #>> '{isScottishCase}'::text[]))), btrim(upper((data #>> '{evidenceHandled}'::text[]))));
