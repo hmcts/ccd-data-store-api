@@ -13,5 +13,15 @@ DROP INDEX IF EXISTS idx_case_data_case_access_category;
 DROP INDEX IF EXISTS idx_case_data_generated_nino;
 DROP INDEX IF EXISTS idx_case_data_divorce_solpaymenthowtopay;
 DROP INDEX IF EXISTS idx_case_data_generated_surname;
-DROP INDEX IF EXISTS idx_case_data_hmctsdwpstate;
-
+DROP INDEX IF EXISTS idx_case_data_probate_formtype; 
+DROP INDEX IF EXISTS idx_case_data_hearing_venue;
+DROP INDEX IF EXISTS idx_case_data_case_external_id;
+DROP INDEX IF EXISTS idx_case_data_cmc_previousservicecasereference;
+DROP INDEX IF EXISTS idx_case_data_divorce_d8helpwithfeesneedhelp;
+DROP INDEX IF EXISTS idx_case_data_paymentreference;
+DROP INDEX IF EXISTS idx_case_data_claimanttype_claimant_addressuk_postcode;
+DROP INDEX IF EXISTS idx_case_data_poboxjurisdiction;
+DROP INDEX IF EXISTS idx_case_data_openingdate;
+DROP INDEX IF EXISTS idx_case_data_divorce_applyfordecreeabsolute;
+DROP INDEX IF EXISTS idx_case_data_deliverydate;
+DROP INDEX IF EXISTS idx_case_data_divorce_dnoutcomecase;
