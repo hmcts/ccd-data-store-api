@@ -60,7 +60,7 @@ public class AccessControlServiceImpl implements AccessControlService {
 
         boolean hasAccess = hasAccessControlList(accessProfiles, criteria, caseType.getAccessControlLists());
         if (!hasAccess) {
-            LOG.info(NO_ROLE_FOUND, "caseType",
+            LOG.debug(NO_ROLE_FOUND, "caseType",
                     caseType.getId(),
                     AccessControlService.extractAccessProfileNames(accessProfiles),
                     "caseTypeACL",
@@ -86,7 +86,7 @@ public class AccessControlServiceImpl implements AccessControlService {
         boolean hasAccess = hasAccessControlList(accessProfiles, criteria, stateACLs);
 
         if (!hasAccess) {
-            LOG.error(NO_ROLE_FOUND, "caseState",
+            LOG.debug(NO_ROLE_FOUND, "caseState",
                     caseState,
                     AccessControlService.extractAccessProfileNames(accessProfiles),
                     "caseStateACL",
