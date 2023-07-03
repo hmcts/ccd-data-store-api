@@ -10,4 +10,3 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_applicant2email ON public.
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_benefitcode_isscottishcase_evidencehandled ON public.case_data USING btree (btrim(upper((data #>> '{benefitCode}'::text[]))), btrim(upper((data #>> '{isScottishCase}'::text[]))), btrim(upper((data #>> '{evidenceHandled}'::text[]))));
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_respondentlname_respondentfmname ON public.case_data USING btree (btrim(upper((data #>> '{respondentLName}'::text[]))), btrim(upper((data #>> '{respondentFMName}'::text[]))));
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_apprespondentlname_apprespondentfmname ON public.case_data USING btree (btrim(upper((data #>> '{appRespondentLName}'::text[]))), btrim(upper((data #>> '{appRespondentFMName}'::text[]))));
-ANALYZE;
