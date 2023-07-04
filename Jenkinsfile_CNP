@@ -1,5 +1,6 @@
 #!groovy
 import uk.gov.hmcts.contino.AppPipelineDsl
+import uk.gov.hmcts.contino.GithubAPI
 properties(
     [
         [
@@ -15,7 +16,7 @@ properties(
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
-def branchesToSync = ['demo', 'ithc', 'perftest']
+def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
 
 // Variables to switch pipeline logic and wiring per type of build
 
@@ -126,6 +127,11 @@ withPipeline(type, product, component) {
         enablePactAs([
                 AppPipelineDsl.PactRoles.PROVIDER
         ])
+
+        def githubApi = new GithubAPI(this)
+        if (!githubApi.getLabelsbyPattern(env.BRANCH_NAME, "keep-helm")) {
+            enableCleanupOfHelmReleaseAlways()
+        }
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
@@ -147,28 +153,28 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
     enableHighLevelDataSetup()
 
-    after('test') {
+    afterAlways('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
 
-    after('smoketest:preview') {
+    afterAlways('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     }
 
-    after('smoketest:aat') {
+    afterAlways('smoketest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     }
 
-    after('functionalTest:preview') {
+    afterAlways('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     }
 
-    after('functionalTest:aat') {
+    afterAlways('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     }
 
-    after('pact-provider-verification') {
+    afterAlways('pact-provider-verification') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
 }

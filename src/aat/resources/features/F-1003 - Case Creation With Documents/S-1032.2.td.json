@@ -1,0 +1,20 @@
+{
+  "_guid_": "S-1032.2",
+  "_extends_": "F-1003-Test_Base_data",
+  "title": "must get an error response for a case type ID containing potentially malicious characters",
+  "specs": [
+    "contains a case type ID containing potentially malicious characters"
+  ],
+  "request": {
+    "pathVariables": {
+      "CaseTypeID": "BEFTA_%CASETYPE_2_1"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "message": "The request was rejected because the URL contained a potentially malicious String \"%25\"",
+      "path" : "/case-types/BEFTA_%25CASETYPE_2_1/cases"
+    }
+  }
+}

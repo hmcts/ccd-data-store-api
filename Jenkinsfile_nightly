@@ -2,7 +2,8 @@
 
 properties([
     // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-    pipelineTriggers([cron('H 07 * * *')])
+    //CCD-3539 (Stop running Nightly builds on weekends) - At 07:00 on every day-of-week from Monday through Friday.  Original schedule was 'H 07 * * *'
+    pipelineTriggers([cron('H 07 * * 1-5')])
 ])
 
 @Library("Infrastructure")
@@ -104,17 +105,17 @@ withNightlyPipeline(type, product, component) {
     enableHighLevelDataSetup()
     enableFortifyScan()
 
-    after('fortify-scan') {
+    afterAlways('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     }
-    after('test') {
+    afterAlways('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
 
     enableFullFunctionalTest(200)
 
-    after('fullFunctionalTest') {
+    afterAlways('fullFunctionalTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     }
     enableSlackNotifications('#ccd-nightly-builds')

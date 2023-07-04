@@ -174,6 +174,9 @@ public class ApplicationParams {
     @Value("${ccd.access-control.caseworker.role.regex}")
     private String ccdAccessControlCaseworkerRoleRegex;
 
+    @Value("#{'${ccd.access-control.restricted-roles}'.split(',')}")
+    private List<String> ccdAccessControlRestrictedRoles;
+
     @Value("${enable-attribute-based-access-control}")
     private boolean enableAttributeBasedAccessControl;
 
@@ -513,6 +516,10 @@ public class ApplicationParams {
 
     public String getCcdAccessControlCaseworkerRoleRegex() {
         return ccdAccessControlCaseworkerRoleRegex;
+    }
+
+    public List<String> getCcdAccessControlRestrictedRoles() {
+        return ccdAccessControlRestrictedRoles;
     }
 
     public boolean getEnableAttributeBasedAccessControl() {

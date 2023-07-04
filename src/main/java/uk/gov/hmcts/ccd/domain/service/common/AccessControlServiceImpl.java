@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -55,14 +54,17 @@ public class AccessControlServiceImpl implements AccessControlService {
     public boolean canAccessCaseTypeWithCriteria(final CaseTypeDefinition caseType,
                                                  final Set<AccessProfile> accessProfiles,
                                                  final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = caseType != null
-            && hasAccessControlList(accessProfiles, criteria, caseType.getAccessControlLists());
+        if (caseType == null) {
+            return false;
+        }
 
+        boolean hasAccess = hasAccessControlList(accessProfiles, criteria, caseType.getAccessControlLists());
         if (!hasAccess) {
-            LOG.debug("No relevant case type access for caseType={}, caseTypeACLs={}, userRoles={}",
-                caseType != null ? caseType.getId() : "",
-                caseType != null ? caseType.getAccessControlLists() : Lists.newArrayList(),
-                accessProfiles);
+            LOG.debug(NO_ROLE_FOUND, "caseType",
+                    caseType.getId(),
+                    AccessControlService.extractAccessProfileNames(accessProfiles),
+                    "caseTypeACL",
+                    caseType.getAccessControlLists());
         }
 
         return hasAccess;
@@ -84,10 +86,11 @@ public class AccessControlServiceImpl implements AccessControlService {
         boolean hasAccess = hasAccessControlList(accessProfiles, criteria, stateACLs);
 
         if (!hasAccess) {
-            LOG.debug("No relevant case state access for caseState={}, caseStateACL={}, userRoles={}",
-                     caseState,
-                     stateACLs,
-                accessProfiles);
+            LOG.debug(NO_ROLE_FOUND, "caseState",
+                    caseState,
+                    AccessControlService.extractAccessProfileNames(accessProfiles),
+                    "caseStateACL",
+                    stateACLs);
         }
         return hasAccess;
     }
@@ -97,14 +100,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                   final List<CaseEventDefinition> caseEventDefinitions,
                                                   final Set<AccessProfile> accessProfiles,
                                                   final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = hasCaseEventAccess(eventId, caseEventDefinitions, accessProfiles, criteria);
-        if (!hasAccess) {
-            LOG.debug("No relevant event access for eventId={}, eventAcls={}, userRoles={}",
-                eventId,
-                getCaseEventAcls(caseEventDefinitions, eventId),
-                accessProfiles);
-        }
-        return hasAccess;
+        return hasCaseEventAccess(eventId, caseEventDefinitions, accessProfiles, criteria);
     }
 
     @Override
@@ -127,7 +123,15 @@ public class AccessControlServiceImpl implements AccessControlService {
     public boolean canAccessCaseViewFieldWithCriteria(final CommonField caseViewField,
                                                       final Set<AccessProfile> accessProfiles,
                                                       final Predicate<AccessControlList> criteria) {
-        return hasAccessControlList(accessProfiles, criteria, caseViewField.getAccessControlLists());
+        if (!hasAccessControlList(accessProfiles, criteria, caseViewField.getAccessControlLists())) {
+            LOG.debug(NO_ROLE_FOUND, "caseField",
+                    caseViewField.getId(),
+                    AccessControlService.extractAccessProfileNames(accessProfiles),
+                    "caseFieldACL",
+                    caseViewField.getAccessControlLists());
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -368,18 +372,21 @@ public class AccessControlServiceImpl implements AccessControlService {
         if (caseFieldDefinitions.isEmpty()) {
             return true;
         }
-        for (CaseFieldDefinition caseField : caseFieldDefinitions) {
-            if (caseField.getId().equals(fieldName)
-                && hasAccessControlList(accessProfiles, criteria, caseField.getAccessControlLists())) {
-                return true;
-            }
+
+        Optional<CaseFieldDefinition> matchedField = caseFieldDefinitions.stream()
+                .filter(caseField -> caseField.getId().equals(fieldName))
+                .findFirst();
+        if (matchedField.isEmpty()) {
+            LOG.error("No matching caseField={} in caseFieldDefinitions", fieldName);
+            return false;
+        } else if (hasAccessControlList(accessProfiles, criteria, matchedField.get().getAccessControlLists())) {
+            return true;
         }
-        AccessControlServiceImpl.LOG.debug(
-            "Field names do not match or no relevant field access for fieldName={}, "
-                + "caseFieldDefinitions={}, userRoles={}",
-            fieldName,
-            getCaseFieldAcls(caseFieldDefinitions, fieldName),
-            accessProfiles);
+        LOG.error(NO_ROLE_FOUND, "caseField",
+                fieldName,
+                AccessControlService.extractAccessProfileNames(accessProfiles),
+                "caseFieldACL",
+                getCaseFieldAcls(caseFieldDefinitions, fieldName));
         return false;
     }
 

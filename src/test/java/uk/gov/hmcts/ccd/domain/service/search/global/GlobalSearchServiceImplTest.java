@@ -12,6 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,6 +26,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
@@ -50,7 +53,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,6 +69,7 @@ class GlobalSearchServiceImplTest extends TestFixtures {
     private ApplicationParams applicationParams;
 
     @Spy
+    @SuppressWarnings("unused") // needed to set up GlobalSearchServiceImpl
     private ObjectMapperService objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
 
     @Mock
@@ -76,6 +83,9 @@ class GlobalSearchServiceImplTest extends TestFixtures {
 
     @Mock
     private GlobalSearchQueryBuilder globalSearchQueryBuilder;
+
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
 
     @Mock
     private GlobalSearchParser globalSearchParser;
@@ -245,7 +255,41 @@ class GlobalSearchServiceImplTest extends TestFixtures {
                 ),
                 () -> assertTrue(
                     request.getSearchCriteria().getCcdCaseTypeIds().containsAll(output.getCaseTypeIds())
-                )
+                ),
+                // NB: verify jurisdiction lookup not used when case types supplied
+                () -> verify(caseDefinitionRepository, never()).getCaseTypesIDsByJurisdictions(anyList())
+            );
+        }
+
+        @ParameterizedTest(
+            name = "Query Check: should populate case types from jurisdictions lookup if null or empty: {0}"
+        )
+        @NullAndEmptySource
+        void shouldPopulateCaseTypesFromJurisdictionsLookupIfNull(List<String> caseTypeIds) throws Exception {
+
+            // ARRANGE
+            mockInternalCalls();
+
+            // setup case type and jurisdiction relationships
+            List<String> jurisdictions = List.of("jurisdictions_1", "jurisdictions_2");
+            List<String> expectedCaseTypes = List.of("case_type_1", "case_type_2");
+            doReturn(expectedCaseTypes).when(caseDefinitionRepository).getCaseTypesIDsByJurisdictions(jurisdictions);
+
+            // add list of jurisdictions to request
+            request.getSearchCriteria().setCcdCaseTypeIds(caseTypeIds); // i.e. @NullAndEmptySource
+            request.getSearchCriteria().setCcdJurisdictionIds(jurisdictions);
+
+            // ACT
+            CrossCaseTypeSearchRequest output = underTest.assembleSearchQuery(request);
+
+            // ASSERT
+            assertAll(
+                () -> assertEquals(expectedCaseTypes.size(), output.getCaseTypeIds().size()),
+                () -> assertTrue(expectedCaseTypes.containsAll(output.getCaseTypeIds())),
+
+                // NB: verify jurisdiction lookup used when case types are missing
+                () -> verify(caseDefinitionRepository, times(1))
+                    .getCaseTypesIDsByJurisdictions(jurisdictions)
             );
         }
 
@@ -330,11 +374,11 @@ class GlobalSearchServiceImplTest extends TestFixtures {
             assertAll(
                 () -> assertEquals(
                     GLOBAL_SEARCH_INDEX_NAME,
-                    output.getSearchIndex().get().getIndexName()
+                    output.getSearchIndex().orElseThrow().getIndexName()
                 ),
                 () -> assertEquals(
                     GLOBAL_SEARCH_INDEX_TYPE,
-                    output.getSearchIndex().get().getIndexType()
+                    output.getSearchIndex().orElseThrow().getIndexType()
                 )
             );
         }
