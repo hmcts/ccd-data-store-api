@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,11 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -34,8 +31,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
 
 @Service
@@ -207,18 +202,8 @@ public class CaseSearchResultViewGenerator {
             caseDetails.getMetadata()
         );
 
-        updateCaseFieldsWithAccessControlMetadata(caseFields, caseDetails);
-
         return new SearchResultViewItem(caseDetails.getReferenceAsString(), caseFields, new HashMap<>(caseFields),
                 caseDetails.getSupplementaryData());
-    }
-
-    private void updateCaseFieldsWithAccessControlMetadata(Map<String, Object> caseFields, CaseDetails caseDetails) {
-        CaseAccessMetadata caseAccessMetadata = Strings.isNullOrEmpty(caseDetails.getReferenceAsString())
-            ? caseDataAccessControl.generateAccessMetadataWithNoCaseId()
-            : caseSearchesViewAccessControl.getCaseAccessMetaData(caseDetails.getReference().toString());
-        caseFields.put(ACCESS_GRANTED, new TextNode(caseAccessMetadata.getAccessGrantsString()));
-        caseFields.put(ACCESS_PROCESS, new TextNode(caseAccessMetadata.getAccessProcessString()));
     }
 
     private Map<String, Object> prepareData(SearchResultDefinition searchResult,

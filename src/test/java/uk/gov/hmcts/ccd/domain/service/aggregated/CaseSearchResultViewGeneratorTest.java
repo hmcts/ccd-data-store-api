@@ -623,27 +623,6 @@ class CaseSearchResultViewGeneratorTest {
     }
 
     @Test
-    void shouldBuildResultsWithCaseAccessMetadata() {
-        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
-        caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
-        caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
-
-        when(caseDataAccessControl.generateAccessMetadata(anyString()))
-            .thenReturn(caseAccessMetadata);
-
-        CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
-            Collections.emptyList());
-
-        assertAll(
-            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
-                .get(CaseAccessMetadata.ACCESS_PROCESS)).asText(), is(AccessProcess.CHALLENGED.name())),
-            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
-                .get(CaseAccessMetadata.ACCESS_GRANTED)).asText(),
-                is(GrantType.BASIC.name() + "," + GrantType.SPECIFIC.name()))
-        );
-    }
-
-    @Test
     void shouldInvokeSearchProcessorDCPIsProvided() {
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
