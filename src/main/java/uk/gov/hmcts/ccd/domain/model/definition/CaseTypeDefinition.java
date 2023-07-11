@@ -7,9 +7,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.Value;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
@@ -25,15 +23,13 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
-@Data
-@ToString
+@Value
 @Builder
 @AllArgsConstructor
-@Value
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 public class CaseTypeDefinition implements Serializable {
     private static final long serialVersionUID = 5688786015302840008L;
-    String id;         // TODO: make final
+    String id;
     String description;
     Version version;
     String name;
