@@ -53,8 +53,8 @@ class AuthorisedGetUserProfileOperationTest {
         new CaseEventDefinition());
 
     private final CaseTypeDefinition caseTypeDefinition1 = CaseTypeDefinition.builder().build();
-    private final CaseTypeDefinition caseTypeDefinition2 = CaseTypeDefinition.builder().build();
-    private final CaseTypeDefinition notAllowedCaseTypeDefinition = CaseTypeDefinition.builder().build();
+    private final CaseTypeDefinition notAllowedCaseTypeDefinition = CaseTypeDefinition
+        .builder().id("not-allowed").build();
 
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
@@ -75,8 +75,9 @@ class AuthorisedGetUserProfileOperationTest {
             test2JurisdictionDisplayProperties});
 
         List<CaseTypeDefinition> caseTypes1Definition = asList(notAllowedCaseTypeDefinition, caseTypeDefinition1);
-        List<CaseTypeDefinition> caseTypes2Definition = asList(caseTypeDefinition1, notAllowedCaseTypeDefinition,
-            caseTypeDefinition2);
+        List<CaseTypeDefinition> caseTypes2Definition = asList(CaseTypeDefinition.builder()
+                .id("1").build(), notAllowedCaseTypeDefinition,
+            CaseTypeDefinition.builder().id("2").build());
 
         test1JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes1Definition);
         test2JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes2Definition);
