@@ -54,13 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil.CaseDetailsBuilder.caseDetails;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
@@ -665,7 +659,8 @@ class CaseSearchResultViewGeneratorTest {
 
         assertAll(
             () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get(CaseAccessMetadata.ACCESS_PROCESS)),
-            () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get(CaseAccessMetadata.ACCESS_GRANTED))
+            () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get(CaseAccessMetadata.ACCESS_GRANTED)),
+            () -> verify(caseDataAccessControl, never()).generateAccessMetadata(anyString())
         );
     }
 
