@@ -53,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -629,7 +630,7 @@ class CaseSearchResultViewGeneratorTest {
     }
 
     @Test
-    void shouldBuildResultsWithCaseAccessMetadata() {
+    void shouldBuildResultsWithCaseAccessMetadataByDefault() {
         CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
         caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
         caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
@@ -646,6 +647,25 @@ class CaseSearchResultViewGeneratorTest {
             () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
                 .get(CaseAccessMetadata.ACCESS_GRANTED)).asText(),
                 is(GrantType.BASIC.name() + "," + GrantType.SPECIFIC.name()))
+        );
+    }
+
+    @Test
+    void shouldNotBuildResultsWithCaseAccessMetadataWhenDisabled() {
+        when(applicationParams.getInternalSearchCaseAccessMetadataEnabled()).thenReturn(false);
+        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+        caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
+        caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
+
+        when(caseDataAccessControl.generateAccessMetadata(anyString()))
+            .thenReturn(caseAccessMetadata);
+
+        CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
+            Collections.emptyList());
+
+        assertAll(
+            () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get(CaseAccessMetadata.ACCESS_PROCESS)),
+            () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get(CaseAccessMetadata.ACCESS_GRANTED))
         );
     }
 
