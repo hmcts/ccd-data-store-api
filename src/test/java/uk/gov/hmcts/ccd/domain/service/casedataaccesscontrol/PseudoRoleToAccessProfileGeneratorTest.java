@@ -54,7 +54,8 @@ class PseudoRoleToAccessProfileGeneratorTest {
             .accessControlLists(List.of(
                 aclWithRole(IDAM_ROLE1),
                 aclWithRole(IDAM_ROLE2),
-                aclWithRole(CASE_ROLE1)))
+                aclWithRole(CASE_ROLE1),
+                aclWithRole(CASE_ROLE6)))
             .states(List.of(
                 caseStateWithAcl(asList(aclWithRole(IDAM_ROLE3), aclWithRole(CASE_ROLE1))),
                 caseStateWithAcl(List.of(aclWithRole(CASE_ROLE2)))))
@@ -102,20 +103,6 @@ class PseudoRoleToAccessProfileGeneratorTest {
             .findAny();
     }
 
-    private void addCaseTypeAcls(CaseTypeDefinition caseTypeDefinition) {
-        caseTypeDefinition.setAccessControlLists(asList(aclWithRole(IDAM_ROLE1),
-                                                        aclWithRole(IDAM_ROLE2),
-                                                        aclWithRole(CASE_ROLE1),
-                                                        aclWithRole(CASE_ROLE6)));
-    }
-
-    private void addStateAcls(CaseTypeDefinition caseTypeDefinition) {
-        caseTypeDefinition.setStates(asList(
-            caseStateWithAcl(asList(aclWithRole(IDAM_ROLE3),
-                                    aclWithRole(CASE_ROLE1))),
-            caseStateWithAcl(List.of(aclWithRole(CASE_ROLE2)))
-        ));
-    }
     private CaseStateDefinition caseStateWithAcl(List<AccessControlList> acls) {
         CaseStateDefinition state = new CaseStateDefinition();
         state.setAccessControlLists(acls);
