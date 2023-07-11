@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
 @Value
-@FieldDefaults(level = AccessLevel.PRIVATE) // After lombok upgrade this can be removed as it's now the default
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+@SuppressWarnings("RedundantModifiersValueLombok") // see https://sonarsource.atlassian.net/browse/SONARJAVA-4536
 public class CaseTypeDefinition implements Serializable {
     private static final long serialVersionUID = 5688786015302840008L;
     String id;
@@ -40,32 +40,32 @@ public class CaseTypeDefinition implements Serializable {
     @JsonProperty("security_classification")
     SecurityClassification securityClassification;
     @Builder.Default
-    List<CaseEventDefinition> events = new ArrayList<>();
+    private List<CaseEventDefinition> events = new ArrayList<>();
     @Builder.Default
-    List<CaseStateDefinition> states = new ArrayList<>();
+    private List<CaseStateDefinition> states = new ArrayList<>();
     @JsonProperty("case_fields")
     @Builder.Default
-    List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
+    private List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
     @JsonProperty("printable_document_url")
     String printableDocumentsUrl;
     @JsonProperty("acls")
     @Builder.Default
-    List<AccessControlList> accessControlLists = new ArrayList<>();
+    private List<AccessControlList> accessControlLists = new ArrayList<>();
     @JsonProperty("callback_get_case_url")
     String callbackGetCaseUrl;
     @JsonProperty("retries_get_case_url")
-    List<Integer> retriesGetCaseUrl;
+    private List<Integer> retriesGetCaseUrl;
     @Builder.Default
-    List<SearchAliasField> searchAliasFields = new ArrayList<>();
+    private List<SearchAliasField> searchAliasFields = new ArrayList<>();
     @Builder.Default
-    List<SearchParty> searchParties = new ArrayList<>();
+    private List<SearchParty> searchParties = new ArrayList<>();
     @Builder.Default
-    List<SearchCriteria> searchCriterias = new ArrayList<>();
+    private List<SearchCriteria> searchCriterias = new ArrayList<>();
     @Builder.Default
-    List<CategoryDefinition> categories = new ArrayList<>();
+    private List<CategoryDefinition> categories = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
     @Builder.Default
-    List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
+    private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
 
     public String getId() {
         return id;
