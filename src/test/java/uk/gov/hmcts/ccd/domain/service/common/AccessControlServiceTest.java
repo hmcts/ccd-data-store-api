@@ -283,7 +283,7 @@ public class AccessControlServiceTest {
                 ))
                 .build();
 
-            setupLogging().setLevel(Level.ERROR);
+            setupLogging().setLevel(Level.DEBUG);
             assertAll(
                 () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType,
                     ACCESS_PROFILES,
@@ -299,7 +299,7 @@ public class AccessControlServiceTest {
             );
             loggingEventList = listAppender.list;
             assertAll(
-                    () -> assertTrue(loggingEventList.stream().allMatch(log -> log.getLevel() == Level.ERROR)),
+                    () -> assertTrue(loggingEventList.stream().allMatch(log -> log.getLevel() == Level.DEBUG)),
                     () -> assertTrue(loggingEventList.stream().anyMatch(log ->
                             log.getFormattedMessage().equals(expectedLogMessage)))
             );
@@ -1577,7 +1577,7 @@ public class AccessControlServiceTest {
                 ))
                 .build();
 
-            setupLogging().setLevel(Level.INFO);
+            setupLogging().setLevel(Level.DEBUG);
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
@@ -1592,7 +1592,7 @@ public class AccessControlServiceTest {
                     "caseTypeACL", List.of());
 
             assertAll(
-                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.INFO)),
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
                     () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
 
@@ -4843,7 +4843,7 @@ public class AccessControlServiceTest {
                     "[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]");
 
             assertAll(
-                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.INFO)),
+                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
                 () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
             );
         }
