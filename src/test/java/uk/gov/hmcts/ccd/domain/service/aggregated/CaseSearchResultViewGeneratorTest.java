@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
@@ -136,6 +137,9 @@ class CaseSearchResultViewGeneratorTest {
     private CaseSearchesViewAccessControl caseSearchesViewAccessControl;
     @Mock
     private DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
+
+    @Mock
+    private ApplicationParams applicationParams;
 
     private CaseSearchResultViewGenerator classUnderTest;
 
@@ -320,10 +324,12 @@ class CaseSearchResultViewGeneratorTest {
             .thenReturn(true);
 
         classUnderTest = new CaseSearchResultViewGenerator(caseTypeService, searchResultDefinitionService,
-            dateTimeSearchResultProcessor, caseSearchesViewAccessControl, caseDataAccessControl);
+            dateTimeSearchResultProcessor, caseSearchesViewAccessControl, caseDataAccessControl, applicationParams);
 
         when(caseDataAccessControl.generateAccessMetadata(anyString()))
             .thenReturn(new CaseAccessMetadata());
+
+        when(applicationParams.getInternalSearchCaseAccessMetadataEnabled()).thenReturn(true);
     }
 
     private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
