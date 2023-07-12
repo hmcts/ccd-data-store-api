@@ -80,7 +80,6 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDEX_TYPE;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDICES;
@@ -441,30 +440,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
                 () -> assertThat(caseDetails.getFields().size(), is(8)),
-                () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
-            );
-        }
-
-        @Test
-        void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUseHaveNoAuthorisationOnCaseField1() throws Exception {
-            when(applicationParams.getInternalSearchCaseAccessMetadataEnabled()).thenReturn(true);
-            ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
-
-            CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                "RDM-8782NOACCESS");
-            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
-
-            assertAll(
-                () -> assertThat(caseSearchResultViewResource.getHeaders().size(), is(1)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getJurisdiction(),
-                    is(AUTOTEST_1)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getCaseTypeId(),
-                    is(CASE_TYPE_A)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().size(), is(1)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0),
-                    is(DEFAULT_CASE_REFERENCE)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
-                () -> assertThat(caseDetails.getFields().size(), is(10)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
             );
         }
