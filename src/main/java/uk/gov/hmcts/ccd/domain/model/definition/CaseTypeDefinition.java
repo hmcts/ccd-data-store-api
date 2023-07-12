@@ -229,18 +229,18 @@ public class CaseTypeDefinition implements Serializable {
             .name(caseType.getName())
             .jurisdictionDefinition(caseType.getJurisdictionDefinition())
             .securityClassification(caseType.getSecurityClassification())
-            .events(new ArrayList<>(events)) // TODO: make a deep copy
-            .states(new ArrayList<>(states)) // TODO: make a deep copy
-            .caseFieldDefinitions(new ArrayList<>(caseFieldDefinitions)) // TODO: make a deep copy
+            .events(List.copyOf(events))
+            .states(List.copyOf(states))
+            .caseFieldDefinitions(List.copyOf(caseFieldDefinitions))
             .printableDocumentsUrl(caseType.getPrintableDocumentsUrl())
-            .accessControlLists(new ArrayList<>(caseType.getAccessControlLists())) // TODO: make a deep copy
+            .accessControlLists(List.copyOf(caseType.getAccessControlLists()))
             .callbackGetCaseUrl(caseType.getCallbackGetCaseUrl())
-            .retriesGetCaseUrl(new ArrayList<>(caseType.getRetriesGetCaseUrl())) // TODO: make a deep copy
-            .searchAliasFields(new ArrayList<>(caseType.getSearchAliasFields())) // TODO: make a deep copy
-            .searchParties(new ArrayList<>(caseType.getSearchParties())) // TODO: make a deep copy
-            .searchCriterias(new ArrayList<>(caseType.getSearchCriterias())) // TODO: make a deep copy
-            .categories(new ArrayList<>(caseType.getCategories())) // TODO: make a deep copy
-            .roleToAccessProfiles(new ArrayList<>(caseType.getRoleToAccessProfiles())); // TODO: make a deep copy
+            .retriesGetCaseUrl(List.copyOf(caseType.getRetriesGetCaseUrl()))
+            .searchAliasFields(List.copyOf(caseType.getSearchAliasFields()))
+            .searchParties(List.copyOf(caseType.getSearchParties()))
+            .searchCriterias(List.copyOf(caseType.getSearchCriterias()))
+            .categories(List.copyOf(caseType.getCategories()))
+            .roleToAccessProfiles(List.copyOf(caseType.getRoleToAccessProfiles()));
     }
 
     public static CaseTypeDefinitionBuilder caseTypeDefinitionCopy(CaseTypeDefinition caseType) {
