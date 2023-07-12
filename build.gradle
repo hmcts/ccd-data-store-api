@@ -90,7 +90,6 @@ ext {
     appInsightsVersion = '2.4.1'
     swagger2Version = '3.0.0'
     hibernateVersion = '5.6.10.Final'
-    hazelcastVersion = '5.2.1'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -162,8 +161,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.retry:spring-retry')
     implementation('org.springframework.boot:spring-boot-starter-cache')
-    implementation group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
-    implementation group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
+    implementation "com.github.ben-manes.caffeine:caffeine:3.1.6"
 
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
@@ -289,8 +287,6 @@ dependencies {
     contractTestCompile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.6.1'
     contractTestCompile group: 'javax.inject', name: 'javax.inject', version: '1'
     contractTestCompile group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
-    contractTestCompile group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
-    contractTestCompile group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
     contractTestCompile('org.springframework.boot:spring-boot-starter-hateoas')
     contractTestCompile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import com.hazelcast.config.EvictionPolicy;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -116,9 +115,6 @@ public class ApplicationParams {
 
     @Value("${default.cache.max.size}")
     private Integer defaultCacheMaxSize;
-
-    @Value("${default.cache.eviction.policy}")
-    private EvictionPolicy defaultCacheEvictionPolicy;
 
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
@@ -421,10 +417,6 @@ public class ApplicationParams {
 
     public int getDefaultCacheMaxSize() {
         return defaultCacheMaxSize;
-    }
-
-    public EvictionPolicy getDefaultCacheEvictionPolicy() {
-        return defaultCacheEvictionPolicy;
     }
 
     public List<String> getSearchBlackList() {
