@@ -9,79 +9,65 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.ToString;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@ApiModel(description = "")
-@ToString
+@ApiModel
+@Value
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(force = true, access = AccessLevel.PACKAGE)
 public class JurisdictionDefinition implements Serializable {
 
-    private String id = null;
-    private String name = null;
-    private String description = null;
-    private Date liveFrom = null;
-    private Date liveUntil = null;
+    String id;
+    String name;
+    String description;
+    Date liveFrom;
+    Date liveUntil;
 
+    @SuppressWarnings("RedundantModifiersValueLombok") // see https://sonarsource.atlassian.net/browse/SONARJAVA-4536
+    @Builder.Default
     private List<CaseTypeDefinition> caseTypeDefinitions = new ArrayList<>();
 
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(required = true)
     @JsonProperty("id")
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(required = true)
     @JsonProperty("name")
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @ApiModelProperty(value = "")
+    @ApiModelProperty
     @JsonProperty("description")
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @ApiModelProperty(value = "")
+    @ApiModelProperty
     @JsonProperty("live_from")
     public Date getLiveFrom() {
         return liveFrom;
     }
 
-    public void setLiveFrom(Date liveFrom) {
-        this.liveFrom = liveFrom;
-    }
-
-    @ApiModelProperty(value = "")
+    @ApiModelProperty
     @JsonProperty("live_until")
     public Date getLiveUntil() {
         return liveUntil;
     }
 
-    public void setLiveUntil(Date liveUntil) {
-        this.liveUntil = liveUntil;
-    }
-
-    @ApiModelProperty(value = "")
+    @ApiModelProperty
     @JsonProperty("case_types")
     public List<CaseTypeDefinition> getCaseTypeDefinitions() {
         return caseTypeDefinitions;
     }
 
-    public void setCaseTypeDefinitions(List<CaseTypeDefinition> caseTypeDefinitions) {
-        this.caseTypeDefinitions = caseTypeDefinitions;
-    }
 
     public List<String> getCaseTypesIDs() {
         return this.getCaseTypeDefinitions().stream().map(CaseTypeDefinition::getId).collect(Collectors.toList());

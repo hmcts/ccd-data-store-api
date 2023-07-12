@@ -103,6 +103,7 @@ class CallbackInvokerTest {
     private CallbackInvoker callbackInvoker;
 
     private CaseEventDefinition caseEventDefinition;
+    private CaseEventDefinition.CaseEventDefinitionBuilder caseEventDefinitionBuilder;
     private CaseTypeDefinition caseTypeDefinition;
     private CaseDetails caseDetailsBefore;
     private CaseDetails caseDetails;
@@ -113,10 +114,11 @@ class CallbackInvokerTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setCallBackURLAboutToStartEvent(URL_ABOUT_TO_START);
-        caseEventDefinition.setCallBackURLAboutToSubmitEvent(URL_ABOUT_TO_SUBMIT);
-        caseEventDefinition.setCallBackURLSubmittedEvent(URL_AFTER_SUBMIT);
+        caseEventDefinitionBuilder = CaseEventDefinition.builder()
+            .callBackURLAboutToStartEvent(URL_ABOUT_TO_START)
+            .callBackURLAboutToSubmitEvent(URL_ABOUT_TO_SUBMIT)
+            .callBackURLSubmittedEvent(URL_AFTER_SUBMIT);
+        caseEventDefinition = caseEventDefinitionBuilder.build();
         caseTypeDefinition = CaseTypeDefinition.builder().build();
         caseDetailsBefore = new CaseDetails();
         caseDetails = new CaseDetails();
@@ -158,7 +160,7 @@ class CallbackInvokerTest {
         @Test
         @DisplayName("should disable callback retries")
         void shouldDisableCallbackRetries() {
-            caseEventDefinition.setRetriesTimeoutAboutToStartEvent(RETRIES_DISABLED);
+            caseEventDefinition = caseEventDefinitionBuilder.retriesTimeoutAboutToStartEvent(RETRIES_DISABLED).build();
 
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails,
                 IGNORE_WARNING);
@@ -196,7 +198,8 @@ class CallbackInvokerTest {
         @Test
         @DisplayName("should disable callback retries")
         void shouldDisableCallbackRetries() {
-            caseEventDefinition.setRetriesTimeoutURLAboutToSubmitEvent(RETRIES_DISABLED);
+            caseEventDefinition = caseEventDefinitionBuilder.retriesTimeoutURLAboutToSubmitEvent(RETRIES_DISABLED)
+                .build();
 
             final AboutToSubmitCallbackResponse
                 response =
@@ -411,7 +414,7 @@ class CallbackInvokerTest {
         @Test
         @DisplayName("should disable callback retries")
         void shouldDisableCallbackRetries() {
-            caseEventDefinition.setRetriesTimeoutURLSubmittedEvent(RETRIES_DISABLED);
+            caseEventDefinition = caseEventDefinitionBuilder.retriesTimeoutURLSubmittedEvent(RETRIES_DISABLED).build();
 
             callbackInvoker.invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore, caseDetails);
 

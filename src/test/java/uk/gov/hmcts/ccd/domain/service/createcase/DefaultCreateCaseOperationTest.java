@@ -68,7 +68,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 
 class DefaultCreateCaseOperationTest {
 
@@ -137,6 +136,7 @@ class DefaultCreateCaseOperationTest {
     private static final IdamUser IDAM_USER = buildIdamUser();
     private static CaseTypeDefinition CASE_TYPE;
     private CaseEventDefinition eventTrigger;
+    private CaseEventDefinition.CaseEventDefinitionBuilder eventTriggerBuilder;
 
     @BeforeEach
     void setup() throws Exception {
@@ -161,7 +161,8 @@ class DefaultCreateCaseOperationTest {
         data = buildJsonNodeData();
         given(userRepository.getUser()).willReturn(IDAM_USER);
         given(userRepository.getUserId()).willReturn(UID);
-        eventTrigger = newCaseEvent().withId("eventId").withName("event Name").build();
+        eventTriggerBuilder = CaseEventDefinition.builder().id("eventId").name("event Name");
+        eventTrigger = eventTriggerBuilder.build();
         eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(DRAFT_ID).build();
         CASE_TYPE = buildCaseType();
 
@@ -377,6 +378,7 @@ class DefaultCreateCaseOperationTest {
     @DisplayName("Should return saved case details when Submitted Callback url is blank")
     void shouldReturnSavedCaseDetails_whenSubmittedCallBackUrlIsBlank() {
         final String caseEventStateId = "Some state";
+        eventTrigger = eventTriggerBuilder.callBackURLSubmittedEvent("   ").build();
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
         given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);
@@ -393,7 +395,6 @@ class DefaultCreateCaseOperationTest {
                                                same(IGNORE_WARNING)))
             .willReturn(savedCaseType);
         willDoNothing().given(draftGateway).delete(DRAFT_ID);
-        eventTrigger.setCallBackURLSubmittedEvent("   ");
 
         final CaseDetails caseDetails = defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
                                                                                      eventData,
@@ -431,13 +432,13 @@ class DefaultCreateCaseOperationTest {
     @DisplayName("Should return saved case details when call back fails")
     void shouldReturnSavedCaseDetails_whenCallBackFails() {
         final String caseEventStateId = "Some state";
+        eventTrigger = eventTriggerBuilder.callBackURLSubmittedEvent("http://localhost/submittedcallback").build();
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
         given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        eventTrigger.setCallBackURLSubmittedEvent("http://localhost/submittedcallback");
         given(callbackInvoker.invokeSubmittedCallback(eventTrigger, null, savedCaseType))
             .willThrow(new CallbackException("call back exception"));
         given(
@@ -490,13 +491,13 @@ class DefaultCreateCaseOperationTest {
     void shouldReturnAlsoCallbackResponse_whenCallBackIsInvokedSuccessfully() {
         final String caseEventStateId = "Some state";
         final String mockCaseTypeId = "mock case type id";
+        eventTrigger = eventTriggerBuilder.callBackURLSubmittedEvent("http://localhost/submittedcallback").build();
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
         given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        eventTrigger.setCallBackURLSubmittedEvent("http://localhost/submittedcallback");
         given(callbackInvoker.invokeSubmittedCallback(eventTrigger,
                                                       null,
                                                       savedCaseType)).willReturn(response);
@@ -553,6 +554,7 @@ class DefaultCreateCaseOperationTest {
         final String caseEventStateId = "Some state";
         final Long caseReference = 1855854166952584L;
 
+        eventTrigger = eventTriggerBuilder.callBackURLSubmittedEvent("http://localhost/submittedcallback").build();
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
         given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);
@@ -560,7 +562,6 @@ class DefaultCreateCaseOperationTest {
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(savedCaseType.getReference()).willReturn(caseReference);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        eventTrigger.setCallBackURLSubmittedEvent("http://localhost/submittedcallback");
         given(callbackInvoker.invokeSubmittedCallback(eventTrigger,
             null,
             savedCaseType)).willReturn(response);
@@ -619,11 +620,11 @@ class DefaultCreateCaseOperationTest {
     }
 
     private static Event buildEvent() {
-        final Event event = anEvent().build();
-        event.setEventId("eid");
-        event.setDescription("e-desc");
-        event.setSummary("e-summ");
-        return event;
+        return anEvent()
+            .withEventId("eid")
+            .withDescription("e-desc")
+            .withSummary("e-summ")
+            .build();
     }
 
     private Map<String, JsonNode> buildJsonNodeData() throws IOException {
@@ -657,14 +658,12 @@ class DefaultCreateCaseOperationTest {
             .name("case type name")
             .jurisdictionDefinition(buildJurisdiction())
             .version(version)
-            .caseFieldDefinitions(List.of(new CaseFieldDefinition()))
+            .caseFieldDefinitions(List.of(CaseFieldDefinition.builder().build()))
             .build();
     }
 
     private static JurisdictionDefinition buildJurisdiction() {
-        final JurisdictionDefinition j = new JurisdictionDefinition();
-        j.setId(JURISDICTION_ID);
-        return j;
+        return JurisdictionDefinition.builder().id(JURISDICTION_ID).build();
     }
 
     private Map<String, Map<String, Object>> createSupplementaryDataRequest() {

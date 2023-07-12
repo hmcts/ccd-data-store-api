@@ -1,26 +1,29 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 
-@Data
-@NoArgsConstructor
+@Value
+@Builder
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@NoArgsConstructor(force = true, access = AccessLevel.PACKAGE)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CategoryDefinition implements Serializable {
 
-    private String categoryId;
-    private String categoryLabel;
-    private String parentCategoryId;
-    private LocalDate liveFrom;
-    private LocalDate liveTo;
-    private Integer displayOrder;
-    private String caseTypeId;
+    String categoryId;
+    String categoryLabel;
+    String parentCategoryId;
+    LocalDate liveFrom;
+    LocalDate liveTo;
+    Integer displayOrder;
+    String caseTypeId;
 
 }

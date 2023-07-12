@@ -12,6 +12,7 @@ import org.mockito.Spy;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
@@ -35,8 +36,6 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.SEARCH;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class ElasticsearchSortServiceTest {
 
@@ -50,24 +49,33 @@ class ElasticsearchSortServiceTest {
     private static final String COLLECTION_DATE_FIELD_ID = "CollectionDateField";
     private static final String JURISDICTION = "JURISDICTION";
     private static final String LAST_MODIFIED_DATE = "LAST_MODIFIED_DATE";
-    private static final FieldTypeDefinition TEXT_FIELD_TYPE = aFieldType().withType("Text").withId("Text").build();
-    private static final FieldTypeDefinition DATE_FIELD_TYPE = aFieldType().withType("Date").withId("Date").build();
-    private static final FieldTypeDefinition COLLECTION_TEXT_FIELD_TYPE = aFieldType().withType("Collection")
-        .withId("Collection").withCollectionFieldType(TEXT_FIELD_TYPE).build();
-    private static final FieldTypeDefinition COLLECTION_DATE_FIELD_TYPE = aFieldType().withType("Collection")
-        .withId("Collection").withCollectionFieldType(DATE_FIELD_TYPE).build();
-    private static final CommonField JURISDICTION_FIELD = newCaseField().withMetadata(true).withId(JURISDICTION)
+    private static final FieldTypeDefinition TEXT_FIELD_TYPE = FieldTypeDefinition.builder().type("Text")
+        .id("Text").build();
+    private static final FieldTypeDefinition DATE_FIELD_TYPE = FieldTypeDefinition.builder().type("Date")
+        .id("Date").build();
+    private static final FieldTypeDefinition COLLECTION_TEXT_FIELD_TYPE = FieldTypeDefinition.builder()
+        .type("Collection")
+        .id("Collection").collectionFieldTypeDefinition(TEXT_FIELD_TYPE).build();
+    private static final FieldTypeDefinition COLLECTION_DATE_FIELD_TYPE = FieldTypeDefinition.builder()
+        .type("Collection")
+        .id("Collection").collectionFieldTypeDefinition(DATE_FIELD_TYPE).build();
+    private static final CommonField JURISDICTION_FIELD = CaseFieldDefinition.builder().metadata(true)
+        .id(JURISDICTION)
         .build();
-    private static final CommonField LAST_MODIFIED_DATE_FIELD = newCaseField().withMetadata(true)
-        .withId(LAST_MODIFIED_DATE).build();
-    private static final CommonField TEXT_FIELD = newCaseField().withId(TEXT_FIELD_ID).withFieldType(TEXT_FIELD_TYPE)
+    private static final CommonField LAST_MODIFIED_DATE_FIELD = CaseFieldDefinition.builder().metadata(true)
+        .id(LAST_MODIFIED_DATE).build();
+    private static final CommonField TEXT_FIELD = CaseFieldDefinition.builder().id(TEXT_FIELD_ID)
+        .fieldTypeDefinition(TEXT_FIELD_TYPE)
         .build();
-    private static final CommonField DATE_FIELD = newCaseField().withId(DATE_FIELD_ID).withFieldType(DATE_FIELD_TYPE)
+    private static final CommonField DATE_FIELD = CaseFieldDefinition.builder().id(DATE_FIELD_ID)
+        .fieldTypeDefinition(DATE_FIELD_TYPE)
         .build();
-    private static final CommonField COLLECTION_TEXT_FIELD = newCaseField().withId(COLLECTION_TEXT_FIELD_ID)
-        .withFieldType(COLLECTION_TEXT_FIELD_TYPE).build();
-    private static final CommonField COLLECTION_DATE_FIELD = newCaseField().withId(COLLECTION_DATE_FIELD_ID)
-        .withFieldType(COLLECTION_DATE_FIELD_TYPE).build();
+    private static final CommonField COLLECTION_TEXT_FIELD = CaseFieldDefinition.builder()
+        .id(COLLECTION_TEXT_FIELD_ID)
+        .fieldTypeDefinition(COLLECTION_TEXT_FIELD_TYPE).build();
+    private static final CommonField COLLECTION_DATE_FIELD = CaseFieldDefinition.builder()
+        .id(COLLECTION_DATE_FIELD_ID)
+        .fieldTypeDefinition(COLLECTION_DATE_FIELD_TYPE).build();
 
     @InjectMocks
     private ElasticsearchSortService elasticsearchSortService;

@@ -170,10 +170,12 @@ class AttributeBasedJurisdictionsResolverTest {
     void shouldReturnJurisdictionsWhereNoCaseTypeOrJurisdictionProvided() {
         given(idamUser.getId()).willReturn(USER_ID);
         given(userRepository.getUser()).willReturn(idamUser);
-        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-        jurisdictionDefinition.setId("jurisdictionId");
-        final JurisdictionDefinition jurisdictionDefinition1 = new JurisdictionDefinition();
-        jurisdictionDefinition1.setId(PROBATE_JURISDICTION);
+        final JurisdictionDefinition jurisdictionDefinition = JurisdictionDefinition.builder()
+            .id("jurisdictionId")
+            .build();
+        final JurisdictionDefinition jurisdictionDefinition1 = JurisdictionDefinition.builder()
+            .id(PROBATE_JURISDICTION)
+            .build();
         given(caseDefinitionRepository
             .getAllJurisdictionsFromDefinitionStore())
             .willReturn(List.of(jurisdictionDefinition, jurisdictionDefinition1));
@@ -207,8 +209,9 @@ class AttributeBasedJurisdictionsResolverTest {
     void shouldReturnJurisdictionsWhereCaseTypeProvided() {
         given(idamUser.getId()).willReturn(USER_ID);
         given(userRepository.getUser()).willReturn(idamUser);
-        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-        jurisdictionDefinition.setId("jurisdictionId");
+        final JurisdictionDefinition jurisdictionDefinition = JurisdictionDefinition.builder()
+            .id("jurisdictionId")
+            .build();
 
         final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
             .jurisdictionDefinition(jurisdictionDefinition)

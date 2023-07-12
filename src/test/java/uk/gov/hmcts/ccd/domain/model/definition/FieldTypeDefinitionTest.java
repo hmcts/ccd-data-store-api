@@ -20,8 +20,9 @@ public class FieldTypeDefinitionTest {
 
         @Test
         public void getChildrenOfTextType() {
-            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-            fieldTypeDefinition.setType("Text");
+            FieldTypeDefinition fieldTypeDefinition = FieldTypeDefinition.builder()
+                .type("Text")
+                .build();
 
             List<CaseFieldDefinition> children = fieldTypeDefinition.getChildren();
 
@@ -30,16 +31,15 @@ public class FieldTypeDefinitionTest {
 
         @Test
         public void getChildrenOfCollectionType() {
-            CaseFieldDefinition caseFieldDefinition1 = new CaseFieldDefinition();
-            caseFieldDefinition1.setId("caseField1");
-            CaseFieldDefinition caseFieldDefinition2 = new CaseFieldDefinition();
-            caseFieldDefinition2.setId("caseField2");
+            CaseFieldDefinition caseFieldDefinition1 = CaseFieldDefinition.builder().id("caseField1").build();
+            CaseFieldDefinition caseFieldDefinition2 = CaseFieldDefinition.builder().id("caseField2").build();
 
-            FieldTypeDefinition collectionFieldTypeDefinition = new FieldTypeDefinition();
+            FieldTypeDefinition collectionFieldTypeDefinition = FieldTypeDefinition.builder().build();
             collectionFieldTypeDefinition.setComplexFields(asList(caseFieldDefinition1, caseFieldDefinition2));
-            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-            fieldTypeDefinition.setType("Collection");
-            fieldTypeDefinition.setCollectionFieldTypeDefinition(collectionFieldTypeDefinition);
+            FieldTypeDefinition fieldTypeDefinition = FieldTypeDefinition.builder()
+                .type("Collection")
+                .collectionFieldTypeDefinition(collectionFieldTypeDefinition)
+                .build();
 
             List<CaseFieldDefinition> children = fieldTypeDefinition.getChildren();
 
@@ -50,8 +50,9 @@ public class FieldTypeDefinitionTest {
 
         @Test
         public void getChildrenOfInvalidCollectionType() {
-            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-            fieldTypeDefinition.setType("Collection");
+            FieldTypeDefinition fieldTypeDefinition = FieldTypeDefinition.builder()
+                .type("Collection")
+                .build();
 
             List<CaseFieldDefinition> children = fieldTypeDefinition.getChildren();
 
@@ -60,12 +61,9 @@ public class FieldTypeDefinitionTest {
 
         @Test
         public void getChildrenOfComplexType() {
-            CaseFieldDefinition caseFieldDefinition1 = new CaseFieldDefinition();
-            caseFieldDefinition1.setId("caseField1");
-            CaseFieldDefinition caseFieldDefinition2 = new CaseFieldDefinition();
-            caseFieldDefinition2.setId("caseField2");
-            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-            fieldTypeDefinition.setType("Complex");
+            CaseFieldDefinition caseFieldDefinition1 = CaseFieldDefinition.builder().id("caseField1").build();
+            CaseFieldDefinition caseFieldDefinition2 = CaseFieldDefinition.builder().id("caseField2").build();
+            FieldTypeDefinition fieldTypeDefinition = FieldTypeDefinition.builder().type("Complex").build();
             fieldTypeDefinition.setComplexFields(asList(caseFieldDefinition1, caseFieldDefinition2));
 
             List<CaseFieldDefinition> children = fieldTypeDefinition.getChildren();

@@ -8,8 +8,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -77,9 +78,11 @@ class MoneyGBPValidatorTest {
 
     @Test
     void checkMaxMin_BothBelow1GBP() {
-        final CaseFieldDefinition minMaxCaseFieldDefinition = caseField().withMin(5)
-                                                     .withMax(10)
-                                                     .build();
+        final CaseFieldDefinition minMaxCaseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal(5))
+                .max(new BigDecimal(10))
+                .build()).build();
 
         // Test valid max min
         final List<ValidationResult> result01 = validator.validate(FIELD_ID,
@@ -113,9 +116,11 @@ class MoneyGBPValidatorTest {
 
     @Test
     void checkMaxMin_BothAbove1GBP() {
-        final CaseFieldDefinition minMaxCaseFieldDefinition = caseField().withMin(123)
-                                                     .withMax(123456)
-                                                     .build();
+        final CaseFieldDefinition minMaxCaseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal(123))
+                .max(new BigDecimal(123456))
+                .build()).build();
 
         // Test invalid max min
         final List<ValidationResult> result01 = validator.validate(FIELD_ID,
@@ -136,7 +141,14 @@ class MoneyGBPValidatorTest {
         assertEquals(validator.getType(), BaseType.get("MoneyGBP"), "Type is incorrect");
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(MoneyGBPValidator.TYPE_ID);
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .type(MoneyGBPValidator.TYPE_ID);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition().build());
     }
 }

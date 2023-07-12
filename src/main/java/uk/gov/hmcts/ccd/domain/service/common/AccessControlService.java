@@ -312,7 +312,11 @@ public interface AccessControlService {
                         eventId, isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents,
                         childCaseViewField.getId(), childField, accessProfiles);
                     if (shouldRemoveCaseViewField) {
-                        caseViewField.getFieldTypeDefinition().getChildren().remove(childCaseViewField);
+                        List<CaseFieldDefinition> children = caseViewField.getFieldTypeDefinition().getChildren();
+                        List<CaseFieldDefinition> newChildren = children.stream()
+                            .filter(child -> !child.equals(childCaseViewField))
+                            .collect(toList());
+                        caseViewField.getFieldTypeDefinition().setChildren(newChildren);
                     }
 
                     Optional<WizardPageField> optionalWizardPageField = getWizardPageField(wizardPages, rootFieldId);
@@ -429,22 +433,48 @@ public interface AccessControlService {
     default void locateAndRemoveChildField(CommonField caseViewField,
                                            CaseFieldDefinition childField,
                                            boolean isCollection) {
+        CommonField fieldToRemove = findNestedField(caseViewField, childField.getId());
         if (isCollection) {
-            caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().remove(
-                findNestedField(caseViewField, childField.getId()));
+            List<CaseFieldDefinition> newComplexFields = caseViewField.getFieldTypeDefinition()
+                .getCollectionFieldTypeDefinition()
+                .getComplexFields()
+                .stream()
+                .filter(complexField -> !complexField.equals(fieldToRemove))
+                .collect(toList());
+
+            caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition()
+                .setComplexFields(newComplexFields);
         } else {
-            caseViewField.getFieldTypeDefinition().getComplexFields()
-                .remove(findNestedField(caseViewField, childField.getId()));
+            List<CaseFieldDefinition> newComplexFields = caseViewField.getFieldTypeDefinition()
+                .getComplexFields()
+                .stream()
+                .filter(complexField -> !complexField.equals(fieldToRemove))
+                .collect(toList());
+
+            caseViewField.getFieldTypeDefinition().setComplexFields(newComplexFields);
         }
     }
 
     default void locateAndRemoveCaseField(CaseFieldDefinition caseField, CommonField caseViewField) {
+        CommonField fieldToRemove = findNestedField(caseViewField, caseField.getId());
         if (caseViewField.isCollectionFieldType()) {
-            caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().remove(
-                findNestedField(caseViewField, caseField.getId()));
+            List<CaseFieldDefinition> newComplexFields = caseViewField.getFieldTypeDefinition()
+                .getCollectionFieldTypeDefinition()
+                .getComplexFields()
+                .stream()
+                .filter(complexField -> !complexField.equals(fieldToRemove))
+                .collect(toList());
+
+            caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition()
+                .setComplexFields(newComplexFields);
         } else {
-            caseViewField.getFieldTypeDefinition().getComplexFields()
-                .remove(findNestedField(caseViewField, caseField.getId()));
+            List<CaseFieldDefinition> newComplexFields = caseViewField.getFieldTypeDefinition()
+                .getComplexFields()
+                .stream()
+                .filter(complexField -> !complexField.equals(fieldToRemove))
+                .collect(toList());
+
+            caseViewField.getFieldTypeDefinition().setComplexFields(newComplexFields);
         }
     }
 

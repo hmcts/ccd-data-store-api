@@ -34,13 +34,10 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPL
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 @DisplayName("DefaultGetCriteriaOperationTest")
 public class DefaultGetCriteriaOperationTest {
     private static final String TEXT_TYPE = "Text";
-    private static final String DATE_TYPE = "Date";
     private static final String PERSON = "Person";
     private static final String DEBTOR_DETAILS = "Debtor details";
     private static final String NAME = "Name";
@@ -50,10 +47,10 @@ public class DefaultGetCriteriaOperationTest {
     private static final String SHOW_CONDITION = "some show condition";
 
     private CaseTypeDefinition caseTypeDefinition;
-    private final CaseFieldDefinition caseFieldDefinition1 = new CaseFieldDefinition();
-    private final CaseFieldDefinition caseFieldDefinition2 = new CaseFieldDefinition();
-    private final CaseFieldDefinition caseFieldDefinition3 = new CaseFieldDefinition();
-    private final CaseFieldDefinition caseFieldDefinition4 = new CaseFieldDefinition();
+    private CaseFieldDefinition caseFieldDefinition1;
+    private CaseFieldDefinition caseFieldDefinition2;
+    private CaseFieldDefinition caseFieldDefinition3;
+    private CaseFieldDefinition caseFieldDefinition4;
 
     @Mock
     private UIDefinitionRepository uiDefinitionRepository;
@@ -61,40 +58,51 @@ public class DefaultGetCriteriaOperationTest {
     private CaseDefinitionRepository caseDefinitionRepository;
     private DefaultGetCriteriaOperation defaultGetCriteriaOperation;
 
-    private CaseFieldDefinition name = newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE)
-        .withType(TEXT_TYPE).build()).build();
-    private CaseFieldDefinition surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE)
-        .withType(TEXT_TYPE).build()).build();
-    private FieldTypeDefinition personFieldTypeDefinition = aFieldType()
-        .withId(PERSON)
-        .withType(COMPLEX)
-        .withComplexField(name)
-        .withComplexField(surname)
+    private CaseFieldDefinition name = CaseFieldDefinition.builder().id(NAME)
+        .fieldTypeDefinition(FieldTypeDefinition.builder().id(TEXT_TYPE)
+        .type(TEXT_TYPE).build()).build();
+    private CaseFieldDefinition surname = CaseFieldDefinition.builder().id(SURNAME)
+        .fieldTypeDefinition(FieldTypeDefinition.builder().id(TEXT_TYPE)
+        .type(TEXT_TYPE).build()).build();
+    private FieldTypeDefinition personFieldTypeDefinition = FieldTypeDefinition.builder()
+        .id(PERSON)
+        .type(COMPLEX)
+        .complexFields(List.of(name, surname))
         .build();
     private CaseFieldDefinition person =
-        newCaseField().withId(PERSON).withFieldType(personFieldTypeDefinition).build();
-    private CaseFieldDefinition dob =
-        newCaseField().withId(DOB).withFieldType(aFieldType().withId(DATE_TYPE).withType(DATE_TYPE).build())
-        .withDisplayContextParameter(DISPLAY_CONTEXT_PARAMETER).build();
+        CaseFieldDefinition.builder().id(PERSON).fieldTypeDefinition(personFieldTypeDefinition).build();
 
     private FieldTypeDefinition debtorFieldTypeDefinition =
-        aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
+        FieldTypeDefinition.builder().id(DEBTOR_DETAILS).type(COMPLEX).complexFields(List.of(person)).build();
     private CaseFieldDefinition debtorDetails =
-        newCaseField().withId(DEBTOR_DETAILS).withFieldType(debtorFieldTypeDefinition).build();
+        CaseFieldDefinition.builder().id(DEBTOR_DETAILS).fieldTypeDefinition(debtorFieldTypeDefinition).build();
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.initMocks(this);
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        caseFieldDefinition1.setId("field1");
-        caseFieldDefinition1.setFieldTypeDefinition(fieldTypeDefinition);
-        caseFieldDefinition2.setId("field2");
-        caseFieldDefinition2.setFieldTypeDefinition(fieldTypeDefinition);
-        caseFieldDefinition3.setId("field3");
-        caseFieldDefinition3.setFieldTypeDefinition(fieldTypeDefinition);
-        caseFieldDefinition4.setId("field4");
-        caseFieldDefinition4.setFieldTypeDefinition(fieldTypeDefinition);
-        caseFieldDefinition4.setMetadata(true);
+        FieldTypeDefinition fieldTypeDefinition = FieldTypeDefinition.builder().build();
+
+        caseFieldDefinition1 = CaseFieldDefinition.builder()
+            .id("field1")
+            .fieldTypeDefinition(fieldTypeDefinition)
+            .build();
+
+        caseFieldDefinition2 = CaseFieldDefinition.builder()
+            .id("field2")
+            .fieldTypeDefinition(fieldTypeDefinition)
+            .build();
+
+        caseFieldDefinition3 = CaseFieldDefinition.builder()
+            .id("field3")
+            .fieldTypeDefinition(fieldTypeDefinition)
+            .build();
+
+        caseFieldDefinition4 = CaseFieldDefinition.builder()
+            .id("field4")
+            .fieldTypeDefinition(fieldTypeDefinition)
+            .metadata(true)
+            .build();
+
         caseTypeDefinition = CaseTypeDefinition.builder()
             .id("Test case type")
             .caseFieldDefinitions(List.of(caseFieldDefinition1, caseFieldDefinition2, caseFieldDefinition3,

@@ -38,10 +38,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.NUMBE
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.YES_OR_NO;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.message.additionaldata.PublishableField.FIELD_SEPARATOR;
 
 class DataBlockGeneratorTest {
@@ -74,8 +71,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableSimpleBooleanField() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -90,18 +87,18 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.YES_OR_NO)
-                        .withType(FieldTypeDefinition.YES_OR_NO)
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(FieldTypeDefinition.YES_OR_NO)
+                        .type(FieldTypeDefinition.YES_OR_NO)
                         .build())
                     .build(),
-                newCaseField()
-                    .withId("dontPublished")
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.YES_OR_NO)
-                        .withType(FieldTypeDefinition.YES_OR_NO)
+                CaseFieldDefinition.builder()
+                    .id("dontPublished")
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(FieldTypeDefinition.YES_OR_NO)
+                        .type(FieldTypeDefinition.YES_OR_NO)
                         .build())
                     .build()
             ))
@@ -125,8 +122,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableSimpleNumberField() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -141,18 +138,18 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.MONEY_GBP)
-                        .withType(FieldTypeDefinition.MONEY_GBP)
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(FieldTypeDefinition.MONEY_GBP)
+                        .type(FieldTypeDefinition.MONEY_GBP)
                         .build())
                     .build(),
-                newCaseField()
-                    .withId("dontPublished")
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.YES_OR_NO)
-                        .withType(FieldTypeDefinition.YES_OR_NO)
+                CaseFieldDefinition.builder()
+                    .id("dontPublished")
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(FieldTypeDefinition.YES_OR_NO)
+                        .type(FieldTypeDefinition.YES_OR_NO)
                         .build())
                     .build()
             ))
@@ -177,8 +174,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableSimpleTextFieldAlias() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -190,11 +187,11 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.TEXT)
-                        .withType(FieldTypeDefinition.TEXT)
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(FieldTypeDefinition.TEXT)
+                        .type(FieldTypeDefinition.TEXT)
                         .build())
                     .build()
             ))
@@ -220,8 +217,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableSimpleAddressUkField() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -233,15 +230,17 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.PREDEFINED_COMPLEX_ADDRESS_UK)
-                        .withType(COMPLEX)
-                        .withComplexField(complexField("AddressLine1", TEXT))
-                        .withComplexField(complexField("AddressLine2", TEXT))
-                        .withComplexField(complexField("AddressLine3", TEXT))
-                        .withComplexField(complexField("Country", TEXT))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(FieldTypeDefinition.PREDEFINED_COMPLEX_ADDRESS_UK)
+                        .type(COMPLEX)
+                        .complexFields(List.of(
+                            complexField("AddressLine1", TEXT),
+                            complexField("AddressLine2", TEXT),
+                            complexField("AddressLine3", TEXT),
+                            complexField("Country", TEXT)
+                        ))
                         .build())
                     .build()
             ))
@@ -273,8 +272,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableSimpleCollectionField() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -285,12 +284,12 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(COLLECTION)
-                        .withType(COLLECTION)
-                        .withCollectionFieldType(fieldType(TEXT))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(COLLECTION)
+                        .type(COLLECTION)
+                        .collectionFieldTypeDefinition(fieldType(TEXT))
                         .build())
                     .build()
             ))
@@ -330,8 +329,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableComplexCollectionField() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -342,18 +341,19 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COLLECTION)
-                            .withType(COLLECTION)
-                            .withCollectionFieldType(
-                                aFieldType()
-                                    .withId(COMPLEX_ID_2)
-                                    .withType(COMPLEX)
-                                    .withComplexField(complexField(SUB_NESTED_FIELD_1, YES_OR_NO))
-                                    .withComplexField(complexField(SUB_NESTED_FIELD_2, NUMBER))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COLLECTION)
+                            .type(COLLECTION)
+                            .collectionFieldTypeDefinition(
+                                FieldTypeDefinition.builder()
+                                    .id(COMPLEX_ID_2)
+                                    .type(COMPLEX)
+                                    .complexFields(List.of(
+                                        complexField(SUB_NESTED_FIELD_1, YES_OR_NO),
+                                        complexField(SUB_NESTED_FIELD_2, NUMBER)))
                                     .build()
                             )
                             .build()
@@ -399,8 +399,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableComplexField() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -411,27 +411,29 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1, TEXT))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2, TEXT))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_3, TEXT))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(
+                                complexField(NESTED_FIELD_1, TEXT),
+                                CaseFieldDefinition.builder()
+                                    .id(NESTED_FIELD_2)
+                                    .fieldTypeDefinition(
+                                        FieldTypeDefinition.builder()
+                                            .id(COMPLEX_ID_2)
+                                            .type(COMPLEX)
+                                            .complexFields(List.of(
+                                                complexField(SUB_NESTED_FIELD_1, TEXT),
+                                                complexField(SUB_NESTED_FIELD_2, TEXT),
+                                                complexField(SUB_NESTED_FIELD_3, TEXT)
+                                            ))
                                             .build()
                                     )
                                     .build()
-                            )
+                            ))
                             .build()
                     )
                     .build()
@@ -464,8 +466,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForComplexWithComplexOverrides() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -488,26 +490,27 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1, TEXT))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2, TEXT))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(
+                                complexField(NESTED_FIELD_1, TEXT),
+                                CaseFieldDefinition.builder()
+                                    .id(NESTED_FIELD_2)
+                                    .fieldTypeDefinition(
+                                        FieldTypeDefinition.builder()
+                                            .id(COMPLEX_ID_2)
+                                            .type(COMPLEX)
+                                            .complexFields(List.of(
+                                                complexField(SUB_NESTED_FIELD_1, TEXT),
+                                                complexField(SUB_NESTED_FIELD_2, TEXT)
+                                            ))
                                             .build()
                                     )
-                                    .build()
-                            )
+                                    .build()))
                             .build()
                     )
                     .build()
@@ -541,8 +544,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForComplexWithComplexOverrides2() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -559,26 +562,27 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1, TEXT))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2, TEXT))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(
+                                complexField(NESTED_FIELD_1, TEXT),
+                                CaseFieldDefinition.builder()
+                                    .id(NESTED_FIELD_2)
+                                    .fieldTypeDefinition(
+                                        FieldTypeDefinition.builder()
+                                            .id(COMPLEX_ID_2)
+                                            .type(COMPLEX)
+                                            .complexFields(List.of(
+                                                complexField(SUB_NESTED_FIELD_1, TEXT),
+                                                complexField(SUB_NESTED_FIELD_2, TEXT)
+                                            ))
                                             .build()
                                     )
-                                    .build()
-                            )
+                                    .build()))
                             .build()
                     )
                     .build()
@@ -611,8 +615,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForComplexWithCollectionOverrides() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -635,32 +639,35 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COLLECTION)
-                                            .withCollectionFieldType(
-                                                aFieldType()
-                                                    .withId("SomeOtherType")
-                                                    .withType(COMPLEX)
-                                                    .withComplexField(complexField(SUB_NESTED_FIELD_1, TEXT))
-                                                    .withComplexField(complexField(SUB_NESTED_FIELD_2, TEXT))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(
+                                complexField(NESTED_FIELD_1, TEXT),
+                                CaseFieldDefinition.builder()
+                                    .id(NESTED_FIELD_2)
+                                    .fieldTypeDefinition(
+                                        FieldTypeDefinition.builder()
+                                            .id(COMPLEX_ID_2)
+                                            .type(COLLECTION)
+                                            .collectionFieldTypeDefinition(
+                                                FieldTypeDefinition.builder()
+                                                    .id("SomeOtherType")
+                                                    .type(COMPLEX)
+                                                    .complexFields(List.of(
+                                                        complexField(SUB_NESTED_FIELD_1, TEXT),
+                                                        complexField(SUB_NESTED_FIELD_2, TEXT)
+                                                    ))
                                                     .build()
                                             )
                                             .build()
                                     )
                                     .build()
-                            )
+                            ))
+
                             .build()
                     )
                     .build()
@@ -706,8 +713,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForComplexWithCollectionOverrides2() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -724,24 +731,25 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COLLECTION)
-                                            .withCollectionFieldType(fieldType(TEXT))
-                                            .build()
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(
+                                complexField(NESTED_FIELD_1, TEXT),
+                                    CaseFieldDefinition.builder()
+                                        .id(NESTED_FIELD_2)
+                                        .fieldTypeDefinition(
+                                            FieldTypeDefinition.builder()
+                                                .id(COMPLEX_ID_2)
+                                                .type(COLLECTION)
+                                                .collectionFieldTypeDefinition(fieldType(TEXT))
+                                                .build()
+                                        )
+                                        .build()
                                     )
-                                    .build()
                             )
                             .build()
                     )
@@ -781,8 +789,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForComplexWithCollectionOverrides3() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -799,25 +807,25 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COLLECTION)
-                                            .withCollectionFieldType(fieldType(TEXT))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField(NESTED_FIELD_1, TEXT)))
+                            .complexFields(List.of(
+                                CaseFieldDefinition.builder()
+                                    .id(NESTED_FIELD_2)
+                                    .fieldTypeDefinition(
+                                        FieldTypeDefinition.builder()
+                                            .id(COMPLEX_ID_2)
+                                            .type(COLLECTION)
+                                            .collectionFieldTypeDefinition(fieldType(TEXT))
                                             .build()
                                     )
                                     .build()
-                            )
+                            ))
                             .build()
                     )
                     .build()
@@ -856,8 +864,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForComplexWithComplexOverridesWithAlias() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -880,26 +888,27 @@ class DataBlockGeneratorTest {
             .build();
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1, TEXT))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2, TEXT))
-                                            .build()
-                                    )
-                                    .build()
-                            )
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(
+                                complexField(NESTED_FIELD_1, TEXT),
+                                    CaseFieldDefinition.builder()
+                                        .id(NESTED_FIELD_2)
+                                        .fieldTypeDefinition(
+                                            FieldTypeDefinition.builder()
+                                                .id(COMPLEX_ID_2)
+                                                .type(COMPLEX)
+                                                .complexFields(List.of(
+                                                    complexField(SUB_NESTED_FIELD_1, TEXT),
+                                                    complexField(SUB_NESTED_FIELD_2, TEXT)))
+                                                .build()
+                                        )
+                                        .build()
+                                    ))
                             .build()
                     )
                     .build()
@@ -935,8 +944,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForComplexWithComplexOverridesWithMoneyGBP() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -959,26 +968,27 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1, MONEY_GBP))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1, TEXT))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2, TEXT))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(
+                                complexField(NESTED_FIELD_1, MONEY_GBP),
+                                CaseFieldDefinition.builder()
+                                    .id(NESTED_FIELD_2)
+                                    .fieldTypeDefinition(
+                                        FieldTypeDefinition.builder()
+                                            .id(COMPLEX_ID_2)
+                                            .type(COMPLEX)
+                                            .complexFields(List.of(
+                                                complexField(SUB_NESTED_FIELD_1, TEXT),
+                                                complexField(SUB_NESTED_FIELD_2, TEXT)
+                                            ))
                                             .build()
                                     )
-                                    .build()
-                            )
+                                    .build()))
                             .build()
                     )
                     .build()
@@ -1012,8 +1022,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForComplexWithComplexOverridesWithYesOrNoField() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -1036,26 +1046,28 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1, YES_OR_NO))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1, TEXT))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2, TEXT))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(
+                                complexField(NESTED_FIELD_1, YES_OR_NO),
+                                CaseFieldDefinition.builder()
+                                    .id(NESTED_FIELD_2)
+                                    .fieldTypeDefinition(
+                                        FieldTypeDefinition.builder()
+                                            .id(COMPLEX_ID_2)
+                                            .type(COMPLEX)
+                                            .complexFields(List.of(
+                                                complexField(SUB_NESTED_FIELD_1, TEXT),
+                                                complexField(SUB_NESTED_FIELD_2, TEXT)
+                                            ))
                                             .build()
                                     )
                                     .build()
-                            )
+                            ))
                             .build()
                     )
                     .build()
@@ -1089,8 +1101,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableFieldWithNullValue() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -1101,11 +1113,11 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.TEXT)
-                        .withType(FieldTypeDefinition.TEXT)
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(FieldTypeDefinition.TEXT)
+                        .type(FieldTypeDefinition.TEXT)
                         .build())
                     .build()
             ))
@@ -1129,8 +1141,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableFieldWithNoKey() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -1141,11 +1153,11 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.TEXT)
-                        .withType(FieldTypeDefinition.TEXT)
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(FieldTypeDefinition.TEXT)
+                        .type(FieldTypeDefinition.TEXT)
                         .build())
                     .build()
             ))
@@ -1168,8 +1180,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableBooleanFieldWithNullValue() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -1180,11 +1192,11 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(YES_OR_NO)
-                        .withType(YES_OR_NO)
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(YES_OR_NO)
+                        .type(YES_OR_NO)
                         .build())
                     .build()
             ))
@@ -1208,8 +1220,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableBooleanFieldWithEmptyValue() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -1220,11 +1232,11 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(YES_OR_NO)
-                        .withType(YES_OR_NO)
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(YES_OR_NO)
+                        .type(YES_OR_NO)
                         .build())
                     .build()
             ))
@@ -1248,8 +1260,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableNumberFieldWithNullValue() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -1260,11 +1272,11 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(NUMBER)
-                        .withType(NUMBER)
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .id(NUMBER)
+                        .type(NUMBER)
                         .build())
                     .build()
             ))
@@ -1288,8 +1300,8 @@ class DataBlockGeneratorTest {
 
     @Test
     void shouldBuildDataForPublishableComplexOverrideFieldWithNullValue() throws JsonProcessingException {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -1318,26 +1330,28 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1, TEXT))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2, TEXT))
-                                            .build()
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(
+                                complexField(NESTED_FIELD_1, TEXT),
+                                    CaseFieldDefinition.builder()
+                                        .id(NESTED_FIELD_2)
+                                        .fieldTypeDefinition(
+                                            FieldTypeDefinition.builder()
+                                                .id(COMPLEX_ID_2)
+                                                .type(COMPLEX)
+                                                .complexFields(List.of(
+                                                    complexField(SUB_NESTED_FIELD_1, TEXT),
+                                                    complexField(SUB_NESTED_FIELD_2, TEXT)
+                                                ))
+                                                .build()
+                                        )
+                                        .build())
                                     )
-                                    .build()
-                            )
                             .build()
                     )
                     .build()
@@ -1364,16 +1378,16 @@ class DataBlockGeneratorTest {
     }
 
     private CaseFieldDefinition complexField(String id, String type) {
-        return newCaseField()
-            .withId(id)
-            .withFieldType(fieldType(type))
+        return CaseFieldDefinition.builder()
+            .id(id)
+            .fieldTypeDefinition(fieldType(type))
             .build();
     }
 
     private FieldTypeDefinition fieldType(String type) {
-        return aFieldType()
-            .withId(type)
-            .withType(type)
+        return FieldTypeDefinition.builder()
+            .id(type)
+            .type(type)
             .build();
     }
 }

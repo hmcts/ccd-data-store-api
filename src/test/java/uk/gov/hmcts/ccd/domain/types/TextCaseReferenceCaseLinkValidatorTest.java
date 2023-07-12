@@ -10,9 +10,9 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -66,8 +66,8 @@ class TextCaseReferenceCaseLinkValidatorTest {
     @DisplayName("should pass test against regular expression")
     void textRegexPass() {
 
-        final CaseFieldDefinition caseFieldDefinition =
-            caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().fieldTypeDefinition(defaultFieldDefinition()
+            .regularExpression("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build()).build();
         final JsonNode validValue = NODE_FACTORY.textNode("1596-1048-4059-0000");
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
         final List<ValidationResult> validResult = validator.validate(validationContext1);
@@ -94,8 +94,8 @@ class TextCaseReferenceCaseLinkValidatorTest {
     @Test
     @DisplayName("should fail test against regular expression")
     void textRegexFail() {
-        final CaseFieldDefinition caseFieldDefinition =
-            caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().fieldTypeDefinition(defaultFieldDefinition()
+            .regularExpression("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build()).build();
         final JsonNode validValue = NODE_FACTORY.textNode("15xxxx00");
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
         final List<ValidationResult> validResult = validator.validate(validationContext1);
@@ -114,8 +114,8 @@ class TextCaseReferenceCaseLinkValidatorTest {
     @Test
     @DisplayName("should fail test against due to resource not found")
     void failDueToResourceNotFound() {
-        final CaseFieldDefinition caseFieldDefinition =
-            caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().fieldTypeDefinition(defaultFieldDefinition()
+            .regularExpression("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build()).build();
         final String caseReference = "1596-1048-4059-0000";
         final JsonNode validValue = NODE_FACTORY.textNode(caseReference);
 
@@ -136,7 +136,14 @@ class TextCaseReferenceCaseLinkValidatorTest {
         );
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(TextAreaValidator.TYPE_ID);
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .type(TextAreaValidator.TYPE_ID);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition().build());
     }
 }

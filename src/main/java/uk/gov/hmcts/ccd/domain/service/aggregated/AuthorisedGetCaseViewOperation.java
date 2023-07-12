@@ -98,9 +98,10 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
                                      String accessGranted,
                                      String accessGrantedLabel,
                                      String caseViewFieldValue) {
-        var fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setId(TEXT);
-        fieldTypeDefinition.setType(TEXT);
+        var fieldTypeDefinition = FieldTypeDefinition.builder()
+            .id(TEXT)
+            .type(TEXT)
+            .build();
 
         CaseViewField caseViewField = new CaseViewField();
         caseViewField.setId(accessGranted);

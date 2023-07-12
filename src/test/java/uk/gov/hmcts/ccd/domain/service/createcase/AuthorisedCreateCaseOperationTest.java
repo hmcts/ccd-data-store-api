@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -52,7 +53,6 @@ import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 class AuthorisedCreateCaseOperationTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -105,7 +105,7 @@ class AuthorisedCreateCaseOperationTest {
                                                                                        IGNORE);
         caseTypeDefinition = CaseTypeDefinition.builder()
             .events(events)
-            .jurisdictionDefinition(newJurisdiction().withJurisdictionId(JURISDICTION_ID).build())
+            .jurisdictionDefinition(JurisdictionDefinition.builder().id(JURISDICTION_ID).build())
             .caseFieldDefinitions(caseFieldDefinitions)
             .build();
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);

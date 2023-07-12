@@ -491,8 +491,9 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         searchParams.put("PersonFirstName", "Janet");
 
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
-            caseStateDefinition.setId("CaseCreated");
+            CaseStateDefinition caseStateDefinition = CaseStateDefinition.builder()
+                .id("CaseCreated")
+                .build();
 
             when(accessControlService
                 .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
@@ -519,8 +520,9 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     })
     public void searchWithParams_restrictedStates() {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
-            caseStateDefinition.setId("CaseRestricted");
+            CaseStateDefinition caseStateDefinition = CaseStateDefinition.builder()
+                .id("CaseRestricted")
+                .build();
 
             when(accessControlService
                 .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))

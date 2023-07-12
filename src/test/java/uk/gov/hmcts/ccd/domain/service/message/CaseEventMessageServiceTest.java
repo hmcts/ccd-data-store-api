@@ -133,12 +133,12 @@ class CaseEventMessageServiceTest {
 
 
     private CaseEventDefinition buildEventTrigger() {
-        final CaseEventDefinition event = new CaseEventDefinition();
-        event.setId(EVENT_ID);
-        event.setName(EVENT_NAME);
-        event.setPublish(Boolean.TRUE);
-        event.setPreStates(Arrays.asList(STATE));
-        return event;
+        return CaseEventDefinition.builder()
+            .id(EVENT_ID)
+            .name(EVENT_NAME)
+            .publish(Boolean.TRUE)
+            .preStates(Arrays.asList(STATE))
+            .build();
     }
 
     private CaseDetails buildCaseDetails() {

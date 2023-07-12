@@ -281,7 +281,8 @@ public abstract class AbstractBaseIntegrationTest {
             messageQueueCandidate.setPublished(published.toLocalDateTime());
         }
         try {
-            messageQueueCandidate.setMessageInformation(mapper.readTree(resultSet.getString("message_information")));
+            messageQueueCandidate.setMessageInformation(
+                mapper.readTree(resultSet.getString("message_information")));
         } catch (IOException e) {
             fail("Incorrect JSON structure: " + resultSet.getString("DATA"));
         }
@@ -337,14 +338,13 @@ public abstract class AbstractBaseIntegrationTest {
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
                                         Long caseReference, String eventId) {
-        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-        jurisdictionDefinition.setId(jurisdictionId);
+        final JurisdictionDefinition jurisdictionDefinition = JurisdictionDefinition
+            .builder().id(jurisdictionId).build();
 
         final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
                 .id(caseTypeId).build();
 
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId(eventId);
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id(eventId).build();
 
         return eventTokenService.generateToken(userId, getCase(template, caseReference), caseEventDefinition,
             jurisdictionDefinition, caseTypeDefinition);
@@ -352,14 +352,13 @@ public abstract class AbstractBaseIntegrationTest {
 
     protected String generateEventTokenNewCase(String userId, String jurisdictionId,
                                                String caseTypeId, String eventId) {
-        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-        jurisdictionDefinition.setId(jurisdictionId);
+        final JurisdictionDefinition jurisdictionDefinition = JurisdictionDefinition.builder()
+            .id(jurisdictionId).build();
 
         final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
             .id(caseTypeId).build();
 
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId(eventId);
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id(eventId).build();
 
         return eventTokenService.generateToken(userId, caseEventDefinition, jurisdictionDefinition, caseTypeDefinition);
     }

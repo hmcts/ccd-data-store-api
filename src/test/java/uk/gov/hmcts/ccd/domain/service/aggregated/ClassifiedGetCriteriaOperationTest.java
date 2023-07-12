@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
@@ -24,8 +25,6 @@ import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
 
@@ -37,13 +36,17 @@ class ClassifiedGetCriteriaOperationTest {
     private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
     private static final String CASE_FIELD_ID_1_4 = "CASE_FIELD_1_4";
-    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(PUBLIC)
+    private static final CaseFieldDefinition CASE_FIELD_1_1 = CaseFieldDefinition.builder()
+        .id(CASE_FIELD_ID_1_1).securityLabel(PUBLIC)
         .build();
-    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(PUBLIC)
+    private static final CaseFieldDefinition CASE_FIELD_1_2 = CaseFieldDefinition.builder()
+        .id(CASE_FIELD_ID_1_2).securityLabel(PUBLIC)
         .build();
-    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3).withSC(PUBLIC)
+    private static final CaseFieldDefinition CASE_FIELD_1_3 = CaseFieldDefinition.builder()
+        .id(CASE_FIELD_ID_1_3).securityLabel(PUBLIC)
         .build();
-    private static final CaseFieldDefinition CASE_FIELD_1_4 = newCaseField().withId(CASE_FIELD_ID_1_4).withSC(PUBLIC)
+    private static final CaseFieldDefinition CASE_FIELD_1_4 = CaseFieldDefinition.builder()
+        .id(CASE_FIELD_ID_1_4).securityLabel(PUBLIC)
         .build();
     private static List<WorkbasketInput> testWorkbasketInputs;
     private static List<SearchInput> testSearchInputs;
@@ -76,8 +79,8 @@ class ClassifiedGetCriteriaOperationTest {
         MockitoAnnotations.initMocks(this);
         testCaseTypeDefinition = CaseTypeDefinition.builder()
             .id(CASE_TYPE_ONE)
-            .jurisdictionDefinition(newJurisdiction()
-                .withJurisdictionId(JURISDICTION_ID)
+            .jurisdictionDefinition(JurisdictionDefinition.builder()
+                .id(JURISDICTION_ID)
                 .build())
             .caseFieldDefinitions(List.of(CASE_FIELD_1_1, CASE_FIELD_1_2, CASE_FIELD_1_3, CASE_FIELD_1_4))
             .build();
@@ -91,7 +94,7 @@ class ClassifiedGetCriteriaOperationTest {
 
     @Test
     @DisplayName("should filter workbasket input fields when user does not have enough SC rank")
-    void shouldFilterFieldsWithSC() {
+    void shouldFilterFieldssecurityLabel() {
         doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE,
             CAN_READ, WORKBASKET);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
@@ -130,7 +133,7 @@ class ClassifiedGetCriteriaOperationTest {
 
     @Test
     @DisplayName("should filter search input fields when user does not have enough SC rank")
-    void shouldFilterSearchInputFieldsWithSC() {
+    void shouldFilterSearchInputFieldssecurityLabel() {
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
             testCaseTypeDefinition, CASE_FIELD_ID_1_1);

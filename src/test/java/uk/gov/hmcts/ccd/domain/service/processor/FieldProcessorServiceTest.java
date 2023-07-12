@@ -245,9 +245,7 @@ class FieldProcessorServiceTest {
     }
 
     private CaseFieldDefinition caseField(String id) {
-        CaseFieldDefinition caseField = new CaseFieldDefinition();
-        caseField.setId(id);
-        return caseField;
+        return CaseFieldDefinition.builder().id(id).build();
     }
 
     private CaseEventFieldDefinition caseEventField(String id) {

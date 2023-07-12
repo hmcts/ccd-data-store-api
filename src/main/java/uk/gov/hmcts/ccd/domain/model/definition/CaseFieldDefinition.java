@@ -3,7 +3,13 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
-import lombok.ToString;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.Value;
+import lombok.experimental.NonFinal;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 
 import java.io.Serializable;
@@ -18,77 +24,78 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-@ToString
-@ApiModel(description = "")
+@ApiModel
+@Value
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(force = true, access = AccessLevel.PACKAGE)
 public class CaseFieldDefinition implements Serializable, CommonField {
 
     private static final long serialVersionUID = -4257574164546267919L;
 
-    private String id = null;
+    @NonFinal
+    @Setter
+    String id;
     @JsonProperty("case_type_id")
-    private String caseTypeId = null;
-    private String label = null;
+    @Setter
+    @NonFinal
+    String caseTypeId;
+    String label;
     @JsonProperty("hint_text")
-    private String hintText = null;
+    String hintText;
     @JsonProperty("field_type")
-    private FieldTypeDefinition fieldTypeDefinition = null;
-    private Boolean hidden = null;
+    FieldTypeDefinition fieldTypeDefinition;
+    Boolean hidden;
     @JsonProperty("security_classification")
-    private String securityLabel = null;
+    String securityLabel;
     @JsonProperty("live_from")
-    private String liveFrom = null;
+    String liveFrom;
     @JsonProperty("live_until")
-    private String liveUntil = null;
-    private Integer order;
+    String liveUntil;
+    Integer order;
     @JsonProperty("show_condition")
-    private String showCondition = null;
+    @NonFinal
+    String showCondition;
     @JsonProperty("acls")
-    private List<AccessControlList> accessControlLists;
+    @SuppressWarnings("RedundantModifiersValueLombok") // see https://sonarsource.atlassian.net/browse/SONARJAVA-4536
+    @NonFinal
+    @Builder.Default
+    private List<AccessControlList> accessControlLists = new ArrayList<>();
     @JsonProperty("complexACLs")
+    @SuppressWarnings("RedundantModifiersValueLombok") // see https://sonarsource.atlassian.net/browse/SONARJAVA-4536
+    @Builder.Default
     private List<ComplexACL> complexACLs = new ArrayList<>();
-    private boolean metadata;
+    boolean metadata;
     @JsonProperty("display_context")
-    private String displayContext;
+    @NonFinal
+    String displayContext;
     @JsonProperty("display_context_parameter")
-    private String displayContextParameter;
+    @NonFinal
+    String displayContextParameter;
     @JsonProperty("retain_hidden_value")
-    private Boolean retainHiddenValue;
+    @NonFinal
+    Boolean retainHiddenValue;
     @JsonProperty("formatted_value")
-    private Object formattedValue;
+    @NonFinal
+    Object formattedValue;
     @JsonProperty("category_id")
-    private String categoryId;
+    String categoryId;
 
     @Override
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getCaseTypeId() {
         return caseTypeId;
-    }
-
-    public void setCaseTypeId(String caseTypeId) {
-        this.caseTypeId = caseTypeId;
     }
 
     public String getLabel() {
         return label;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
     public String getHintText() {
         return hintText;
-    }
-
-    public void setHintText(String hintText) {
-        this.hintText = hintText;
     }
 
     @Override
@@ -96,54 +103,31 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         return fieldTypeDefinition;
     }
 
-    public void setFieldTypeDefinition(FieldTypeDefinition fieldTypeDefinition) {
-        this.fieldTypeDefinition = fieldTypeDefinition;
-    }
-
     public Boolean getHidden() {
         return hidden;
-    }
-
-    public void setHidden(Boolean hidden) {
-        this.hidden = hidden;
     }
 
     public String getSecurityLabel() {
         return securityLabel;
     }
 
-    public void setSecurityLabel(String securityLabel) {
-        this.securityLabel = securityLabel;
-    }
-
     public String getLiveFrom() {
         return liveFrom;
-    }
-
-    public void setLiveFrom(String liveFrom) {
-        this.liveFrom = liveFrom;
     }
 
     public String getLiveUntil() {
         return liveUntil;
     }
 
-    public void setLiveUntil(String liveUntil) {
-        this.liveUntil = liveUntil;
-    }
-
     public Integer getOrder() {
         return order;
-    }
-
-    public void setOrder(final Integer order) {
-        this.order = order;
     }
 
     public String getShowCondition() {
         return showCondition;
     }
 
+    @Override
     public void setShowCondition(String showCondition) {
         this.showCondition = showCondition;
     }
@@ -161,17 +145,10 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         return complexACLs;
     }
 
-    public void setComplexACLs(List<ComplexACL> complexACLs) {
-        this.complexACLs = complexACLs;
-    }
-
     public boolean isMetadata() {
         return metadata;
     }
 
-    public void setMetadata(boolean metadata) {
-        this.metadata = metadata;
-    }
 
     @Override
     public String getDisplayContext() {
@@ -197,6 +174,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         return retainHiddenValue;
     }
 
+    @Override
     public void setRetainHiddenValue(Boolean retainHiddenValue) {
         this.retainHiddenValue = retainHiddenValue;
     }
@@ -213,10 +191,6 @@ public class CaseFieldDefinition implements Serializable, CommonField {
 
     public String getCategoryId() {
         return categoryId;
-    }
-
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
     }
 
     @JsonIgnore

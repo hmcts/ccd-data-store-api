@@ -105,7 +105,7 @@ class CachedCaseDefinitionRepositoryTest {
         @DisplayName("should initially retrieve base types from decorated repository")
         void shouldRetrieveBaseTypesFromDecorated() {
             final List<FieldTypeDefinition> expectedBaseTypes =
-                List.of(new FieldTypeDefinition(), new FieldTypeDefinition());
+                List.of(FieldTypeDefinition.builder().build(), FieldTypeDefinition.builder().build());
             doReturn(expectedBaseTypes).when(caseDefinitionRepository).getBaseTypes();
 
             final List<FieldTypeDefinition> baseTypes = cachedCaseDefinitionRepository.getBaseTypes();
@@ -120,14 +120,15 @@ class CachedCaseDefinitionRepositoryTest {
         @DisplayName("should cache base types for subsequent calls")
         void shouldCacheBaseTypesForSubsequentCalls() {
             final List<FieldTypeDefinition> expectedBaseTypes =
-                List.of(new FieldTypeDefinition(), new FieldTypeDefinition());
+                List.of(FieldTypeDefinition.builder().build(), FieldTypeDefinition.builder().build());
             doReturn(expectedBaseTypes).when(caseDefinitionRepository).getBaseTypes();
 
             cachedCaseDefinitionRepository.getBaseTypes();
 
             verify(caseDefinitionRepository, times(1)).getBaseTypes();
 
-            doReturn(List.of(new FieldTypeDefinition(), new FieldTypeDefinition())).when(caseDefinitionRepository)
+            doReturn(List.of(FieldTypeDefinition.builder().build(), FieldTypeDefinition.builder().build()))
+                .when(caseDefinitionRepository)
                 .getBaseTypes();
 
             final List<FieldTypeDefinition> baseTypes = cachedCaseDefinitionRepository.getBaseTypes();

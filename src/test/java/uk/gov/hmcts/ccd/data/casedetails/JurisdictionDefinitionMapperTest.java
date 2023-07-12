@@ -12,18 +12,16 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 class JurisdictionDefinitionMapperTest {
     uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper jurisdictionMapper =
             new uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper();
 
-    CaseStateDefinition caseStateDefinition1 = newState()
-        .withId("ST1")
+    CaseStateDefinition caseStateDefinition1 = CaseStateDefinition.builder()
+        .id("ST1")
         .build();
-    CaseStateDefinition caseStateDefinition2 = newState()
-        .withId("ST2")
+    CaseStateDefinition caseStateDefinition2 = CaseStateDefinition.builder()
+        .id("ST2")
         .build();
 
     CaseTypeDefinition caseTypeDefinition1 = CaseTypeDefinition.builder()
@@ -35,12 +33,11 @@ class JurisdictionDefinitionMapperTest {
         .states(List.of(caseStateDefinition2))
         .build();
 
-    JurisdictionDefinition jurisdictionDefinition = newJurisdiction()
-        .withJurisdictionId("jid")
-        .withName("name")
-        .withDescription("description")
-        .withCaseType(caseTypeDefinition1)
-        .withCaseType(caseTypeDefinition2)
+    JurisdictionDefinition jurisdictionDefinition = JurisdictionDefinition.builder()
+        .id("jid")
+        .name("name")
+        .description("description")
+        .caseTypeDefinitions(List.of(caseTypeDefinition1, caseTypeDefinition2))
         .build();
 
     @Test

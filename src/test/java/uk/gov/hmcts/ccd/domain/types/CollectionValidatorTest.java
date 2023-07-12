@@ -25,24 +25,30 @@ public class CollectionValidatorTest {
     private static final String CASE_FIELD_ID = "Aliases";
 
     private CollectionValidator validator;
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseFieldDefinitionBuilder;
     private CaseFieldDefinition caseFieldDefinition;
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldTypeDefinition;
 
     @Before
     public void setUp() throws Exception {
         validator = new CollectionValidator();
 
-        final FieldTypeDefinition collectionFieldTypeDefinition = new FieldTypeDefinition();
-        collectionFieldTypeDefinition.setId(TYPE_TEXT);
-        collectionFieldTypeDefinition.setType(TYPE_TEXT);
+        final FieldTypeDefinition collectionFieldTypeDefinition = FieldTypeDefinition.builder()
+            .id(TYPE_TEXT)
+            .type(TYPE_TEXT)
+            .build();
 
-        final FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setId(TYPE_TEXT);
-        fieldTypeDefinition.setType(COLLECTION);
-        fieldTypeDefinition.setCollectionFieldTypeDefinition(collectionFieldTypeDefinition);
+        defaultFieldTypeDefinition = FieldTypeDefinition.builder()
+            .id(TYPE_TEXT)
+            .type(COLLECTION)
+            .collectionFieldTypeDefinition(collectionFieldTypeDefinition)
+            ;
 
-        caseFieldDefinition = new CaseFieldDefinition();
-        caseFieldDefinition.setId(CASE_FIELD_ID);
-        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+        caseFieldDefinitionBuilder = CaseFieldDefinition.builder()
+            .id(CASE_FIELD_ID)
+            .fieldTypeDefinition(defaultFieldTypeDefinition.build());
+
+        caseFieldDefinition = caseFieldDefinitionBuilder.build();
     }
 
     @Test
@@ -55,7 +61,12 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_invalidMin() throws IOException {
-        caseFieldDefinition.getFieldTypeDefinition().setMin(new BigDecimal(2));
+        caseFieldDefinition = caseFieldDefinitionBuilder
+            .fieldTypeDefinition(defaultFieldTypeDefinition
+                .min(new BigDecimal(2))
+                .build()
+            )
+            .build();
 
         final List<ValidationResult> results =
             validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"} ]"), caseFieldDefinition);
@@ -66,7 +77,12 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_invalidMax() throws IOException {
-        caseFieldDefinition.getFieldTypeDefinition().setMax(ONE);
+        caseFieldDefinition = caseFieldDefinitionBuilder
+            .fieldTypeDefinition(defaultFieldTypeDefinition
+                .max(ONE)
+                .build()
+            )
+            .build();
 
         final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree(
             "[ { \"value\": \"V1\"}, { \"value\": \"V2\"} ]"),
@@ -78,8 +94,13 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_validMinMax() throws IOException {
-        caseFieldDefinition.getFieldTypeDefinition().setMin(ONE);
-        caseFieldDefinition.getFieldTypeDefinition().setMax(ONE);
+        caseFieldDefinition = caseFieldDefinitionBuilder
+            .fieldTypeDefinition(defaultFieldTypeDefinition
+                .min(ONE)
+                .max(ONE)
+                .build()
+            )
+            .build();
 
         final List<ValidationResult> results =
             validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"} ]"), caseFieldDefinition);

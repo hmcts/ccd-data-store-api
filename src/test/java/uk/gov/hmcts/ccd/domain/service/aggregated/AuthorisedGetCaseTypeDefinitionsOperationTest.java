@@ -36,9 +36,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CR
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
 
 class AuthorisedGetCaseTypeDefinitionsOperationTest {
 
@@ -78,104 +75,104 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
     private static final String CASE_TYPE_ID1 = "CASE_TYPE_ID1";
     private static final String CASE_TYPE_ID2 = "CASE_TYPE_ID2";
     private static final String CASE_TYPE_ID3 = "CASE_TYPE_ID3";
-    private static final CaseStateDefinition CASE_STATE_1_1 = newState().withId(STATE_ID_1_1).build();
-    private static final CaseStateDefinition CASE_STATE_1_2 = newState().withId(STATE_ID_1_2).build();
-    private static final CaseStateDefinition CASE_STATE_2_1 = newState().withId(STATE_ID_2_1).build();
-    private static final CaseStateDefinition CASE_STATE_2_2 = newState().withId(STATE_ID_2_2).build();
-    private static final CaseStateDefinition CASE_STATE_3_1 = newState().withId(STATE_ID_3_1).build();
-    private static final CaseStateDefinition CASE_STATE_3_2 = newState().withId(STATE_ID_3_2).build();
-    private static final CaseEventDefinition CASE_EVENT_1_1 = newCaseEvent().withId(EVENT_ID_1_1)
-        .withAcl(anAcl()
+    private static final CaseStateDefinition CASE_STATE_1_1 = CaseStateDefinition.builder().id(STATE_ID_1_1).build();
+    private static final CaseStateDefinition CASE_STATE_1_2 = CaseStateDefinition.builder().id(STATE_ID_1_2).build();
+    private static final CaseStateDefinition CASE_STATE_2_1 = CaseStateDefinition.builder().id(STATE_ID_2_1).build();
+    private static final CaseStateDefinition CASE_STATE_2_2 = CaseStateDefinition.builder().id(STATE_ID_2_2).build();
+    private static final CaseStateDefinition CASE_STATE_3_1 = CaseStateDefinition.builder().id(STATE_ID_3_1).build();
+    private static final CaseStateDefinition CASE_STATE_3_2 = CaseStateDefinition.builder().id(STATE_ID_3_2).build();
+    private static final CaseEventDefinition CASE_EVENT_1_1 = CaseEventDefinition.builder().id(EVENT_ID_1_1)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseEventDefinition CASE_EVENT_1_2 = newCaseEvent().withId(EVENT_ID_1_2)
-        .withAcl(anAcl()
+    private static final CaseEventDefinition CASE_EVENT_1_2 = CaseEventDefinition.builder().id(EVENT_ID_1_2)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withRead(true)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseEventDefinition CASE_EVENT_1_3 = newCaseEvent().withId(EVENT_ID_1_3)
-        .withAcl(anAcl()
+    private static final CaseEventDefinition CASE_EVENT_1_3 = CaseEventDefinition.builder().id(EVENT_ID_1_3)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withRead(true)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseEventDefinition CASE_EVENT_2_3 = newCaseEvent().withId(EVENT_ID_2_3)
-        .withAcl(anAcl()
+    private static final CaseEventDefinition CASE_EVENT_2_3 = CaseEventDefinition.builder().id(EVENT_ID_2_3)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseEventDefinition CASE_EVENT_3_1 = newCaseEvent().withId(EVENT_ID_3_1)
-        .withAcl(anAcl()
+    private static final CaseEventDefinition CASE_EVENT_3_1 = CaseEventDefinition.builder().id(EVENT_ID_3_1)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseEventDefinition CASE_EVENT_3_2 = newCaseEvent().withId(EVENT_ID_3_2)
-        .withAcl(anAcl()
+    private static final CaseEventDefinition CASE_EVENT_3_2 = CaseEventDefinition.builder().id(EVENT_ID_3_2)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withRead(true)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseEventDefinition CASE_EVENT_3_3 = newCaseEvent().withId(EVENT_ID_3_3)
-        .withAcl(anAcl()
+    private static final CaseEventDefinition CASE_EVENT_3_3 = CaseEventDefinition.builder().id(EVENT_ID_3_3)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
-                     .build())
+                     .build()))
         .build();
 
-    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1)
-        .withAcl(anAcl()
+    private static final CaseFieldDefinition CASE_FIELD_1_1 = CaseFieldDefinition.builder().id(CASE_FIELD_ID_1_1)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2)
-        .withAcl(anAcl()
+    private static final CaseFieldDefinition CASE_FIELD_1_2 = CaseFieldDefinition.builder().id(CASE_FIELD_ID_1_2)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withRead(true)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3)
-        .withAcl(anAcl()
+    private static final CaseFieldDefinition CASE_FIELD_1_3 = CaseFieldDefinition.builder().id(CASE_FIELD_ID_1_3)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseFieldDefinition CASE_FIELD_2_3 = newCaseField().withId(CASE_FIELD_ID_2_3)
-        .withAcl(anAcl()
+    private static final CaseFieldDefinition CASE_FIELD_2_3 = CaseFieldDefinition.builder().id(CASE_FIELD_ID_2_3)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseFieldDefinition CASE_FIELD_3_1 = newCaseField().withId(CASE_FIELD_ID_3_1)
-        .withAcl(anAcl()
+    private static final CaseFieldDefinition CASE_FIELD_3_1 = CaseFieldDefinition.builder().id(CASE_FIELD_ID_3_1)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withRead(true)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseFieldDefinition CASE_FIELD_3_2 = newCaseField().withId(CASE_FIELD_ID_3_2)
-        .withAcl(anAcl()
+    private static final CaseFieldDefinition CASE_FIELD_3_2 = CaseFieldDefinition.builder().id(CASE_FIELD_ID_3_2)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withCreate(true)
-                     .build())
+                     .build()))
         .build();
-    private static final CaseFieldDefinition CASE_FIELD_3_3 = newCaseField().withId(CASE_FIELD_ID_3_3)
-        .withAcl(anAcl()
+    private static final CaseFieldDefinition CASE_FIELD_3_3 = CaseFieldDefinition.builder().id(CASE_FIELD_ID_3_3)
+        .accessControlLists(List.of(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withRead(true)
-                     .build())
+                     .build()))
         .build();
 
 
@@ -206,11 +203,11 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
                 .build()))
             .states(List.of(CASE_STATE_1_1, CASE_STATE_1_2))
             .events(List.of(CASE_EVENT_1_1,
-                newCaseEvent()
-                    .withId(EVENT_ID_1_2)
-                    .withAcl(anAcl()
+                CaseEventDefinition.builder()
+                    .id(EVENT_ID_1_2)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
-                        .build())
+                        .build()))
                     .build(),
                 CASE_EVENT_1_3))
             .caseFieldDefinitions(List.of(CASE_FIELD_1_1, CASE_FIELD_1_2, CASE_FIELD_1_3))
@@ -224,32 +221,32 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
                 .build()))
             .states(List.of(CASE_STATE_2_1, CASE_STATE_2_2))
             .events(List.of(
-                newCaseEvent()
-                    .withId(EVENT_ID_2_1)
-                    .withAcl(anAcl()
+                CaseEventDefinition.builder()
+                    .id(EVENT_ID_2_1)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withRead(true)
-                        .build())
+                        .build()))
                     .build(),
-                newCaseEvent().withId(EVENT_ID_2_2)
-                    .withAcl(anAcl()
+                CaseEventDefinition.builder().id(EVENT_ID_2_2)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withRead(true)
-                        .build())
+                        .build()))
                     .build(),
                 CASE_EVENT_2_3
             ))
             .caseFieldDefinitions(List.of(
-                newCaseField().withId(CASE_FIELD_ID_2_1)
-                    .withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_ID_2_1)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
                         .withRead(true)
-                        .build())
+                        .build()))
                     .build(),
-                newCaseField().withId(CASE_FIELD_ID_2_2)
-                    .withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_ID_2_2)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
-                        .build())
+                        .build()))
                     .build(),
                 CASE_FIELD_2_3
             ))

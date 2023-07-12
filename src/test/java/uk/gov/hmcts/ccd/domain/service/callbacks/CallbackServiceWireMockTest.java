@@ -69,8 +69,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         caseDetails.setState("test state");
         caseDetails.setCaseTypeId("test case type");
 
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("TEST-EVENT");
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id("TEST-EVENT").build();
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(caseDetails.getData());
@@ -94,8 +93,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         caseDetails.setState("test state");
         caseDetails.setCaseTypeId("test case type");
 
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("TEST-EVENT");
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id("TEST-EVENT").build();
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(caseDetails.getData());
@@ -119,8 +117,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         caseDetails.setState("test state");
         caseDetails.setCaseTypeId("test case type");
 
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("TEST-EVENT");
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id("TEST-EVENT").build();
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("Test message"));
@@ -139,8 +136,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
     public void notFoundFailurePath() {
         final String testUrl = "http://localhost";
         final CaseDetails caseDetails = new CaseDetails();
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("TEST-EVENT");
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id("TEST-EVENT").build();
 
         callbackService.send(testUrl, TEST_CALLBACK, caseEventDefinition, null, caseDetails, false);
     }
@@ -150,8 +146,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
         final CallbackResponse callbackResponse = new CallbackResponse();
         final CaseDetails caseDetails = new CaseDetails();
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("TEST-EVENT");
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id("TEST-EVENT").build();
 
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
@@ -164,8 +159,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final String testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
         final CallbackResponse callbackResponse = new CallbackResponse();
         final CaseDetails caseDetails = new CaseDetails();
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("TEST-EVENT");
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id("TEST-EVENT").build();
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
@@ -186,8 +180,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
         final CallbackResponse callbackResponse = new CallbackResponse();
         final CaseDetails caseDetails = new CaseDetails();
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("TEST-EVENT");
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id("TEST-EVENT").build();
 
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(401)));
@@ -238,8 +231,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final String testUrl = "http://localhost:" + wiremockPort + "/test-callback-submitted";
         final CallbackResponse callbackResponse = new CallbackResponse();
         final CaseDetails caseDetails = new CaseDetails();
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("TEST-EVENT");
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id("TEST-EVENT").build();
 
         stubFor(post(urlMatching("/test-callback-submitted.*")).willReturn(
             okJson(mapper.writeValueAsString(callbackResponse)).withStatus(201)));
@@ -262,8 +254,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final String testUrl = "http://localhost:" + wiremockPort + "/test-callback-invaliddd";
         final CallbackResponse callbackResponse = new CallbackResponse();
         final CaseDetails caseDetails = new CaseDetails();
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("TEST-EVENT");
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id("TEST-EVENT").build();
 
         stubFor(post(urlMatching("/test-callback-invaliddd.*")).willReturn(
             okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
@@ -292,8 +283,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class), restTemplate,
             Mockito.mock(ApplicationParams.class), Mockito.mock(AppInsights.class));
         final CaseDetails caseDetails = new CaseDetails();
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("TEST-EVENT");
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().id("TEST-EVENT").build();
 
         try {
             underTest.send(testUrl, TEST_CALLBACK, caseEventDefinition, null, caseDetails, String.class);

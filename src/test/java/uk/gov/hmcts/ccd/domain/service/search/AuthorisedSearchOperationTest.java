@@ -195,11 +195,9 @@ class AuthorisedSearchOperationTest {
 
     private List<CaseFieldDefinition> getCaseFieldsWithIds(String... dataTestFields) {
         return Stream.of(dataTestFields)
-            .map(field -> {
-                CaseFieldDefinition caseField = new CaseFieldDefinition();
-                caseField.setId(field);
-                return caseField;
-            })
+            .map(field -> CaseFieldDefinition.builder()
+                .id(field)
+                .build())
             .collect(Collectors.toList());
     }
 

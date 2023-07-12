@@ -495,8 +495,9 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
     private void setupWithCategories() {
         final CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
-        CategoryDefinition category = new CategoryDefinition();
-        category.setCategoryId(VALID_CATEGORY_ID);
+        CategoryDefinition category = CategoryDefinition.builder()
+            .categoryId(VALID_CATEGORY_ID)
+            .build();
         List<CategoryDefinition> categories = List.of(category);
         doReturn(caseTypeDefinition)
             .when(caseDefinitionRepository).getCaseType(anyString());

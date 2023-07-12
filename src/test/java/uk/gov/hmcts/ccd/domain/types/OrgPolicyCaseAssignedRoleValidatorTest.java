@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,8 +53,7 @@ class OrgPolicyCaseAssignedRoleValidatorTest {
     @DisplayName("should fail due to incorrect organisation role")
     void failDueToIncorrectOrganisationRole() {
 
-        final CaseFieldDefinition caseFieldDefinition = caseField().build();
-        caseFieldDefinition.setId("TEST");
+        final CaseFieldDefinition caseFieldDefinition = caseField().id("TEST").build();
         final JsonNode validValue = NODE_FACTORY.textNode("XXXX");
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
         final List<ValidationResult> validResult = validator.validate(validationContext1);
@@ -70,8 +69,7 @@ class OrgPolicyCaseAssignedRoleValidatorTest {
     @DisplayName("should fail due to null organisation role")
     void failDueToNullOrganisationRole() {
 
-        final CaseFieldDefinition caseFieldDefinition = caseField().build();
-        caseFieldDefinition.setId("TEST");
+        final CaseFieldDefinition caseFieldDefinition = caseField().id("TEST").build();
         final JsonNode validValue = NODE_FACTORY.nullNode();
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
         final List<ValidationResult> validResult = validator.validate(validationContext1);
@@ -114,7 +112,10 @@ class OrgPolicyCaseAssignedRoleValidatorTest {
     @DisplayName("should fail test against regular expression")
     void textRegexFail() {
         final CaseFieldDefinition caseFieldDefinition =
-            caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
+            caseField().fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .type(TextValidator.TYPE_ID)
+                    .regularExpression("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)")
+                .build()).build();
         final JsonNode validValue = NODE_FACTORY.textNode("15xxxx00");
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
         final List<ValidationResult> validResult = validator.validate(validationContext1);
@@ -129,7 +130,12 @@ class OrgPolicyCaseAssignedRoleValidatorTest {
         );
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(TextValidator.TYPE_ID);
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(FieldTypeDefinition.builder()
+                .type(TextValidator.TYPE_ID)
+                .build()
+            );
     }
 }

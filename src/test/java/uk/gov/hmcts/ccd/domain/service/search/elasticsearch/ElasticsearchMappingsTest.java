@@ -9,7 +9,6 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class ElasticsearchMappingsTest {
 
@@ -35,7 +34,7 @@ class ElasticsearchMappingsTest {
 
         @Test
         void shouldReturnTrueWhenCaseDataFieldTypeIsMappedAsDefaultText() {
-            FieldTypeDefinition fieldType = aFieldType().withType("FixedList").build();
+            FieldTypeDefinition fieldType = FieldTypeDefinition.builder().type("FixedList").build();
 
             final boolean result = elasticsearchMappings.isDefaultTextCaseData(fieldType);
 
@@ -44,9 +43,10 @@ class ElasticsearchMappingsTest {
 
         @Test
         void shouldReturnTrueWhenCaseDataFieldCollectionTypeIsMappedAsDefaultText() {
-            FieldTypeDefinition fieldType = aFieldType().withType("Collection").withCollectionFieldType(
-                aFieldType().withType("Text").build()
-            ).build();
+            FieldTypeDefinition fieldType = FieldTypeDefinition.builder().type("Collection")
+                .collectionFieldTypeDefinition(
+                    FieldTypeDefinition.builder().type("Text").build()
+                ).build();
 
             final boolean result = elasticsearchMappings.isDefaultTextCaseData(fieldType);
 
@@ -55,7 +55,7 @@ class ElasticsearchMappingsTest {
 
         @Test
         void shouldReturnFalseWhenCaseDataFieldTypeIsNotMappedAsDefaultText() {
-            FieldTypeDefinition fieldType = aFieldType().withType("Date").build();
+            FieldTypeDefinition fieldType = FieldTypeDefinition.builder().type("Date").build();
 
             final boolean result = elasticsearchMappings.isDefaultTextCaseData(fieldType);
 
@@ -64,9 +64,9 @@ class ElasticsearchMappingsTest {
 
         @Test
         void shouldReturnFalseWhenCaseDataFieldCollectionTypeIsNotMappedAsDefaultText() {
-            FieldTypeDefinition fieldType = aFieldType().withType("Collection").withCollectionFieldType(
-                aFieldType().withType("Number").build()
-            ).build();
+            FieldTypeDefinition fieldType = FieldTypeDefinition.builder().type("Collection")
+                .collectionFieldTypeDefinition(FieldTypeDefinition.builder().type("Number").build())
+                .build();
 
             final boolean result = elasticsearchMappings.isDefaultTextCaseData(fieldType);
 

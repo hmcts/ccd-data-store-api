@@ -67,9 +67,7 @@ import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.Search
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class CaseSearchResultViewGeneratorTest {
 
@@ -187,93 +185,91 @@ class CaseSearchResultViewGeneratorTest {
 
         caseSearchResult = new CaseSearchResult(3L, Arrays.asList(caseDetails1, caseDetails2, caseDetails3));
 
-        final CaseFieldDefinition fatherName = newCaseField().withId(FATHER_NAME)
-            .withFieldType(textFieldType())
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withSC(SECURITY_CLASSIFICATION.name())
-            .withAcl(anAcl()
+        final CaseFieldDefinition fatherName = CaseFieldDefinition.builder().id(FATHER_NAME)
+            .fieldTypeDefinition(textFieldType())
+            .caseTypeId(CASE_TYPE_ID_1)
+            .securityLabel(SECURITY_CLASSIFICATION.name())
+            .accessControlLists(List.of(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
-                .build()).build();
-        final CaseFieldDefinition motherName = newCaseField().withId(MOTHER_NAME)
-            .withFieldType(textFieldType())
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withSC(SECURITY_CLASSIFICATION.name())
-            .withAcl(anAcl()
+                .build())).build();
+        final CaseFieldDefinition motherName = CaseFieldDefinition.builder().id(MOTHER_NAME)
+            .fieldTypeDefinition(textFieldType())
+            .caseTypeId(CASE_TYPE_ID_1)
+            .securityLabel(SECURITY_CLASSIFICATION.name())
+            .accessControlLists(List.of(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
-                .build()).build();
+                .build())).build();
 
-        final CaseFieldDefinition addressLine1 = newCaseField().withId(ADDRESS_LINE_1)
-            .withFieldType(textFieldType())
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withSC(SECURITY_CLASSIFICATION.name())
-            .withAcl(anAcl()
+        final CaseFieldDefinition addressLine1 = CaseFieldDefinition.builder().id(ADDRESS_LINE_1)
+            .fieldTypeDefinition(textFieldType())
+            .caseTypeId(CASE_TYPE_ID_1)
+            .securityLabel(SECURITY_CLASSIFICATION.name())
+            .accessControlLists(List.of(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
-                .build()).build();
-        final CaseFieldDefinition postCode = newCaseField().withId(POSTCODE)
-            .withFieldType(textFieldType())
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withSC(SECURITY_CLASSIFICATION.name())
-            .withAcl(anAcl()
+                .build())).build();
+        final CaseFieldDefinition postCode = CaseFieldDefinition.builder().id(POSTCODE)
+            .fieldTypeDefinition(textFieldType())
+            .caseTypeId(CASE_TYPE_ID_1)
+            .securityLabel(SECURITY_CLASSIFICATION.name())
+            .accessControlLists(List.of(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
-                .build()).build();
-        final FieldTypeDefinition addressFieldTypeDefinition = aFieldType().withId(FAMILY_ADDRESS).withType(COMPLEX)
-            .withComplexField(addressLine1).withComplexField(postCode).build();
+                .build())).build();
+        final FieldTypeDefinition addressFieldTypeDefinition = FieldTypeDefinition.builder().id(FAMILY_ADDRESS)
+            .type(COMPLEX)
+            .complexFields(List.of(addressLine1, postCode)).build();
         final CaseFieldDefinition familyAddress =
-            newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition)
-                .withCaseTypeId(CASE_TYPE_ID_1)
-                .withAcl(anAcl()
+            CaseFieldDefinition.builder().id(FAMILY_ADDRESS).fieldTypeDefinition(addressFieldTypeDefinition)
+                .caseTypeId(CASE_TYPE_ID_1)
+                .accessControlLists(List.of(anAcl()
             .withRole(ROLE_IN_USER_ROLE_1)
             .withRead(true)
-            .build()).build();
+            .build())).build();
 
         final FieldTypeDefinition familyDetailsFieldTypeDefinition =
-            aFieldType().withId(FAMILY).withType(COMPLEX)
-                .withComplexField(fatherName)
-                .withComplexField(motherName)
-                .withComplexField(familyAddress)
+            FieldTypeDefinition.builder().id(FAMILY).type(COMPLEX)
+                .complexFields(List.of(fatherName, motherName, familyAddress))
                 .build();
 
-        jurisdiction = new JurisdictionDefinition();
-        jurisdiction.setId(JURISDICTION);
+        jurisdiction = JurisdictionDefinition.builder().id(JURISDICTION).build();
         CaseTypeDefinition caseTypeDefinition1 = CaseTypeDefinition.builder()
             .id(CASE_TYPE_ID_1)
             .jurisdictionDefinition(jurisdiction)
             .securityClassification(SecurityClassification.PUBLIC)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_1).fieldTypeDefinition(textFieldType())
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_2).fieldTypeDefinition(textFieldType())
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_3).fieldTypeDefinition(textFieldType())
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldTypeDefinition)
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(FAMILY_DETAILS).fieldTypeDefinition(familyDetailsFieldTypeDefinition)
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build())
-                    .withComplexACL(aComplexACL()
+                        .build()))
+                    .complexACLs(List.of(aComplexACL()
                         .withListElementCode("Line1")
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
                         .withUpdate(false)
-                        .build())
+                        .build()))
                     .build()
             ))
             .build();
@@ -284,18 +280,18 @@ class CaseSearchResultViewGeneratorTest {
             .jurisdictionDefinition(jurisdiction)
             .securityClassification(SecurityClassification.PUBLIC)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType())
-                    .withCaseTypeId(CASE_TYPE_ID_2)
-                    .withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_4).fieldTypeDefinition(textFieldType())
+                    .caseTypeId(CASE_TYPE_ID_2)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType())
-                    .withCaseTypeId(CASE_TYPE_ID_2)
-                    .withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_5).fieldTypeDefinition(textFieldType())
+                    .caseTypeId(CASE_TYPE_ID_2)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build()
+                        .build())).build()
             ))
             .build();
 
@@ -439,30 +435,30 @@ class CaseSearchResultViewGeneratorTest {
             .jurisdictionDefinition(jurisdiction)
             .securityClassification(SecurityClassification.PUBLIC)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId(CASE_FIELD_1)
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withFieldType(textFieldType()).withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_1)
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .fieldTypeDefinition(textFieldType()).accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_2)
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_2)
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .fieldTypeDefinition(textFieldType()).accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_4)
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_4)
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .fieldTypeDefinition(textFieldType()).accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_5)
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_5)
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .fieldTypeDefinition(textFieldType()).accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build()
+                        .build())).build()
             ))
             .build();
 
@@ -536,30 +532,30 @@ class CaseSearchResultViewGeneratorTest {
             .jurisdictionDefinition(jurisdiction)
             .securityClassification(SecurityClassification.PUBLIC)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_1).fieldTypeDefinition(textFieldType())
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_2)
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_2)
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .fieldTypeDefinition(textFieldType()).accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_4)
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_4)
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .fieldTypeDefinition(textFieldType()).accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_5)
-                    .withCaseTypeId(CASE_TYPE_ID_1)
-                    .withFieldType(textFieldType()).withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_5)
+                    .caseTypeId(CASE_TYPE_ID_1)
+                    .fieldTypeDefinition(textFieldType()).accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build()
+                        .build())).build()
                 ))
             .build();
 
@@ -702,10 +698,11 @@ class CaseSearchResultViewGeneratorTest {
             .jurisdictionDefinition(jurisdiction)
             .securityClassification(SecurityClassification.PUBLIC)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_1)
+                    .fieldTypeDefinition(textFieldType()).accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLE_1)
                     .withRead(true)
-                    .build()).build()
+                    .build())).build()
             ))
             .build();
 
@@ -761,6 +758,6 @@ class CaseSearchResultViewGeneratorTest {
     }
 
     private FieldTypeDefinition textFieldType() {
-        return aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build();
+        return FieldTypeDefinition.builder().id(TEXT_TYPE).type(TEXT_TYPE).build();
     }
 }

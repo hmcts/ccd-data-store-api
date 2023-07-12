@@ -854,13 +854,14 @@ class DefaultCaseDataAccessControlTest {
     private List<RoleToAccessProfileDefinition> createRoleToAccessProfileDefinitions(String... roleNames) {
         List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = Lists.newArrayList();
 
-        Arrays.stream(roleNames).forEach(roleName -> {
-            roleToAccessProfileDefinitions.add(
-                new RoleToAccessProfileDefinition(
-                    CASE_TYPE_1, false, false, AUTHORISATION_1,
-                    roleName, null, null, roleName, null
-                ));
-        });
+        Arrays.stream(roleNames).forEach(roleName -> roleToAccessProfileDefinitions.add(
+            RoleToAccessProfileDefinition.builder()
+                .caseTypeId(CASE_TYPE_1)
+                .readOnly(false)
+                .authorisations(AUTHORISATION_1)
+                .roleName(roleName)
+                .accessProfiles(roleName)
+                .build()));
 
         return roleToAccessProfileDefinitions;
     }

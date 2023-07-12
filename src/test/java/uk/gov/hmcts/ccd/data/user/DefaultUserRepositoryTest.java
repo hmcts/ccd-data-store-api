@@ -277,10 +277,11 @@ class DefaultUserRepositoryTest {
             when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
             when(applicationParams.userDefaultSettingsURL()).thenReturn(FIND_USER_PROFILE_URL);
 
-            final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-            jurisdictionDefinition.setId("TEST");
-            jurisdictionDefinition.setName("Test");
-            jurisdictionDefinition.setDescription("Test Jurisdiction");
+            final JurisdictionDefinition jurisdictionDefinition = JurisdictionDefinition.builder()
+                .id("TEST")
+                .name("Test")
+                .description("Test Jurisdiction")
+                .build();
 
             final UserDefault userDefault = new UserDefault();
             userDefault.setJurisdictionDefinitions(singletonList(jurisdictionDefinition));
@@ -360,10 +361,11 @@ class DefaultUserRepositoryTest {
             when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
             when(applicationParams.userDefaultSettingsURL()).thenReturn(FIND_USER_PROFILE_URL);
 
-            final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-            jurisdictionDefinition.setId("TEST");
-            jurisdictionDefinition.setName("Test");
-            jurisdictionDefinition.setDescription("Test Jurisdiction");
+            final JurisdictionDefinition jurisdictionDefinition = JurisdictionDefinition.builder()
+                .id("TEST")
+                .name("Test")
+                .description("Test Jurisdiction")
+                .build();
 
             final UserDefault userDefault = new UserDefault();
             userDefault.setJurisdictionDefinitions(singletonList(jurisdictionDefinition));

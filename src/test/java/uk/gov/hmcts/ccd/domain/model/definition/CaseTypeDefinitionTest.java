@@ -11,8 +11,6 @@ import java.util.Optional;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class CaseTypeDefinitionTest {
 
@@ -21,10 +19,12 @@ class CaseTypeDefinitionTest {
     private static final String SURNAME = "Surname";
 
     private uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition name =
-            newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build())
+            CaseFieldDefinition.builder().id(NAME).fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id(TEXT_TYPE).type(TEXT_TYPE).build())
                     .build();
     private uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition surname =
-            newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build())
+        CaseFieldDefinition.builder().id(SURNAME).fieldTypeDefinition(FieldTypeDefinition.builder()
+                .id(TEXT_TYPE).type(TEXT_TYPE).build())
                     .build();
 
     private CaseTypeDefinition caseTypeDefinition;

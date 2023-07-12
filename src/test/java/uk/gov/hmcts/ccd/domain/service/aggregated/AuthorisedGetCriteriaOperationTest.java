@@ -31,7 +31,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
 
@@ -44,10 +43,14 @@ class AuthorisedGetCriteriaOperationTest {
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
     private static final String CASE_FIELD_ID_1_4 = "CASE_FIELD_1_4";
     private static final String CASE_FIELD_ID_1_5 = "CASE_FIELD_1_5";
-    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_5 = newCaseField().withId(CASE_FIELD_ID_1_5).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_1 = CaseFieldDefinition.builder()
+        .id(CASE_FIELD_ID_1_1).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_2 = CaseFieldDefinition.builder()
+        .id(CASE_FIELD_ID_1_2).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_3 = CaseFieldDefinition.builder()
+        .id(CASE_FIELD_ID_1_3).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_5 = CaseFieldDefinition.builder()
+        .id(CASE_FIELD_ID_1_5).build();
     private static List<WorkbasketInput> testWorkbasketInputs;
     private static List<SearchInput> testSearchInputs;
     @Mock

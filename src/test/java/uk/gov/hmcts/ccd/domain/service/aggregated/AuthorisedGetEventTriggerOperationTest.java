@@ -152,7 +152,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                   eq(accessProfiles),
                                                                   eq(CAN_CREATE))).thenReturn(true);
 
-        CaseEventDefinition caseEvent = new CaseEventDefinition();
+        CaseEventDefinition caseEvent = CaseEventDefinition.builder().build();
         when(eventTriggerService.findCaseEvent(eq(caseType), eq(EVENT_TRIGGER_ID))).thenReturn(caseEvent);
         when(eventTriggerService.isPreStateValid(eq(STATE), eq(caseEvent))).thenReturn(true);
     }

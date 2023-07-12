@@ -60,12 +60,10 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewActionableEventBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewBuilder.aCaseView;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTabBuilder.newCaseViewTab;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 class AuthorisedGetCaseViewOperationTest {
     private static final String JURISDICTION_ID = "Probate";
@@ -85,16 +83,16 @@ class AuthorisedGetCaseViewOperationTest {
     private static final Set<AccessProfile> ACCESS_PROFILES = createAccessProfiles(USER_ROLES);
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
     private static final CaseViewActionableEvent[] EMPTY_TRIGGERS = new CaseViewActionableEvent[]{};
-    private static final CaseEventDefinition CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
-    private static final CaseEventDefinition CASE_EVENT_2 = newCaseEvent().withId("event2").build();
+    private static final CaseEventDefinition CASE_EVENT = CaseEventDefinition.builder().id(EVENT_ID_STRING).build();
+    private static final CaseEventDefinition CASE_EVENT_2 = CaseEventDefinition.builder().id("event2").build();
     private static final CaseViewActionableEvent CASE_VIEW_TRIGGER = aViewTrigger().withId(EVENT_ID_STRING).build();
     private static final CaseViewActionableEvent CASE_VIEW_TRIGGER_2 = aViewTrigger().withId("event2").build();
     private static final CaseViewActionableEvent[] AUTH_CASE_VIEW_TRIGGERS =
         new CaseViewActionableEvent[]{CASE_VIEW_TRIGGER};
     private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_ID).build();
-    private static final JurisdictionDefinition jurisdiction = newJurisdiction()
-        .withJurisdictionId(JURISDICTION_ID)
-        .withName(JURISDICTION_ID)
+    private static final JurisdictionDefinition jurisdiction = JurisdictionDefinition.builder()
+        .id(JURISDICTION_ID)
+        .name(JURISDICTION_ID)
         .build();
     private static final AccessControlList acl1 = anAcl().withRole("caseworker-sscs")
         .withCreate(true).withRead(true).withUpdate(true).withDelete(true).build();

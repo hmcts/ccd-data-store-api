@@ -45,7 +45,8 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
     private CallbackResponse callbackResponse;
     private CaseDetails caseDetails = new CaseDetails();
-    private final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+    private CaseEventDefinition.CaseEventDefinitionBuilder caseEventDefinitionBuilder;
+    private CaseEventDefinition caseEventDefinition;
     private final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder().build();
 
     @Before
@@ -55,8 +56,10 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         caseDetails = newCaseDetails().build();
 
         String testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
-        caseEventDefinition.setCallBackURLAboutToStartEvent(testUrl);
-        caseEventDefinition.setName("Test");
+        caseEventDefinitionBuilder = CaseEventDefinition.builder()
+            .name("Test")
+            .callBackURLAboutToStartEvent(testUrl);
+        caseEventDefinition = caseEventDefinitionBuilder.build();
         wireMockServer.resetAll();
     }
 
@@ -92,7 +95,8 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
             .willSetStateTo("FirstFailedAttempt"));
 
         List<Integer> disabledRetries = Lists.newArrayList(0);
-        caseEventDefinition.setRetriesTimeoutAboutToStartEvent(disabledRetries);
+
+        caseEventDefinition = caseEventDefinitionBuilder.retriesTimeoutAboutToStartEvent(disabledRetries).build();
 
         CallbackException callbackException = assertThrows(CallbackException.class, () ->
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false));

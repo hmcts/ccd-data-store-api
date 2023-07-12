@@ -60,11 +60,9 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeTabBuilder.newCaseTab;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeTabFieldBuilder.newCaseTabField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class DefaultGetCaseViewOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -151,13 +149,15 @@ class DefaultGetCaseViewOperationTest {
         caseTypeTabsDefinition = newCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
         doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
-        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-        jurisdictionDefinition.setName(JURISDICTION_ID);
+        JurisdictionDefinition jurisdictionDefinition = JurisdictionDefinition.builder()
+            .name(JURISDICTION_ID)
+            .build();
 
-        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-        caseFieldDefinition.setId(MetaData.CaseField.CASE_TYPE.getReference());
-        caseFieldDefinition.setMetadata(true);
-        caseFieldDefinition.setFieldTypeDefinition(new FieldTypeDefinition());
+        CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+            .id(MetaData.CaseField.CASE_TYPE.getReference())
+            .metadata(true)
+            .fieldTypeDefinition(FieldTypeDefinition.builder().build())
+            .build();
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .jurisdictionDefinition(jurisdictionDefinition)
@@ -166,9 +166,10 @@ class DefaultGetCaseViewOperationTest {
 
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
-        caseStateDefinition = new CaseStateDefinition();
-        caseStateDefinition.setId(STATE);
-        caseStateDefinition.setTitleDisplay(TITLE_DISPLAY);
+        caseStateDefinition = CaseStateDefinition.builder()
+            .id(STATE)
+            .titleDisplay(TITLE_DISPLAY)
+            .build();
         doReturn(caseStateDefinition).when(caseTypeService).findState(any(), any());
 
         doAnswer(invocation ->
@@ -185,10 +186,10 @@ class DefaultGetCaseViewOperationTest {
                 newCaseTabCollection()
                     .withTab(newCaseTab()
                         .withTabField(newCaseTabField()
-                            .withCaseField(newCaseField()
-                                .withId(CASE_HISTORY_VIEWER)
-                                .withFieldType(aFieldType()
-                                    .withType(CASE_HISTORY_VIEWER)
+                            .withCaseField(CaseFieldDefinition.builder()
+                                .id(CASE_HISTORY_VIEWER)
+                                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                                    .type(CASE_HISTORY_VIEWER)
                                     .build())
                                 .build())
                             .build())
@@ -196,10 +197,10 @@ class DefaultGetCaseViewOperationTest {
                     .build();
             doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
             caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
-                .caseFieldDefinitions(singletonList(newCaseField()
-                        .withId(CASE_HISTORY_VIEWER)
-                        .withFieldType(aFieldType()
-                            .withType(CASE_HISTORY_VIEWER)
+                .caseFieldDefinitions(singletonList(CaseFieldDefinition.builder()
+                        .id(CASE_HISTORY_VIEWER)
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .type(CASE_HISTORY_VIEWER)
                             .build())
                         .build())).build();
             doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID,
@@ -229,10 +230,10 @@ class DefaultGetCaseViewOperationTest {
                 newCaseTabCollection()
                     .withTab(newCaseTab()
                         .withTabField(newCaseTabField()
-                            .withCaseField(newCaseField()
-                                .withId("NotACaseHistoryViewer")
-                                    .withFieldType(aFieldType()
-                                        .withType("NotACaseHistoryViewer")
+                            .withCaseField(CaseFieldDefinition.builder()
+                                .id("NotACaseHistoryViewer")
+                                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                                        .type("NotACaseHistoryViewer")
                                         .build())
                                     .build())
                             .build())
@@ -240,10 +241,10 @@ class DefaultGetCaseViewOperationTest {
                     .build();
             doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
             caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
-                .caseFieldDefinitions(singletonList(newCaseField()
-                        .withId(CASE_HISTORY_VIEWER)
-                        .withFieldType(aFieldType()
-                            .withType(CASE_HISTORY_VIEWER)
+                .caseFieldDefinitions(singletonList(CaseFieldDefinition.builder()
+                        .id(CASE_HISTORY_VIEWER)
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .type(CASE_HISTORY_VIEWER)
                             .build())
                         .build())).build();
             doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID,
@@ -270,8 +271,9 @@ class DefaultGetCaseViewOperationTest {
         @Test
         @DisplayName("should not filter event when enabling condition is valid")
         void shouldNotFilterEventWhenEnablingConditionIsValid() {
-            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\"");
+            CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder()
+                .endButtonLabel("dataTestField1=\"dataTestField1\"")
+                .build();
             caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
                     .events(List.of(caseEventDefinition)).build();
             doReturn(caseTypeDefinition).when(caseTypeService)
@@ -287,8 +289,9 @@ class DefaultGetCaseViewOperationTest {
         @Test
         @DisplayName("should filter event when enabling condition is not valid")
         void shouldFilterEventWhenEnablingConditionIsNotValid() {
-            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\" AND dataTestField2=\"Test\"");
+            CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder()
+                .endButtonLabel("dataTestField1=\"dataTestField1\" AND dataTestField2=\"Test\"")
+                .build();
             caseTypeDefinition = CaseTypeDefinition.caseTypeDefinitionCopy(caseTypeDefinition)
                     .events(List.of(caseEventDefinition)).build();
             doReturn(caseTypeDefinition).when(caseTypeService)

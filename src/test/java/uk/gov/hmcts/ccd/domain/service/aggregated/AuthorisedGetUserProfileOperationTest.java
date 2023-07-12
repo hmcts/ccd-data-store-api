@@ -46,11 +46,12 @@ class AuthorisedGetUserProfileOperationTest {
     private Set<AccessProfile> accessProfiles = createAccessProfiles(userRoles);
 
     private List<CaseStateDefinition> caseStateDefinitions =
-        asList(new CaseStateDefinition(), new CaseStateDefinition(), new CaseStateDefinition());
-    private List<CaseEventDefinition> caseEventDefinitions = asList(new CaseEventDefinition(),
-        new CaseEventDefinition(),
-        new CaseEventDefinition(),
-        new CaseEventDefinition());
+        asList(CaseStateDefinition.builder().build(), CaseStateDefinition.builder().build(),
+            CaseStateDefinition.builder().build());
+    private List<CaseEventDefinition> caseEventDefinitions = asList(CaseEventDefinition.builder().build(),
+        CaseEventDefinition.builder().build(),
+        CaseEventDefinition.builder().build(),
+        CaseEventDefinition.builder().build());
 
     private final CaseTypeDefinition caseTypeDefinition1 = CaseTypeDefinition.builder().build();
     private final CaseTypeDefinition notAllowedCaseTypeDefinition = CaseTypeDefinition

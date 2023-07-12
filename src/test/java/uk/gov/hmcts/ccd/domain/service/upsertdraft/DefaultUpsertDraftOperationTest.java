@@ -11,7 +11,9 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -35,10 +37,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.EventBuilder.newEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 import static uk.gov.hmcts.ccd.domain.service.upsertdraft.DefaultUpsertDraftOperation.CASE_DATA_CONTENT;
 
 class DefaultUpsertDraftOperationTest {
@@ -51,8 +51,8 @@ class DefaultUpsertDraftOperationTest {
     private static final String DID = "5";
     private static final CaseTypeDefinition CASE_TYPE = CaseTypeDefinition.builder()
         .id(CTID)
-        .jurisdictionDefinition(newJurisdiction().withJurisdictionId(JID).build())
-        .events(List.of(newCaseEvent().withId(ETID).build()))
+        .jurisdictionDefinition(JurisdictionDefinition.builder().id(JID).build())
+        .events(List.of(CaseEventDefinition.builder().id(ETID).build()))
         .securityClassification(SecurityClassification.PUBLIC)
         .build();
     private static final Map<String, JsonNode> DATA = Maps.newHashMap();

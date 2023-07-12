@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,13 +43,10 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ge
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getPeopleCollectionFieldDefinition;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getPersonFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseUpdateViewEventBuilder.newCaseUpdateViewEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewActionableEventBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
 
@@ -79,24 +77,24 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should not change view trigger when all has required ACL")
         void doNotFilterCaseViewTriggersWhenACLsMatch() {
-            final CaseEventDefinition event1 = newCaseEvent()
-                .withId(EVENT_ID_1)
-                .withAcl(anAcl()
+            final CaseEventDefinition event1 = CaseEventDefinition.builder()
+                .id(EVENT_ID_1)
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
-                    .build()).build();
-            final CaseEventDefinition event2 = newCaseEvent()
-                .withId(EVENT_ID_2)
-                .withAcl(anAcl()
+                    .build())).build();
+            final CaseEventDefinition event2 = CaseEventDefinition.builder()
+                .id(EVENT_ID_2)
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
-                    .build()).build();
-            final CaseEventDefinition event3 = newCaseEvent()
-                .withId(EVENT_ID_3)
-                .withAcl(anAcl()
+                    .build())).build();
+            final CaseEventDefinition event3 = CaseEventDefinition.builder()
+                .id(EVENT_ID_3)
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
-                    .build()).build();
+                    .build())).build();
             final List<CaseEventDefinition> caseEventDefinitions = Arrays.asList(event1, event2, event3);
 
             final CaseViewActionableEvent[] filteredTriggers = accessControlService
@@ -107,24 +105,24 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter view triggers according to the ACLs")
         void filterCaseViewTriggersWhenCreateACLIsMissing() {
-            final CaseEventDefinition event1 = newCaseEvent()
-                .withId(EVENT_ID_1)
-                .withAcl(anAcl()
+            final CaseEventDefinition event1 = CaseEventDefinition.builder()
+                .id(EVENT_ID_1)
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_NOT_IN_USER_ROLES)
                     .withCreate(true)
-                    .build()).build();
-            final CaseEventDefinition event2 = newCaseEvent()
-                .withId(EVENT_ID_2)
-                .withAcl(anAcl()
+                    .build())).build();
+            final CaseEventDefinition event2 = CaseEventDefinition.builder()
+                .id(EVENT_ID_2)
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_NOT_IN_USER_ROLES_2)
                     .withCreate(true)
-                    .build()).build();
-            final CaseEventDefinition event3 = newCaseEvent()
-                .withId(EVENT_ID_3)
-                .withAcl(anAcl()
+                    .build())).build();
+            final CaseEventDefinition event3 = CaseEventDefinition.builder()
+                .id(EVENT_ID_3)
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
-                    .build()).build();
+                    .build())).build();
             final List<CaseEventDefinition> caseEventDefinitions = Arrays.asList(event1, event2, event3);
 
             final CaseViewActionableEvent[] filteredTriggers =
@@ -145,19 +143,19 @@ class AccessControlServiceFilterTest {
         void filterCaseFieldsUserHasAccess() {
             final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId("Name")
-                        .withAcl(anAcl()
+                    CaseFieldDefinition.builder()
+                        .id("Name")
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("Surname")
-                        .withAcl(anAcl()
+                    CaseFieldDefinition.builder()
+                        .id("Surname")
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES_2)
                             .withCreate(true)
-                            .build())
+                            .build()))
                         .build()
                 ))
                 .build();
@@ -198,19 +196,19 @@ class AccessControlServiceFilterTest {
         void filterCaseFieldsUserHasNoAccess() {
             final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId("Name")
-                        .withAcl(anAcl()
+                    CaseFieldDefinition.builder()
+                        .id("Name")
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_NOT_IN_USER_ROLES)
                             .withCreate(true)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("Surname")
-                        .withAcl(anAcl()
+                    CaseFieldDefinition.builder()
+                        .id("Surname")
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_NOT_IN_USER_ROLES_2)
                             .withCreate(true)
-                            .build())
+                            .build()))
                         .build()
                 ))
                 .build();
@@ -249,12 +247,12 @@ class AccessControlServiceFilterTest {
         void filterCaseFieldsWithNoDefinition() {
             final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId("Surname")
-                        .withAcl(anAcl()
+                    CaseFieldDefinition.builder()
+                        .id("Surname")
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES_2)
                             .withCreate(true)
-                            .build())
+                            .build()))
                         .build()
                 ))
                 .build();
@@ -298,55 +296,55 @@ class AccessControlServiceFilterTest {
         void filterComplexCaseFieldChildrenByCreateAccess() {
             final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId("Name")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Name")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("Surname")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Surname")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES_2)
                             .withCreate(true)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("BornAddress")
-                        .withFieldType(getAddressFieldType())
-                        .withAcl(anAcl()
+                    CaseFieldDefinition.builder()
+                        .id("BornAddress")
+                        .fieldTypeDefinition(getAddressFieldType())
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(true)
-                            .build())
-                        .withComplexACL(aComplexACL()
+                            .build()))
+                        .complexACLs(List.of(aComplexACL()
                             .withListElementCode("Name")
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
-                            .build())
-                        .withComplexACL(aComplexACL()
-                            .withListElementCode("Address")
-                            .withRole(ROLE_IN_USER_ROLES)
-                            .withCreate(true)
-                            .build())
-                        .withComplexACL(aComplexACL()
-                            .withListElementCode("Address.Line1")
-                            .withRole(ROLE_IN_USER_ROLES)
-                            .withCreate(true)
-                            .build())
-                        .withComplexACL(aComplexACL()
-                            .withListElementCode("Address.PostCode")
-                            .withRole(ROLE_IN_USER_ROLES)
-                            .withCreate(true)
-                            .build())
+                            .build(),
+                            aComplexACL()
+                                .withListElementCode("Address")
+                                .withRole(ROLE_IN_USER_ROLES)
+                                .withCreate(true)
+                                .build(),
+                            aComplexACL()
+                                .withListElementCode("Address.Line1")
+                                .withRole(ROLE_IN_USER_ROLES)
+                                .withCreate(true)
+                                .build(),
+                            aComplexACL()
+                                .withListElementCode("Address.PostCode")
+                                .withRole(ROLE_IN_USER_ROLES)
+                                .withCreate(true)
+                                .build()))
                         .build()
                 ))
                 .build();
@@ -412,73 +410,74 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter child fields of a collection caseField if UPDATE ACL is missing for child fields")
         void filterCollectionCaseFieldChildrenByUpdateAccess() {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("LastName")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("LastName")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
                     people,
-                    newCaseField()
-                        .withId("Name")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Name")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES)
                             .withUpdate(false)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("Surname")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Surname")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES_2)
                             .withUpdate(true)
-                            .build())
+                            .build()))
                         .build()
                 ))
                 .build();
@@ -492,12 +491,12 @@ class AccessControlServiceFilterTest {
                 .build();
             final CaseViewField caseViewField3 = aViewField()
                 .withId("People")
-                .withFieldType(aFieldType()
-                    .withId("G339483948")
-                    .withType(COLLECTION)
+                .withFieldType(FieldTypeDefinition.builder()
+                    .id("G339483948")
+                    .type(COLLECTION)
+                    .collectionFieldTypeDefinition(getPersonFieldType())
                     .build())
                 .build();
-            caseViewField3.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -590,73 +589,74 @@ class AccessControlServiceFilterTest {
         @DisplayName("Should filter child fields of a collection caseField if UPDATE ACL is missing for child fields"
             + " - alternate")
         void filterCollectionCaseFieldChildrenByUpdateAccessAlternate() {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("LastName")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(false)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("LastName")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(false)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
                     people,
-                    newCaseField()
-                        .withId("Name")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Name")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES)
                             .withUpdate(false)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("Surname")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Surname")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES_2)
                             .withUpdate(true)
-                            .build())
+                            .build()))
                         .build()
                 ))
                 .build();
@@ -670,12 +670,12 @@ class AccessControlServiceFilterTest {
                 .build();
             final CaseViewField caseViewField3 = aViewField()
                 .withId("People")
-                .withFieldType(aFieldType()
-                    .withId("G339483948")
-                    .withType(COLLECTION)
+                .withFieldType(FieldTypeDefinition.builder()
+                    .id("G339483948")
+                    .type(COLLECTION)
+                    .collectionFieldTypeDefinition(getPersonFieldType())
                     .build())
                 .build();
-            caseViewField3.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -717,123 +717,124 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter child fields of a collection caseField if CREATE ACL is missing for child fields")
         void filterCollectionCaseFieldChildrenByCreateAccess() {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("LastName")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornCity")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornCountry")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornAddress")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornAddress.Name")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornAddress.Address")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornAddress.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornAddress.Address.Country")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes.Txt")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes.Tags")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes.Tags.Tag")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("LastName")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornCity")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornCountry")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornAddress")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornAddress.Name")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornAddress.Address")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornAddress.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornAddress.Address.Country")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes.Txt")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes.Tags")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes.Tags.Tag")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
                     people,
-                    newCaseField()
-                        .withId("Name")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Name")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("Surname")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Surname")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES_2)
                             .withCreate(true)
-                            .build())
+                            .build()))
                         .build()
                 ))
                 .build();
@@ -847,12 +848,12 @@ class AccessControlServiceFilterTest {
                 .build();
             final CaseViewField caseViewField3 = aViewField()
                 .withId("People")
-                .withFieldType(aFieldType()
-                    .withId("G339483948")
-                    .withType(COLLECTION)
+                .withFieldType(FieldTypeDefinition.builder()
+                    .id("G339483948")
+                    .type(COLLECTION)
+                    .collectionFieldTypeDefinition(getPersonFieldType())
                     .build())
                 .build();
-            caseViewField3.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -1097,123 +1098,124 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter all when filtered for UPDATE but ACLs are for CREATE")
         void filterAllByUpdateAccessWhenAllAccessIsOnCreate() {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("LastName")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornCity")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornCountry")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornAddress")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornAddress.Name")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornAddress.Address")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornAddress.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("BirthInfo.BornAddress.Address.Country")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes.Txt")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes.Tags")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes.Tags.Tag")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("LastName")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornCity")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornCountry")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornAddress")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornAddress.Name")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornAddress.Address")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornAddress.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("BirthInfo.BornAddress.Address.Country")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes.Txt")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes.Tags")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes.Tags.Tag")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
                     people,
-                    newCaseField()
-                        .withId("Name")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Name")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("Surname")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Surname")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES_2)
                             .withCreate(true)
-                            .build())
+                            .build()))
                         .build()
                 ))
                 .build();
@@ -1227,12 +1229,12 @@ class AccessControlServiceFilterTest {
                 .build();
             final CaseViewField caseViewField3 = aViewField()
                 .withId("People")
-                .withFieldType(aFieldType()
-                    .withId("G339483948")
-                    .withType(COLLECTION)
+                .withFieldType(FieldTypeDefinition.builder()
+                    .id("G339483948")
+                    .type(COLLECTION)
+                    .collectionFieldTypeDefinition(getPersonFieldType())
                     .build())
                 .build();
-            caseViewField3.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -1264,38 +1266,38 @@ class AccessControlServiceFilterTest {
         void leaveComplexCaseFieldWithPredefinedChildrenByUpdateAccess() {
             final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId("Name")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Name")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("Surname")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Surname")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES_2)
                             .withCreate(true)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("Address")
-                        .withFieldType(aFieldType()
-                            .withId(PREDEFINED_COMPLEX_ADDRESS_UK)
-                            .withType("Complex")
+                    CaseFieldDefinition.builder()
+                        .id("Address")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id(PREDEFINED_COMPLEX_ADDRESS_UK)
+                            .type("Complex")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES_2)
                             .withCreate(true)
-                            .build())
+                            .build()))
                         .build()
                 ))
                 .build();
@@ -1311,9 +1313,9 @@ class AccessControlServiceFilterTest {
                 .build();
             final CaseViewField caseViewField3 = aViewField()
                 .withId("Address")
-                .withFieldType(aFieldType()
-                    .withId(PREDEFINED_COMPLEX_ADDRESS_UK)
-                    .withType("Complex")
+                .withFieldType(FieldTypeDefinition.builder()
+                    .id(PREDEFINED_COMPLEX_ADDRESS_UK)
+                    .type("Complex")
                     .build())
                 .build();
             caseViewField3.getFieldTypeDefinition().setComplexFields(getPredefinedAddressFields());
@@ -1348,38 +1350,38 @@ class AccessControlServiceFilterTest {
         void filterComplexCaseFieldChildrenByUpdateAccessWhenAllAccessIsOnCreate() {
             final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId("Name")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Name")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("Surname")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+                    CaseFieldDefinition.builder()
+                        .id("Surname")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES_2)
                             .withCreate(true)
-                            .build())
+                            .build()))
                         .build(),
-                    newCaseField()
-                        .withId("Address")
-                        .withFieldType(aFieldType()
-                            .withId(PREDEFINED_COMPLEX_ADDRESS_UK)
-                            .withType("Complex")
+                    CaseFieldDefinition.builder()
+                        .id("Address")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id(PREDEFINED_COMPLEX_ADDRESS_UK)
+                            .type("Complex")
                             .build())
-                        .withAcl(anAcl()
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES_2)
                             .withCreate(false)
-                            .build())
+                            .build()))
                         .build()
                 ))
                 .build();
@@ -1395,9 +1397,9 @@ class AccessControlServiceFilterTest {
                 .build();
             final CaseViewField caseViewField3 = aViewField()
                 .withId("Address")
-                .withFieldType(aFieldType()
-                    .withId(PREDEFINED_COMPLEX_ADDRESS_UK)
-                    .withType("Complex")
+                .withFieldType(FieldTypeDefinition.builder()
+                    .id(PREDEFINED_COMPLEX_ADDRESS_UK)
+                    .type("Complex")
                     .build())
                 .build();
             caseViewField3.getFieldTypeDefinition().setComplexFields(getPredefinedAddressFields());
@@ -1440,9 +1442,10 @@ class AccessControlServiceFilterTest {
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("People")
-                .withFieldType(aFieldType()
-                    .withId("G339483948")
-                    .withType(COLLECTION)
+                .withFieldType(FieldTypeDefinition.builder()
+                    .id("G339483948")
+                    .type(COLLECTION)
+                    .collectionFieldTypeDefinition(getPersonFieldType())
                     .build())
                 .withACL(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
@@ -1451,7 +1454,6 @@ class AccessControlServiceFilterTest {
                     .withUpdate(false)
                     .build())
                 .build();
-            caseViewField1.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
             caseViewField1.getFieldTypeDefinition().getChildren().stream()
                 .filter(e -> e.getId().equals("Addresses")).findFirst()
                 .get().setAccessControlLists(asList(anAcl()
@@ -1504,9 +1506,10 @@ class AccessControlServiceFilterTest {
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("People")
-                .withFieldType(aFieldType()
-                    .withId("G339483948")
-                    .withType(COLLECTION)
+                .withFieldType(FieldTypeDefinition.builder()
+                    .id("G339483948")
+                    .type(COLLECTION)
+                    .collectionFieldTypeDefinition(getPersonFieldType())
                     .build())
                 .withACL(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
@@ -1515,7 +1518,6 @@ class AccessControlServiceFilterTest {
                     .withUpdate(true)
                     .build())
                 .build();
-            caseViewField1.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -1545,9 +1547,10 @@ class AccessControlServiceFilterTest {
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("People")
-                .withFieldType(aFieldType()
-                    .withId("G339483948")
-                    .withType(COLLECTION)
+                .withFieldType(FieldTypeDefinition.builder()
+                    .id("G339483948")
+                    .type(COLLECTION)
+                    .collectionFieldTypeDefinition(getPersonFieldType())
                     .build())
                 .withACL(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
@@ -1556,7 +1559,6 @@ class AccessControlServiceFilterTest {
                     .withUpdate(false)
                     .build())
                 .build();
-            caseViewField1.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -1589,38 +1591,38 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should not filter and case field if user has all required ACLs")
         void doNotFilterCaseFieldsIfUserHasAccess() {
-            final CaseFieldDefinition caseField1 = newCaseField()
-                .withId("FirstName")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            final CaseFieldDefinition caseField1 = CaseFieldDefinition.builder()
+                .id("FirstName")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
-                .withAcl(anAcl()
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withRead(true)
-                    .build())
+                    .build()))
                 .build();
-            final CaseFieldDefinition caseField2 = newCaseField()
-                .withId("LastName")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            final CaseFieldDefinition caseField2 = CaseFieldDefinition.builder()
+                .id("LastName")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
-                .withAcl(anAcl()
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withRead(true)
-                    .build())
+                    .build()))
                 .build();
-            final CaseFieldDefinition caseField3 = newCaseField()
-                .withId("Address")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            final CaseFieldDefinition caseField3 = CaseFieldDefinition.builder()
+                .id("Address")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
-                .withAcl(anAcl()
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withRead(true)
-                    .build())
+                    .build()))
                 .build();
             List<CaseFieldDefinition> caseFieldDefinitions = Arrays.asList(caseField1, caseField2, caseField3);
 
@@ -1637,38 +1639,38 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter and case fields if user missing ACLs")
         void filterCaseFieldsByUserAccess() {
-            final CaseFieldDefinition caseField1 = newCaseField()
-                .withId("FirstName")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            final CaseFieldDefinition caseField1 = CaseFieldDefinition.builder()
+                .id("FirstName")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
-                .withAcl(anAcl()
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withRead(true)
-                    .build())
+                    .build()))
                 .build();
-            final CaseFieldDefinition caseField2 = newCaseField()
-                .withId("LastName")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            final CaseFieldDefinition caseField2 = CaseFieldDefinition.builder()
+                .id("LastName")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
-                .withAcl(anAcl()
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withRead(true)
-                    .build())
+                    .build()))
                 .build();
-            final CaseFieldDefinition caseField3 = newCaseField()
-                .withId("Address")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            final CaseFieldDefinition caseField3 = CaseFieldDefinition.builder()
+                .id("Address")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
-                .withAcl(anAcl()
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_NOT_IN_USER_ROLES)
                     .withRead(true)
-                    .build())
+                    .build()))
                 .build();
             List<CaseFieldDefinition> caseFieldDefinitions = Arrays.asList(caseField1, caseField2, caseField3);
 
@@ -1689,43 +1691,44 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter sub fields of caseFields based on Complex ACLs on READ")
         void filterCaseFieldsUserHasReadAccess() {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withRead(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("FirstName")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withRead(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("LastName")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withRead(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withRead(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withRead(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withRead(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withRead(false)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("FirstName")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("LastName")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(false)
+                        .build()
+                ))
+                .build();
             people.propagateACLsToNestedFields();
 
             final List<CaseFieldDefinition> filteredCaseFields =
@@ -1752,43 +1755,44 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter sub fields of caseFields based on Complex ACLs on UPDATE")
         void filterCaseFieldsUserHasUpdateAccess() {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("FirstName")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("LastName")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(false)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("FirstName")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("LastName")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(false)
+                        .build()
+                ))
+                    .build();
             people.propagateACLsToNestedFields();
 
             final List<CaseFieldDefinition> filteredCaseFields = accessControlService.filterCaseFieldsByAccess(
@@ -1814,53 +1818,53 @@ class AccessControlServiceFilterTest {
 
     static List<CaseFieldDefinition> getPredefinedAddressFields() {
         return asList(
-            newCaseField()
-                .withId("AddressLine1")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            CaseFieldDefinition.builder()
+                .id("AddressLine1")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
                 .build(),
-            newCaseField()
-                .withId("AddressLine2")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            CaseFieldDefinition.builder()
+                .id("AddressLine2")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
                 .build(),
-            newCaseField()
-                .withId("AddressLine3")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            CaseFieldDefinition.builder()
+                .id("AddressLine3")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
                 .build(),
-            newCaseField()
-                .withId("PostCode")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            CaseFieldDefinition.builder()
+                .id("PostCode")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
                 .build(),
-            newCaseField()
-                .withId("PostTown")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            CaseFieldDefinition.builder()
+                .id("PostTown")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
                 .build(),
-            newCaseField()
-                .withId("County")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            CaseFieldDefinition.builder()
+                .id("County")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
                 .build(),
-            newCaseField()
-                .withId("Country")
-                .withFieldType(aFieldType()
-                    .withId("Text")
-                    .withType("Text")
+            CaseFieldDefinition.builder()
+                .id("Country")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("Text")
+                    .type("Text")
                     .build())
                 .build()
         );

@@ -10,16 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document._links;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -40,12 +36,11 @@ class DocumentSanitiserTest {
 
     private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
 
-    private static final CaseTypeDefinition CASE_TYPE;
-
     private static final String TYPE_DOCUMENT = "Document";
-    private static final FieldTypeDefinition DOCUMENT_FIELD_TYPE = new FieldTypeDefinition();
-    private static final String DOCUMENT_FIELD_ID = "D8Document";
-    private static final CaseFieldDefinition DOCUMENT_FIELD = new CaseFieldDefinition();
+    private static final FieldTypeDefinition DOCUMENT_FIELD_TYPE = FieldTypeDefinition.builder()
+        .id(TYPE_DOCUMENT)
+        .type(TYPE_DOCUMENT)
+        .build();
     private static final String DOCUMENT_URL_VALUE = "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
     private static final String BINARY_URL = "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary";
     private static final String FILENAME = "Seagulls_Sqaure.jpg";
@@ -56,17 +51,6 @@ class DocumentSanitiserTest {
 
     private ObjectNode documentValueInitial = JSON_FACTORY.objectNode();
     private ObjectNode documentValueSanitised = JSON_FACTORY.objectNode();
-
-    static {
-        DOCUMENT_FIELD_TYPE.setId(TYPE_DOCUMENT);
-        DOCUMENT_FIELD_TYPE.setType(TYPE_DOCUMENT);
-        DOCUMENT_FIELD.setId(DOCUMENT_FIELD_ID);
-        DOCUMENT_FIELD.setFieldTypeDefinition(DOCUMENT_FIELD_TYPE);
-
-        CASE_TYPE = CaseTypeDefinition.builder()
-            .caseFieldDefinitions(Collections.singletonList(DOCUMENT_FIELD))
-            .build();
-    }
 
     @Mock
     private DocumentManagementRestClient documentManagementRestClient;

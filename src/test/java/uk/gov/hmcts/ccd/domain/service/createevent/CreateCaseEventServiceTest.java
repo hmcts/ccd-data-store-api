@@ -191,8 +191,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         caseDetails.setLastModified(LAST_MODIFIED);
         caseDetails.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore = caseDetails.shallowClone();
-        CaseStateDefinition postState = new CaseStateDefinition();
-        postState.setId(POST_STATE);
+
         IdamUser user = new IdamUser();
         user.setId(USER_ID);
 
@@ -207,6 +206,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, caseEventDefinition);
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
+        CaseStateDefinition postState = CaseStateDefinition.builder()
+            .id(POST_STATE)
+            .build();
         doReturn(postState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         doReturn(user).when(userRepository).getUser();
         doReturn(user).when(userRepository).getUser(anyString());
@@ -295,12 +297,11 @@ class CreateCaseEventServiceTest extends TestFixtures {
     void shouldNotUpdateLastStateModifiedWhenStateTransitionNotOccurred() {
         caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore.setState(PRE_STATE_ID);
-        caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition = CaseEventDefinition.builder().build();
         doReturn(PRE_STATE_ID).when(this.casePostStateService)
             .evaluateCaseState(any(CaseEventDefinition.class), any(CaseDetails.class));
 
-        CaseStateDefinition state = new CaseStateDefinition();
-        state.setId(PRE_STATE_ID);
+        CaseStateDefinition state = CaseStateDefinition.builder().id(PRE_STATE_ID).build();
 
         doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, caseEventDefinition);
@@ -458,8 +459,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Test
     @DisplayName("should update case category id")
     void shouldUpdateCaseDocumentCategoryId() {
-        CaseStateDefinition state = new CaseStateDefinition();
-        state.setId(POST_STATE);
+        CaseStateDefinition state = CaseStateDefinition.builder().id(POST_STATE).build();
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         caseDetails.setState(POST_STATE);
         doReturn(caseDetails).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));

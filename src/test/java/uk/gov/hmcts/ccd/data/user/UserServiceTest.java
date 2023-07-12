@@ -113,15 +113,18 @@ public class UserServiceTest {
     }
 
     private void initialiseJurisdictions() {
-        j1 = new JurisdictionDefinition();
-        j1.setId("J1");
-        j1.setName("J1Name");
-        j1.setDescription("Desc1");
-        j2 = new JurisdictionDefinition();
-        j2.setId("J2");
-        j2.setName("J2Name");
-        j2.setDescription("Desc2");
-        unknownJurisdictionDefinition = new JurisdictionDefinition();
-        unknownJurisdictionDefinition.setId("J3");
+        j1 = JurisdictionDefinition.builder()
+            .id("J1")
+            .name("J1Name")
+            .description("Desc1")
+            .build();
+        j2 = JurisdictionDefinition.builder()
+            .id("J2")
+            .name("J2Name")
+            .description("Desc2")
+            .build();
+        unknownJurisdictionDefinition = JurisdictionDefinition.builder()
+            .id("J3")
+            .build();
     }
 }

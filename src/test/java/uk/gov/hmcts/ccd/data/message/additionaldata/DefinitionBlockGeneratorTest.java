@@ -35,10 +35,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DOCUM
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DYNAMIC_LIST;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.NUMBER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class DefinitionBlockGeneratorTest {
 
@@ -90,8 +87,8 @@ class DefinitionBlockGeneratorTest {
 
     @Test
     void shouldBuildDefinitionForPublishableSimpleField() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -106,13 +103,13 @@ class DefinitionBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(textField())
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(textField())
                     .build(),
-                newCaseField()
-                    .withId("NotToBePublished")
-                    .withFieldType(textField())
+                CaseFieldDefinition.builder()
+                    .id("NotToBePublished")
+                    .fieldTypeDefinition(textField())
                     .build()
             ))
             .build();
@@ -133,8 +130,8 @@ class DefinitionBlockGeneratorTest {
 
     @Test
     void shouldBuildDefinitionForSimpleFieldWithAlias() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -146,9 +143,9 @@ class DefinitionBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(textField())
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(textField())
                     .build()
             ))
             .build();
@@ -169,8 +166,8 @@ class DefinitionBlockGeneratorTest {
 
     @Test
     void shouldBuildDefinitionForCollectionOfBasicFields() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -181,13 +178,13 @@ class DefinitionBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId("CollectionField-6a1350e1-618c-4ed4-8c58-1eb6ed9ff731")
-                            .withType(COLLECTION)
-                            .withCollectionFieldType(fieldType(NUMBER))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id("CollectionField-6a1350e1-618c-4ed4-8c58-1eb6ed9ff731")
+                            .type(COLLECTION)
+                            .collectionFieldTypeDefinition(fieldType(NUMBER))
                             .build()
                     )
                     .build()
@@ -210,8 +207,8 @@ class DefinitionBlockGeneratorTest {
 
     @Test
     void shouldBuildDefinitionForDynamicListField() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -222,9 +219,9 @@ class DefinitionBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(fieldType(DYNAMIC_LIST))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(fieldType(DYNAMIC_LIST))
                     .build()
             ))
             .build();
@@ -245,8 +242,8 @@ class DefinitionBlockGeneratorTest {
 
     @Test
     void shouldBuildDefinitionForDocumentField() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -257,9 +254,9 @@ class DefinitionBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(fieldType(DOCUMENT))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(fieldType(DOCUMENT))
                     .build()
             ))
             .build();
@@ -302,8 +299,8 @@ class DefinitionBlockGeneratorTest {
 
     @Test
     void shouldBuildDefinitionForCollectionOfComplexFields() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -314,18 +311,19 @@ class DefinitionBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId("CollectionField-6a1350e1-618c-4ed4-8c58-1eb6ed9ff731")
-                            .withType(COLLECTION)
-                            .withCollectionFieldType(
-                                aFieldType()
-                                    .withId(COMPLEX_ID_1)
-                                    .withType(COMPLEX)
-                                    .withComplexField(complexField(NESTED_FIELD_1))
-                                    .withComplexField(complexField(NESTED_FIELD_2, DATETIME))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id("CollectionField-6a1350e1-618c-4ed4-8c58-1eb6ed9ff731")
+                            .type(COLLECTION)
+                            .collectionFieldTypeDefinition(
+                                FieldTypeDefinition.builder()
+                                    .id(COMPLEX_ID_1)
+                                    .type(COMPLEX)
+                                    .complexFields(List.of(
+                                        complexField(NESTED_FIELD_1), complexField(NESTED_FIELD_2, DATETIME))
+                                    )
                                     .build()
                             )
                             .build()
@@ -361,8 +359,8 @@ class DefinitionBlockGeneratorTest {
 
     @Test
     void shouldBuildDefinitionForComplexWithoutComplexOverrides() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -371,28 +369,25 @@ class DefinitionBlockGeneratorTest {
             ))
             .build();
 
+        CaseFieldDefinition complexField2 = CaseFieldDefinition.builder()
+            .id(NESTED_FIELD_2)
+            .fieldTypeDefinition(
+                FieldTypeDefinition.builder()
+                    .id(COMPLEX_ID_2)
+                    .type(COMPLEX)
+                    .complexFields(List.of(complexField(SUB_NESTED_FIELD_1), complexField(SUB_NESTED_FIELD_2)))
+                    .build())
+            .build();
+
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2))
-                                            .build()
-                                    )
-                                    .build()
-                            )
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField(NESTED_FIELD_1), complexField2))
                             .build()
                     )
                     .build()
@@ -441,8 +436,8 @@ class DefinitionBlockGeneratorTest {
 
     @Test
     void shouldBuildDefinitionForComplexWithComplexOverrides() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -463,28 +458,27 @@ class DefinitionBlockGeneratorTest {
             ))
             .build();
 
+        CaseFieldDefinition complexField2 = CaseFieldDefinition.builder()
+            .id(NESTED_FIELD_2)
+            .fieldTypeDefinition(
+                FieldTypeDefinition.builder()
+                    .id(COMPLEX_ID_2)
+                    .type(COMPLEX)
+                    .complexFields(List.of(complexField(SUB_NESTED_FIELD_1), complexField(SUB_NESTED_FIELD_2)))
+                    .build()
+            )
+            .build();
+
+
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2))
-                                            .build()
-                                    )
-                                    .build()
-                            )
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField(NESTED_FIELD_1), complexField2))
                             .build()
                     )
                     .build()
@@ -520,8 +514,8 @@ class DefinitionBlockGeneratorTest {
 
     @Test
     void shouldBuildDefinitionForComplexWithComplexOverridesWithAlias() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -543,28 +537,27 @@ class DefinitionBlockGeneratorTest {
             ))
             .build();
 
+        CaseFieldDefinition complexField2 = CaseFieldDefinition.builder()
+            .id(NESTED_FIELD_2)
+            .fieldTypeDefinition(
+                FieldTypeDefinition.builder()
+                    .id(COMPLEX_ID_2)
+                    .type(COMPLEX)
+                    .complexFields(List.of(complexField(SUB_NESTED_FIELD_1), complexField(SUB_NESTED_FIELD_2)))
+                    .build()
+            )
+            .build();
+
+
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2))
-                                            .build()
-                                    )
-                                    .build()
-                            )
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField(NESTED_FIELD_1), complexField2))
                             .build()
                     )
                     .build()
@@ -619,8 +612,8 @@ class DefinitionBlockGeneratorTest {
 
     @Test
     void shouldNotBuildTypeDefinitionForComplexWithMissingComplexParent() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -636,28 +629,26 @@ class DefinitionBlockGeneratorTest {
             ))
             .build();
 
+        CaseFieldDefinition complexField2 = CaseFieldDefinition.builder()
+            .id(NESTED_FIELD_2)
+            .fieldTypeDefinition(
+                FieldTypeDefinition.builder()
+                    .id(COMPLEX_ID_2)
+                    .type(COMPLEX)
+                    .complexFields(List.of(complexField(SUB_NESTED_FIELD_1), complexField(SUB_NESTED_FIELD_2)))
+                    .build()
+            )
+            .build();
+
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2))
-                                            .build()
-                                    )
-                                    .build()
-                            )
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField(NESTED_FIELD_1), complexField2))
                             .build()
                     )
                     .build()
@@ -680,8 +671,8 @@ class DefinitionBlockGeneratorTest {
 
     @Test
     void shouldBuildDefinitionForComplexWithOverridesButTopLevelNotPublishable() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -698,17 +689,18 @@ class DefinitionBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_1)
-                                    .withFieldType(textField())
-                                    .build()
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(
+                                    CaseFieldDefinition.builder()
+                                        .id(NESTED_FIELD_1)
+                                        .fieldTypeDefinition(textField())
+                                        .build()
+                                )
                             )
                             .build()
                     )
@@ -738,8 +730,8 @@ class DefinitionBlockGeneratorTest {
     void shouldDefaultFieldTypeForTypesWithoutMappings() {
         String fieldType = "NewType";
 
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -750,9 +742,9 @@ class DefinitionBlockGeneratorTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(fieldType(fieldType))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID)
+                    .fieldTypeDefinition(fieldType(fieldType))
                     .build()
             ))
             .build();
@@ -772,16 +764,16 @@ class DefinitionBlockGeneratorTest {
     }
 
     private CaseFieldDefinition complexField(String id, String type) {
-        return newCaseField()
-            .withId(id)
-            .withFieldType(fieldType(type))
+        return CaseFieldDefinition.builder()
+            .id(id)
+            .fieldTypeDefinition(fieldType(type))
             .build();
     }
 
     private CaseFieldDefinition complexField(String id) {
-        return newCaseField()
-            .withId(id)
-            .withFieldType(textField())
+        return CaseFieldDefinition.builder()
+            .id(id)
+            .fieldTypeDefinition(textField())
             .build();
     }
 
@@ -790,9 +782,9 @@ class DefinitionBlockGeneratorTest {
     }
 
     private FieldTypeDefinition fieldType(String type) {
-        return aFieldType()
-            .withId(type)
-            .withType(type)
+        return FieldTypeDefinition.builder()
+            .id(type)
+            .type(type)
             .build();
     }
 }

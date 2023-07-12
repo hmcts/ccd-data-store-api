@@ -27,22 +27,21 @@ public class CollectionSanitiserTest {
     private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
 
     private static final String TYPE_1 = "Type1";
-    private static final FieldTypeDefinition FIELD_1_TYPE = new FieldTypeDefinition();
+    private static final FieldTypeDefinition FIELD_1_TYPE = FieldTypeDefinition.builder()
+        .id(TYPE_1)
+        .type(TYPE_1)
+        .build();
 
     private static final JsonNode ITEM_1_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value 1");
     private static final JsonNode ITEM_1_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value 1");
     private static final JsonNode ITEM_2_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value 2");
     private static final JsonNode ITEM_2_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value 2");
 
-    private static final FieldTypeDefinition COLLECTION_FIELD_TYPE = new FieldTypeDefinition();
+    private static final FieldTypeDefinition COLLECTION_FIELD_TYPE = FieldTypeDefinition.builder()
+        .collectionFieldTypeDefinition(FIELD_1_TYPE)
+        .build();
+
     private static final JsonNode UNIQUE_ID = JSON_FACTORY.textNode("123");
-
-    static {
-        FIELD_1_TYPE.setId(TYPE_1);
-        FIELD_1_TYPE.setType(TYPE_1);
-
-        COLLECTION_FIELD_TYPE.setCollectionFieldTypeDefinition(FIELD_1_TYPE);
-    }
 
     private Sanitiser type1Sanitiser;
 

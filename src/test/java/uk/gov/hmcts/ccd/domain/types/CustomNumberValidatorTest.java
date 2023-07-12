@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -47,8 +47,11 @@ class CustomNumberValidatorTest {
         caseFieldDefinition = caseField(FIELD_ID).build();
     }
 
-    private CaseFieldDefinitionBuilder caseField(String fieldId) {
-        return new CaseFieldDefinitionBuilder(fieldId).withType(CustomNumberValidator.TYPE_ID);
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField(String fieldId) {
+        return CaseFieldDefinition.builder()
+            .id(fieldId)
+            .fieldTypeDefinition(FieldTypeDefinition.builder()
+                .type(CustomNumberValidator.TYPE_ID).build());
     }
 
     @Test

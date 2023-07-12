@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -104,7 +104,8 @@ class EmailValidatorTest {
 
     @Test
     void fieldTypeRegEx() {
-        final CaseFieldDefinition regexCaseFieldDefinition = caseField().withRegExp("^[a-z]\\w*@hmcts.net$").build();
+        final CaseFieldDefinition regexCaseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition().regularExpression("^[a-z]\\w*@hmcts.net$").build()).build();
         final JsonNode validValue = NODE_FACTORY.textNode("k9@hmcts.net");
         final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, regexCaseFieldDefinition);
         assertEquals(0, validResult.size(), validResult.toString());
@@ -128,7 +129,8 @@ class EmailValidatorTest {
 
     @Test
     void checkMin() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(new BigDecimal(13)).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition().min(new BigDecimal(13)).build()).build();
         final JsonNode validValue = NODE_FACTORY.textNode("k99@hmcts.net");
         final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
         assertEquals(0, validResult.size(), validResult.toString());
@@ -141,7 +143,8 @@ class EmailValidatorTest {
 
     @Test
     void checkMax() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMax(new BigDecimal(12)).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition().max(new BigDecimal(12)).build()).build();
         final JsonNode validValue = NODE_FACTORY.textNode("k9@hmcts.net");
         final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
         assertEquals(0, validResult.size(), validResult.toString());
@@ -162,7 +165,14 @@ class EmailValidatorTest {
         assertEquals(validator.getType(), BaseType.get("Email"), "Type is incorrect");
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(EmailValidator.TYPE_ID);
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .type(EmailValidator.TYPE_ID);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition().build());
     }
 }

@@ -203,10 +203,11 @@ public class CaseDataValidator {
                 );
             }
             final BaseType baseType = BaseType.get(fieldTypeDefinition.getType());
-            final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-            caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
-            caseFieldDefinition.setId(index);
-            caseFieldDefinition.setCaseTypeId(validationContext.getCaseTypeId());
+            final CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+                .fieldTypeDefinition(fieldTypeDefinition)
+                .id(index)
+                .caseTypeId(validationContext.getCaseTypeId())
+                .build();
             return validateSimpleField(
                                         index,
                                         itemValue,

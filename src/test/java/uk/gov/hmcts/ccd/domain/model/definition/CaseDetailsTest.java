@@ -127,13 +127,16 @@ class CaseDetailsTest {
     }
 
     private uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField createCaseTypeTabField(String id, String type) {
-        uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition caseField =
-                new uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition();
-        caseField.setId(id);
         uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition labelFieldType =
-                new uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition();
-        labelFieldType.setType(type);
-        caseField.setFieldTypeDefinition(labelFieldType);
+            uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition
+                .builder()
+                .type(type)
+                .build();
+        uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition caseField =
+            uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition.builder()
+                .id(id)
+                .fieldTypeDefinition(labelFieldType)
+                .build();
         uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField tabField =
                 new uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField();
         tabField.setCaseFieldDefinition(caseField);

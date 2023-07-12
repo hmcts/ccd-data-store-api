@@ -9,8 +9,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,10 +49,6 @@ class NumberValidatorTest {
         caseFieldDefinition = caseField().build();
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(NumberValidator.TYPE_ID);
-    }
-
     @Test
     void noValueOrMaxOrMin() {
         final JsonNode data = NODE_FACTORY.textNode("");
@@ -62,18 +59,22 @@ class NumberValidatorTest {
 
     @Test
     void noValueWithMaxOrMin() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5)
-                                               .withMax(10)
-                                               .build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal(5))
+                .max(new BigDecimal(10))
+                .build()).build();
         final JsonNode data = NODE_FACTORY.textNode("");
         assertEquals(0, validator.validate("TEST_FIELD_ID", data, caseFieldDefinition).size());
     }
 
     @Test
     void valueWithMaxMin() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5)
-                                               .withMax(10)
-                                               .build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal(5))
+                .max(new BigDecimal(10))
+                .build()).build();
 
         assertEquals(0,
                      validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("5"), caseFieldDefinition).size(),
@@ -128,9 +129,11 @@ class NumberValidatorTest {
 
     @Test
     void valueWithSameMaxMin() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(0)
-                                               .withMax(0)
-                                               .build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal(0))
+                .max(new BigDecimal(0))
+                .build()).build();
 
         assertEquals(0,
                      validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("0"), caseFieldDefinition).size(),
@@ -159,9 +162,11 @@ class NumberValidatorTest {
 
     @Test
     void valueWithSameDecimalMaxMin() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(0.0f)
-                                               .withMax(0.0f)
-                                               .build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal("0.0"))
+                .max(new BigDecimal("0.0"))
+                .build()).build();
 
         assertEquals(0,
                      validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("0"), caseFieldDefinition).size(),
@@ -174,7 +179,8 @@ class NumberValidatorTest {
 
     @Test
     void fieldTypeRegEx() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("^\\d\\.\\d\\d$").build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition().regularExpression("^\\d\\.\\d\\d$").build()).build();
 
         assertEquals(0,
                      validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("8.20"), caseFieldDefinition).size(),
@@ -199,9 +205,11 @@ class NumberValidatorTest {
 
     @Test
     void incorrectFormat() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5)
-                                               .withMax(10)
-                                               .build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal(5))
+                .max(new BigDecimal(10))
+                .build()).build();
 
         assertEquals(1,
                      validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("10.1xxxx"), caseFieldDefinition).size(),
@@ -216,5 +224,16 @@ class NumberValidatorTest {
     @Test
     void getType() {
         assertEquals(validator.getType(), BaseType.get("NUMBER"), "Type is incorrect");
+    }
+
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .type(NumberValidator.TYPE_ID);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition().build());
     }
 }

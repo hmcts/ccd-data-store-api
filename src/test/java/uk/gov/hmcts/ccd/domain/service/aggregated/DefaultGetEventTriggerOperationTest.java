@@ -57,7 +57,6 @@ class DefaultGetEventTriggerOperationTest {
     private final DraftResponse draftResponse =
         newDraftResponse().withDocument(newCaseDraft().withEventId(EVENT_TRIGGER_ID).build()).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
-    private final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
     private final List<CaseEventFieldDefinition> eventFields = Lists.newArrayList();
     private final StartEventResult startEventResult =
         newStartEventTrigger().withEventToken(TOKEN).withCaseDetails(caseDetails).build();
@@ -169,13 +168,14 @@ class DefaultGetEventTriggerOperationTest {
         @Test
         @DisplayName("should get trigger with all data set")
         void shouldGetTriggerWithAllDataSet() {
-            caseEventDefinition.setId(EVENT_TRIGGER_ID);
-            caseEventDefinition.setName(EVENT_TRIGGER_NAME);
-            caseEventDefinition.setDescription(EVENT_TRIGGER_DESCRIPTION);
-            caseEventDefinition.setShowSummary(EVENT_TRIGGER_SHOW_SUMMARY);
-            caseEventDefinition.setShowEventNotes(EVENT_TRIGGER_SHOW_EVENT_NOTES);
-
-            caseEventDefinition.setCaseFields(eventFields);
+            CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder()
+                .id(EVENT_TRIGGER_ID)
+                .name(EVENT_TRIGGER_NAME)
+                .description(EVENT_TRIGGER_DESCRIPTION)
+                .showSummary(EVENT_TRIGGER_SHOW_SUMMARY)
+                .showEventNotes(EVENT_TRIGGER_SHOW_EVENT_NOTES)
+                .caseFields(eventFields)
+                .build();
 
             CaseUpdateViewEvent result = defaultGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                      EVENT_TRIGGER_ID,

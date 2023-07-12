@@ -179,8 +179,9 @@ class AuthorisedCreateEventOperationTest {
         doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT);
 
-        CategoryDefinition categoryDefinition = new CategoryDefinition();
-        categoryDefinition.setCategoryId(categoryId);
+        CategoryDefinition categoryDefinition = CategoryDefinition.builder()
+            .categoryId(categoryId)
+            .build();
         caseTypeDefinition = CaseTypeDefinition.builder()
             .events(events)
             .caseFieldDefinitions(caseFieldDefinitions)
@@ -255,7 +256,7 @@ class AuthorisedCreateEventOperationTest {
 
         // GIVEN
         doReturn(true).when(timeToLiveService).isCaseTypeUsingTTL(any());
-        doReturn(new CaseEventDefinition()).when(eventTriggerService).findCaseEvent(any(), any());
+        doReturn(CaseEventDefinition.builder().build()).when(eventTriggerService).findCaseEvent(any(), any());
 
         // WHEN
         authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,

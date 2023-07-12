@@ -188,8 +188,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithoutTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(TTL_INCREMENT)
+                .build();
 
             // WHEN
             var output = timeToLiveService.updateCaseDataClassificationWithTTL(
@@ -206,8 +207,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(null);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(null)
+                .build();
 
             // WHEN
             var output = timeToLiveService.updateCaseDataClassificationWithTTL(
@@ -227,8 +229,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(TTL_INCREMENT)
+                .build();
 
             // WHEN
             var output = timeToLiveService.updateCaseDataClassificationWithTTL(
@@ -244,8 +247,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(TTL_INCREMENT)
+                .build();
 
             // WHEN
             var output = timeToLiveService.updateCaseDataClassificationWithTTL(
@@ -265,8 +269,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(TTL_INCREMENT)
+                .build();
 
             mockGetDefaultSecurityClassificationsResponse();
 
@@ -287,8 +292,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(TTL_INCREMENT)
+                .build();
 
             mockGetDefaultSecurityClassificationsResponse();
 
@@ -345,10 +351,11 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithoutTTL();
-            var caseEventDefinition = new CaseEventDefinition();
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(TTL_INCREMENT)
+                .build();
 
             // NB: the following should be ignored as CaseType check takes preference
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree("some random value to  preserve"));
 
             // WHEN
@@ -363,8 +370,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(null);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(null)
+                .build();
 
             // WHEN
             var output = timeToLiveService.updateCaseDetailsWithTTL(null, caseEventDefinition, caseTypeDefinition);
@@ -378,8 +386,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(TTL_INCREMENT)
+                .build();
 
             Map<String, JsonNode> expectedCaseData = addDaysToSystemTTL(new HashMap<>(), TTL_INCREMENT);
 
@@ -395,8 +404,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(null);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(null)
+                .build();
 
             // WHEN
             var output = timeToLiveService.updateCaseDetailsWithTTL(caseData, caseEventDefinition, caseTypeDefinition);
@@ -410,8 +420,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(TTL_INCREMENT)
+                .build();
 
             Map<String, JsonNode> expectedCaseData = addDaysToSystemTTL(caseData, TTL_INCREMENT);
 
@@ -427,8 +438,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(null);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(null)
+                .build();
 
             TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
@@ -445,8 +457,9 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(TTL_INCREMENT)
+                .build();
 
             TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
@@ -465,14 +478,14 @@ class TimeToLiveServiceTest {
 
             // GIVEN
             var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
+            var caseEventDefinition = CaseEventDefinition.builder()
+                .ttlIncrement(TTL_INCREMENT)
+                .build();
 
             TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
             String ttlNodeAsString = objectMapper.valueToTree(ttl).toString();
 
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
 
             doThrow(JsonProcessingException.class).when(objectMapper).readValue(ttlNodeAsString, TTL.class);
 
@@ -1253,9 +1266,10 @@ class TimeToLiveServiceTest {
 
     private CaseTypeDefinition createCaseTypeDefinitionWithoutTTL() {
 
-        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-        caseFieldDefinition.setId("myTextField");
-        caseFieldDefinition.setFieldTypeDefinition(createFieldTypeDefinition(TEXT));
+        CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+            .id("myTextField")
+            .fieldTypeDefinition(createFieldTypeDefinition(TEXT))
+            .build();
 
         List<CaseFieldDefinition> caseFields = new ArrayList<>();
         caseFields.add(caseFieldDefinition);
@@ -1267,19 +1281,20 @@ class TimeToLiveServiceTest {
     private CaseTypeDefinition createCaseTypeDefinitionWithTTL() {
         var newCaseTypeDefinition = createCaseTypeDefinitionWithoutTTL();
 
-        CaseFieldDefinition ttlFieldDefinition = new CaseFieldDefinition();
-        ttlFieldDefinition.setId(TTL_CASE_FIELD_ID);
-        ttlFieldDefinition.setFieldTypeDefinition(createFieldTypeDefinition(TTL_CASE_FIELD_ID));
+        CaseFieldDefinition ttlFieldDefinition = CaseFieldDefinition.builder()
+            .id(TTL_CASE_FIELD_ID)
+            .fieldTypeDefinition(createFieldTypeDefinition(TTL_CASE_FIELD_ID))
+            .build();
 
         newCaseTypeDefinition.getCaseFieldDefinitions().add(ttlFieldDefinition);
         return newCaseTypeDefinition;
     }
 
     private FieldTypeDefinition createFieldTypeDefinition(String type) {
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setId(type);
-        fieldTypeDefinition.setType(type);
-        return fieldTypeDefinition;
+        return FieldTypeDefinition.builder()
+            .id(type)
+            .type(type)
+            .build();
     }
 
 }

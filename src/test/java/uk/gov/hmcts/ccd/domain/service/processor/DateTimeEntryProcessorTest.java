@@ -35,7 +35,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 
 class DateTimeEntryProcessorTest {
 
@@ -66,7 +65,7 @@ class DateTimeEntryProcessorTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        when(definitionRepository.getBaseTypes()).thenReturn(Collections.EMPTY_LIST);
+        when(definitionRepository.getBaseTypes()).thenReturn(Collections.emptyList());
         BaseType.setCaseDefinitionRepository(definitionRepository);
         BaseType.initialise();
         setUpBaseTypes();
@@ -84,7 +83,7 @@ class DateTimeEntryProcessorTest {
             .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
-            new CaseFieldDefinition(),
+            CaseFieldDefinition.builder().build(),
             new CaseEventFieldDefinition(),
             wizardPageField(ID, Collections.EMPTY_LIST));
 
@@ -105,9 +104,9 @@ class DateTimeEntryProcessorTest {
             .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
-            new CaseFieldDefinition(),
+            CaseFieldDefinition.builder().build(),
             new CaseEventFieldDefinition(),
-            wizardPageField(ID, Collections.EMPTY_LIST));
+            wizardPageField(ID, Collections.emptyList()));
 
         assertAll(
             () -> assertThat(result.isTextual(), is(true)),
@@ -127,7 +126,7 @@ class DateTimeEntryProcessorTest {
             .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
-            new CaseFieldDefinition(),
+            CaseFieldDefinition.builder().build(),
             new CaseEventFieldDefinition(),
             wizardPageField(ID, Collections.EMPTY_LIST));
 
@@ -156,7 +155,7 @@ class DateTimeEntryProcessorTest {
             .thenReturn(new TextNode("1995-12-25T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
-            new CaseFieldDefinition(),
+            CaseFieldDefinition.builder().build(),
             new CaseEventFieldDefinition(),
             wizardPageField(ID, Collections.EMPTY_LIST));
 
@@ -182,20 +181,20 @@ class DateTimeEntryProcessorTest {
                       + "    }\n"
                       + "}";
         JsonNode node = MAPPER.readTree(json).get("ComplexField");
-        CaseFieldDefinition caseField1 = newCaseField().withId("ComplexDateTimeField")
-            .withFieldType(fieldType()).withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build();
-        CaseFieldDefinition caseField2 = newCaseField().withId("NestedDateField")
-            .withFieldType(fieldType("Date", "Date", null, null))
-            .withDisplayContextParameter("#DATETIMEENTRY(MM)").build();
-        CaseFieldDefinition caseField3 = newCaseField().withId("NestedCollectionTextField")
-            .withFieldType(fieldType("Collection", "Collection", null, fieldType())).build();
-        CaseFieldDefinition caseField4 = newCaseField().withId("LabelField")
-            .withFieldType(fieldType("Label", "Label", null, null)).build();
-        CaseFieldDefinition caseField5 = newCaseField().withId("ComplexNestedField")
-            .withFieldType(fieldType("Complex", "Complex", Arrays.asList(caseField2, caseField3, caseField4),
+        CaseFieldDefinition caseField1 = CaseFieldDefinition.builder().id("ComplexDateTimeField")
+            .fieldTypeDefinition(fieldType()).displayContextParameter("#DATETIMEENTRY(yyyy)").build();
+        CaseFieldDefinition caseField2 = CaseFieldDefinition.builder().id("NestedDateField")
+            .fieldTypeDefinition(fieldType("Date", "Date", null, null))
+            .displayContextParameter("#DATETIMEENTRY(MM)").build();
+        CaseFieldDefinition caseField3 = CaseFieldDefinition.builder().id("NestedCollectionTextField")
+            .fieldTypeDefinition(fieldType("Collection", "Collection", null, fieldType())).build();
+        CaseFieldDefinition caseField4 = CaseFieldDefinition.builder().id("LabelField")
+            .fieldTypeDefinition(fieldType("Label", "Label", null, null)).build();
+        CaseFieldDefinition caseField5 = CaseFieldDefinition.builder().id("ComplexNestedField")
+            .fieldTypeDefinition(fieldType("Complex", "Complex", Arrays.asList(caseField2, caseField3, caseField4),
                 null)).build();
-        CaseFieldDefinition caseField6 = newCaseField().withId("ComplexField")
-            .withFieldType(fieldType("Complex", "Complex", Arrays.asList(caseField1, caseField5),
+        CaseFieldDefinition caseField6 = CaseFieldDefinition.builder().id("ComplexField")
+            .fieldTypeDefinition(fieldType("Complex", "Complex", Arrays.asList(caseField1, caseField5),
                 null)).build();
         CaseViewField caseViewField = caseViewField(ID, null,
             fieldType("Complex", "Complex", Arrays.asList(caseField1, caseField5), null)
@@ -221,9 +220,7 @@ class DateTimeEntryProcessorTest {
     }
 
     private CaseFieldDefinition caseField(String id) {
-        CaseFieldDefinition caseField = new CaseFieldDefinition();
-        caseField.setId(id);
-        return caseField;
+        return CaseFieldDefinition.builder().id(id).build();
     }
 
     private WizardPageField wizardPageField(String id, List<WizardPageComplexFieldOverride> overrides) {
@@ -243,12 +240,12 @@ class DateTimeEntryProcessorTest {
 
     private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields,
                                           FieldTypeDefinition collectionFieldType) {
-        FieldTypeDefinition fieldType = new FieldTypeDefinition();
-        fieldType.setId(id);
-        fieldType.setType(type);
-        fieldType.setComplexFields(complexFields);
-        fieldType.setCollectionFieldTypeDefinition(collectionFieldType);
-        return fieldType;
+        return FieldTypeDefinition.builder()
+            .id(id)
+            .type(type)
+            .complexFields(complexFields)
+            .collectionFieldTypeDefinition(collectionFieldType)
+            .build();
     }
 
     private FieldTypeDefinition fieldType() {

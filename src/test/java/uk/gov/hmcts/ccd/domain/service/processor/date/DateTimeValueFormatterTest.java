@@ -495,9 +495,10 @@ class DateTimeValueFormatterTest {
     }
 
     private CaseFieldDefinition caseField(String id, FieldTypeDefinition fieldType, String displayContextParameter) {
-        CaseFieldDefinition caseField = new CaseFieldDefinition();
-        caseField.setId(id);
-        caseField.setFieldTypeDefinition(fieldType);
+        CaseFieldDefinition caseField = CaseFieldDefinition.builder()
+            .id(id)
+            .fieldTypeDefinition(fieldType)
+            .build();
         caseField.setDisplayContextParameter(displayContextParameter);
         return caseField;
     }
@@ -515,12 +516,12 @@ class DateTimeValueFormatterTest {
 
     private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields,
                                           FieldTypeDefinition collectionFieldType) {
-        FieldTypeDefinition fieldType = new FieldTypeDefinition();
-        fieldType.setId(id);
-        fieldType.setType(type);
-        fieldType.setComplexFields(complexFields);
-        fieldType.setCollectionFieldTypeDefinition(collectionFieldType);
-        return fieldType;
+        return FieldTypeDefinition.builder()
+            .id(id)
+            .type(type)
+            .complexFields(complexFields)
+            .collectionFieldTypeDefinition(collectionFieldType)
+            .build();
     }
 
     private FieldTypeDefinition fieldType(String fieldType) {

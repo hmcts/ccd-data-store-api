@@ -51,9 +51,9 @@ public class DefinitionsCachingIT {
     private static final int VERSION_2 = 3311;
     private static final int VERSION_3 = 331111;
 
-    private static final JurisdictionDefinition JURISDICTION_DEFINITION_1 = new JurisdictionDefinition();
-    private static final JurisdictionDefinition JURISDICTION_DEFINITION_2 = new JurisdictionDefinition();
-    private static final JurisdictionDefinition JURISDICTION_DEFINITION_3 = new JurisdictionDefinition();
+    private static final JurisdictionDefinition JURISDICTION_DEFINITION_1 = JurisdictionDefinition.builder().build();
+    private static final JurisdictionDefinition JURISDICTION_DEFINITION_2 = JurisdictionDefinition.builder().build();
+    private static final JurisdictionDefinition JURISDICTION_DEFINITION_3 = JurisdictionDefinition.builder().build();
 
     @SpyBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;

@@ -197,19 +197,17 @@ public abstract class TestFixtures {
     }
 
     protected CaseEventDefinition buildCaseEventDefinition() {
-        CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setPostStates(getEventPostStates(POST_STATE));
-        caseEventDefinition.setPublish(Boolean.TRUE);
-
-        return caseEventDefinition;
+        return CaseEventDefinition.builder()
+            .postStates(getEventPostStates(POST_STATE))
+            .publish(Boolean.TRUE)
+            .build();
     }
 
     protected JurisdictionDefinition buildJurisdictionDefinition() {
-        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-        jurisdictionDefinition.setId(JURISDICTION_ID);
-        jurisdictionDefinition.setName(JURISDICTION_NAME);
-
-        return jurisdictionDefinition;
+        return JurisdictionDefinition.builder()
+            .id(JURISDICTION_ID)
+            .name(JURISDICTION_NAME)
+            .build();
     }
 
     protected CaseTypeDefinition buildCaseTypeDefinition() {
@@ -217,14 +215,12 @@ public abstract class TestFixtures {
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
 
-        final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
+        return CaseTypeDefinition.builder()
             .id(CASE_TYPE_ID)
             .name(CASE_TYPE_NAME)
             .jurisdictionDefinition(jurisdictionDefinition)
             .version(version)
             .build();
-
-        return caseTypeDefinition;
     }
 
     private List<EventPostStateDefinition> getEventPostStates(String... postStateReferences) {

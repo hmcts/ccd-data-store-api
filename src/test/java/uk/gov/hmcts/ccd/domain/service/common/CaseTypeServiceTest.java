@@ -78,9 +78,7 @@ class CaseTypeServiceTest {
         }
 
         private CaseStateDefinition buildCaseState(final String name) {
-            final CaseStateDefinition s = new CaseStateDefinition();
-            s.setId(name);
-            return s;
+            return CaseStateDefinition.builder().id(name).build();
         }
     }
 

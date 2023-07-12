@@ -74,7 +74,7 @@ class CallbackServiceTest {
 
     private CallbackService callbackService;
 
-    private CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+    private CaseEventDefinition caseEventDefinition;
     private CaseDetails caseDetails = new CaseDetails();
     private CallbackResponse callbackResponse = new CallbackResponse();
     private Logger logger;
@@ -84,7 +84,9 @@ class CallbackServiceTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        caseEventDefinition.setId("TEST-EVENT");
+        caseEventDefinition = CaseEventDefinition.builder()
+            .id("TEST-EVENT")
+            .build();
 
         caseDetails.setState("test state");
         caseDetails.setCaseTypeId("test case type");

@@ -8,7 +8,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
 
 import java.util.Collections;
 import java.util.List;
@@ -76,7 +77,8 @@ class FixedListValidatorTest {
 
     @Test
     void fieldTypeRegEx() {
-        final CaseFieldDefinition caseFieldDefinitionWithRegEx = caseField().withRegExp("AAAAAA").build();
+        final CaseFieldDefinition caseFieldDefinitionWithRegEx = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition().regularExpression("AAAAAA").build()).build();
         final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("AAAAAA"),
             caseFieldDefinitionWithRegEx);
         assertEquals(0, result01.size());
@@ -98,10 +100,20 @@ class FixedListValidatorTest {
         assertEquals("TEST_FIELD_ID", result.get(0).getFieldId());
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(FixedListValidator.TYPE_ID)
-                                             .withFixedListItem("AAAAAA")
-                                             .withFixedListItem("BBBBBB")
-                                             .withFixedListItem("CCCCCC");
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .fixedListItemDefinitions(List.of(
+                new FixedListItemDefinition("AAAAAA", null, null),
+                new FixedListItemDefinition("BBBBBB", null, null),
+                new FixedListItemDefinition("CCCCCC", null, null)
+            ))
+            .type(FixedListValidator.TYPE_ID);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .build());
     }
 }

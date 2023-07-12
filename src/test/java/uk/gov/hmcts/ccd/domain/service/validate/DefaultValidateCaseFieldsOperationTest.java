@@ -405,7 +405,7 @@ class DefaultValidateCaseFieldsOperationTest {
 
         final CaseEventFieldDefinition caseEventFieldDefinition = new CaseEventFieldDefinition();
         caseEventFieldDefinition.setCaseFieldId("OrganisationPolicyField");
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+
         final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition = new CaseEventFieldComplexDefinition();
         caseEventFieldComplexDefinition.setRetainHiddenValue(Boolean.FALSE);
         caseEventFieldComplexDefinition.setReference(ORGANISATION_POLICY_ROLE);
@@ -414,8 +414,10 @@ class DefaultValidateCaseFieldsOperationTest {
         caseEventFieldDefinitions.add(caseEventFieldDefinition);
         caseEventFieldDefinition.setCaseEventFieldComplexDefinitions(caseEventFieldComplexDefinitions);
 
-        caseEventDefinition.setId("eventId");
-        caseEventDefinition.setCaseFields(caseEventFieldDefinitions);
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder()
+            .id("eventId")
+            .caseFields(caseEventFieldDefinitions)
+            .build();
         caseEventDefinitions.add(caseEventDefinition);
         return CaseTypeDefinition.builder()
             .id("caseTypeId")
@@ -453,8 +455,6 @@ class DefaultValidateCaseFieldsOperationTest {
         final CaseEventFieldDefinition caseEventFieldDefinition1 = new CaseEventFieldDefinition();
         caseEventFieldDefinition1.setCaseFieldId(caseFieldId1);
 
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-
         final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition1 = new CaseEventFieldComplexDefinition();
         caseEventFieldComplexDefinition1.setDefaultValue(defaultValue1);
         caseEventFieldComplexDefinition1.setRetainHiddenValue(Boolean.FALSE);
@@ -479,8 +479,10 @@ class DefaultValidateCaseFieldsOperationTest {
         caseEventFieldDefinitions.add(caseEventFieldDefinition2);
 
         //---General ---/
-        caseEventDefinition.setId("eventId");
-        caseEventDefinition.setCaseFields(caseEventFieldDefinitions);
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder()
+            .id("eventId")
+            .caseFields(caseEventFieldDefinitions)
+            .build();
         caseEventDefinitions.add(caseEventDefinition);
         return CaseTypeDefinition.builder()
             .id("caseTypeId")
@@ -492,9 +494,9 @@ class DefaultValidateCaseFieldsOperationTest {
     }
 
     private static JurisdictionDefinition buildJurisdiction() {
-        final JurisdictionDefinition j = new JurisdictionDefinition();
-        j.setId(JURISDICTION_ID);
-        return j;
+        return JurisdictionDefinition.builder()
+            .id(JURISDICTION_ID)
+            .build();
     }
 
     private Map<String, JsonNode> buildJsonNodeDataWithTwoOrganisationPolicyRole(String organisationPolicyRole1,

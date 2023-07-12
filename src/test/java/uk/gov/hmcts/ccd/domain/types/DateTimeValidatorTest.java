@@ -10,7 +10,6 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -185,7 +184,9 @@ class DateTimeValidatorTest {
         final String validDateTime = "2001-01-01T00:00:00Z";
         final String invalidDateTime = "2002-01-01T00:00:00Z";
         final String maxDateTime = "2001-12-31T00:00:00+01:00";
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMax(datetime(maxDateTime)).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition().max(datetime(maxDateTime)).build())
+            .build();
 
         final List<ValidationResult> result01 =
             validator.validate(FIELD_ID, NODE_FACTORY.textNode(validDateTime), caseFieldDefinition);
@@ -207,7 +208,9 @@ class DateTimeValidatorTest {
         final String validDateTime = "2001-12-31T00:00:00Z";
         final String invalidDateTime = "2000-01-01T00:00:00Z";
         final String minDateTime = "2001-01-01T00:00:00Z";
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(datetime(minDateTime)).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition().min(datetime(minDateTime)).build())
+            .build();
 
         final List<ValidationResult> result01 =
             validator.validate(FIELD_ID, NODE_FACTORY.textNode(validDateTime), caseFieldDefinition);
@@ -232,9 +235,11 @@ class DateTimeValidatorTest {
         final String invalidMaxDateTime = "2002-01-01T00:00:00Z";
         final String minDateTime = "2001-01-01T00:00:00Z";
         final String maxDateTime = "2001-12-31T00:00:00Z";
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(datetime(minDateTime))
-                                               .withMax(datetime(maxDateTime))
-                                               .build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition().min(datetime(minDateTime))
+                .max(datetime(maxDateTime))
+                .build())
+            .build();
 
         final List<ValidationResult> result01 =
             validator.validate(FIELD_ID, NODE_FACTORY.textNode(validDateTime), caseFieldDefinition);
@@ -261,7 +266,8 @@ class DateTimeValidatorTest {
     @Test
     void invalidFieldTypeRegEx() {
         final String validDateTime = "2001-12-10T00:00:00Z";
-        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("InvalidRegEx").build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().fieldTypeDefinition(defaultFieldDefinition()
+            .regularExpression("InvalidRegEx").build()).build();
 
         final List<ValidationResult> result = validator.validate(FIELD_ID,
                                                                  NODE_FACTORY.textNode(validDateTime),
@@ -288,7 +294,8 @@ class DateTimeValidatorTest {
     void validRegEx() {
         final String validDateTime = "2001-12-10T00:00:00";
         final String limitedRegex = "^\\d{4}-\\d{2}-\\d{2}[T\\s]\\d{2}:\\d{2}:\\d{2}$";
-        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp(limitedRegex).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().fieldTypeDefinition(defaultFieldDefinition()
+            .regularExpression(limitedRegex).build()).build();
 
         final List<ValidationResult> result = validator.validate(FIELD_ID,
                                                                  NODE_FACTORY.textNode(validDateTime),
@@ -339,8 +346,15 @@ class DateTimeValidatorTest {
         assertThat(result.get(0).getErrorMessage(), is("Date or Time entered is not valid"));
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(DateTimeValidator.TYPE_ID);
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .type(DateTimeValidator.TYPE_ID);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition().build());
     }
 
     private BigDecimal datetime(final String datetimeString) {

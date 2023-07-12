@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -22,8 +23,6 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPL
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class PublishableFieldTest {
 
@@ -51,9 +50,9 @@ class PublishableFieldTest {
         void shouldCreatePublishableFieldForTopLevelField() {
             caseTypeDefinition = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId(FIELD_ID)
-                        .withFieldType(textField())
+                    CaseFieldDefinition.builder()
+                        .id(FIELD_ID)
+                        .fieldTypeDefinition(textField())
                         .build()
                 ))
                 .build();
@@ -84,9 +83,9 @@ class PublishableFieldTest {
         void shouldCreatePublishableFieldForTopLevelFieldWithAlias() {
             caseTypeDefinition = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId(FIELD_ID)
-                        .withFieldType(textField())
+                    CaseFieldDefinition.builder()
+                        .id(FIELD_ID)
+                        .fieldTypeDefinition(textField())
                         .build()
                 ))
                 .build();
@@ -118,18 +117,18 @@ class PublishableFieldTest {
         void shouldCreatePublishableFieldForNestedField() {
             caseTypeDefinition = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId(FIELD_ID)
-                        .withFieldType(
-                            aFieldType()
-                                .withId("SomeComplexType")
-                                .withType(COMPLEX)
-                                .withComplexField(
-                                    newCaseField()
-                                        .withId(NESTED_FIELD)
-                                        .withFieldType(textField())
+                    CaseFieldDefinition.builder()
+                        .id(FIELD_ID)
+                        .fieldTypeDefinition(
+                            FieldTypeDefinition.builder()
+                                .id("SomeComplexType")
+                                .type(COMPLEX)
+                                .complexFields(List.of(
+                                    CaseFieldDefinition.builder()
+                                        .id(NESTED_FIELD)
+                                        .fieldTypeDefinition(textField())
                                         .build()
-                                )
+                                ))
                                 .build()
                         )
                         .build()
@@ -161,18 +160,18 @@ class PublishableFieldTest {
         void shouldCreatePublishableFieldForNestedFieldWithAlias() {
             caseTypeDefinition = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId(FIELD_ID)
-                        .withFieldType(
-                            aFieldType()
-                                .withId("SomeComplexType")
-                                .withType(COMPLEX)
-                                .withComplexField(
-                                    newCaseField()
-                                        .withId(NESTED_FIELD)
-                                        .withFieldType(textField())
+                    CaseFieldDefinition.builder()
+                        .id(FIELD_ID)
+                        .fieldTypeDefinition(
+                            FieldTypeDefinition.builder()
+                                .id("SomeComplexType")
+                                .type(COMPLEX)
+                                .complexFields(List.of(
+                                    CaseFieldDefinition.builder()
+                                        .id(NESTED_FIELD)
+                                        .fieldTypeDefinition(textField())
                                         .build()
-                                )
+                                ))
                                 .build()
                         )
                         .build()
@@ -206,9 +205,9 @@ class PublishableFieldTest {
             caseTypeDefinition = CaseTypeDefinition.builder()
                 .id("CaseTypeId")
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId(FIELD_ID)
-                        .withFieldType(textField())
+                    CaseFieldDefinition.builder()
+                        .id(FIELD_ID)
+                        .fieldTypeDefinition(textField())
                         .build()
                 ))
                 .build();
@@ -230,9 +229,9 @@ class PublishableFieldTest {
         }
 
         private FieldTypeDefinition textField() {
-            return aFieldType()
-                .withId(TEXT)
-                .withType(TEXT)
+            return FieldTypeDefinition.builder()
+                .id(TEXT)
+                .type(TEXT)
                 .build();
         }
     }
@@ -274,7 +273,7 @@ class PublishableFieldTest {
         @Test
         void shouldGetFieldIdForFieldWithNonNestedPath() {
             publishableField.setPath("TopLevel");
-            publishableField.setCaseField(newCaseField().withId("TopLevel").build());
+            publishableField.setCaseField(CaseFieldDefinition.builder().id("TopLevel").build());
 
             String result = publishableField.getFieldId();
 

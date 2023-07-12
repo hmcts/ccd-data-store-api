@@ -106,10 +106,12 @@ public class PseudoRoleToAccessProfileGenerator {
     }
 
     private RoleToAccessProfileDefinition createRoleToAccessProfile(String ctId, String role, boolean addIdamPrefix) {
-        return new RoleToAccessProfileDefinition(
-            ctId, false, false, null,
-            role, null, null, addIdamPrefix ? IDAM_PREFIX + role : role,
-            null
-        );
+        return RoleToAccessProfileDefinition.builder()
+            .caseTypeId(ctId)
+            .readOnly(false)
+            .accessProfiles(role)
+            .roleName(addIdamPrefix ? IDAM_PREFIX + role : role)
+            .build();
+
     }
 }

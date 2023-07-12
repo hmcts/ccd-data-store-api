@@ -176,12 +176,13 @@ class CaseDataExtractorTest {
 
         caseFields = getCaseFieldsFromJson(CASE_FIELD_JSON);
 
-        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setType("CustomType");
-
-        caseFieldDefinition.setId("id");
-        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+        FieldTypeDefinition fieldTypeDefinition = FieldTypeDefinition.builder()
+            .type("CustomType")
+            .build();
+        CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+            .id("id")
+            .fieldTypeDefinition(fieldTypeDefinition)
+            .build();
 
         caseFields.add(caseFieldDefinition);
 

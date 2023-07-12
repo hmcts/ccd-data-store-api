@@ -49,8 +49,9 @@ class ElasticsearchSecurityClassificationFilterTest {
     void shouldCreateTermsQueryBuilder() {
         final String jurisdictionId = "jurisdiction";
         when(userRepository.getHighestUserClassification(jurisdictionId)).thenReturn(PRIVATE);
-        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-        jurisdictionDefinition.setId(jurisdictionId);
+        JurisdictionDefinition jurisdictionDefinition = JurisdictionDefinition.builder()
+            .id(jurisdictionId)
+            .build();
         CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
             .jurisdictionDefinition(jurisdictionDefinition)
             .build();

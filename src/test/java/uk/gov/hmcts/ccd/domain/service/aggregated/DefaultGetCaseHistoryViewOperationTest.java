@@ -106,8 +106,9 @@ class DefaultGetCaseHistoryViewOperationTest {
                                                                                   "dataTestField2").build();
         doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
-        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-        jurisdictionDefinition.setName(JURISDICTION_ID);
+        JurisdictionDefinition jurisdictionDefinition = JurisdictionDefinition.builder()
+            .name(JURISDICTION_ID)
+            .build();
 
         CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
             .jurisdictionDefinition(jurisdictionDefinition)
@@ -115,7 +116,7 @@ class DefaultGetCaseHistoryViewOperationTest {
 
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
-        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        CaseStateDefinition caseStateDefinition = CaseStateDefinition.builder().build();
         doReturn(caseStateDefinition).when(caseTypeService).findState(caseTypeDefinition, STATE);
 
         doAnswer(invocation -> invocation.getArgument(0)).when(fieldProcessorService).processCaseViewField(any());

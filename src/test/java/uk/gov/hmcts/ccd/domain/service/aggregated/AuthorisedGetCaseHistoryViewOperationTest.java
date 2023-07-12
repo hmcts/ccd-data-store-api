@@ -40,7 +40,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseHistoryViewBuilder.aCaseHistoryView;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewEventBuilder.aCaseViewEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
@@ -58,10 +57,10 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final Set<AccessProfile> ACCESS_PROFILES = createAccessProfiles(USER_ROLES);
     private static final String ROLE_NOT_IN_USER_ROLES = "caseworker-family-law";
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
-    private static final CaseEventDefinition CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
+    private static final CaseEventDefinition CASE_EVENT = CaseEventDefinition.builder().id(EVENT_ID_STRING).build();
     private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_REFERENCE)
             .withCaseTypeId(CASE_TYPE_ID).withReference(Long.valueOf(CASE_REFERENCE)).build();
-    private static final CaseEventDefinition CASE_EVENT_2 = newCaseEvent().withId("event2").build();
+    private static final CaseEventDefinition CASE_EVENT_2 = CaseEventDefinition.builder().id("event2").build();
     private static final CaseTypeDefinition TEST_CASE_TYPE = CaseTypeDefinition.builder()
         .events(List.of(CASE_EVENT, CASE_EVENT_2)).build();
     private static final CaseViewEvent CASE_VIEW_EVENT = aCaseViewEvent().withId(EVENT_ID_STRING).build();

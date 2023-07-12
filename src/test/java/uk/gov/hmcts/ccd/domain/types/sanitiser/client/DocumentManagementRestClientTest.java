@@ -19,7 +19,6 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
@@ -53,13 +52,21 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
     private static final String BINARY_URL = "http://localhost:%s/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary";
     private static final String FILENAME = "Seagulls_Sqaure.jpg";
     private static final String TYPE_DOCUMENT = "Document";
-    private static final String DOCUMENT_FIELD_ID = "D8Document";
-    private static final FieldTypeDefinition DOCUMENT_FIELD_TYPE = new FieldTypeDefinition();
-    private static final CaseFieldDefinition DOCUMENT_FIELD = new CaseFieldDefinition();
+    private static final FieldTypeDefinition DOCUMENT_FIELD_TYPE = FieldTypeDefinition.builder()
+        .id(TYPE_DOCUMENT)
+        .type(TYPE_DOCUMENT)
+        .build();
     private static final ObjectNode DOCUMENT_VALUE_INITIAL = JSON_FACTORY.objectNode();
     private static final ObjectNode DOCUMENT_VALUE_SANITISED = JSON_FACTORY.objectNode();
     private static final String BEARER_TEST_JWT = "Bearer testJwt";
     private static final String SERVICE_JWT = "ey373478378347847834783784";
+
+    static {
+        DOCUMENT_VALUE_INITIAL.put("document_url", DOCUMENT_URL);
+        DOCUMENT_VALUE_SANITISED.put("document_url", DOCUMENT_URL);
+        DOCUMENT_VALUE_SANITISED.put("document_binary_url", BINARY_URL);
+        DOCUMENT_VALUE_SANITISED.put("document_filename", FILENAME);
+    }
 
     private ObjectMapper objectMapper = new ObjectMapper();
     private RestTemplate restTemplate = new RestTemplate();
@@ -69,18 +76,6 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
     @Mock
     private Document document;
     private DocumentManagementRestClient subject;
-
-    static {
-        DOCUMENT_FIELD_TYPE.setId(TYPE_DOCUMENT);
-        DOCUMENT_FIELD_TYPE.setType(TYPE_DOCUMENT);
-        DOCUMENT_FIELD.setId(DOCUMENT_FIELD_ID);
-        DOCUMENT_FIELD.setFieldTypeDefinition(DOCUMENT_FIELD_TYPE);
-
-        DOCUMENT_VALUE_INITIAL.put("document_url", DOCUMENT_URL);
-        DOCUMENT_VALUE_SANITISED.put("document_url", DOCUMENT_URL);
-        DOCUMENT_VALUE_SANITISED.put("document_binary_url", BINARY_URL);
-        DOCUMENT_VALUE_SANITISED.put("document_filename", FILENAME);
-    }
 
     @Before
     public void setUp() {

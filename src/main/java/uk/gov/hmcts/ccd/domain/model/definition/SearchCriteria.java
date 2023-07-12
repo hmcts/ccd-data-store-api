@@ -1,18 +1,25 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@Data
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@Value
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(force = true, access = AccessLevel.PACKAGE)
 public class SearchCriteria implements Serializable {
 
-    private String caseTypeId;
-    private String otherCaseReference;
-    private Date liveFrom;
-    private Date liveTo;
+    String caseTypeId;
+    String otherCaseReference;
+    Date liveFrom;
+    Date liveTo;
 }

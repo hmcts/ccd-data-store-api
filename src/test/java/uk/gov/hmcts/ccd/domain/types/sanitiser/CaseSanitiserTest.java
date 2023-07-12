@@ -24,26 +24,24 @@ public class CaseSanitiserTest {
 
     private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
 
-    private static final CaseTypeDefinition CASE_TYPE;
-
     private static final String TYPE_SIMPLE = "Simple";
-    private static final FieldTypeDefinition SIMPLE_FIELD_TYPE = new FieldTypeDefinition();
+    private static final FieldTypeDefinition SIMPLE_FIELD_TYPE = FieldTypeDefinition.builder()
+        .id(TYPE_SIMPLE)
+        .type(TYPE_SIMPLE)
+        .build();
     private static final String SIMPLE_FIELD_ID = "FirstName";
-    private static final CaseFieldDefinition SIMPLE_FIELD = new CaseFieldDefinition();
+    private static final CaseFieldDefinition SIMPLE_FIELD = CaseFieldDefinition.builder()
+        .id(SIMPLE_FIELD_ID)
+        .fieldTypeDefinition(SIMPLE_FIELD_TYPE)
+        .build();
+
+    private static final CaseTypeDefinition CASE_TYPE = CaseTypeDefinition.builder()
+        .caseFieldDefinitions(Collections.singletonList(SIMPLE_FIELD))
+        .build();
+
     private static final JsonNode SIMPLE_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value");
     private static final JsonNode SIMPLE_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value");
     private static final String TYPE_OTHER = "Other";
-
-    static {
-        SIMPLE_FIELD_TYPE.setId(TYPE_SIMPLE);
-        SIMPLE_FIELD_TYPE.setType(TYPE_SIMPLE);
-        SIMPLE_FIELD.setId(SIMPLE_FIELD_ID);
-        SIMPLE_FIELD.setFieldTypeDefinition(SIMPLE_FIELD_TYPE);
-
-        CASE_TYPE = CaseTypeDefinition.builder()
-            .caseFieldDefinitions(Collections.singletonList(SIMPLE_FIELD))
-            .build();
-    }
 
     private CaseSanitiser caseSanitiser;
     private Sanitiser simpleSanitiser;

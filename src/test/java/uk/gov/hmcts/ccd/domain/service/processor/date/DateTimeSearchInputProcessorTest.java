@@ -35,8 +35,6 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class DateTimeSearchInputProcessorTest {
 
@@ -127,11 +125,12 @@ class DateTimeSearchInputProcessorTest {
     @Test
     void shouldConvertWorkbasketComplexQueryParamUsingDisplayContextParameter() {
         CriteriaInput criteriaInput = new CriteriaInput();
-        FieldTypeDefinition complexFieldType = aFieldType().withId(COMPLEX_FIELD).withType(FieldTypeDefinition.COMPLEX)
-            .withComplexField(
-            newCaseField().withId(NESTED_FIELD).withFieldType(fieldType("Date"))
-                .withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build()
-        ).build();
+        FieldTypeDefinition complexFieldType = FieldTypeDefinition.builder().id(COMPLEX_FIELD)
+            .type(FieldTypeDefinition.COMPLEX)
+            .complexFields(List.of(
+            CaseFieldDefinition.builder().id(NESTED_FIELD).fieldTypeDefinition(fieldType("Date"))
+                .displayContextParameter("#DATETIMEENTRY(yyyy)").build()
+        )).build();
         criteriaInput.setField(field(COMPLEX_FIELD, complexFieldType));
         criteriaInputs.add(criteriaInput);
         Map<String, String> queryParams = new HashMap<>();
@@ -151,10 +150,11 @@ class DateTimeSearchInputProcessorTest {
     @Test
     void shouldConvertSearchComplexQueryParamUsingDisplayContextParameter() {
         CriteriaInput criteriaInput = new CriteriaInput();
-        FieldTypeDefinition complexFieldType = aFieldType().withId(COMPLEX_FIELD).withType(FieldTypeDefinition.COMPLEX)
-            .withComplexField(
-            newCaseField().withId(NESTED_FIELD).withFieldType(fieldType("Date"))
-                .withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build()
+        FieldTypeDefinition complexFieldType = FieldTypeDefinition.builder().id(COMPLEX_FIELD)
+            .type(FieldTypeDefinition.COMPLEX)
+            .complexFields(List.of(
+            CaseFieldDefinition.builder().id(NESTED_FIELD).fieldTypeDefinition(fieldType("Date"))
+                .displayContextParameter("#DATETIMEENTRY(yyyy)").build())
         ).build();
         criteriaInput.setField(field(COMPLEX_FIELD, complexFieldType));
         criteriaInputs.add(criteriaInput);
@@ -218,8 +218,8 @@ class DateTimeSearchInputProcessorTest {
     void shouldConvertWorkbasketCollectionQueryParamUsingDisplayContextParameter() {
         CriteriaInput criteriaInput = new CriteriaInput();
         criteriaInput.setField(field(COLLECTION_FIELD,
-            aFieldType().withId(FieldTypeDefinition.COLLECTION).withType(FieldTypeDefinition.COLLECTION)
-                .withCollectionFieldType(fieldType("Date")).build())
+            FieldTypeDefinition.builder().id(FieldTypeDefinition.COLLECTION).type(FieldTypeDefinition.COLLECTION)
+                .collectionFieldTypeDefinition(fieldType("Date")).build())
         );
         criteriaInput.setDisplayContextParameter("#DATETIMEENTRY(yyyy)");
         criteriaInputs.add(criteriaInput);
@@ -278,15 +278,15 @@ class DateTimeSearchInputProcessorTest {
         criteriaInput3.setField(field(TEXT_FIELD, fieldType("Text")));
         CriteriaInput criteriaInput4 = new CriteriaInput();
         criteriaInput4.setField(field(COLLECTION_FIELD,
-            aFieldType().withId(FieldTypeDefinition.COLLECTION).withType(FieldTypeDefinition.COLLECTION)
-                .withCollectionFieldType(fieldType("Date")).build())
+            FieldTypeDefinition.builder().id(FieldTypeDefinition.COLLECTION).type(FieldTypeDefinition.COLLECTION)
+                .collectionFieldTypeDefinition(fieldType("Date")).build())
         );
         CriteriaInput criteriaInput5 = new CriteriaInput();
         criteriaInput5.setField(field(COMPLEX_FIELD, NESTED_FIELD, fieldType("DateTime")));
         CriteriaInput criteriaInput6 = new CriteriaInput();
-        criteriaInput6.setField(field(COMPLEX_FIELD, aFieldType().withId(COMPLEX_FIELD)
-            .withType(FieldTypeDefinition.COMPLEX).withComplexField(
-            newCaseField().withId("OtherNestedField").withFieldType(fieldType("Date")).build()
+        criteriaInput6.setField(field(COMPLEX_FIELD, FieldTypeDefinition.builder().id(COMPLEX_FIELD)
+            .type(FieldTypeDefinition.COMPLEX).complexFields(List.of(
+            CaseFieldDefinition.builder().id("OtherNestedField").fieldTypeDefinition(fieldType("Date")).build())
         ).build()));
         criteriaInputs = Arrays.asList(criteriaInput1, criteriaInput2, criteriaInput3, criteriaInput4, criteriaInput5,
             criteriaInput6);
@@ -507,12 +507,12 @@ class DateTimeSearchInputProcessorTest {
 
     private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields,
                                           FieldTypeDefinition collectionFieldType) {
-        FieldTypeDefinition fieldType = new FieldTypeDefinition();
-        fieldType.setId(id);
-        fieldType.setType(type);
-        fieldType.setComplexFields(complexFields);
-        fieldType.setCollectionFieldTypeDefinition(collectionFieldType);
-        return fieldType;
+        return FieldTypeDefinition.builder()
+            .id(id)
+            .type(type)
+            .complexFields(complexFields)
+            .collectionFieldTypeDefinition(collectionFieldType)
+            .build();
     }
 
     private FieldTypeDefinition fieldType(String fieldType) {

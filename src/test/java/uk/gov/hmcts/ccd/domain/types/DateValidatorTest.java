@@ -10,7 +10,6 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -171,7 +170,9 @@ class DateValidatorTest {
         final String validDate = "2001-01-01Z";
         final String invalidDate = "2002-01-01Z";
         final String maxDate = "2001-12-31+01:00";
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMax(date(maxDate)).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition().max(date(maxDate)).build())
+            .build();
 
         final List<ValidationResult> result01 =
             validator.validate(FIELD_ID, NODE_FACTORY.textNode(validDate), caseFieldDefinition);
@@ -194,7 +195,9 @@ class DateValidatorTest {
         final String validDate = "2001-12-31Z";
         final String invalidDate = "2000-01-01Z";
         final String minDate = "2001-01-01Z";
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(date(minDate)).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition().min(date(minDate)).build())
+            .build();
 
         final List<ValidationResult> result01 =
             validator.validate(FIELD_ID, NODE_FACTORY.textNode(validDate), caseFieldDefinition);
@@ -219,9 +222,12 @@ class DateValidatorTest {
         final String invalidMaxDate = "2002-01-01Z";
         final String minDate = "2001-01-01Z";
         final String maxDate = "2001-12-31Z";
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(date(minDate))
-                                               .withMax(date(maxDate))
-                                               .build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(date(minDate))
+                .max(date(maxDate))
+                .build())
+            .build();
 
         final List<ValidationResult> result01 =
             validator.validate(FIELD_ID, NODE_FACTORY.textNode(validDate), caseFieldDefinition);
@@ -248,10 +254,14 @@ class DateValidatorTest {
     void invalidFieldTypeRegEx() {
         final String validDate = "2001-12-10Z";
 
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(date("2001-01-01"))
-                                               .withMax(date("2001-12-10Z"))
-                                               .withRegExp("InvalidRegEx")
-                                               .build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(date("2001-01-01"))
+                .max(date("2001-12-10Z"))
+                .regularExpression("InvalidRegEx")
+                .build())
+            .build();
+
         final List<ValidationResult> result =
             validator.validate(FIELD_ID, NODE_FACTORY.textNode(validDate), caseFieldDefinition);
         assertAll(
@@ -279,7 +289,8 @@ class DateValidatorTest {
     @Test
     void validRegEx() {
         final String validDate = "2001-12-10";
-        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp(LIMITED_REGEX).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().fieldTypeDefinition(defaultFieldDefinition()
+            .regularExpression(LIMITED_REGEX).build()).build();
 
         final List<ValidationResult> result =
             validator.validate(FIELD_ID, NODE_FACTORY.textNode(validDate), caseFieldDefinition);
@@ -295,7 +306,14 @@ class DateValidatorTest {
         }
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(DateValidator.TYPE_ID);
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .type(DateValidator.TYPE_ID);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition().build());
     }
 }

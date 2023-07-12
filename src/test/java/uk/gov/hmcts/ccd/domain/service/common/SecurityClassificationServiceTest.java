@@ -53,7 +53,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
@@ -101,9 +100,9 @@ public class SecurityClassificationServiceTest {
         private static final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
         private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
         private final CaseFieldDefinition testCaseField11 =
-            newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
+            CaseFieldDefinition.builder().id(CASE_FIELD_ID_1_1).securityLabel(SC_PUBLIC).build();
         private final CaseFieldDefinition testCaseField12 =
-            newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
+            CaseFieldDefinition.builder().id(CASE_FIELD_ID_1_2).securityLabel(SC_RESTRICTED).build();
         private final CaseTypeDefinition testCaseTypeDefinition = CaseTypeDefinition.builder()
             .id(CASE_TYPE_ONE)
             .caseFieldDefinitions(List.of(testCaseField11, testCaseField12))
@@ -373,12 +372,14 @@ public class SecurityClassificationServiceTest {
 
         @BeforeEach
         void setUp() throws IOException {
-            CaseEventDefinition createEvent = new CaseEventDefinition();
-            createEvent.setId("createEvent");
-            createEvent.setSecurityClassification(RESTRICTED);
-            CaseEventDefinition updateEvent = new CaseEventDefinition();
-            updateEvent.setId("updateEvent");
-            updateEvent.setSecurityClassification(PRIVATE);
+            CaseEventDefinition createEvent = CaseEventDefinition.builder()
+                .id("createEvent")
+                .securityClassification(RESTRICTED)
+                .build();
+            CaseEventDefinition updateEvent = CaseEventDefinition.builder()
+                .id("updateEvent")
+                .securityClassification(PRIVATE)
+                .build();
             List<CaseEventDefinition> events = Arrays.asList(createEvent, updateEvent);
             caseTypeDefinition = CaseTypeDefinition.builder()
                 .events(events)
@@ -388,8 +389,9 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return classification relevant for event")
         void shouldGetClassificationForEvent() {
-            CaseEventDefinition eventTrigger = new CaseEventDefinition();
-            eventTrigger.setId("createEvent");
+            CaseEventDefinition eventTrigger = CaseEventDefinition.builder()
+                .id("createEvent")
+                .build();
             SecurityClassification result = securityClassificationService.getClassificationForEvent(caseTypeDefinition,
                 eventTrigger);
 
@@ -399,8 +401,9 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should fail to return fields when event not found")
         void shouldThrowRuntimeExceptionIfEventNotFound() {
-            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-            caseEventDefinition.setId("unknown");
+            CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder()
+                .id("unknown")
+                .build();
 
             assertThrows(RuntimeException.class, () ->
                 securityClassificationService.getClassificationForEvent(caseTypeDefinition, caseEventDefinition));

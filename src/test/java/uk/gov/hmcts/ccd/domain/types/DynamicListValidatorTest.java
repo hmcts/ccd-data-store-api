@@ -15,7 +15,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
 
 @DisplayName("DynamicListValidator")
 class DynamicListValidatorTest {
@@ -191,10 +192,20 @@ class DynamicListValidatorTest {
         assertEquals(validator.getType(), BaseType.get(DYNAMIC_LIST), "Type is incorrect");
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(DYNAMIC_LIST)
-            .withDynamicListItem("AAAAAA", "A Value")
-            .withDynamicListItem("BBBBBB", "B Value")
-            .withDynamicListItem("CCCCCC", "C Value");
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .fixedListItemDefinitions(List.of(
+                new FixedListItemDefinition("AAAAAA", "A Value", null),
+                new FixedListItemDefinition("BBBBBB", "B Value", null),
+                new FixedListItemDefinition("CCCCCC", "C Value", null)
+            ))
+            .type(DYNAMIC_LIST);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .build());
     }
 }

@@ -44,8 +44,6 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
@@ -125,34 +123,35 @@ class MergeDataToSearchResultOperationTest {
         caseDetailsList = Arrays.asList(caseDetails1, caseDetails2);
 
         final CaseFieldDefinition fatherName =
-            newCaseField().withId(FATHER_NAME).withFieldType(textFieldType()).build();
+            CaseFieldDefinition.builder().id(FATHER_NAME).fieldTypeDefinition(textFieldType()).build();
         final CaseFieldDefinition motherName =
-            newCaseField().withId(MOTHER_NAME).withFieldType(textFieldType()).build();
+            CaseFieldDefinition.builder().id(MOTHER_NAME).fieldTypeDefinition(textFieldType()).build();
 
         final CaseFieldDefinition addressLine1 =
-            newCaseField().withId(ADDRESS_LINE_1).withFieldType(textFieldType()).build();
-        final CaseFieldDefinition postCode = newCaseField().withId(POSTCODE).withFieldType(textFieldType()).build();
-        final FieldTypeDefinition addressFieldTypeDefinition = aFieldType().withId(FAMILY_ADDRESS).withType(COMPLEX)
-            .withComplexField(addressLine1).withComplexField(postCode).build();
+            CaseFieldDefinition.builder().id(ADDRESS_LINE_1).fieldTypeDefinition(textFieldType()).build();
+        final CaseFieldDefinition postCode = CaseFieldDefinition.builder()
+            .id(POSTCODE).fieldTypeDefinition(textFieldType()).build();
+        final FieldTypeDefinition addressFieldTypeDefinition = FieldTypeDefinition.builder()
+            .id(FAMILY_ADDRESS).type(COMPLEX)
+            .complexFields(List.of(addressLine1, postCode)).build();
         final CaseFieldDefinition familyAddress =
-            newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition).build();
+            CaseFieldDefinition.builder().id(FAMILY_ADDRESS).fieldTypeDefinition(addressFieldTypeDefinition).build();
 
         final FieldTypeDefinition familyDetailsFieldTypeDefinition =
-            aFieldType().withId(FAMILY).withType(COMPLEX)
-                .withComplexField(fatherName)
-                .withComplexField(motherName)
-                .withComplexField(familyAddress)
+            FieldTypeDefinition.builder().id(FAMILY).type(COMPLEX)
+                .complexFields(List.of(fatherName, motherName, familyAddress))
                 .build();
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .id(CASE_TYPE_ID)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build(),
-                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).build(),
-                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType()).build(),
-                newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).build(),
-                newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build(),
-                newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldTypeDefinition).build()
+                CaseFieldDefinition.builder().id(CASE_FIELD_1).fieldTypeDefinition(textFieldType()).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_2).fieldTypeDefinition(textFieldType()).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_3).fieldTypeDefinition(textFieldType()).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_4).fieldTypeDefinition(textFieldType()).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_5).fieldTypeDefinition(textFieldType()).build(),
+                CaseFieldDefinition.builder().id(FAMILY_DETAILS)
+                    .fieldTypeDefinition(familyDetailsFieldTypeDefinition).build()
             ))
             .build();
 
@@ -160,9 +159,9 @@ class MergeDataToSearchResultOperationTest {
         caseTypeDefinitionWithLabels = CaseTypeDefinition.builder()
             .id(CASE_TYPE_ID)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build(),
-                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).build(),
-                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType()).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_1).fieldTypeDefinition(textFieldType()).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_2).fieldTypeDefinition(textFieldType()).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_3).fieldTypeDefinition(textFieldType()).build(),
                 labelField
             ))
             .build();
@@ -532,7 +531,8 @@ class MergeDataToSearchResultOperationTest {
 
         CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = CaseTypeDefinition.builder()
             .id(CASE_TYPE_ID)
-            .caseFieldDefinitions(List.of(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build()))
+            .caseFieldDefinitions(List.of(CaseFieldDefinition.builder().id(CASE_FIELD_1)
+                .fieldTypeDefinition(textFieldType()).build()))
             .build();
         final SearchResultView searchResultView  = classUnderTest.execute(caseTypeWithoutCaseFieldDefinition,
                                                                             searchResult, caseDetailsList, NO_ERROR);
@@ -547,17 +547,17 @@ class MergeDataToSearchResultOperationTest {
     }
 
     private FieldTypeDefinition textFieldType() {
-        return aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build();
+        return FieldTypeDefinition.builder().id(TEXT_TYPE).type(TEXT_TYPE).build();
     }
 
     private CaseFieldDefinition buildLabelCaseField(final String labelId, final String labelText) {
-        final CaseFieldDefinition caseFieldDefinition = newCaseField()
-            .withId(labelId)
-            .withFieldType(aFieldType()
-                .withType(LABEL)
-                .withId(UUID.randomUUID().toString())
+        final CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+            .id(labelId)
+            .fieldTypeDefinition(FieldTypeDefinition.builder()
+                .type(LABEL)
+                .id(UUID.randomUUID().toString())
                 .build())
-            .withFieldLabelText(labelText)
+            .label(labelText)
             .build();
         return caseFieldDefinition;
     }

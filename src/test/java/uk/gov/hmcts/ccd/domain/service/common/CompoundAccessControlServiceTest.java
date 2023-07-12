@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,9 +35,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.p2
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.person1;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.person2;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class CompoundAccessControlServiceTest {
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
@@ -307,22 +306,23 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access if parent and children have ACLs")
         void shouldGrantAccessIfParentAndChildrenHaveAccess() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(true)
-                    .build()));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -340,11 +340,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access if parent and children have ACLs - inherited from parent")
         void shouldGrantAccessIfParentHasAccess() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -360,11 +361,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should be OK with empty fields")
         void shouldBeOKWithEmptyFields() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(List.of(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -380,22 +382,23 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access if parent and required children have ACLs")
         void shouldGrantAccessIfParentAndRequiredChildrenHaveAccess() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(List.of(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(false)
-                    .build()));
+                    .build()))
+                    .complexACLs(asList(
+                        aComplexACL()
+                            .withListElementCode("Addresses")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(true)
+                            .build(),
+                        aComplexACL()
+                            .withListElementCode("Notes")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(false)
+                            .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -411,16 +414,17 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to add new child if child has the required ACLs - existing data")
         void shouldGrantAccessToNewChildIfChildrenHasAccess() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
-            people.setComplexACLs(asList(aComplexACL()
-                .withListElementCode("Addresses")
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(List.of(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .build()))
+                .complexACLs(asList(aComplexACL()
+                    .withListElementCode("Addresses")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -441,16 +445,17 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to add new child if child has the required ACLs - fine grain ACL")
         void shouldGrantAccessToNewChildIfChildrenHasAccessFineGrained() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
-            people.setComplexACLs(asList(aComplexACL()
-                .withListElementCode("Notes.Tags")
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .build()))
+                .complexACLs(asList(aComplexACL()
+                    .withListElementCode("Notes.Tags")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -472,16 +477,17 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access to add new child if child has the required ACLs - fine grain ACL")
         void shouldDenyAccessToNewChildIfChildrenHasAccessFineGrained() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
-            people.setComplexACLs(asList(aComplexACL()
-                .withListElementCode("Notes.Tags")
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(false)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .build()))
+                .complexACLs(asList(aComplexACL()
+                    .withListElementCode("Notes.Tags")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(false)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -503,16 +509,17 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access to add new child if child lacks the required ACLs - existing data")
         void shouldDenyAccessToNewChildIfChildrenHasAccess() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
-            people.setComplexACLs(asList(aComplexACL()
-                .withListElementCode("Addresses")
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(false)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .build()))
+                .complexACLs(asList(aComplexACL()
+                    .withListElementCode("Addresses")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(false)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -533,22 +540,23 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access if a child does not have ACLs")
         void shouldDenyAccessIfParentAndChildrenHaveAccess() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withCreate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Notes")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
-                    .build()));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Notes")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -571,11 +579,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access when nothing changes even when U doesn't exist")
         void shouldGrantAccessWhenNoUpdates() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withUpdate(false)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(false)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -590,11 +599,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access when child field updated and U exists- name change")
         void shouldGrantAccessWhenChildFieldUpdatedAndACLExists() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withUpdate(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -611,7 +621,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access for child field updates when no U - name change")
         void shouldDenyAccessWhenChildFieldUpdatedAndNoACL() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(false)
+                    .build()))
+                .build();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withUpdate(false)
@@ -632,12 +647,13 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access when child field updated and U exists - address.line1 change")
         void shouldGrantAccessWhenChildFieldUpdatedAndACLInheritedFromParent() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .withUpdate(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -657,12 +673,13 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access when a child is updated and U exist - multiple address.line1 change")
         void shouldGrantAccessWhenAChildFieldUpdatedAndACLExist() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .withUpdate(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -685,17 +702,18 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access when a child is updated and U doesn't exist - multiple address.line1 change")
         void shouldDenyAccessWhenChildUpdatedAndNoACL() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(aComplexACL()
-                .withListElementCode("Addresses")
-                .withRole(ROLE_IN_USER_ROLES)
-                .withUpdate(false)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .withUpdate(true)
+                    .build()))
+                .complexACLs(asList(aComplexACL()
+                    .withListElementCode("Addresses")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(false)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -719,19 +737,20 @@ class CompoundAccessControlServiceTest {
         @DisplayName("Should grant access when child nodes same but a new node added C exist and No U - new address "
             + "added")
         void shouldGrantAccessWhenChildNotUpdatedAndOnlyNewChildAdded() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
-                    .withUpdate(false)
-                    .build()));
+                    .withUpdate(true)
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(false)
+                        .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -750,29 +769,30 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access when a child is updated and U exist - fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedAndFineGrainedACLExists() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
                     .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -797,29 +817,30 @@ class CompoundAccessControlServiceTest {
         @DisplayName("Should grant access when a child is updated and U exist, complex child has no initial value - "
             + "fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedFromNullAndFineGrainedACLExists() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
                     .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -843,39 +864,40 @@ class CompoundAccessControlServiceTest {
         @DisplayName("Should grant access when a child is updated and U exist, complex child has null initial value - "
             + "fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedFromNullNodeAndFineGrainedACLExists() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
                     .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.PostCode")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Country")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.PostCode")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Country")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -899,29 +921,30 @@ class CompoundAccessControlServiceTest {
         @DisplayName("Should grant access when a child is updated and U exist, complex child has null final value - "
             + "fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedToNullAndFineGrainedACLExists() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
                     .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -945,29 +968,30 @@ class CompoundAccessControlServiceTest {
         @DisplayName("Should deny access when a child is updated and U doesnot exist, complex child has no initial "
             + "value - fine grained ACL")
         void shouldDenyAccessWhenChildUpdatedFromNullAndFineGrainedACLDoesNotExist() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
                     .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -992,29 +1016,30 @@ class CompoundAccessControlServiceTest {
         @DisplayName("Should deny access when a child is updated and U doesnot exist, complex child has null final "
             + "value - fine grained ACL")
         void shouldDenyAccessWhenChildUpdatedToNullAndFineGrainedACLDoesNotExist() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
                     .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1038,29 +1063,30 @@ class CompoundAccessControlServiceTest {
         @DisplayName("Should grant access when child is not updated and No U exists but 'null' is sent as value - "
             + "READONLY case")
         void shouldGrantAccessWhenChildIsNotUpdatedAndNullValueSent() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
                     .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(false)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(false)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(false)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(false)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1080,29 +1106,30 @@ class CompoundAccessControlServiceTest {
         @DisplayName("Should deny access when a child is updated and No U exist - fine grained ACL Name, address."
             + "line1/2 changes")
         void shouldDenyAccessWhenChildUpdatedAndNoFineGrainedACLExists() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withCreate(true)
-                .withUpdate(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
                     .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line1")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(true)
-                    .build(),
-                aComplexACL()
-                    .withListElementCode("Addresses.Address.Line2")
-                    .withRole(ROLE_IN_USER_ROLES)
-                    .withUpdate(false)
-                    .build()
-            ));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line1")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build(),
+                    aComplexACL()
+                        .withListElementCode("Addresses.Address.Line2")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(false)
+                        .build()
+                ))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1127,23 +1154,23 @@ class CompoundAccessControlServiceTest {
         void shouldNotGrantAccessToFieldWithAclAccessNotGrantedForCollectionOfDocuments() throws IOException {
             CaseTypeDefinition caseType = CaseTypeDefinition.builder()
                 .caseFieldDefinitions(List.of(
-                    newCaseField()
-                        .withId("Documents")
-                        .withFieldType(aFieldType()
-                            .withType(COLLECTION)
-                            .withCollectionFieldType(aFieldType()
-                                .withType(DOCUMENT)
-                                .withId(DOCUMENT)
+                    CaseFieldDefinition.builder()
+                        .id("Documents")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .type(COLLECTION)
+                            .collectionFieldTypeDefinition(FieldTypeDefinition.builder()
+                                .type(DOCUMENT)
+                                .id(DOCUMENT)
                                 .build())
                             .build())
-                        .withOrder(1)
-                        .withAcl(anAcl()
+                        .order(1)
+                        .accessControlLists(List.of(anAcl()
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
                             .withUpdate(false)
                             .withDelete(false)
                             .withRead(true)
-                            .build())
+                            .build()))
                         .build()
                 ))
                 .build();
@@ -1210,11 +1237,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access when a root node is deleted and D exists")
         void shouldGrantAccessWhenRootDeletedAndACLExist() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1229,11 +1257,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access when a root node is deleted and No D")
         void shouldDenyAccessWhenRootDeletedAndNoACL() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(false)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(false)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1248,11 +1277,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access when a child node is deleted and D exists")
         void shouldGrantAccessWhenChildDeletedAndACLExist() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1271,11 +1301,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access when a child node is deleted and No D")
         void shouldDenyAccessWhenChildDeletedAndNoACLExist() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(false)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(false)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1294,17 +1325,18 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access when a child node is deleted and No D - fine grained ACL")
         void shouldDenyAccessWhenChildDeletedAndNoACLExistForChildField() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("Addresses")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
-                    .withDelete(false)
-                    .build()));
+                    .withDelete(true)
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("Addresses")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withDelete(false)
+                        .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1323,16 +1355,17 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to add new child if child has the required ACLs - whole node deleted")
         void shouldGrantAccessToNewChildIfChildrenHasAccessFineGrained() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
-            people.setComplexACLs(asList(aComplexACL()
-                .withListElementCode("Notes.Tags")
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(true)
+                    .build()))
+                .complexACLs(asList(aComplexACL()
+                    .withListElementCode("Notes.Tags")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1354,16 +1387,17 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access to add new child if child has the required ACLs - whole node deleted")
         void shouldDenyAccessToNewChildIfChildrenHasAccessFineGrained() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
-            people.setComplexACLs(asList(aComplexACL()
-                .withListElementCode("Notes.Tags")
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(false)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(true)
+                    .build()))
+                .complexACLs(asList(aComplexACL()
+                    .withListElementCode("Notes.Tags")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(false)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1392,11 +1426,12 @@ class CompoundAccessControlServiceTest {
         @DisplayName("Should grant access when a nested complex child node is deleted and has the required ACLs - whole"
             + " node deleted")
         void shouldGrantAccessWhenNestedComplexChildDeletedAndDeleteACLExists() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1416,17 +1451,18 @@ class CompoundAccessControlServiceTest {
         @DisplayName("Should grant access when a nested complex child node is deleted and has the required fine "
             + "grained ACLs - whole node deleted")
         void shouldGrantAccessWhenNestedComplexChildDeletedAndFineGrainedDeleteACLExists() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
-            people.setComplexACLs(asList(
-                aComplexACL()
-                    .withListElementCode("BirthInfo")
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withDelete(true)
-                    .build()));
+                    .build()))
+                .complexACLs(asList(
+                    aComplexACL()
+                        .withListElementCode("BirthInfo")
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withDelete(true)
+                        .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1445,11 +1481,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should be OK with empty nested complex child in new data")
         void shouldBeOKWithEmptyNestedComplexFieldInNewData() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1468,11 +1505,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should be OK with empty nested complex child in existing data")
         void shouldBeOKWithEmptyNestedComplexFieldInExistingData() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1491,11 +1529,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should be OK with null nested complex child in new data")
         void shouldBeOKWithNullNestedComplexFieldInNewData() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1514,11 +1553,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should be OK with null nested complex child in existing data")
         void shouldBeOKWithNullNestedComplexFieldInExistingData() throws IOException {
-            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
-                .withRole(ROLE_IN_USER_ROLES)
-                .withDelete(true)
-                .build()));
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition()
+                .accessControlLists(asList(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(true)
+                    .build()))
+                .build();
 
             final CaseTypeDefinition caseTypeDefinition = caseTypeDefinitionWithField(people);
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
@@ -1672,19 +1712,18 @@ class CompoundAccessControlServiceTest {
 
         @BeforeEach
         void setup() {
-            note = newCaseField()
-                .withId("Note")
-                .withFieldType(aFieldType()
-                    .withId("NoteComplex")
-                    .withType(COMPLEX)
-                    .withComplexField(newCaseField()
-                        .withId("Txt")
-                        .withFieldType(aFieldType()
-                            .withId("Text")
-                            .withType("Text")
+            note = CaseFieldDefinition.builder()
+                .id("Note")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .id("NoteComplex")
+                    .type(COMPLEX)
+                    .complexFields(List.of(CaseFieldDefinition.builder()
+                        .id("Txt")
+                        .fieldTypeDefinition(FieldTypeDefinition.builder()
+                            .id("Text")
+                            .type("Text")
                             .build())
-                        .build())
-                    .withComplexField(getTagFieldDefinition())
+                        .build(), getTagFieldDefinition()))
                     .build())
                 .build();
             caseTypeDefinition = caseTypeDefinitionWithField(note);

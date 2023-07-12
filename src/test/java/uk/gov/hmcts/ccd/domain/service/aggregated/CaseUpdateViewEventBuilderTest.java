@@ -45,9 +45,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties.CASE_TYPE_ID;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.StartEventResultBuilder.newStartEventTrigger;
 
 class CaseUpdateViewEventBuilderTest {
@@ -59,15 +56,17 @@ class CaseUpdateViewEventBuilderTest {
     private static final Boolean EVENT_TRIGGER_SHOW_SUMMARY = true;
     private static final Boolean EVENT_TRIGGER_SHOW_EVENT_NOTES = false;
     private static final String CASE_REFERENCE = "1234567891012345";
-    private final CaseEventDefinition caseEventDefinition = newCaseEvent()
-        .withId(EVENT_TRIGGER_ID)
-        .withName(EVENT_TRIGGER_NAME)
-        .withDescription(EVENT_TRIGGER_DESCRIPTION)
-        .withShowSummary(EVENT_TRIGGER_SHOW_SUMMARY)
-        .withShowEventNotes(EVENT_TRIGGER_SHOW_EVENT_NOTES)
+    private final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder()
+        .id(EVENT_TRIGGER_ID)
+        .name(EVENT_TRIGGER_NAME)
+        .description(EVENT_TRIGGER_DESCRIPTION)
+        .showSummary(EVENT_TRIGGER_SHOW_SUMMARY)
+        .showEventNotes(EVENT_TRIGGER_SHOW_EVENT_NOTES)
         .build();
-    private final List<CaseEventDefinition> events = Lists.newArrayList(newCaseEvent().build());
-    private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList(newCaseField().build());
+    private final List<CaseEventDefinition> events = Lists.newArrayList(CaseEventDefinition.builder().build());
+    private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList(
+        CaseFieldDefinition.builder().build()
+    );
     private final List<CaseEventFieldDefinition> eventFields = Lists.newArrayList();
     private final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
         .id(CASE_TYPE_ID)
@@ -81,7 +80,10 @@ class CaseUpdateViewEventBuilderTest {
     private final List<CaseViewField> viewFields = Lists.newArrayList();
     private static final String STATE_ID = "STATE_ID";
     private static final String TITLE_DISPLAY = "titleDisplay";
-    private final CaseStateDefinition caseStateDefinition = newState().withId(STATE_ID).build();
+    private final CaseStateDefinition caseStateDefinition = CaseStateDefinition.builder()
+        .id(STATE_ID)
+        .titleDisplay(TITLE_DISPLAY)
+        .build();
 
     private static final String SUPPLEMENTARY_DATA_FIELD_1 = "Supplementary data field 1";
     private static final String SUPPLEMENTARY_DATA_FIELD_2 = "Supplementary data field 2";
@@ -115,7 +117,6 @@ class CaseUpdateViewEventBuilderTest {
         when(caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails.getData()))
             .thenReturn(viewFields);
         caseDetails.setState(STATE_ID);
-        caseStateDefinition.setTitleDisplay(TITLE_DISPLAY);
         when(caseTypeService.findState(caseTypeDefinition, STATE_ID)).thenReturn(caseStateDefinition);
 
         caseUpdateViewEventBuilder = new CaseUpdateViewEventBuilder(caseDefinitionRepository,

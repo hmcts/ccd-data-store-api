@@ -168,8 +168,9 @@ class SubmitCaseTransactionTest {
     }
 
     private CaseStateDefinition buildState() {
-        final CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
-        caseStateDefinition.setName(STATE_NAME);
+        final CaseStateDefinition caseStateDefinition = CaseStateDefinition.builder()
+            .name(STATE_NAME)
+            .build();
         return caseStateDefinition;
     }
 
@@ -341,9 +342,11 @@ class SubmitCaseTransactionTest {
     }
 
     private CaseEventDefinition buildEventTrigger() {
-        final CaseEventDefinition event = new CaseEventDefinition();
-        event.setId(EVENT_ID);
-        event.setName(EVENT_NAME);
+        final CaseEventDefinition event = CaseEventDefinition
+            .builder()
+            .id(EVENT_ID)
+            .name(EVENT_NAME)
+            .build();
         return event;
     }
 

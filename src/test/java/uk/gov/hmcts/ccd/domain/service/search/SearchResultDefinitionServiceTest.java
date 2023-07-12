@@ -6,8 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 import java.util.Arrays;
@@ -26,9 +28,6 @@ import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.SE
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class SearchResultDefinitionServiceTest {
 
@@ -38,15 +37,15 @@ class SearchResultDefinitionServiceTest {
     private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
     private static final String CASE_FIELD_ID_1_3_NESTED = "NESTED_FIELD_1";
-    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1)
-        .withCaseTypeId(CASE_TYPE_ID).withFieldLabelText("Label1").withMetadata(true).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2)
-        .withCaseTypeId(CASE_TYPE_ID).withFieldLabelText("Label2").withMetadata(true).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3)
-        .withCaseTypeId(CASE_TYPE_ID).withFieldLabelText("Label3").withMetadata(false).withFieldType(
-            aFieldType().withType("Complex").withComplexField(
-                newCaseField().withId(CASE_FIELD_ID_1_3_NESTED).withCaseTypeId(CASE_TYPE_ID)
-                    .withFieldLabelText("NestedLabel3").build()
+    private static final CaseFieldDefinition CASE_FIELD_1_1 = CaseFieldDefinition.builder().id(CASE_FIELD_ID_1_1)
+        .caseTypeId(CASE_TYPE_ID).label("Label1").metadata(true).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_2 = CaseFieldDefinition.builder().id(CASE_FIELD_ID_1_2)
+        .caseTypeId(CASE_TYPE_ID).label("Label2").metadata(true).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_3 = CaseFieldDefinition.builder().id(CASE_FIELD_ID_1_3)
+        .caseTypeId(CASE_TYPE_ID).label("Label3").metadata(false).fieldTypeDefinition(
+            FieldTypeDefinition.builder().type("Complex").complexFields(List.of(
+                CaseFieldDefinition.builder().id(CASE_FIELD_ID_1_3_NESTED).caseTypeId(CASE_TYPE_ID)
+                    .label("NestedLabel3").build())
             ).build()
         ).build();
     private static final String ORG_CASES = "ORGCASES";
@@ -68,7 +67,7 @@ class SearchResultDefinitionServiceTest {
             .caseFieldDefinitions(List.of(
                 CASE_FIELD_1_1, CASE_FIELD_1_2, CASE_FIELD_1_3
             ))
-            .events(List.of(newCaseEvent().withId(EVENT_ID).withCanSaveDraft(true).build()))
+            .events(List.of(CaseEventDefinition.builder().id(EVENT_ID).canSaveDraft(true).build()))
             .build();
     }
 

@@ -79,8 +79,12 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
 
     @Test
     void testShouldTransformOne() {
-        final CategoryDefinition categoryDefinition =
-            new CategoryDefinition("Cat-1", "Cat-1", null, null, null, 1, "");
+        final CategoryDefinition categoryDefinition = CategoryDefinition.builder()
+            .categoryId("Cat-1")
+            .categoryLabel("Cat-1")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
         final List<CategoryDefinition> categoryDefinitions = provideCategoryDefinitions();
         final Category expectedCategory = getCategory1();
 
@@ -112,8 +116,12 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
     void testShouldResolveDocumentCategory(final String categoryOnDocument,
                                            final String categoryOnFieldDefinition,
                                            final String expectedCategory) {
-        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
-            "document-cat", "", null, null, 1, "");
+        CategoryDefinition categoryDefinition =  CategoryDefinition.builder()
+            .categoryId("document-cat")
+            .parentCategoryId("")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
         final String result = underTest.resolveDocumentCategory(categoryOnDocument, categoryOnFieldDefinition,
             asList(categoryDefinition));
 
@@ -138,8 +146,13 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
     void testShouldTransformDocument(final CaseFieldMetadata caseFieldExtract,
                final Tuple2<String, Map<String, String>> documentNode,
                final Document expectedDocument) throws Exception {
-        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
-            "document-cat", "", null, null, 1, "");
+        CategoryDefinition categoryDefinition = CategoryDefinition.builder()
+            .categoryId("document-cat")
+            .parentCategoryId("")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
+
         final Map<String, JsonNode> caseData =
             loadCaseDataFromJson(String.format("tests/%s", "CaseDataExtractorDocumentData.json"));
         doReturn(documentNode).when(fileViewDocumentService).getDocumentNode(caseFieldExtract.getPath(), caseData);
@@ -166,8 +179,15 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
         final Map<String, JsonNode> caseData =
             loadCaseDataFromJson(String.format("tests/%s", "CaseDataExtractorDocumentData.json"));
         doReturn(documentNode).when(fileViewDocumentService).getDocumentNode(caseFieldExtract.getPath(), caseData);
-        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
-            "document-cat", "", null, null, 1, "");
+
+        CategoryDefinition categoryDefinition =  CategoryDefinition.builder()
+            .categoryId("document-cat")
+            .categoryLabel("document-cat")
+            .parentCategoryId("")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
+
         final Tuple2<String, Optional<Document>> actualResult = underTest.transformDocument(caseFieldExtract, caseData,
             asList(categoryDefinition));
         assertThat(actualResult).isNull();
@@ -194,8 +214,14 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
             .extractFieldTypePaths(caseData, caseFieldDefinitions, documentType);
         primeFileViewDocumentServiceForDocumentDictionary(caseData);
 
-        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
-            "document-cat", "", null, null, 1, "");
+
+        CategoryDefinition categoryDefinition =  CategoryDefinition.builder()
+            .categoryId("document-cat")
+            .categoryLabel("document-cat")
+            .parentCategoryId("")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
         final Map<String, List<Document>> results =
             underTest.buildCategorisedDocumentDictionary(caseData, caseFieldDefinitions, asList(categoryDefinition));
 
@@ -397,20 +423,73 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
     }
 
     private List<CategoryDefinition> provideRootCategoryDefinitions() {
-        final CategoryDefinition cat1 = new CategoryDefinition("Cat-1", "Cat-1", null, null, null, 1, "");
-        final CategoryDefinition cat4 = new CategoryDefinition("Cat-4", "Cat-4", null, null, null, 1, "");
+        CategoryDefinition cat1 =  CategoryDefinition.builder()
+            .categoryId("Cat-1")
+            .categoryLabel("Cat-1")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
+
+        CategoryDefinition cat4 =  CategoryDefinition.builder()
+            .categoryId("Cat-4")
+            .categoryLabel("Cat-4")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
 
         return List.of(cat1, cat4);
     }
 
     private List<CategoryDefinition> provideCategoryDefinitions() {
         final List<CategoryDefinition> rootCategoryDefinitions = provideRootCategoryDefinitions();
-        final CategoryDefinition cat2 = new CategoryDefinition("Cat-2", "Cat-2", "Cat-1", null, null, 1, "");
-        final CategoryDefinition cat3 = new CategoryDefinition("Cat-3", "Cat-3", "Cat-2", null, null, 1, "");
-        final CategoryDefinition cat5 = new CategoryDefinition("Cat-5", "Cat-5", "Cat-4", null, null, 1, "");
-        final CategoryDefinition cat6 = new CategoryDefinition("Cat-6", "Cat-6", "Cat-4", null, null, 1, "");
-        final CategoryDefinition cat7 = new CategoryDefinition("Cat-7", "Cat-7", "Cat-6", null, null, 1, "");
-        final CategoryDefinition cat8 = new CategoryDefinition("Cat-8", "Cat-8", "Cat-6", null, null, 1, "");
+
+        CategoryDefinition cat2 =  CategoryDefinition.builder()
+            .categoryId("Cat-2")
+            .categoryLabel("Cat-2")
+            .parentCategoryId("Cat-1")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
+
+        CategoryDefinition cat3 =  CategoryDefinition.builder()
+            .categoryId("Cat-3")
+            .categoryLabel("Cat-3")
+            .parentCategoryId("Cat-2")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
+
+        CategoryDefinition cat5 =  CategoryDefinition.builder()
+            .categoryId("Cat-5")
+            .categoryLabel("Cat-5")
+            .parentCategoryId("Cat-4")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
+
+        CategoryDefinition cat6 =  CategoryDefinition.builder()
+            .categoryId("Cat-6")
+            .categoryLabel("Cat-6")
+            .parentCategoryId("Cat-4")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
+
+        CategoryDefinition cat7 =  CategoryDefinition.builder()
+            .categoryId("Cat-7")
+            .categoryLabel("Cat-7")
+            .parentCategoryId("Cat-6")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
+
+        CategoryDefinition cat8 =  CategoryDefinition.builder()
+            .categoryId("Cat-8")
+            .categoryLabel("Cat-8")
+            .parentCategoryId("Cat-6")
+            .displayOrder(1)
+            .caseTypeId("")
+            .build();
 
         return Stream.of(rootCategoryDefinitions, List.of(cat2, cat3, cat5, cat6, cat7, cat8))
             .flatMap(Collection::stream)

@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -57,10 +58,8 @@ import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 public class DefaultStartEventOperationTest {
 
@@ -235,10 +234,10 @@ public class DefaultStartEventOperationTest {
     private final CaseDetails caseDetails = newCaseDetails().withData(null).build();
     private final CaseTypeDefinition caseTypeDefinition = CaseTypeDefinition.builder()
         .id(TEST_CASE_TYPE_ID)
-        .jurisdictionDefinition(newJurisdiction().withJurisdictionId(TEST_JURISDICTION_ID).build())
+        .jurisdictionDefinition(JurisdictionDefinition.builder().id(TEST_JURISDICTION_ID).build())
         .build();
-    private final CaseEventDefinition caseEventDefinition = newCaseEvent().withTTLIncrement(TTL_INCREMENT)
-        .withCaseFields(
+    private final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder().ttlIncrement(TTL_INCREMENT)
+        .caseFields(
             Arrays.asList(newCaseEventField()
                           .withCaseFieldId("ChangeOrganisationRequestField")
                           .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()

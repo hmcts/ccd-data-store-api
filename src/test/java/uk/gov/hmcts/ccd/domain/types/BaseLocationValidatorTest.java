@@ -10,8 +10,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,8 +55,13 @@ class BaseLocationValidatorTest {
         textValidator = new TextValidator();
         validator = new BaseLocationValidator(textValidator);
 
-        caseFieldDefinition = caseField().withMin(5)
-            .withMax(10)
+        caseFieldDefinition = caseField()
+            .fieldTypeDefinition(
+                defaultFieldDefinition()
+                    .min(new BigDecimal(5))
+                    .max(new BigDecimal(10))
+                    .build()
+            )
             .build();
     }
 
@@ -101,9 +107,15 @@ class BaseLocationValidatorTest {
     @Test
     @DisplayName("should test exact length when min and max are equal")
     void baseLocationFieldWithSameMinMax() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5)
-            .withMax(5)
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(
+                defaultFieldDefinition()
+                    .min(new BigDecimal(5))
+                    .max(new BigDecimal(5))
+                    .build()
+            )
             .build();
+
         final JsonNode valid_value = NODE_FACTORY.textNode("12345");
         final List<ValidationResult> validMinMaxResults =
             validator.validate(FIELD_ID, valid_value, caseFieldDefinition);
@@ -127,7 +139,8 @@ class BaseLocationValidatorTest {
     @Test
     @DisplayName("should test against regular expression")
     void baseLocationRegex() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().fieldTypeDefinition(
+            defaultFieldDefinition().regularExpression("\\d{4}-\\d{2}-\\d{2}").build()).build();
         final JsonNode validValue = NODE_FACTORY.textNode("1234-56-78");
         final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
 
@@ -161,7 +174,14 @@ class BaseLocationValidatorTest {
         assertThat(validationResult, hasSize(0));
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(BaseLocationValidator.TYPE_ID);
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .type(BaseLocationValidator.TYPE_ID);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition().build());
     }
 }

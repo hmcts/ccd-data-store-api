@@ -181,10 +181,11 @@ public class CaseDataExtractor {
                 log.debug("Ignoring Unknown Type:" + fieldTypeDefinition.getType() + " " + itemFieldId);
                 return Collections.emptyList();
             }
-            final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-            caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
-            caseFieldDefinition.setId(index);
-            caseFieldDefinition.setCategoryId(categoryId);
+            final CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+                .fieldTypeDefinition(fieldTypeDefinition)
+                .id(index)
+                .categoryId(categoryId)
+                .build();
 
             return simpleCaseTypeMetadataExtractor.extractCaseFieldData(
                     nodeEntry,

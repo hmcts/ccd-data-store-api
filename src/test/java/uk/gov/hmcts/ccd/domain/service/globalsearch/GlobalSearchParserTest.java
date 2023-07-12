@@ -39,8 +39,6 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPL
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class GlobalSearchParserTest {
 
@@ -87,8 +85,9 @@ class GlobalSearchParserTest {
         parties = List.of(party);
         doReturn(USER_ACCESS_PROFILES).when(caseDataAccessControl).generateAccessProfilesByCaseDetails(any());
 
-        jurisdiction = new JurisdictionDefinition();
-        jurisdiction.setId(JURISDICTION);
+        jurisdiction = JurisdictionDefinition.builder()
+            .id(JURISDICTION)
+            .build();
 
         caseTypeDefinition1 = CaseTypeDefinition.builder()
             .id(CASE_TYPE_ID_1)
@@ -99,28 +98,29 @@ class GlobalSearchParserTest {
                 .build()))
             .securityClassification(SecurityClassification.PUBLIC)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId("caseManagementLocation")
-                    .withSC(SecurityClassification.PUBLIC.name())
-                    .withFieldType(
-                        aFieldType()
-                            .withId("caseManagementLocation")
-                            .withType(COMPLEX)
-                            .withComplexField(complexField("region", TEXT,
-                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
-                            .withComplexField(complexField("baseLocation", TEXT,
-                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
+                CaseFieldDefinition.builder().id("caseManagementLocation")
+                    .securityLabel(SecurityClassification.PUBLIC.name())
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id("caseManagementLocation")
+                            .type(COMPLEX)
+                            .complexFields(List.of(
+                                complexField("region", TEXT, SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true),
+                                        complexField("baseLocation", TEXT,
+                                            SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true)
+                                    ))
                             .build())
                     .build(),
-                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                    .withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_2).fieldTypeDefinition(textFieldType())
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                    .withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_3).fieldTypeDefinition(textFieldType())
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build()
+                        .build())).build()
             ))
             .build();
 
@@ -133,28 +133,28 @@ class GlobalSearchParserTest {
                 .build()))
             .securityClassification(SecurityClassification.PUBLIC)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId("caseManagementLocation")
-                    .withSC(SecurityClassification.PUBLIC.name())
-                    .withFieldType(
-                        aFieldType()
-                            .withId("caseManagementLocation")
-                            .withType(COMPLEX)
-                            .withComplexField(complexField("region", TEXT,
-                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, false))
-                            .withComplexField(complexField("baseLocation", TEXT,
-                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
+                CaseFieldDefinition.builder().id("caseManagementLocation")
+                    .securityLabel(SecurityClassification.PUBLIC.name())
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id("caseManagementLocation")
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField("region", TEXT,
+                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, false),
+                                        complexField("baseLocation", TEXT,
+                                            SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true)))
                             .build())
                     .build(),
-                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                    .withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_2).fieldTypeDefinition(textFieldType())
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                    .withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_3).fieldTypeDefinition(textFieldType())
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build()
+                        .build())).build()
             ))
             .build();
 
@@ -169,28 +169,28 @@ class GlobalSearchParserTest {
             ))
             .securityClassification(SecurityClassification.PUBLIC)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId("caseManagementLocation")
-                    .withSC(SecurityClassification.PUBLIC.name())
-                    .withFieldType(
-                        aFieldType()
-                            .withId("caseManagementLocation")
-                            .withType(COMPLEX)
-                            .withComplexField(complexField("region", TEXT,
-                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
-                            .withComplexField(complexField("baseLocation", TEXT,
-                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
+                CaseFieldDefinition.builder().id("caseManagementLocation")
+                    .securityLabel(SecurityClassification.PUBLIC.name())
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id("caseManagementLocation")
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField("region", TEXT,
+                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true),
+                                        complexField("baseLocation", TEXT,
+                                            SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true)))
                             .build())
                     .build(),
-                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                    .withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_2).fieldTypeDefinition(textFieldType())
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                    .withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_3).fieldTypeDefinition(textFieldType())
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build()
+                        .build())).build()
             ))
             .build();
 
@@ -205,28 +205,28 @@ class GlobalSearchParserTest {
             ))
             .securityClassification(SecurityClassification.PUBLIC)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId("caseManagementLocation")
-                    .withSC(SecurityClassification.PUBLIC.name())
-                    .withFieldType(
-                        aFieldType()
-                            .withId("caseManagementLocation")
-                            .withType(COMPLEX)
-                            .withComplexField(complexField("region", TEXT,
-                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, false))
-                            .withComplexField(complexField("baseLocation", TEXT,
-                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
+                CaseFieldDefinition.builder().id("caseManagementLocation")
+                    .securityLabel(SecurityClassification.PUBLIC.name())
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id("caseManagementLocation")
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField("region", TEXT,
+                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, false),
+                                        complexField("baseLocation", TEXT,
+                                            SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true)))
                             .build())
                     .build(),
-                newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                    .withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_2).fieldTypeDefinition(textFieldType())
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build(),
-                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                    .withAcl(anAcl()
+                        .build())).build(),
+                CaseFieldDefinition.builder().id(CASE_FIELD_3).fieldTypeDefinition(textFieldType())
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build()
+                        .build())).build()
             ))
             .build();
 
@@ -241,35 +241,35 @@ class GlobalSearchParserTest {
             ))
             .securityClassification(SecurityClassification.RESTRICTED)
             .caseFieldDefinitions(List.of(
-                newCaseField().withId("caseManagementLocation")
-                    .withSC(SecurityClassification.PUBLIC.name())
-                    .withFieldType(
-                        aFieldType()
-                            .withId("caseManagementLocation")
-                            .withType(COMPLEX)
-                            .withComplexField(complexField("region", TEXT,
-                                SecurityClassification.RESTRICTED, ROLE_IN_USER_ROLE_1, true))
-                            .withComplexField(complexField("baseLocation", TEXT,
-                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
+                CaseFieldDefinition.builder().id("caseManagementLocation")
+                    .securityLabel(SecurityClassification.PUBLIC.name())
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id("caseManagementLocation")
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField("region", TEXT,
+                                SecurityClassification.RESTRICTED, ROLE_IN_USER_ROLE_1, true),
+                                        complexField("baseLocation", TEXT,
+                                            SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true)))
                             .build())
                     .build(),
-                newCaseField().withId("searchCriteria")
-                    .withSC(SecurityClassification.PUBLIC.name())
-                    .withFieldType(
-                        aFieldType()
-                            .withId("searchCriteria")
-                            .withType(COMPLEX)
-                            .withComplexField(complexField("OtherCaseReferences", TEXT,
-                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
-                            .withComplexField(complexField("SearchParties", TEXT,
-                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, false))
+                CaseFieldDefinition.builder().id("searchCriteria")
+                    .securityLabel(SecurityClassification.PUBLIC.name())
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id("searchCriteria")
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField("OtherCaseReferences", TEXT,
+                                SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true),
+                                        complexField("SearchParties", TEXT,
+                                            SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, false)))
                             .build())
                     .build(),
-                newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                    .withAcl(anAcl()
+                CaseFieldDefinition.builder().id(CASE_FIELD_3).fieldTypeDefinition(textFieldType())
+                    .accessControlLists(List.of(anAcl()
                         .withRole(ROLE_IN_USER_ROLE_1)
                         .withRead(true)
-                        .build()).build()
+                        .build())).build()
             ))
             .build();
 
@@ -456,7 +456,7 @@ class GlobalSearchParserTest {
     }
 
     private FieldTypeDefinition textFieldType() {
-        return aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build();
+        return FieldTypeDefinition.builder().id(TEXT_TYPE).type(TEXT_TYPE).build();
     }
 
     private CaseFieldDefinition complexField(String id,
@@ -464,21 +464,21 @@ class GlobalSearchParserTest {
                                              SecurityClassification securityClassification,
                                              String user,
                                              Boolean readAccess) {
-        return newCaseField()
-            .withId(id)
-            .withFieldType(fieldType(type))
-            .withSC(securityClassification.name())
-            .withAcl(anAcl()
+        return CaseFieldDefinition.builder()
+            .id(id)
+            .fieldTypeDefinition(fieldType(type))
+            .securityLabel(securityClassification.name())
+            .accessControlLists(List.of(anAcl()
                 .withRole(user)
                 .withRead(readAccess)
-                .build())
+                .build()))
             .build();
     }
 
     private FieldTypeDefinition fieldType(String type) {
-        return aFieldType()
-            .withId(type)
-            .withType(type)
+        return FieldTypeDefinition.builder()
+            .id(type)
+            .type(type)
             .build();
     }
 

@@ -9,8 +9,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -106,7 +107,8 @@ class PostCodeValidatorTest {
 
     @Test
     void checkFieldRegex() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("^[0-9]*$").build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().fieldTypeDefinition(defaultFieldDefinition()
+            .regularExpression("^[0-9]*$").build()).build();
         final List<ValidationResult> validResult = validator.validate(FIELD_ID,
                                                                       NODE_FACTORY.textNode("123456789"),
             caseFieldDefinition);
@@ -130,7 +132,10 @@ class PostCodeValidatorTest {
 
     @Test
     void testInvalidMin() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal(5))
+                .build()).build();
         final JsonNode invalidMin = NODE_FACTORY.textNode("Test");
 
         final List<ValidationResult> validationResults = validator.validate(FIELD_ID, invalidMin, caseFieldDefinition);
@@ -141,7 +146,10 @@ class PostCodeValidatorTest {
 
     @Test
     void testInvalidMax() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMax(6).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .max(new BigDecimal(6))
+                .build()).build();
         final JsonNode invalidMax = NODE_FACTORY.textNode("Test Test Test");
 
         final List<ValidationResult> validationResults = validator.validate(FIELD_ID, invalidMax, caseFieldDefinition);
@@ -152,9 +160,11 @@ class PostCodeValidatorTest {
 
     @Test
     void testValidMinMaxButNoRegExChecks() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5)
-                                               .withMax(6)
-                                               .build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal(5))
+                .max(new BigDecimal(6))
+                .build()).build();
         // Disable regular expression checks
         when(postcodeBaseType.getRegularExpression()).thenReturn("^.*$");
 
@@ -233,7 +243,14 @@ class PostCodeValidatorTest {
         assertThat(result, empty());
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(PostCodeValidator.TYPE_ID);
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .type(PostCodeValidator.TYPE_ID);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition().build());
     }
 }

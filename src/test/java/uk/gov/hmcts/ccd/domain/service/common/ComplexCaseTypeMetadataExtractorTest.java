@@ -72,12 +72,14 @@ class ComplexCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadata
 
     @Test
     void testShouldEvaluatePathWithFieldIdPrefix() {
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setId(FIELD_TYPE_ID);
-        fieldTypeDefinition.setType("Type-1");
+        FieldTypeDefinition fieldTypeDefinition = FieldTypeDefinition.builder()
+            .id(FIELD_TYPE_ID)
+            .type("Type-1")
+            .build();
         fieldTypeDefinition.setComplexFields(emptyList());
-        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+        CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+            .fieldTypeDefinition(fieldTypeDefinition)
+            .build();
 
         final CaseFieldMetadataExtractor.RecursionParams recursionParams =
             new CaseFieldMetadataExtractor.RecursionParams(

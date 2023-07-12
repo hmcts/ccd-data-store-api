@@ -255,9 +255,10 @@ public class CreateCaseEventService {
                                                        final String categoryId,
                                                        Event event) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
-        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("DocumentUpdated");
-        caseEventDefinition.setName("Update Document Category Id");
+        final CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder()
+            .id("DocumentUpdated")
+            .name("Update Document Category Id")
+            .build();
         caseDetails.setLastModified(now());
 
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());

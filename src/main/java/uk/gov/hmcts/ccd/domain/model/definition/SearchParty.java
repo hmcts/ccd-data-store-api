@@ -1,24 +1,31 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@Data
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@Value
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(force = true, access = AccessLevel.PACKAGE)
 public class SearchParty implements Serializable {
 
-    private String caseTypeId;
-    private String searchPartyDob;
-    private String searchPartyDod;
-    private String searchPartyPostCode;
-    private String searchPartyAddressLine1;
-    private String searchPartyEmailAddress;
-    private Date liveFrom;
-    private Date liveTo;
-    private String searchPartyName;
-    private String searchPartyCollectionFieldName;
+    String caseTypeId;
+    String searchPartyDob;
+    String searchPartyDod;
+    String searchPartyPostCode;
+    String searchPartyAddressLine1;
+    String searchPartyEmailAddress;
+    Date liveFrom;
+    Date liveTo;
+    String searchPartyName;
+    String searchPartyCollectionFieldName;
 }

@@ -136,9 +136,10 @@ public class CallbackInvoker {
         String url = caseTypeDefinition.getCallbackGetCaseUrl();
         List<Integer> retries = caseTypeDefinition.getRetriesGetCaseUrl();
 
-        CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setId("GetCaseCallback");
-        caseEventDefinition.setName("GetCaseCallback");
+        CaseEventDefinition caseEventDefinition = CaseEventDefinition.builder()
+            .id("GetCaseCallback")
+            .name("GetCaseCallback")
+            .build();
 
         ResponseEntity<GetCaseCallbackResponse> getCaseCallbackResponseEntity;
         if (isRetriesDisabled(retries)) {

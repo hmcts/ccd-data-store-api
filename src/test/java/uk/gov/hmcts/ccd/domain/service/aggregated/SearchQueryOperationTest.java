@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
@@ -54,8 +55,6 @@ import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.Search
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 
 class SearchQueryOperationTest {
     private static final String CASE_TYPE_ID = "GrantOnly";
@@ -64,9 +63,12 @@ class SearchQueryOperationTest {
     private static final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
     private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
-    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_1 = CaseFieldDefinition.builder()
+        .id(CASE_FIELD_ID_1_1).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_2 = CaseFieldDefinition.builder()
+        .id(CASE_FIELD_ID_1_2).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_3 = CaseFieldDefinition.builder()
+        .id(CASE_FIELD_ID_1_3).build();
     private static final String DRAFT_ID = "1";
     private static final String CASE_FIELD_2 = "Case field 2";
     private static final String SEARCH_VIEW = "SEARCH";
@@ -104,6 +106,7 @@ class SearchQueryOperationTest {
     private List<CaseDetails> drafts = Lists.newArrayList();
     private List<CaseDetails> cases = Lists.newArrayList();
     private CaseTypeDefinition testCaseTypeDefinition;
+    private CaseTypeDefinition.CaseTypeDefinitionBuilder testCaseTypeDefinitionBuilder;
 
     @Captor
     private ArgumentCaptor<List<CaseDetails>> argument;
@@ -112,15 +115,14 @@ class SearchQueryOperationTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseTypeDefinition = CaseTypeDefinition.builder()
+        testCaseTypeDefinitionBuilder = CaseTypeDefinition.builder()
             .id(CASE_TYPE_ID)
             .caseFieldDefinitions(List.of(CASE_FIELD_1_1, CASE_FIELD_1_2, CASE_FIELD_1_3))
-            .events(List.of(newCaseEvent().withId(EVENT_ID).withCanSaveDraft(true).build()))
+            .events(List.of(CaseEventDefinition.builder().id(EVENT_ID).canSaveDraft(true).build()));
+
+        testCaseTypeDefinition = testCaseTypeDefinitionBuilder
             .build();
 
-        Optional<CaseTypeDefinition> testCaseTypeOpt = Optional.of(testCaseTypeDefinition);
-
-        doReturn(testCaseTypeOpt).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
         searchQueryOperation = new SearchQueryOperation(searchOperation,
             mergeDataToSearchResultOperation,
             getCaseTypeOperation,
@@ -147,9 +149,16 @@ class SearchQueryOperationTest {
         cases.add(newCaseDetails().build());
     }
 
+    private void setupMocks() {
+        Optional<CaseTypeDefinition> testCaseTypeOpt = Optional.of(testCaseTypeDefinition);
+
+        doReturn(testCaseTypeOpt).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
+    }
+
     @Test
     @DisplayName("should search using search operation")
     void shouldSearchUsingSearchOperation() {
+        setupMocks();
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
         assertAll(
@@ -163,6 +172,7 @@ class SearchQueryOperationTest {
     @Test
     @DisplayName("should include drafts if drafts enabled and if drafts are present")
     void shouldIncludeDrafts() {
+        setupMocks();
         doReturn(drafts).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
 
@@ -182,7 +192,11 @@ class SearchQueryOperationTest {
     @Test
     @DisplayName("should not call draft-store if drafts are not enabled")
     void shouldNotCallDraftStore() {
-        testCaseTypeDefinition.getEvents().get(0).setCanSaveDraft(false);
+        testCaseTypeDefinition = testCaseTypeDefinitionBuilder
+            .events(List.of(CaseEventDefinition.builder().id(EVENT_ID).canSaveDraft(false).build()))
+            .build();
+        setupMocks();
+
         doReturn(drafts).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
 
@@ -202,6 +216,7 @@ class SearchQueryOperationTest {
     @Test
     @DisplayName("should not call draft-store for actual Search")
     void shouldNotCallDraftStoreForSearch() {
+        setupMocks();
         doReturn(drafts).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
 
@@ -221,6 +236,7 @@ class SearchQueryOperationTest {
     @Test
     @DisplayName("should return cases and resultError but not drafts when draft store unresponsive")
     void shouldReturnCasesAndResultErrorButNoDraftsWhenDraftStoreUnresponsive() {
+        setupMocks();
         DraftAccessException draftAccessException = new DraftAccessException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         doThrow(draftAccessException).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
@@ -238,6 +254,7 @@ class SearchQueryOperationTest {
     @Test
     @DisplayName("should return empty when caseType is not found")
     void shouldReturnEmptyNoCaseTypeFound() {
+        setupMocks();
         doReturn(Optional.empty()).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
@@ -252,6 +269,7 @@ class SearchQueryOperationTest {
     @Test
     @DisplayName("should get workBasketResult and pass to mergeDataToSearchResultOperation")
     void shouldGetWorkBasketResultAndMerge() {
+        setupMocks();
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
@@ -269,6 +287,7 @@ class SearchQueryOperationTest {
     @Test
     @DisplayName("should get searchResult and pass to mergeDataToSearchResultOperation")
     void shouldGetSearchResultsAndMerge() {
+        setupMocks();
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
@@ -285,6 +304,7 @@ class SearchQueryOperationTest {
     @Test
     @DisplayName("should build sortOrderFields from sort search results fields only")
     void shouldBuildSortOrderFieldsFromSortResultsFieldsOnly() {
+        setupMocks();
         SearchResultField nonSortField = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", "");
         SearchResultField sortField = buildSortResultField(CASE_FIELD_2, "", null, ASC, 1);
         SearchResultDefinition searchResult = searchResult()
@@ -305,6 +325,7 @@ class SearchQueryOperationTest {
     @Test
     @DisplayName("should build sortOrderFields based on priority order")
     void shouldBuildSortOrderFieldsInTheOrderOfPriority() {
+        setupMocks();
         SearchResultField sortField1 = buildSortResultField(CASE_FIELD_ID_1_1, "", null, ASC, 2);
         SearchResultField sortField2 = buildSortResultField(CASE_FIELD_ID_1_2, "", null, DESC, 1);
         SearchResultDefinition searchResult = searchResult()
@@ -326,6 +347,7 @@ class SearchQueryOperationTest {
     @Test
     @DisplayName("should build sortOrderFields based on user role")
     void shouldFilterSortOrderFieldsBasedOnUserRole() {
+        setupMocks();
         SearchResultField sortField1 = buildSortResultField(CASE_FIELD_ID_1_1, "", USER_ROLE_1, ASC, 2);
         SearchResultField sortField2 = buildSortResultField(CASE_FIELD_ID_1_2, CASE_FIELD_PATH, USER_ROLE_2, DESC, 1);
         SearchResultDefinition searchResult = searchResult()

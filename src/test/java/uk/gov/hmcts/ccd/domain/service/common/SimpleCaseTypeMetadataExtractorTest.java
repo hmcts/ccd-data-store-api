@@ -75,11 +75,13 @@ class SimpleCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataE
 
     @Test
     void testShouldEvaluatePathWithFieldIdPrefix() {
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setId(FIELD_TYPE_ID);
-        fieldTypeDefinition.setType(BASE_FIELD_TYPE_ID);
-        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+        FieldTypeDefinition fieldTypeDefinition = FieldTypeDefinition.builder()
+            .id(FIELD_TYPE_ID)
+            .type(BASE_FIELD_TYPE_ID)
+            .build();
+        CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+            .fieldTypeDefinition(fieldTypeDefinition)
+            .build();
 
         final List<CaseFieldMetadata> metadataList = singletonList(new CaseFieldMetadata("timeline.0.type", null));
 
@@ -99,11 +101,13 @@ class SimpleCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataE
 
     @Test
     void testShouldPassWithNullBaseType() {
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setId(BASE_FIELD_TYPE_ID);
-        fieldTypeDefinition.setType(null);
-        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+        FieldTypeDefinition fieldTypeDefinition = FieldTypeDefinition.builder()
+            .id(BASE_FIELD_TYPE_ID)
+            .type(null)
+            .build();
+        CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+            .fieldTypeDefinition(fieldTypeDefinition)
+            .build();
 
         final List<CaseFieldMetadata> metadataList = singletonList(new CaseFieldMetadata(FIELD_TYPE_ID, null));
 
@@ -124,11 +128,13 @@ class SimpleCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataE
     @MethodSource("provideNonMatchingFieldTypeParameters")
     void testShouldReturnUnchangedWhenFieldTypeDoesNotMatchFieldTypeDefinitionId(final String fieldType,
                                                                                  final List<CaseFieldMetadata> paths) {
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setId(FIELD_TYPE_ID);
-        fieldTypeDefinition.setType("Type-1");
-        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+        FieldTypeDefinition fieldTypeDefinition = FieldTypeDefinition.builder()
+            .id(FIELD_TYPE_ID)
+            .type("Type-1")
+            .build();
+        CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+            .fieldTypeDefinition(fieldTypeDefinition)
+            .build();
 
         final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> results =
             underTest.extractCaseFieldData(
@@ -147,7 +153,7 @@ class SimpleCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataE
     @ParameterizedTest
     @MethodSource("providePreEvaluatedPathsParameters")
     void testShouldReturnUnchangedWhenFieldTypeDefinitionIsNull(final List<CaseFieldMetadata> paths) {
-        final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        final CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder().build();
 
         final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> results =
             underTest.extractCaseFieldData(
@@ -166,11 +172,13 @@ class SimpleCaseTypeMetadataExtractorTest extends AbstractBaseCaseFieldMetadataE
     @ParameterizedTest
     @MethodSource("provideMatchingFieldTypeParameters")
     void testShouldEvaluatePath(final List<CaseFieldMetadata> pathsBefore, final List<CaseFieldMetadata> pathsAfter) {
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setId(FIELD_TYPE_ID_GENERATED);
-        fieldTypeDefinition.setType(BASE_FIELD_TYPE_ID);
-        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+        FieldTypeDefinition fieldTypeDefinition = FieldTypeDefinition.builder()
+            .id(FIELD_TYPE_ID_GENERATED)
+            .type(BASE_FIELD_TYPE_ID)
+            .build();
+        CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+            .fieldTypeDefinition(fieldTypeDefinition)
+            .build();
 
         final Either<CaseFieldMetadataExtractor.RecursionParams, List<CaseFieldMetadata>> results =
             underTest.extractCaseFieldData(

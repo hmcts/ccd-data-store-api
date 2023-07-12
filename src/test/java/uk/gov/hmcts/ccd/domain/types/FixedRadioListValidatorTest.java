@@ -14,7 +14,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
 
 @DisplayName("FixedRadioListValidator")
 class FixedRadioListValidatorTest {
@@ -75,10 +76,20 @@ class FixedRadioListValidatorTest {
         assertEquals(validator.getType(), BaseType.get(FIXED_RADIO_LIST), "Type is incorrect");
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(FIXED_RADIO_LIST)
-            .withFixedListItem("AAAAAA")
-            .withFixedListItem("BBBBBB")
-            .withFixedListItem("CCCCCC");
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .fixedListItemDefinitions(List.of(
+                new FixedListItemDefinition("AAAAAA", null, null),
+                new FixedListItemDefinition("BBBBBB", null, null),
+                new FixedListItemDefinition("CCCCCC", null, null)
+            ))
+            .type(FIXED_RADIO_LIST);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .build());
     }
 }

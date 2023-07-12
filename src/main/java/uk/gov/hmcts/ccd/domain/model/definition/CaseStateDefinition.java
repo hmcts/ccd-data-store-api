@@ -4,31 +4,37 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import java.io.Serializable;
 import java.util.List;
 
-@ApiModel(description = "")
+@ApiModel
+@Value
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(force = true, access = AccessLevel.PACKAGE)
 public class CaseStateDefinition implements Serializable {
 
     @JsonIgnore
     public static final String ANY = "*";
 
-    private String id = null;
-    private String name = null;
-    private String description = null;
-    private Integer displayOrder = null;
-    private String titleDisplay;
+    String id;
+    String name;
+    String description;
+    Integer displayOrder;
+    String titleDisplay;
+    @SuppressWarnings("RedundantModifiersValueLombok") // see https://sonarsource.atlassian.net/browse/SONARJAVA-4536
     private List<AccessControlList> accessControlLists;
 
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(required = true)
     @JsonProperty("id")
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     /**
@@ -40,27 +46,15 @@ public class CaseStateDefinition implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     @ApiModelProperty(value = "")
     @JsonProperty("description")
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     @JsonProperty("order")
     public Integer getDisplayOrder() {
         return displayOrder;
-    }
-
-    public void setDisplayOrder(Integer displayOrder) {
-        this.displayOrder = displayOrder;
     }
 
     @ApiModelProperty(value = "Title label to be displayed for state")
@@ -69,17 +63,9 @@ public class CaseStateDefinition implements Serializable {
         return titleDisplay;
     }
 
-    public void setTitleDisplay(String titleDisplay) {
-        this.titleDisplay = titleDisplay;
-    }
-
     @ApiModelProperty(value = "State Access Control Lists")
     @JsonProperty("acls")
     public List<AccessControlList> getAccessControlLists() {
         return accessControlLists;
-    }
-
-    public void setAccessControlLists(List<AccessControlList> accessControlLists) {
-        this.accessControlLists = accessControlLists;
     }
 }

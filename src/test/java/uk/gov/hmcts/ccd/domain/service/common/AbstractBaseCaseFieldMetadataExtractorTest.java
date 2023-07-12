@@ -49,7 +49,7 @@ abstract class AbstractBaseCaseFieldMetadataExtractorTest extends TestFixtures {
     }
 
     protected static Stream<Arguments> provideNullParameters() {
-        final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        final CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder().build();
 
         return Stream.of(
             Arguments.of(null, caseFieldDefinition, "timeline.0.", FIELD_TYPE_ID, emptyList()),

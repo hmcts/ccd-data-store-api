@@ -75,6 +75,7 @@ class DefaultCreateEventOperationTest {
 
     private Map<String, JsonNode> data;
     private CaseTypeDefinition caseTypeDefinition;
+    private CaseEventDefinition.CaseEventDefinitionBuilder caseEventDefinitionBuilder;
     private CaseEventDefinition caseEventDefinition;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
@@ -97,8 +98,9 @@ class DefaultCreateEventOperationTest {
         data = buildJsonNodeData();
         caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN)
             .withIgnoreWarning(IGNORE_WARNING).build();
-        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-        jurisdictionDefinition.setId(JURISDICTION_ID);
+        final JurisdictionDefinition jurisdictionDefinition = JurisdictionDefinition.builder()
+            .id(JURISDICTION_ID)
+            .build();
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
         caseTypeDefinition = CaseTypeDefinition.builder()
@@ -107,18 +109,18 @@ class DefaultCreateEventOperationTest {
             .version(version)
             .build();
 
-        caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setPostStates(getEventPostStates(POST_STATE));
+        caseEventDefinitionBuilder = CaseEventDefinition.builder()
+            .postStates(getEventPostStates(POST_STATE));
+        caseEventDefinition = caseEventDefinitionBuilder.build();
 
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
         caseDetails.setLastModified(LAST_MODIFIED);
         caseDetailsBefore = mock(CaseDetails.class);
-        postState = new CaseStateDefinition();
-        postState.setId(POST_STATE);
-
-        mockCaseEventResult();
+        postState = CaseStateDefinition.builder()
+            .id(POST_STATE)
+            .build();
     }
 
     private void mockCaseEventResult() {
@@ -147,7 +149,9 @@ class DefaultCreateEventOperationTest {
     @Test
     @DisplayName("should invoke after submit callback")
     void shouldInvokeAfterSubmitCallback() {
-        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        caseEventDefinition = caseEventDefinitionBuilder.callBackURLSubmittedEvent(CALLBACK_URL).build();
+        mockCaseEventResult();
+
         AfterSubmitCallbackResponse response = new AfterSubmitCallbackResponse();
         response.setConfirmationHeader("Header");
         response.setConfirmationBody("Body");
@@ -171,7 +175,8 @@ class DefaultCreateEventOperationTest {
     @Test
     @DisplayName("should return incomplete response status if remote endpoint is down")
     void shouldReturnIncomplete() {
-        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        caseEventDefinition = caseEventDefinitionBuilder.callBackURLSubmittedEvent(CALLBACK_URL).build();
+        mockCaseEventResult();
         doThrow(new CallbackException("Testing failure")).when(callbackInvoker)
             .invokeSubmittedCallback(caseEventDefinition,
                 caseDetailsBefore,
@@ -202,7 +207,8 @@ class DefaultCreateEventOperationTest {
     @Test
     @DisplayName("should invoke after submit callback case system event")
     void shouldInvokeAfterSubmitCallbackCaseSystemEvent() {
-        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        caseEventDefinition = caseEventDefinitionBuilder.callBackURLSubmittedEvent(CALLBACK_URL).build();
+        mockCaseEventResult();
         AfterSubmitCallbackResponse response = new AfterSubmitCallbackResponse();
         response.setConfirmationHeader("Header");
         response.setConfirmationBody("Body");

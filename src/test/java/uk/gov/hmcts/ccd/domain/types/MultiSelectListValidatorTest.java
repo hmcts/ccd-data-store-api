@@ -10,8 +10,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -118,7 +120,10 @@ class MultiSelectListValidatorTest {
 
     @Test
     void validate_shouldNOTBeValidWhenBelowMin() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(2).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal(2))
+                .build()).build();
 
         final ArrayNode values = NODE_FACTORY.arrayNode()
                                              .add(OPTION_1);
@@ -131,7 +136,10 @@ class MultiSelectListValidatorTest {
 
     @Test
     void validate_shouldNOTBeValidWhenAboveMax() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMax(ONE).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .max(ONE)
+                .build()).build();
 
         final ArrayNode values = NODE_FACTORY.arrayNode()
                                              .add(OPTION_1)
@@ -143,10 +151,20 @@ class MultiSelectListValidatorTest {
         assertThat(results.get(0).getErrorMessage(), equalTo("Cannot select more than 1 option"));
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(MultiSelectListValidator.TYPE_ID)
-                                             .withFixedListItem(OPTION_1)
-                                             .withFixedListItem(OPTION_2)
-                                             .withFixedListItem(OPTION_3);
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .fixedListItemDefinitions(List.of(
+                new FixedListItemDefinition(OPTION_1, null, null),
+                new FixedListItemDefinition(OPTION_2, null, null),
+                new FixedListItemDefinition(OPTION_3, null, null)
+            ))
+            .type(MultiSelectListValidator.TYPE_ID);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .build());
     }
 }

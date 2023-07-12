@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.security.DefaultAuthorisedCaseDefinitionDataService;
 
@@ -33,7 +34,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 class DefaultAuthorisedCaseDefinitionDataServiceTest {
 
@@ -54,7 +54,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(caseTypeDefinition.getJurisdictionDefinition()).thenReturn(newJurisdiction().withJurisdictionId("jid")
+        when(caseTypeDefinition.getJurisdictionDefinition()).thenReturn(JurisdictionDefinition.builder().id("jid")
             .build());
     }
 
@@ -110,10 +110,10 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         }
 
         private List<CaseStateDefinition> getCaseStates() {
-            CaseStateDefinition caseStateDefinition1 = new CaseStateDefinition();
-            caseStateDefinition1.setId(STATE1);
-            CaseStateDefinition caseStateDefinition2 = new CaseStateDefinition();
-            caseStateDefinition2.setId(STATE2);
+            CaseStateDefinition caseStateDefinition1 = CaseStateDefinition.builder()
+                .id(STATE1).build();
+            CaseStateDefinition caseStateDefinition2 = CaseStateDefinition.builder()
+                .id(STATE2).build();
             return Arrays.asList(caseStateDefinition1, caseStateDefinition2);
         }
 

@@ -8,8 +8,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -86,7 +87,10 @@ class TextAreaValidatorTest {
 
     @Test
     void validate_shouldNotBeValidWhenMinimumLengthRequirementNotMet() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(4).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal(4))
+                .build()).build();
 
         final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx"),
             caseFieldDefinition);
@@ -97,7 +101,10 @@ class TextAreaValidatorTest {
 
     @Test
     void validate_shouldBeValidWhenMinimumLengthRequirementMet() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(4).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .min(new BigDecimal(4))
+                .build()).build();
 
         final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx4"),
             caseFieldDefinition);
@@ -107,7 +114,10 @@ class TextAreaValidatorTest {
 
     @Test
     void validate_shouldNotBeValidWhenMaximumLengthRequirementNotMet() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMax(4).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .max(new BigDecimal(4))
+                .build()).build();
 
         final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx45"),
             caseFieldDefinition);
@@ -118,7 +128,10 @@ class TextAreaValidatorTest {
 
     @Test
     void validate_shouldBeValidWhenMaximumLengthRequirementMet() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withMax(4).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField()
+            .fieldTypeDefinition(defaultFieldDefinition()
+                .max(new BigDecimal(4))
+                .build()).build();
 
         final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx"),
             caseFieldDefinition);
@@ -128,7 +141,8 @@ class TextAreaValidatorTest {
 
     @Test
     void validate_shouldNotBeValidWhenRegexRequirementNotMet() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().fieldTypeDefinition(defaultFieldDefinition()
+            .regularExpression("\\d{4}-\\d{2}-\\d{2}").build()).build();
 
         final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("3232"),
             caseFieldDefinition);
@@ -139,7 +153,8 @@ class TextAreaValidatorTest {
 
     @Test
     void validate_shouldBeValidWhenRegexRequirementMet() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().fieldTypeDefinition(defaultFieldDefinition()
+            .regularExpression("\\d{4}-\\d{2}-\\d{2}").build()).build();
 
         final List<ValidationResult> results = validator.validate(FIELD_ID,
                                                                   NODE_FACTORY.textNode("3232-32-32"),
@@ -157,7 +172,15 @@ class TextAreaValidatorTest {
         assertThat(results.get(0).getFieldId(), equalTo(FIELD_ID));
     }
 
-    private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(TextAreaValidator.TYPE_ID);
+
+    private FieldTypeDefinition.FieldTypeDefinitionBuilder defaultFieldDefinition() {
+        return FieldTypeDefinition.builder()
+            .type(TextAreaValidator.TYPE_ID);
+    }
+
+    private CaseFieldDefinition.CaseFieldDefinitionBuilder caseField() {
+        return CaseFieldDefinition.builder()
+            .id(FIELD_ID)
+            .fieldTypeDefinition(defaultFieldDefinition().build());
     }
 }

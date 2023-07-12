@@ -1275,8 +1275,9 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
             .id(CASE_TYPE_ID)
             .build();
-        final JurisdictionDefinition jurisdiction = new JurisdictionDefinition();
-        jurisdiction.setId(JURISDICTION_ID);
+        final JurisdictionDefinition jurisdiction = JurisdictionDefinition.builder()
+            .id(JURISDICTION_ID)
+            .build();
         final String URL =
             String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID,
                 CASE_TYPE_ID, CASE_REFERENCE);
@@ -1316,8 +1317,9 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseTypeDefinition caseType = CaseTypeDefinition.builder()
             .id(CASE_TYPE_ID)
             .build();
-        final JurisdictionDefinition jurisdiction = new JurisdictionDefinition();
-        jurisdiction.setId(JURISDICTION_ID);
+        final JurisdictionDefinition jurisdiction = JurisdictionDefinition.builder()
+            .id(JURISDICTION_ID)
+            .build();
         final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID,
             JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 

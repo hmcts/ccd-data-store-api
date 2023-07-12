@@ -19,10 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class AdditionalDataContextTest {
 
@@ -50,8 +47,8 @@ class AdditionalDataContextTest {
 
     @Test
     void shouldGetPublishableFieldsOnly() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID_1)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -71,17 +68,17 @@ class AdditionalDataContextTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID_1)
-                    .withFieldType(textField())
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID_1)
+                    .fieldTypeDefinition(textField())
                     .build(),
-                newCaseField()
-                    .withId("NotToBePublished")
-                    .withFieldType(textField())
+                CaseFieldDefinition.builder()
+                    .id("NotToBePublished")
+                    .fieldTypeDefinition(textField())
                     .build(),
-                newCaseField()
-                    .withId(FIELD_ID_2)
-                    .withFieldType(textField())
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID_2)
+                    .fieldTypeDefinition(textField())
                     .build()
                 ))
             .build();
@@ -109,8 +106,8 @@ class AdditionalDataContextTest {
 
     @Test
     void shouldGetPublishableFieldsForComplexWithoutOverrides() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID_1)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -121,13 +118,13 @@ class AdditionalDataContextTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID_1)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID_1)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField(NESTED_FIELD_1)))
                             .build()
                     )
                     .build()
@@ -153,8 +150,8 @@ class AdditionalDataContextTest {
 
     @Test
     void shouldGetPublishableFieldsForComplexWithOverrides() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID_1)
                     .withDisplayContext(DisplayContext.COMPLEX)
@@ -188,28 +185,25 @@ class AdditionalDataContextTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID_1)
-                    .withFieldType(
-                        aFieldType()
-                            .withId(COMPLEX_ID_1)
-                            .withType(COMPLEX)
-                            .withComplexField(complexField(NESTED_FIELD_1))
-                            .withComplexField(complexField(NESTED_FIELD_1))
-                            .withComplexField(
-                                newCaseField()
-                                    .withId(NESTED_FIELD_2)
-                                    .withFieldType(
-                                        aFieldType()
-                                            .withId(COMPLEX_ID_2)
-                                            .withType(COMPLEX)
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_1))
-                                            .withComplexField(complexField(SUB_NESTED_FIELD_2))
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID_1)
+                    .fieldTypeDefinition(
+                        FieldTypeDefinition.builder()
+                            .id(COMPLEX_ID_1)
+                            .type(COMPLEX)
+                            .complexFields(List.of(complexField(NESTED_FIELD_1), complexField(NESTED_FIELD_1),
+                                CaseFieldDefinition.builder()
+                                    .id(NESTED_FIELD_2)
+                                    .fieldTypeDefinition(
+                                        FieldTypeDefinition.builder()
+                                            .id(COMPLEX_ID_2)
+                                            .type(COMPLEX)
+                                            .complexFields(List.of(
+                                                complexField(SUB_NESTED_FIELD_1), complexField(SUB_NESTED_FIELD_2)))
                                             .build()
                                     )
-                                    .build()
-                            )
-                            .withComplexField(complexField("NotToBePublished"))
+                                    .build(),
+                                complexField("NotToBePublished")))
                             .build()
                     )
                     .build()
@@ -254,8 +248,8 @@ class AdditionalDataContextTest {
 
     @Test
     void shouldReturnEmptyListsWhenNoPublishableFields() {
-        caseEventDefinition = newCaseEvent()
-            .withCaseFields(List.of(
+        caseEventDefinition = CaseEventDefinition.builder()
+            .caseFields(List.of(
                 newCaseEventField()
                     .withCaseFieldId(FIELD_ID_1)
                     .withDisplayContext(DisplayContext.MANDATORY)
@@ -265,9 +259,9 @@ class AdditionalDataContextTest {
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(
-                newCaseField()
-                    .withId(FIELD_ID_1)
-                    .withFieldType(textField())
+                CaseFieldDefinition.builder()
+                    .id(FIELD_ID_1)
+                    .fieldTypeDefinition(textField())
                     .build()
             ))
             .build();
@@ -283,16 +277,16 @@ class AdditionalDataContextTest {
     }
 
     private CaseFieldDefinition complexField(String id) {
-        return newCaseField()
-            .withId(id)
-            .withFieldType(textField())
+        return CaseFieldDefinition.builder()
+            .id(id)
+            .fieldTypeDefinition(textField())
             .build();
     }
 
     private FieldTypeDefinition textField() {
-        return aFieldType()
-            .withId(TEXT)
-            .withType(TEXT)
+        return FieldTypeDefinition.builder()
+            .id(TEXT)
+            .type(TEXT)
             .build();
     }
 }

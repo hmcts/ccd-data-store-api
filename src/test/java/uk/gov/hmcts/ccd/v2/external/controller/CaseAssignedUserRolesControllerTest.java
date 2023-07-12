@@ -343,6 +343,7 @@ class CaseAssignedUserRolesControllerTest {
 
     }
 
+    @SuppressWarnings("removal")
     @Nested
     @DisplayName("GET /case-users")
     class GetCaseUserRoles {

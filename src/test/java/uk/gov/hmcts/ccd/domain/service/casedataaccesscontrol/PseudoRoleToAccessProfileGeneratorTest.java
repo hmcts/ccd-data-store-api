@@ -104,22 +104,22 @@ class PseudoRoleToAccessProfileGeneratorTest {
     }
 
     private CaseStateDefinition caseStateWithAcl(List<AccessControlList> acls) {
-        CaseStateDefinition state = new CaseStateDefinition();
-        state.setAccessControlLists(acls);
-        return state;
+        return CaseStateDefinition.builder()
+            .accessControlLists(acls)
+            .build();
     }
 
     private CaseEventDefinition createEventWithAcl(List<AccessControlList> acls) {
-        CaseEventDefinition event = new CaseEventDefinition();
-        event.setAccessControlLists(acls);
-        return event;
+        return CaseEventDefinition.builder()
+            .accessControlLists(acls)
+            .build();
     }
 
     private CaseFieldDefinition createCaseField(List<AccessControlList> acls, List<ComplexACL> complexAcls) {
-        CaseFieldDefinition caseField = new CaseFieldDefinition();
-        caseField.setAccessControlLists(acls);
-        caseField.setComplexACLs(complexAcls);
-        return caseField;
+        return CaseFieldDefinition.builder()
+            .accessControlLists(acls)
+            .complexACLs(complexAcls)
+            .build();
     }
 
     private ComplexACL complexAclWithRole(String role) {

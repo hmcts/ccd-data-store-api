@@ -26,34 +26,34 @@ public class ComplexSanitiserTest {
     private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
 
     private static final String TYPE_1 = "Type1";
-    private static final FieldTypeDefinition FIELD_1_TYPE = new FieldTypeDefinition();
+    private static final FieldTypeDefinition FIELD_1_TYPE = FieldTypeDefinition.builder()
+        .id(TYPE_1)
+        .type(TYPE_1)
+        .build();
     private static final String FIELD_1_ID = "FirstName";
-    private static final CaseFieldDefinition FIELD_1 = new CaseFieldDefinition();
+    private static final CaseFieldDefinition FIELD_1 = CaseFieldDefinition.builder()
+        .id(FIELD_1_ID)
+        .fieldTypeDefinition(FIELD_1_TYPE)
+        .build();
     private static final JsonNode FIELD_1_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value 1");
     private static final JsonNode FIELD_1_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value 1");
 
     private static final String TYPE_2 = "Type2";
-    private static final FieldTypeDefinition FIELD_2_TYPE = new FieldTypeDefinition();
+    private static final FieldTypeDefinition FIELD_2_TYPE = FieldTypeDefinition.builder()
+        .id(TYPE_2)
+        .type(TYPE_2)
+        .build();
     private static final String FIELD_2_ID = "Money";
-    private static final CaseFieldDefinition FIELD_2 = new CaseFieldDefinition();
+    private static final CaseFieldDefinition FIELD_2 = CaseFieldDefinition.builder()
+        .id(FIELD_2_ID)
+        .fieldTypeDefinition(FIELD_2_TYPE)
+        .build();
     private static final JsonNode FIELD_2_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value 2");
     private static final JsonNode FIELD_2_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value 2");
 
-    private static final FieldTypeDefinition COMPLEX_FIELD_TYPE = new FieldTypeDefinition();
-
-    static {
-        FIELD_1_TYPE.setId(TYPE_1);
-        FIELD_1_TYPE.setType(TYPE_1);
-        FIELD_1.setId(FIELD_1_ID);
-        FIELD_1.setFieldTypeDefinition(FIELD_1_TYPE);
-
-        FIELD_2_TYPE.setId(TYPE_2);
-        FIELD_2_TYPE.setType(TYPE_2);
-        FIELD_2.setId(FIELD_2_ID);
-        FIELD_2.setFieldTypeDefinition(FIELD_2_TYPE);
-
-        COMPLEX_FIELD_TYPE.setComplexFields(Arrays.asList(FIELD_1, FIELD_2));
-    }
+    private static final FieldTypeDefinition COMPLEX_FIELD_TYPE = FieldTypeDefinition.builder()
+        .complexFields(Arrays.asList(FIELD_1, FIELD_2))
+        .build();
 
     private Sanitiser type1Sanitiser;
     private Sanitiser type2Sanitiser;

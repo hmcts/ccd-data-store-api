@@ -110,7 +110,7 @@ public abstract class CaseLinkTestFixtures {
     protected CaseTypeDefinition createCaseTypeDefinition() {
         return CaseTypeDefinition.builder()
             .id(CASE_TYPE_ID)
-            .caseFieldDefinitions(List.of(new CaseFieldDefinition(), new CaseFieldDefinition()))
+            .caseFieldDefinitions(List.of(CaseFieldDefinition.builder().build(), CaseFieldDefinition.builder().build()))
             .build();
     }
 

@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class DateTimeFormatParserTest {
 
@@ -444,7 +443,7 @@ class DateTimeFormatParserTest {
     }
 
     private FieldTypeDefinition fieldType(String fieldType) {
-        return aFieldType().withType(fieldType).build();
+        return FieldTypeDefinition.builder().type(fieldType).build();
     }
 
     private void setUpBaseTypes() {

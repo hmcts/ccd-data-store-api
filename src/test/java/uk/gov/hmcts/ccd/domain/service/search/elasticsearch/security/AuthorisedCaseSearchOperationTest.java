@@ -267,11 +267,12 @@ class AuthorisedCaseSearchOperationTest {
         @Test
         @DisplayName("should transform alias field for a collection field in source filter ")
         void shouldTransformAliasFieldForCollection() {
-            CaseFieldDefinition collectionField = new CaseFieldDefinition();
-            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-            fieldTypeDefinition.setType(FieldTypeDefinition.COLLECTION);
-            collectionField.setFieldTypeDefinition(fieldTypeDefinition);
-            collectionField.setId("collectionField");
+            CaseFieldDefinition collectionField = CaseFieldDefinition.builder()
+                .id("collectionField")
+                .fieldTypeDefinition(FieldTypeDefinition.builder()
+                    .type(FieldTypeDefinition.COLLECTION).build())
+                .build();
+
             caseTypeDefinition.getCaseFieldDefinitions().add(collectionField);
 
             ObjectNode dataNode = JsonNodeFactory.instance.objectNode();
@@ -310,18 +311,10 @@ class AuthorisedCaseSearchOperationTest {
     }
 
     private List<SearchAliasField> getSearchAliasFields() {
-        SearchAliasField aliasField1 = new SearchAliasField();
-        aliasField1.setCaseFieldPath("firstName");
-        aliasField1.setId("name");
-        SearchAliasField aliasField2 = new SearchAliasField();
-        aliasField2.setCaseFieldPath("personAddress.postcode");
-        aliasField2.setId("postcode");
-        SearchAliasField aliasField3 = new SearchAliasField();
-        aliasField3.setCaseFieldPath("collectionField.value");
-        aliasField3.setId("collection");
-        SearchAliasField aliasField4 = new SearchAliasField();
-        aliasField4.setCaseFieldPath("pathNotFound");
-        aliasField4.setId("pathNotFound");
+        SearchAliasField aliasField1 = new SearchAliasField("name", null, "firstName", null);
+        SearchAliasField aliasField2 = new SearchAliasField("postcode", null, "personAddress.postcode", null);
+        SearchAliasField aliasField3 = new SearchAliasField("collection", null, "collectionField.value", null);
+        SearchAliasField aliasField4 = new SearchAliasField("pathNotFound", null, "pathNotFound", null);
 
         return asList(aliasField1, aliasField2, aliasField3, aliasField4);
     }

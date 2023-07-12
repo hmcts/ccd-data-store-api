@@ -71,8 +71,7 @@ class GlobalSearchProcessorServiceTest {
 
         globalSearchProcessorService = new GlobalSearchProcessorService(objectMapperService);
 
-        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-        caseFieldDefinition.setId(SEARCH_CRITERIA);
+        CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder().id(SEARCH_CRITERIA).build();
 
         caseTypeDefinition = CaseTypeDefinition.builder()
             .caseFieldDefinitions(List.of(caseFieldDefinition))
@@ -82,7 +81,7 @@ class GlobalSearchProcessorServiceTest {
         caseData.put("PersonFirstName", JacksonUtils.MAPPER.readTree("\"FirstNameValue\""));
 
         searchPartyPropertyNames = List.of(NAME, ADDRESS_LINE_1, EMAIL_ADDRESS, POSTCODE, DATE_OF_BIRTH, DATE_OF_DEATH);
-        searchParty = new SearchParty();
+        searchParty = SearchParty.builder().build();
     }
 
     @Test
@@ -99,11 +98,9 @@ class GlobalSearchProcessorServiceTest {
     void checkNullAndEmptyCaseDataResultsInEmptySearchCriteriaCreation(Map<String, JsonNode> testData) {
 
         // ARRANGE
-        SearchCriteria searchCriteria = new SearchCriteria();
-        searchCriteria.setOtherCaseReference("TextField1");
+        SearchCriteria searchCriteria = SearchCriteria.builder().otherCaseReference("TextField1").build();
 
-        SearchParty searchParty = new SearchParty();
-        searchParty.setSearchPartyName("TextField1");
+        SearchParty searchParty = SearchParty.builder().searchPartyName("TextField1").build();
 
         caseTypeDefinition.setSearchCriterias(List.of(searchCriteria));
         caseTypeDefinition.setSearchParties(List.of(searchParty));
@@ -121,8 +118,10 @@ class GlobalSearchProcessorServiceTest {
         final String middleName = "MiddleName";
         final String lastName = "LastName";
 
-        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
-        searchParty.setSearchPartyCollectionFieldName(collectionName);
+        searchParty = SearchParty.builder()
+            .searchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName))
+            .searchPartyCollectionFieldName(collectionName)
+            .build();
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         // NB: not adding `myCollection` field to case data as test requires it to be missing
@@ -181,13 +180,16 @@ class GlobalSearchProcessorServiceTest {
         final String email = "EmailAddress";
         final String address = "AddressLine1";
 
-        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
-        searchParty.setSearchPartyAddressLine1(address);
-        searchParty.setSearchPartyPostCode(postCode);
-        searchParty.setSearchPartyEmailAddress(email);
-        searchParty.setSearchPartyDob(dob);
-        searchParty.setSearchPartyDod(dod);
-        searchParty.setSearchPartyCollectionFieldName(collectionName);
+        searchParty = SearchParty.builder()
+            .searchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName))
+            .searchPartyAddressLine1(address)
+            .searchPartyPostCode(postCode)
+            .searchPartyEmailAddress(email)
+            .searchPartyDob(dob)
+            .searchPartyDod(dod)
+            .searchPartyCollectionFieldName(collectionName)
+            .build();
+
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("myCollection", JacksonUtils.MAPPER.readTree(collectionAsString));
@@ -198,8 +200,7 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkOtherReferenceFieldPopulatedInSearchCriteria() throws JsonProcessingException {
-        SearchCriteria searchCriteria = new SearchCriteria();
-        searchCriteria.setOtherCaseReference("TextField1");
+        SearchCriteria searchCriteria = SearchCriteria.builder().otherCaseReference("TextField1").build();
 
         caseTypeDefinition.setSearchCriterias(List.of(searchCriteria));
 
@@ -222,8 +223,8 @@ class GlobalSearchProcessorServiceTest {
     @Test
     void checkOtherReferenceFieldPopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
 
-        SearchCriteria searchCriteria = new SearchCriteria();
-        searchCriteria.setOtherCaseReference("PersonAddress.AddressLine1");
+        SearchCriteria searchCriteria = SearchCriteria.builder()
+            .otherCaseReference("PersonAddress.AddressLine1").build();
 
         caseTypeDefinition.setSearchCriterias(List.of(searchCriteria));
 
@@ -246,7 +247,9 @@ class GlobalSearchProcessorServiceTest {
     @Test
     void checkSearchPartyNamePopulatedInSearchCriteria() throws JsonProcessingException {
 
-        searchParty.setSearchPartyName("SearchPartyFirstName");
+        searchParty = SearchParty.builder()
+            .searchPartyName("SearchPartyFirstName")
+            .build();
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("SearchPartyFirstName", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_FIRST_NAME_1  + "\""));
@@ -257,7 +260,9 @@ class GlobalSearchProcessorServiceTest {
     @Test
     void checkSearchPartyNamePopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
 
-        searchParty.setSearchPartyName("SearchParty.FirstName");
+        searchParty = SearchParty.builder()
+            .searchPartyName("SearchParty.FirstName")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -277,7 +282,10 @@ class GlobalSearchProcessorServiceTest {
         final String middleName = "MiddleName";
         final String lastName = "LastName";
 
-        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        searchParty = SearchParty.builder()
+            .searchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName))
+            .build();
+
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put(firstName, JacksonUtils.MAPPER.readTree("\""  + searchPartyNameFirstName  + "\""));
@@ -306,7 +314,9 @@ class GlobalSearchProcessorServiceTest {
         final String missingName = "MissingName"; // test will miss this field out of the case data
         final String lastName = "LastName";
 
-        searchParty.setSearchPartyName(String.format("%s,%s,%s,%s", firstName, middleName, missingName, lastName));
+        searchParty = SearchParty.builder()
+            .searchPartyName(String.format("%s,%s,%s,%s", firstName, middleName, missingName, lastName))
+            .build();
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put(firstName, JacksonUtils.MAPPER.readTree("\""  + searchPartyNameFirstName  + "\""));
@@ -329,7 +339,9 @@ class GlobalSearchProcessorServiceTest {
         final String middleName = "MyPerson.Person.MiddleName";
         final String lastName = "MyPerson.Person.LastName";
 
-        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        searchParty = SearchParty.builder()
+            .searchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName))
+            .build();
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("MyPerson", JacksonUtils.MAPPER.readTree("{\n"
@@ -364,13 +376,16 @@ class GlobalSearchProcessorServiceTest {
         final String email = "EmailAddress";
         final String address = "AddressLine1";
 
-        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
-        searchParty.setSearchPartyAddressLine1(address);
-        searchParty.setSearchPartyPostCode(postCode);
-        searchParty.setSearchPartyEmailAddress(email);
-        searchParty.setSearchPartyDob(dob);
-        searchParty.setSearchPartyDod(dod);
-        searchParty.setSearchPartyCollectionFieldName(collectionName);
+        searchParty = SearchParty.builder()
+            .searchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName))
+            .searchPartyAddressLine1(address)
+            .searchPartyPostCode(postCode)
+            .searchPartyEmailAddress(email)
+            .searchPartyDob(dob)
+            .searchPartyDod(dod)
+            .searchPartyCollectionFieldName(collectionName)
+            .build();
+
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[{\n"
@@ -414,13 +429,15 @@ class GlobalSearchProcessorServiceTest {
         final String email = "Person.EmailAddress";
         final String address = "Person.Address.AddressLine1";
 
-        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
-        searchParty.setSearchPartyAddressLine1(address);
-        searchParty.setSearchPartyPostCode(postCode);
-        searchParty.setSearchPartyEmailAddress(email);
-        searchParty.setSearchPartyDob(dob);
-        searchParty.setSearchPartyDod(dod);
-        searchParty.setSearchPartyCollectionFieldName(collectionName);
+        searchParty = SearchParty.builder()
+            .searchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName))
+            .searchPartyAddressLine1(address)
+            .searchPartyPostCode(postCode)
+            .searchPartyEmailAddress(email)
+            .searchPartyDob(dob)
+            .searchPartyDod(dod)
+            .searchPartyCollectionFieldName(collectionName)
+            .build();
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[{\n"
@@ -468,13 +485,15 @@ class GlobalSearchProcessorServiceTest {
         final String email = "Person.EmailAddress";
         final String address = "Person.Address.AddressLine1";
 
-        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
-        searchParty.setSearchPartyAddressLine1(address);
-        searchParty.setSearchPartyPostCode(postCode);
-        searchParty.setSearchPartyEmailAddress(email);
-        searchParty.setSearchPartyDob(dob);
-        searchParty.setSearchPartyDod(dod);
-        searchParty.setSearchPartyCollectionFieldName(collectionName);
+        searchParty = SearchParty.builder()
+            .searchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName))
+            .searchPartyAddressLine1(address)
+            .searchPartyPostCode(postCode)
+            .searchPartyEmailAddress(email)
+            .searchPartyDob(dob)
+            .searchPartyDod(dod)
+            .searchPartyCollectionFieldName(collectionName)
+            .build();
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("myComplex", JacksonUtils.MAPPER.readTree("{\n"
@@ -524,13 +543,15 @@ class GlobalSearchProcessorServiceTest {
         final String email = "EmailAddress";
         final String address = "Address.AddressLine1";
 
-        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
-        searchParty.setSearchPartyAddressLine1(address);
-        searchParty.setSearchPartyPostCode(postCode);
-        searchParty.setSearchPartyEmailAddress(email);
-        searchParty.setSearchPartyDob(dob);
-        searchParty.setSearchPartyDod(dod);
-        searchParty.setSearchPartyCollectionFieldName(collectionName);
+        searchParty = SearchParty.builder()
+            .searchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName))
+            .searchPartyAddressLine1(address)
+            .searchPartyPostCode(postCode)
+            .searchPartyEmailAddress(email)
+            .searchPartyDob(dob)
+            .searchPartyDod(dod)
+            .searchPartyCollectionFieldName(collectionName)
+            .build();
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("myComplex", JacksonUtils.MAPPER.readTree("{\n"
@@ -573,7 +594,10 @@ class GlobalSearchProcessorServiceTest {
         final String missingName = "MyPerson.Person.MissingName"; // test will miss this field out of the case data
         final String lastName = "MyPerson.Person.LastName";
 
-        searchParty.setSearchPartyName(String.format("%s,%s,%s,%s", firstName, middleName, missingName, lastName));
+        searchParty = SearchParty.builder()
+            .searchPartyName(String.format("%s,%s,%s,%s", firstName, middleName, missingName, lastName))
+            .build();
+
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("MyPerson", JacksonUtils.MAPPER.readTree("{\n"
@@ -599,7 +623,10 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyAddressLinePopulatedInSearchCriteria() throws JsonProcessingException {
-        searchParty.setSearchPartyAddressLine1("SearchPartyAddress");
+        searchParty = SearchParty.builder()
+            .searchPartyAddressLine1("SearchPartyAddress")
+            .build();
+
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("SearchPartyAddress", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_ADDRESS_1  + "\""));
@@ -609,8 +636,9 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyAddressLinePopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
-
-        searchParty.setSearchPartyAddressLine1("SearchParty.Address");
+        searchParty = SearchParty.builder()
+            .searchPartyAddressLine1("SearchParty.Address")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -621,8 +649,10 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyEMailAddressPopulatedInSearchCriteria() throws JsonProcessingException {
+        searchParty = SearchParty.builder()
+            .searchPartyEmailAddress("SearchPartyEmailAddress")
+            .build();
 
-        searchParty.setSearchPartyEmailAddress("SearchPartyEmailAddress");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("SearchPartyEmailAddress", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_EMAIL_1  + "\""));
@@ -632,8 +662,9 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyEMailAddressPopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
-
-        searchParty.setSearchPartyEmailAddress("SearchParty.EmailAddress");
+        searchParty = SearchParty.builder()
+            .searchPartyEmailAddress("SearchParty.EmailAddress")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -645,8 +676,9 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyPostCodePopulatedInSearchCriteria() throws JsonProcessingException {
-
-        searchParty.setSearchPartyPostCode("SearchPartyPostCode");
+        searchParty = SearchParty.builder()
+            .searchPartyPostCode("SearchPartyPostCode")
+            .build();
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("SearchPartyPostCode", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_POSTCODE_1  + "\""));
@@ -656,8 +688,9 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyPostCodePopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
-
-        searchParty.setSearchPartyPostCode("MySearchParty.SearchParty.PostCode.name");
+        searchParty = SearchParty.builder()
+            .searchPartyPostCode("MySearchParty.SearchParty.PostCode.name")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -674,8 +707,9 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyDateOfDeathPopulatedInSearchCriteria() throws JsonProcessingException {
-
-        searchParty.setSearchPartyDod("SearchPartyDod");
+        searchParty = SearchParty.builder()
+            .searchPartyDod("SearchPartyDod")
+            .build();
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("SearchPartyDod", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_DOD_1  + "\""));
@@ -685,8 +719,9 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyDateOfDeathEmptyInSearchCriteriaWhenBadDateValue() throws JsonProcessingException {
-
-        searchParty.setSearchPartyDod("SearchPartyDod");
+        searchParty = SearchParty.builder()
+            .searchPartyDod("SearchPartyDod")
+            .build();
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         final String dodField = "bad-dob";
@@ -697,8 +732,9 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyDateOfDeathPopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
-
-        searchParty.setSearchPartyDod("SearchParty.PostCode.name");
+        searchParty = SearchParty.builder()
+            .searchPartyDod("SearchParty.PostCode.name")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -713,8 +749,9 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyDateOfBirthPopulatedInSearchCriteria() throws JsonProcessingException {
-
-        searchParty.setSearchPartyDob("SearchPartyDoB");
+        searchParty = SearchParty.builder()
+            .searchPartyDob("SearchPartyDoB")
+            .build();
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("SearchPartyDoB", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_DOB_1  + "\""));
@@ -724,8 +761,9 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyDateOfBirthPopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
-
-        searchParty.setSearchPartyDob("SearchParty.PostCode.name");
+        searchParty = SearchParty.builder()
+            .searchPartyDob("SearchParty.PostCode.name")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -740,8 +778,9 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyDateOfBirthEmptyInSearchCriteriaWhenBadDateValue() throws JsonProcessingException {
-
-        searchParty.setSearchPartyDob("SearchPartyDob");
+        searchParty = SearchParty.builder()
+            .searchPartyDob("SearchPartyDob")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -755,8 +794,10 @@ class GlobalSearchProcessorServiceTest {
     void checkSearchCriteriaExistsButSearchPartyNodeIsNullWhenTwoBadDateValues()
         throws JsonProcessingException {
 
-        searchParty.setSearchPartyDob("spDob");
-        searchParty.setSearchPartyDod("spDod");
+        searchParty = SearchParty.builder()
+            .searchPartyDob("spDob")
+            .searchPartyDod("spDod")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -772,12 +813,14 @@ class GlobalSearchProcessorServiceTest {
     @Test
     void checkSearchCriteriaContainingASearchPartyContainingAllFields() throws JsonProcessingException {
 
-        searchParty.setSearchPartyName("spName");
-        searchParty.setSearchPartyDob("spDob");
-        searchParty.setSearchPartyDod("spDod");
-        searchParty.setSearchPartyPostCode("spPostCode");
-        searchParty.setSearchPartyEmailAddress("spEmail");
-        searchParty.setSearchPartyAddressLine1("spAddress");
+        searchParty = SearchParty.builder()
+            .searchPartyName("spName")
+            .searchPartyAddressLine1("spAddress")
+            .searchPartyPostCode("spPostCode")
+            .searchPartyEmailAddress("spEmail")
+            .searchPartyDob("spDob")
+            .searchPartyDod("spDod")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -803,13 +846,15 @@ class GlobalSearchProcessorServiceTest {
     @Test
     void checkSearchCriteriaContainingASearchPartyContainingAllFieldsFromCollection() throws JsonProcessingException {
 
-        searchParty.setSearchPartyName("spName");
-        searchParty.setSearchPartyDob("spDob");
-        searchParty.setSearchPartyDod("spDod");
-        searchParty.setSearchPartyPostCode("spPostCode");
-        searchParty.setSearchPartyEmailAddress("spEmail");
-        searchParty.setSearchPartyAddressLine1("spAddress");
-        searchParty.setSearchPartyCollectionFieldName("myCollection");
+        searchParty = SearchParty.builder()
+            .searchPartyName("spName")
+            .searchPartyDob("spDob")
+            .searchPartyDod("spDod")
+            .searchPartyPostCode("spPostCode")
+            .searchPartyEmailAddress("spEmail")
+            .searchPartyAddressLine1("spAddress")
+            .searchPartyCollectionFieldName("myCollection")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -842,12 +887,14 @@ class GlobalSearchProcessorServiceTest {
     void checkSearchCriteriaContainingASearchPartyContainingAllFieldsTwoDateFieldsAreWrong()
         throws JsonProcessingException {
 
-        searchParty.setSearchPartyName("spName");
-        searchParty.setSearchPartyDob("spDob");
-        searchParty.setSearchPartyDod("spDod");
-        searchParty.setSearchPartyPostCode("spPostCode");
-        searchParty.setSearchPartyEmailAddress("spEmail");
-        searchParty.setSearchPartyAddressLine1("spAddress");
+        searchParty = SearchParty.builder()
+            .searchPartyName("spName")
+            .searchPartyAddressLine1("spAddress")
+            .searchPartyPostCode("spPostCode")
+            .searchPartyEmailAddress("spEmail")
+            .searchPartyDob("spDob")
+            .searchPartyDod("spDod")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -879,18 +926,21 @@ class GlobalSearchProcessorServiceTest {
     @Test
     void checkSearchCriteriaContainingMultipleSearchPartiesContainingAllFields() throws JsonProcessingException {
 
-        searchParty.setSearchPartyName("spName");
-        searchParty.setSearchPartyDob("spDob");
-        searchParty.setSearchPartyPostCode("spPostCode");
-        searchParty.setSearchPartyEmailAddress("spEmail");
-        searchParty.setSearchPartyAddressLine1("spAddress");
+        searchParty = SearchParty.builder()
+            .searchPartyName("spName")
+            .searchPartyAddressLine1("spAddress")
+            .searchPartyPostCode("spPostCode")
+            .searchPartyEmailAddress("spEmail")
+            .searchPartyDob("spDob")
+            .build();
 
-        SearchParty searchParty2 = new SearchParty();
-        searchParty2.setSearchPartyName("sp.Name.value");
-        searchParty2.setSearchPartyDob("sp.Dob.value");
-        searchParty2.setSearchPartyPostCode("sp.PostCode.value");
-        searchParty2.setSearchPartyEmailAddress("sp.Email.value");
-        searchParty2.setSearchPartyAddressLine1("sp.Address.value");
+        SearchParty searchParty2 = SearchParty.builder()
+            .searchPartyName("sp.Name.value")
+            .searchPartyAddressLine1("sp.Address.value")
+            .searchPartyPostCode("sp.PostCode.value")
+            .searchPartyEmailAddress("sp.Email.value")
+            .searchPartyDob("sp.Dob.value")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty, searchParty2));
 
@@ -934,20 +984,22 @@ class GlobalSearchProcessorServiceTest {
     void checkSearchCriteriaContainsMultipleSearchPartiesFromCollection()
         throws JsonProcessingException {
 
-        searchParty.setSearchPartyName("spName");
-        searchParty.setSearchPartyDob("spDob");
-        searchParty.setSearchPartyPostCode("spPostCode");
-        searchParty.setSearchPartyEmailAddress("spEmail");
-        searchParty.setSearchPartyAddressLine1("spAddress");
-        searchParty.setSearchPartyCollectionFieldName("myCollection");
+        searchParty = SearchParty.builder()
+            .searchPartyName("spName")
+            .searchPartyAddressLine1("spAddress")
+            .searchPartyPostCode("spPostCode")
+            .searchPartyEmailAddress("spEmail")
+            .searchPartyCollectionFieldName("myCollection")
+            .searchPartyDob("spDob")
+            .build();
 
-        SearchParty searchParty2 = new SearchParty();
-        searchParty2.setSearchPartyName("sp.Name.value");
-        searchParty2.setSearchPartyDob("sp.Dob.value");
-        searchParty2.setSearchPartyPostCode("sp.PostCode.value");
-        searchParty2.setSearchPartyEmailAddress("sp.Email.value");
-        searchParty2.setSearchPartyAddressLine1("sp.Address.value");
-        searchParty2.setSearchPartyAddressLine1("sp.Collection.value");
+        SearchParty searchParty2 = SearchParty.builder()
+            .searchPartyName("sp.Name.value")
+            .searchPartyAddressLine1("sp.Collection.value")
+            .searchPartyPostCode("sp.PostCode.value")
+            .searchPartyEmailAddress("sp.Email.value")
+            .searchPartyDob("sp.Dob.value")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty, searchParty2));
 
@@ -986,20 +1038,23 @@ class GlobalSearchProcessorServiceTest {
     @Test
     void checkSearchCriteriaContainingSingleMatchingSearchPartyContainingAllFields() throws JsonProcessingException {
 
-        searchParty.setSearchPartyName("spName");
-        searchParty.setSearchPartyDob("spDob");
-        searchParty.setSearchPartyDod("spDod");
-        searchParty.setSearchPartyPostCode("spPostCode");
-        searchParty.setSearchPartyEmailAddress("spEmail");
-        searchParty.setSearchPartyAddressLine1("spAddress");
+        searchParty = SearchParty.builder()
+            .searchPartyName("spName")
+            .searchPartyAddressLine1("spAddress")
+            .searchPartyPostCode("spPostCode")
+            .searchPartyEmailAddress("spEmail")
+            .searchPartyDob("spDob")
+            .searchPartyDod("spDod")
+            .build();
 
-        SearchParty searchParty2 = new SearchParty();
-        searchParty2.setSearchPartyName("do.not.find.me");
-        searchParty2.setSearchPartyDob("do.not.find.me");
-        searchParty2.setSearchPartyDod("do.not.find.me");
-        searchParty2.setSearchPartyPostCode("do.not.find.me");
-        searchParty2.setSearchPartyEmailAddress("do.not.find.me");
-        searchParty2.setSearchPartyAddressLine1("do.not.find.me");
+        SearchParty searchParty2 = SearchParty.builder()
+            .searchPartyName("do.not.find.me")
+            .searchPartyAddressLine1("do.not.find.me")
+            .searchPartyPostCode("do.not.find.me")
+            .searchPartyEmailAddress("do.not.find.me")
+            .searchPartyDob("do.not.find.me")
+            .searchPartyDod("do.not.find.me")
+            .build();
 
         caseTypeDefinition.setSearchParties(List.of(searchParty, searchParty2));
 

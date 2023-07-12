@@ -28,19 +28,15 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
@@ -71,7 +67,6 @@ import java.util.function.Consumer;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 @SuppressWarnings("checkstyle:MethodName") // method naming predates checkstyle implementation in module
 public class TestBuildersUtil {
@@ -449,7 +444,7 @@ public class TestBuildersUtil {
 
         private BannerBuilder() {
             this.banner = new Banner();
-            this.banner.setJurisdictionDefinition(new JurisdictionDefinition());
+            this.banner.setJurisdictionDefinition(JurisdictionDefinition.builder().build());
         }
 
         public static BannerBuilder newBanner() {
@@ -596,34 +591,6 @@ public class TestBuildersUtil {
         }
     }
 
-    public static class CaseStateBuilder {
-        private final CaseStateDefinition caseStateDefinition;
-        private final List<AccessControlList> acls = newArrayList();
-
-        private CaseStateBuilder() {
-            this.caseStateDefinition = new CaseStateDefinition();
-        }
-
-        public static CaseStateBuilder newState() {
-            return new CaseStateBuilder();
-        }
-
-        public CaseStateBuilder withAcl(AccessControlList accessControlList) {
-            this.acls.add(accessControlList);
-            return this;
-        }
-
-        public CaseStateBuilder withId(String id) {
-            caseStateDefinition.setId(id);
-            return this;
-        }
-
-        public CaseStateDefinition build() {
-            caseStateDefinition.setAccessControlLists(this.acls);
-            return caseStateDefinition;
-        }
-    }
-
     public static class AccessControlListBuilder {
         private final AccessControlList accessControlList;
 
@@ -710,69 +677,6 @@ public class TestBuildersUtil {
             return complexACL;
         }
 
-    }
-
-    public static class CaseEventBuilder {
-        private final CaseEventDefinition caseEventDefinition;
-        private final List<AccessControlList> accessControlLists = newArrayList();
-
-        private CaseEventBuilder() {
-            this.caseEventDefinition = new CaseEventDefinition();
-        }
-
-        public static CaseEventBuilder newCaseEvent() {
-            return new CaseEventBuilder();
-        }
-
-        public CaseEventBuilder withAcl(AccessControlList accessControlList) {
-            accessControlLists.add(accessControlList);
-            return this;
-        }
-
-        public CaseEventBuilder withCaseFields(List<CaseEventFieldDefinition> caseEventFieldDefinitions) {
-            caseEventDefinition.setCaseFields(caseEventFieldDefinitions);
-            return this;
-        }
-
-        public CaseEventBuilder withId(String id) {
-            caseEventDefinition.setId(id);
-            return this;
-        }
-
-        public CaseEventDefinition build() {
-            caseEventDefinition.setAccessControlLists(accessControlLists);
-            return caseEventDefinition;
-        }
-
-        public CaseEventBuilder withCanSaveDraft(Boolean canSaveDraft) {
-            caseEventDefinition.setCanSaveDraft(canSaveDraft);
-            return this;
-        }
-
-        public CaseEventBuilder withName(String name) {
-            caseEventDefinition.setName(name);
-            return this;
-        }
-
-        public CaseEventBuilder withDescription(String description) {
-            caseEventDefinition.setDescription(description);
-            return this;
-        }
-
-        public CaseEventBuilder withShowSummary(Boolean showSummary) {
-            caseEventDefinition.setShowSummary(showSummary);
-            return this;
-        }
-
-        public CaseEventBuilder withShowEventNotes(Boolean showEventNotes) {
-            caseEventDefinition.setShowEventNotes(showEventNotes);
-            return this;
-        }
-
-        public CaseEventBuilder withTTLIncrement(Integer ttlIncrement) {
-            caseEventDefinition.setTtlIncrement(ttlIncrement);
-            return this;
-        }
     }
 
     public static class CaseEventFieldDefinitionBuilder {
@@ -1078,161 +982,6 @@ public class TestBuildersUtil {
         }
     }
 
-    public static class CaseFieldBuilder {
-        private final CaseFieldDefinition caseFieldDefinition;
-        private final List<AccessControlList> accessControlLists = newArrayList();
-        private final List<ComplexACL> complexACLs = newArrayList();
-        private FieldTypeDefinition caseFieldTypeDefinition;
-
-        private CaseFieldBuilder() {
-            this.caseFieldDefinition = new CaseFieldDefinition();
-        }
-
-        public static CaseFieldBuilder newCaseField() {
-            return new CaseFieldBuilder();
-        }
-
-        public CaseFieldBuilder withId(String id) {
-            caseFieldDefinition.setId(id);
-            return this;
-        }
-
-        public CaseFieldBuilder withSC(String securityClassification) {
-            caseFieldDefinition.setSecurityLabel(securityClassification);
-            return this;
-        }
-
-        public CaseFieldBuilder withFieldType(FieldTypeDefinition fieldTypeDefinition) {
-            caseFieldTypeDefinition = fieldTypeDefinition;
-            return this;
-        }
-
-        public CaseFieldBuilder withFieldLabelText(String label) {
-            caseFieldDefinition.setLabel(label);
-            return this;
-        }
-
-        public CaseFieldBuilder withAcl(AccessControlList accessControlList) {
-            accessControlLists.add(accessControlList);
-            return this;
-        }
-
-        public CaseFieldBuilder withComplexACL(ComplexACL complexACL) {
-            complexACLs.add(complexACL);
-            return this;
-        }
-
-        public CaseFieldBuilder withOrder(final int order) {
-            caseFieldDefinition.setOrder(order);
-            return this;
-        }
-
-        public CaseFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
-            caseFieldDefinition.setDisplayContextParameter(displayContextParameter);
-            return this;
-        }
-
-        public CaseFieldBuilder withMetadata(final boolean asMetadata) {
-            caseFieldDefinition.setMetadata(asMetadata);
-            return this;
-        }
-
-        public CaseFieldBuilder withCaseTypeId(final String caseTypeId) {
-            caseFieldDefinition.setCaseTypeId(caseTypeId);
-            return this;
-        }
-
-        public CaseFieldDefinition build() {
-            caseFieldDefinition.setAccessControlLists(accessControlLists);
-            caseFieldDefinition.setComplexACLs(complexACLs);
-            caseFieldDefinition.setFieldTypeDefinition(caseFieldTypeDefinition);
-            return caseFieldDefinition;
-        }
-    }
-
-    public static class FixedListItemBuilder {
-        private final FixedListItemDefinition fixedListItemDefinition;
-
-        public FixedListItemBuilder() {
-            this.fixedListItemDefinition = new FixedListItemDefinition();
-        }
-
-        public static FixedListItemBuilder aFixedListItem() {
-            return new FixedListItemBuilder();
-        }
-
-        public FixedListItemBuilder withCode(String code) {
-            this.fixedListItemDefinition.setCode(code);
-            return this;
-        }
-
-        public FixedListItemBuilder withOrder(String order) {
-            this.fixedListItemDefinition.setOrder(order);
-            return this;
-        }
-
-        public FixedListItemDefinition build() {
-            return fixedListItemDefinition;
-        }
-    }
-
-    public static class FieldTypeBuilder {
-        private final FieldTypeDefinition fieldTypeDefinition;
-        private final List<CaseFieldDefinition> complexFields;
-
-        private FieldTypeBuilder() {
-            this.fieldTypeDefinition = new FieldTypeDefinition();
-            this.complexFields = Lists.newArrayList();
-        }
-
-        public static FieldTypeBuilder aFieldType() {
-            return new FieldTypeBuilder();
-        }
-
-        public FieldTypeBuilder withId(String id) {
-            fieldTypeDefinition.setId(id);
-            return this;
-        }
-
-        public FieldTypeBuilder withType(String type) {
-            fieldTypeDefinition.setType(type);
-            return this;
-        }
-
-        public FieldTypeBuilder withComplexField(CaseFieldDefinition complexField) {
-            complexFields.add(complexField);
-            return this;
-        }
-
-        public FieldTypeBuilder withCollectionFieldType(FieldTypeDefinition collectionFieldTypeDefinition) {
-            fieldTypeDefinition.setCollectionFieldTypeDefinition(collectionFieldTypeDefinition);
-            return this;
-        }
-
-        public FieldTypeBuilder withCollectionField(CaseFieldDefinition complexField) {
-            fieldTypeDefinition.setCollectionFieldTypeDefinition(aFieldType()
-                .withComplexField(complexField)
-                .withType(COMPLEX)
-                .build());
-            return this;
-        }
-
-        public FieldTypeBuilder withFixedListItems(final FixedListItemDefinition... fixedListItemDefinitions) {
-            fieldTypeDefinition.setFixedListItemDefinitions(Lists.newArrayList(fixedListItemDefinitions));
-            return this;
-        }
-
-        public FieldTypeBuilder withFixedListItems(final List<FixedListItemDefinition> fixedListItemDefinitions) {
-            fieldTypeDefinition.setFixedListItemDefinitions(fixedListItemDefinitions);
-            return this;
-        }
-
-        public FieldTypeDefinition build() {
-            fieldTypeDefinition.setComplexFields(complexFields);
-            return fieldTypeDefinition;
-        }
-    }
-
     public static class CaseViewFieldBuilder {
         private final CaseViewField caseViewField;
         private final List<AccessControlList> acls = newArrayList();
@@ -1298,43 +1047,6 @@ public class TestBuildersUtil {
             return auditEvent;
         }
     }
-
-    public static class JurisdictionBuilder {
-        private final JurisdictionDefinition jurisdictionDefinition;
-
-        public static JurisdictionBuilder newJurisdiction() {
-            return new JurisdictionBuilder();
-        }
-
-        private JurisdictionBuilder() {
-            this.jurisdictionDefinition = new JurisdictionDefinition();
-        }
-
-        public JurisdictionBuilder withJurisdictionId(String id) {
-            jurisdictionDefinition.setId(id);
-            return this;
-        }
-
-        public JurisdictionBuilder withName(String name) {
-            jurisdictionDefinition.setName(name);
-            return this;
-        }
-
-        public JurisdictionBuilder withDescription(String description) {
-            jurisdictionDefinition.setDescription(description);
-            return this;
-        }
-
-        public JurisdictionBuilder withCaseType(CaseTypeDefinition caseTypeDefinition) {
-            jurisdictionDefinition.getCaseTypeDefinitions().add(caseTypeDefinition);
-            return this;
-        }
-
-        public JurisdictionDefinition build() {
-            return jurisdictionDefinition;
-        }
-    }
-
 
     public static class WorkbasketInputBuilder {
         private final WorkbasketInput workbasketInput;
@@ -1551,11 +1263,12 @@ public class TestBuildersUtil {
             CaseTypeTabDefinition tab = new CaseTypeTabDefinition();
             List<CaseTypeTabField> tabFields = new ArrayList<>();
             asList(caseFieldIds).forEach(caseFieldId -> {
-                CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-                caseFieldDefinition.setId(caseFieldId);
-                FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-                fieldTypeDefinition.setType("YesOrNo");
-                caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+                CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+                    .id(caseFieldId)
+                    .fieldTypeDefinition(FieldTypeDefinition.builder()
+                        .type("YesOrNo")
+                        .build())
+                    .build();
                 CaseTypeTabField tabField = new CaseTypeTabField();
                 tabField.setCaseFieldDefinition(caseFieldDefinition);
                 tabField.setShowCondition(caseFieldId + "-fieldShowCondition");

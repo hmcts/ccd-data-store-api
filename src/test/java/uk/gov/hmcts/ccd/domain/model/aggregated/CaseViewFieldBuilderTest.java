@@ -36,12 +36,9 @@ import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 public class CaseViewFieldBuilderTest {
 
-    private static final CaseFieldDefinition CASE_FIELD_2 = new CaseFieldDefinition();
     private static final CaseEventFieldDefinition EVENT_FIELD = new CaseEventFieldDefinition();
     private static final CaseEventFieldDefinition EVENT_FIELD_2 = new CaseEventFieldDefinition();
     private static final CaseEventFieldDefinition EVENT_FIELD_3 = new CaseEventFieldDefinition();
@@ -54,32 +51,32 @@ public class CaseViewFieldBuilderTest {
         .withUpdate(false).withDelete(true).build();
     private static final AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false)
         .withUpdate(true).withDelete(false).build();
-    private static final FieldTypeDefinition TEXT_FIELD_TYPE_DEFINITION = aFieldType().withId("Text").withType("Text")
+    private static final FieldTypeDefinition TEXT_FIELD_TYPE_DEFINITION = FieldTypeDefinition.builder()
+        .id("Text").type("Text")
         .build();
-    private static final CaseFieldDefinition CASE_FIELD = newCaseField()
-        .withFieldType(TEXT_FIELD_TYPE_DEFINITION)
-        .withId("PersonFirstName")
-        .withAcl(acl1)
-        .withAcl(acl2)
-        .withAcl(acl3)
+    private static final CaseFieldDefinition CASE_FIELD = CaseFieldDefinition.builder()
+        .fieldTypeDefinition(TEXT_FIELD_TYPE_DEFINITION)
+        .id("PersonFirstName")
+        .accessControlLists(List.of(acl1, acl2, acl3))
+        .caseTypeId("TestAddressBookCase")
+        .hidden(Boolean.FALSE)
+        .label("First name")
+        .securityLabel("LO1")
+        .metadata(false)
+        .formattedValue("DisplayValue")
         .build();
-    private static final CaseFieldDefinition CASE_FIELD_3 = newCaseField().withFieldType(TEXT_FIELD_TYPE_DEFINITION)
-        .withId("STATE").build();
+
+    private static final CaseFieldDefinition CASE_FIELD_2 = CaseFieldDefinition.builder()
+        .id("PersonLastName")
+        .build();
+
+    private static final CaseFieldDefinition CASE_FIELD_3 = CaseFieldDefinition.builder()
+        .fieldTypeDefinition(TEXT_FIELD_TYPE_DEFINITION)
+        .metadata(true)
+        .id("STATE").build();
     private static final String TEXT_TYPE = "Text";
 
     static {
-        CASE_FIELD.setCaseTypeId("TestAddressBookCase");
-        CASE_FIELD.setHidden(Boolean.FALSE);
-        CASE_FIELD.setHintText("Some hint");
-        CASE_FIELD.setLabel("First name");
-        CASE_FIELD.setSecurityLabel("LO1");
-        CASE_FIELD.setMetadata(false);
-        CASE_FIELD.setFormattedValue("DisplayValue");
-
-        CASE_FIELD_2.setId("PersonLastName");
-
-        CASE_FIELD_3.setMetadata(true);
-
         EVENT_FIELD.setCaseFieldId("PersonFirstName");
         EVENT_FIELD.setDisplayContext(READONLY);
         EVENT_FIELD.setDisplayContextParameter("#TABLE(Title, FirstName, MiddleName)");
@@ -238,8 +235,9 @@ public class CaseViewFieldBuilderTest {
         public void shouldOverrideCaseFieldLabelAndHintWithEventFieldLabelAndHint() {
             String overriddenLabel = "overridden label";
             String overriddenHint = "overridden hint";
-            CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-            caseFieldDefinition.setFieldTypeDefinition(TEXT_FIELD_TYPE_DEFINITION);
+            CaseFieldDefinition caseFieldDefinition = CaseFieldDefinition.builder()
+                .fieldTypeDefinition(TEXT_FIELD_TYPE_DEFINITION)
+                .build();
             CaseEventFieldDefinition caseEventFieldDefinition = new CaseEventFieldDefinition();
             caseEventFieldDefinition.setLabel(overriddenLabel);
             caseEventFieldDefinition.setHintText(overriddenHint);
@@ -268,90 +266,100 @@ public class CaseViewFieldBuilderTest {
         private static final String POSTCODE = "Post Code";
         private static final String FAMILY_NAME = "Family Name";
 
-        private final CaseFieldDefinition name = newCaseField().withId(NAME).withFieldType(aFieldType()
-            .withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-        private final CaseFieldDefinition surname = newCaseField()
-            .withId(SURNAME)
-            .withFieldType(aFieldType()
-                .withId(TEXT_TYPE)
-                .withType(TEXT_TYPE)
+        private final CaseFieldDefinition name = CaseFieldDefinition.builder().id(NAME)
+            .fieldTypeDefinition(FieldTypeDefinition.builder()
+            .id(TEXT_TYPE).type(TEXT_TYPE).build()).build();
+        private final CaseFieldDefinition surname = CaseFieldDefinition.builder()
+            .id(SURNAME)
+            .fieldTypeDefinition(FieldTypeDefinition.builder()
+                .id(TEXT_TYPE)
+                .type(TEXT_TYPE)
                 .build())
             .build();
-        private final CaseFieldDefinition adult = newCaseField()
-            .withId(ADULT)
-            .withFieldType(aFieldType()
-                .withId(YESNO_TYPE)
-                .withType(YESNO_TYPE)
+        private final CaseFieldDefinition adult = CaseFieldDefinition.builder()
+            .id(ADULT)
+            .fieldTypeDefinition(FieldTypeDefinition.builder()
+                .id(YESNO_TYPE)
+                .type(YESNO_TYPE)
                 .build())
             .build();
-        private final FieldTypeDefinition personFieldTypeDefinition = aFieldType()
-            .withId(PERSON)
-            .withType(COMPLEX)
-            .withComplexField(name)
-            .withComplexField(surname)
-            .withComplexField(adult)
+        private final FieldTypeDefinition personFieldTypeDefinition = FieldTypeDefinition.builder()
+            .id(PERSON)
+            .type(COMPLEX)
+            .complexFields(List.of(name, surname, adult))
             .build();
         private final CaseFieldDefinition person =
-            newCaseField().withId(PERSON).withFieldType(personFieldTypeDefinition).build();
-        private final FieldTypeDefinition membersFieldTypeDefinition = aFieldType()
-            .withId(MEMBERS + "-some-uid-value")
-            .withType(COLLECTION)
-            .withCollectionField(person)
-            .build();
-        private final CaseFieldDefinition members =
-            newCaseField().withId(MEMBERS).withFieldType(membersFieldTypeDefinition).build();
-
-        private final CaseFieldDefinition addressLine = newCaseField()
-            .withId(ADDRESS_LINE)
-            .withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build())
-            .build();
-        private final FieldTypeDefinition addressLinesType =
-            aFieldType().withId(ADDRESS_LINES).withType(COLLECTION).withCollectionField(addressLine).build();
-        private final CaseFieldDefinition addressLines =
-            newCaseField().withId(ADDRESS_LINES).withFieldType(addressLinesType).build();
-        private final CaseFieldDefinition postCode = newCaseField()
-            .withId(POSTCODE)
-            .withFieldType(aFieldType()
-                .withId(TEXT_TYPE)
-                .withType(TEXT_TYPE)
+            CaseFieldDefinition.builder().id(PERSON).fieldTypeDefinition(personFieldTypeDefinition).build();
+        private final FieldTypeDefinition membersFieldTypeDefinition = FieldTypeDefinition.builder()
+            .id(MEMBERS + "-some-uid-value")
+            .type(COLLECTION)
+            .collectionFieldTypeDefinition(FieldTypeDefinition.builder()
+                .complexFields(List.of(person))
+                .type(COMPLEX)
                 .build())
             .build();
-        private final FieldTypeDefinition addressFieldTypeDefinition = aFieldType()
-            .withComplexField(addressLines)
-            .withComplexField(postCode)
-            .withId(ADDRESS)
-            .withType(COMPLEX)
+        private final CaseFieldDefinition members =
+            CaseFieldDefinition.builder().id(MEMBERS).fieldTypeDefinition(membersFieldTypeDefinition).build();
+
+        private final CaseFieldDefinition addressLine = CaseFieldDefinition.builder()
+            .id(ADDRESS_LINE)
+            .fieldTypeDefinition(FieldTypeDefinition.builder().id(TEXT_TYPE).type(TEXT_TYPE).build())
+            .build();
+        private final FieldTypeDefinition addressLinesType =
+            FieldTypeDefinition.builder().id(ADDRESS_LINES).type(COLLECTION)
+                .collectionFieldTypeDefinition(FieldTypeDefinition.builder()
+                    .complexFields(List.of(addressLine))
+                    .type(COMPLEX)
+                    .build())
+                .build();
+        private final CaseFieldDefinition addressLines =
+            CaseFieldDefinition.builder().id(ADDRESS_LINES).fieldTypeDefinition(addressLinesType).build();
+        private final CaseFieldDefinition postCode = CaseFieldDefinition.builder()
+            .id(POSTCODE)
+            .fieldTypeDefinition(FieldTypeDefinition.builder()
+                .id(TEXT_TYPE)
+                .type(TEXT_TYPE)
+                .build())
+            .build();
+        private final FieldTypeDefinition addressFieldTypeDefinition = FieldTypeDefinition.builder()
+            .complexFields(List.of(addressLine, addressLines, postCode))
+            .id(ADDRESS)
+            .type(COMPLEX)
             .build();
         private final CaseFieldDefinition address =
-            newCaseField().withId(ADDRESS).withFieldType(addressFieldTypeDefinition).build();
+            CaseFieldDefinition.builder().id(ADDRESS).fieldTypeDefinition(addressFieldTypeDefinition).build();
 
-        private final CaseFieldDefinition familyName = newCaseField()
-            .withId(FAMILY_NAME)
-            .withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build())
+        private final CaseFieldDefinition familyName = CaseFieldDefinition.builder()
+            .id(FAMILY_NAME)
+            .fieldTypeDefinition(FieldTypeDefinition.builder().id(TEXT_TYPE).type(TEXT_TYPE).build())
             .build();
         private final FieldTypeDefinition nameFieldTypeDefinition =
-            aFieldType().withId(NAME + "-some-uid-value").withType(COLLECTION).withCollectionField(familyName).build();
+            FieldTypeDefinition.builder().id(NAME + "-some-uid-value").type(COLLECTION)
+                .collectionFieldTypeDefinition(FieldTypeDefinition.builder()
+                    .complexFields(List.of(familyName))
+                    .type(COMPLEX)
+                    .build())
+                .build();
         private final CaseFieldDefinition familyNames =
-            newCaseField().withId(FAMILY_NAME).withFieldType(nameFieldTypeDefinition).build();
+            CaseFieldDefinition.builder().id(FAMILY_NAME).fieldTypeDefinition(nameFieldTypeDefinition).build();
 
         // A complex family field formed of members collection of complex person - text name, text surname and yesNo
         // adult fields,family name(text) and an address (complex address type - collection of text address lines and
         // a text postCode)
         private final FieldTypeDefinition familyFieldTypeDefinition =
-            aFieldType().withId(FAMILY).withType(COMPLEX).withComplexField(familyNames).withComplexField(members)
-                .withComplexField(address).build();
+            FieldTypeDefinition.builder().id(FAMILY).type(COMPLEX)
+                .complexFields(List.of(familyNames, members, address))
+                .build();
         private final AccessControlList acl1 = anAcl().withRole("role1").withCreate(true).withRead(true)
             .withUpdate(true).withDelete(false).build();
         private final AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true)
             .withUpdate(false).withDelete(true).build();
         private final AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false)
             .withUpdate(true).withDelete(false).build();
-        private final CaseFieldDefinition family = newCaseField()
-            .withId(FAMILY)
-            .withFieldType(familyFieldTypeDefinition)
-            .withAcl(acl1)
-            .withAcl(acl2)
-            .withAcl(acl3)
+        private final CaseFieldDefinition family = CaseFieldDefinition.builder()
+            .id(FAMILY)
+            .fieldTypeDefinition(familyFieldTypeDefinition)
+            .accessControlLists(List.of(acl1, acl2, acl3))
             .build();
 
         @BeforeEach

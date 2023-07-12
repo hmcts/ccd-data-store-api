@@ -116,7 +116,8 @@ public class DefaultCaseDefinitionRepositoryTest {
 
     @Test(expected = ResourceNotFoundException.class)
     public void shouldReturnFieldTypeListWhenGetBaseTypesIsCalled() {
-        FieldTypeDefinition[] fieldTypeDefinitionArr = {new FieldTypeDefinition(), new FieldTypeDefinition()};
+        FieldTypeDefinition[] fieldTypeDefinitionArr = {FieldTypeDefinition.builder().build(),
+            FieldTypeDefinition.builder().build()};
         doReturn(fieldTypeDefinitionArr).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
         List<FieldTypeDefinition> fieldTypeDefinitions = caseDefinitionRepository.getBaseTypes();
         assertEquals(2, fieldTypeDefinitions.size());
