@@ -330,7 +330,7 @@ class CaseSearchResultViewGeneratorTest {
         when(caseDataAccessControl.generateAccessMetadata(anyString()))
             .thenReturn(new CaseAccessMetadata());
 
-        when(applicationParams.getInternalSearchCaseAccessMetadataEnabled()).thenReturn(true);
+        when(applicationParams.getInternalSearchCaseAccessMetadataEnabled()).thenReturn(false);
     }
 
     private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
@@ -630,7 +630,27 @@ class CaseSearchResultViewGeneratorTest {
     }
 
     @Test
-    void shouldBuildResultsWithCaseAccessMetadataByDefault() {
+    void shouldNotBuildResultsWithCaseAccessMetadataByDefault() {
+        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+        caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
+        caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
+
+        when(caseDataAccessControl.generateAccessMetadata(anyString()))
+            .thenReturn(caseAccessMetadata);
+
+        CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
+            Collections.emptyList());
+
+        assertAll(
+            () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get(CaseAccessMetadata.ACCESS_PROCESS)),
+            () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get(CaseAccessMetadata.ACCESS_GRANTED)),
+            () -> verify(caseDataAccessControl, never()).generateAccessMetadata(anyString())
+        );
+    }
+    
+    @Test
+    void shouldBuildResultsWithCaseAccessMetadataWhenEnabled() {
+        when(applicationParams.getInternalSearchCaseAccessMetadataEnabled()).thenReturn(true);
         CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
         caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
         caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
@@ -647,26 +667,6 @@ class CaseSearchResultViewGeneratorTest {
             () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
                 .get(CaseAccessMetadata.ACCESS_GRANTED)).asText(),
                 is(GrantType.BASIC.name() + "," + GrantType.SPECIFIC.name()))
-        );
-    }
-
-    @Test
-    void shouldNotBuildResultsWithCaseAccessMetadataWhenDisabled() {
-        when(applicationParams.getInternalSearchCaseAccessMetadataEnabled()).thenReturn(false);
-        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
-        caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
-        caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
-
-        when(caseDataAccessControl.generateAccessMetadata(anyString()))
-            .thenReturn(caseAccessMetadata);
-
-        CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
-            Collections.emptyList());
-
-        assertAll(
-            () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get(CaseAccessMetadata.ACCESS_PROCESS)),
-            () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get(CaseAccessMetadata.ACCESS_GRANTED)),
-            () -> verify(caseDataAccessControl, never()).generateAccessMetadata(anyString())
         );
     }
 
