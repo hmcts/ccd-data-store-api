@@ -140,12 +140,16 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                 final List<CaseFieldDefinition> caseFieldDefinitions,
                                                 final Set<AccessProfile> accessProfiles) {
         if (newData != null) {
+            LOG.error("NewData={} passed in caseFieldDefinitions", newData);
             final boolean noAccessGranted = getStream(newData)
                 .anyMatch(newFieldName -> {
+                    LOG.error("newFieldName passed is..", newFieldName);
                     if (existingData.has(newFieldName)) {
+                        LOG.error("valueDifferentAndHasUpdateAccess={}...", newFieldName);
                         return !valueDifferentAndHasUpdateAccess(newData, existingData, newFieldName,
                             caseFieldDefinitions, accessProfiles);
-                    } else {
+                    } else { 
+                        LOG.error("hasCaseFieldAccess={}...", newFieldName);
                         return !hasCaseFieldAccess(caseFieldDefinitions, accessProfiles, CAN_CREATE, newFieldName);
                     }
                 });
