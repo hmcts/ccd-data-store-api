@@ -29,7 +29,7 @@ public class CacheConfiguration {
     }
 
     @Bean
-    public CacheManager cacheManagerTicker() {
+    public CacheManager cacheManager() {
         final int defaultMaxIdle = applicationParams.getDefaultCacheMaxIdleSecs();
         final int defaultCacheTtl = applicationParams.getDefaultCacheTtlSecs();
         final int userCacheTtl = applicationParams.getUserCacheTTLSecs();
@@ -50,11 +50,11 @@ public class CacheConfiguration {
 
             newMapConfigWithTtl("allJurisdictionsCache", jurisdictionCacheTtl),
             newMapConfigWithTtl("userRolesCache", userCacheTtl),
-            newMapConfigWithTtl("userInfoCache", userCacheTtl), //40
+            newMapConfigWithTtl("userInfoCache", userCacheTtl),
             newMapConfigWithTtl("idamUserRoleCache", userCacheTtl),
             newMapConfigWithTtl("systemUserTokenCache", systemUserTokenCacheTTLSecs),
             newMapConfigWithTtl("bannersCache", defaultCacheTtl),
-            newMapConfigWithTtl("jurisdictionUiConfigsCache", defaultCacheTtl), //30
+            newMapConfigWithTtl("jurisdictionUiConfigsCache", defaultCacheTtl),
             newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", defaultCacheTtl),
             newMapConfigWithTtl("caseRolesCache", defaultCacheTtl),
             newMapConfigWithTtl("jurisdictionCache", jurisdictionCacheTtl),
@@ -75,11 +75,11 @@ public class CacheConfiguration {
 
     private CaffeineCache buildCache(String cacheName, int ttl, int maxIdle) {
         Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder();
-        if (ttl > 0) {
+        if (ttl > TTL_ZERO) {
             cacheBuilder.expireAfterWrite(Duration.ofSeconds(ttl));
         }
 
-        if (maxIdle > 0) {
+        if (maxIdle > TTL_ZERO) {
             cacheBuilder.expireAfterAccess(Duration.ofSeconds(maxIdle));
         }
 
