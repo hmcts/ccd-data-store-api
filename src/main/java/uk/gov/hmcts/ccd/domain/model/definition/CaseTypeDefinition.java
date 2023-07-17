@@ -229,18 +229,18 @@ public class CaseTypeDefinition implements Serializable {
             .name(caseType.getName())
             .jurisdictionDefinition(caseType.getJurisdictionDefinition())
             .securityClassification(caseType.getSecurityClassification())
-            .events(List.copyOf(events))
-            .states(List.copyOf(states))
-            .caseFieldDefinitions(List.copyOf(caseFieldDefinitions))
+            .events(new ArrayList<>(events))
+            .states(new ArrayList<>(states))
+            .caseFieldDefinitions(new ArrayList<>(caseFieldDefinitions))
             .printableDocumentsUrl(caseType.getPrintableDocumentsUrl())
-            .accessControlLists(List.copyOf(caseType.getAccessControlLists()))
+            .accessControlLists(new ArrayList<>(caseType.getAccessControlLists()))
             .callbackGetCaseUrl(caseType.getCallbackGetCaseUrl())
-            .retriesGetCaseUrl(List.copyOf(caseType.getRetriesGetCaseUrl()))
-            .searchAliasFields(List.copyOf(caseType.getSearchAliasFields()))
-            .searchParties(List.copyOf(caseType.getSearchParties()))
-            .searchCriterias(List.copyOf(caseType.getSearchCriterias()))
-            .categories(List.copyOf(caseType.getCategories()))
-            .roleToAccessProfiles(List.copyOf(caseType.getRoleToAccessProfiles()));
+            .retriesGetCaseUrl(new ArrayList<>(caseType.getRetriesGetCaseUrl()))
+            .searchAliasFields(new ArrayList<>(caseType.getSearchAliasFields()))
+            .searchParties(new ArrayList<>(caseType.getSearchParties()))
+            .searchCriterias(new ArrayList<>(caseType.getSearchCriterias()))
+            .categories(new ArrayList<>(caseType.getCategories()))
+            .roleToAccessProfiles(new ArrayList<>(caseType.getRoleToAccessProfiles()));
     }
 
     public static CaseTypeDefinitionBuilder caseTypeDefinitionCopy(CaseTypeDefinition caseType) {
