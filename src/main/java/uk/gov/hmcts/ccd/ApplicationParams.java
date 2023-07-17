@@ -114,6 +114,9 @@ public class ApplicationParams {
     @Value("${user.cache.ttl.secs}")
     private Integer userCacheTTLSecs;
 
+    @Value("${user.role.cache.ttl.secs}")
+    private Integer userRoleCacheTTLSecs;
+
     @Value("${default.cache.max.size}")
     private Integer defaultCacheMaxSize;
 
@@ -420,6 +423,10 @@ public class ApplicationParams {
 
     public Integer getUserCacheTTLSecs() {
         return userCacheTTLSecs;
+    }
+
+    public Integer getUserRoleCacheTTLSecs() {
+        return userRoleCacheTTLSecs;
     }
 
     public int getDefaultCacheMaxSize() {
