@@ -52,7 +52,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private final AccessControlService accessControlService;
     private final CaseAccessService caseAccessService;
     private final CaseDetailsJsonParser caseDetailsJsonParser;
-    private final GetCaseOperation authGetCaseOperation;
     private final CaseService caseService;
     private final EventTriggerService eventTriggerService;
     private final TimeToLiveService timeToLiveService;
@@ -64,7 +63,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                           final AccessControlService accessControlService,
                                           CaseAccessService caseAccessService,
                                           CaseDetailsJsonParser caseDetailsJsonParser,
-                                          @Qualifier("authorised") final GetCaseOperation authGetCaseOperation,
                                           CaseService caseService,
                                           final EventTriggerService eventTriggerService,
                                           final TimeToLiveService timeToLiveService) {
@@ -75,7 +73,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         this.accessControlService = accessControlService;
         this.caseAccessService = caseAccessService;
         this.caseDetailsJsonParser = caseDetailsJsonParser;
-        this.authGetCaseOperation = authGetCaseOperation;
         this.caseService = caseService;
         this.eventTriggerService = eventTriggerService;
         this.timeToLiveService = timeToLiveService;
@@ -162,7 +159,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
     private CreateCaseEventDetails getCreateCaseEventDetails(String caseReference) {
         CreateCaseEventDetails createCaseEventDetails = new CreateCaseEventDetails();
-        CaseDetails existingCaseDetails = authGetCaseOperation.execute(caseReference)
+        CaseDetails existingCaseDetails = getCaseOperation.execute(caseReference)
             .orElseThrow(() -> new ResourceNotFoundException("Case not found"));
         createCaseEventDetails.setCaseDetails(existingCaseDetails);
 
