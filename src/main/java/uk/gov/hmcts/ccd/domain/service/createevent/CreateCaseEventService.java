@@ -261,8 +261,8 @@ public class CreateCaseEventService {
                                                        final String attributePath,
                                                        final String categoryId,
                                                        Event event) {
-        final CaseDetails caseDetails = defaultCaseDetailsRepository.findByReference(caseReference).
-            orElseThrow(() ->
+        final CaseDetails caseDetails = defaultCaseDetailsRepository.findByReference(caseReference)
+            .orElseThrow(() ->
             new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
 
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
