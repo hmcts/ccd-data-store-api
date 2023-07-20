@@ -166,6 +166,7 @@ class AuthorisedCreateEventOperationTest {
             accessControlService,
             caseAccessService,
             caseDetailsJsonParser,
+            getCaseOperation,
             caseService,
             eventTriggerService,
             timeToLiveService);
