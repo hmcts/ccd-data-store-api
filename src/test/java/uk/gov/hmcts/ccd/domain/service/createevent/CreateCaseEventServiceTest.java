@@ -83,8 +83,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
     @Mock
-    private CaseDetailsRepository defaultCaseDetailsRepository;
-    @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
     @Mock
     private CaseAuditEventRepository caseAuditEventRepository;
@@ -207,10 +205,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, caseEventDefinition);
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
-        doReturn(caseDetails).when(defaultCaseDetailsRepository).set(caseDetails);
         doReturn(postState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         doReturn(user).when(userRepository).getUser();
         doReturn(user).when(userRepository).getUser(anyString());
