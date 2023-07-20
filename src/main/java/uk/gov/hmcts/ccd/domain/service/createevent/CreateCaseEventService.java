@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -66,6 +67,8 @@ public class CreateCaseEventService {
 
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
+    private final CaseDetailsRepository defaultCaseDetailsRepository;
+
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final EventTriggerService eventTriggerService;
@@ -90,10 +93,13 @@ public class CreateCaseEventService {
     private final TimeToLiveService timeToLiveService;
     private final CaseLinkService caseLinkService;
 
+
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                   final CaseDetailsRepository caseDetailsRepository,
+                                  @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+                                  final CaseDetailsRepository defaultCaseDetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                   final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
@@ -143,6 +149,7 @@ public class CreateCaseEventService {
         this.caseDetailsJsonParser = jsonPathParser;
         this.timeToLiveService = timeToLiveService;
         this.caseLinkService = caseLinkService;
+        this.defaultCaseDetailsRepository = defaultCaseDetailsRepository;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -254,7 +261,10 @@ public class CreateCaseEventService {
                                                        final String attributePath,
                                                        final String categoryId,
                                                        Event event) {
-        final CaseDetails caseDetails = getCaseDetails(caseReference);
+        final CaseDetails caseDetails = defaultCaseDetailsRepository.findByReference(caseReference).
+            orElseThrow(() ->
+            new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
+
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("DocumentUpdated");
         caseEventDefinition.setName("Update Document Category Id");
