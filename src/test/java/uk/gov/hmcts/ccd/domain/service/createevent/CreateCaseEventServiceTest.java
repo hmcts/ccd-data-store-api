@@ -485,11 +485,11 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Test
     @DisplayName("should update case category id by sending full data content")
     void shouldUpdateCaseDocumentCategoryIdBySendingFullDataContent() throws Exception {
-        CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
         caseDetailsFromDB = caseDetails.shallowClone();
         Map<String, JsonNode> data = Maps.newHashMap();
         data.put("dataKey1", JSON_NODE_FACTORY.textNode("dataValue1"));
         caseDetailsFromDB.setData(data);
+        CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
 
         doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
         doReturn(caseDetailsFromDB).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
