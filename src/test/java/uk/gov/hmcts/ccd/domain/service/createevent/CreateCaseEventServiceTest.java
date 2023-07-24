@@ -1,16 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -77,11 +77,15 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private static final int CASE_VERSION = 0;
     private static final String ATTRIBUTE_PATH = "DocumentField";
     private static final String CATEGORY_ID = "categoryId";
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+
 
     @Mock
     private UserRepository userRepository;
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
+    @Mock
+    private CaseDetailsRepository defaultCaseDetailsRepository;
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
     @Mock
@@ -151,6 +155,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private CaseTypeDefinition caseTypeDefinition;
     private CaseEventDefinition caseEventDefinition;
     private CaseDetails caseDetails;
+    private CaseDetails caseDetailsFromDB;
     private CaseDetails caseDetailsBefore;
     private CaseDataContent caseDataContent;
 
@@ -191,6 +196,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         caseDetails.setLastModified(LAST_MODIFIED);
         caseDetails.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore = caseDetails.shallowClone();
+
         CaseStateDefinition postState = new CaseStateDefinition();
         postState.setId(POST_STATE);
         IdamUser user = new IdamUser();
@@ -205,8 +211,10 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, caseEventDefinition);
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
+
         doReturn(postState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         doReturn(user).when(userRepository).getUser();
         doReturn(user).when(userRepository).getUser(anyString());
@@ -469,6 +477,35 @@ class CreateCaseEventServiceTest extends TestFixtures {
             CATEGORY_ID,
             new Event());
 
+        assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
+    }
+
+    @Test
+    @DisplayName("should update case category id by sending whole document")
+    void shouldUpdateCaseDocumentCategoryId2() throws Exception {
+        caseDetailsFromDB = caseDetails.shallowClone();
+        Map<String, JsonNode> data = Maps.newHashMap();
+        data.put("dataKey1", JSON_NODE_FACTORY.textNode("dataValue1"));
+        caseDetailsFromDB.setData(data);
+
+        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(caseDetailsFromDB).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
+        doReturn(caseDetailsFromDB).when(caseService).clone(Mockito.any(CaseDetails.class));
+
+
+        CaseStateDefinition state = new CaseStateDefinition();
+        state.setId(POST_STATE);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
+        caseDetailsFromDB.setState(POST_STATE);
+        doReturn(caseDetailsFromDB).when(caseDetailsRepository).set(Mockito.any(CaseDetails.class));
+
+
+        final CreateCaseEventResult caseEventResult = underTest.createCaseSystemEvent(CASE_REFERENCE,
+            ATTRIBUTE_PATH,
+            CATEGORY_ID,
+            new Event());
+
+        assertThat(caseEventResult.getSavedCaseDetails().getData()).isEqualTo(data);
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
     }
 
