@@ -450,7 +450,8 @@ public class CreateCaseEventService {
                                               final String oldState,
                                               final String onBehalfOfUserToken,
                                               final SecurityClassification securityClassification) {
-        final CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
+        final CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition,
+            caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());
         auditEvent.setEventName(caseEventDefinition.getName());
