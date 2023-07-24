@@ -6,7 +6,10 @@ import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -490,14 +493,14 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
         doReturn(caseDetailsFromDB).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
-        doReturn(caseDetailsFromDB).when(caseService).clone(Mockito.any(CaseDetails.class));
+        doReturn(caseDetailsFromDB).when(caseService).clone(any(CaseDetails.class));
 
 
         CaseStateDefinition state = new CaseStateDefinition();
         state.setId(POST_STATE);
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         caseDetailsFromDB.setState(POST_STATE);
-        doReturn(caseDetailsFromDB).when(caseDetailsRepository).set(Mockito.any(CaseDetails.class));
+        doReturn(caseDetailsFromDB).when(caseDetailsRepository).set(any(CaseDetails.class));
 
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseSystemEvent(CASE_REFERENCE,
