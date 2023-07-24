@@ -62,10 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
@@ -87,8 +84,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private UserRepository userRepository;
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
-    @Mock
-    private CaseDetailsRepository defaultCaseDetailsRepository;
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
     @Mock
@@ -484,8 +479,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
     }
 
     @Test
-    @DisplayName("should update case category id by sending whole document")
-    void shouldUpdateCaseDocumentCategoryId2() throws Exception {
+    @DisplayName("should update case category id by sending full data content")
+    void shouldUpdateCaseDocumentCategoryIdBySendingFullDataContent() throws Exception {
+        CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
         caseDetailsFromDB = caseDetails.shallowClone();
         Map<String, JsonNode> data = Maps.newHashMap();
         data.put("dataKey1", JSON_NODE_FACTORY.textNode("dataValue1"));
