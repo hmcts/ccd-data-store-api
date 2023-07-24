@@ -228,6 +228,9 @@ public class ApplicationParams {
     @Value("${system.user.token.cache.ttl.secs}")
     private Integer systemUserTokenCacheTTLSecs;
 
+    @Value("${search.internal.case-access-metadata.enabled}")
+    private boolean internalSearchCaseAccessMetadataEnabled;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -616,5 +619,9 @@ public class ApplicationParams {
 
     public Integer getSystemUserTokenCacheTTLSecs() {
         return systemUserTokenCacheTTLSecs;
+    }
+
+    public boolean getInternalSearchCaseAccessMetadataEnabled() {
+        return internalSearchCaseAccessMetadataEnabled;
     }
 }
