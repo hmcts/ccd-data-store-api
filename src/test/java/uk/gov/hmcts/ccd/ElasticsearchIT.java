@@ -439,7 +439,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0),
                     is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
-                () -> assertThat(caseDetails.getFields().size(), is(10)),
+                () -> assertThat(caseDetails.getFields().size(), is(8)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
             );
         }
@@ -499,12 +499,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     is(nestedFieldId)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
                     is(MetaData.CaseField.CASE_REFERENCE.getReference())),
-                () -> assertThat(caseDetails.getFields().size(), is(13)),
+                () -> assertThat(caseDetails.getFields().size(), is(11)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
                 () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFields().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
                 () -> assertThat(caseDetails.getFields().containsKey(COMPLEX_FIELD), is(true)),
-                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(13)),
+                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(11)),
                 () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted(), false),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
@@ -536,12 +536,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     is(nestedFieldId)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
                     is(MetaData.CaseField.CASE_REFERENCE.getReference())),
-                () -> assertThat(caseDetails.getFields().size(), is(13)),
+                () -> assertThat(caseDetails.getFields().size(), is(11)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
                 () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFields().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
                 () -> assertThat(caseDetails.getFields().containsKey(COMPLEX_FIELD), is(true)),
-                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(13)),
+                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(11)),
                 () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted(), false),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
@@ -562,7 +562,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(10)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(18)),
+                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(16)),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(),
                     is(2)),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
