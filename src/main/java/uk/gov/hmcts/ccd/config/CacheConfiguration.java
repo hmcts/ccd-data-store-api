@@ -33,6 +33,7 @@ public class CacheConfiguration {
         final int defaultMaxIdle = applicationParams.getDefaultCacheMaxIdleSecs();
         final int defaultCacheTtl = applicationParams.getDefaultCacheTtlSecs();
         final int userCacheTtl = applicationParams.getUserCacheTTLSecs();
+        final int userRoleCacheTtl = applicationParams.getUserRoleCacheTTLSecs();
         final int jurisdictionCacheTtl = applicationParams.getJurisdictionTTLSecs();
         final int systemUserTokenCacheTTLSecs = applicationParams.getSystemUserTokenCacheTTLSecs();
 
@@ -49,7 +50,7 @@ public class CacheConfiguration {
             newMapConfigWithMaxIdle("caseTypePseudoRoleToAccessProfileCache", defaultMaxIdle),
 
             newMapConfigWithTtl("allJurisdictionsCache", jurisdictionCacheTtl),
-            newMapConfigWithTtl("userRolesCache", userCacheTtl),
+            newMapConfigWithTtl("userRolesCache", userRoleCacheTtl),
             newMapConfigWithTtl("userInfoCache", userCacheTtl),
             newMapConfigWithTtl("idamUserRoleCache", userCacheTtl),
             newMapConfigWithTtl("systemUserTokenCache", systemUserTokenCacheTTLSecs),
