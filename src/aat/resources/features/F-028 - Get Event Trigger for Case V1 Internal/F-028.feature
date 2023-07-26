@@ -12,6 +12,8 @@ Scenario: must return event trigger data successfully for valid pre-state condit
 
     Given a user with [an active profile in CCD],
       And a case that has just been created as in [Standard_Full_Case_Creation_Data],
+      And a successful call [test123] as in [S-044_v2_external]
+      And a successful call [test123] as in [S-044_case_definition]
 
      When a request is prepared with appropriate values,
       And the request [is prepared with valid Jurisdiction, Case ID and User ID],
@@ -22,7 +24,7 @@ Scenario: must return event trigger data successfully for valid pre-state condit
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-045 @Ignore # re-write as part of RDM-6847
+@S-045 # re-write as part of RDM-6847
 Scenario: must return negative response when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
