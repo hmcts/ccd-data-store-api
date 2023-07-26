@@ -1,4 +1,5 @@
-ARG JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
+# Adding Back CMS GC, note: This GC is removed in Java 14.
+ARG JAVA_OPTS="-XX:+UseConcMarkSweepGC -Djava.security.egd=file:/dev/./urandom"
 ARG APP_INSIGHTS_AGENT_VERSION=2.6.1
 ARG PLATFORM=""
 
