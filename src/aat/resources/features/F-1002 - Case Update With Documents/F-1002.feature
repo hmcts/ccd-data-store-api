@@ -1,4 +1,4 @@
-@F-1002
+@F-1002 @cdam
 Feature: F-1002: Submit Event for an Existing Case
 
   Background: Load test data for the scenario

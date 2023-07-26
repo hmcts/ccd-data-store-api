@@ -1,6 +1,6 @@
 {
   "_guid_": "F-142_Create1LinkedCases_1StandardCaseLinks",
-  "_extends_": "Health__Base",
+  "_extends_": "Simple_404",
 
   "specs": [
     "to create 1 standard linked case with basic access for test account"

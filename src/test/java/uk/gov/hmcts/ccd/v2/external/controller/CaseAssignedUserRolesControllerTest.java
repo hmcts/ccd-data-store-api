@@ -78,7 +78,7 @@ class CaseAssignedUserRolesControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(caseReferenceService.validateUID(CASE_ID_GOOD)).thenReturn(true);
         when(caseReferenceService.validateUID(CASE_ID_BAD)).thenReturn(false);
@@ -343,6 +343,7 @@ class CaseAssignedUserRolesControllerTest {
 
     }
 
+    @SuppressWarnings("removal") // Suppressing `removal` warning as these test are for a known deprecated endpoint
     @Nested
     @DisplayName("GET /case-users")
     class GetCaseUserRoles {

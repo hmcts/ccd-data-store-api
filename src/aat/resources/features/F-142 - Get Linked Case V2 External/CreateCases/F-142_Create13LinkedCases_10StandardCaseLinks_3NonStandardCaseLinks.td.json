@@ -1,6 +1,6 @@
 {
   "_guid_": "F-142_Create13LinkedCases_10StandardCaseLinks_3NonStandardCaseLinks",
-  "_extends_": "Health__Base",
+  "_extends_": "Simple_404",
 
   "specs": [
     "to create 10 standard linked case and 3 non standard case links, with basic access for test account"

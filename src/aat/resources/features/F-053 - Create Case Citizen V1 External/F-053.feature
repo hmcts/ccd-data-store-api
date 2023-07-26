@@ -154,7 +154,7 @@ Scenario: must return negative response HTTP-400 when request contains a malform
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-578
+@S-578 @cdam
 Scenario: must create and update successfully the respective fields with ACL permissions for a Citizen
 
     Given a user with [an active Citizen profile in CCD],

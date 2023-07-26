@@ -1,4 +1,4 @@
-@F-140
+@F-140 @cdam
 Feature: F-140: CategoriesAndDocument endpoint
 
   Background: Load test data for the scenario

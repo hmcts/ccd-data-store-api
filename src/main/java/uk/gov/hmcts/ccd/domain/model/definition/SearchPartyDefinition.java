@@ -1,15 +1,15 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Data
-public class SearchParty implements Serializable {
+public class SearchPartyDefinition implements Serializable {
 
     private String caseTypeId;
     private String searchPartyDob;
@@ -21,4 +21,5 @@ public class SearchParty implements Serializable {
     private Date liveTo;
     private String searchPartyName;
     private String searchPartyCollectionFieldName;
+
 }

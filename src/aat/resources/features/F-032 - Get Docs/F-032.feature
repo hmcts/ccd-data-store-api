@@ -7,7 +7,7 @@ Background:
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-124
+@S-124 @cdam
 Scenario: must retrieve printable documents successfully for correct inputs
 
   Given a user with [an active profile in CCD],
