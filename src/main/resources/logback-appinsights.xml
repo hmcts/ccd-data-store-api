@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <appender name="APP_INSIGHTS" class="com.microsoft.applicationinsights.logback.ApplicationInsightsAppender">
+    </appender>
+
+    <appender name="ASYNC_APP_INSIGHTS" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+        <appender-ref ref="APP_INSIGHTS" />
+    </appender>
+
+    <logger name="uk.gov.hmcts" level="OFF"/>
+
+    <logger name="uk.gov.hmcts.ccd.domain.model.lau" level="${ROOT_LOGGING_LEVEL:-INFO}">
+        <appender-ref ref="ASYNC_APP_INSIGHTS" />
+    </logger>
+</included>
