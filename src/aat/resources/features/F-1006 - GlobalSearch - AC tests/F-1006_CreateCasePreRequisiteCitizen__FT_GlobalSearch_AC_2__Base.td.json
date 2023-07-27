@@ -1,0 +1,39 @@
+{
+  "_guid_": "F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Base",
+  "_extends_": "CreateCase_FT_GlobalSearch_AC_2_PreRequisiteCitizen__Base",
+
+  "prerequisites": [
+    { "Token_Creation_Citizen": "F-1006_Case_Data_Create_Token_Creation_Citizen__FT_GlobalSearch_AC_2" }
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_GlobalSearch_AC_2"
+    },
+
+    "body": {
+      "data": {
+        "_extends_": "F-1006_CaseData_Without_SearchCriteria",
+
+        "Email": "${[scenarioContext][customValues][UniqueString]}@mail.com"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "_extends_": "F-1006_CaseData_With_SearchCriteria",
+
+        "caseManagementLocation": {
+          "baseLocation": "${[scenarioContext][testData][request][body][data][caseManagementLocation][baseLocation]}",
+          "region": "${[scenarioContext][testData][request][body][data][caseManagementLocation][region]}"
+        }
+      },
+
+      "data_classification": {
+        "_extends_": "Befta_Global_Search_Data_Classifications"
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "title": "Returning all results from Global Search matching the users jurisdictions/case types",
+  "_guid_": "S-1006.AP.1",
+  "_extends_": "GlobalSearch__Base",
+
+  "specs": [
+    "a caseworker with RA1: BASIC role assignment",
+    "search for case type with matching pseudo role assignments",
+    "contains case with Access Process value NONE"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker_Staff"
+    }
+  },
+
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "CCDCaseTypeIds": [
+          "FT_GlobalSearch_AC_1"
+        ],
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_1][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 1,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "caseReference"
+        },
+        {
+          "_extends_": "F-1006_ExpectedCaseSearchResult",
+
+          "caseReference" : "${}${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_1][testData][actualResponse][body][id]}",
+
+          "processForAccess" : "NONE",
+
+          "CCDCaseTypeId" : "FT_GlobalSearch_AC_1",
+          "CCDCaseTypeName" : "FT_GlobalSearch_AC_1"
+        }
+      ]
+    }
+  }
+}
