@@ -114,6 +114,9 @@ public class ApplicationParams {
     @Value("${user.cache.ttl.secs}")
     private Integer userCacheTTLSecs;
 
+    @Value("${user.role.cache.ttl.secs}")
+    private Integer userRoleCacheTTLSecs;
+
     @Value("${default.cache.max.size}")
     private Integer defaultCacheMaxSize;
 
@@ -171,6 +174,9 @@ public class ApplicationParams {
     @Value("${ccd.access-control.caseworker.role.regex}")
     private String ccdAccessControlCaseworkerRoleRegex;
 
+    @Value("#{'${ccd.access-control.restricted-roles}'.split(',')}")
+    private List<String> ccdAccessControlRestrictedRoles;
+
     @Value("${enable-attribute-based-access-control}")
     private boolean enableAttributeBasedAccessControl;
 
@@ -221,6 +227,9 @@ public class ApplicationParams {
 
     @Value("${system.user.token.cache.ttl.secs}")
     private Integer systemUserTokenCacheTTLSecs;
+
+    @Value("${search.internal.case-access-metadata.enabled}")
+    private boolean internalSearchCaseAccessMetadataEnabled;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -416,6 +425,10 @@ public class ApplicationParams {
         return userCacheTTLSecs;
     }
 
+    public Integer getUserRoleCacheTTLSecs() {
+        return userRoleCacheTTLSecs;
+    }
+
     public int getDefaultCacheMaxSize() {
         return defaultCacheMaxSize;
     }
@@ -506,6 +519,10 @@ public class ApplicationParams {
 
     public String getCcdAccessControlCaseworkerRoleRegex() {
         return ccdAccessControlCaseworkerRoleRegex;
+    }
+
+    public List<String> getCcdAccessControlRestrictedRoles() {
+        return ccdAccessControlRestrictedRoles;
     }
 
     public boolean getEnableAttributeBasedAccessControl() {
@@ -602,5 +619,9 @@ public class ApplicationParams {
 
     public Integer getSystemUserTokenCacheTTLSecs() {
         return systemUserTokenCacheTTLSecs;
+    }
+
+    public boolean getInternalSearchCaseAccessMetadataEnabled() {
+        return internalSearchCaseAccessMetadataEnabled;
     }
 }

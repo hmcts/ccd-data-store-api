@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
@@ -9,17 +10,11 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import org.junit.After;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -28,6 +23,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -37,8 +33,16 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -52,20 +56,22 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinitionTest.findNestedField;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DOCUMENT;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_ROLE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.extractAccessProfileNames;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
@@ -247,6 +253,11 @@ public class AccessControlServiceTest {
     static final String person2 =
         p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + arrayEnd + p2Notes + p2End;
 
+    private Logger logger;
+    private ListAppender<ILoggingEvent> listAppender;
+    private List<ILoggingEvent> loggingEventList;
+    private boolean logServiceClass;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -258,8 +269,8 @@ public class AccessControlServiceTest {
     class CanAccessCaseStateWithCriteriaAclTests {
 
         @Test
-        @DisplayName("Should not grant access to case state with relevant acl missing")
-        void shouldNotGrantAccessToStateIfRelevantACLMissing() {
+        @DisplayName("Should not grant access to case state for user with missing role")
+        void shouldNotGrantAccessToStateForUserWithMissingRole() {
             CaseTypeDefinition caseType = newCaseType()
                 .withState(newState()
                     .withId(STATE_ID1)
@@ -271,6 +282,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
+            setupLogging().setLevel(Level.DEBUG);
             assertAll(
                 () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType,
                     ACCESS_PROFILES,
@@ -278,6 +290,17 @@ public class AccessControlServiceTest {
                 () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType,
                     ACCESS_PROFILES,
                     CAN_CREATE), is(false))
+            );
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    NO_ROLE_FOUND, "caseState", STATE_ID1,
+                    extractAccessProfileNames(ACCESS_PROFILES),
+                    "caseStateACL", "[ACL{accessProfile='caseworker-divorce-loa4', crud=CR}]"
+            );
+            loggingEventList = listAppender.list;
+            assertAll(
+                    () -> assertTrue(loggingEventList.stream().allMatch(log -> log.getLevel() == Level.DEBUG)),
+                    () -> assertTrue(loggingEventList.stream().anyMatch(log ->
+                            log.getFormattedMessage().equals(expectedLogMessage)))
             );
         }
 
@@ -433,8 +456,8 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not grant access to case fields with relevant acl missing")
-        void shouldNotGrantAccessToFieldsIfRelevantAclMissing() throws IOException {
+        @DisplayName("Should not grant access to case fields for user with missing role")
+        void shouldNotGrantAccessToFieldsForUserWithMissingRole() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId(ADDRESSES)
@@ -450,6 +473,7 @@ public class AccessControlServiceTest {
             ));
             JsonNode dataNode = JacksonUtils.convertValueJsonNode(data);
 
+            setupLogging().setLevel(Level.ERROR);
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
@@ -457,6 +481,18 @@ public class AccessControlServiceTest {
                     ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
+
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    NO_ROLE_FOUND, "caseField", ADDRESSES,
+                    extractAccessProfileNames(ACCESS_PROFILES), "caseFieldACL",
+                    "[ACL{accessProfile='caseworker-divorce-loa4', crud=CR}]"
+            );
+
+            loggingEventList = listAppender.list;
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
         }
 
         @Test
@@ -567,8 +603,40 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should grant access to case fields when field is no present in definition")
+        @DisplayName("Should not grant access to case fields when field is not present in definition")
         void shouldGrantAccessToFieldsIfFieldNotPresentInDefinition() throws IOException {
+            CaseTypeDefinition caseType = newCaseType()
+                    .withField(newCaseField()
+                            .withId(ADDRESSES)
+                            .build())
+                    .build();
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
+                    "{  \"WrongAddresses\": \"someText\" }"
+            ));
+            JsonNode dataNode = JacksonUtils.convertValueJsonNode(data);
+
+            setupLogging().setLevel(Level.ERROR);
+            assertThat(
+                    accessControlService.canAccessCaseFieldsWithCriteria(
+                            dataNode,
+                            caseType.getCaseFieldDefinitions(),
+                            ACCESS_PROFILES,
+                            CAN_CREATE),
+                    is(false));
+
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    "No matching caseField={} in caseFieldDefinitions", "WrongAddresses");
+
+            loggingEventList = listAppender.list;
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
+        }
+
+        @Test
+        @DisplayName("Should grant access to case fields when expected fields is empty in definition file")
+        void shouldGrantAccessToFieldsIfFieldNotPresentInDefinitionAndDefinitionIsEmpty() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .build();
             final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
@@ -1018,7 +1086,6 @@ public class AccessControlServiceTest {
                 + "    }\n"
                 + "  ]\n"
                 + "}");
-
             assertFieldsAccess(false, caseType, newDataNode, existingDataNode);
         }
 
@@ -1249,8 +1316,8 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not grant access to event with relevant acl missing")
-        void shouldNotGrantAccessToEventIfRelevantAclMissing() {
+        @DisplayName("Should not grant access to event for user with missing role")
+        void shouldNotGrantAccessToEventForUserWithMissingRole() {
             final CaseTypeDefinition caseType = new CaseTypeDefinition();
             CaseEventDefinition eventDefinition = new CaseEventDefinition();
             eventDefinition.setId(EVENT_ID);
@@ -1261,6 +1328,8 @@ public class AccessControlServiceTest {
             eventDefinition.setAccessControlLists(accessControlLists);
             caseType.setEvents(singletonList(eventDefinition));
 
+            logServiceClass = true;
+            setupLogging().setLevel(Level.ERROR);
             assertThat(
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID,
@@ -1268,6 +1337,16 @@ public class AccessControlServiceTest {
                     ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
+
+            loggingEventList = listAppender.list;
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    NO_ROLE_FOUND, "caseEvent", EVENT_ID,
+                    extractAccessProfileNames(ACCESS_PROFILES),
+                    "caseEventACL", "[ACL{accessProfile='caseworker-divorce-loa4', crud=C}]");
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
         }
 
         @Test
@@ -1325,6 +1404,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
+            logServiceClass = true;
+            setupLogging().setLevel(Level.ERROR);
             assertThat(
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID_LOWER_CASE,
@@ -1332,6 +1413,17 @@ public class AccessControlServiceTest {
                     ACCESS_PROFILES,
                     AccessControlList::isCreate),
                 is(false));
+
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    "No matching caseEvent={} in caseEventDefinitions",
+                        EVENT_ID_LOWER_CASE
+            );
+
+            loggingEventList = listAppender.list;
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.ERROR)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
         }
 
         @Test
@@ -1368,7 +1460,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case if acls are missing")
         void shouldNotGrantAccessToCaseIfMissingAcls() {
-            final CaseTypeDefinition caseType = new CaseTypeDefinition();
+            final CaseTypeDefinition caseType = newCaseType().build();
 
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
@@ -1379,8 +1471,8 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not grant access to case with relevant acl missing")
-        void shouldNotGrantAccessToCaseIfRelevantAclMissing() {
+        @DisplayName("Should not grant access to case for user with missing role")
+        void shouldNotGrantAccessToCaseForUserWithMissingRole() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
@@ -1410,12 +1502,36 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
+            setupLogging().setLevel(Level.DEBUG);
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
                     ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
+
+            loggingEventList = listAppender.list;
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    NO_ROLE_FOUND, "caseType", caseType.getId(),
+                    "[caseworker-divorce-loa, caseworker-probate-loa3, caseworker-probate-loa1]",
+                    "caseTypeACL", List.of());
+
+            assertAll(
+                    () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
+                    () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
+
+        }
+
+        @Test
+        @DisplayName("Should not grant access to case if caseType is null")
+        void shouldNotGrantAccessToCaseIfCaseTypeIsNull() {
+            assertThat(
+                    accessControlService.canAccessCaseTypeWithCriteria(
+                            null,
+                            ACCESS_PROFILES,
+                            CAN_CREATE),
+                    is(false));
         }
 
         @Test
@@ -1468,8 +1584,8 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not return data if field with relevant acl missing")
-        void shouldNotReturnFieldIfRelevantAclMissing() throws IOException {
+        @DisplayName("Should not return data for user with missing role")
+        void shouldNotReturnFieldForUserWithMissingRole() throws IOException {
             CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId(ADDRESSES)
@@ -2327,8 +2443,8 @@ public class AccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should not return audit event if relevant acl missing")
-        void shouldNotReturnEventIfRelevantAclMissing() {
+        @DisplayName("Should not return audit event for user with missing role")
+        void shouldNotReturnEventForUserWithMissingRole() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
@@ -3910,8 +4026,8 @@ public class AccessControlServiceTest {
     class ReturnsCaseEventsDataWithCaseEventAccessAclTests {
 
         @Test
-        @DisplayName("Should not return case event definition if relevant acl missing")
-        void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() {
+        @DisplayName("Should not return case event definition for user with missing role")
+        void shouldNotReturnCaseEventDefinitionForUserWithMissingRole() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
@@ -4055,8 +4171,8 @@ public class AccessControlServiceTest {
     class CaseViewFieldsAclTests {
 
         @Test
-        @DisplayName("Should not return case event definition if relevant acl missing")
-        void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() {
+        @DisplayName("Should not return case event definition for user with missing role")
+        void shouldNotReturnCaseEventDefinitionForUserWithMissingRole() {
             final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
@@ -4492,6 +4608,67 @@ public class AccessControlServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("Case View Field with Criteria tests")
+    class CanAccessCaseViewFieldWithCriteriaTests {
+
+        @Test
+        @DisplayName("Should allow access when the role has read permission")
+        void shouldGrantAccessWhenRoleHasReadPermissionForField() {
+            final CommonField viewField =
+                newCaseField()
+                    .withId("NotesReadAccessForRole")
+                    .withFieldType(aFieldType()
+                        .withType(TEXT)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build();
+
+            setupLogging().setLevel(Level.DEBUG);
+            boolean canAccessCaseViewField =
+                accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ);
+
+            loggingEventList = listAppender.list;
+
+            assertAll(
+                () -> assertThat(canAccessCaseViewField, is(true)),
+                () -> assertThat(loggingEventList.size(), is(0))
+            );
+        }
+
+        @Test
+        @DisplayName("Should not grant access to case view for user with missing role")
+        void shouldNotGrantAccessToCaseViewForUserWithMissingRole() {
+            final CommonField viewField = newCaseField()
+                    .withId("NotesNoReadAccessForRole")
+                    .withFieldType(aFieldType()
+                            .withType(TEXT)
+                            .build())
+                    .withAcl(anAcl()
+                            .withRole(ROLE_NOT_IN_USER_ROLES)
+                            .withRead(true)
+                            .build())
+                    .build();
+
+            setupLogging().setLevel(Level.DEBUG);
+            assertFalse(accessControlService.canAccessCaseViewFieldWithCriteria(viewField, ACCESS_PROFILES, CAN_READ));
+
+            loggingEventList = listAppender.list;
+            String expectedLogMessage = TestBuildersUtil.formatLogMessage(
+                    NO_ROLE_FOUND, "caseField", "NotesNoReadAccessForRole",
+                    extractAccessProfileNames(ACCESS_PROFILES), "caseFieldACL",
+                    "[ACL{accessProfile='caseworker-divorce-loa4', crud=R}]");
+
+            assertAll(
+                () -> assertThat(loggingEventList.get(0).getLevel(), is(Level.DEBUG)),
+                () -> assertThat(loggingEventList.get(0).getFormattedMessage(), is(expectedLogMessage))
+            );
+        }
+    }
+
     private JsonNode getJsonNode(String content) throws IOException {
         final Map<String, JsonNode> newData = JacksonUtils.convertValue(MAPPER.readTree(content));
         return JacksonUtils.convertValueJsonNode(newData);
@@ -4506,6 +4683,30 @@ public class AccessControlServiceTest {
                 caseType.getCaseFieldDefinitions(),
                 ACCESS_PROFILES),
             is(hasFieldAccess));
+    }
+
+    private Logger setupLogging() {
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        logger = (Logger) LoggerFactory.getLogger(
+                        logServiceClass ? AccessControlService.class : AccessControlServiceImpl.class);
+        logger.detachAndStopAllAppenders();
+        if (loggingEventList != null && !loggingEventList.isEmpty()) {
+            loggingEventList.clear();
+        }
+        logger.addAppender(listAppender);
+        logServiceClass = false;
+        return logger;
+    }
+
+    @After
+    public void tearDown() {
+        if (listAppender != null) {
+            listAppender.stop();
+        }
+        if (logger != null) {
+            logger.detachAndStopAllAppenders();
+        }
     }
 
     private JsonNode getTextNode(String value) {

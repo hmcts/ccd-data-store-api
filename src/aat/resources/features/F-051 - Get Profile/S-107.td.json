@@ -1,41 +1,28 @@
 {
-	"_guid_": "S-107",
-	"_extends_": "Base_Expecting_403",
-	"title": "must return 401 when request does not provide valid authentication credentials",
+  "_guid_": "S-107",
+  "_extends_": "F-051_Test_Data_Base_V1",
+  "title": "must return 401 when request does not provide valid authentication credentials",
 
-	"productName": "CCD Data Store",
-	"operationName": "Get default settings for user",
+  "users": {
+    "invokingUser": {
+      "_extends_": "CaseworkerAutotest"
+    }
+  },
 
-	"method": "GET",
-	"uri": "/caseworkers/{uid}/profile",
+  "specs": [
+    "a detailed profile in CCD",
+    "uses an invalid user token",
+    "contains a 401 return code"
+  ],
 
-	"specs": [
-		"a detailed profile in CCD",
-		"uses a Case ID that doesn’t exist in CCD",
-		"uses the invalid authorization",
-		"has the 403 return code"
-	],
+  "request": {
+    "headers": {
+      "Authorization": "Bearer abc"
+    }
+  },
 
-	"request": {
-		"headers": {
-			"Authorization": "TESTAUTH"
-		},
-		"pathVariables": {
-			"uid": "some id"
-		}
-	},
-
-	"expectedResponse": {
-		"headers": {
-			"Content-Encoding": "gzip",
-			"Content-Length": "[[ANYTHING_PRESENT]]"
-		},
-		"body": {
-			"timestamp": "[[ANYTHING_PRESENT]]",
-			"status": 403,
-			"error": "Forbidden",
-			"message": "Access Denied",
-			"path": "/caseworkers/some%20id/profile"
-		}
-	}
+  "expectedResponse": {
+    "_extends_": "Common_401_Response",
+    "body": null
+  }
 }

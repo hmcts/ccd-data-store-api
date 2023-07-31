@@ -1,0 +1,7 @@
+{
+  "_guid_": "S-069.2",
+  "_extends_": "F-069_Test_Data_Base",
+  "specs": [
+    "doesn't contain the event that doesn't match the data from the Callback"
+  ]
+}

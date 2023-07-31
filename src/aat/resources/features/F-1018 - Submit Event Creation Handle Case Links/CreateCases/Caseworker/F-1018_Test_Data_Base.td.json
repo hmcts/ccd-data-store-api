@@ -34,10 +34,7 @@
         "SearchCriteria" : { }
       },
       "data_classification": {
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-      },
-      "security_classifications": {
-        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        "SearchCriteria": "[[ANYTHING_PRESENT]]"
       }
     }
   }

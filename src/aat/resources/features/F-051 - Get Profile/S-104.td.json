@@ -1,0 +1,28 @@
+{
+	"_guid_": "S-104",
+  "_extends_": "F-051_Test_Data_Base_V2",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "CaseworkerAutotest"
+    }
+  },
+
+  "specs": [
+    "a detailed profile in CCD",
+    "uses an invalid user token",
+    "contains a 401 return code"
+  ],
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer abc"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_401_Response",
+    "body" : null
+  }
+}
