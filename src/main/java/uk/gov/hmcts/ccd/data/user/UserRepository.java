@@ -8,7 +8,6 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 public interface UserRepository {
 
@@ -30,13 +29,14 @@ public interface UserRepository {
 
     IdamUser getUserByUserId(String userId);
 
-        /**
-         * Get caseworker user's jurisdictions based on their roles.
-         * Note that for cross-jurisdiction roles, this method will NOT return every jurisdiction - it only
-         * takes into account jurisdiction-specific caseworker roles.
-         * If a user is cross-jurisdiction, the jurisdictions should be obtained from the CaseDefinitionRepository.
-         * @return The jurisdictions the user has access to based on their caseworker roles.
-         */
+    /**
+     * Get caseworker user's jurisdictions based on their roles.
+     * Note that for cross-jurisdiction roles, this method will NOT return every jurisdiction - it only
+     * takes into account jurisdiction-specific caseworker roles.
+     * If a user is cross-jurisdiction, the jurisdictions should be obtained from the CaseDefinitionRepository.
+     *
+     * @return The jurisdictions the user has access to based on their caseworker roles.
+     */
     List<String> getCaseworkerUserRolesJurisdictions();
 
     boolean anyRoleEqualsAnyOf(List<String> userRoles);
