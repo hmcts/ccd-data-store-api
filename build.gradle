@@ -86,7 +86,7 @@ ext {
     junitJupiterVersion = '5.8.2'
     junitVintageVersion = '5.8.2'
     powermockVersion = '2.0.7'
-    reformLogging = '5.1.9'
+    reformLogging = '6.0.1'
     appInsightsVersion = '2.4.1'
     swagger2Version = '3.0.0'
     hibernateVersion = '5.6.10.Final'
