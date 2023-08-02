@@ -492,9 +492,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
 
         doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
-        doReturn(caseDetailsFromDB).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
-        doReturn(caseDetailsFromDB).when(caseService).clone(any(CaseDetails.class));
-
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         CaseStateDefinition state = new CaseStateDefinition();
         state.setId(POST_STATE);
