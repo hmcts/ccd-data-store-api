@@ -81,9 +81,13 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
         if (userRoleClassifications.containsKey(userRole)) {
             LOGGER.info("Using userRoleClassifications cached value for :" + userRole);
         }
-        UserRole ur = userRoleClassifications.computeIfAbsent(userRole, caseDefinitionRepository::getUserRoleClassifications);
-        LOGGER.info("Found user role " + ur.getRole() == null ? "null" : ur.getRole() +
-            "with security classification " + ur.getSecurityClassification() == null ? "null" : ur.getSecurityClassification()
+        UserRole ur = userRoleClassifications.computeIfAbsent(userRole,
+            caseDefinitionRepository::getUserRoleClassifications
+        );
+        LOGGER.info("Found user role "
+            + ur.getRole() == null ? "null" : ur.getRole()
+            + "with security classification "
+            + ur.getSecurityClassification() == null ? "null" : ur.getSecurityClassification()
         );
         return ur;
     }
