@@ -78,7 +78,14 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     @Override
     public UserRole getUserRoleClassifications(String userRole) {
-        return userRoleClassifications.computeIfAbsent(userRole, caseDefinitionRepository::getUserRoleClassifications);
+        if (userRoleClassifications.containsKey(userRole)) {
+            LOGGER.info("Using userRoleClassifications cached value for :" + userRole);
+        }
+        UserRole ur = userRoleClassifications.computeIfAbsent(userRole, caseDefinitionRepository::getUserRoleClassifications);
+        LOGGER.info("Found user role " + ur.getRole() == null ? "null" : ur.getRole() +
+            "with security classification " + ur.getSecurityClassification() == null ? "null" : ur.getSecurityClassification()
+        );
+        return ur;
     }
 
     @Override
