@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.6.10'
+        springBootVersion = '2.7.11'
     }
     dependencies {
         classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:1.1.1'
@@ -48,8 +48,8 @@ apply from: './gradle/suppress.gradle'
 def versions = [
         pact_version    : '4.1.7',
 ]
-ext['spring-security.version'] = '5.6.9'
-ext['spring-framework.version'] = '5.3.26'
+ext['spring-security.version'] = '5.7.8'
+ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.14.1'
 
 
