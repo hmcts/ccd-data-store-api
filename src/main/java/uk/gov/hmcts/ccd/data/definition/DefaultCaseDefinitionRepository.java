@@ -144,7 +144,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             final HttpEntity requestEntity = new HttpEntity<CaseTypeDefinition>(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("userRole", encodeBase64(userRole));
-            LOG.info("Getting UserRoleClassifications for : " + userRole);
+            LOG.info("Getting UserRoleClassifications for : {}", userRole);
             return restTemplate.exchange(applicationParams.userRoleClassification(), HttpMethod.GET, requestEntity,
                     UserRole.class, queryParams).getBody();
         } catch (Exception e) {
