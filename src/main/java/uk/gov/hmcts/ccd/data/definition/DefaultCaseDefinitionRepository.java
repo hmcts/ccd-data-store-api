@@ -55,7 +55,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Deprecated
     @SuppressWarnings("squid:S1133")
     @Override
-    public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
+    public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) { //NOT CALLED
         try {
             return Arrays.asList(Objects.requireNonNull(definitionStoreClient.invokeRestCall(
                 applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId),
@@ -80,7 +80,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    public CaseTypeDefinition getCaseType(final String caseTypeId) {
+    public CaseTypeDefinition getCaseType(final String caseTypeId) { //CALLED
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
             final CaseTypeDefinition caseTypeDefinition = definitionStoreClient
@@ -106,7 +106,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    public List<FieldTypeDefinition> getBaseTypes() {
+    public List<FieldTypeDefinition> getBaseTypes() { //CALLED
         try {
             return Arrays.asList(Objects.requireNonNull(definitionStoreClient
                 .invokeRestCall(applicationParams.baseTypesURL(),
@@ -126,7 +126,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     @Cacheable("userRolesCache")
-    public UserRole getUserRoleClassifications(String userRole) {
+    public UserRole getUserRoleClassifications(String userRole) { //CALLED
         try {
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("userRole", encodeBase64(userRole));
@@ -146,7 +146,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    public List<UserRole> getClassificationsForUserRoleList(List<String> userRoles) {
+    public List<UserRole> getClassificationsForUserRoleList(List<String> userRoles) { //NOT CALLED
         try {
             if (userRoles.isEmpty()) {
                 return Collections.emptyList();
@@ -169,7 +169,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         return getLatestVersionFromDefinitionStore(caseTypeId);
     }
 
-    public CaseTypeDefinitionVersion getLatestVersionFromDefinitionStore(String caseTypeId) {
+    public CaseTypeDefinitionVersion getLatestVersionFromDefinitionStore(String caseTypeId) { //CALLED
         try {
             CaseTypeDefinitionVersion version = definitionStoreClient
                 .invokeRestCall(applicationParams.caseTypeLatestVersionUrl(caseTypeId),
@@ -236,7 +236,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         return getJurisdictionsFromDefinitionStore(Optional.of(Collections.emptyList()));
     }
 
-    private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
+    private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) { //CALLED
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
             jurisdictionIds.ifPresent(ids -> builder.queryParam("ids", String.join(",", ids)));
