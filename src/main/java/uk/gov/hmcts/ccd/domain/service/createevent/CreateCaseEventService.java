@@ -232,6 +232,7 @@ public class CreateCaseEventService {
             timeNow,
             oldState,
             content.getOnBehalfOfUserToken(),
+            content.getOnBehalfOfId(),
             securityClassificationService.getClassificationForEvent(caseTypeDefinition,
                 caseEventDefinition)
         );
@@ -311,6 +312,7 @@ public class CreateCaseEventService {
             caseTypeDefinition,
             timeNow,
             oldState,
+            null,
             null,
             SecurityClassification.PUBLIC
         );
@@ -439,6 +441,7 @@ public class CreateCaseEventService {
                                               final LocalDateTime timeNow,
                                               final String oldState,
                                               final String onBehalfOfUserToken,
+                                              final String onBehalfOfId,
                                               final SecurityClassification securityClassification) {
         final CaseStateDefinition caseStateDefinition =
             caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
@@ -457,7 +460,7 @@ public class CreateCaseEventService {
         auditEvent.setSecurityClassification(securityClassification);
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
-        saveUserDetails(onBehalfOfUserToken, auditEvent);
+        saveUserDetails(onBehalfOfUserToken, onBehalfOfId, auditEvent);
 
         caseAuditEventRepository.set(auditEvent);
         messageService.handleMessage(MessageContext.builder()
@@ -468,15 +471,16 @@ public class CreateCaseEventService {
             .build());
     }
 
-    private void saveUserDetails(String onBehalfOfUserToken, AuditEvent auditEvent) {
+    private void saveUserDetails(String onBehalfOfUserToken, String onBehalfOfId, AuditEvent auditEvent) {
         boolean onBehalfOfUserTokenExists = !StringUtils.isEmpty(onBehalfOfUserToken);
+        boolean onBehalfOfIdExists = !StringUtils.isEmpty(onBehalfOfId);
         IdamUser user = onBehalfOfUserTokenExists
             ? userRepository.getUser(onBehalfOfUserToken)
-            : userRepository.getUser();
+            : onBehalfOfIdExists ? userRepository.getUserByUserId(onBehalfOfId) : userRepository.getUser();
         auditEvent.setUserId(user.getId());
         auditEvent.setUserLastName(user.getSurname());
         auditEvent.setUserFirstName(user.getForename());
-        if (onBehalfOfUserTokenExists) {
+        if (onBehalfOfUserTokenExists || onBehalfOfIdExists) {
             user = userRepository.getUser();
             auditEvent.setProxiedBy(user.getId());
             auditEvent.setProxiedByLastName(user.getSurname());

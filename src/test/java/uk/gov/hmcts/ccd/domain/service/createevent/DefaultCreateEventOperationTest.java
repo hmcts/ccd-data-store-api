@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
@@ -221,6 +222,20 @@ class DefaultCreateEventOperationTest {
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
             () -> assertThat(caseDetails.getCallbackResponseStatus(), is("CALLBACK_COMPLETED"))
         );
+    }
+
+    @Test
+    @DisplayName("should return incomplete response status if remote endpoint is down onBehalfOfId")
+    void shouldReturnInvokeSettingProxiedOnBehalfOfId() {
+        String onBehalfOfId = UUID.randomUUID().toString();
+        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING)
+            .withOnBehalfOfId(onBehalfOfId).build();
+        mockCaseEventResult();
+
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        assertNotNull(caseDetails);
     }
 
     private Map<String, JsonNode> buildJsonNodeData() {

@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
@@ -708,6 +709,48 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         assertNotNull(exception);
         assertTrue(StringUtils.contains(exception.getMessage(), CASE_ID_INVALID));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldSaveOnBehalfOfUserAndProxiedByUserId() throws Exception {
+        String caseId = "1504259907353529";
+        final String URL = "/cases/" + caseId + "/events";
+
+        UserInfo userInfo = UserInfo.builder()
+            .uid("TestUserId")
+            .givenName("firstname")
+            .familyName("familyname")
+            .build();
+        stubFor(WireMock.get(urlMatching("/o/userinfo"))
+            .withHeader(HttpHeaders.AUTHORIZATION, containing("Test_Token"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+
+        String onBehalfOfId = UUID.randomUUID().toString();
+        stubFor(WireMock.get(urlMatching("/api/v1/users/" + onBehalfOfId))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent()
+            .withCaseReference(caseId)
+            .withOnBehalfOfId(onBehalfOfId)
+            .withEvent(anEvent()
+                .withEventId("HAS_PRE_STATES_EVENT")
+                .withSummary("Short comment")
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "HAS_PRE_STATES_EVENT"))
+            .build();
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(caseDetailsToSave))
+        ).andReturn();
+
+        assertEquals(201, mvcResult.getResponse().getStatus(), mvcResult.getResponse().getContentAsString());
+        String content = mvcResult.getResponse().getContentAsString();
+        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+        assertNotNull(savedCaseResource, "Saved Case Details should not be null");
     }
 
     @Nested
