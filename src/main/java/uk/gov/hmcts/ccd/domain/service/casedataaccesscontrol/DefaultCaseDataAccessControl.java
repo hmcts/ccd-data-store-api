@@ -378,7 +378,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         Set<AccessProfile> accessProfiles = generateAccessProfilesByCaseDetails(caseDetails);
         // HAS @Data tag so toString should work
         LOG.info("--- getUserClassifications Access profile data before getSecurityClassifications ----");
-        accessProfiles.forEach(ap -> LOG.info("Access profile data : {}" , ap.toString()));
+        accessProfiles.forEach(ap -> LOG.info("Access profile data : {}", ap.toString()));
         return getSecurityClassifications(accessProfiles);
     }
 
