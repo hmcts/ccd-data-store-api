@@ -181,7 +181,8 @@ class SubmitCaseTransactionTest {
                                                                                idamUser,
                                                                                caseEventDefinition,
                                                                                this.caseDetails,
-                                                                               IGNORE_WARNING);
+                                                                               IGNORE_WARNING,
+                                                                 null);
 
         final InOrder order = inOrder(caseDetails, caseDetails, caseDetailsRepository);
 
@@ -205,7 +206,7 @@ class SubmitCaseTransactionTest {
                                          idamUser,
                                          caseEventDefinition,
                                          this.caseDetails,
-                                         IGNORE_WARNING);
+                                         IGNORE_WARNING, null);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -240,7 +241,7 @@ class SubmitCaseTransactionTest {
             idamUser,
             caseEventDefinition,
             inputCaseDetails,
-            IGNORE_WARNING);
+            IGNORE_WARNING, null);
 
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
@@ -257,7 +258,7 @@ class SubmitCaseTransactionTest {
             idamUser,
             caseEventDefinition,
             this.caseDetails,
-            IGNORE_WARNING);
+            IGNORE_WARNING, null);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -274,7 +275,7 @@ class SubmitCaseTransactionTest {
             idamUser,
             caseEventDefinition,
             this.caseDetails,
-            IGNORE_WARNING);
+            IGNORE_WARNING, null);
 
         verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null, caseDetails, caseTypeDefinition,
             IGNORE_WARNING);
