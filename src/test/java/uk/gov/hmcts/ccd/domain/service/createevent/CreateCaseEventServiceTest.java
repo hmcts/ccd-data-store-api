@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 
+import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -45,6 +46,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,6 +61,8 @@ import java.util.Optional;
 
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -82,7 +86,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private static final String ATTRIBUTE_PATH = "DocumentField";
     private static final String CATEGORY_ID = "categoryId";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-
+    protected static final String NON_EXISTENT_CASE_REFERENCE = "1234123412341289";
 
     @Mock
     private UserRepository userRepository;
@@ -508,6 +512,26 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         assertThat(caseEventResult.getSavedCaseDetails().getData()).isEqualTo(data);
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
+    }
+
+    @Test
+    @DisplayName("should throw Resource Not Found Exception when no case reference found")
+    void shouldThrowResourceNotFoundExceptionWhenNoCaseReferenceFound() throws Exception {
+        CaseDetailsRepository defaultCaseDetailsRepository = mock(DefaultCaseDetailsRepository.class);
+        doReturn(Optional.empty()).when(defaultCaseDetailsRepository).findByReference(NON_EXISTENT_CASE_REFERENCE);
+        assertThrows(ResourceNotFoundException.class, () -> {
+            underTest.createCaseSystemEvent(NON_EXISTENT_CASE_REFERENCE,
+            ATTRIBUTE_PATH,
+            CATEGORY_ID,
+            new Event());
+        });
+
+        assertAll(
+            () -> verify(caseTypeService, times(0)).findState(any(), any()),
+            () -> verify(caseDetailsRepository, times(0)).set(any()),
+            () -> verify( caseDefinitionRepository, times(0)).getCaseType(any()));
+
+
     }
 
     private void createCaseEvent() {
