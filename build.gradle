@@ -3,45 +3,28 @@ buildscript {
         springBootVersion = '2.7.11'
     }
     dependencies {
-        classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:1.1.1'
-    }
-    dependencies {
-        classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7'
-    }
-    dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
 
 plugins {
     id 'application'
+    id 'jacoco'
+    id 'idea'
+    id 'eclipse'
+    id 'org.springframework.boot' version '2.1.0.RELEASE'
     id 'com.github.ben-manes.versions' version '0.20.0'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
-    id 'org.sonarqube' version '2.7'
-    id 'jacoco'
+    id 'org.sonarqube' version '4.2.0.3129'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'se.patrikerdes.use-latest-versions' version '0.2.7'
-    id 'net.ltgt.apt' version '0.21'
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.23'
-    id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
-    id "info.solidsoft.pitest" version '1.4.0'
-    id "io.freefair.lombok" version "5.3.0"
+    id 'org.jetbrains.gradle.plugin.idea-ext' version "0.7"
+    id 'info.solidsoft.pitest' version '1.4.0'
     id 'uk.gov.hmcts.java' version '0.12.40'
     id 'au.com.dius.pact' version '4.1.0'
+    id "org.jsonschema2pojo" version "1.2.1"
 }
-
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'net.ltgt.apt-idea'
-apply plugin: 'application'
-apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'org.sonarqube'
-apply plugin: 'jsonschema2pojo'
-apply plugin: 'jacoco'
-apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: 'se.patrikerdes.use-latest-versions'
 
 apply from: './gradle/suppress.gradle'
 
@@ -80,7 +63,6 @@ repositories {
         url 'https://jitpack.io'
     }
 }
-// end::repositories[]
 
 ext {
     junitJupiterVersion = '5.8.2'
@@ -108,11 +90,10 @@ java {
     }
 }
 
-
 group 'uk.gov.hmcts.ccd'
 
 bootJar {
-    archiveBaseName = 'core-case-data'
+    archiveFileName = 'core-case-data'
     manifest {
         attributes 'Implementation-Title': project.name,
                 'Implementation-Version': project.version
@@ -120,14 +101,9 @@ bootJar {
     archiveFileName = 'core-case-data.jar'
 }
 
-// tag::dependencies[]
-sourceCompatibility = 11
-targetCompatibility = 11
-
 configurations {
     providedRuntime
     annotationProcessor
-//    runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
@@ -135,8 +111,6 @@ configurations {
     contractTestRuntime.extendsFrom(testRuntime)
     cucumberRuntime.extendsFrom(functionalRuntime)
 }
-
-
 
 //This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
 tasks.withType(Checkstyle) {
@@ -156,9 +130,12 @@ dependencies {
     implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLogging
 
     implementation 'org.mapstruct:mapstruct-jdk8:1.3.1.Final'
-    implementation 'org.projectlombok:lombok:1.18.16'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final', 'org.projectlombok:lombok:1.18.16', 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final', 'org.projectlombok:lombok:1.18.16', 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.28'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
 
     implementation('org.springframework.boot:spring-boot-starter-actuator')
 
@@ -433,23 +410,23 @@ task projectVersion {
     }
 }
 
-idea {
-    project {
-        // experimental: whether annotation processing will be configured in the IDE; only actually used with the 'idea' task.
-        configureAnnotationProcessing = true
-    }
-    module {
-        apt {
-            // whether generated sources dirs are added as generated sources root
-            addGeneratedSourcesDirs = true
-            // whether the annotationProcessor/apt and testAnnotationProcessor/testApt dependencies are added as module dependencies
-            addAptDependencies = true
-
-            // the dependency scope used for apt and/or compileOnly dependencies (when enabled above)
-            mainDependenciesScope = "PROVIDED" // defaults to "COMPILE" when using the Gradle integration in IntelliJ IDEA
-        }
-    }
-}
+//idea {
+//    project {
+//        // experimental: whether annotation processing will be configured in the IDE; only actually used with the 'idea' task.
+//        configureAnnotationProcessing = true
+//    }
+//    module {
+//        apt {
+//            // whether generated sources dirs are added as generated sources root
+//            addGeneratedSourcesDirs = true
+//            // whether the annotationProcessor/apt and testAnnotationProcessor/testApt dependencies are added as module dependencies
+//            addAptDependencies = true
+//
+//            // the dependency scope used for apt and/or compileOnly dependencies (when enabled above)
+//            mainDependenciesScope = "PROVIDED" // defaults to "COMPILE" when using the Gradle integration in IntelliJ IDEA
+//        }
+//    }
+//}
 
 // copied from https://github.com/joelittlejohn/jsonschema2pojo/tree/master/jsonschema2pojo-gradle-plugin
 // Note A problem was found with the configuration of task ':generateJsonSchema2Pojo'.
@@ -656,6 +633,7 @@ jacocoTestReport {
         // XML required by coveralls and for the below coverage checks
         // and html are generated by default
         xml.required = true
+        xml.outputLocation = file("${buildDir}/reports/jacoco/jacocoTestReport.xml")
     }
 
     afterEvaluate {
@@ -668,7 +646,7 @@ jacocoTestReport {
     }
 
     doLast {
-        def report = file("${jacoco.reportsDir}/test/jacocoTestReport.xml")
+        def report = file("${jacoco.reportsDirectory}/test/jacocoTestReport.xml")
         logger.lifecycle("Checking coverage results: ${report}")
 
         def parser = new XmlParser()
@@ -741,6 +719,7 @@ test {
 
     reports {
         html.required = true
+        html.outputLocation = file("${buildDir}/reports/jacoco/html")
     }
 
     jvmArgs = [
@@ -801,7 +780,7 @@ idea {
 task highLevelDataSetup(type: JavaExec) {
     dependsOn aatClasses
 
-    main = "uk.gov.hmcts.ccd.datastore.befta.HighLevelDataSetupApp"
+    mainClass = "uk.gov.hmcts.ccd.datastore.befta.HighLevelDataSetupApp"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
@@ -817,9 +796,9 @@ task smoke() {
     }
 
     doLast {
-        generateCucumberReports.enabled = true
+        generateCucumberReports.required = true
         javaexec {
-            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
+            mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
             args = ['--plugin', "json:${rootDir}/target/cucumber.json",
                     '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
@@ -854,9 +833,9 @@ task functional() {
     }
 
     doFirst {
-        generateCucumberReports.enabled = true
+        generateCucumberReports.required = true
         javaexec {
-            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
+            mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = [
                     '--threads', '1',
@@ -935,7 +914,7 @@ void reloadEnvSecrets(String env) {
 }
 
 task runRemoteDemo(type: JavaExec) {
-    main = mainClassName
+    mainClass = mainClassName
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {
         configRemoteRunTask(it, 'demo')
@@ -943,7 +922,7 @@ task runRemoteDemo(type: JavaExec) {
 }
 
 task runRemoteAAT(type: JavaExec) {
-    main = mainClassName
+    mainClass = mainClassName
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {
         configRemoteRunTask(it, 'aat')

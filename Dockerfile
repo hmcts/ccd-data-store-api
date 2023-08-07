@@ -1,14 +1,14 @@
 ARG JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
-ARG APP_INSIGHTS_AGENT_VERSION=3.4.9
+# renovate: datasource=github-releases depName=microsoft/ApplicationInsights-Java
+ARG APP_INSIGHTS_AGENT_VERSION=3.4.13
 ARG PLATFORM=""
 
 FROM hmctspublic.azurecr.io/base/java${PLATFORM}:17-distroless
 USER hmcts
 LABEL maintainer="https://github.com/hmcts/ccd-data-store-api"
 
-COPY lib/applicationinsights.json /opt/app
 COPY build/libs/core-case-data.jar /opt/app/
-COPY lib/AI-Agent.xml /opt/app/
+COPY lib/applicationinsights.json /opt/app
 
 EXPOSE 4452
 
