@@ -250,7 +250,8 @@ public class DefaultUserRepository implements UserRepository {
         idamUser.setId(userDetails.getId());
         idamUser.setEmail(userDetails.getEmail());
         idamUser.setForename(userDetails.getForename());
-        idamUser.setSurname(userDetails.getSurname().get());
+        Optional<String> surName = userDetails.getSurname();
+        idamUser.setSurname(surName.isPresent() ? surName.get() : null);
         return idamUser;
     }
 
