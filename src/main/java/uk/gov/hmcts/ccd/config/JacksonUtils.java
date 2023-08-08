@@ -27,8 +27,7 @@ import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedC
 
 public final class JacksonUtils {
 
-    private JacksonUtils(){
-
+    private JacksonUtils() {
     }
 
     public static final JsonFactory jsonFactory = JsonFactory.builder()

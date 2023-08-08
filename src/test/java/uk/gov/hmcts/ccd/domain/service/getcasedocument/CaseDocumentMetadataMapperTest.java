@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
@@ -16,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@ContextConfiguration(classes = CaseDocumentMetadataMapperImpl.class)
 class CaseDocumentMetadataMapperTest {
 
     @Autowired
