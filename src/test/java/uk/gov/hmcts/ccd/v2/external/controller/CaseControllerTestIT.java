@@ -726,9 +726,13 @@ class CaseControllerTestIT extends WireMockBaseTest {
             .withHeader(HttpHeaders.AUTHORIZATION, containing("Test_Token"))
             .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
 
+        String onBehalfOfId = UUID.randomUUID().toString();
+        stubFor(WireMock.get(urlMatching("/api/v1/users/" + onBehalfOfId))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+
         final CaseDataContent caseDetailsToSave = newCaseDataContent()
             .withCaseReference(caseId)
-            .withOnBehalfOfUserToken("Test_Token")
+            .withOnBehalfOfId(onBehalfOfId)
             .withEvent(anEvent()
                 .withEventId("HAS_PRE_STATES_EVENT")
                 .withSummary("Short comment")
