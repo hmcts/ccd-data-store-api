@@ -10,7 +10,6 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -179,7 +178,6 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificPubl
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificRestrictedUserRoleAssignmentJson;
 
 @RunWith(Enclosed.class)
-@Disabled("Temporarily disabled due to issue with Embedded ES")
 public class ElasticsearchIT extends ElasticsearchBaseTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchIT.class);
