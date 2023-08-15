@@ -1,0 +1,8 @@
+{
+  "title": "Must get event data after updating with on_behalf_of user",
+  "_guid_": "S-1020",
+  "_extends_": "F1020_Get_CaseEvent_With_On_Behalf_Of_User",
+  "specs": [
+    "an active profile in CCD"
+  ]
+}
