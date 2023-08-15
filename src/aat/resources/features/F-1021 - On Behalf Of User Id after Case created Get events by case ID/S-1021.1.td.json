@@ -5,7 +5,6 @@
   "specs": [
     "an active profile in CCD",
     "uses the case-reference of the case just created",
-    "contains a token created as in S-597-Prerequisite",
     "contains the Id of the case just created",
     "Retrieve audit events by case ID",
     "contains all audit event details under the case"
