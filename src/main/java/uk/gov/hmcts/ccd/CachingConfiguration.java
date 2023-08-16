@@ -63,7 +63,7 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", defaultCacheTtl));
         config.addMapConfig(newMapConfigWithTtl("caseRolesCache", defaultCacheTtl));
         config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", jurisdictionCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("idamUserByIdCache", userCacheTtl)); // Fixed.
+        config.addMapConfig(newMapConfigWithTtl("idamUserByIdCache", userCacheTtl));
         config.addMapConfig(newMapConfigWithTtl(BUILDING_LOCATIONS_CACHE, appParams.getRefDataCacheTtlInSec())
             .setMaxIdleSeconds(0));
         config.addMapConfig(newMapConfigWithTtl(SERVICES_CACHE, appParams.getRefDataCacheTtlInSec())

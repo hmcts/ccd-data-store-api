@@ -51,7 +51,9 @@ import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
@@ -77,6 +79,10 @@ class SubmitCaseTransactionTest {
 
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
+
+    private static final String ON_BEHALF_OF_ID = "24";
+    private static final String ON_BEHALF_OF_FNAME = "Pierre OnBehalf";
+    private static final String ON_BEHALF_OF_LNAME = "Martin OnBehalf";
 
 
     @Mock
@@ -182,7 +188,7 @@ class SubmitCaseTransactionTest {
                                                                                caseEventDefinition,
                                                                                this.caseDetails,
                                                                                IGNORE_WARNING,
-                                                                 null);
+                                                                               null);
 
         final InOrder order = inOrder(caseDetails, caseDetails, caseDetailsRepository);
 
@@ -206,7 +212,8 @@ class SubmitCaseTransactionTest {
                                          idamUser,
                                          caseEventDefinition,
                                          this.caseDetails,
-                                         IGNORE_WARNING, null);
+                                         IGNORE_WARNING,
+                                         null);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -241,7 +248,8 @@ class SubmitCaseTransactionTest {
             idamUser,
             caseEventDefinition,
             inputCaseDetails,
-            IGNORE_WARNING, null);
+            IGNORE_WARNING,
+            null);
 
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
@@ -258,7 +266,8 @@ class SubmitCaseTransactionTest {
             idamUser,
             caseEventDefinition,
             this.caseDetails,
-            IGNORE_WARNING, null);
+            IGNORE_WARNING,
+            null);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -275,10 +284,51 @@ class SubmitCaseTransactionTest {
             idamUser,
             caseEventDefinition,
             this.caseDetails,
-            IGNORE_WARNING, null);
+            IGNORE_WARNING,
+            null);
 
         verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null, caseDetails, caseTypeDefinition,
             IGNORE_WARNING);
+    }
+
+    @Test
+    @DisplayName("should persist event when onBehalfOfUser is Passed")
+    void shouldPersistEventWhenOnBehalfOfUserPassed() {
+        final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+        final ArgumentCaptor<MessageContext> messageCandidateCaptor = ArgumentCaptor.forClass(MessageContext.class);
+
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            buildOnBehalfOfUser());
+
+        assertAll(
+            () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
+            () -> assertAuditEventProxyByUser(auditEventCaptor.getValue()),
+            () -> verify(messageService).handleMessage(messageCandidateCaptor.capture())
+        );
+    }
+
+    private void assertAuditEventProxyByUser(final AuditEvent auditEvent) {
+        assertAll("Audit event",
+            () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
+            () -> assertThat(auditEvent.getProxiedBy(), is(IDAM_ID)),
+            () -> assertThat(auditEvent.getProxiedByFirstName(), is(IDAM_FNAME)),
+            () -> assertThat(auditEvent.getProxiedByLastName(), is(IDAM_LNAME)),
+            () -> assertThat(auditEvent.getUserId(), is(ON_BEHALF_OF_ID)),
+            () -> assertThat(auditEvent.getUserLastName(), is(ON_BEHALF_OF_LNAME)),
+            () -> assertThat(auditEvent.getUserFirstName(), is(ON_BEHALF_OF_FNAME)),
+            () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
+            () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
+            () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
+            () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
+            () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
+            () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
+            () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
     }
 
     private void assertAuditEvent(final AuditEvent auditEvent) {
@@ -355,6 +405,14 @@ class SubmitCaseTransactionTest {
         idamUser.setForename(IDAM_FNAME);
         idamUser.setSurname(IDAM_LNAME);
         idamUser.setEmail(IDAM_EMAIL);
+        return idamUser;
+    }
+
+    private IdamUser buildOnBehalfOfUser() {
+        final IdamUser idamUser = new IdamUser();
+        idamUser.setId(ON_BEHALF_OF_ID);
+        idamUser.setForename(ON_BEHALF_OF_FNAME);
+        idamUser.setSurname(ON_BEHALF_OF_LNAME);
         return idamUser;
     }
 
