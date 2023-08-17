@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@Disabled("Temporarily disabled due to issue with Java 17 upgrade")
 class CaseDocumentMetadataMapperTest {
 
     @Autowired
