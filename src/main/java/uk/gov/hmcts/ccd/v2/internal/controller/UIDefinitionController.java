@@ -95,11 +95,11 @@ public class UIDefinitionController {
             code = 200,
             message = "Success",
             response = WorkbasketInputsViewResource.class
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = "Case type not found"
-        )
+            )
     })
     public ResponseEntity<WorkbasketInputsViewResource> getWorkbasketInputsDetails(@PathVariable("caseTypeId")
                                                                                            String caseTypeId) {
@@ -128,11 +128,11 @@ public class UIDefinitionController {
             code = 200,
             message = "Success",
             response = SearchInputsViewResource.class
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = "Case type not found"
-        )
+            )
     })
     public ResponseEntity<SearchInputsViewResource> getSearchInputsDetails(@PathVariable("caseTypeId")
                                                                                    String caseTypeId) {
@@ -161,7 +161,7 @@ public class UIDefinitionController {
             code = 200,
             message = "Success",
             response = BannerViewResource.class
-        )
+            )
     })
     public ResponseEntity<BannerViewResource> getBanners(@RequestParam("ids") Optional<List<String>> idsOptional) {
         List<Banner> listOfBanners = idsOptional.isPresent()
@@ -188,7 +188,7 @@ public class UIDefinitionController {
             code = 200,
             message = "Success",
             response = JurisdictionConfigViewResource.class
-        )
+            )
     })
     public ResponseEntity<JurisdictionConfigViewResource> getJurisdictionUiConfigs(@RequestParam("ids")
                                                                                    Optional<List<String>> idsOptional) {
@@ -216,15 +216,15 @@ public class UIDefinitionController {
             code = 200,
             message = "Success",
             response = JurisdictionViewResource.class
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = "No jurisdictions found"
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = "Access can only be 'create', 'read' or 'update'"
-        )
+            )
     })
     public ResponseEntity<JurisdictionViewResource> getJurisdictions(@RequestParam(value = "access") String access) {
         if (accessMap.get(access) == null) {
