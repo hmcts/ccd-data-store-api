@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 
 @SuppressWarnings("checkstyle:SummaryJavadoc") // Javadoc predates checkstyle implementation in module
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class AuditEvent extends Event {
     @JsonIgnore
