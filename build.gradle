@@ -68,7 +68,7 @@ ext {
     junitJupiterVersion = '5.8.2'
     junitVintageVersion = '5.8.2'
     powermockVersion = '2.0.7'
-    reformLogging = '5.1.9'
+    reformLogging = '6.0.1'
     appInsightsVersion = '2.4.1'
     swagger2Version = '3.0.0'
     hibernateVersion = '5.6.10.Final'
@@ -830,7 +830,7 @@ task functional(type: JavaExec) {
     group = "Verification"
 
     generateCucumberReports.enabled = false
-    main("uk.gov.hmcts.reform.roleassignment.befta.DataStoreBeftaMain")
+    mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
     args = ['--strict',  '--tags', 'not @Ignore',
             '--plugin', "json:${rootDir}/target/cucumber.json", '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
