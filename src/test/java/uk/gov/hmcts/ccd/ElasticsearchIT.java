@@ -2,15 +2,18 @@ package uk.gov.hmcts.ccd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.apache.commons.io.IOUtils;
+import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,13 +23,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -39,7 +38,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -68,7 +67,6 @@ import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -82,92 +80,13 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDEX_TYPE;
-import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDICES;
 import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
 import static uk.gov.hmcts.ccd.data.ReferenceDataTestFixtures.BUILDING_LOCATIONS_STUB_ID;
 import static uk.gov.hmcts.ccd.data.ReferenceDataTestFixtures.SERVICES_STUB_ID;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_LINE_1;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_LINE_2;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_LINE_2_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_LINE_3;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_LINE_3_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_PRIVATE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_PUBLIC;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_RESTRICTED;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_SOLICITOR;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST2_PUBLIC;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST_1;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST_2;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASEWORKER_CAA;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_A;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_B;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_C;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_D;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COLLECTION_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COLLECTION_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_FIXED_LIST_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_FIXED_LIST_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_NESTED_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_TEXT_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_TEXT_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COUNTRY_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COUNTRY_NESTED_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COUNTRY_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COUNTY_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COUNTY_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CREATED_DATE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CREATED_DATE_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_TIME_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_TIME_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DEFAULT_CASE_REFERENCE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DOCUMENT_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.EMAIL_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.EMAIL_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.FIXED_LIST_ALIAS;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.FIXED_LIST_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.FIXED_LIST_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.FIXED_RADIO_LIST_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.HISTORY_COMPONENT_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.IN_PROGRESS_STATE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.LAST_MODIFIED_DATE_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.LAST_STATE_MODIFIED_DATE_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.MULTI_SELECT_LIST_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_COLLECTION_TEXT_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_NUMBER_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_NUMBER_FIELD_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PARTIAL_PHONE_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE_WITH_SPACE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.POST_CODE_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.POST_CODE_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STREET_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_ALIAS;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_AREA_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_AREA_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TOWN_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TOWN_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.VALUE_SUFFIX;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.YES_OR_NO_FIELD;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.YES_OR_NO_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.alias;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseData;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseTypesParam;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.*;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.aatCTSpecificPublicUserRoleAssignmentJson;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
@@ -178,13 +97,9 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificPriv
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificPublicUserRoleAssignmentJson;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificRestrictedUserRoleAssignmentJson;
 
-@Disabled("temporarily disabling for java 17 upgrade")
+@Slf4j
 @RunWith(Enclosed.class)
 public class ElasticsearchIT extends ElasticsearchBaseTest {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchIT.class);
-
-    private static final String DATA_DIR = "elasticsearch/data";
 
     private static final String REFERENCE_GLOBAL_SEARCH_01 = "1111222233334444";
     private static final String REFERENCE_GLOBAL_SEARCH_02 = "2222333344441111";
@@ -203,29 +118,38 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     @Inject
     private ApplicationParams applicationParams;
 
+    private static ElasticsearchContainer container;
+
     private MockMvc mockMvc;
 
     @BeforeAll
-    public static void initElastic(@Autowired EmbeddedElastic embeddedElastic)
+    public static void initElastic(@Value("${search.elastic.version}") final String ELASTICSEARCH_VERSION,
+                                   @Value("${search.elastic.port}") final int httpPortValue)
         throws IOException, InterruptedException {
 
-        LOG.info("Starting Elastic search...");
-        embeddedElastic.start();
-        LOG.info("Elastic search started.");
-        initData(embeddedElastic);
+        log.info("Starting Elastic search...");
+        container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:" + ELASTICSEARCH_VERSION)
+            .withEnv("discovery.type", "single-node")
+            .withExposedPorts(9200)
+            .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
+                new HostConfig().withPortBindings(
+                    new PortBinding(Ports.Binding.bindPort(httpPortValue), new ExposedPort(9200))
+                )
+            ));
+        container.start();
+        log.info("Elastic search started.");
+        ElasticsearchITSetup configurer = new ElasticsearchITSetup(httpPortValue);
+        log.info("Elastic search adding indexes.");
+        configurer.initIndexes();
+        log.info("Elastic search adding data.");
+        configurer.initData();
     }
 
-    private static void initData(EmbeddedElastic embeddedElastic) throws IOException {
-        PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
-
-        for (String idx : INDICES) {
-            Resource[] resources =
-                resourceResolver.getResources(String.format("classpath:%s/%s/*.json", DATA_DIR, idx));
-            for (Resource resource : resources) {
-                String caseString = IOUtils.toString(resource.getInputStream(), UTF_8);
-                embeddedElastic.index(idx, INDEX_TYPE, caseString);
-            }
-        }
+    @AfterAll
+    public static void tearDownElastic() {
+        log.info("Stopping Elastic search");
+        container.stop();
+        log.info("Elastic search stopped.");
     }
 
     @BeforeEach
@@ -237,13 +161,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         stubSuccess(BUILDING_LOCATIONS_PATH, buildings, BUILDING_LOCATIONS_STUB_ID);
         stubSuccess(SERVICES_PATH, orgServices, SERVICES_STUB_ID);
-    }
-
-    @AfterAll
-    public static void tearDownElastic(@Autowired EmbeddedElastic embeddedElastic) {
-        LOG.info("Stopping Elastic search");
-        embeddedElastic.stop();
-        LOG.info("Elastic search stopped.");
     }
 
     @Nested
@@ -862,7 +779,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         class CrudTest {
             @BeforeEach
             void beforeEach() {
-                LOG.info("CrudTest BeforeEach test method");
+                log.info("CrudTest BeforeEach test method");
                 stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
                     .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
             }
@@ -1239,7 +1156,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         class GeneralAccessTest {
             @BeforeEach
             void beforeEach() {
-                LOG.info("GeneralAccessTest BeforeEach test method");
+                log.info("GeneralAccessTest BeforeEach test method");
                 stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
                     .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
             }
