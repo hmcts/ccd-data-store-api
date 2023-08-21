@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class PortableHttpClient {
-    private static final Consumer<CloseableHttpResponse> noop = x -> {};
+    private static final Consumer<CloseableHttpResponse> noop = x -> { };
 
     private final CloseableHttpClient internalHttpClient = HttpClients.createDefault();
 

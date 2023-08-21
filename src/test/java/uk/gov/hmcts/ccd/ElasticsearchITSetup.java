@@ -143,10 +143,18 @@ public class ElasticsearchITSetup {
 
     private String indexMetadataJson(String indexName, String indexType, String id, String routing) {
         StringJoiner joiner = new StringJoiner(",");
-        if (indexName != null) joiner.add("\"_index\": \"" + indexName + "\"");
-        if (indexType != null) joiner.add("\"_type\": \"" + indexType + "\"");
-        if (id != null) joiner.add("\"_id\": \"" + id + "\"");
-        if (routing != null) joiner.add("\"_routing\": \"" + routing + "\"");
+        if (indexName != null) {
+            joiner.add("\"_index\": \"" + indexName + "\"");
+        }
+        if (indexType != null) {
+            joiner.add("\"_type\": \"" + indexType + "\"");
+        }
+        if (id != null) {
+            joiner.add("\"_id\": \"" + id + "\"");
+        }
+        if (routing != null) {
+            joiner.add("\"_routing\": \"" + routing + "\"");
+        }
         return "{ \"index\": {" + joiner + "} }";
     }
 
