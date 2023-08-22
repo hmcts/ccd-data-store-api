@@ -52,6 +52,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Autowired
     private final RestTemplate restTemplate;
 
+    private void jcdebug(String message) {
+        LOG.debug("JCDEBUG: DefaultCaseDefinitionRepository: debug: " + message);
+        LOG.info("JCDEBUG: DefaultCaseDefinitionRepository: info:  " + message);
+        LOG.warn("JCDEBUG: DefaultCaseDefinitionRepository: warn:  " + message);
+    }
+
     @Inject
     public DefaultCaseDefinitionRepository(final ApplicationParams applicationParams, final SecurityUtils securityUtils,
             final RestTemplate restTemplate) {
@@ -95,6 +101,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
             final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            jcdebug("getCaseType: " + applicationParams.caseTypeDefURL(caseTypeId));
             final CaseTypeDefinition caseTypeDefinition = restTemplate
                     .exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity,
                             CaseTypeDefinition.class)
