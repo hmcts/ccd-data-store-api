@@ -135,7 +135,8 @@ dependencies {
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.3'
 
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
-    implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLogging
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
 
     implementation 'org.mapstruct:mapstruct-jdk8:1.3.1.Final'
     compileOnly 'org.projectlombok:lombok:1.18.28'
