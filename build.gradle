@@ -826,16 +826,21 @@ task smoke() {
 task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
-//    dependsOn aatClasses
+    dependsOn aatClasses
 
     group = "Verification"
 
     generateCucumberReports.enabled = false
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-    args = ['--strict',  '--tags', 'not @Ignore',
-            '--plugin', "json:${rootDir}/target/cucumber.json", '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-            '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
+    args = [
+        '--threads', '1',
+        '--plugin', "json:${rootDir}/target/cucumber.json",
+        '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
+        '--tags', 'not @Ignore',
+        '--glue', 'uk.gov.hmcts.befta.player',
+        '--glue', 'uk.gov.hmcts.ccd.datastore.befta',
+        'src/aat/resources/features'
     ]
     // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
     jvmArgs '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED'
