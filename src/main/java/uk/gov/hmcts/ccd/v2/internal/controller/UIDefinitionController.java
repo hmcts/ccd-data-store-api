@@ -64,9 +64,9 @@ public class UIDefinitionController {
     private final HashMap<String, Predicate<AccessControlList>> accessMap = new HashMap<>();
 
     private void jcdebug(String message) {
-        LOG.debug("JCDEBUG: UIDefinitionController: debug: " + message);
-        LOG.info("JCDEBUG: UIDefinitionController: info:  " + message);
-        LOG.warn("JCDEBUG: UIDefinitionController: warn:  " + message);
+        LOG.debug("JCDEBUG: UIDefinitionController: debug: {}", message);
+        LOG.info("JCDEBUG: UIDefinitionController: info:  {}", message);
+        LOG.warn("JCDEBUG: UIDefinitionController: warn:  {}", message);
     }
 
     @Autowired

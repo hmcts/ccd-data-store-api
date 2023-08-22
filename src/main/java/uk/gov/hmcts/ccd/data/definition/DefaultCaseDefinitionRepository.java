@@ -53,9 +53,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     private final RestTemplate restTemplate;
 
     private void jcdebug(String message) {
-        LOG.debug("JCDEBUG: DefaultCaseDefinitionRepository: debug: " + message);
-        LOG.info("JCDEBUG: DefaultCaseDefinitionRepository: info:  " + message);
-        LOG.warn("JCDEBUG: DefaultCaseDefinitionRepository: warn:  " + message);
+        LOG.debug("JCDEBUG: DefaultCaseDefinitionRepository: debug: {}", message);
+        LOG.info("JCDEBUG: DefaultCaseDefinitionRepository: info: {}", message);
+        LOG.warn("JCDEBUG: DefaultCaseDefinitionRepository: warn: {}", message);
     }
 
     @Inject
