@@ -26,7 +26,7 @@ class CaseSearchResultViewTest {
     void shouldFindHeaderByCaseType() {
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup correctHeader =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup(
-            new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
                         emptyList(), emptyList()
         );
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup otherHeader =
@@ -50,7 +50,7 @@ class CaseSearchResultViewTest {
     void shouldNotFindNonExistingHeader() {
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup header =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup(
-            new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
                         emptyList(), emptyList()
         );
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView caseSearchResultView =
@@ -103,7 +103,7 @@ class CaseSearchResultViewTest {
         );
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup otherHeader =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup(
-            new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata(JURISDICTION,
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata(JURISDICTION,
                     "Other Case Type"), emptyList(), Arrays.asList("333")
         );
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView caseSearchResultView =
@@ -124,7 +124,7 @@ class CaseSearchResultViewTest {
     void shouldReturnEmptyListWhenNoCasesForCaseType() {
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup header =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup(
-            new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
                         emptyList(), emptyList()
         );
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView caseSearchResultView =

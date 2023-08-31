@@ -407,7 +407,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         metadata.setState(Optional.of("CaseCreated"));
         final PaginatedSearchMetadata paginatedSearchMetadata =
             caseDetailsRepository.getPaginatedSearchMetadata(metadata,
-            new HashMap<>());
+                new HashMap<>());
         assertAll(
             () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(6)),
             () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(3))

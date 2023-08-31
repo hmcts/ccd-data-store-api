@@ -36,7 +36,7 @@ public class SearchInputEndpointTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
-            "classpath:sql/insert_cases.sql" })
+        "classpath:sql/insert_cases.sql" })
     public void validSearch() throws Exception {
 
         final MvcResult result = mockMvc.perform(get(URL)
