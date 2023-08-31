@@ -332,7 +332,7 @@ public abstract class AbstractBaseIntegrationTest {
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
                                         String caseReference, String eventId) {
-        return generateEventToken(template, userId, jurisdictionId, caseTypeId, new Long(caseReference), eventId);
+        return generateEventToken(template, userId, jurisdictionId, caseTypeId, Long.valueOf(caseReference), eventId);
     }
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
@@ -365,7 +365,7 @@ public abstract class AbstractBaseIntegrationTest {
     }
 
     protected CaseDetails getCase(JdbcTemplate template, String caseReference) {
-        return getCase(template, new Long(caseReference));
+        return getCase(template, Long.valueOf(caseReference));
     }
 
     protected CaseDetails getCase(JdbcTemplate template, Long caseReference) {

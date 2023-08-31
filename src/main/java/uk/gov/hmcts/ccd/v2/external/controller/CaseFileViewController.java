@@ -52,15 +52,15 @@ public class CaseFileViewController extends AbstractCaseController {
         @ApiResponse(
             code = 204,
             message = "Success"
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.CASE_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.CASE_NOT_FOUND
-        )
+            )
     })
     @LogAudit(operationType = CATEGORIES_AND_DOCUMENTS_ACCESSED, caseId = "#caseRef")
     public ResponseEntity<CategoriesAndDocuments> getCategoriesAndDocuments(
