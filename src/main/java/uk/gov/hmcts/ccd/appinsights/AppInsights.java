@@ -29,8 +29,8 @@ public class AppInsights {
     private final TelemetryClient telemetry;
 
     @Autowired
-    public AppInsights(TelemetryClient telemetry) {
-        this.telemetry = telemetry;
+    public AppInsights() {
+        telemetry = new TelemetryClient();
     }
 
     public void trackRequest(String name, long duration, boolean success) {
