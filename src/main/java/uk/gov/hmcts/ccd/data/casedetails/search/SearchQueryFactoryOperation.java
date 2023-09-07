@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -66,14 +67,17 @@ public class SearchQueryFactoryOperation {
         this.caseTypeService = caseTypeService;
     }
 
-    public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
+    public Optional<Query> build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criterionFactory.build(metadata, params);
 
         Map<String, Object> parametersToBind = Maps.newHashMap();
-        String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
         String whereClausePart = secure(toClauses(criteria), metadata, parametersToBind);
-        String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
+        if (whereClausePart.isEmpty()) {
+            return Optional.empty();
+        }
 
+        String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
+        String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
         String queryString = String.format(queryToFormat, whereClausePart, sortClause);
 
         Query query;
@@ -82,14 +86,19 @@ public class SearchQueryFactoryOperation {
         } else {
             query = entityManager.createNativeQuery(queryString, CaseDetailsEntity.class);
         }
-        parametersToBind.forEach((k, v) -> query.setParameter(k, v));
+        parametersToBind.forEach(query::setParameter);
         addParameters(query, criteria);
         log.debug("[SQL Query ]] : " + queryString);
-        return query;
+        return Optional.of(query);
     }
 
     private String secure(String clauses, MetaData metadata, Map<String, Object> params) {
-        return clauses + addUserCaseAccessClause(params, metadata) + addUserCaseStateAccessClause(metadata, params);
+        var userCaseAccessClause = addUserCaseAccessClause(params, metadata);
+        var userCaseStateAccessClause = addUserCaseStateAccessClause(metadata, params);
+        if (!userCaseAccessClause.isEmpty() || !userCaseStateAccessClause.isEmpty()) {
+            return clauses + userCaseAccessClause + userCaseStateAccessClause;
+        }
+        return "";
     }
 
     private String addUserCaseAccessClause(Map<String, Object> params, MetaData metadata) {
@@ -98,8 +107,9 @@ public class SearchQueryFactoryOperation {
                 .getCaseTypeForJurisdiction(metadata.getCaseTypeId(), metadata.getJurisdiction());
             List<RoleAssignment> roleAssignments = caseDataAccessControl.generateRoleAssignments(caseTypeDefinition);
 
-            return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments, params, caseTypeDefinition);
-
+            if (!roleAssignments.isEmpty()) {
+                return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments, params, caseTypeDefinition);
+            }
         } else if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             params.put("user_id", userAuthorisation.getUserId());
             return " AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = :user_id)";
