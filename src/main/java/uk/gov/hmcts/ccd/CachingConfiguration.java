@@ -29,6 +29,7 @@ public class CachingConfiguration {
         config.setProperty("hazelcast.phone.home.enabled", "false");
         NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();
         networkConfig.getJoin().getMulticastConfig().setEnabled(false);
+        networkConfig.getJoin().getAutoDetectionConfig().setEnabled(false);
         networkConfig.getJoin().getTcpIpConfig().setEnabled(false);
         configCaches(config);
         return config;
@@ -38,6 +39,7 @@ public class CachingConfiguration {
         final int defaultMaxIdle = appParams.getDefaultCacheMaxIdleSecs();
         final int defaultCacheTtl = appParams.getDefaultCacheTtlSecs();
         final int userCacheTtl = appParams.getUserCacheTTLSecs();
+        final int userRoleCacheTtl = appParams.getUserRoleCacheTTLSecs();
         final int jurisdictionCacheTtl = appParams.getJurisdictionTTLSecs();
         final int systemUserTokenCacheTTLSecs = appParams.getSystemUserTokenCacheTTLSecs();
 
@@ -52,7 +54,7 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("caseTypePseudoRoleToAccessProfileCache", defaultMaxIdle));
 
         config.addMapConfig(newMapConfigWithTtl("allJurisdictionsCache", jurisdictionCacheTtl)); // Fixed.
-        config.addMapConfig(newMapConfigWithTtl("userRolesCache", userCacheTtl)); // Fixed.
+        config.addMapConfig(newMapConfigWithTtl("userRolesCache", userRoleCacheTtl)); // Fixed.
         config.addMapConfig(newMapConfigWithTtl("userInfoCache", userCacheTtl)); // Fixed.
         config.addMapConfig(newMapConfigWithTtl("idamUserRoleCache", userCacheTtl)); // Fixed.
         config.addMapConfig(newMapConfigWithTtl("systemUserTokenCache", systemUserTokenCacheTTLSecs));
