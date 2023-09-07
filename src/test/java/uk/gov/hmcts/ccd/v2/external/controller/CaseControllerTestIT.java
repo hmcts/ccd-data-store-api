@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.matching.ContainsPattern;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +38,8 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
+import uk.gov.hmcts.reform.idam.client.models.TokenResponse;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import javax.inject.Inject;
@@ -726,9 +729,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
             .withHeader(HttpHeaders.AUTHORIZATION, containing("Test_Token"))
             .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
 
-        String onBehalfOfId = UUID.randomUUID().toString();
-        stubFor(WireMock.get(urlMatching("/api/v1/users/" + onBehalfOfId))
-            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+        String onBehalfOfId = "53b53d81-3026-4e29-863a-ba1c7787f014";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent()
             .withCaseReference(caseId)
