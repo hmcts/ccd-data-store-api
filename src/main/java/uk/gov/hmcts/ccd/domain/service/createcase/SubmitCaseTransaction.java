@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
