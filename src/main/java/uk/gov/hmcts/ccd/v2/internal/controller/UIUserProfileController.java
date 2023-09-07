@@ -47,7 +47,7 @@ public class UIUserProfileController {
             code = 200,
             message = "Success",
             response = CaseViewResource.class
-        )
+            )
     })
     public ResponseEntity<UserProfileViewResource> getUserProfile() {
 
