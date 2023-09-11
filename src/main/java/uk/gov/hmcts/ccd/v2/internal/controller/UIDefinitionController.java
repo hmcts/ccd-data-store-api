@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 @RestController
 @RequestMapping(path = "/internal")
 public class UIDefinitionController {
+    private static final Logger LOG = LoggerFactory.getLogger(UIDefinitionController.class);
 
     private final GetCriteriaOperation getCriteriaOperation;
 
@@ -59,6 +62,12 @@ public class UIDefinitionController {
     private final GetUserProfileOperation getUserProfileOperation;
 
     private final HashMap<String, Predicate<AccessControlList>> accessMap = new HashMap<>();
+
+    private void jcdebug(String message) {
+        LOG.debug("JCDEBUG: UIDefinitionController: debug: {}", message);
+        LOG.info("JCDEBUG: UIDefinitionController: info:  {}", message);
+        LOG.warn("JCDEBUG: UIDefinitionController: warn:  {}", message);
+    }
 
     @Autowired
     public UIDefinitionController(@Qualifier(AuthorisedGetCriteriaOperation.QUALIFIER)
@@ -136,10 +145,11 @@ public class UIDefinitionController {
     })
     public ResponseEntity<SearchInputsViewResource> getSearchInputsDetails(@PathVariable("caseTypeId")
                                                                                    String caseTypeId) {
-
+        jcdebug("getSearchInputsDetails 1");
         SearchInput[] searchInputs =
             getCriteriaOperation.execute(caseTypeId, CAN_READ, SEARCH).toArray(new SearchInput[0]);
 
+        jcdebug("getSearchInputsDetails 2");
         return ResponseEntity.ok(new SearchInputsViewResource(searchInputs, caseTypeId));
     }
 
