@@ -44,6 +44,12 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     @Autowired
     private final RestTemplate restTemplate;
 
+    private void jcdebug(String message) {
+        LOG.debug("JCDEBUG: HttpUIDefinitionGateway: debug: {}", message);
+        LOG.info("JCDEBUG: HttpUIDefinitionGateway: info: {}", message);
+        LOG.warn("JCDEBUG: HttpUIDefinitionGateway: warn: {}", message);
+    }
+
     @Inject
     HttpUIDefinitionGateway(final ApplicationParams applicationParams,
                             final SecurityUtils securityUtils,
@@ -83,6 +89,8 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         try {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+            jcdebug("getSearchInputFieldDefinitions: "
+                    + withVersionQueryParam(applicationParams.searchInputDefinition(caseTypeId), version));
             final SearchInputFieldsDefinition
                     definition =
                     restTemplate.exchange(
