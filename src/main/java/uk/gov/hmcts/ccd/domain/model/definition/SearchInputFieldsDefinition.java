@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
-import uk.gov.hmcts.ccd.v2.internal.controller.UIDefinitionController;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
