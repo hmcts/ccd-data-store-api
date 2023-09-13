@@ -35,6 +35,7 @@ public class SearchInputFieldsDefinition implements Serializable, CommonDCPModel
     }
 
     public void setFields(List<SearchInputField> fields) {
+        new RuntimeException("JCDEBUG: SearchInputFieldsDefinition.setFields").printStackTrace();
         this.fields = fields;
     }
 
