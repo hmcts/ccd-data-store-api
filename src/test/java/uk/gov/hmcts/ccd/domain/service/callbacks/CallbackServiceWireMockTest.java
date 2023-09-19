@@ -52,7 +52,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 @TestPropertySource(properties =
     {
-        "ccd.callback.timeouts=1,2,3"
+    "ccd.callback.timeouts=1,2,3"
     })
 public class CallbackServiceWireMockTest extends WireMockBaseTest {
     private static final ObjectMapper mapper = new ObjectMapper();
