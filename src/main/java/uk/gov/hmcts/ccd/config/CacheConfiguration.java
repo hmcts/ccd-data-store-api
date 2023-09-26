@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCache;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;
 @Configuration
 @EnableCaching
 @EnableScheduling
+@Slf4j
 public class CacheConfiguration {
 
     private static final int TTL_ZERO = 0;
@@ -36,6 +38,17 @@ public class CacheConfiguration {
         final int userRoleCacheTtl = applicationParams.getUserRoleCacheTTLSecs();
         final int jurisdictionCacheTtl = applicationParams.getJurisdictionTTLSecs();
         final int systemUserTokenCacheTTLSecs = applicationParams.getSystemUserTokenCacheTTLSecs();
+
+        log.info("""
+                Cache Configuration Parameters:
+                defaultMaxIdle (Default Cache Max Idle): {}
+                defaultCacheTtl (Default Cache TTL): {}
+                userCacheTtl (User Cache TTL): {}
+                userRoleCacheTtl (User Role Cache TTL): {}
+                jurisdictionCacheTtl (Jurisdiction Cache TTL): {}
+                systemUserTokenCacheTTLSecs (System User Token Cache TTL): {}""",
+            defaultMaxIdle, defaultCacheTtl, userCacheTtl, userRoleCacheTtl, jurisdictionCacheTtl,
+            systemUserTokenCacheTTLSecs);
 
         var cacheManager = new SimpleCacheManager();
         cacheManager.setCaches(List.of(
