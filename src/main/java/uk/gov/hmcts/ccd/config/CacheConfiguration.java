@@ -41,11 +41,11 @@ public class CacheConfiguration {
 
         log.info("""
                 Cache Configuration Parameters:
-                defaultMaxIdle (Default Cache Max Idle): {}
-                defaultCacheTtl (Default Cache TTL): {}
-                userCacheTtl (User Cache TTL): {}
-                userRoleCacheTtl (User Role Cache TTL): {}
-                jurisdictionCacheTtl (Jurisdiction Cache TTL): {}
+                defaultMaxIdle (Default Cache Max Idle): {},
+                defaultCacheTtl (Default Cache TTL): {},
+                userCacheTtl (User Cache TTL): {},
+                userRoleCacheTtl (User Role Cache TTL): {},
+                jurisdictionCacheTtl (Jurisdiction Cache TTL): {},
                 systemUserTokenCacheTTLSecs (System User Token Cache TTL): {}""",
             defaultMaxIdle, defaultCacheTtl, userCacheTtl, userRoleCacheTtl, jurisdictionCacheTtl,
             systemUserTokenCacheTTLSecs);
