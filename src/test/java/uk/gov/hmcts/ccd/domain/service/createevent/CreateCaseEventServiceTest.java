@@ -522,15 +522,15 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(Optional.empty()).when(defaultCaseDetailsRepository).findByReference(NON_EXISTENT_CASE_REFERENCE);
         assertThrows(ResourceNotFoundException.class, () -> {
             underTest.createCaseSystemEvent(NON_EXISTENT_CASE_REFERENCE,
-            ATTRIBUTE_PATH,
-            CATEGORY_ID,
-            new Event());
+                ATTRIBUTE_PATH,
+                CATEGORY_ID,
+                new Event());
         });
 
         assertAll(
             () -> verify(caseTypeService, times(0)).findState(any(), any()),
             () -> verify(caseDetailsRepository, times(0)).set(any()),
-            () -> verify( caseDefinitionRepository, times(0)).getCaseType(any()));
+            () -> verify(caseDefinitionRepository, times(0)).getCaseType(any()));
 
 
     }
