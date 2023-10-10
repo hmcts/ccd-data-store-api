@@ -40,23 +40,23 @@ public class CaseDocumentController {
             code = 200,
             message = "OK",
             response = CaseDocumentResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.CASE_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.CASE_DOCUMENT_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.CASE_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.CASE_DOCUMENT_NOT_FOUND
-        )
+            )
     })
     public ResponseEntity<CaseDocumentResource> getCaseDocumentMetadata(@PathVariable("caseId") String caseId,
                                                                         @PathVariable("documentId") String documentId) {

@@ -65,7 +65,7 @@ public class GlobalSearchEndpoint {
         @ApiResponse(
             code = 200,
             message = "Search Request Valid"
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
@@ -92,7 +92,7 @@ public class GlobalSearchEndpoint {
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
-        )
+            )
     })
     @LogAudit(
         operationType = AuditOperationType.GLOBAL_SEARCH,

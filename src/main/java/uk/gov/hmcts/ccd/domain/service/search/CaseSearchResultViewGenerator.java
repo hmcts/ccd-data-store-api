@@ -12,6 +12,7 @@ import java.util.Map;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -46,17 +47,20 @@ public class CaseSearchResultViewGenerator {
     private final DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
     private final CaseSearchesViewAccessControl caseSearchesViewAccessControl;
     private final CaseDataAccessControl caseDataAccessControl;
+    private final ApplicationParams applicationParams;
 
     public CaseSearchResultViewGenerator(CaseTypeService caseTypeService,
                                          SearchResultDefinitionService searchResultDefinitionService,
                                          DateTimeSearchResultProcessor dateTimeSearchResultProcessor,
                                          CaseSearchesViewAccessControl caseSearchesViewAccessControl,
-                                         CaseDataAccessControl caseDataAccessControl) {
+                                         CaseDataAccessControl caseDataAccessControl,
+                                         ApplicationParams applicationParams) {
         this.caseTypeService = caseTypeService;
         this.searchResultDefinitionService = searchResultDefinitionService;
         this.dateTimeSearchResultProcessor = dateTimeSearchResultProcessor;
         this.caseSearchesViewAccessControl = caseSearchesViewAccessControl;
         this.caseDataAccessControl = caseDataAccessControl;
+        this.applicationParams = applicationParams;
     }
 
     public CaseSearchResultView execute(String caseTypeId,
@@ -207,7 +211,9 @@ public class CaseSearchResultViewGenerator {
             caseDetails.getMetadata()
         );
 
-        updateCaseFieldsWithAccessControlMetadata(caseFields, caseDetails);
+        if (applicationParams.getInternalSearchCaseAccessMetadataEnabled()) {
+            updateCaseFieldsWithAccessControlMetadata(caseFields, caseDetails);
+        }
 
         return new SearchResultViewItem(caseDetails.getReferenceAsString(), caseFields, new HashMap<>(caseFields),
                 caseDetails.getSupplementaryData());
