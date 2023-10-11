@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
 
-public class AccessControlList implements Serializable {
+public class AccessControlList implements Serializable, Copyable<AccessControlList> {
 
     private String accessProfile;
     private boolean create;
@@ -58,17 +58,6 @@ public class AccessControlList implements Serializable {
         this.delete = delete;
     }
 
-    @JsonIgnore
-    public AccessControlList duplicate() {
-        AccessControlList dup = new AccessControlList();
-        dup.setAccessProfile(accessProfile);
-        dup.setCreate(create);
-        dup.setRead(read);
-        dup.setUpdate(update);
-        dup.setDelete(delete);
-        return dup;
-    }
-
     @Override
     public String toString() {
         return "ACL{"
@@ -76,5 +65,17 @@ public class AccessControlList implements Serializable {
             + ", crud=" + (isCreate() ? "C" : "") + (isRead() ? "R" : "")
             + (isUpdate() ? "U" : "") + (isDelete() ? "D" : "")
             + '}';
+    }
+
+    @JsonIgnore
+    @Override
+    public AccessControlList createCopy() {
+        AccessControlList copy = new AccessControlList();
+        copy.setAccessProfile(this.accessProfile);
+        copy.setCreate(this.create);
+        copy.setRead(this.read);
+        copy.setUpdate(this.update);
+        copy.setDelete(this.delete);
+        return copy;
     }
 }

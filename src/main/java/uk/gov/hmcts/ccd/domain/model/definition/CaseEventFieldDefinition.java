@@ -13,7 +13,7 @@ import java.util.List;
 
 @ToString
 @ApiModel(description = "")
-public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
+public class CaseEventFieldDefinition implements Serializable, CommonDCPModel, Copyable<CaseEventFieldDefinition> {
 
     private String caseFieldId = null;
     private String displayContext = null;
@@ -170,5 +170,26 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    @JsonIgnore
+    @Override
+    public CaseEventFieldDefinition createCopy() {
+        CaseEventFieldDefinition copy = new CaseEventFieldDefinition();
+        copy.setCaseFieldId(this.getCaseFieldId());
+        copy.setDisplayContext(this.getDisplayContext());
+        copy.setDisplayContextParameter(this.getDisplayContextParameter());
+        copy.setShowCondition(this.getShowCondition());
+        copy.setShowSummaryChangeOption(this.getShowSummaryChangeOption());
+        copy.setShowSummaryContentOption(this.getShowSummaryContentOption());
+        copy.setLabel(this.getLabel());
+        copy.setHintText(this.getHintText());
+        copy.setRetainHiddenValue(this.getRetainHiddenValue());
+        copy.setPublish(this.getPublish());
+        copy.setPublishAs(this.getPublishAs());
+        copy.setCaseEventFieldComplexDefinitions(createCopyList(this.getCaseEventFieldComplexDefinitions()));
+        copy.setDefaultValue(this.getDefaultValue());
+
+        return copy;
     }
 }

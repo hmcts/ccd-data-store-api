@@ -173,24 +173,23 @@ class CachedCaseDefinitionRepositoryTest {
         }
 
         @Test
-        @DisplayName("should retrieve latest version of case type missed at request scope cache")
-        void shouldRetrieveLatestVersionCaseTypeByCaseTypeIdWithoutRequestScopeCacheForAnExcludedCaseType() {
+        @DisplayName("should retrieve latest version of cloned case type missed at request scope cache")
+        void shouldRetrieveLatestVersionClonedCaseTypeByCaseTypeIdWithoutRequestScopeCacheForAnExcludedCaseType() {
             CaseTypeDefinition expected = new CaseTypeDefinition();
             expected.setId("DummyCaseType_1");
-            testCachingOfCaseType(expected, 1, 1);
+            testCachingOfCaseType(expected.createCopy(), 1, 1);
         }
 
         void testCachingOfCaseType(CaseTypeDefinition expected, int cacheMissCountBefore, int cacheMissCountAfter) {
             doReturn(expected).when(caseDefinitionRepository).getCaseType(99,expected.getId());
             CaseTypeDefinition actual = cachedCaseDefinitionRepository.getCaseType(99, expected.getId());
-            assertThat(expected, is(actual));
+            assertThat(expected.toString(), is(actual.toString()));
             verify(caseDefinitionRepository, times(cacheMissCountBefore)).getCaseType(99,expected.getId());
             Mockito.clearInvocations(caseDefinitionRepository);
             actual = cachedCaseDefinitionRepository.getCaseType(99, expected.getId());
-            assertThat(expected, is(actual));
+            assertThat(expected.toString(), is(actual.toString()));
             verify(caseDefinitionRepository, times(cacheMissCountAfter)).getCaseType(99,expected.getId());
         }
-
     }
 
     @Nested
