@@ -70,10 +70,14 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
             .anyMatch(ct -> ct.equalsIgnoreCase(caseTypeId));
         if (withinTimeInterval && cacheSwitchOnForCaseType) {
             return caseTypes.computeIfAbsent(format(CASE_TYPE_KEY_FORMAT, caseTypeId, version),
-                e -> caseDefinitionRepository.getCaseType(version, caseTypeId));
+                e -> getClonedCaseType(version, caseTypeId));
         } else {
-            return caseDefinitionRepository.getCaseType(version, caseTypeId);
+            return getClonedCaseType(version, caseTypeId);
         }
+    }
+
+    private CaseTypeDefinition getClonedCaseType(int version, String caseTypeId) {
+        return caseDefinitionRepository.getCaseType(version, caseTypeId).createCopy();
     }
 
     @Override

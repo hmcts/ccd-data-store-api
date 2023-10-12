@@ -52,6 +52,13 @@
           "delete": false
         },
         {
+          "role": "role-citizen",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
           "role": "basic-profile",
           "create": false,
           "read": true,
@@ -102,6 +109,17 @@
           "live_from": "2017-01-01",
           "live_to": null,
           "role_name": "idam:citizen",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCase",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "role-citizen",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "idam:role-citizen",
           "case_access_categories": null
         },
         {
@@ -302,6 +320,13 @@
             },
             {
               "role": "caseworker-probate-private",
+              "create": false,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "role-citizen",
               "create": false,
               "read": true,
               "update": true,
