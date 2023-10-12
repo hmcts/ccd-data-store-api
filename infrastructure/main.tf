@@ -124,7 +124,7 @@ module "postgresql-v15" {
 
   admin_user_object_id = var.jenkins_AAD_objectId
   business_area        = "cft"
-  common_tags          = local.tags
+  common_tags          = var.common_tags
   component            = var.component
   env                  = var.env
   pgsql_databases = [
