@@ -115,15 +115,15 @@ public class CaseController {
             code = 200,
             message = "Success",
             response = CaseResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.CASE_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.CASE_NOT_FOUND
-        )
+            )
     })
     @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
@@ -159,30 +159,30 @@ public class CaseController {
             code = 201,
             message = "Event has been created successfully",
             response = CaseResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.CASE_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.EVENT_TRIGGER_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.CASE_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = "The event could not be processed, for example due to one of the following:\n"
                 + "- Data validation failed\n"
                 + "- Invalid event (e.g. event ID not provided/known)\n"
                 + "- Case does not comply with pre-state condition for event\n"
-        ),
+            ),
         @ApiResponse(
             code = 504,
             message = V2.Error.CALLBACK_EXCEPTION
-        )
+            )
     })
     @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction",
@@ -270,59 +270,59 @@ public class CaseController {
             code = 201,
             message = "Created",
             response = CaseResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.MISSING_EVENT_TOKEN
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = V2.Error.GRANT_FORBIDDEN
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.EVENT_TRIGGER_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.NO_MATCHING_EVENT_TRIGGER
-        ),
+            ),
         @ApiResponse(
             code = 409,
             message = V2.Error.CASE_ALTERED
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = V2.Error.CASE_DATA_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = V2.Error.CASE_TYPE_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = V2.Error.USER_ROLE_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = V2.Error.EVENT_TRIGGER_NOT_SPECIFIED
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = V2.Error.EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = V2.Error.EVENT_TRIGGER_HAS_PRE_STATE
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = V2.Error.CASE_FIELD_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 504,
             message = V2.Error.CALLBACK_EXCEPTION
-        )
+            )
     })
     @LogAudit(operationType = CREATE_CASE, caseId = "#result.body.reference",
         jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
@@ -351,23 +351,23 @@ public class CaseController {
             code = 200,
             message = "Success",
             response = CaseEventsResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.ERROR_CASE_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = V2.Error.CASE_TYPE_DEF_NOT_FOUND_FOR_CASE_ID
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = V2.Error.ROLES_FOR_CASE_ID_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.CASE_AUDIT_EVENTS_NOT_FOUND
-        )
+            )
     })
     public ResponseEntity<CaseEventsResource> getCaseEvents(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
@@ -391,27 +391,27 @@ public class CaseController {
             code = 200,
             message = "Updated",
             response = SupplementaryDataResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.CASE_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.SUPPLEMENTARY_DATA_UPDATE_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.MORE_THAN_ONE_NESTED_LEVEL
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.CASE_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA
-        )
+            )
     })
     @ApiImplicitParams({
         @ApiImplicitParam(

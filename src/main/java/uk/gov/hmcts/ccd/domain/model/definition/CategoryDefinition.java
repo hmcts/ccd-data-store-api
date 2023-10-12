@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,8 +13,8 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class CategoryDefinition implements Serializable {
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class CategoryDefinition implements Serializable, Copyable<CategoryDefinition> {
 
     private String categoryId;
     private String categoryLabel;
@@ -23,4 +24,17 @@ public class CategoryDefinition implements Serializable {
     private Integer displayOrder;
     private String caseTypeId;
 
+    @JsonIgnore
+    @Override
+    public CategoryDefinition createCopy() {
+        return new CategoryDefinition(
+            this.categoryId,
+            this.categoryLabel,
+            this.parentCategoryId,
+            this.liveFrom != null ? LocalDate.from(this.liveFrom) : null,
+            this.liveTo != null ? LocalDate.from(this.liveTo) : null,
+            this.displayOrder,
+            this.caseTypeId
+        );
+    }
 }

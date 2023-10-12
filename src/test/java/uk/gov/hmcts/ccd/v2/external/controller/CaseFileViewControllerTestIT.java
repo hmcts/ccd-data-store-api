@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static uk.gov.hmcts.ccd.ApplicationParams.encode;
 import static uk.gov.hmcts.ccd.TestFixtures.loadCaseTypeDefinition;
 
+
 class CaseFileViewControllerTestIT extends WireMockBaseTest {
 
     @Inject
