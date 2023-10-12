@@ -54,3 +54,7 @@ variable "database_storage_mb" {
   default = "51200"
 }
 
+variable "pgsql_sku" {
+  description = "The PGSql flexible server instance sku"
+  default     = "GP_Standard_D2s_v3"
+}
