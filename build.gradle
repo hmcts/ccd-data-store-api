@@ -395,7 +395,7 @@ pitest {
     ]
     excludedClasses = ['uk.gov.hmcts.ccd.CoreCaseDataApplication',
                        'uk.gov.hmcts.ccd.PersistenceIT',
-                       'uk.gov.hmcts.ccd.v2.external.controller.TestingSupportController']
+                       'uk.gov.hmcts.ccd.v2.external.controller.TestingSupportController'
     ]
 
     enableDefaultIncrementalAnalysis = true
