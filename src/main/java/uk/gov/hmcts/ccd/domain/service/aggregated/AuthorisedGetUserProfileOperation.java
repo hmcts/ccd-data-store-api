@@ -45,7 +45,7 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
             jurisdiction -> jurisdiction.setCaseTypeDefinitions(
                 jurisdiction.getCaseTypeDefinitions()
                     .stream()
-                    .map(caseType -> verifyAccess(caseType, getAccessProfiles(caseType.getId()), access))
+                    .map(caseType -> verifyAccess(caseType.createCopy(), getAccessProfiles(caseType.getId()), access))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList())
