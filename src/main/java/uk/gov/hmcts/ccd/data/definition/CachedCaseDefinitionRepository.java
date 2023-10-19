@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.format;
 
 @Service
+@Slf4j
 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
 @RequestScope
 // TODO: Make this repository return copies of the maps https://tools.hmcts.net/jira/browse/RDM-1459
@@ -77,7 +79,9 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     private CaseTypeDefinition getClonedCaseType(int version, String caseTypeId) {
-        return caseDefinitionRepository.getCaseType(version, caseTypeId).createCopy();
+        var clonedCaseType = caseDefinitionRepository.getCaseType(version, caseTypeId).createCopy();
+        log.debug("Cloned case type: {}", clonedCaseType);
+        return clonedCaseType;
     }
 
     @Override
