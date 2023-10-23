@@ -101,20 +101,23 @@ public class SecurityValidationService {
     }
 
     private boolean isNotNullAndSizeEqual(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
-        if ((callbackDataClassification != null && callbackDataClassification.has("applicantOrganisationPolicy"))
-            || (defaultDataClassification != null && defaultDataClassification.has("applicantOrganisationPolicy"))) {
-            LOG.warn("applicantOrganisationPolicy found with has");
-            return true;
+        if (defaultDataClassification != null && callbackDataClassification != null) {
+
+            if ((callbackDataClassification.has("applicantOrganisationPolicy"))
+                || (defaultDataClassification.has("applicantOrganisationPolicy"))) {
+                LOG.warn("applicantOrganisationPolicy found with has");
+                return true;
+            }
+            LOG.warn("applicantOrganisationPolicy not found with has");
+            if ((callbackDataClassification.findParent("applicantOrganisationPolicy") != null)
+                || (defaultDataClassification.findParent("applicantOrganisationPolicy") != null)) {
+                LOG.warn("applicantOrganisationPolicy found");
+                return true;
+            }
+            LOG.warn("applicantOrganisationPolicy not found");
+            return callbackDataClassification.size() == defaultDataClassification.size();
         }
-        LOG.warn("applicantOrganisationPolicy not found with has");
-        if ((callbackDataClassification != null && callbackDataClassification.findParent("applicantOrganisationPolicy") != null)
-            || (defaultDataClassification != null && defaultDataClassification.findParent("applicantOrganisationPolicy") != null)) {
-            LOG.warn("applicantOrganisationPolicy found");
-            return true;
-        }
-        LOG.warn("applicantOrganisationPolicy not found");
-        return defaultDataClassification != null && callbackDataClassification != null
-            && callbackDataClassification.size() == defaultDataClassification.size();
+        return false;
     }
 
 
