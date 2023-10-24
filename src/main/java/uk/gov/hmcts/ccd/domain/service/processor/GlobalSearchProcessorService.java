@@ -48,7 +48,8 @@ public class GlobalSearchProcessorService {
                                                           Map<String, JsonNode> data) {
 
         // NB: only need to generate GlobalSearch data if 'SearchCriteria' field is present in the case type definition
-        if (caseTypeDefinition.getCaseField(SEARCH_CRITERIA).isPresent()) {
+        if (caseTypeDefinition.getCaseField(SEARCH_CRITERIA).isPresent()
+            && caseTypeDefinition.getSearchCriterias().isEmpty()) {
             Map<String, JsonNode> clonedData = null;
             if (data != null) {
                 clonedData = new HashMap<>(data);
