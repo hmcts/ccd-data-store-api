@@ -105,16 +105,14 @@ public class SecurityValidationService {
 
             if ((callbackDataClassification.has("applicantOrganisationPolicy"))
                 || (defaultDataClassification.has("applicantOrganisationPolicy"))) {
-                LOG.warn("applicantOrganisationPolicy found with has");
+                LOG.info("applicantOrganisationPolicy found with has");
                 return true;
             }
-            LOG.warn("applicantOrganisationPolicy not found with has");
             if ((callbackDataClassification.findParent("applicantOrganisationPolicy") != null)
                 || (defaultDataClassification.findParent("applicantOrganisationPolicy") != null)) {
-                LOG.warn("applicantOrganisationPolicy found");
+                LOG.info("applicantOrganisationPolicy found");
                 return true;
             }
-            LOG.warn("applicantOrganisationPolicy not found");
             return callbackDataClassification.size() == defaultDataClassification.size();
         }
         return false;
