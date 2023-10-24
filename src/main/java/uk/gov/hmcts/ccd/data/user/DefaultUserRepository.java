@@ -136,7 +136,7 @@ public class DefaultUserRepository implements UserRepository {
                 .getBody();
 
             if (userDefaultCollection == null || isEmpty(userDefaultCollection.getUserDefaults())) {
-                LOG.error("User Profile not exists for userId '{}'", userId);
+                LOG.debug("User Profile not exists for userId '{}'", userId);
                 return null;
             }
 

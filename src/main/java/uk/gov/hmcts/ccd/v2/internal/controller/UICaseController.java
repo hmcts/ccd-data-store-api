@@ -64,15 +64,15 @@ public class UICaseController {
             code = 200,
             message = "Success",
             response = CaseViewResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = ERROR_CASE_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = "Case not found"
-        )
+            )
     })
     @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId", jurisdiction = "#result.body.caseType.jurisdiction.id",
         caseType = "#result.body.caseType.id")
@@ -104,15 +104,15 @@ public class UICaseController {
             code = 200,
             message = "Success",
             response = CaseHistoryViewResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = ERROR_CASE_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = "Case event not found"
-        )
+            )
     })
     @LogAudit(operationType = VIEW_CASE_HISTORY, caseId = "#caseId", eventName = "#result.body.event.eventId",
         jurisdiction = "#result.body.caseType.jurisdiction.id", caseType = "#result.body.caseType.id")

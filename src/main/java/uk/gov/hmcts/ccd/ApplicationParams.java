@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import com.hazelcast.config.EvictionPolicy;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -114,11 +113,11 @@ public class ApplicationParams {
     @Value("${user.cache.ttl.secs}")
     private Integer userCacheTTLSecs;
 
+    @Value("${user.role.cache.ttl.secs}")
+    private Integer userRoleCacheTTLSecs;
+
     @Value("${default.cache.max.size}")
     private Integer defaultCacheMaxSize;
-
-    @Value("${default.cache.eviction.policy}")
-    private EvictionPolicy defaultCacheEvictionPolicy;
 
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
@@ -224,6 +223,9 @@ public class ApplicationParams {
 
     @Value("${system.user.token.cache.ttl.secs}")
     private Integer systemUserTokenCacheTTLSecs;
+
+    @Value("${search.internal.case-access-metadata.enabled}")
+    private boolean internalSearchCaseAccessMetadataEnabled;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -419,12 +421,12 @@ public class ApplicationParams {
         return userCacheTTLSecs;
     }
 
-    public int getDefaultCacheMaxSize() {
-        return defaultCacheMaxSize;
+    public Integer getUserRoleCacheTTLSecs() {
+        return userRoleCacheTTLSecs;
     }
 
-    public EvictionPolicy getDefaultCacheEvictionPolicy() {
-        return defaultCacheEvictionPolicy;
+    public int getDefaultCacheMaxSize() {
+        return defaultCacheMaxSize;
     }
 
     public List<String> getSearchBlackList() {
@@ -609,5 +611,9 @@ public class ApplicationParams {
 
     public Integer getSystemUserTokenCacheTTLSecs() {
         return systemUserTokenCacheTTLSecs;
+    }
+
+    public boolean getInternalSearchCaseAccessMetadataEnabled() {
+        return internalSearchCaseAccessMetadataEnabled;
     }
 }
