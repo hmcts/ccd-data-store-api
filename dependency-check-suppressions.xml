@@ -3,7 +3,6 @@
     <notes>Temporary Suppression
         CVE-2022-1471 refer https://tools.hmcts.net/jira/browse/CCD-4454
         CVE-2023-20883 refer [Ticket]
-        CVE-2023-35116 refer [Ticket]
         CVE-2023-2976 refer [Ticket]
         CVE-2023-34036 refer [Ticket]
         CVE-2023-34034 refer [Ticket]
@@ -17,7 +16,6 @@
     </notes>
     <cve>CVE-2022-1471</cve>
     <cve>CVE-2023-20883</cve>
-    <cve>CVE-2023-35116</cve>
     <cve>CVE-2023-2976</cve>
     <cve>CVE-2023-34036</cve>
     <cve>CVE-2023-34034</cve>
