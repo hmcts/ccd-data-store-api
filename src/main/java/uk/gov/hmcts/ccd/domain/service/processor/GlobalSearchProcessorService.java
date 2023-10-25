@@ -95,7 +95,9 @@ public class GlobalSearchProcessorService {
                         .id(UUID.randomUUID().toString())
                         .value(getNestedValueAsString(jsonNode, currentSearchCriteria.getOtherCaseReference()))
                         .build());
+                    log.info("GlobalSearch: Found getOtherCaseReference: {}", jsonNode.textValue());
                 } else if (key.equals(currentSearchCriteria.getOtherCaseReference())) {
+                    log.info("GlobalSearch: Found generated: {}", jsonNode.textValue());
                     otherCaseReferences.add(OtherCaseReference.builder()
                         .id(UUID.randomUUID().toString())
                         .value(jsonNode.textValue())
