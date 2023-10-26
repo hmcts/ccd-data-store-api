@@ -108,11 +108,6 @@ public class SecurityValidationService {
                 LOG.info("applicantOrganisationPolicy found with has");
                 return true;
             }
-            if ((callbackDataClassification.findParent("applicantOrganisationPolicy") != null)
-                || (defaultDataClassification.findParent("applicantOrganisationPolicy") != null)) {
-                LOG.info("applicantOrganisationPolicy found");
-                return true;
-            }
             return callbackDataClassification.size() == defaultDataClassification.size();
         }
         return false;
