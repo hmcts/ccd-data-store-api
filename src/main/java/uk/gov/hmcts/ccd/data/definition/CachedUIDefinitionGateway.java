@@ -33,21 +33,21 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    @Cacheable("workBasketResultCache")
+    //@Cacheable("workBasketResultCache")
     public SearchResultDefinition getWorkBasketResult(final int version, final String caseTypeId) {
         LOG.debug("remote retrieving version {} of workbasket result for {}", version, caseTypeId);
         return httpUiDefinitionGateway.getWorkBasketResult(version, caseTypeId);
     }
 
     @Override
-    @Cacheable("searchResultCache")
+    //@Cacheable("searchResultCache")
     public SearchResultDefinition getSearchResult(final int version, final String caseTypeId) {
         LOG.debug("remote retrieving version {} of search result for {}", version, caseTypeId);
         return httpUiDefinitionGateway.getSearchResult(version, caseTypeId);
     }
 
     @Override
-    @Cacheable("searchCasesResultCache")
+    //@Cacheable("searchCasesResultCache")
     public SearchResultDefinition getSearchCasesResultDefinition(int version, String caseTypeId, String useCase) {
         LOG.debug("remote retrieving version {} of search cases result definition for {}", version, caseTypeId);
         return httpUiDefinitionGateway.getSearchCasesResultDefinition(version, caseTypeId, useCase);
@@ -76,7 +76,7 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    @Cacheable("wizardPageCollectionCache")
+    //@Cacheable("wizardPageCollectionCache")
     public List<WizardPage> getWizardPageCollection(final int version, final String caseTypeId, final String eventId) {
         LOG.debug("remote retrieving version {} of wizard page collection for {} - {}", version, caseTypeId, eventId);
         return httpUiDefinitionGateway.getWizardPageCollection(version, caseTypeId, eventId);
