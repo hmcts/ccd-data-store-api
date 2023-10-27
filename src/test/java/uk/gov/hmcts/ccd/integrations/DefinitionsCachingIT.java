@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.integrations;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -214,7 +213,6 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    @Ignore
     public void testWorkbasketResultAreCached() {
 
         doReturn(searchResult).when(this.httpUIDefinitionGateway).getWorkBasketResult(VERSION_1, ID_1);
@@ -227,7 +225,6 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    @Ignore
     public void testSearchResultAreCached() {
 
         doReturn(searchResult).when(this.httpUIDefinitionGateway).getSearchResult(VERSION_1, ID_1);
@@ -265,7 +262,6 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    @Ignore
     public void testWizardPageDefinitionsAreCached() {
 
         doReturn(wizardPageList).when(this.httpUIDefinitionGateway).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
