@@ -52,7 +52,13 @@ public class UIDefinitionRepository {
 
     public List<WizardPage> getWizardPageCollection(final String caseTypeId, final String eventId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getWizardPageCollection(version.getVersion(), caseTypeId, eventId);
+        List<WizardPage> wizardPages = cachedUiDefinitionGateway
+            .getWizardPageCollection(version.getVersion(), caseTypeId, eventId);
+        return cloneWizardPages(wizardPages);
+    }
+
+    private List<WizardPage> cloneWizardPages(List<WizardPage> wizardPages) {
+        return wizardPages.stream().map(WizardPage::createCopy).toList();
     }
 
     public WorkbasketInputFieldsDefinition getWorkbasketInputDefinitions(final String caseTypeId) {
