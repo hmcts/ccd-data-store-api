@@ -87,7 +87,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
+        caseDetails.setReference(Long.valueOf(CASE_REFERENCE));
         caseDetails.setState(STATE);
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
 

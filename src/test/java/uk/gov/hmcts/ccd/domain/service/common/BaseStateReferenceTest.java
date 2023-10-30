@@ -6,7 +6,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.EventPostStateDefinition;
 
 public class BaseStateReferenceTest {
 
-    protected BaseStateReferenceTest(){
+    protected BaseStateReferenceTest() {
     }
 
     protected EventPostStateDefinition createEventPostStateDefinition(String postStateReference,

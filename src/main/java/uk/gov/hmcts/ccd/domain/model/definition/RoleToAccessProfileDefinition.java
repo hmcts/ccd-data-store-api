@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleToAccessProfileDefinition implements Serializable {
+public class RoleToAccessProfileDefinition implements Serializable, Copyable<RoleToAccessProfileDefinition> {
     private static final long serialVersionUID = 8882065812393433800L;
 
     private static final String AUTHORISATION_SEPARATOR = ",";
@@ -53,5 +54,21 @@ public class RoleToAccessProfileDefinition implements Serializable {
                 .collect(Collectors.toList());
         }
         return new ArrayList<>();
+    }
+
+    @JsonIgnore
+    @Override
+    public RoleToAccessProfileDefinition createCopy() {
+        return RoleToAccessProfileDefinition.builder()
+            .caseTypeId(this.caseTypeId)
+            .disabled(this.disabled)
+            .readOnly(this.readOnly)
+            .authorisations(this.authorisations)
+            .accessProfiles(this.accessProfiles)
+            .liveFrom(this.liveFrom)
+            .liveTo(this.liveTo)
+            .roleName(this.roleName)
+            .caseAccessCategories(this.caseAccessCategories)
+            .build();
     }
 }
