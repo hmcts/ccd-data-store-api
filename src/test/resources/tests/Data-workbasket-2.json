@@ -1,0 +1,107 @@
+{
+  "case_type_id": "Data_2",
+  "fields": [
+    {
+      "metadata": true,
+      "case_field_id": "[CASE_REFERENCE]",
+      "case_field_element_path": null,
+      "label": "Case Number",
+      "order": 1,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_2"
+    },
+    {
+      "metadata": true,
+      "case_field_id": "[LAST_MODIFIED_DATE]",
+      "case_field_element_path": null,
+      "label": "Last modified date",
+      "order": 8,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_2"
+    },
+    {
+      "metadata": true,
+      "case_field_id": "[LAST_STATE_MODIFIED_DATE]",
+      "case_field_element_path": null,
+      "label": "Last state modified date",
+      "order": 9,
+      "role": null,
+      "sort_order": {
+        "direction": "ASC",
+        "priority": 1
+      },
+      "display_context_parameter": null,
+      "case_type_id": "Data_2"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "applicant1FirstName",
+      "case_field_element_path": null,
+      "label": "Applicant's First Name",
+      "order": 3,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_2"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "applicant1LastName",
+      "case_field_element_path": null,
+      "label": "Applicant's Last Name",
+      "order": 4,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_2"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "applicant2FirstName",
+      "case_field_element_path": null,
+      "label": "Respondent's First Name",
+      "order": 5,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_2"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "applicant2LastName",
+      "case_field_element_path": null,
+      "label": "Respondent's Last Name",
+      "order": 6,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_2"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "applicationType",
+      "case_field_element_path": null,
+      "label": "Application Type",
+      "order": 2,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_2"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "dueDate",
+      "case_field_element_path": null,
+      "label": "Due Date",
+      "order": 7,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_2"
+    }
+  ]
+}

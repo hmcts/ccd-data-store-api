@@ -32,17 +32,27 @@ public class UIDefinitionRepository {
 
     public SearchResultDefinition getWorkBasketResult(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getWorkBasketResult(version.getVersion(), caseTypeId);
+        SearchResultDefinition searchResultDefinition = cachedUiDefinitionGateway
+            .getWorkBasketResult(version.getVersion(), caseTypeId);
+        return cloneSearchResultDefinition(searchResultDefinition);
     }
 
     public SearchResultDefinition getSearchResult(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getSearchResult(version.getVersion(), caseTypeId);
+        SearchResultDefinition searchResultDefinition = cachedUiDefinitionGateway
+            .getSearchResult(version.getVersion(), caseTypeId);
+        return cloneSearchResultDefinition(searchResultDefinition);
     }
 
     public SearchResultDefinition getSearchCasesResult(String caseTypeId, String useCase) {
         CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getSearchCasesResultDefinition(version.getVersion(), caseTypeId, useCase);
+        SearchResultDefinition searchResultDefinition = cachedUiDefinitionGateway
+            .getSearchCasesResultDefinition(version.getVersion(), caseTypeId, useCase);
+        return cloneSearchResultDefinition(searchResultDefinition);
+    }
+
+    private SearchResultDefinition cloneSearchResultDefinition(SearchResultDefinition searchResultDefinition) {
+        return searchResultDefinition.createCopy();
     }
 
     public SearchInputFieldsDefinition getSearchInputFieldDefinitions(final String caseTypeId) {
