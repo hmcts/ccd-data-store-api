@@ -5,4 +5,4 @@ database_storage_mb      = "356352"
 
 # PG Flexible Server SKU
 pgsql_sku = "GP_Standard_D8s_v3"
-pgsql_storage_mb = "840000"
+pgsql_storage_mb = "1048576"
