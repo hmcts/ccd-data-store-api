@@ -438,9 +438,6 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testWizardPageDefinitionsAreCached() {
-
-        doReturn(wizardPageList).when(this.httpUIDefinitionGateway).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
-
         uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
         uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
         uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
