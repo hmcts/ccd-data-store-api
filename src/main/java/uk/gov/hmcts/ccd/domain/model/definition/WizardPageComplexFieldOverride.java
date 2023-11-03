@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Optional;
 
 @ApiModel(description = "")
-public class WizardPageComplexFieldOverride implements Serializable {
+public class WizardPageComplexFieldOverride implements Serializable, Copyable<WizardPageComplexFieldOverride> {
     private String complexFieldElementId;
     private String displayContext;
     private String label;
@@ -85,5 +85,18 @@ public class WizardPageComplexFieldOverride implements Serializable {
             .filter(dc -> !dc.equals("HIDDEN"))
             .map(DisplayContext::valueOf)
             .orElse(null);
+    }
+
+    @Override
+    public WizardPageComplexFieldOverride createCopy() {
+        WizardPageComplexFieldOverride clonedOverride = new WizardPageComplexFieldOverride();
+        clonedOverride.setComplexFieldElementId(this.complexFieldElementId);
+        clonedOverride.setDisplayContext(this.displayContext);
+        clonedOverride.setLabel(this.label);
+        clonedOverride.setHintText(this.hintText);
+        clonedOverride.setShowCondition(this.showCondition);
+        clonedOverride.setRetainHiddenValue(this.retainHiddenValue);
+        clonedOverride.setDefaultValue(this.defaultValue);
+        return clonedOverride;
     }
 }
