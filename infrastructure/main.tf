@@ -127,6 +127,7 @@ module "postgresql-v15" {
   common_tags          = var.common_tags
   component            = var.component
   env                  = var.env
+  subnet_suffix        = var.subnet_suffix
   pgsql_databases = [
     {
       name = var.database_name
