@@ -29,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.definition.SortOrder;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 
 import java.util.ArrayList;
@@ -96,11 +97,13 @@ public class DefinitionsCachingIT {
     @Mock
     SearchInputFieldsDefinition searchInputFieldsDefinition;
 
-    List<WizardPage> wizardPageList = Collections.emptyList();
+    List<WizardPage> wizardPageList = new ArrayList<>();
     List<Banner> bannersList = Collections.emptyList();
 
     @Before
     public void setup() {
+        initiateWizardPageList(wizardPageList);
+
         doReturn(caseTypeDefinitionVersion(VERSION_1)).when(this.caseDefinitionRepository)
             .getLatestVersionFromDefinitionStore(ID_1);
         doReturn(caseTypeDefinitionVersion(VERSION_2)).when(this.caseDefinitionRepository)
@@ -115,11 +118,23 @@ public class DefinitionsCachingIT {
             .getJurisdictionFromDefinitionStore("J3");
         doReturn(mockCaseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_1);
 
+        doReturn(wizardPageList).when(this.httpUIDefinitionGateway).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
         SearchResultDefinition searchResultDefinition = createSearchResultDefinition();
         doReturn(searchResultDefinition).when(this.httpUIDefinitionGateway).getWorkBasketResult(VERSION_1, ID_1);
         doReturn(searchResultDefinition).when(this.httpUIDefinitionGateway).getSearchResult(VERSION_1, ID_1);
         doReturn(searchResultDefinition).when(this.httpUIDefinitionGateway)
             .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
+    }
+
+    private void initiateWizardPageList(List<WizardPage> wizardPageList) {
+
+        WizardPageField wizardPageField = new WizardPageField();
+        wizardPageField.setCaseFieldId("case_field_1");
+        List<WizardPageField> wizardPageFields = new ArrayList<>();
+        wizardPageFields.add(wizardPageField);
+        WizardPage wizardPage = new WizardPage();
+        wizardPage.setWizardPageFields(wizardPageFields);
+        wizardPageList.add(wizardPage);
     }
 
     private SearchResultDefinition createSearchResultDefinition() {
@@ -430,8 +445,53 @@ public class DefinitionsCachingIT {
         uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
         uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
 
-        verify(httpUIDefinitionGateway, times(1))
-            .getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+        verify(httpUIDefinitionGateway, times(1)).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+    }
+
+    @Test
+    public void testWizardPageDefinitionsPreventCacheManipulation() {
+        var wizardPagesFirstAttempt = uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
+        var wizardPageFirstAttempt = wizardPagesFirstAttempt.get(0);
+        //change cached data
+        wizardPagesFirstAttempt.forEach(wizardPage -> wizardPage.setWizardPageFields(null));
+        Assert.assertNull(wizardPageFirstAttempt.getWizardPageFields());
+
+        var wizardPagesSecondAttempt = uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
+        var wizardPageSecondAttempt = wizardPagesSecondAttempt.get(0);
+
+        Assert.assertFalse(wizardPageSecondAttempt.getWizardPageFields().isEmpty());
+
+        wizardPagesSecondAttempt.forEach(wizardPage -> wizardPage.setWizardPageFields(null));
+        Assert.assertNull(wizardPageSecondAttempt.getWizardPageFields());
+
+        var wizardPagesThirdAttempt = uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
+        var wizardPageThirdAttempt = wizardPagesThirdAttempt.get(0);
+
+        Assert.assertFalse(wizardPageThirdAttempt.getWizardPageFields().isEmpty());
+
+        verify(httpUIDefinitionGateway, times(1)).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void testWizardPageDefinitionsFailWithCacheManipulationWithoutDeepCopy() {
+        var wizardPagesFirstAttempt = cachedUIDefinitionGateway.getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+        var wizardPageFirstAttempt = wizardPagesFirstAttempt.get(0);
+        //change cached data
+        wizardPagesFirstAttempt.forEach(wizardPage -> wizardPage.setWizardPageFields(null));
+        Assert.assertNull(wizardPageFirstAttempt.getWizardPageFields());
+
+        var wizardPagesSecondAttempt = cachedUIDefinitionGateway.getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+        var wizardPageSecondAttempt = wizardPagesSecondAttempt.get(0);
+
+        Assert.assertNull(wizardPageSecondAttempt.getWizardPageFields());
+
+        var wizardPagesThirdAttempt = cachedUIDefinitionGateway.getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+        var wizardPageThirdAttempt = wizardPagesThirdAttempt.get(0);
+
+        Assert.assertNull(wizardPageThirdAttempt.getWizardPageFields());
+
+        verify(httpUIDefinitionGateway, times(1)).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
     }
 
     protected CaseTypeDefinitionVersion caseTypeDefinitionVersion(int version) {
