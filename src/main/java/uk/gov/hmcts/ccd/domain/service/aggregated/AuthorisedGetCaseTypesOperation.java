@@ -44,7 +44,7 @@ public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {
     @Override
     public List<CaseTypeDefinition> execute(String jurisdictionId, Predicate<AccessControlList> access) {
         return getCaseTypesOperation.execute(jurisdictionId, access).stream()
-            .map(caseType -> verifyAccess(caseType.createCopy(), getAccessProfiles(caseType.getId()), access))
+            .map(caseType -> verifyAccess(caseType, getAccessProfiles(caseType.getId()), access))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
