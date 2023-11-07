@@ -20,6 +20,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
@@ -55,10 +56,13 @@ class CaseTypeDefinitionTest {
         String fileContent = fromFileAsString("tests/FT-MasterCaseType-payload.json");
 
         CaseTypeDefinition caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
-        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
-
         CaseTypeDefinition copiedCaseTypeDefinition = caseTypeDefinition.createCopy();
+
+        assertNotEquals(caseTypeDefinition.hashCode(), copiedCaseTypeDefinition.hashCode());
+
+        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
         String copiedJson = objectMapper.writeValueAsString(copiedCaseTypeDefinition);
+
 
         String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
         String copiedJsonHash256 = DigestUtils.sha256Hex(copiedJson);
@@ -71,9 +75,11 @@ class CaseTypeDefinitionTest {
         String fileContent = fromFileAsString("tests/BEFTA-CASETYPE-3-1-payload.json");
 
         CaseTypeDefinition caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
-        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
-
         CaseTypeDefinition copiedCaseTypeDefinition = caseTypeDefinition.createCopy();
+
+        assertNotEquals(caseTypeDefinition.hashCode(), copiedCaseTypeDefinition.hashCode());
+
+        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
         String copiedJson = objectMapper.writeValueAsString(copiedCaseTypeDefinition);
 
         String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
@@ -87,9 +93,11 @@ class CaseTypeDefinitionTest {
         String fileContent = fromFileAsString("tests/FT-ComplexCRUD-payload.json");
 
         CaseTypeDefinition caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
-        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
-
         CaseTypeDefinition copiedCaseTypeDefinition = caseTypeDefinition.createCopy();
+
+        assertNotEquals(caseTypeDefinition.hashCode(), copiedCaseTypeDefinition.hashCode());
+
+        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
         String copiedJson = objectMapper.writeValueAsString(copiedCaseTypeDefinition);
 
         String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
