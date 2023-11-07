@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,8 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+
+import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -42,6 +46,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,12 +62,16 @@ import java.util.UUID;
 
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -78,6 +87,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private static final int CASE_VERSION = 0;
     private static final String ATTRIBUTE_PATH = "DocumentField";
     private static final String CATEGORY_ID = "categoryId";
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    protected static final String NON_EXISTENT_CASE_REFERENCE = "1234123412341289";
 
     @Mock
     private UserRepository userRepository;
@@ -152,6 +163,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private CaseTypeDefinition caseTypeDefinition;
     private CaseEventDefinition caseEventDefinition;
     private CaseDetails caseDetails;
+    private CaseDetails caseDetailsFromDB;
     private CaseDetails caseDetailsBefore;
     private CaseDataContent caseDataContent;
 
@@ -192,6 +204,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         caseDetails.setLastModified(LAST_MODIFIED);
         caseDetails.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore = caseDetails.shallowClone();
+
         CaseStateDefinition postState = new CaseStateDefinition();
         postState.setId(POST_STATE);
         IdamUser user = new IdamUser();
@@ -206,8 +219,10 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, caseEventDefinition);
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
+
         doReturn(postState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         doReturn(user).when(userRepository).getUser();
         doReturn(user).when(userRepository).getUserByUserId(anyString());
@@ -496,6 +511,54 @@ class CreateCaseEventServiceTest extends TestFixtures {
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
         assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
             .isEqualTo(LAST_MODIFIED);
+    }
+
+    @Test
+    @DisplayName("should update case category id by sending full data content")
+    void shouldUpdateCaseDocumentCategoryIdBySendingFullDataContent() throws Exception {
+        caseDetailsFromDB = caseDetails.shallowClone();
+        Map<String, JsonNode> data = Maps.newHashMap();
+        data.put("dataKey1", JSON_NODE_FACTORY.textNode("dataValue1"));
+        caseDetailsFromDB.setData(data);
+        CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
+
+        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+
+        CaseStateDefinition state = new CaseStateDefinition();
+        state.setId(POST_STATE);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
+        caseDetailsFromDB.setState(POST_STATE);
+        doReturn(caseDetailsFromDB).when(caseDetailsRepository).set(any(CaseDetails.class));
+
+
+        final CreateCaseEventResult caseEventResult = underTest.createCaseSystemEvent(CASE_REFERENCE,
+            ATTRIBUTE_PATH,
+            CATEGORY_ID,
+            new Event());
+
+        assertThat(caseEventResult.getSavedCaseDetails().getData()).isEqualTo(data);
+        assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
+    }
+
+    @Test
+    @DisplayName("should throw Resource Not Found Exception when no case reference found")
+    void shouldThrowResourceNotFoundExceptionWhenNoCaseReferenceFound() throws Exception {
+        CaseDetailsRepository defaultCaseDetailsRepository = mock(DefaultCaseDetailsRepository.class);
+        doReturn(Optional.empty()).when(defaultCaseDetailsRepository).findByReference(NON_EXISTENT_CASE_REFERENCE);
+        assertThrows(ResourceNotFoundException.class, () -> {
+            underTest.createCaseSystemEvent(NON_EXISTENT_CASE_REFERENCE,
+                ATTRIBUTE_PATH,
+                CATEGORY_ID,
+                new Event());
+        });
+
+        assertAll(
+            () -> verify(caseTypeService, times(0)).findState(any(), any()),
+            () -> verify(caseDetailsRepository, times(0)).set(any()),
+            () -> verify(caseDefinitionRepository, times(0)).getCaseType(any()));
+
+
     }
 
     private void createCaseEvent() {

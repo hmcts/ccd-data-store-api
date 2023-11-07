@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,7 +14,7 @@ import lombok.ToString;
 
 @ApiModel(description = "")
 @ToString
-public class JurisdictionDefinition implements Serializable {
+public class JurisdictionDefinition implements Serializable, Copyable<JurisdictionDefinition> {
 
     private String id = null;
     private String name = null;
@@ -85,5 +86,20 @@ public class JurisdictionDefinition implements Serializable {
 
     public List<String> getCaseTypesIDs() {
         return this.getCaseTypeDefinitions().stream().map(CaseTypeDefinition::getId).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    @Override
+    public JurisdictionDefinition createCopy() {
+        JurisdictionDefinition copy = new JurisdictionDefinition();
+        copy.setId(this.id);
+        copy.setName(this.name);
+        copy.setDescription(this.description);
+        copy.setLiveFrom(this.liveFrom != null ? new Date(this.liveFrom.getTime()) : null);
+        copy.setLiveUntil(this.liveUntil != null ? new Date(this.liveUntil.getTime()) : null);
+        copy.setCaseTypeDefinitions(this.caseTypeDefinitions != null
+            ? createCopyList(this.caseTypeDefinitions) : null);
+
+        return copy;
     }
 }

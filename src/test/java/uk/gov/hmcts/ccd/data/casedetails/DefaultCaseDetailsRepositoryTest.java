@@ -116,6 +116,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         listener = new RequestContextListener();
         context = new MockServletContext();
         listener.requestInitialized(new ServletRequestEvent(context, request));
+
+        wireMockServer.resetToDefaultMappings();
     }
 
     @After
@@ -204,6 +206,13 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
         when(userAuthorisation.getUserId()).thenReturn(evil);
 
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
+
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         final PaginatedSearchMetadata byMetaData =
             caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
@@ -260,7 +269,14 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
     @Test (expected = BadRequestException.class)
     public void sanitiseInputMainQuerySortOrderForCaseFieldID() {
-        String caseFieldId = "insert into case users values(1,2,3)";
+        final String caseFieldId = "insert into case users values(1,2,3)";
+
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         metadata.setSortDirection(Optional.of("Asc"));
@@ -275,7 +291,14 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void validateInputMainQueryMetaDataFieldId() {
-        String notSoEvil = "[UNKNOWN_FIELD]";
+        final String notSoEvil = "[UNKNOWN_FIELD]";
+
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         metadata.setSortDirection(Optional.of("Asc"));
@@ -294,13 +317,20 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void findByWildcardReturnCorrectRecords() {
         ReflectionTestUtils.setField(applicationParams, "wildcardSearchAllowed", true);
-        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
 
         Map<String, String> params = Maps.newHashMap();
         params.put("PersonFirstName", "%An%");
         final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, params);
         // See case types and citizen names in insert_cases.sql to understand this result.
-        assertThat(byMetaData.getTotalResultsCount(), is(5));
+        assertThat(byMetaData.getTotalResultsCount(), is(2));
     }
 
     @Test
@@ -308,10 +338,54 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     public void getFindByMetadataReturnCorrectRecords() {
         assumeDataInitialised();
 
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
+
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         final PaginatedSearchMetadata byMetaData =
             caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
-        assertThat(byMetaData.getTotalResultsCount(), is(8));
+        assertThat(byMetaData.getTotalResultsCount(), is(4));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void getPaginatedSearchMetadataReturnEmptyResult() {
+        assumeDataInitialised();
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final PaginatedSearchMetadata byMetaData =
+            caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
+        assertAll(
+            () -> assertThat(byMetaData.getTotalResultsCount(), is(0)),
+            () -> assertThat(byMetaData.getTotalPagesCount(), is(0))
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByMetaDataAndFieldDataReturnEmtyCaseDetailsList() {
+        assumeDataInitialised();
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        metadata.setSortDirection(Optional.of("Asc"));
+        SortOrderField sortOrderField = SortOrderField.sortOrderWith()
+            .caseFieldId("[LAST_MODIFIED_DATE]")
+            .metadata(true)
+            .direction("DESC")
+            .build();
+        metadata.addSortOrderField(sortOrderField);
+
+        HashMap<String, String> searchParams = new HashMap<>();
+        searchParams.put("PersonFirstName", "Janet");
+
+        final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
+            searchParams);
+
+        assertEquals(0, byMetaDataAndFieldData.size());
     }
 
     @Test
@@ -330,6 +404,14 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         HashMap<String, String> searchParams = new HashMap<>();
         searchParams.put("PersonFirstName", "Janet");
+
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
+
         final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
             searchParams);
 
@@ -357,6 +439,13 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             .direction("DESC")
             .build());
 
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
+
         final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
             Maps.newHashMap());
 
@@ -372,9 +461,17 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     public void getFindByMetadataAndFieldDataReturnCorrectRecords() {
         assumeDataInitialised();
 
-        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         HashMap<String, String> searchParams = new HashMap<>();
         searchParams.put("PersonFirstName", "Janet");
+
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
+
         final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
             searchParams);
         assertAll(
@@ -405,12 +502,20 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         metadata.setState(Optional.of("CaseCreated"));
+
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
+
         final PaginatedSearchMetadata paginatedSearchMetadata =
             caseDetailsRepository.getPaginatedSearchMetadata(metadata,
                 new HashMap<>());
         assertAll(
-            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(6)),
-            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(3))
+            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(4)),
+            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(2))
         );
     }
 
@@ -419,9 +524,17 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     public void getPaginatedSearchMetadataShouldReturnPaginationInfoWhenSearchedWithSearchParams() {
         assumeDataInitialised();
 
-        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         HashMap<String, String> searchParams = new HashMap<>();
         searchParams.put("PersonFirstName", "Janet");
+
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
+
         final PaginatedSearchMetadata paginatedSearchMetadata =
             caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams);
         assertAll(
@@ -440,9 +553,16 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void searchWithParams_withAccessLevelAll() {
-        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         HashMap<String, String> searchParams = new HashMap<>();
         searchParams.put("PersonFirstName", "Janet");
+
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
 
         final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, searchParams);
 
@@ -507,8 +627,16 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
                 hasProperty("reference", equalTo(1504254784737847L))
             )))
         );
+
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
+
         assertThat(caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams).getTotalResultsCount(),
-            is(2));
+            is(1));
     }
 
     @Test
