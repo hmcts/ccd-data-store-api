@@ -58,9 +58,11 @@ public class SearchResultDefinitionTest {
 
         SearchResultDefinition searchResultDefinition = objectMapper
             .readValue(fileContent, SearchResultDefinition.class);
-        String originalJson = objectMapper.writeValueAsString(searchResultDefinition);
-
         SearchResultDefinition copiedSearchResultDefinition = searchResultDefinition.createCopy();
+
+        assertNotEquals(searchResultDefinition.hashCode(), copiedSearchResultDefinition.hashCode());
+
+        String originalJson = objectMapper.writeValueAsString(searchResultDefinition);
         String copiedJson = objectMapper.writeValueAsString(copiedSearchResultDefinition);
 
         String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
@@ -75,9 +77,11 @@ public class SearchResultDefinitionTest {
 
         SearchResultDefinition searchResultDefinition = objectMapper
             .readValue(fileContent, SearchResultDefinition.class);
-        String originalJson = objectMapper.writeValueAsString(searchResultDefinition);
-
         SearchResultDefinition copiedSearchResultDefinition = searchResultDefinition.createCopy();
+
+        assertNotEquals(searchResultDefinition.hashCode(), copiedSearchResultDefinition.hashCode());
+
+        String originalJson = objectMapper.writeValueAsString(searchResultDefinition);
         String copiedJson = objectMapper.writeValueAsString(copiedSearchResultDefinition);
 
         String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
