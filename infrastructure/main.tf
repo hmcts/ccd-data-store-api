@@ -95,26 +95,10 @@ resource "azurerm_key_vault_secret" "draft-store-key" {
 }
 
 ////////////////////////////////
-// DB version 11              //
+// DB version 15              //
 ////////////////////////////////
 
-module "data-store-db-v11" {
-  source          = "git@github.com:hmcts/cnp-module-postgres?ref=master"
-  product         = var.product
-  component       = var.component
-  name            = "${local.app_full_name}-postgres-db-v11"
-  location        = "${var.location}"
-  env             = "${var.env}"
-  subscription    = "${var.subscription}"
-  postgresql_user = "${var.postgresql_user}"
-  database_name   = "${var.database_name}"
-  postgresql_version = "11"
-  sku_name        = "${var.database_sku_name}"
-  sku_tier        = "GeneralPurpose"
-  sku_capacity    = "${var.database_sku_capacity}"
-  storage_mb      = "${var.database_storage_mb}"
-  common_tags     = "${var.common_tags}"
-}
+
 module "postgresql_v15" {
   source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
   providers = {
