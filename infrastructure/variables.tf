@@ -54,3 +54,15 @@ variable "database_storage_mb" {
   default = "51200"
 }
 
+variable "pgsql_sku" {
+  description = "The PGSql flexible server instance sku"
+  default     = "GP_Standard_D2s_v3"
+}
+
+variable "aks_subscription_id" {}
+
+variable "pgsql_storage_mb" {
+  description = "Max storage allowed for the PGSql Flexibile instance"
+  type        = number
+  default     = 65536
+}
