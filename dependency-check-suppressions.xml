@@ -15,7 +15,6 @@
         CVE-2023-45648 refer https://tools.hmcts.net/jira/browse/CCD-4973
         CVE-2023-44487 refer https://tools.hmcts.net/jira/browse/CCD-4974
     </notes>
-    <cve>CVE-2022-45688</cve>
     <cve>CVE-2023-20883</cve>
     <cve>CVE-2023-35116</cve>
     <cve>CVE-2023-2976</cve>
