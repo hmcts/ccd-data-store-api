@@ -118,8 +118,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public JurisdictionDefinition getJurisdiction(String jurisdictionId) {
         LOGGER.debug("Will get jurisdiction '{}' from repository.", jurisdictionId);
-        return jurisdictions.computeIfAbsent(jurisdictionId,
-            id -> caseDefinitionRepository.getJurisdiction(id).createCopy());
+        return jurisdictions.computeIfAbsent(jurisdictionId, caseDefinitionRepository::getJurisdiction);
     }
 
     @Override
@@ -129,11 +128,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     @Override
     public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore() {
-        return cloneJurisdictions(caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore());
-    }
-
-    private List<JurisdictionDefinition> cloneJurisdictions(List<JurisdictionDefinition> jurisdictions) {
-        return jurisdictions.stream().map(JurisdictionDefinition::createCopy).toList();
+        return caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore();
     }
 
     @Override

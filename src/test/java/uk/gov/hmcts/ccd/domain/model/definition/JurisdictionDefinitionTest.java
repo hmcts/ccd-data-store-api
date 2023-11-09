@@ -13,7 +13,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 
 class JurisdictionDefinitionTest {
@@ -33,7 +34,8 @@ class JurisdictionDefinitionTest {
     public void autoTest1JurisdictionCompareActualAndClone() throws JsonProcessingException {
         String fileContent = fromFileAsString("tests/AUTOTEST1-jurisdiction-payload.json");
 
-        JurisdictionDefinition jurisdictionDefinition = objectMapper.readValue(fileContent, JurisdictionDefinition.class);
+        JurisdictionDefinition jurisdictionDefinition = objectMapper
+            .readValue(fileContent, JurisdictionDefinition.class);
         JurisdictionDefinition copiedJurisdictionDefinition  = jurisdictionDefinition.createCopy();
 
         assertNotEquals(jurisdictionDefinition.hashCode(), copiedJurisdictionDefinition.hashCode());
@@ -52,7 +54,8 @@ class JurisdictionDefinitionTest {
     public void beftaMasterJurisdictionCompareActualAndClone() throws JsonProcessingException {
         String fileContent = fromFileAsString("tests/BEFTA_MASTER-jurisdiction-payload.json");
 
-        JurisdictionDefinition jurisdictionDefinition = objectMapper.readValue(fileContent, JurisdictionDefinition.class);
+        JurisdictionDefinition jurisdictionDefinition = objectMapper
+            .readValue(fileContent, JurisdictionDefinition.class);
         JurisdictionDefinition copiedJurisdictionDefinition  = jurisdictionDefinition.createCopy();
 
         assertNotEquals(jurisdictionDefinition.hashCode(), copiedJurisdictionDefinition.hashCode());
@@ -71,7 +74,8 @@ class JurisdictionDefinitionTest {
     public void beftaJurisdiction3JurisdictionCompareActualAndClone() throws JsonProcessingException {
         String fileContent = fromFileAsString("tests/BEFTA_JURISDICTION_3-jurisdiction-payload.json");
 
-        JurisdictionDefinition jurisdictionDefinition = objectMapper.readValue(fileContent, JurisdictionDefinition.class);
+        JurisdictionDefinition jurisdictionDefinition = objectMapper
+            .readValue(fileContent, JurisdictionDefinition.class);
         JurisdictionDefinition copiedJurisdictionDefinition  = jurisdictionDefinition.createCopy();
 
         assertNotEquals(jurisdictionDefinition.hashCode(), copiedJurisdictionDefinition.hashCode());
