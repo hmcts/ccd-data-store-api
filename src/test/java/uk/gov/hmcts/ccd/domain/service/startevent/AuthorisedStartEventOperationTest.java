@@ -31,6 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -383,5 +384,14 @@ class AuthorisedStartEventOperationTest {
                 IGNORE_WARNING));
         }
 
+        @Test
+        @DisplayName("should fail if case reference is not found")
+        void shouldFailWithExceptionWhenCaseIsNotFound() {
+            assertThrows(CaseNotFoundException.class, () ->
+                authorisedStartEventOperation.triggerStartForCase("aa", EVENT_TRIGGER_ID,
+                    IGNORE_WARNING));
+        }
+
     }
+
 }

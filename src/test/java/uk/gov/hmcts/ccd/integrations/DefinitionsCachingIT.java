@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CachedUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
@@ -25,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 
 import java.util.ArrayList;
@@ -70,6 +73,9 @@ public class DefinitionsCachingIT {
     @SpyBean
     private HttpUIDefinitionGateway httpUIDefinitionGateway;
 
+    @SpyBean
+    private CachedUIDefinitionGateway cachedUIDefinitionGateway;
+
     @Mock
     CaseTypeDefinition mockCaseTypeDefinition;
 
@@ -85,11 +91,13 @@ public class DefinitionsCachingIT {
     @Mock
     SearchInputFieldsDefinition searchInputFieldsDefinition;
 
-    List<WizardPage> wizardPageList = Collections.emptyList();
+    List<WizardPage> wizardPageList = new ArrayList<>();
     List<Banner> bannersList = Collections.emptyList();
 
     @Before
     public void setup() {
+        initiateWizardPageList(wizardPageList);
+
         doReturn(caseTypeDefinitionVersion(VERSION_1)).when(this.caseDefinitionRepository)
             .getLatestVersionFromDefinitionStore(ID_1);
         doReturn(caseTypeDefinitionVersion(VERSION_2)).when(this.caseDefinitionRepository)
@@ -103,6 +111,19 @@ public class DefinitionsCachingIT {
         doReturn(JURISDICTION_DEFINITION_3).when(this.caseDefinitionRepository)
             .getJurisdictionFromDefinitionStore("J3");
         doReturn(mockCaseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_1);
+
+        doReturn(wizardPageList).when(this.httpUIDefinitionGateway).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+    }
+
+    private void initiateWizardPageList(List<WizardPage> wizardPageList) {
+
+        WizardPageField wizardPageField = new WizardPageField();
+        wizardPageField.setCaseFieldId("case_field_1");
+        List<WizardPageField> wizardPageFields = new ArrayList<>();
+        wizardPageFields.add(wizardPageField);
+        WizardPage wizardPage = new WizardPage();
+        wizardPage.setWizardPageFields(wizardPageFields);
+        wizardPageList.add(wizardPage);
     }
 
     @Test
@@ -263,12 +284,55 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testWizardPageDefinitionsAreCached() {
+        uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
+        uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
+        uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
 
-        doReturn(wizardPageList).when(this.httpUIDefinitionGateway).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+        verify(httpUIDefinitionGateway, times(1)).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+    }
 
-        uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
-        uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
-        uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
+    @Test
+    public void testWizardPageDefinitionsPreventCacheManipulation() {
+        var wizardPagesFirstAttempt = uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
+        var wizardPageFirstAttempt = wizardPagesFirstAttempt.get(0);
+        //change cached data
+        wizardPagesFirstAttempt.forEach(wizardPage -> wizardPage.setWizardPageFields(null));
+        Assert.assertNull(wizardPageFirstAttempt.getWizardPageFields());
+
+        var wizardPagesSecondAttempt = uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
+        var wizardPageSecondAttempt = wizardPagesSecondAttempt.get(0);
+
+        Assert.assertFalse(wizardPageSecondAttempt.getWizardPageFields().isEmpty());
+
+        wizardPagesSecondAttempt.forEach(wizardPage -> wizardPage.setWizardPageFields(null));
+        Assert.assertNull(wizardPageSecondAttempt.getWizardPageFields());
+
+        var wizardPagesThirdAttempt = uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
+        var wizardPageThirdAttempt = wizardPagesThirdAttempt.get(0);
+
+        Assert.assertFalse(wizardPageThirdAttempt.getWizardPageFields().isEmpty());
+
+        verify(httpUIDefinitionGateway, times(1)).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void testWizardPageDefinitionsFailWithCacheManipulationWithoutDeepCopy() {
+        var wizardPagesFirstAttempt = cachedUIDefinitionGateway.getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+        var wizardPageFirstAttempt = wizardPagesFirstAttempt.get(0);
+        //change cached data
+        wizardPagesFirstAttempt.forEach(wizardPage -> wizardPage.setWizardPageFields(null));
+        Assert.assertNull(wizardPageFirstAttempt.getWizardPageFields());
+
+        var wizardPagesSecondAttempt = cachedUIDefinitionGateway.getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+        var wizardPageSecondAttempt = wizardPagesSecondAttempt.get(0);
+
+        Assert.assertNull(wizardPageSecondAttempt.getWizardPageFields());
+
+        var wizardPagesThirdAttempt = cachedUIDefinitionGateway.getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+        var wizardPageThirdAttempt = wizardPagesThirdAttempt.get(0);
+
+        Assert.assertNull(wizardPageThirdAttempt.getWizardPageFields());
 
         verify(httpUIDefinitionGateway, times(1)).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
     }
