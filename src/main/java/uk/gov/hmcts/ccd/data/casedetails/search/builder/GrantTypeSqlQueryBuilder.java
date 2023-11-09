@@ -70,6 +70,8 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
                     return innerQuery;
                 }
 
+                innerQuery = addInQueryForCaseGroupId(representative.getCaseGroupId(),
+                    innerQuery);
                 innerQuery = addEqualsQueryForOptionalAttribute(representative.getJurisdiction(),
                     innerQuery, JURISDICTION);
                 innerQuery = addEqualsQueryForOptionalAttribute(representative.getRegion(),
@@ -99,6 +101,12 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
                 + String.format(QUERY, STATES, statesParam);
         }
         return parentQuery;
+    }
+
+    private String addInQueryForCaseGroupId(String caseGroupId, String parentQuery) {
+
+        return parentQuery + getOperator(parentQuery, AND)
+            + " data ->>'caseAccessGroups' like '%\"caseGroupId\": \""+caseGroupId+"\"%' ";
     }
 
     private String addInQueryForReference(Map<String, Object> params,

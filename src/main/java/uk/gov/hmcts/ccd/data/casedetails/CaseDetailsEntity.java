@@ -79,6 +79,7 @@ public class CaseDetailsEntity {
     public static final String ID_FIELD_COL = "id";
     public static final String STATE_FIELD_COL = "state";
     public static final String JURISDICTION_FIELD_COL = "jurisdiction";
+    public static final String CASE_GROUP_ID_FIELD_COL = "data.caseAccessGroups.value.caseGroupId";
     public static final String JURISDICTION_FIELD_KEYWORD_COL = "jurisdiction.keyword";
     public static final String CASE_TYPE_ID_FIELD_COL = "case_type_id";
     public static final String REFERENCE_FIELD_COL = "reference";
@@ -94,6 +95,7 @@ public class CaseDetailsEntity {
 
     public static final String LOCATION = "data.caseManagementLocation.baseLocation";
     public static final String REGION = "data.caseManagementLocation.region";
+    public static final String CASE_GROUP = "data.caseAccessGroups.baseLocation";
     public static final String CASE_ACCESS_CATEGORY = "data.CaseAccessCategory";
 
     @Id

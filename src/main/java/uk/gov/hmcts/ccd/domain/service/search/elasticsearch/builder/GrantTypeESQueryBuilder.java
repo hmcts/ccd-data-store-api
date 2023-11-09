@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -15,7 +12,12 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchRoleAssignment;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.CASE_ACCESS_CATEGORY;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.CASE_GROUP_ID_FIELD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.LOCATION;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIELD_COL;
@@ -47,6 +49,8 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
                     return;
                 }
 
+                addNestedTermQueryForOptionalAttribute(representative.getCaseGroupId(), innerQuery,
+                    CASE_GROUP_ID_FIELD_COL);
                 addTermQueryForOptionalAttribute(representative.getJurisdiction(), innerQuery, JURISDICTION_FIELD_COL);
                 addTermQueryForOptionalAttribute(representative.getRegion(), innerQuery, REGION);
                 addTermQueryForOptionalAttribute(representative.getLocation(), innerQuery, LOCATION);
@@ -84,6 +88,14 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
                                                   String matchName) {
         if (StringUtils.isNotBlank(attribute)) {
             parentQuery.must(QueryBuilders.termQuery(matchName + KEYWORD, attribute));
+        }
+    }
+
+    private void addNestedTermQueryForOptionalAttribute(String attribute,
+                                                  BoolQueryBuilder parentQuery,
+                                                  String matchName) {
+        if (StringUtils.isNotBlank(attribute)) {
+            parentQuery.must(QueryBuilders.termsQuery(matchName + KEYWORD, attribute));
         }
     }
 
