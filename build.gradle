@@ -31,10 +31,10 @@ apply from: './gradle/suppress.gradle'
 def versions = [
         pact_version    : '4.1.7',
 ]
-ext['spring-security.version'] = '5.7.8'
+
+ext['spring-security.version'] = '5.6.9'
 ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.15.3'
-
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
@@ -165,7 +165,7 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
     implementation "org.flywaydb:flyway-core:8.5.13"
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.32'
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
