@@ -122,8 +122,6 @@ module "postgresql_v15" {
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
   }
-
-  subnet_suffix = "expanded"
   
   admin_user_object_id = var.jenkins_AAD_objectId
   business_area        = "cft"
