@@ -2,7 +2,6 @@
   <suppress>
     <notes>Temporary Suppression
         CVE-2023-20883 refer https://tools.hmcts.net/jira/browse/CCD-4736
-        CVE-2023-35116 refer https://tools.hmcts.net/jira/browse/CCD-4771
         CVE-2023-2976  refer https://tools.hmcts.net/jira/browse/CCD-4967
         CVE-2023-34036 refer https://tools.hmcts.net/jira/browse/CCD-4968
         CVE-2023-34034 refer https://tools.hmcts.net/jira/browse/CCD-4969
@@ -14,7 +13,6 @@
         CVE-2023-44487 refer https://tools.hmcts.net/jira/browse/CCD-4974
     </notes>
     <cve>CVE-2023-20883</cve>
-    <cve>CVE-2023-35116</cve>
     <cve>CVE-2023-2976</cve>
     <cve>CVE-2023-34036</cve>
     <cve>CVE-2023-34034</cve>

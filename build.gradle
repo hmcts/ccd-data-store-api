@@ -34,7 +34,7 @@ def versions = [
 
 ext['spring-security.version'] = '5.6.9'
 ext['spring-framework.version'] = '5.3.27'
-ext['jackson.version'] = '2.14.1'
+ext['jackson.version'] = '2.15.3'
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
