@@ -161,7 +161,6 @@ public class AccessControlServiceImpl implements AccessControlService {
                 missingFields.add(fieldName);
             }
         }
-
         return missingFields;
     }
 
