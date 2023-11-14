@@ -5,7 +5,6 @@
         CVE-2023-2976  refer https://tools.hmcts.net/jira/browse/CCD-4967
         CVE-2023-34036 refer https://tools.hmcts.net/jira/browse/CCD-4968
         CVE-2023-34034 refer https://tools.hmcts.net/jira/browse/CCD-4969
-        CVE-2020-8908  refer https://tools.hmcts.net/jira/browse/CCD-4970
         CVE-2023-20873 refer https://tools.hmcts.net/jira/browse/CCD-4604
         CVE-2023-41080 refer https://tools.hmcts.net/jira/browse/CCD-4972
         CVE-2023-42794 refer https://tools.hmcts.net/jira/browse/CCD-4973
@@ -17,7 +16,6 @@
     <cve>CVE-2023-2976</cve>
     <cve>CVE-2023-34036</cve>
     <cve>CVE-2023-34034</cve>
-    <cve>CVE-2020-8908</cve>
     <cve>CVE-2023-20873</cve>
     <cve>CVE-2023-41080</cve>
     <cve>CVE-2023-42794</cve>
