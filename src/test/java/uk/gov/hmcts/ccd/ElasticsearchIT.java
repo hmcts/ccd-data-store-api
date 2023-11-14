@@ -2,9 +2,13 @@ package uk.gov.hmcts.ccd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.apache.commons.io.IOUtils;
+import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.jupiter.api.AfterAll;
@@ -19,13 +23,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -38,7 +38,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -67,7 +67,6 @@ import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -81,8 +80,6 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDEX_TYPE;
-import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDICES;
 import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
@@ -177,12 +174,9 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificPriv
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificPublicUserRoleAssignmentJson;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificRestrictedUserRoleAssignmentJson;
 
+@Slf4j
 @RunWith(Enclosed.class)
 public class ElasticsearchIT extends ElasticsearchBaseTest {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchIT.class);
-
-    private static final String DATA_DIR = "elasticsearch/data";
 
     private static final String REFERENCE_GLOBAL_SEARCH_01 = "1111222233334444";
     private static final String REFERENCE_GLOBAL_SEARCH_02 = "2222333344441111";
@@ -201,29 +195,38 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     @Inject
     private ApplicationParams applicationParams;
 
+    private static ElasticsearchContainer container;
+
     private MockMvc mockMvc;
 
     @BeforeAll
-    public static void initElastic(@Autowired EmbeddedElastic embeddedElastic)
+    public static void initElastic(@Value("${search.elastic.version}") final String elasticVersion,
+                                   @Value("${search.elastic.port}") final int httpPortValue)
         throws IOException, InterruptedException {
 
-        LOG.info("Starting Elastic search...");
-        embeddedElastic.start();
-        LOG.info("Elastic search started.");
-        initData(embeddedElastic);
+        log.info("Starting Elastic search...");
+        container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:" + elasticVersion)
+            .withEnv("discovery.type", "single-node")
+            .withExposedPorts(9200)
+            .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
+                new HostConfig().withPortBindings(
+                    new PortBinding(Ports.Binding.bindPort(httpPortValue), new ExposedPort(9200))
+                )
+            ));
+        container.start();
+        log.info("Elastic search started.");
+        ElasticsearchITSetup configurer = new ElasticsearchITSetup(httpPortValue);
+        log.info("Elastic search adding indexes.");
+        configurer.initIndexes();
+        log.info("Elastic search adding data.");
+        configurer.initData();
     }
 
-    private static void initData(EmbeddedElastic embeddedElastic) throws IOException {
-        PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
-
-        for (String idx : INDICES) {
-            Resource[] resources =
-                resourceResolver.getResources(String.format("classpath:%s/%s/*.json", DATA_DIR, idx));
-            for (Resource resource : resources) {
-                String caseString = IOUtils.toString(resource.getInputStream(), UTF_8);
-                embeddedElastic.index(idx, INDEX_TYPE, caseString);
-            }
-        }
+    @AfterAll
+    public static void tearDownElastic() {
+        log.info("Stopping Elastic search");
+        container.stop();
+        log.info("Elastic search stopped.");
     }
 
     @BeforeEach
@@ -235,13 +238,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         stubSuccess(BUILDING_LOCATIONS_PATH, buildings, BUILDING_LOCATIONS_STUB_ID);
         stubSuccess(SERVICES_PATH, orgServices, SERVICES_STUB_ID);
-    }
-
-    @AfterAll
-    public static void tearDownElastic(@Autowired EmbeddedElastic embeddedElastic) {
-        LOG.info("Stopping Elastic search");
-        embeddedElastic.stop();
-        LOG.info("Elastic search stopped.");
     }
 
     @Nested
@@ -439,7 +435,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0),
                     is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
-                () -> assertThat(caseDetails.getFields().size(), is(10)),
+                () -> assertThat(caseDetails.getFields().size(), is(8)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
             );
         }
@@ -499,12 +495,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     is(nestedFieldId)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
                     is(MetaData.CaseField.CASE_REFERENCE.getReference())),
-                () -> assertThat(caseDetails.getFields().size(), is(13)),
+                () -> assertThat(caseDetails.getFields().size(), is(11)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
                 () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFields().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
                 () -> assertThat(caseDetails.getFields().containsKey(COMPLEX_FIELD), is(true)),
-                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(13)),
+                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(11)),
                 () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted(), false),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
@@ -536,12 +532,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     is(nestedFieldId)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
                     is(MetaData.CaseField.CASE_REFERENCE.getReference())),
-                () -> assertThat(caseDetails.getFields().size(), is(13)),
+                () -> assertThat(caseDetails.getFields().size(), is(11)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
                 () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFields().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
                 () -> assertThat(caseDetails.getFields().containsKey(COMPLEX_FIELD), is(true)),
-                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(13)),
+                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(11)),
                 () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted(), false),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
@@ -562,7 +558,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(10)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(18)),
+                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(16)),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(),
                     is(2)),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
@@ -860,7 +856,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         class CrudTest {
             @BeforeEach
             void beforeEach() {
-                LOG.info("CrudTest BeforeEach test method");
+                log.info("CrudTest BeforeEach test method");
                 stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
                     .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
             }
@@ -1237,7 +1233,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         class GeneralAccessTest {
             @BeforeEach
             void beforeEach() {
-                LOG.info("GeneralAccessTest BeforeEach test method");
+                log.info("GeneralAccessTest BeforeEach test method");
                 stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
                     .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
             }

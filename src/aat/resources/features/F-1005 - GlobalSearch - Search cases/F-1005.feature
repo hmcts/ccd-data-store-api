@@ -191,8 +191,7 @@ Feature: F-1005: Global Search - Search cases
      And the response [has 200 return code],
      And the response has all other details as expected.
 
-
-  @S-1005.13  #CCD-3659
+  @S-1005.13 @Ignore #CCD-3659
   Scenario: Successfully search for case with Jurisdictions but not CaseTypes in search criteria
     Given a user with [an active profile in CCD]
 

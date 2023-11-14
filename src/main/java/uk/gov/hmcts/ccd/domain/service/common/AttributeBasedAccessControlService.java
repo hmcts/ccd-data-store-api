@@ -50,7 +50,7 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
             .map(acls -> {
                 AccessControlList accessControl = acls;
                 if (accessProfile.getReadOnly()) {
-                    accessControl = acls.duplicate();
+                    accessControl = acls.createCopy();
                     accessControl.setCreate(false);
                     accessControl.setDelete(false);
                     accessControl.setUpdate(false);
