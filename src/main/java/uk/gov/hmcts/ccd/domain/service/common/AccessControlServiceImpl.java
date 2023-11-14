@@ -3,12 +3,8 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -152,6 +148,27 @@ public class AccessControlServiceImpl implements AccessControlService {
             return !noAccessGranted;
         }
         return true;
+    }
+
+    @Override
+    public Set<String> getMissingFieldsForUpsert(JsonNode newData, JsonNode existingData,
+                                                 List<CaseFieldDefinition> caseFieldDefinitions,
+                                                 Set<AccessProfile> accessProfiles) {
+        Set<String> missingFields = new HashSet<>();
+
+        // Logic to determine missing fields based on newData, existingData, and caseFieldDefinitions
+        // This logic can vary based on your specific requirements and data structures
+
+        // For example, iterating through caseFieldDefinitions and checking against the provided data
+        for (CaseFieldDefinition fieldDefinition : caseFieldDefinitions) {
+            String fieldName = fieldDefinition.getCaseTypeId();
+            // Assuming some logic to check if the fieldName is missing in the newData or existingData
+            if (!newData.has(fieldName) && !existingData.has(fieldName)) {
+                missingFields.add(fieldName);
+            }
+        }
+
+        return missingFields;
     }
 
     @Override

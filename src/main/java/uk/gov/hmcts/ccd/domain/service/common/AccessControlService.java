@@ -99,6 +99,11 @@ public interface AccessControlService {
                                          List<CaseFieldDefinition> caseFieldDefinitions,
                                          Set<AccessProfile> accessProfiles);
 
+    Set<String> getMissingFieldsForUpsert(JsonNode newData, JsonNode existingData,
+                                                     List<CaseFieldDefinition> caseFieldDefinitions,
+                                                     Set<AccessProfile> accessProfiles);
+
+
     CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(String caseTypeId, String caseReference, String eventId,
                                                               CaseUpdateViewEvent caseEventTrigger,
                                                               List<CaseFieldDefinition> caseFieldDefinitions,
