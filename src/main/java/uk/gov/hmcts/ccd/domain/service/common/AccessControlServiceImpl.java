@@ -155,14 +155,8 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                  List<CaseFieldDefinition> caseFieldDefinitions,
                                                  Set<AccessProfile> accessProfiles) {
         Set<String> missingFields = new HashSet<>();
-
-        // Logic to determine missing fields based on newData, existingData, and caseFieldDefinitions
-        // This logic can vary based on your specific requirements and data structures
-
-        // For example, iterating through caseFieldDefinitions and checking against the provided data
         for (CaseFieldDefinition fieldDefinition : caseFieldDefinitions) {
             String fieldName = fieldDefinition.getCaseTypeId();
-            // Assuming some logic to check if the fieldName is missing in the newData or existingData
             if (!newData.has(fieldName) && !existingData.has(fieldName)) {
                 missingFields.add(fieldName);
             }
