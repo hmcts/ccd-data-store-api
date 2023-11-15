@@ -254,15 +254,17 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
     private void verifyCaseFieldsAccess(Map<String, JsonNode> newData, CaseDetails existingCaseDetails,
                                         CaseTypeDefinition caseTypeDefinition, Set<AccessProfile> accessProfiles) {
-        if (!accessControlService.canAccessCaseFieldsForUpsert(
+        Set<String> missingFields = accessControlService.getMissingFieldsForUpsert(
             MAPPER.convertValue(newData, JsonNode.class),
             MAPPER.convertValue(existingCaseDetails.getData(), JsonNode.class),
             caseTypeDefinition.getCaseFieldDefinitions(),
-            accessProfiles)) {
+            accessProfiles);
+
+        if (!missingFields.isEmpty()) {
+            log.info("Fields not found: " + missingFields);
             throw new ResourceNotFoundException(NO_FIELD_FOUND);
         }
     }
-
 
     private void updateCaseDetailsWithTtlIncrement(CaseDetails caseDetails,
                                                    CaseTypeDefinition caseTypeDefinition,
