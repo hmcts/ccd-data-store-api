@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -153,6 +154,20 @@ public class AccessControlServiceImpl implements AccessControlService {
             return !noAccessGranted;
         }
         return true;
+    }
+
+    @Override
+    public Set<String> getMissingFieldsForUpsert(JsonNode newData, JsonNode existingData,
+                                                 List<CaseFieldDefinition> caseFieldDefinitions,
+                                                 Set<AccessProfile> accessProfiles) {
+        Set<String> missingFields = new HashSet<>();
+        for (CaseFieldDefinition fieldDefinition : caseFieldDefinitions) {
+            String fieldName = fieldDefinition.getCaseTypeId();
+            if (!newData.has(fieldName) && !existingData.has(fieldName)) {
+                missingFields.add(fieldName);
+            }
+        }
+        return missingFields;
     }
 
     @Override
