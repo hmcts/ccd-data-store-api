@@ -44,6 +44,8 @@ steps:
     when:
       - push-images
     keep: true
+    retries: 3
+    retryDelay: 5
 
   - id: manifest-push
     cmd: docker manifest push --purge {{.Run.Registry}}/{{CI_IMAGE_TAG}}
