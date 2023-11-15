@@ -32,6 +32,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -59,6 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
@@ -4435,13 +4437,13 @@ public class AccessControlServiceTest {
         void shouldFailIfCaseFieldDoesNotExist() throws IOException {
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
-            assertThat(
-                accessControlService.canAccessCaseFieldsForUpsert(
+            assertThrows(ResourceNotFoundException.class, () -> {
+                accessControlService.getMissingFieldsForUpsert(
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
                     Collections.emptyList(),
-                    ACCESS_PROFILES),
-                is(false));
+                    ACCESS_PROFILES);
+            });
         }
 
         private JsonNode getExistingDataNode() {
