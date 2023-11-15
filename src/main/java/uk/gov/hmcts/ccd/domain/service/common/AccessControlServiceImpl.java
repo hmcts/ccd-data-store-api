@@ -142,32 +142,23 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                 final List<CaseFieldDefinition> caseFieldDefinitions,
                                                 final Set<AccessProfile> accessProfiles) {
         if (newData != null) {
+            Set<String> missingFields = new HashSet<>();
             final boolean noAccessGranted = getStream(newData)
                 .anyMatch(newFieldName -> {
                     if (existingData.has(newFieldName)) {
                         return !valueDifferentAndHasUpdateAccess(newData, existingData, newFieldName,
                             caseFieldDefinitions, accessProfiles);
                     } else {
+                        missingFields.add(newFieldName);
                         return !hasCaseFieldAccess(caseFieldDefinitions, accessProfiles, CAN_CREATE, newFieldName);
                     }
                 });
+            if (!missingFields.isEmpty()) {
+                System.out.println("Missing Fields: " + missingFields);
+             }
             return !noAccessGranted;
         }
         return true;
-    }
-
-    @Override
-    public Set<String> getMissingFieldsForUpsert(JsonNode newData, JsonNode existingData,
-                                                 List<CaseFieldDefinition> caseFieldDefinitions,
-                                                 Set<AccessProfile> accessProfiles) {
-        Set<String> missingFields = new HashSet<>();
-        for (CaseFieldDefinition fieldDefinition : caseFieldDefinitions) {
-            String fieldName = fieldDefinition.getCaseTypeId();
-            if (!newData.has(fieldName) && !existingData.has(fieldName)) {
-                missingFields.add(fieldName);
-            }
-        }
-        return missingFields;
     }
 
     @Override

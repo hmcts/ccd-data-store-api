@@ -60,7 +60,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
@@ -4437,17 +4436,13 @@ public class AccessControlServiceTest {
         void shouldFailIfCaseFieldDoesNotExist() throws IOException {
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
-            assertThrows(ResourceNotFoundException.class, () -> {
-                accessControlService.getMissingFieldsForUpsert(
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
                     Collections.emptyList(),
-                    ACCESS_PROFILES);
-            });
-        }
-
-        private JsonNode getExistingDataNode() {
-            return null;
+                    ACCESS_PROFILES),
+                is(false));
         }
 
         @Test
