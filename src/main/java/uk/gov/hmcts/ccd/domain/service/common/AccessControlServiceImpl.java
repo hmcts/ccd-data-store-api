@@ -154,7 +154,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                     }
                 });
             if (!missingFields.isEmpty()) {
-                System.out.println("Missing Fields: " + missingFields);
+                LOG.debug("Missing Fields: " + missingFields);
             }
             return !noAccessGranted;
         }
