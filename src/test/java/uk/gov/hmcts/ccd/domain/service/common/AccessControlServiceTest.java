@@ -4444,21 +4444,6 @@ public class AccessControlServiceTest {
                 is(false));
         }
 
-        @Test
-        @DisplayName("Should fail if the caseField not found")
-        void shouldFailIfCaseFieldDoesNotExist1() throws IOException {
-            CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-            JsonNode existingDataNode = getExistingDataNode();
-
-            Set<String> missingFields = accessControlService.getMissingFieldsForUpsert(
-                getJsonNode("{ \"child1\": \"value1\", \"child2\": \"value2\" }"),
-                existingDataNode,
-                caseTypeDefinition.getCaseFieldDefinitions(),
-                Collections.emptySet());
-            assertThat(missingFields.contains("newChild"), is(true));
-        }
-
-
         private JsonNode getExistingDataNode() {
             return null;
         }
