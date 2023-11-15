@@ -156,19 +156,19 @@ public class AccessControlServiceImpl implements AccessControlService {
         return true;
     }
 
-    @Override
-    public Set<String> getMissingFieldsForUpsert(JsonNode newData, JsonNode existingData,
-                                                 List<CaseFieldDefinition> caseFieldDefinitions,
-                                                 Set<AccessProfile> accessProfiles) {
-        Set<String> missingFields = new HashSet<>();
-        for (CaseFieldDefinition fieldDefinition : caseFieldDefinitions) {
-            String fieldName = fieldDefinition.getCaseTypeId();
-            if (!newData.has(fieldName) && !existingData.has(fieldName)) {
-                missingFields.add(fieldName);
-            }
-        }
-        return missingFields;
-    }
+//    @Override
+//    public Set<String> getMissingFieldsForUpsert(JsonNode newData, JsonNode existingData,
+//                                                 List<CaseFieldDefinition> caseFieldDefinitions,
+//                                                 Set<AccessProfile> accessProfiles) {
+//        Set<String> missingFields = new HashSet<>();
+//        for (CaseFieldDefinition fieldDefinition : caseFieldDefinitions) {
+//            String fieldName = fieldDefinition.getCaseTypeId();
+//            if (!newData.has(fieldName) && !existingData.has(fieldName)) {
+//                missingFields.add(fieldName);
+//            }
+//        }
+//        return missingFields;
+//    }
 
     @Override
     public JsonNode filterCaseFieldsByAccess(final JsonNode caseFields,
