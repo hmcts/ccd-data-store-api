@@ -4445,6 +4445,25 @@ public class AccessControlServiceTest {
         }
 
         @Test
+        @DisplayName("Should fail if the caseField not found")
+        void shouldFailIfCaseFieldDoesNotExist1() throws IOException {
+            CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+            JsonNode existingDataNode = getExistingDataNode();
+
+            Set<String> missingFields = accessControlService.getMissingFieldsForUpsert(
+                getJsonNode("{ \"child1\": \"value1\", \"child2\": \"value2\" }"),
+                existingDataNode,
+                caseTypeDefinition.getCaseFieldDefinitions(),
+                Collections.emptySet());
+            assertThat(missingFields.contains("newChild"), is(true));
+        }
+
+
+        private JsonNode getExistingDataNode() {
+            return null;
+        }
+
+        @Test
         @DisplayName("Should allow creation of new items on collection")
         void shouldGrantCreateAccessToCollectionType() throws IOException {
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
