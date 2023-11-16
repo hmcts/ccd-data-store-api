@@ -19,4 +19,5 @@ public class RoleAssignmentAttributes {
     private Optional<String> region;
     private Optional<String> location;
     private Optional<String> contractType;
+    private Optional<String> caseAccessGroupId;
 }
