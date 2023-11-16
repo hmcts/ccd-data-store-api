@@ -34,7 +34,7 @@ public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         Optional<String> raCaseAccessGroupId = roleAssignment.getAttributes().getCaseAccessGroupId();
         List<String> caseAccessGroupIds = getCaseAccessGroupIds(caseDetails).orElse(Collections.EMPTY_LIST);
-        LOG.info("Match role assignment caseAccessGroupId {} with case details caseAccessGroupIds {} for role assignment {}",
+        LOG.info("Match role assignment caseAccessGroupId {} with caseAccessGroupIds {} for role assignment {}",
             raCaseAccessGroupId,
             caseAccessGroupIds,
             roleAssignment.getId());
