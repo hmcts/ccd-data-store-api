@@ -8,6 +8,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 public interface RoleAttributeMatcher {
 
     String CASE_MANAGEMENT__LOCATION = "caseManagementLocation";
+    String CASE_ACCESS_GROUPS = "caseAccessGroups";
     String BASE_LOCATION = "baseLocation";
     String REGION = "region";
     String EMPTY_STR = "";
