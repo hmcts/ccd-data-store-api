@@ -6,13 +6,6 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +20,16 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -48,6 +51,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private final AccessControlService accessControlService;
     private final ObjectMapperService objectMapperService;
     private final CaseDataAccessControl caseDataAccessControl;
+    private final Executor asyncExecutor;
 
     @Autowired
     public AuthorisedCaseSearchOperation(
@@ -55,13 +59,15 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
         AccessControlService accessControlService,
         ObjectMapperService objectMapperService,
-        CaseDataAccessControl caseDataAccessControl) {
+        CaseDataAccessControl caseDataAccessControl,
+        @Qualifier("asyncExecutor") Executor asyncExecutor) {
 
         this.caseSearchOperation = caseSearchOperation;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
         this.accessControlService = accessControlService;
         this.objectMapperService = objectMapperService;
         this.caseDataAccessControl = caseDataAccessControl;
+        this.asyncExecutor = asyncExecutor;
     }
 
     @Override
@@ -103,31 +109,37 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         }
 
         CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest, dataClassification);
-        filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest, dataClassification);
+        filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest);
 
         return result;
     }
 
     private void filterCaseDataByCaseType(List<CaseTypeDefinition> authorisedCaseTypes,
                                           List<CaseDetails> cases,
-                                          CrossCaseTypeSearchRequest authorisedSearchRequest,
-                                          boolean dataClassification) {
+                                          CrossCaseTypeSearchRequest authorisedSearchRequest) {
         Map<String, CaseTypeDefinition> caseTypeIdByCaseType = authorisedCaseTypes
             .stream()
             .collect(Collectors.toMap(CaseTypeDefinition::getId, Function.identity()));
 
-        cases.stream()
-            .filter(caseDetails -> caseTypeIdByCaseType.containsKey(caseDetails.getCaseTypeId()))
-            .forEach(caseDetails -> filterCaseData(caseTypeIdByCaseType.get(caseDetails.getCaseTypeId()),
-                                                   caseDetails,
-                                                   authorisedSearchRequest,
-                                                   dataClassification));
+        CompletableFuture<Void> allProcessing = CompletableFuture.allOf(cases.stream()
+                .filter(caseDetails -> caseTypeIdByCaseType.containsKey(caseDetails.getCaseTypeId()))
+                .map(caseDetails -> CompletableFuture.runAsync(() -> {
+                    filterCaseData(
+                        caseTypeIdByCaseType.get(caseDetails.getCaseTypeId()),
+                        caseDetails,
+                        authorisedSearchRequest
+                    );
+                }, asyncExecutor)).toArray(CompletableFuture[]::new))
+            .exceptionally(e -> {
+                throw new RuntimeException("Process filterCaseDataByCaseType terminated due to an exception", e);
+            });
+
+        allProcessing.join();
     }
 
     private void filterCaseData(CaseTypeDefinition authorisedCaseType,
                                 CaseDetails caseDetails,
-                                CrossCaseTypeSearchRequest authorisedSearchRequest,
-                                boolean dataClassification) {
+                                CrossCaseTypeSearchRequest authorisedSearchRequest) {
         filterCaseDataByAclAccess(authorisedCaseType, caseDetails);
         filterCaseDataForMultiCaseTypeSearch(authorisedSearchRequest, authorisedCaseType, caseDetails);
     }
@@ -137,8 +149,8 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         JsonNode caseData = caseDataToJsonNode(caseDetails);
         JsonNode accessFilteredData =
             accessControlService.filterCaseFieldsByAccess(caseData, authorisedCaseType.getCaseFieldDefinitions(),
-                                                            getAccessProfiles(caseDetails),
-                                                            CAN_READ, false);
+                getAccessProfiles(caseDetails),
+                CAN_READ, false);
         caseDetails.setData(jsonNodeToCaseData(accessFilteredData));
     }
 
@@ -146,20 +158,20 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
      * Filters the case data to the aliases that were passed in the _source filter of the search request.
      * For e.g. if the case data is
      * "case_data": {
-     *   "PersonFirstName" : "J",
-     *   "PersonLastName": "Baker",
-     *   "PersonAddress": {
-     *     "city": "London",
-     *     "postcode": "W4"
-     *   }
+     * "PersonFirstName" : "J",
+     * "PersonLastName": "Baker",
+     * "PersonAddress": {
+     * "city": "London",
+     * "postcode": "W4"
+     * }
      * }
      * and the source filter is
      * "_source": ["alias.lastName", "alias.postcode"]
      * where alias.lastName = case_data.PersonLastName and alias.postcode = case_data.PersonAddress.postcode
      * the case data will be filtered and transformed to
      * "case_data": {
-     *   "lastName": "Baker",
-     *   "postcode": "W4",
+     * "lastName": "Baker",
+     * "postcode": "W4",
      * }
      * If no source filter was passed then this will remove case data and return only metadata.
      */
@@ -178,8 +190,8 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
                 .stream()
                 .filter(searchRequest::hasAliasField)
                 .forEach(searchAliasField -> findCaseFieldPathInCaseData(authorisedCaseType,
-                                                                        caseDataJson,
-                                                                        searchAliasField.getCaseFieldPath())
+                    caseDataJson,
+                    searchAliasField.getCaseFieldPath())
                     .filter(not(JsonNode::isMissingNode))
                     .ifPresent(jsonNode ->
                         ((ObjectNode) filteredMultiCaseTypeSearchData).set(searchAliasField.getId(), jsonNode)));
