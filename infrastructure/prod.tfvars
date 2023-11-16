@@ -4,4 +4,5 @@ database_sku_capacity = "32"
 database_storage_mb   = "2048000"
 
 pgsql_sku        = "GP_Standard_D32s_v3"
-pgsql_storage_mb = 2097152  
+pgsql_storage_mb = 2097152
+subnet_suffix = "expanded"
