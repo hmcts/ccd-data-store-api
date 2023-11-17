@@ -124,8 +124,44 @@ class CaseAccessGroupsMatcherTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails();
         ObjectMapper mapper = new ObjectMapper();
 
-        String missingAnId = simpleGAjsonRequest.replaceAll("\"id\": \"id1\",\n", "\n");
-        Map<String, JsonNode> dataMap = JacksonUtils.convertValue(mapper.readTree(missingAnId));
+        String replacing = "\"id\": \"id1\",\n";
+        String missing = simpleGAjsonRequest.replaceAll(replacing, "\n");
+
+        Map<String, JsonNode> dataMap = JacksonUtils.convertValue(mapper.readTree(missing));
+
+        when(caseDetails.getData()).thenReturn(dataMap);
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
+    }
+
+    @Test
+    void shouldNotMatchOnCaseAccessGroupIdWithMissingValue() throws JsonProcessingException {
+        RoleAssignment roleAssignment = createRoleAssignment(Instant.now().minus(1, ChronoUnit.DAYS),
+            Instant.now().plus(2, ChronoUnit.DAYS), "PRIVATE", null, null, null, null, Optional.of("caseGroupId1"));
+
+        CaseDetails caseDetails = mockCaseDetails();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String replacing = ",\n      \"value\": \\{\n        \"caseAccessGroupId\": \"caseGroupId1\",\n"
+            + "        \"caseGroupType\": \"caseGroupType1\"\n      \\}\n";
+        String missing = simpleGAjsonRequest.replaceAll(replacing, "\n");
+
+        Map<String, JsonNode> dataMap = JacksonUtils.convertValue(mapper.readTree(missing));
+
+        when(caseDetails.getData()).thenReturn(dataMap);
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
+    }
+
+    @Test
+    void shouldNotMatchOnCaseAccessGroupIdWhenNotAnArray() throws JsonProcessingException {
+        RoleAssignment roleAssignment = createRoleAssignment(Instant.now().minus(1, ChronoUnit.DAYS),
+            Instant.now().plus(2, ChronoUnit.DAYS), "PRIVATE", null, null, null, null, Optional.of("caseGroupId1"));
+
+        CaseDetails caseDetails = mockCaseDetails();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String missing = "{\n\"caseAccessGroups\": \"\"}\n";
+
+        Map<String, JsonNode> dataMap = JacksonUtils.convertValue(mapper.readTree(missing));
 
         when(caseDetails.getData()).thenReturn(dataMap);
         assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
