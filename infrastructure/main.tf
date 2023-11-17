@@ -122,14 +122,13 @@ module "postgresql_v15" {
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
   }
-
-  subnet_suffix = "expanded"
   
   admin_user_object_id = var.jenkins_AAD_objectId
   business_area        = "cft"
   common_tags          = var.common_tags
   component            = var.component
   env                  = var.env
+  subnet_suffix        = var.subnet_suffix
   pgsql_databases = [
     {
       name = var.database_name
