@@ -33,7 +33,7 @@ public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
     @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         Optional<String> raCaseAccessGroupId = roleAssignment.getAttributes().getCaseAccessGroupId();
-        List<String> caseAccessGroupIds = getCaseAccessGroupIds(caseDetails).orElse(Collections.EMPTY_LIST);
+        List<String> caseAccessGroupIds = getCaseAccessGroupIds(caseDetails).orElse(Collections.emptyList());
         LOG.info("Match role assignment caseAccessGroupId {} with caseAccessGroupIds {} for role assignment {}",
             raCaseAccessGroupId,
             caseAccessGroupIds,
@@ -54,7 +54,7 @@ public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
         return matched;
     }
 
-    private Optional<List> getCaseAccessGroupIds(CaseDetails caseDetails) {
+    private Optional<List<String>> getCaseAccessGroupIds(CaseDetails caseDetails) {
         JsonNode caseAccessGroups = caseDetails.getData().get(CASE_ACCESS_GROUPS);
         if (caseAccessGroups != null) {
             return Optional.ofNullable(getCaseAccessGroupIds(caseAccessGroups));

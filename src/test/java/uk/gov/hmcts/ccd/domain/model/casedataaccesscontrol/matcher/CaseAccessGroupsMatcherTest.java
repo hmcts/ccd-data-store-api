@@ -25,14 +25,14 @@ class CaseAccessGroupsMatcherTest extends BaseFilter {
     private final String simpleGAjsonRequest = "{\n"
         + "  \"caseAccessGroups\": [\n"
         + "    {\n"
-        + "      \"id\": \"ffaec4ae-e7dc-43f1-862b-1b85041bc36d\",\n"
+        + "      \"id\": \"id1\",\n"
         + "      \"value\": {\n"
         + "        \"caseAccessGroupId\": \"caseGroupId1\",\n"
         + "        \"caseGroupType\": \"caseGroupType1\"\n"
         + "      }\n"
         + "    },\n"
         + "    {\n"
-        + "      \"id\": \"46410c2a-acda-43e0-bb2e-cd5b1663c616\",\n"
+        + "      \"id\": \"id2\",\n"
         + "      \"value\": {\n"
         + "        \"caseAccessGroupId\": \"caseGroupId2\",\n"
         + "        \"caseGroupType\": \"caseGroupType2\"\n"
@@ -40,7 +40,6 @@ class CaseAccessGroupsMatcherTest extends BaseFilter {
         + "    }\n"
         + "  ]\n"
         + "}\n";
-
 
     @BeforeEach
     void setUp() {
@@ -62,7 +61,35 @@ class CaseAccessGroupsMatcherTest extends BaseFilter {
     }
 
     @Test
-    void shouldMatchOnCaseAccessGroupIdWithEmptyValues() throws JsonProcessingException {
+    void shouldNotMatchOnCaseAccessGroupIdWithEmptyRAValues() throws JsonProcessingException {
+        RoleAssignment roleAssignment = createRoleAssignment(Instant.now().minus(1, ChronoUnit.DAYS),
+            Instant.now().plus(2, ChronoUnit.DAYS), "PRIVATE", null, null, null, null, Optional.of("caseGroupId1"));
+
+        CaseDetails caseDetails = mockCaseDetails();
+        ObjectMapper mapper = new ObjectMapper();
+
+        Map<String, JsonNode> dataMap = JacksonUtils.convertValue(mapper.readTree("{}"));
+
+        when(caseDetails.getData()).thenReturn(dataMap);
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
+    }
+
+    @Test
+    void shouldMatchOnCaseAccessGroupIdWithEmptyCaseValues() throws JsonProcessingException {
+        RoleAssignment roleAssignment = createRoleAssignment(Instant.now().minus(1, ChronoUnit.DAYS),
+            Instant.now().plus(2, ChronoUnit.DAYS), "PRIVATE", null, null, null, null, null);
+
+        CaseDetails caseDetails = mockCaseDetails();
+        ObjectMapper mapper = new ObjectMapper();
+
+        Map<String, JsonNode> dataMap = JacksonUtils.convertValue(mapper.readTree(simpleGAjsonRequest));
+
+        when(caseDetails.getData()).thenReturn(dataMap);
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, caseDetails));
+    }
+
+    @Test
+    void shouldMatchOnCaseAccessGroupIdWithEmptyCaseAndRAValues() throws JsonProcessingException {
         RoleAssignment roleAssignment = createRoleAssignment(Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS), "PRIVATE", null, null, null, null, null);
 
@@ -88,4 +115,20 @@ class CaseAccessGroupsMatcherTest extends BaseFilter {
         when(caseDetails.getData()).thenReturn(dataMap);
         assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
     }
+
+    @Test
+    void shouldNotMatchOnCaseAccessGroupIdWithMissingItemId() throws JsonProcessingException {
+        RoleAssignment roleAssignment = createRoleAssignment(Instant.now().minus(1, ChronoUnit.DAYS),
+            Instant.now().plus(2, ChronoUnit.DAYS), "PRIVATE", null, null, null, null, Optional.of("caseGroupId1"));
+
+        CaseDetails caseDetails = mockCaseDetails();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String missingAnId = simpleGAjsonRequest.replaceAll("\"id\": \"id1\",\n", "\n");
+        Map<String, JsonNode> dataMap = JacksonUtils.convertValue(mapper.readTree(missingAnId));
+
+        when(caseDetails.getData()).thenReturn(dataMap);
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
+    }
+
 }
