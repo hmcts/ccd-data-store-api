@@ -11,46 +11,6 @@
 [![HitCount](http://hits.dwyl.io/SP9gBJ/ccd-data-store-api.svg)](#ccd-data-store-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## setup for Group Access
-### create a ccd-data-store docker image for local use
-
-```bash
-../ga-ccd-docker/ccd login
-
-./gradlew assemble
-
-docker build -t localdebug .
-
-docker tag localdebug:latest localdebug:staging
-```
-
-
-stop ccd-data-store-api container on ga-ccd-docker
-
-update ga-ccd-docker **backend.yml** so that
-
-**ccd-data-store-api** points to image: **localdebug:latest**
-
-restart ccd-data-store-api container by
-
-```bash
-./ccd compose up -d
-```
-
-You can debug this image on intellij if you have some vm args enabled pre-startup
-
-on the start up logs for it you should see....
-
-Picked up JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-2023-11-09T09:30:37.642852637Z Listening for transport dt_socket at address: 5005 **_Attach debugger_**
-
-Click the Attach debugger grey text
-
-
-**xxxxxxxxxx---END OF GROUP ACCESS SETUP---xxxxxxxxxx**
-
----
-
 Store/search cases and provide workbaskets.
 
 ### Prerequisites
