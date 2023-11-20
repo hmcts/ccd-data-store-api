@@ -26,6 +26,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
+import uk.gov.hmcts.ccd.domain.model.definition.SortOrder;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
@@ -35,6 +37,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -53,6 +57,8 @@ public class DefinitionsCachingIT {
     private static final int VERSION_1 = 33;
     private static final int VERSION_2 = 3311;
     private static final int VERSION_3 = 331111;
+
+    private static final String USE_CASE_1 = "usecase1";
 
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_1 = new JurisdictionDefinition();
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_2 = new JurisdictionDefinition();
@@ -113,6 +119,11 @@ public class DefinitionsCachingIT {
         doReturn(mockCaseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_1);
 
         doReturn(wizardPageList).when(this.httpUIDefinitionGateway).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+        SearchResultDefinition searchResultDefinition = createSearchResultDefinition();
+        doReturn(searchResultDefinition).when(this.httpUIDefinitionGateway).getWorkBasketResult(VERSION_1, ID_1);
+        doReturn(searchResultDefinition).when(this.httpUIDefinitionGateway).getSearchResult(VERSION_1, ID_1);
+        doReturn(searchResultDefinition).when(this.httpUIDefinitionGateway)
+            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
     }
 
     private void initiateWizardPageList(List<WizardPage> wizardPageList) {
@@ -125,6 +136,22 @@ public class DefinitionsCachingIT {
         wizardPage.setWizardPageFields(wizardPageFields);
         wizardPageList.add(wizardPage);
     }
+
+    private SearchResultDefinition createSearchResultDefinition() {
+        SortOrder sortOrder = new SortOrder();
+        sortOrder.setDirection("direction");
+        sortOrder.setPriority(1);
+
+        SearchResultField searchResultField = new SearchResultField();
+        searchResultField.setCaseFieldId("casefield_1");
+        searchResultField.setSortOrder(sortOrder);
+
+        SearchResultField[] searchResultFields = new SearchResultField[]{searchResultField};
+        SearchResultDefinition searchResultDefinition = new SearchResultDefinition();
+        searchResultDefinition.setFields(searchResultFields);
+        return searchResultDefinition;
+    }
+
 
     @Test
     public void testJurisdictionListsAreCached() {
@@ -235,9 +262,6 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testWorkbasketResultAreCached() {
-
-        doReturn(searchResult).when(this.httpUIDefinitionGateway).getWorkBasketResult(VERSION_1, ID_1);
-
         uiDefinitionRepository.getWorkBasketResult(ID_1);
         uiDefinitionRepository.getWorkBasketResult(ID_1);
         uiDefinitionRepository.getWorkBasketResult(ID_1);
@@ -246,15 +270,144 @@ public class DefinitionsCachingIT {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void testWorkbasketResultPreventCacheManipulation() {
+        var searchResultDefinitionFirstAttempt = uiDefinitionRepository.getWorkBasketResult(ID_1);
+        //change cached data
+        searchResultDefinitionFirstAttempt.setFields(null);
+        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
+
+        var searchResultDefinitionSecondAttempt = uiDefinitionRepository.getWorkBasketResult(ID_1);
+
+        assertEquals(1, searchResultDefinitionSecondAttempt.getFields().length);
+
+        searchResultDefinitionSecondAttempt.setFields(null);
+        assertNull(searchResultDefinitionSecondAttempt.getFields());
+
+        var searchResultDefinitionThirdAttempt = uiDefinitionRepository.getWorkBasketResult(ID_1);
+
+        assertEquals(1, searchResultDefinitionThirdAttempt.getFields().length);
+
+        verify(httpUIDefinitionGateway, times(1)).getWorkBasketResult(VERSION_1, ID_1);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void testWorkbasketResultFailWithCacheManipulationWithoutDeepCopy() {
+        var searchResultDefinitionFirstAttempt = cachedUIDefinitionGateway.getWorkBasketResult(VERSION_1, ID_1);
+        //change cached data
+        searchResultDefinitionFirstAttempt.setFields(null);
+        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
+
+        var searchResultDefinitionSecondAttempt = cachedUIDefinitionGateway.getWorkBasketResult(VERSION_1, ID_1);
+        Assert.assertNull(searchResultDefinitionSecondAttempt.getFields());
+
+        var searchResultDefinitionThirdAttempt = cachedUIDefinitionGateway.getWorkBasketResult(VERSION_1, ID_1);
+        Assert.assertNull(searchResultDefinitionThirdAttempt.getFields());
+
+        verify(httpUIDefinitionGateway, times(1)).getWorkBasketResult(VERSION_1, ID_1);
+    }
+
+    @Test
     public void testSearchResultAreCached() {
-
-        doReturn(searchResult).when(this.httpUIDefinitionGateway).getSearchResult(VERSION_1, ID_1);
-
         uiDefinitionRepository.getSearchResult(ID_1);
         uiDefinitionRepository.getSearchResult(ID_1);
         uiDefinitionRepository.getSearchResult(ID_1);
 
         verify(httpUIDefinitionGateway, times(1)).getSearchResult(VERSION_1, ID_1);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void testSearchResultPreventCacheManipulation() {
+        var searchResultDefinitionFirstAttempt = uiDefinitionRepository.getSearchResult(ID_1);
+        //change cached data
+        searchResultDefinitionFirstAttempt.setFields(null);
+        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
+
+        var searchResultDefinitionSecondAttempt = uiDefinitionRepository.getSearchResult(ID_1);
+
+        assertEquals(1, searchResultDefinitionSecondAttempt.getFields().length);
+
+        searchResultDefinitionSecondAttempt.setFields(null);
+        assertNull(searchResultDefinitionSecondAttempt.getFields());
+
+        var searchResultDefinitionThirdAttempt = uiDefinitionRepository.getSearchResult(ID_1);
+
+        assertEquals(1, searchResultDefinitionThirdAttempt.getFields().length);
+
+        verify(httpUIDefinitionGateway, times(1)).getSearchResult(VERSION_1, ID_1);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void testSearchResultFailWithCacheManipulationWithoutDeepCopy() {
+        var searchResultDefinitionFirstAttempt = cachedUIDefinitionGateway.getSearchResult(VERSION_1, ID_1);
+        //change cached data
+        searchResultDefinitionFirstAttempt.setFields(null);
+        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
+
+        var searchResultDefinitionSecondAttempt = cachedUIDefinitionGateway.getSearchResult(VERSION_1, ID_1);
+        Assert.assertNull(searchResultDefinitionSecondAttempt.getFields());
+
+        var searchResultDefinitionThirdAttempt = cachedUIDefinitionGateway.getSearchResult(VERSION_1, ID_1);
+        Assert.assertNull(searchResultDefinitionThirdAttempt.getFields());
+
+        verify(httpUIDefinitionGateway, times(1)).getSearchResult(VERSION_1, ID_1);
+    }
+
+    @Test
+    public void testSearchCasesResultAreCached() {
+        uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
+        uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
+        uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
+
+        verify(httpUIDefinitionGateway, times(1))
+            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void testSearchCasesResultPreventCacheManipulation() {
+        var searchResultDefinitionFirstAttempt = uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
+        //change cached data
+        searchResultDefinitionFirstAttempt.setFields(null);
+        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
+
+        var searchResultDefinitionSecondAttempt = uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
+
+        assertEquals(1, searchResultDefinitionSecondAttempt.getFields().length);
+
+        searchResultDefinitionSecondAttempt.setFields(null);
+        assertNull(searchResultDefinitionSecondAttempt.getFields());
+
+        var searchResultDefinitionThirdAttempt = uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
+
+        assertEquals(1, searchResultDefinitionThirdAttempt.getFields().length);
+
+        verify(httpUIDefinitionGateway, times(1))
+            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void testSearchCasesResultFailWithCacheManipulationWithoutDeepCopy() {
+        var searchResultDefinitionFirstAttempt = cachedUIDefinitionGateway
+            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
+        //change cached data
+        searchResultDefinitionFirstAttempt.setFields(null);
+        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
+
+        var searchResultDefinitionSecondAttempt = cachedUIDefinitionGateway
+            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
+        Assert.assertNull(searchResultDefinitionSecondAttempt.getFields());
+
+        var searchResultDefinitionThirdAttempt = cachedUIDefinitionGateway
+            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
+        Assert.assertNull(searchResultDefinitionThirdAttempt.getFields());
+
+        verify(httpUIDefinitionGateway, times(1))
+            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
     }
 
     @Test
@@ -279,7 +432,8 @@ public class DefinitionsCachingIT {
         uiDefinitionRepository.getSearchInputFieldDefinitions(ID_1);
         uiDefinitionRepository.getSearchInputFieldDefinitions(ID_1);
 
-        verify(httpUIDefinitionGateway, times(1)).getSearchInputFieldDefinitions(VERSION_1, ID_1);
+        verify(httpUIDefinitionGateway, times(1))
+            .getSearchInputFieldDefinitions(VERSION_1, ID_1);
     }
 
     @Test

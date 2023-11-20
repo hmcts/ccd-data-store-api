@@ -1,9 +1,8 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,7 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class SearchResultDefinition implements Serializable {
+public class SearchResultDefinition implements Serializable, Copyable<SearchResultDefinition> {
+
     private SearchResultField[] fields;
 
     public SearchResultField[] getFields() {
@@ -57,5 +57,19 @@ public class SearchResultDefinition implements Serializable {
             return count != 0;
         }
         return false;
+    }
+
+    @Override
+    public SearchResultDefinition createCopy() {
+        SearchResultDefinition copy = new SearchResultDefinition();
+        if (fields != null) {
+            SearchResultField[] copiedFields = Arrays.stream(fields)
+                .map(originalField -> originalField != null ? originalField.createCopy() : null)
+                .toArray(SearchResultField[]::new);
+            copy.setFields(copiedFields);
+        } else {
+            copy.setFields(null);
+        }
+        return copy;
     }
 }
