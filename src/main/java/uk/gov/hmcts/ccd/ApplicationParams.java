@@ -227,6 +227,9 @@ public class ApplicationParams {
     @Value("${search.internal.case-access-metadata.enabled}")
     private boolean internalSearchCaseAccessMetadataEnabled;
 
+    @Value("${enable-case-group-access-filtering}")
+    private boolean enableCaseGroupAccessFiltering;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -615,5 +618,9 @@ public class ApplicationParams {
 
     public boolean getInternalSearchCaseAccessMetadataEnabled() {
         return internalSearchCaseAccessMetadataEnabled;
+    }
+
+    public boolean getCaseGroupAccessFilteringEnabled() {
+        return enableCaseGroupAccessFiltering;
     }
 }
