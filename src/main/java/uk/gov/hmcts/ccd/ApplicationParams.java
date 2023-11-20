@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import com.hazelcast.config.EvictionPolicy;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -120,9 +119,6 @@ public class ApplicationParams {
     @Value("${default.cache.max.size}")
     private Integer defaultCacheMaxSize;
 
-    @Value("${default.cache.eviction.policy}")
-    private EvictionPolicy defaultCacheEvictionPolicy;
-
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
 
@@ -227,6 +223,9 @@ public class ApplicationParams {
 
     @Value("${system.user.token.cache.ttl.secs}")
     private Integer systemUserTokenCacheTTLSecs;
+
+    @Value("${search.internal.case-access-metadata.enabled}")
+    private boolean internalSearchCaseAccessMetadataEnabled;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -430,10 +429,6 @@ public class ApplicationParams {
         return defaultCacheMaxSize;
     }
 
-    public EvictionPolicy getDefaultCacheEvictionPolicy() {
-        return defaultCacheEvictionPolicy;
-    }
-
     public List<String> getSearchBlackList() {
         return searchBlackList;
     }
@@ -616,5 +611,9 @@ public class ApplicationParams {
 
     public Integer getSystemUserTokenCacheTTLSecs() {
         return systemUserTokenCacheTTLSecs;
+    }
+
+    public boolean getInternalSearchCaseAccessMetadataEnabled() {
+        return internalSearchCaseAccessMetadataEnabled;
     }
 }

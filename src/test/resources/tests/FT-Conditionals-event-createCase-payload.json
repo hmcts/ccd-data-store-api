@@ -1,0 +1,236 @@
+{
+  "case_type_id": "FT_Conditionals",
+  "event_id": "createCase",
+  "wizard_pages": [
+    {
+      "id": "createCaseConditionalPage1",
+      "label": "Conditional Page 1",
+      "order": 1,
+      "wizard_page_fields": [
+        {
+          "case_field_id": "TextFieldOptionalButtonTest",
+          "order": 27,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "MaritalStatusField",
+          "order": 3,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextAreaField",
+          "order": 2,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "DateField",
+          "order": 3,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldOptional",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldShowHide12",
+          "order": 25,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldMandatoryButtonTest",
+          "order": 28,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "MoneyField",
+          "order": 8,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "YesNoField",
+          "order": 7,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldShowHide10",
+          "order": 23,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "PhoneField",
+          "order": 5,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldShowHide8",
+          "order": 20,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "NumberField",
+          "order": 6,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldShowHide5",
+          "order": 14,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldShowHide4",
+          "order": 13,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldShowHide13",
+          "order": 26,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldShowHide3",
+          "order": 12,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldShowHide9",
+          "order": 22,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldShowHide11",
+          "order": 24,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldShowHide7",
+          "order": 19,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "AddressUKField",
+          "order": 4,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "EmailField",
+          "order": 9,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextField2",
+          "order": 11,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextFieldShowHide6",
+          "order": 15,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "MultiSelectField",
+          "order": 10,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        }
+      ],
+      "show_condition": null,
+      "callback_url_mid_event": null,
+      "retries_timeout_mid_event": []
+    },
+    {
+      "id": "createCaseConditionalPage2",
+      "label": "Conditional Page 2",
+      "order": 2,
+      "wizard_page_fields": [
+        {
+          "case_field_id": "TextField3",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        }
+      ],
+      "show_condition": "TextField=\"showmethemoney\"",
+      "callback_url_mid_event": null,
+      "retries_timeout_mid_event": []
+    },
+    {
+      "id": "createCaseConditionalPage3",
+      "label": "Conditional Page 3",
+      "order": 3,
+      "wizard_page_fields": [
+        {
+          "case_field_id": "AddressComplex1",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        }
+      ],
+      "show_condition": "TextField3=\"showpage3\"",
+      "callback_url_mid_event": null,
+      "retries_timeout_mid_event": []
+    },
+    {
+      "id": "createCaseConditionalPage4",
+      "label": "Conditional Page 4",
+      "order": 4,
+      "wizard_page_fields": [
+        {
+          "case_field_id": "CollectionComplexField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        }
+      ],
+      "show_condition": "TextField3=\"showpage4\"",
+      "callback_url_mid_event": null,
+      "retries_timeout_mid_event": []
+    },
+    {
+      "id": "createCaseConditionalPage5",
+      "label": "Conditional Page 5",
+      "order": 5,
+      "wizard_page_fields": [
+        {
+          "case_field_id": "TextField11",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        }
+      ],
+      "show_condition": "TextField=\"showmethemoney\" AND TextField3=\"showpage5\"",
+      "callback_url_mid_event": null,
+      "retries_timeout_mid_event": []
+    }
+  ]
+}
