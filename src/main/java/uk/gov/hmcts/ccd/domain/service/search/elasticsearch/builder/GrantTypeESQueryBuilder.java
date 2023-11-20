@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchRoleAssignment
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.CASE_ACCESS_CATEGORY;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_COL;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.CASE_ACCESS_GROUP_ID_FIELD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.LOCATION;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIELD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REGION;
@@ -47,6 +48,8 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
                     return;
                 }
 
+                addTermQueryForOptionalAttribute(representative.getCaseAccessGroupId(), innerQuery,
+                    CASE_ACCESS_GROUP_ID_FIELD_COL);
                 addTermQueryForOptionalAttribute(representative.getJurisdiction(), innerQuery, JURISDICTION_FIELD_COL);
                 addTermQueryForOptionalAttribute(representative.getRegion(), innerQuery, REGION);
                 addTermQueryForOptionalAttribute(representative.getLocation(), innerQuery, LOCATION);
