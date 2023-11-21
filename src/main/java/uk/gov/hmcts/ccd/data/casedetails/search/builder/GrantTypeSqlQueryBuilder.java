@@ -108,7 +108,7 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
             return parentQuery;
         }
         return parentQuery + getOperator(parentQuery, AND)
-            + " data ->>'caseAccessGroups' like '%\"caseAccessGroupId\": \"" + caseAccessGroupId + "\"%' ";
+            + "data->'caseAccessGroups' @> '[{\"value\":{\"caseAccessGroupId\": \"" + caseAccessGroupId + "\"}}]'";
     }
 
     private String addInQueryForReference(Map<String, Object> params,
