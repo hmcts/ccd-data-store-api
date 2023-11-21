@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
-public class SortOrder implements Serializable {
+public class SortOrder implements Serializable, Copyable<SortOrder> {
 
     @JsonProperty("direction")
     private String direction;
@@ -25,5 +25,13 @@ public class SortOrder implements Serializable {
 
     public void setPriority(Integer priority) {
         this.priority = priority;
+    }
+
+    @Override
+    public SortOrder createCopy() {
+        SortOrder copy = new SortOrder();
+        copy.setDirection(this.direction);
+        copy.setPriority(this.priority);
+        return copy;
     }
 }
