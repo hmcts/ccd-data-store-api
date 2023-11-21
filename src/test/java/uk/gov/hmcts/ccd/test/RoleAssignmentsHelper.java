@@ -217,7 +217,7 @@ public class RoleAssignmentsHelper {
             .endTime(END_TIME)
             .created(CREATED)
             .authorisations(Collections.emptyList())
-            .attributes(createRoleAssignmentRecordAttribute(caseId, caseType, jurisdiction, localised))
+            .attributes(createRoleAssignmentRecordAttribute(caseId, caseType, jurisdiction, localised, null))
             .build();
     }
 
@@ -236,7 +236,7 @@ public class RoleAssignmentsHelper {
             .endTime(END_TIME)
             .created(CREATED)
             .authorisations(Collections.emptyList())
-            .attributes(createRoleAssignmentRecordAttribute(caseId, null, null, true))
+            .attributes(createRoleAssignmentRecordAttribute(caseId, null, null, true, null))
             .build();
     }
 
@@ -265,7 +265,8 @@ public class RoleAssignmentsHelper {
     private static RoleAssignmentAttributesResource createRoleAssignmentRecordAttribute(String caseId,
                                                                                         String caseType,
                                                                                         String jurisdiction,
-                                                                                        boolean localised) {
+                                                                                        boolean localised,
+                                                                                        String caseGroupId) {
         if (localised) {
             return RoleAssignmentAttributesResource.builder()
                 .jurisdiction(Optional.of(jurisdiction == null ? "DIVORCE" : jurisdiction))
@@ -274,6 +275,7 @@ public class RoleAssignmentsHelper {
                 .region(Optional.of("Hampshire"))
                 .location(Optional.of("Southampton"))
                 .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
+                .caseAccessGroupId(Optional.ofNullable(caseGroupId))
                 .build();
         } else {
             return RoleAssignmentAttributesResource.builder()
@@ -283,6 +285,7 @@ public class RoleAssignmentsHelper {
                 .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
                 .region(Optional.empty())
                 .location(Optional.empty())
+                .caseAccessGroupId(Optional.ofNullable(caseGroupId))
                 .build();
         }
     }

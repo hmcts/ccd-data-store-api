@@ -69,7 +69,7 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
     void shouldIncludeShouldQueryWhenCaseTypeContainsCaseAccessCategory() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
             "CASE", "", "",
-            "", "", null, "", ROLE_NAME_1);
+            "", "", null, "", ROLE_NAME_1, null);
 
         Set<String> caseStates = Sets.newHashSet("STATE-1");
         CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);

@@ -85,6 +85,20 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
         assertEquals(1, query.must().size());
     }
 
+    @Test
+    void shouldReturnBasicQueryWhenRoleAssignmentsWithCaseAccessGroupsExists() {
+        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, null, null, null, null, null, null,
+            null, null, "caseAccessGroupId");
+        when(caseDataAccessControl.generateRoleAssignments(any(CaseTypeDefinition.class)))
+            .thenReturn(Lists.newArrayList(roleAssignment));
+
+
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
+        assertNotNull(query);
+        assertEquals(1, query.must().size());
+    }
+
 
     @Test
     void shouldReturnNonOrganisationalQueryWhenRoleAssignmentsGrantTypeExists() {
