@@ -69,6 +69,20 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     }
 
     @Test
+    void shouldReturnQueryWhenRoleAssignmentHasCaseAccessGroupId() {
+        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "ROLE1",
+            "PRIVATE", "", "", null, null, "", "caseAccessGroupId");
+        String query = basicGrantTypeQueryBuilder
+            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), caseTypeDefinition);
+
+        assertNotNull(query);
+        String expectedValue =  "( data->'caseAccessGroups' @> '[{\"value\":{\"caseAccessGroupId\": "
+            + "\"caseAccessGroupId\"}}]' AND state in (:states_1_basic) "
+            + "AND security_classification in (:classifications_1_basic) )";
+        assertEquals(expectedValue, query);
+    }
+
+    @Test
     void shouldReturnEmptyQueryWhenRoleAssignmentHasAuthorisations() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
             "CASE",
