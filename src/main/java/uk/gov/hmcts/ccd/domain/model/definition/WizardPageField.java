@@ -9,8 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ApiModel(description = "")
-public class WizardPageField implements Serializable {
-
+public class WizardPageField implements Serializable, Copyable<WizardPageField> {
     private String caseFieldId = null;
     private Integer order = null;
     private Integer pageColumnNumber;
@@ -56,5 +55,16 @@ public class WizardPageField implements Serializable {
         return getComplexFieldOverrides().stream()
             .filter(override -> fieldPath.equals(override.getComplexFieldElementId()))
             .findAny();
+    }
+
+    @Override
+    public WizardPageField createCopy() {
+        WizardPageField clonedField = new WizardPageField();
+        clonedField.setCaseFieldId(this.caseFieldId);
+        clonedField.setOrder(this.order);
+        clonedField.setPageColumnNumber(this.pageColumnNumber);
+        clonedField.setComplexFieldOverrides(createCopyList(this.complexFieldOverrides));
+
+        return clonedField;
     }
 }
