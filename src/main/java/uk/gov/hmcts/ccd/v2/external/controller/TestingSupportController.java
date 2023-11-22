@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiResponses;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.type.StringType;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -60,7 +59,6 @@ public class TestingSupportController {
         @ApiResponse(code = 404, message = "Unable to find case type"),
         @ApiResponse(code = 500, message = "Unexpected error")
     })
-    @ConditionalOnExpression("${testing-support-endpoints.enabled:false}")
     public void dataCaseTypeIdDelete(
         @ApiParam(value = "Change ID", required = true) @PathVariable("changeId") BigInteger changeId,
         @ApiParam(value = "Case Type ID", required = true) @RequestParam("caseTypeIds") String caseTypeIds) {
