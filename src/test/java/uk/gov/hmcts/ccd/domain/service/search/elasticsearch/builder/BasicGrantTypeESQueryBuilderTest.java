@@ -94,4 +94,34 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         assertTrue(query.hasClauses());
         assertEquals(1, (query.should().size()));
     }
+
+    @Test
+    void shouldIncludeShouldQueryWhenCaseTypeContainsCaseAccessGroup() {
+        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
+            "CASE", "", "",
+            "", "", null, "", ROLE_NAME_1, "caseAccesGroupId1");
+
+        Set<String> caseStates = Sets.newHashSet("STATE-1");
+        CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
+        when(caseStateDefinition.getId()).thenReturn("STATE-1");
+        List<CaseStateDefinition> caseStateDefinitions = Lists.newArrayList(caseStateDefinition);
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any())).thenReturn(caseStateDefinitions);
+
+        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = mockRoleToAccessProfileDefinitions(
+            ROLE_NAME_1,
+            CASE_TYPE_ID_1,
+            1,
+            false,
+            null,
+            "Civil/Standard,Crime/Standard");
+        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
+
+        BoolQueryBuilder query = basicGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment),
+            caseTypeDefinition);
+
+        assertNotNull(query);
+        assertTrue(query.hasClauses());
+        assertEquals(1, (query.should().size()));
+    }
 }
