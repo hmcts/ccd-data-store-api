@@ -58,6 +58,7 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -224,6 +225,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         doReturn(postState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         doReturn(user).when(userRepository).getUser();
+        doReturn(user).when(userRepository).getUserByUserId(anyString());
         doReturn(user).when(userRepository).getUser(anyString());
         doReturn(caseDetailsBefore).when(caseService).clone(caseDetails);
         doReturn(data).when(fieldProcessorService).processData(any(), any(), any(CaseEventDefinition.class));
@@ -485,6 +487,30 @@ class CreateCaseEventServiceTest extends TestFixtures {
             new Event());
 
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
+    }
+
+
+    @Test
+    @DisplayName("should use onBehalfOfId")
+    void shouldUpdateUserDetailsWhenOnBehalfOfIdIsPassed() {
+        String onBehalfOfId = UUID.randomUUID().toString();
+
+        caseDataContent = newCaseDataContent()
+            .withEvent(event)
+            .withData(data)
+            .withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING)
+            .withOnBehalfOfId(onBehalfOfId)
+            .build();
+
+        final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        verify(userRepository).getUserByUserId(onBehalfOfId);
+        verify(userRepository).getUser();
+        verify(globalSearchProcessorService).populateGlobalSearchData(any(CaseTypeDefinition.class), anyMap());
+        assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
+        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
+            .isEqualTo(LAST_MODIFIED);
     }
 
     @Test
