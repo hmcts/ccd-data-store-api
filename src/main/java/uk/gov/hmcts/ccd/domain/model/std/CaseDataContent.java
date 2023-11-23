@@ -37,6 +37,9 @@ public class CaseDataContent {
     @JsonProperty("on_behalf_of_token")
     private String onBehalfOfUserToken;
 
+    @JsonProperty("on_behalf_of_id")
+    private String onBehalfOfId;
+
     @JsonProperty("supplementary_data_request")
     private Map<String, Map<String, Object>> supplementaryDataRequest;
 
@@ -123,6 +126,14 @@ public class CaseDataContent {
 
     public void setOnBehalfOfUserToken(String onBehalfOfUserToken) {
         this.onBehalfOfUserToken = onBehalfOfUserToken;
+    }
+
+    public String getOnBehalfOfId() {
+        return onBehalfOfId;
+    }
+
+    public void setOnBehalfOfId(String onBehalfOfId) {
+        this.onBehalfOfId = onBehalfOfId;
     }
 
     public Map<String, Map<String, Object>> getSupplementaryDataRequest() {
