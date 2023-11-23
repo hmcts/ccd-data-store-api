@@ -8,8 +8,8 @@ public interface Copyable<T>  {
     T createCopy();
 
     default <S extends Copyable<S>> List<S> createCopyList(List<S> originalList) {
-        if (originalList == null || originalList.isEmpty()) {
-            return originalList;
+        if (originalList == null) {
+            return null;
         }
 
         List<S> copyList = new ArrayList<>(originalList.size());
