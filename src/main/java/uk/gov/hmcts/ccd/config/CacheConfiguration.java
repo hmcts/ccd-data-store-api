@@ -72,6 +72,7 @@ public class CacheConfiguration {
             newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", defaultCacheTtl),
             newMapConfigWithTtl("caseRolesCache", defaultCacheTtl),
             newMapConfigWithTtl("jurisdictionCache", jurisdictionCacheTtl),
+            newMapConfigWithTtl("idamUserByIdCache", userCacheTtl),
             newMapConfigWithTtl(BUILDING_LOCATIONS_CACHE, applicationParams.getRefDataCacheTtlInSec()),
             newMapConfigWithTtl(SERVICES_CACHE, applicationParams.getRefDataCacheTtlInSec())
         ));
