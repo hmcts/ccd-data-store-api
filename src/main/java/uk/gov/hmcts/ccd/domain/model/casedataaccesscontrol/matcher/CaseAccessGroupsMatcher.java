@@ -2,8 +2,6 @@ package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -21,20 +19,15 @@ public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
 
     @Override
     public MatcherType getType() {
-        return MatcherType.ROLENAME;
+        return MatcherType.CASEACCESSGROUPID;
     }
 
-    private static final String VALUE_FIELD = "value";
-    private static final String ID_FIELD = "id";
-    private static final String CASE_ACCESS_GROUP_ID_FIELD = "caseAccessGroupId";
-
-    private static final Logger LOG = LoggerFactory.getLogger(CaseAccessGroupsMatcher.class);
 
     @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         Optional<String> raCaseAccessGroupId = roleAssignment.getAttributes().getCaseAccessGroupId();
         List<String> caseAccessGroupIds = getCaseAccessGroupIds(caseDetails).orElse(Collections.emptyList());
-        LOG.info("Match role assignment caseAccessGroupId {} with caseAccessGroupIds {} for role assignment {}",
+        log.debug("Match role assignment caseAccessGroupId {} with caseAccessGroupIds {} for role assignment {}",
             raCaseAccessGroupId,
             caseAccessGroupIds,
             roleAssignment.getId());
@@ -47,7 +40,7 @@ public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
             }
         }
 
-        log.info("Role assignment caseAccessGroupId {} and case details caseAccessGroupIds {} match {}",
+        log.debug("Role assignment caseAccessGroupId {} and case details caseAccessGroupIds {} match {}",
             raCaseAccessGroupId,
             caseAccessGroupIds,
             matched);
@@ -69,8 +62,8 @@ public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
             Iterator<JsonNode> elements = caseAccessGroups.elements();
             while (elements.hasNext()) {
                 JsonNode jsonNode = elements.next();
-                JsonNode valueNode = jsonNode.get(VALUE_FIELD);
-                JsonNode idNode = jsonNode.get(ID_FIELD);
+                JsonNode valueNode = jsonNode.get(COLLECTION_VALUE_FIELD);
+                JsonNode idNode = jsonNode.get(COLLECTION_ID_FIELD);
                 if (valueNode != null && idNode != null) {
                     String caseAccessGroupId = valueNode.get(CASE_ACCESS_GROUP_ID_FIELD).asText();
                     allGroupIds.add(caseAccessGroupId);
