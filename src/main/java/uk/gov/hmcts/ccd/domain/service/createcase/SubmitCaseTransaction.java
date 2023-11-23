@@ -77,12 +77,14 @@ public class SubmitCaseTransaction implements AccessControl {
         maxAttempts = 2,
         backoff = @Backoff(delay = 50)
     )
+
     public CaseDetails submitCase(Event event,
                                   CaseTypeDefinition caseTypeDefinition,
                                   IdamUser idamUser,
                                   CaseEventDefinition caseEventDefinition,
                                   CaseDetails caseDetails,
-                                  Boolean ignoreWarning) {
+                                  Boolean ignoreWarning,
+                                  IdamUser onBehalfOfUser) {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
@@ -125,7 +127,8 @@ public class SubmitCaseTransaction implements AccessControl {
             caseTypeDefinition,
             idamUser,
             caseEventDefinition,
-            caseDetailsAfterCallbackWithoutHashes
+            caseDetailsAfterCallbackWithoutHashes,
+            onBehalfOfUser
         );
 
         caseDataAccessControl.grantAccess(savedCaseDetails, idamUser.getId());
@@ -145,7 +148,8 @@ public class SubmitCaseTransaction implements AccessControl {
                                                      CaseTypeDefinition caseTypeDefinition,
                                                      IdamUser idamUser,
                                                      CaseEventDefinition caseEventDefinition,
-                                                     CaseDetails newCaseDetails) {
+                                                     CaseDetails newCaseDetails,
+                                                     IdamUser onBehalfOfUser) {
 
         final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
@@ -161,14 +165,12 @@ public class SubmitCaseTransaction implements AccessControl {
         auditEvent.setStateName(caseStateDefinition.getName());
         auditEvent.setCaseTypeId(caseTypeDefinition.getId());
         auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
-        auditEvent.setUserId(idamUser.getId());
-        auditEvent.setUserLastName(idamUser.getSurname());
-        auditEvent.setUserFirstName(idamUser.getForename());
         auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition,
             caseEventDefinition));
         auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
         auditEvent.setSignificantItem(response.getSignificantItem());
+        saveUserDetails(idamUser, onBehalfOfUser, auditEvent);
 
         caseAuditEventRepository.set(auditEvent);
 
@@ -178,6 +180,21 @@ public class SubmitCaseTransaction implements AccessControl {
             .caseEventDefinition(caseEventDefinition)
             .oldState(null).build());
         return savedCaseDetails;
+    }
+
+    private void saveUserDetails(IdamUser idamUser, IdamUser onBehalfOfUser, AuditEvent auditEvent) {
+        if (onBehalfOfUser == null) {
+            auditEvent.setUserId(idamUser.getId());
+            auditEvent.setUserLastName(idamUser.getSurname());
+            auditEvent.setUserFirstName(idamUser.getForename());
+        } else {
+            auditEvent.setUserId(onBehalfOfUser.getId());
+            auditEvent.setUserLastName(onBehalfOfUser.getSurname());
+            auditEvent.setUserFirstName(onBehalfOfUser.getForename());
+            auditEvent.setProxiedBy(idamUser.getId());
+            auditEvent.setProxiedByLastName(idamUser.getSurname());
+            auditEvent.setProxiedByFirstName(idamUser.getForename());
+        }
     }
 
 }
