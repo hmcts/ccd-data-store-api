@@ -67,7 +67,6 @@ public class TestingSupportController {
         var caseTypesWithChangeIds = caseIdList.stream().map(caseTypeId -> caseTypeId + "-" + changeId).toList();
 
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
 
         executeSql(
             session,
