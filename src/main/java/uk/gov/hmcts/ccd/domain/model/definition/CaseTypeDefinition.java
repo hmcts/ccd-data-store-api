@@ -263,7 +263,7 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
         CaseTypeDefinition copy = new CaseTypeDefinition();
         copy.setId(this.getId());
         copy.setDescription(this.getDescription());
-        copy.setVersion(this.getVersion());
+        copy.setVersion(this.getVersion() != null ? this.getVersion().createCopy() : null);
         copy.setName(this.getName());
         copy.setJurisdictionDefinition(this.getJurisdictionDefinition() != null
             ? this.getJurisdictionDefinition().createCopy() : null);
