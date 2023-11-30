@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -47,9 +48,13 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
     public static final String CASE_ACCESS_CATEGORY = "data" + " #>> '{CaseAccessCategory}'";
 
+    private ApplicationParams applicationParams;
+
     protected GrantTypeSqlQueryBuilder(AccessControlService accessControlService,
-                                       CaseDataAccessControl caseDataAccessControl) {
+                                       CaseDataAccessControl caseDataAccessControl,
+                                       ApplicationParams applicationParams) {
         super(accessControlService, caseDataAccessControl);
+        this.applicationParams = applicationParams;
     }
 
     public String createQuery(List<RoleAssignment> roleAssignments,
@@ -104,6 +109,9 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
     }
 
     private String addOptionalInQueryForCaseGroupId(String caseAccessGroupId, String parentQuery) {
+        if (!applicationParams.getCaseGroupAccessFilteringEnabled()) {
+            return parentQuery;
+        }
         if (StringUtils.isBlank(caseAccessGroupId)) {
             return parentQuery;
         }
