@@ -240,6 +240,25 @@ public class RoleAssignmentsHelper {
             .build();
     }
 
+    public static RoleAssignmentResource createRoleAssignmentRecord(String id, String caseId, String caseGroupId) {
+        return RoleAssignmentResource.builder()
+            .id(id)
+            .actorIdType(ActorIdType.IDAM.name())
+            .actorId("aecfec12-1f9a-40cb-bd8c-7a9f3506e67c")
+            .roleType(RoleType.CASE.name())
+            .roleName("judiciary")
+            .classification(Classification.PUBLIC.name())
+            .grantType(GrantType.STANDARD.name())
+            .roleCategory(RoleCategory.JUDICIAL.name())
+            .readOnly(false)
+            .beginTime(BEGIN_TIME)
+            .endTime(END_TIME)
+            .created(CREATED)
+            .authorisations(Collections.emptyList())
+            .attributes(createRoleAssignmentRecordAttribute(caseId, null, null, true, caseGroupId))
+            .build();
+    }
+
     public static RoleAssignmentResponse createRoleAssignmentResponse(
         List<RoleAssignmentResource> roleAssignments) {
         return RoleAssignmentResponse.builder()
