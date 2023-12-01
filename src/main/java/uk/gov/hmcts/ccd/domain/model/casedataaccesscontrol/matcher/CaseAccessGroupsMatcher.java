@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "enable-group-access-filtering", havingValue = "true")
+@ConditionalOnProperty(name = "enable-case-group-access-filtering", havingValue = "true")
 public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
 
     @Override

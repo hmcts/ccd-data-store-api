@@ -48,13 +48,10 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
     public static final String CASE_ACCESS_CATEGORY = "data" + " #>> '{CaseAccessCategory}'";
 
-    private ApplicationParams applicationParams;
-
     protected GrantTypeSqlQueryBuilder(AccessControlService accessControlService,
                                        CaseDataAccessControl caseDataAccessControl,
                                        ApplicationParams applicationParams) {
-        super(accessControlService, caseDataAccessControl);
-        this.applicationParams = applicationParams;
+        super(accessControlService, caseDataAccessControl, applicationParams);
     }
 
     public String createQuery(List<RoleAssignment> roleAssignments,
@@ -109,7 +106,7 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
     }
 
     private String addOptionalInQueryForCaseGroupId(String caseAccessGroupId, String parentQuery) {
-        if (!applicationParams.getCaseGroupAccessFilteringEnabled()) {
+        if (!getApplicationParams().getCaseGroupAccessFilteringEnabled()) {
             return parentQuery;
         }
         if (StringUtils.isBlank(caseAccessGroupId)) {
