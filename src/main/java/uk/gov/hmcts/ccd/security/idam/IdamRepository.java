@@ -58,6 +58,12 @@ public class IdamRepository {
         return roles;
     }
 
+    @Cacheable("idamUserByIdCache")
+    public UserDetails getUserByUserId(String userId) {
+        String dataStoreSystemUserToken = selfInstance.getDataStoreSystemUserAccessToken();
+        return getUserByUserId(userId, dataStoreSystemUserToken);
+    }
+
     private UserDetails getUserByUserId(String userId, String bearerToken) {
         return idamClient.getUserByUserId(bearerToken, userId);
     }

@@ -52,6 +52,18 @@ class RestTemplateConfiguration {
     @Value("${http.client.connection.drafts.create.timeout}")
     private int draftsCreateConnectionTimeout;
 
+    @Value("${http.client.connection.definition-store.timeout}")
+    private int definitionStoreConnectionTimeout;
+
+    @Bean(name = "definitionStoreRestTemplate")
+    public RestTemplate definitionStoreRestTemplate() {
+        final RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(
+            new HttpComponentsClientHttpRequestFactory(getHttpClient(definitionStoreConnectionTimeout)));
+        LOG.info("definitionStoreConnectionTimeout: {}", definitionStoreConnectionTimeout);
+        return restTemplate;
+    }
+
     @Bean(name = "restTemplate")
     public RestTemplate restTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
@@ -103,7 +115,7 @@ class RestTemplateConfiguration {
 
     @PreDestroy
     void close() {
-        LOG.info("PreDestory called");
+        LOG.info("PreDestroy called");
         if (null != cm) {
             LOG.info("closing connection manager");
             cm.close();

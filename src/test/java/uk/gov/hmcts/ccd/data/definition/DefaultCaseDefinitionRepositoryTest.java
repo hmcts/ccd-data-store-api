@@ -39,6 +39,9 @@ public class DefaultCaseDefinitionRepositoryTest {
     private ApplicationParams applicationParams;
 
     @Mock
+    private DefinitionStoreClient definitionStoreClient;
+
+    @Mock
     private SecurityUtils securityUtils;
 
     @Mock
@@ -52,7 +55,7 @@ public class DefaultCaseDefinitionRepositoryTest {
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(new HttpHeaders()).when(securityUtils).userAuthorizationHeaders();
 
-        caseDefinitionRepository = new DefaultCaseDefinitionRepository(applicationParams, securityUtils, restTemplate);
+        caseDefinitionRepository = new DefaultCaseDefinitionRepository(applicationParams, definitionStoreClient);
     }
 
     @Test(expected = ResourceNotFoundException.class)
