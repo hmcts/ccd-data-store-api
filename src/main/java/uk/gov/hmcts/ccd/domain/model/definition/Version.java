@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @ApiModel(description = "")
-public class Version implements Serializable {
+public class Version implements Serializable, Copyable<Version> {
 
     private Integer number = null;
     private Date liveFrom = null;
@@ -48,5 +48,14 @@ public class Version implements Serializable {
 
     public void setLiveUntil(Date liveUntil) {
         this.liveUntil = liveUntil;
+    }
+
+    @Override
+    public Version createCopy() {
+        Version copy = new Version();
+        copy.setNumber(this.number);
+        copy.setLiveFrom(this.liveFrom != null ? new Date(this.liveFrom.getTime()) : null);
+        copy.setLiveUntil(this.liveUntil != null ? new Date(this.liveUntil.getTime()) : null);
+        return copy;
     }
 }

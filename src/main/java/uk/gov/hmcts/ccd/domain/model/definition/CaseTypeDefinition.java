@@ -11,16 +11,16 @@ import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
 @ToString
-public class CaseTypeDefinition implements Serializable {
+public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefinition> {
     private static final long serialVersionUID = 5688786015302840008L;
     private String id;
     private String description;
@@ -255,5 +255,33 @@ public class CaseTypeDefinition implements Serializable {
 
     public List<CategoryDefinition> getCategories() {
         return categories;
+    }
+
+    @JsonIgnore
+    @Override
+    public CaseTypeDefinition createCopy() {
+        CaseTypeDefinition copy = new CaseTypeDefinition();
+        copy.setId(this.getId());
+        copy.setDescription(this.getDescription());
+        copy.setVersion(this.getVersion() != null ? this.getVersion().createCopy() : null);
+        copy.setName(this.getName());
+        copy.setJurisdictionDefinition(this.getJurisdictionDefinition() != null
+            ? this.getJurisdictionDefinition().createCopy() : null);
+        copy.setSecurityClassification(this.getSecurityClassification());
+        copy.setEvents(createCopyList(this.getEvents()));
+        copy.setStates(createCopyList(this.getStates()));
+        copy.setCaseFieldDefinitions(createCopyList(this.getCaseFieldDefinitions()));
+        copy.setPrintableDocumentsUrl(this.getPrintableDocumentsUrl());
+        copy.setAccessControlLists(createACLCopyList(this.getAccessControlLists()));
+        copy.setCallbackGetCaseUrl(this.getCallbackGetCaseUrl());
+        copy.setRetriesGetCaseUrl(this.getRetriesGetCaseUrl() != null
+            ? new ArrayList<>(this.getRetriesGetCaseUrl()) : null);
+        copy.setSearchAliasFields(createCopyList(this.getSearchAliasFields()));
+        copy.setSearchParties(createCopyList(this.getSearchParties()));
+        copy.setSearchCriterias(createCopyList(this.getSearchCriterias()));
+        copy.setCategories(createCopyList(this.getCategories()));
+        copy.setRoleToAccessProfiles(createCopyList(this.getRoleToAccessProfiles()));
+
+        return copy;
     }
 }

@@ -31,10 +31,10 @@ apply from: './gradle/suppress.gradle'
 def versions = [
         pact_version    : '4.1.7',
 ]
-ext['spring-security.version'] = '5.7.8'
-ext['spring-framework.version'] = '5.3.27'
-ext['jackson.version'] = '2.14.1'
 
+ext['spring-security.version'] = '5.6.9'
+ext['spring-framework.version'] = '5.3.27'
+ext['jackson.version'] = '2.15.3'
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
@@ -72,7 +72,6 @@ ext {
     appInsightsVersion = '2.4.1'
     swagger2Version = '3.0.0'
     hibernateVersion = '5.6.10.Final'
-    hazelcastVersion = '5.3.1'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -157,8 +156,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.retry:spring-retry')
     implementation('org.springframework.boot:spring-boot-starter-cache')
-    implementation group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
-    implementation group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.6'
 
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
@@ -167,7 +165,7 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
     implementation "org.flywaydb:flyway-core:8.5.13"
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.32'
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
@@ -251,8 +249,6 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.18.3'
     testImplementation 'com.github.hmcts:fortify-client:1.3.0:all'
     testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
-    testImplementation group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
-    testImplementation group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
 
     // for sonar analysis
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
@@ -290,8 +286,6 @@ dependencies {
     contractTestImplementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.6.1'
     contractTestImplementation group: 'javax.inject', name: 'javax.inject', version: '1'
     contractTestImplementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
-    contractTestImplementation group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
-    contractTestImplementation group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
     contractTestImplementation('org.springframework.boot:spring-boot-starter-hateoas')
     contractTestImplementation(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
@@ -306,7 +300,8 @@ dependencies {
     }
     contractTestImplementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
     contractTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
-
+    contractTestImplementation 'org.springframework.boot:spring-boot-starter-cache'
+    contractTestImplementation 'com.github.ben-manes.caffeine:caffeine:3.1.6'
     aatImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
     aatImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
     aatImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
@@ -321,9 +316,9 @@ dependencyManagement {
 
     dependencies {
         // Versions prior to 30.0 vulnerable to CVE-2020-8908
-        dependency 'com.google.guava:guava:30.1-jre'
+        dependency 'com.google.guava:guava:32.1.2-jre'
 
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.73') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.75') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -399,7 +394,8 @@ pitest {
                    'uk.gov.hmcts.ccd.v2.internal.resource.*'
     ]
     excludedClasses = ['uk.gov.hmcts.ccd.CoreCaseDataApplication',
-                       'uk.gov.hmcts.ccd.PersistenceIT'
+                       'uk.gov.hmcts.ccd.PersistenceIT',
+                       'uk.gov.hmcts.ccd.v2.external.controller.TestingSupportController'
     ]
 
     enableDefaultIncrementalAnalysis = true
@@ -596,6 +592,9 @@ sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java,**/UIDefinitionController.java,**/DefaultCaseDefinitionRepository.java" +
             "**/SearchInputFieldsDefinition.java,**/AppInsightsConfiguration.java,**/DefaultCaseDefinitionRepository.java,**/HttpUIDefinitionGateway.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java," +
+            "**/AppInsightsConfiguration.java," +
+            "**/TestingSupportController.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"

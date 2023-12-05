@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -66,6 +67,8 @@ public class CreateCaseEventService {
 
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
+    private final CaseDetailsRepository defaultCaseDetailsRepository;
+
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final EventTriggerService eventTriggerService;
@@ -90,10 +93,13 @@ public class CreateCaseEventService {
     private final TimeToLiveService timeToLiveService;
     private final CaseLinkService caseLinkService;
 
+
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                   final CaseDetailsRepository caseDetailsRepository,
+                                  @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+                                  final CaseDetailsRepository defaultCaseDetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                   final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
@@ -143,6 +149,7 @@ public class CreateCaseEventService {
         this.caseDetailsJsonParser = jsonPathParser;
         this.timeToLiveService = timeToLiveService;
         this.caseLinkService = caseLinkService;
+        this.defaultCaseDetailsRepository = defaultCaseDetailsRepository;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -232,6 +239,7 @@ public class CreateCaseEventService {
             timeNow,
             oldState,
             content.getOnBehalfOfUserToken(),
+            content.getOnBehalfOfId(),
             securityClassificationService.getClassificationForEvent(caseTypeDefinition,
                 caseEventDefinition)
         );
@@ -254,7 +262,10 @@ public class CreateCaseEventService {
                                                        final String attributePath,
                                                        final String categoryId,
                                                        Event event) {
-        final CaseDetails caseDetails = getCaseDetails(caseReference);
+        final CaseDetails caseDetails = defaultCaseDetailsRepository.findByReference(caseReference)
+            .orElseThrow(() ->
+            new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
+
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("DocumentUpdated");
         caseEventDefinition.setName("Update Document Category Id");
@@ -311,6 +322,7 @@ public class CreateCaseEventService {
             caseTypeDefinition,
             timeNow,
             oldState,
+            null,
             null,
             SecurityClassification.PUBLIC
         );
@@ -439,9 +451,10 @@ public class CreateCaseEventService {
                                               final LocalDateTime timeNow,
                                               final String oldState,
                                               final String onBehalfOfUserToken,
+                                              final String onBehalfOfId,
                                               final SecurityClassification securityClassification) {
-        final CaseStateDefinition caseStateDefinition =
-            caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
+        final CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition,
+            caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());
         auditEvent.setEventName(caseEventDefinition.getName());
@@ -457,7 +470,7 @@ public class CreateCaseEventService {
         auditEvent.setSecurityClassification(securityClassification);
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
-        saveUserDetails(onBehalfOfUserToken, auditEvent);
+        saveUserDetails(onBehalfOfUserToken, onBehalfOfId, auditEvent);
 
         caseAuditEventRepository.set(auditEvent);
         messageService.handleMessage(MessageContext.builder()
@@ -468,15 +481,16 @@ public class CreateCaseEventService {
             .build());
     }
 
-    private void saveUserDetails(String onBehalfOfUserToken, AuditEvent auditEvent) {
+    private void saveUserDetails(String onBehalfOfUserToken, String onBehalfOfId, AuditEvent auditEvent) {
         boolean onBehalfOfUserTokenExists = !StringUtils.isEmpty(onBehalfOfUserToken);
+        boolean onBehalfOfIdExists = !StringUtils.isEmpty(onBehalfOfId);
         IdamUser user = onBehalfOfUserTokenExists
             ? userRepository.getUser(onBehalfOfUserToken)
-            : userRepository.getUser();
+            : onBehalfOfIdExists ? userRepository.getUserByUserId(onBehalfOfId) : userRepository.getUser();
         auditEvent.setUserId(user.getId());
         auditEvent.setUserLastName(user.getSurname());
         auditEvent.setUserFirstName(user.getForename());
-        if (onBehalfOfUserTokenExists) {
+        if (onBehalfOfUserTokenExists || onBehalfOfIdExists) {
             user = userRepository.getUser();
             auditEvent.setProxiedBy(user.getId());
             auditEvent.setProxiedByLastName(user.getSurname());

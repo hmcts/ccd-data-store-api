@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.Collection;
@@ -66,6 +67,10 @@ public class SecurityUtils {
 
     public UserInfo getUserInfo(String userToken) {
         return idamRepository.getUserInfo(userToken);
+    }
+
+    public UserDetails getUserByUserId(String userId) {
+        return idamRepository.getUserByUserId(userId);
     }
 
     public String getUserId() {
