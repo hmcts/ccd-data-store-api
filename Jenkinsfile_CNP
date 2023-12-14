@@ -108,6 +108,11 @@ env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
+// BEFTA retry env variables
+env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
+env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
+env.BEFTA_RETRY_MAX_DELAY = "1000"
+env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 
 withPipeline(type, product, component) {
     onMaster {
