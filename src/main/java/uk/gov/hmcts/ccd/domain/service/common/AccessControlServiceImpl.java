@@ -3,12 +3,14 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -140,15 +142,20 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                 final List<CaseFieldDefinition> caseFieldDefinitions,
                                                 final Set<AccessProfile> accessProfiles) {
         if (newData != null) {
+            Set<String> missingFields = new HashSet<>();
             final boolean noAccessGranted = getStream(newData)
                 .anyMatch(newFieldName -> {
                     if (existingData.has(newFieldName)) {
                         return !valueDifferentAndHasUpdateAccess(newData, existingData, newFieldName,
                             caseFieldDefinitions, accessProfiles);
                     } else {
+                        missingFields.add(newFieldName);
                         return !hasCaseFieldAccess(caseFieldDefinitions, accessProfiles, CAN_CREATE, newFieldName);
                     }
                 });
+            if (!missingFields.isEmpty()) {
+                LOG.debug("Missing Fields: " + missingFields);
+            }
             return !noAccessGranted;
         }
         return true;
