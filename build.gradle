@@ -591,6 +591,8 @@ jsonSchema2Pojo {
 
 sonarqube {
     properties {
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/UIDefinitionController.java,**/DefaultCaseDefinitionRepository.java" +
+            "**/SearchInputFieldsDefinition.java,**/AppInsightsConfiguration.java,**/DefaultCaseDefinitionRepository.java,**/HttpUIDefinitionGateway.java"
         property "sonar.exclusions", "build/generated-sources/**/*.java," +
             "**/AppInsightsConfiguration.java," +
             "**/TestingSupportController.java"

@@ -3,20 +3,31 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 @ToString
 @ApiModel(description = "")
 public class SearchInputFieldsDefinition implements Serializable, CommonDCPModel {
+    private static final Logger LOG = LoggerFactory.getLogger(SearchInputFieldsDefinition.class);
 
     private String caseTypeId = null;
     private List<SearchInputField> fields = new ArrayList<>();
     private String displayContextParameter = null;
+
+    private void jcdebug(String message) {
+        LOG.debug("JCDEBUG: SearchInputFieldsDefinition: debug: {}", message);
+        LOG.info("JCDEBUG: SearchInputFieldsDefinition: info:  {}", message);
+        LOG.warn("JCDEBUG: SearchInputFieldsDefinition: warn:  {}", message);
+    }
 
     @ApiModelProperty(value = "")
     @JsonProperty("case_type_id")
@@ -35,6 +46,14 @@ public class SearchInputFieldsDefinition implements Serializable, CommonDCPModel
     }
 
     public void setFields(List<SearchInputField> fields) {
+        try {
+            throw new RuntimeException("JCDEBUG: SearchInputFieldsDefinition.setFields");
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            jcdebug("setFields: " + sw.toString());
+        }
         this.fields = fields;
     }
 

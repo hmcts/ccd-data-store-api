@@ -43,9 +43,16 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     private final ApplicationParams applicationParams;
     private final DefinitionStoreClient definitionStoreClient;
 
+    private void jcdebug(String message) {
+        LOG.debug("JCDEBUG: DefaultCaseDefinitionRepository: debug: {}", message);
+        LOG.info("JCDEBUG: DefaultCaseDefinitionRepository: info: {}", message);
+        LOG.warn("JCDEBUG: DefaultCaseDefinitionRepository: warn: {}", message);
+    }
+
+    @Inject
     public DefaultCaseDefinitionRepository(final ApplicationParams applicationParams,
                                            final DefinitionStoreClient definitionStoreClient) {
-        this.applicationParams = applicationParams;
+      this.applicationParams = applicationParams;
         this.definitionStoreClient = definitionStoreClient;
     }
 
@@ -83,6 +90,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
+            final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            jcdebug("getCaseType: " + applicationParams.caseTypeDefURL(caseTypeId));
+            final CaseTypeDefinition caseTypeDefinition = restTemplate
+                    .exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity,
+                            CaseTypeDefinition.class)
+                    .getBody();
             final CaseTypeDefinition caseTypeDefinition = definitionStoreClient
                 .invokeRestCall(applicationParams.caseTypeDefURL(caseTypeId),
                 CaseTypeDefinition.class).getBody();
