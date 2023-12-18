@@ -81,6 +81,7 @@ ext {
             'class'      : 98
     ]
     springCloudVersion = '2021.0.3'
+    beftaFwVersion = '8.8.0'
 }
 
 java {
@@ -268,8 +269,8 @@ dependencies {
 
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.12'
 
-    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.11'
-    testRuntimeOnly group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.11'
+    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
+    testRuntimeOnly group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
 
     contractTestImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     contractTestImplementation "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
