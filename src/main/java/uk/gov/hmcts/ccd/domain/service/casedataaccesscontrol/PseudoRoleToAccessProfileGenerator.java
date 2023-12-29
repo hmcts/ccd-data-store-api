@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.copyoncache.CopyOnCache;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
@@ -21,7 +20,6 @@ public class PseudoRoleToAccessProfileGenerator {
 
     private static final String CASE_ROLE_ID_REGEX = "^\\[[a-zA-Z]([a-zA-Z0-9-_]*)\\]$";
 
-    @CopyOnCache
     @Cacheable(value = "caseTypePseudoRoleToAccessProfileCache",
         key = "{#caseTypeDefinition.version.number, #caseTypeDefinition.id}")
     public List<RoleToAccessProfileDefinition> generate(CaseTypeDefinition caseTypeDefinition) {

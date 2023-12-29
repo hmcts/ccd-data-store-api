@@ -44,7 +44,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     @Autowired
     public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
-                                          CaseDefinitionRepository caseDefinitionRepository,
+                                                  CaseDefinitionRepository caseDefinitionRepository,
                                           ApplicationParams applicationParams) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.applicationParams = applicationParams;
@@ -53,7 +53,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         return caseTypesForJurisdictions.computeIfAbsent(jurisdictionId,
-            caseDefinitionRepository::getCaseTypesForJurisdiction);
+                                                         caseDefinitionRepository::getCaseTypesForJurisdiction);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
         final int fromHour = applicationParams.getRequestScopeCachedCaseTypesFromHour();
         final int tillHour = applicationParams.getRequestScopeCachedCaseTypesTillHour();
         final int currentHour = LocalDateTime.now().getHour();
-        final boolean withinTimeInterval = currentHour >= fromHour && currentHour < tillHour;
+        final boolean withinTimeInterval = currentHour >= fromHour  && currentHour < tillHour;
         final boolean cacheSwitchOnForCaseType = applicationParams.getRequestScopeCachedCaseTypes().stream()
             .anyMatch(ct -> ct.equalsIgnoreCase(caseTypeId));
         if (withinTimeInterval && cacheSwitchOnForCaseType) {
