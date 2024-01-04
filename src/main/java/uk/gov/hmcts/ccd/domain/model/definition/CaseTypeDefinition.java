@@ -48,6 +48,7 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
     private final List<CategoryDefinition> categories = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
+    private List<AccessTypeRolesDefinition> accessTypeRolesDefinitions = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -225,6 +226,14 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
 
     public void setRoleToAccessProfiles(List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
         this.roleToAccessProfiles = roleToAccessProfiles;
+    }
+
+    public List<AccessTypeRolesDefinition> getAccessTypeRolesDefinitions() {
+        return accessTypeRolesDefinitions;
+    }
+
+    public void setAccessTypeRolesDefinitions(List<AccessTypeRolesDefinition> accessTypeRolesDefinitions) {
+        this.accessTypeRolesDefinitions = accessTypeRolesDefinitions;
     }
 
     public List<SearchParty> getSearchParties() {
