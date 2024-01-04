@@ -121,6 +121,10 @@ public class SubmitCaseTransaction implements AccessControl {
             caseDetailsAfterCallback
         );
 
+        caseTypeDefinition.getAccessTypeRolesDefinitions()
+            .forEach(record -> record.getGroupRoleName())
+        ;
+
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
             event,

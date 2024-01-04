@@ -31,7 +31,7 @@ public class CaseFieldDefinition implements Serializable, CommonField, Copyable<
     @JsonProperty("hint_text")
     private String hintText = null;
     @JsonProperty("field_type")
-    private FieldTypeDefinition fieldTypeDefinition = null;
+    private FieldTypeDefinition fieldTypeDefinition = null; //this is where the new group field is
     private Boolean hidden = null;
     @JsonProperty("security_classification")
     private String securityLabel = null;
