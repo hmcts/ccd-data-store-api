@@ -16,6 +16,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 
+import java.net.URI;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -43,12 +44,12 @@ public class DefinitionStoreClientIT {
     private DefinitionStoreClient definitionStoreClient;
 
     @Test
-    public void testShouldInvokeRestCallWithQueryParamsRetryAfterHttpServerErrorException() {
+    public void testShouldInvokeGetRequestWithQueryParamsRetryAfterHttpServerErrorException() {
         when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
         when(restTemplate.exchange(anyString(), any(), any(), ArgumentMatchers.<Class<Object>>any(), anyMap()))
             .thenThrow(HttpServerErrorException.class);
 
-        assertThrows(HttpServerErrorException.class, () -> definitionStoreClient.invokeRestCall("http://localhost",
+        assertThrows(HttpServerErrorException.class, () -> definitionStoreClient.invokeGetRequest("http://localhost",
             Class.class, Collections.emptyMap()));
 
         verify(restTemplate, times(5)).exchange(
@@ -61,12 +62,12 @@ public class DefinitionStoreClientIT {
     }
 
     @Test
-    public void testShouldInvokeRestCallRetryAfterHttpServerErrorException() {
+    public void testShouldInvokeGetRequestRetryAfterHttpServerErrorException() {
         when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
         when(restTemplate.exchange(anyString(), any(), any(), ArgumentMatchers.<Class<Object>>any(), anyMap()))
             .thenThrow(HttpServerErrorException.class);
 
-        assertThrows(HttpServerErrorException.class, () -> definitionStoreClient.invokeRestCall("http://localhost",
+        assertThrows(HttpServerErrorException.class, () -> definitionStoreClient.invokeGetRequest("http://localhost",
             Class.class));
 
         verify(restTemplate, times(5)).exchange(
@@ -79,12 +80,29 @@ public class DefinitionStoreClientIT {
     }
 
     @Test
-    public void testShouldInvokeRestCallWithQueryParamsNotRetryAfterHttpClientErrorException() {
+    public void testShouldInvokeGetRequestWithURIRetryAfterHttpServerErrorException() {
+        when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
+        when(restTemplate.exchange(any(URI.class), any(), any(), ArgumentMatchers.<Class<Object>>any()))
+            .thenThrow(HttpServerErrorException.class);
+
+        URI url = URI.create("http://localhost");
+        assertThrows(HttpServerErrorException.class, () -> definitionStoreClient.invokeGetRequest(url, Class.class));
+
+        verify(restTemplate, times(5)).exchange(
+            url,
+            HttpMethod.GET,
+            HttpEntity.EMPTY,
+            Class.class
+        );
+    }
+
+    @Test
+    public void testShouldInvokeGetRequestWithQueryParamsNotRetryAfterHttpClientErrorException() {
         when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
         when(restTemplate.exchange(anyString(), any(), any(), ArgumentMatchers.<Class<Object>>any(), anyMap()))
             .thenThrow(HttpClientErrorException.class);
 
-        assertThrows(HttpClientErrorException.class, () -> definitionStoreClient.invokeRestCall("http://localhost",
+        assertThrows(HttpClientErrorException.class, () -> definitionStoreClient.invokeGetRequest("http://localhost",
             Class.class, Collections.emptyMap()));
 
         verify(restTemplate, times(1)).exchange(
@@ -97,12 +115,12 @@ public class DefinitionStoreClientIT {
     }
 
     @Test
-    public void testShouldInvokeRestCallNotRetryAfterHttpClientErrorException() {
+    public void testShouldInvokeGetRequestNotRetryAfterHttpClientErrorException() {
         when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
         when(restTemplate.exchange(anyString(), any(), any(), ArgumentMatchers.<Class<Object>>any(), anyMap()))
             .thenThrow(HttpClientErrorException.class);
 
-        assertThrows(HttpClientErrorException.class, () -> definitionStoreClient.invokeRestCall("http://localhost",
+        assertThrows(HttpClientErrorException.class, () -> definitionStoreClient.invokeGetRequest("http://localhost",
             Class.class));
 
         verify(restTemplate, times(1)).exchange(
@@ -111,6 +129,23 @@ public class DefinitionStoreClientIT {
             HttpEntity.EMPTY,
             Class.class,
             Collections.emptyMap()
+        );
+    }
+
+    @Test
+    public void testShouldInvokeGetRequestWithURINotRetryAfterHttpClientErrorException() {
+        when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
+        when(restTemplate.exchange(any(URI.class), any(), any(), ArgumentMatchers.<Class<Object>>any()))
+            .thenThrow(HttpClientErrorException.class);
+
+        URI url = URI.create("http://localhost");
+        assertThrows(HttpClientErrorException.class, () -> definitionStoreClient.invokeGetRequest(url, Class.class));
+
+        verify(restTemplate, times(1)).exchange(
+            url,
+            HttpMethod.GET,
+            HttpEntity.EMPTY,
+            Class.class
         );
     }
 }
