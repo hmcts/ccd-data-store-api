@@ -1,0 +1,40 @@
+{
+  "_guid_": "S-068.7",
+  "operationName": "Save draft as a caseworker",
+  "_extends_": "F-068_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "Save draft as a caseworker",
+    "contains an invalid event token",
+    "contains a HTTP 400 Bad Request"
+  ],
+  "method": "POST",
+  "uri": "/internal/case-types/{ctid}/drafts",
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "ctid": "FT_CRUD"
+    },
+    "body": {
+      "data": {
+        "TextField": "field1",
+        "TextField2": "field2"
+      },
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE2NzQ4MzQ3Nzd9.LqtdAFEkGdXFWw3aBTW78Vw7P9B2xtrID77-EramxiJvwKgYsThyDI_4nwt9XJWMfX3vzGTicccW9Xr-duBu4A"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body" : {
+      "message" : "Token is not valid",
+      "path" : "/case-types/FT_CRUD/cases"
+    }
+  }
+}
