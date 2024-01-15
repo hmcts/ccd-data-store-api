@@ -81,7 +81,7 @@ ext {
             'class'      : 98
     ]
     springCloudVersion = '2021.0.3'
-    beftaFwVersion = '8.8.0'
+    beftaFwVersion = '8.9.0'
 }
 
 java {
@@ -247,7 +247,8 @@ dependencies {
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testImplementation 'io.github.openfeign:feign-jackson:9.7.0'
-    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.18.3'
+    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.19.3'
+    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.19.3'
     testImplementation 'com.github.hmcts:fortify-client:1.3.0:all'
     testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
