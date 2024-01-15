@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 
 import java.net.SocketTimeoutException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
@@ -34,15 +35,22 @@ public class DefinitionStoreClient {
     @Retryable(value = {HttpServerErrorException.class, SocketTimeoutException.class},
         maxAttemptsExpression = "${definition-store.retry.maxAttempts}",
         backoff = @Backoff(delayExpression = "${definition-store.retry.maxDelay}"))
-    public <T> ResponseEntity<T> invokeRestCall(final String url, Class<T> responseType,
-                                                Map<String, String> queryParams) {
+    public <T> ResponseEntity<T> invokeGetRequest(final String url, Class<T> responseType,
+                                                  Map<String, String> queryParams) {
         return restTemplate.exchange(url, HttpMethod.GET, createRequestEntity(), responseType, queryParams);
     }
 
     @Retryable(value = {HttpServerErrorException.class, SocketTimeoutException.class},
         maxAttemptsExpression = "${definition-store.retry.maxAttempts}",
         backoff = @Backoff(delayExpression = "${definition-store.retry.maxDelay}"))
-    public <T> ResponseEntity<T> invokeRestCall(final String url, final Class<T> responseType) {
+    public <T> ResponseEntity<T> invokeGetRequest(final String url, final Class<T> responseType) {
         return restTemplate.exchange(url, HttpMethod.GET, createRequestEntity(), responseType, Collections.emptyMap());
+    }
+
+    @Retryable(value = {HttpServerErrorException.class, SocketTimeoutException.class},
+        maxAttemptsExpression = "${definition-store.retry.maxAttempts}",
+        backoff = @Backoff(delayExpression = "${definition-store.retry.maxDelay}"))
+    <T> ResponseEntity<T> invokeGetRequest(final URI url, final Class<T> responseType) {
+        return restTemplate.exchange(url, HttpMethod.GET, createRequestEntity(), responseType);
     }
 }

@@ -57,7 +57,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {
-            return Arrays.asList(Objects.requireNonNull(definitionStoreClient.invokeRestCall(
+            return Arrays.asList(Objects.requireNonNull(definitionStoreClient.invokeGetRequest(
                 applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId),
                 CaseTypeDefinition[].class).getBody()));
         } catch (Exception e) {
@@ -84,7 +84,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
             final CaseTypeDefinition caseTypeDefinition = definitionStoreClient
-                .invokeRestCall(applicationParams.caseTypeDefURL(caseTypeId),
+                .invokeGetRequest(applicationParams.caseTypeDefURL(caseTypeId),
                 CaseTypeDefinition.class).getBody();
             if (caseTypeDefinition != null) {
                 caseTypeDefinition.getCaseFieldDefinitions().stream()
@@ -109,7 +109,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public List<FieldTypeDefinition> getBaseTypes() {
         try {
             return Arrays.asList(Objects.requireNonNull(definitionStoreClient
-                .invokeRestCall(applicationParams.baseTypesURL(),
+                .invokeGetRequest(applicationParams.baseTypesURL(),
                 FieldTypeDefinition[].class).getBody()));
         } catch (Exception e) {
             LOG.warn("Error while retrieving base types", e);
@@ -130,7 +130,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         try {
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("userRole", encodeBase64(userRole));
-            return definitionStoreClient.invokeRestCall(applicationParams.userRoleClassification(),
+            return definitionStoreClient.invokeGetRequest(applicationParams.userRoleClassification(),
                 UserRole.class, queryParams).getBody();
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException
@@ -154,7 +154,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("roles", StringUtils.join(userRoles, ","));
             return Arrays.asList(Objects.requireNonNull(definitionStoreClient
-                .invokeRestCall(applicationParams.userRolesClassificationsURL(),
+                .invokeGetRequest(applicationParams.userRolesClassificationsURL(),
                 UserRole[].class, queryParams).getBody()));
         } catch (Exception e) {
             LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
@@ -172,7 +172,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public CaseTypeDefinitionVersion getLatestVersionFromDefinitionStore(String caseTypeId) {
         try {
             CaseTypeDefinitionVersion version = definitionStoreClient
-                .invokeRestCall(applicationParams.caseTypeLatestVersionUrl(caseTypeId),
+                .invokeGetRequest(applicationParams.caseTypeLatestVersionUrl(caseTypeId),
                 CaseTypeDefinitionVersion.class)
                     .getBody();
             LOG.debug("retrieved latest version for case type: {}: {}", caseTypeId, version);
@@ -245,7 +245,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 jurisdictionIds.orElse(Collections.emptyList()));
 
             List<JurisdictionDefinition> jurisdictionDefinitionList = Optional.ofNullable(
-                    definitionStoreClient.invokeRestCall(builder.build().encode().toUriString(),
+                    definitionStoreClient.invokeGetRequest(builder.build().encode().toUriString(),
                         JurisdictionDefinition[].class).getBody())
                 .map(Arrays::asList)
                 .orElse(Collections.emptyList());
