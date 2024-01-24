@@ -211,7 +211,7 @@ public class CaseDocumentService {
 
     public void insertUploadTimestamp(JsonNode node, String uploadTimestamp) {
         if (!node.has(UPLOAD_TIMESTAMP)) {
-            if(LOGGER.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Adding to document_url '{}'", node.findValue(DOCUMENT_URL));
                 LOGGER.debug("jsonNode before: '{}'", node);
             }
