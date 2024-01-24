@@ -34,7 +34,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-
 @Service
 public class SubmitCaseTransaction implements AccessControl {
 
@@ -108,6 +107,8 @@ public class SubmitCaseTransaction implements AccessControl {
             caseTypeDefinition,
             ignoreWarning
         );
+
+        caseDocumentService.addUploadTimestamps(caseDetailsWithoutHashes);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = caseDetailsWithoutHashes;
