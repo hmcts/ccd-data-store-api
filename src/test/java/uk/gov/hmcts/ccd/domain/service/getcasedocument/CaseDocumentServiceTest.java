@@ -52,6 +52,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.UPLOAD_TIMESTAMP;
 
 @ExtendWith(MockitoExtension.class)
 class CaseDocumentServiceTest extends TestFixtures {
@@ -72,7 +73,6 @@ class CaseDocumentServiceTest extends TestFixtures {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_DETAIL_FIELD = "dataTestField1";
-    private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
 
     private final String urlGoogle = "https://www.google.com";
     private final String urlYahoo = "https://www.yahoo.com";

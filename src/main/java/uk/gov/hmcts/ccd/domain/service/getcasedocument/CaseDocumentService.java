@@ -26,6 +26,7 @@ import java.util.Collection;
 import static java.util.Collections.emptyMap;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_HASH;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_URL;
+import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.UPLOAD_TIMESTAMP;
 
 @Named
 public class CaseDocumentService {
@@ -35,7 +36,6 @@ public class CaseDocumentService {
     private final CaseDocumentAmApiClient caseDocumentAmApiClient;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CaseDocumentService.class);
-    private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
 
     @Inject
     public CaseDocumentService(final CaseService caseService,
