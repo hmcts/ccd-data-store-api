@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -143,7 +143,7 @@ public class CaseDocumentService {
         List<String> documentUrlsNew = findUrlsNotInOriginal(documentUrlsFromDb, documentUrlsFromRequest);
         LOGGER.debug("findUrlsNotInOriginal() ended. Size={}", documentUrlsNew.size());
 
-        final String uploadTimestamp = ZonedDateTime.now().toString();
+        final String uploadTimestamp = Instant.now().toString();
         addUploadTimestampToDocument(jsonNodes, documentUrlsNew, uploadTimestamp);
     }
 

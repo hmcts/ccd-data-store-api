@@ -24,7 +24,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -383,7 +383,7 @@ class CaseDocumentServiceTest extends TestFixtures {
     @Test
     void testInsertTimestampIfNotAlreadyPresent() {
         JsonNode jsonNode = generateTestNode(jsonDocumentNode);
-        String uploadTimestamp = ZonedDateTime.now().toString();
+        String uploadTimestamp = Instant.now().toString();
         assertFalse(jsonNode.has(UPLOAD_TIMESTAMP));
 
         underTest.insertUploadTimestamp(jsonNode, uploadTimestamp);
@@ -394,7 +394,7 @@ class CaseDocumentServiceTest extends TestFixtures {
 
     @Test
     void testDoNotInsertTimestampIfAlreadyPresent() {
-        final String uploadTimestamp = ZonedDateTime.now().minusNanos(5).toString();
+        final String uploadTimestamp = Instant.now().minusNanos(5).toString();
         JsonNode jsonNode = generateTestNode(jsonDocumentNode);
         assertFalse(jsonNode.has(UPLOAD_TIMESTAMP));
 
@@ -402,7 +402,7 @@ class CaseDocumentServiceTest extends TestFixtures {
         assertTrue(jsonNode.has(UPLOAD_TIMESTAMP));
         assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
 
-        String uploadTimestampNew = ZonedDateTime.now().toString();
+        String uploadTimestampNew = Instant.now().toString();
         underTest.insertUploadTimestamp(jsonNode, uploadTimestampNew);
         assertNotEquals(uploadTimestampNew, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
         assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
