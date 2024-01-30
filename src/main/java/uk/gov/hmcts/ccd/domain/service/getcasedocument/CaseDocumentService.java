@@ -119,7 +119,6 @@ public class CaseDocumentService {
         }
     }
 
-
     private CaseDetails removeHashes(final CaseDetails caseDetails) {
         final CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
 
