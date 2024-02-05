@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.7.11'
+        springBootVersion = '2.7.12'
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -31,10 +31,10 @@ apply from: './gradle/suppress.gradle'
 def versions = [
         pact_version    : '4.1.7',
 ]
-ext['spring-security.version'] = '5.7.8'
-ext['spring-framework.version'] = '5.3.27'
-ext['jackson.version'] = '2.14.1'
 
+ext['spring-security.version'] = '5.6.9'
+ext['spring-framework.version'] = '5.3.27'
+ext['jackson.version'] = '2.15.3'
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
@@ -81,6 +81,7 @@ ext {
             'class'      : 98
     ]
     springCloudVersion = '2021.0.3'
+    beftaFwVersion = '8.8.0'
 }
 
 java {
@@ -165,7 +166,7 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
     implementation "org.flywaydb:flyway-core:8.5.13"
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.32'
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
@@ -268,8 +269,8 @@ dependencies {
 
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.12'
 
-    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.11'
-    testRuntimeOnly group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.11'
+    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
+    testRuntimeOnly group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
 
     contractTestImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     contractTestImplementation "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
@@ -316,7 +317,7 @@ dependencyManagement {
 
     dependencies {
         // Versions prior to 30.0 vulnerable to CVE-2020-8908
-        dependency 'com.google.guava:guava:30.1-jre'
+        dependency 'com.google.guava:guava:32.1.2-jre'
 
         dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.75') {
             entry 'tomcat-embed-core'
@@ -394,7 +395,8 @@ pitest {
                    'uk.gov.hmcts.ccd.v2.internal.resource.*'
     ]
     excludedClasses = ['uk.gov.hmcts.ccd.CoreCaseDataApplication',
-                       'uk.gov.hmcts.ccd.PersistenceIT'
+                       'uk.gov.hmcts.ccd.PersistenceIT',
+                       'uk.gov.hmcts.ccd.v2.external.controller.TestingSupportController'
     ]
 
     enableDefaultIncrementalAnalysis = true
@@ -590,7 +592,8 @@ jsonSchema2Pojo {
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java," +
-            "**/AppInsightsConfiguration.java"
+            "**/AppInsightsConfiguration.java," +
+            "**/TestingSupportController.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"

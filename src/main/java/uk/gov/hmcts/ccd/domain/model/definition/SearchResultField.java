@@ -6,7 +6,7 @@ import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 import java.io.Serializable;
 
-public class SearchResultField implements Serializable, CommonDCPModel {
+public class SearchResultField implements Serializable, CommonDCPModel, Copyable<SearchResultField> {
 
     @JsonProperty("case_type_id")
     private String caseTypeId;
@@ -112,5 +112,21 @@ public class SearchResultField implements Serializable, CommonDCPModel {
 
     public void setUseCase(String useCase) {
         this.useCase = useCase;
+    }
+
+    @Override
+    public SearchResultField createCopy() {
+        SearchResultField copy = new SearchResultField();
+        copy.setCaseTypeId(this.caseTypeId);
+        copy.setCaseFieldId(this.caseFieldId);
+        copy.setCaseFieldPath(this.caseFieldPath);
+        copy.setLabel(this.label);
+        copy.setDisplayOrder(this.displayOrder);
+        copy.setMetadata(this.metadata);
+        copy.setRole(this.role);
+        copy.setSortOrder(this.sortOrder != null ? this.sortOrder.createCopy() : null);
+        copy.setDisplayContextParameter(this.displayContextParameter);
+        copy.setUseCase(this.useCase);
+        return copy;
     }
 }
