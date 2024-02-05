@@ -82,7 +82,7 @@ public class CaseDocumentTimestampService {
                                              String uploadTimestamp) {
         List<JsonNode> jsonNodes = findNodes(nodes);
         jsonNodes.forEach(jsonNode -> {
-            if (documentUrlsNew.contains(jsonNode.get(DOCUMENT_URL).toString()) && !jsonNode.has(UPLOAD_TIMESTAMP)) {
+            if (documentUrlsNew.contains(jsonNode.get(DOCUMENT_URL).asText()) && !jsonNode.has(UPLOAD_TIMESTAMP)) {
                 insertUploadTimestamp(jsonNode, uploadTimestamp);
             }
         });

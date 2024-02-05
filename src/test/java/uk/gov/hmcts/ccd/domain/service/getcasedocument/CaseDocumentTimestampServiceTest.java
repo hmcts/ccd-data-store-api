@@ -122,8 +122,10 @@ class CaseDocumentTimestampServiceTest {
         caseDetails.setReference(caseDetailsDb.getReference());
         caseDetails.setData(dataMap);
 
+        final int countExpectedChanges = 5;
+
         List<String> lstDocumentUrls = underTest.findUrlsNotInOriginal(caseDetails, caseDetailsDb);
-        assertEquals(5, lstDocumentUrls.size());
+        assertEquals(countExpectedChanges, lstDocumentUrls.size());
 
         underTest.addUploadTimestamps(caseDetails, caseDetailsDb);
 
@@ -131,11 +133,15 @@ class CaseDocumentTimestampServiceTest {
 
         assertTrue(lstDocumentUrls.size() > 0);
         List<JsonNode> lstJsonNodes = underTest.findNodes(nodes);
+        //System.out.println("lstJsonNodes:" + lstJsonNodes);
         lstJsonNodes.forEach(node -> {
-            if (lstDocumentUrls.contains(node.get(DOCUMENT_URL))) {
-                System.out.println(node.asText());
+            int countChanges = 0;
+            if (lstDocumentUrls.contains(node.get(DOCUMENT_URL).asText())) {
+                countChanges++;
+                System.out.println("node - " + node.get(DOCUMENT_URL).asText() + " : " + node.get(UPLOAD_TIMESTAMP));
                 assertTrue(node.has(UPLOAD_TIMESTAMP));
             }
+            assertEquals(countExpectedChanges, countChanges);
         });
     }
 
