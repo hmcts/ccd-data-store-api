@@ -28,14 +28,14 @@ class CaseAccessGroupsMatcherTest extends BaseFilter {
         + "      \"id\": \"id1\",\n"
         + "      \"value\": {\n"
         + "        \"caseAccessGroupId\": \"caseGroupId1\",\n"
-        + "        \"caseGroupType\": \"caseGroupType1\"\n"
+        + "        \"caseAccessGroupType\": \"caseAccessGroupType1\"\n"
         + "      }\n"
         + "    },\n"
         + "    {\n"
         + "      \"id\": \"id2\",\n"
         + "      \"value\": {\n"
         + "        \"caseAccessGroupId\": \"caseGroupId2\",\n"
-        + "        \"caseGroupType\": \"caseGroupType2\"\n"
+        + "        \"caseAccessGroupType\": \"caseAccessGroupType2\"\n"
         + "      }\n"
         + "    }\n"
         + "  ]\n"
@@ -142,7 +142,11 @@ class CaseAccessGroupsMatcherTest extends BaseFilter {
         ObjectMapper mapper = new ObjectMapper();
 
         String replacing = ",\n      \"value\": \\{\n        \"caseAccessGroupId\": \"caseGroupId1\",\n"
+<<<<<<< HEAD
             + "        \"caseGroupType\": \"caseGroupType1\"\n      \\}\n";
+=======
+            + "        \"caseAccessGroupType\": \"caseAccessGroupType1\"\n      \\}\n";
+>>>>>>> GA-14-search-by-caseGroupAccessId
         String missing = simpleGAjsonRequest.replaceAll(replacing, "\n");
 
         Map<String, JsonNode> dataMap = JacksonUtils.convertValue(mapper.readTree(missing));
