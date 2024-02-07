@@ -114,6 +114,40 @@ public class BaseFilter {
         return roleAssignment;
     }
 
+    protected RoleAssignment createRoleAssignment(Instant startDate,
+                                                  Instant endDate,
+                                                  String securityClassification,
+                                                  Optional<String> caseId,
+                                                  Optional<String> jurisdiction,
+                                                  Optional<String> region,
+                                                  Optional<String> location,
+                                                  Optional<String> caseAccessGroupId) {
+        RoleAssignment roleAssignment = RoleAssignment.builder().build();
+
+        roleAssignment.setActorId("Actor1");
+        roleAssignment.setRoleName(ROLE_NAME_1);
+        roleAssignment.setActorIdType(ActorIdType.IDAM.name());
+        roleAssignment.setRoleType(RoleType.ORGANISATION.name());
+        roleAssignment.setClassification(securityClassification);
+        roleAssignment.setGrantType(GrantType.BASIC.name());
+        roleAssignment.setRoleCategory(RoleCategory.JUDICIAL.name());
+        roleAssignment.setReadOnly(false);
+        roleAssignment.setBeginTime(startDate);
+        roleAssignment.setEndTime(endDate);
+        roleAssignment.setCreated(Instant.now());
+        roleAssignment.setAuthorisations(Lists.newArrayList());
+
+        // role assignment attributes
+        RoleAssignmentAttributes roleAssignmentAttributes = createRoleAssignmentAttributes(caseId,
+            jurisdiction,
+            region,
+            location,
+            caseAccessGroupId);
+
+        roleAssignment.setAttributes(roleAssignmentAttributes);
+        return roleAssignment;
+    }
+
     private RoleAssignmentAttributes createRoleAssignmentAttributes(Optional<String> caseId,
                                                                     Optional<String> jurisdiction,
                                                                     Optional<String> region,
@@ -127,6 +161,24 @@ public class BaseFilter {
         roleAssignmentAttributes.setLocation(location);
         roleAssignmentAttributes.setRegion(region);
         roleAssignmentAttributes.setCaseType(Optional.of("TEST_CASE_TYPE"));
+        return roleAssignmentAttributes;
+    }
+
+    private RoleAssignmentAttributes createRoleAssignmentAttributes(Optional<String> caseId,
+                                                                    Optional<String> jurisdiction,
+                                                                    Optional<String> region,
+                                                                    Optional<String> location,
+                                                                    Optional<String> caseAccessGroupId) {
+        // role assignment attributes
+        RoleAssignmentAttributes roleAssignmentAttributes = new RoleAssignmentAttributes();
+
+        roleAssignmentAttributes.setCaseId(caseId);
+        roleAssignmentAttributes.setJurisdiction(jurisdiction);
+        roleAssignmentAttributes.setContractType(Optional.of("SALARIED"));
+        roleAssignmentAttributes.setLocation(location);
+        roleAssignmentAttributes.setRegion(region);
+        roleAssignmentAttributes.setCaseType(Optional.of("TEST_CASE_TYPE"));
+        roleAssignmentAttributes.setCaseAccessGroupId(caseAccessGroupId);
         return roleAssignmentAttributes;
     }
 
