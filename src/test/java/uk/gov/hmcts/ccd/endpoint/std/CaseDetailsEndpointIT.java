@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,7 +58,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -4242,10 +4240,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "    \"document_url\": \"http://localhost:" + getPort()
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
             "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
-            + "/binary\"," +
-            "    \"document_filename\": \"Seagulls_Square.jpg\",\n"
+            + "/binary\","
+            + "    \"document_filename\": \"Seagulls_Square.jpg\",\n"
             + "  \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
-            +"}" +
+            + "}" +
             "}");
         caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
         final String expectedClassificationString = "{" +
@@ -5698,12 +5696,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             map1 = mapper.readValue(sanitizedData.toString(), Map.class);
         } catch (Exception e) {
             System.out.println("sanitizedData to map1 - Exception " + e.getMessage());
-        };
+        }
         try {
-            map2 = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8)).get("case_data").toString(), Map.class);
+            map2 = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8))
+                .get("case_data").toString(), Map.class);
         } catch  (Exception e) {
             System.out.println("mvcResult.data to map2 - Exception " + e.getMessage());
-        };
+        }
 
         System.out.println("map1:" + map1);
         System.out.println("map2:" + map2);
