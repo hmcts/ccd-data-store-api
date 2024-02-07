@@ -608,6 +608,7 @@ class DefaultCreateCaseOperationTest {
 
         assertAll("Call back response returned successfully",
             () -> assertThat(caseDetails.getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> assertThat(caseDetails.getCaseTypeId(), is(CASE_TYPE_ID)),
             () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
                 CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
             () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),

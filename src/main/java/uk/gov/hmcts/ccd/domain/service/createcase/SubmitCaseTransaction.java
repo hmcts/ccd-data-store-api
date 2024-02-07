@@ -10,8 +10,10 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRolesDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -33,6 +35,10 @@ import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -121,6 +127,11 @@ public class SubmitCaseTransaction implements AccessControl {
             caseDetailsAfterCallback
         );
 
+        //find caseAccessGroups collection
+        Optional<CaseFieldDefinition> caseAccessGroups = caseTypeDefinition.getCaseField("CaseAccessGroups");
+
+
+        // need to get the case access group and save it in the access type role definition
         caseTypeDefinition.getAccessTypeRolesDefinitions()
             .forEach(record -> record.getGroupRoleName())
         ;
@@ -145,6 +156,15 @@ public class SubmitCaseTransaction implements AccessControl {
         );
 
         return savedCaseDetails;
+    }
+
+    private List<AccessTypeRolesDefinition> processAccessTypeRoleDefinition(List<AccessTypeRolesDefinition> accessTypeRolesDefinition){
+
+        return accessTypeRolesDefinition.stream()
+            .filter(accessTypeRole -> Objects.nonNull(accessTypeRole.getGroupRoleName()))
+            .filter(accessTypeRole -> !accessTypeRole.getGroupRoleName().isEmpty())
+            .collect(Collectors.toList());
+
     }
 
     private CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response,

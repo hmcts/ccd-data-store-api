@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,10 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -37,9 +40,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -116,6 +121,7 @@ class SubmitCaseTransactionTest {
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
     private CaseTypeDefinition caseTypeDefinition;
+    private List<CaseFieldDefinition> caseFields = Lists.newArrayList();
     private IdamUser idamUser;
     private CaseEventDefinition caseEventDefinition;
     private CaseStateDefinition state;
@@ -187,6 +193,40 @@ class SubmitCaseTransactionTest {
                                                                                this.caseDetails,
                                                                                IGNORE_WARNING,
                                                                                null);
+
+        final InOrder order = inOrder(caseDetails, caseDetails, caseDetailsRepository);
+
+        assertAll(
+            () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
+            () -> order.verify(caseDetails).setCreatedDate(notNull(LocalDateTime.class)),
+            () -> order.verify(caseDetails).setLastStateModifiedDate(notNull(LocalDateTime.class)),
+            () -> order.verify(caseDetails).setReference(Long.valueOf(CASE_UID)),
+            () -> order.verify(caseDetailsRepository).set(caseDetails)
+        );
+    }
+
+    @Test
+    @DisplayName("should persist case with updated Group")
+    void shouldPersistCaseWithUpdatedGroup() {
+
+
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setId(FIELD_TYPE_ID);
+        fieldTypeDefinition.setType("Type-1");
+        fieldTypeDefinition.setComplexFields(emptyList());
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+
+        caseFields.add(caseFieldDefinition);
+        caseTypeDefinition.setCaseFieldDefinitions(caseFields);
+
+        final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            null);
 
         final InOrder order = inOrder(caseDetails, caseDetails, caseDetailsRepository);
 
