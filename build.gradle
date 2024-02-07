@@ -81,7 +81,7 @@ ext {
             'class'      : 98
     ]
     springCloudVersion = '2021.0.3'
-    beftaFwVersion = '8.8.1'
+    beftaFwVersion = '8.9.0'
 }
 
 java {
