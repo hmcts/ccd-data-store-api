@@ -39,23 +39,27 @@
           "documentEvidence": {
             "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
             "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-            "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+            "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+            "upload_timestamp" : "2001-01-01T00:00:00.000000Z"
           }
         },
         "Document1": {
           "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "upload_timestamp" : "2001-01-01T00:00:00.000000Z"
         },
         "Document2": {
           "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "upload_timestamp" : "2001-01-01T00:00:00.000000Z"
         },
         "Document3": {
           "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "upload_timestamp" : "2001-01-01T00:00:00.000000Z"
         }
       },
       "event": {
@@ -92,12 +96,14 @@
         "Document3" : {
           "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "upload_timestamp" : "2001-01-01T00:00:00.000000Z"
         },
         "Document2" : {
           "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "upload_timestamp" : "2001-01-01T00:00:00.000000Z"
         },
         "nationalityProof" : {
           "typeOfProof" : "document",
@@ -105,13 +111,15 @@
           "documentEvidence" : {
             "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
             "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-            "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+            "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+            "upload_timestamp" : "2001-01-01T00:00:00.000000Z"
           }
         },
         "Document1" : {
           "document_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_binary_url": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
-          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+          "document_filename": "${[scenarioContext][siblingContexts][F-141_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "upload_timestamp" : "2001-01-01T00:00:00.000000Z"
         }
       },
       "data_classification" : {
