@@ -1,0 +1,66 @@
+{
+  "_guid_": "F-1022_Get_Event_Token_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Case worker",
+
+  "method": "GET",
+  "uri": "/case-types/CaseAccessGroups_Casetype/event-triggers/{etid}",
+
+  "specs": [
+    "to create a token for case creation",
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+  "request": {
+    "headers":{
+      "_extends_": "Common_Request_Headers",
+      "Experimental" : "true"
+    },
+    "pathVariables": {
+      "etid": "createCase"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers" : {
+      "Content-Encoding" : "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "token" : "[[ANYTHING_PRESENT]]",
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "case_details" : {
+        "id" : null,
+        "jurisdiction" : "BEFTA_JURISDICTION_1",
+        "state" : null,
+        "version" : null,
+        "case_type_id" : "CaseAccessGroups_Casetype",
+        "created_date" : null,
+        "last_modified" : null,
+        "last_state_modified_date" : null,
+        "security_classification" : null,
+        "case_data" : { },
+        "data_classification": {},
+        "supplementary_data": null,
+        "after_submit_callback_response" : null,
+        "callback_response_status_code" : null,
+        "callback_response_status" : null,
+        "delete_draft_response_status_code" : null,
+        "delete_draft_response_status" : null
+      },
+      "event_id" : "createCase"
+    }
+  }
+}

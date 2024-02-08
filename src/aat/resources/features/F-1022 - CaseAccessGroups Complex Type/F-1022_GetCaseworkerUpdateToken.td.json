@@ -1,0 +1,47 @@
+{
+  "_guid_": "F-1022_GetCaseworkerUpdateToken",
+  "title": "should create an event token for correct inputs",
+
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve an update token",
+
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+
+  "specs": [
+    "to get a caseworker event token to update the case just created"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "jid": "BEFTA_JURISDICTION_1",
+      "ctid": "CaseAccessGroups_Casetype",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1022_CreateCase][testData][actualResponse][body][id]}",
+      "etid": "updateCase"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/json",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": "[[ANYTHING_PRESENT]]",
+      "event_id": "updateCase"
+    }
+  }
+}

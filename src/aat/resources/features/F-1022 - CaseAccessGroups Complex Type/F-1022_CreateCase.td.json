@@ -1,0 +1,102 @@
+{
+  "_guid_": "F-1022_CreateCase",
+  "_extends_": "F-1022_Test_Data_Base",
+  "specs": [
+    "to create a case"
+  ],
+  "prerequisites" : [ {
+    "Token_Creation": "F-1022_Get_Event_Token_Base"
+  }
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "caseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupType": "12345",
+              "caseAccessGroupId": "12345"
+            },
+            "id": null
+          }
+        ]
+      },
+      "event": {
+        "id": "createCase"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "event_data": {
+        "caseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupType": "12345",
+              "caseAccessGroupId": "12345"
+            },
+            "id": null
+          }
+        ]
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_JURISDICTION_1",
+      "case_type": "CaseAccessGroups_Casetype",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "CaseCreated",
+      "security_classification": "PUBLIC",
+      "data": {
+        "caseAccessGroups": [
+          {
+            "__ordering__": "UNORDERED",
+            "__elementId__": "value"
+          },
+          {
+            "value": {
+              "caseAccessGroupType": "12345",
+              "caseAccessGroupId": "12345"
+            },
+            "id": "[[ANYTHING_PRESENT]]"
+          }
+        ]
+      },
+      "data_classification": {
+        "caseAccessGroups": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "value": {
+                "caseAccessGroupType": "PUBLIC",
+                "caseAccessGroupId": "PUBLIC"
+              },
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        }
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}
