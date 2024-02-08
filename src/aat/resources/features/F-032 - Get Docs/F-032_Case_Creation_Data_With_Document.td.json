@@ -13,8 +13,7 @@
           "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][customValues][documentIdInTheResponse]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][customValues][documentIdInTheResponse]}/binary",
           "document_filename": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][originalDocumentName]}",
-          "document_hash": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][hashToken]}",
-          "upload_timestamp": "[[ANYTHING_PRESENT]]"
+          "document_hash": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][hashToken]}"
         }
 			}
 		}
@@ -26,9 +25,8 @@
 				"DocumentField1": {
 					"document_url": "[[ANYTHING_PRESENT]]",
 					"document_binary_url": "[[ANYTHING_PRESENT]]",
-					"document_filename": "[[ANYTHING_PRESENT]]",
-          "upload_timestamp": "[[ANYTHING_PRESENT]]"
-        }
+					"document_filename": "[[ANYTHING_PRESENT]]"
+				}
 			},
 			"data_classification": {
 				"DocumentField1": "PUBLIC"
