@@ -13,6 +13,8 @@
 
 Store/search cases and provide workbaskets.
 
+Dummy change
+
 ### Prerequisites
 
 - [Open JDK 17](https://openjdk.java.net/)
