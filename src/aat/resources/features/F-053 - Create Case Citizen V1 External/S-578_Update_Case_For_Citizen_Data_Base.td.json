@@ -25,8 +25,7 @@
 				"DocumentField2": {
           "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}/binary",
-          "document_filename":"Elastic Search test Case.png --> updated by Citizen",
-          "upload_timestamp": "2001-01-01T00:00:00.000000Z"
+          "document_filename":"Elastic Search test Case.png --> updated by Citizen"
 				}
 			},
 			"event": {
