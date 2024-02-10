@@ -14,8 +14,7 @@
         "DocumentField1": {
           "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
-          "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}",
-          "upload_timestamp": "2001-01-01T00:00:00.000000Z"
+          "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
         }
       }
     }
