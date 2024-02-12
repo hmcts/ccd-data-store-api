@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRolesDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
@@ -182,6 +183,10 @@ class AuthorisedCreateEventOperationTest {
         CategoryDefinition categoryDefinition = new CategoryDefinition();
         categoryDefinition.setCategoryId(categoryId);
         caseTypeDefinition.setCategories(Lists.newArrayList(categoryDefinition));
+
+        AccessTypeRolesDefinition accessTypeRolesDefinition = new AccessTypeRolesDefinition();
+        caseTypeDefinition.setAccessTypeRoles(Lists.newArrayList(accessTypeRolesDefinition));
+
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getAccessProfiles(anyString())).thenReturn(USER_ROLES);
