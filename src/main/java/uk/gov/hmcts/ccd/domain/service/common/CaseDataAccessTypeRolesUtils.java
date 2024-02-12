@@ -37,8 +37,8 @@ public class CaseDataAccessTypeRolesUtils {
             . For the field retrieved from the case data, Organisation.OrganisationID has a non-empty value.
         */
 
-        List<AccessTypeRolesDefinition> accessTypeRolesDefinition = caseTypeDefinition.getAccessTypeRoles();
-
+        List<AccessTypeRolesDefinition> accessTypeRolesDefinitions = caseTypeDefinition.getAccessTypeRoles();
+        List<AccessTypeRolesDefinition>  filteredAccessTypeRolesDefinitions = filterAccessRoles(caseDetails, accessTypeRolesDefinitions);
         /*
         3. For each retained record, create a case group ID value by substituting the organisation policy
            Organisation.OrganisationID value in CaseTypeOrganisationAccess.CaseGroupIDTemplate. For example :
@@ -96,7 +96,7 @@ public class CaseDataAccessTypeRolesUtils {
         return isCCDAllCasesAccess;
     }
 
-    private void filterAccessRoles(CaseDetails caseDetails,
+    private List<AccessTypeRolesDefinition> filterAccessRoles(CaseDetails caseDetails,
                                    List<AccessTypeRolesDefinition> accessTypeRolesDefinitions) {
         /*
         2. Filter all AccessTypeRole records (joined with their owning AccessType records), keeping records where:
@@ -124,19 +124,7 @@ public class CaseDataAccessTypeRolesUtils {
             accessTypeRolesDefinitionWithCaseAssignedRoleField.stream()
                 .filter(element -> getCaseDetailsWithCaseAssignedRoleField(caseDetails, element.getCaseAssignedRoleField()).hasCaseReference())
                 .collect(Collectors.toList());
-
-     /*   Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> caseUserRolesWhichHaveAnOrgId =
-            cauRolesByCaseDetails.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-                    // filter out no organisation_id and [CREATOR] case role
-                    .filter(caseUserRole ->
-                        StringUtils.isNoneBlank(caseUserRole.getOrganisationId())
-                            && !caseUserRole.getCaseRole().equalsIgnoreCase(CREATOR.getRole()))
-                    .collect(Collectors.toList())))
-                // filter cases that have no remaining roles
-                .entrySet().stream().filter(e -> !e.getValue().isEmpty())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                */
+        return accessTypeRolesDefinitionWithNonEmptyOrganisationID;
     }
 
 
