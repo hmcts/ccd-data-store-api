@@ -95,14 +95,13 @@ public class CallbackService {
         final Optional<ResponseEntity<CallbackResponse>> responseEntity =
             sendRequest(url, callbackType, CallbackResponse.class, callbackRequest);
         try {
-            LOG.debug("JCDEBUG.debug: CallbackService.sendSingleRequest: URL = {} , TYPE = {} , EVENT = {} , " +
-                "DETAILSBEFORE = {} , DETAILS = {}", url, callbackType, caseEvent, caseDetailsBefore, caseDetails);
-            LOG.info("JCDEBUG.info: CallbackService.sendSingleRequest: URL = {} , TYPE = {} , EVENT = {} , " +
-                "DETAILSBEFORE = {} , DETAILS = {}", url, callbackType, caseEvent, caseDetailsBefore, caseDetails);
-            LOG.warn("JCDEBUG.warn: CallbackService.sendSingleRequest: URL = {} , TYPE = {} , EVENT = {} , " +
-                "DETAILSBEFORE = {} , DETAILS = {}", url, callbackType, caseEvent, caseDetailsBefore, caseDetails);
-        }
-        catch (Exception e) {
+            LOG.debug("JCDEBUG.debug: CallbackService.sendSingleRequest: URL = {} , TYPE = {} , EVENT = {} , "
+                + "DETAILSBEFORE = {} , DETAILS = {}", url, callbackType, caseEvent, caseDetailsBefore, caseDetails);
+            LOG.info("JCDEBUG.info: CallbackService.sendSingleRequest: URL = {} , TYPE = {} , EVENT = {} , "
+                + "DETAILSBEFORE = {} , DETAILS = {}", url, callbackType, caseEvent, caseDetailsBefore, caseDetails);
+            LOG.warn("JCDEBUG.warn: CallbackService.sendSingleRequest: URL = {} , TYPE = {} , EVENT = {} , "
+                + "DETAILSBEFORE = {} , DETAILS = {}", url, callbackType, caseEvent, caseDetailsBefore, caseDetails);
+        } catch (Exception e) {
             LOG.debug("JCDEBUG.debug: CallbackService.sendSingleRequest: Exception creating log: {} {}",
                 e.getMessage(), e.toString());
             LOG.info("JCDEBUG.info: CallbackService.sendSingleRequest: Exception creating log: {} {}",
