@@ -8,7 +8,9 @@
 
   "expectedResponse": {
     "body": {
-      "case_users": []
+      "case_users": [],
+      "organisationStatus": "[[ANYTHING_PRESENT]]",
+      "organisationProfileIds": "[[ANYTHING_PRESENT]]"
     }
   }
 }
