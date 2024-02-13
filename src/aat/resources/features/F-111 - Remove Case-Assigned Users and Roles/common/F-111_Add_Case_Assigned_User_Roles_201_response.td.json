@@ -3,8 +3,6 @@
   "_extends_": "Common_201_Response",
 
   "body": {
-    "status_message": "Case-User-Role assignments created successfully",
-    "organisationStatus": "[[ANYTHING_PRESENT]]",
-    "organisationProfileIds": "[[ANYTHING_PRESENT]]"
+    "status_message": "Case-User-Role assignments created successfully"
   }
 }
