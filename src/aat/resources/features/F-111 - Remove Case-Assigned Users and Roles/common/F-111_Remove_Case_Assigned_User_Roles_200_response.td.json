@@ -3,6 +3,8 @@
   "_extends_": "Common_200_Response",
 
   "body": {
-    "status_message": "Case-User-Role assignments removed successfully"
+    "status_message": "Case-User-Role assignments removed successfully",
+    "organisationStatus": "[[ANYTHING_PRESENT]]",
+    "organisationProfileIds": "[[ANYTHING_PRESENT]]"
   }
 }
