@@ -29,7 +29,9 @@
           "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
           "case_role": "[CR-1]"
         }
-      ]
+      ],
+      "organisationStatus": "[[ANYTHING_PRESENT]]",
+      "organisationProfileIds": "[[ANYTHING_PRESENT]]"
     }
   }
 }
