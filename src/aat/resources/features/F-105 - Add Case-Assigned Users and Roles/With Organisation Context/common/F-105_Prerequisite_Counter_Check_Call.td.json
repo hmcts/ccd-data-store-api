@@ -12,7 +12,9 @@
 
   "expectedResponse": {
     "body": {
-      "supplementary_data": "[[ANYTHING_PRESENT]]"
+      "supplementary_data": "[[ANYTHING_PRESENT]]",
+      "organisationStatus": "[[ANYTHING_PRESENT]]",
+      "organisationProfileIds": "[[ANYTHING_PRESENT]]"
     }
   }
 }
