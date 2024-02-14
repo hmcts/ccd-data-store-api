@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ public class CaseDataAccessTypeRolesUtils {
 
     protected static final String FAILED_TO_READ_CASE_ACCESS_GROUPS_FROM_CASE_DATA = "Failed to read 'caseAccessGroups' from case data";
     protected static final String CCD_ALL_CASES = "CCD:all-cases-access";
-    protected static final String ORGANISATIONID = "OrganisationId";
+    protected static final String ORGANISATIONID = "Organisation.OrganisationID";
 
     public CaseDataAccessTypeRolesUtils() {
 
@@ -47,6 +48,13 @@ public class CaseDataAccessTypeRolesUtils {
            . Substituting Organisation.OrganisationID value in CaseGroupIDTemplate to have a new case group ID
               - CIVIL:bulk:[RESPONDENT01SOLICITOR]:550e8400-e29b-41d4-a716-446655440000
         */
+        List<CaseAccessGroup> caseAccessGroups = null;
+        for (AccessTypeRolesDefinition accessTypeRolesDefinition: filteredAccessTypeRolesDefinitions ){
+            if (caseAccessGroups == null) {
+                caseAccessGroups = new ArrayList<>();
+            }
+            String caseGroupID = accessTypeRolesDefinition.getCaseAccessGroupIdTemplate().replace("$ORGID$", );
+        }
 
         /*
         4. Add each case group ID to the caseAccessGroups collection in the case data, setting
@@ -144,12 +152,15 @@ public class CaseDataAccessTypeRolesUtils {
             Map<String, JsonNode> withcaseAssignedRoleField = (Map<String, JsonNode>) caseAccessGroupJsonNode.entrySet().stream()
                 .filter(cd -> cd.getKey().equals(caseAssignedRoleField) &&
                     StringUtils.isNoneBlank(cd.getValue().toString()))
-                //cd.getKey().equals(ORGANISATIONID) &&
-                //StringUtils.isNoneBlank(cd.getValue().toString())
+                .collect(Collectors.toList());
+
+            Map<String, JsonNode> withCaseOrganisationID = (Map<String, JsonNode>) withcaseAssignedRoleField.entrySet().stream()
+                .filter(cd -> cd.getKey().equals(ORGANISATIONID) &&
+                    StringUtils.isNoneBlank(cd.getValue().toString()))
                 .collect(Collectors.toList());
 
             CaseDetails caseDetailsWithCaseAssignedRoleField = new CaseDetails();
-            caseDetailsWithCaseAssignedRoleField.setData(withcaseAssignedRoleField);
+            caseDetailsWithCaseAssignedRoleField.setData(withCaseOrganisationID);
             return caseDetailsWithCaseAssignedRoleField;
         }
         return null;
