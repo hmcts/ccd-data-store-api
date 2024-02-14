@@ -8,7 +8,7 @@
   "uri": "/case-users",
 
   "s2sClientId": "aac_manage_case_assignment",
-  
+
   "request": {
     "_extends_": "Common_Request"
   },
@@ -19,6 +19,10 @@
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Type": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "organisationStatus": "[[ANYTHING_PRESENT]]",
+      "organisationProfileIds": "[[ANYTHING_PRESENT]]"
     }
   }
 }
