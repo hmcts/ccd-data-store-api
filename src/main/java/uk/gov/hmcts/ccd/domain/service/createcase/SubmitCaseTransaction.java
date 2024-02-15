@@ -51,10 +51,6 @@ public class SubmitCaseTransaction implements AccessControl {
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
 
-    protected static final String FAILED_TO_READ_CASE_ACCESS_GROUPS_FROM_CASE_DATA = "Failed to read 'caseAccessGroups' from case data";
-    protected static final String CCD_ALL_CASES = "CCD:all-cases-access";
-    protected static final String ORGANISATIONID = "OrganisationId";
-
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                      final CaseDetailsRepository caseDetailsRepository,

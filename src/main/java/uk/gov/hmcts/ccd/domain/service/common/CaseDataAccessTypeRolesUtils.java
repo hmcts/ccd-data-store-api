@@ -4,20 +4,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.VALUE;
 
 public class CaseDataAccessTypeRolesUtils {
 
-    protected static final String FAILED_TO_READ_CASE_ACCESS_GROUPS_FROM_CASE_DATA = "Failed to read 'caseAccessGroups' from case data";
+    protected static final String FAILED_TO_READ_CASE_ACCESS_GROUPS_FROM_CASE_DATA =
+        "Failed to read 'caseAccessGroups' from case data";
     protected static final String CCD_ALL_CASES = "CCD:all-cases-access";
     protected static final String ORGANISATIONID = "Organisation.OrganisationID";
+
+    private CaseTypeDefinition caseTypeDefinition;
 
     public CaseDataAccessTypeRolesUtils() {
 
@@ -25,6 +27,7 @@ public class CaseDataAccessTypeRolesUtils {
 
     private void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition){
 
+        this.caseTypeDefinition = caseTypeDefinition;
         /*
         1. Remove all items from the case data caseAccessGroups collection where caseGroupType = CCD:all-cases-access.
         */
@@ -39,7 +42,8 @@ public class CaseDataAccessTypeRolesUtils {
         */
 
         List<AccessTypeRolesDefinition> accessTypeRolesDefinitions = caseTypeDefinition.getAccessTypeRoles();
-        List<AccessTypeRolesDefinition>  filteredAccessTypeRolesDefinitions = filterAccessRoles(caseDetails, accessTypeRolesDefinitions);
+        List<AccessTypeRolesDefinition>  filteredAccessTypeRolesDefinitions = filterAccessRoles(caseDetails,
+            accessTypeRolesDefinitions);
         /*
         3. For each retained record, create a case group ID value by substituting the organisation policy
            Organisation.OrganisationID value in CaseTypeOrganisationAccess.CaseGroupIDTemplate. For example :
@@ -48,26 +52,25 @@ public class CaseDataAccessTypeRolesUtils {
            . Substituting Organisation.OrganisationID value in CaseGroupIDTemplate to have a new case group ID
               - CIVIL:bulk:[RESPONDENT01SOLICITOR]:550e8400-e29b-41d4-a716-446655440000
         */
-        List<CaseAccessGroup> caseAccessGroups = null;
-        for (AccessTypeRolesDefinition accessTypeRolesDefinition: filteredAccessTypeRolesDefinitions ){
-            if (caseAccessGroups == null) {
-                caseAccessGroups = new ArrayList<>();
-            }
-            String caseGroupID = accessTypeRolesDefinition.getCaseAccessGroupIdTemplate().replace("$ORGID$", );
-        }
+        Map<String, JsonNode> caseDatawithOrganisationID =
+            (Map<String, JsonNode>) caseDetails.getData().entrySet().stream()
+            .filter(cd -> cd.getKey().equals(ORGANISATIONID) &&
+                StringUtils.isNoneBlank(cd.getValue().toString()))
+            .collect(Collectors.toList());
+
+        JsonNode organisationIDdata = JacksonUtils.convertValueJsonNode(caseDatawithOrganisationID);
+        final Iterator<String> fieldNames = organisationIDdata.fieldNames();
+
+        List<CaseAccessGroup> caseAccessGroups = buildGroupAccessId(organisationIDdata,
+            filteredAccessTypeRolesDefinitions);
 
         /*
         4. Add each case group ID to the caseAccessGroups collection in the case data, setting
            caseGroupType = CCD:all-cases-access
         */
-
-
-        // need to get the case access group and save it in the access type role definition
-/*
-        caseTypeDefinitiongetAccessTypeRolesDefinitions()
-            .forEach(record -> record.getGroupRoleName())
-        ;
-*/
+        for (CaseAccessGroup cag : caseAccessGroups){
+            cag.setCaseAccessGroupType(CCD_ALL_CASES);
+        }
     }
 
     public CaseDetails removeCCDAllCasesAccessFromCaseAccessGroups(CaseDetails currentCaseDetails) {
@@ -76,7 +79,8 @@ public class CaseDataAccessTypeRolesUtils {
         */
         CaseDetails results = currentCaseDetails;
         List<CaseAccessGroup> caseAccessGroups = getCaseAccessGroupFromCaseData(currentCaseDetails.getData());
-        results.getData().entrySet().removeIf(caseDetails -> !isCCDAllCasesAccess(caseAccessGroups, currentCaseDetails));
+        results.getData().entrySet().removeIf(caseDetails ->
+            !isCCDAllCasesAccess(caseAccessGroups, currentCaseDetails));
         return (CaseDetails) results;
     }
 
@@ -85,7 +89,8 @@ public class CaseDataAccessTypeRolesUtils {
         if (caseAccessGroupJsonNode != null) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
-                return Collections.singletonList(objectMapper.readValue(caseAccessGroupJsonNode.toString(), CaseAccessGroup.class));
+                return Collections.singletonList(objectMapper.readValue(caseAccessGroupJsonNode.toString(),
+                    CaseAccessGroup.class));
             } catch (JsonProcessingException e) {
                 throw new ValidationException(FAILED_TO_READ_CASE_ACCESS_GROUPS_FROM_CASE_DATA);
             }
@@ -114,6 +119,8 @@ public class CaseDataAccessTypeRolesUtils {
               structure.)
             . For the field retrieved from the case data, Organisation.OrganisationID has a non-empty value.
         */
+        CaseDetails caseDetailsWithCaseAssignedRoleField;
+
         List<AccessTypeRolesDefinition> accessTypeRolesDefinitionWithCaseAssignedRoleField =
             accessTypeRolesDefinitions.stream()
                 /*GroupRoleName is not empty.
@@ -130,40 +137,67 @@ public class CaseDataAccessTypeRolesUtils {
         //. For the field retrieved from the case data, Organisation.OrganisationID has a non-empty value.
         List<AccessTypeRolesDefinition> accessTypeRolesDefinitionWithNonEmptyOrganisationID =
             accessTypeRolesDefinitionWithCaseAssignedRoleField.stream()
-                .filter(element -> getCaseDetailsWithCaseAssignedRoleField(caseDetails, element.getCaseAssignedRoleField()).hasCaseReference())
+                .filter(element ->  isExitsCaseDetailsWithCaseAssignedRoleFieldOrganisationID(caseDetails,
+                    element.getCaseAssignedRoleField()))
                 .collect(Collectors.toList());
         return accessTypeRolesDefinitionWithNonEmptyOrganisationID;
     }
 
 
 
-    private CaseDetails getCaseDetailsWithCaseAssignedRoleField(CaseDetails caseDetails, String caseAssignedRoleField) {
+    private Boolean isExitsCaseDetailsWithCaseAssignedRoleFieldOrganisationID(CaseDetails caseDetails,
+                                                                              String caseAssignedRoleField) {
         Map<String, JsonNode> caseAccessGroupJsonNode = caseDetails.getData();
-         /*
-        2. Filter all AccessTypeRole records (joined with their owning AccessType records), keeping records where:
-            . GroupRoleName is not empty.
-            . CaseAssignedRoleField has a value, and the field exists in the case data.
-              (Note that this may be a field of type OrganisationPolicy, or a complex type field with equivalent
-              structure.)
-            . For the field retrieved from the case data, Organisation.OrganisationID has a non-empty value.
-        */
+         //part of 2. For the field retrieved from the case data,  Organisation.OrganisationID has a non-empty value.
 
         if (caseDetails.getData().entrySet().contains(caseAssignedRoleField)) {
-            Map<String, JsonNode> withcaseAssignedRoleField = (Map<String, JsonNode>) caseAccessGroupJsonNode.entrySet().stream()
+            Map<String, JsonNode> withcaseAssignedRoleField =
+                (Map<String, JsonNode>) caseAccessGroupJsonNode.entrySet().stream()
                 .filter(cd -> cd.getKey().equals(caseAssignedRoleField) &&
                     StringUtils.isNoneBlank(cd.getValue().toString()))
                 .collect(Collectors.toList());
 
-            Map<String, JsonNode> withCaseOrganisationID = (Map<String, JsonNode>) withcaseAssignedRoleField.entrySet().stream()
+            Map<String, JsonNode> withCaseOrganisationID =
+                (Map<String, JsonNode>) withcaseAssignedRoleField.entrySet().stream()
                 .filter(cd -> cd.getKey().equals(ORGANISATIONID) &&
                     StringUtils.isNoneBlank(cd.getValue().toString()))
                 .collect(Collectors.toList());
 
-            CaseDetails caseDetailsWithCaseAssignedRoleField = new CaseDetails();
-            caseDetailsWithCaseAssignedRoleField.setData(withCaseOrganisationID);
-            return caseDetailsWithCaseAssignedRoleField;
+
+            if (withCaseOrganisationID != null && !withCaseOrganisationID.isEmpty()) {
+                //caseDetails has Organisation.OrganisationID and is a non-empty value
+                return true;
+            }
         }
-        return null;
+        return false;
     }
 
+    private List<CaseAccessGroup> buildGroupAccessId(
+        final JsonNode orgDataNode,
+        List<AccessTypeRolesDefinition> filteredAccessTypeRolesDefinitions) {
+
+        List<CaseAccessGroup> caseAccessGroups = null;
+        for (AccessTypeRolesDefinition accessTypeRolesDefinition : filteredAccessTypeRolesDefinitions) {
+            if (caseAccessGroups == null) {
+                caseAccessGroups = new ArrayList<>();
+            }
+
+            List<CaseFieldDefinition> caseFieldDefinitions = caseTypeDefinition.getCaseFieldDefinitions();
+            final Iterator<String> fieldNames = orgDataNode.fieldNames();
+            while (fieldNames.hasNext()) {
+                final String fieldName = fieldNames.next();
+                Iterator<CaseFieldDefinition> cfIterator = caseFieldDefinitions.iterator();
+                while (cfIterator.hasNext()) {
+                    orgDataNode.forEach(caseFieldValueJsonNode -> {
+                        if (caseFieldValueJsonNode.get(VALUE).get(fieldName) != null) {
+                            // Build the Group Access
+                            String caseGroupID = accessTypeRolesDefinition.getCaseAccessGroupIdTemplate()
+                                .replace("$ORGID$", caseFieldValueJsonNode.get(VALUE).toString());
+                        }
+                    });
+                }
+            }
+        }
+        return caseAccessGroups;
+    }
 }
