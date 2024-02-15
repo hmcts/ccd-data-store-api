@@ -82,7 +82,6 @@ ext {
     ]
     springCloudVersion = '2021.0.3'
     beftaFwVersion = '8.9.0'
-
 }
 
 java {
