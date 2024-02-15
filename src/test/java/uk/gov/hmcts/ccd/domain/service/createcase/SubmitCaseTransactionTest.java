@@ -425,4 +425,39 @@ class SubmitCaseTransactionTest {
         return result;
     }
 
+    @Test
+    @DisplayName("should create a case With OrganisationID")
+    void shouldPersistCreateCaseEventWithOrganisationID() throws IOException {
+        CaseDetails inputCaseDetails = new CaseDetails();
+        inputCaseDetails.setCaseTypeId("SomeCaseType");
+        inputCaseDetails.setJurisdiction("SomeJurisdiction");
+        inputCaseDetails.setState("SomeState");
+
+        AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn(inputCaseDetails).when(caseDocumentService).stripDocumentHashes(inputCaseDetails);
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
+            null,
+            inputCaseDetails,
+            caseTypeDefinition,
+            IGNORE_WARNING);
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUploadWithOrgID.json");
+
+        inputCaseDetails.setData(dataMap);
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
+        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            inputCaseDetails,
+            IGNORE_WARNING,
+            null);
+
+
+        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+    }
+
 }

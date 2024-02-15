@@ -5,10 +5,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroup;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroups;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRolesDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.*;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Collections;
 import java.util.stream.Collectors;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.VALUE;
 
@@ -25,7 +34,7 @@ public class CaseDataAccessTypeRolesUtils {
 
     }
 
-    private void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition){
+    private void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
 
         this.caseTypeDefinition = caseTypeDefinition;
         /*
@@ -54,8 +63,8 @@ public class CaseDataAccessTypeRolesUtils {
         */
         Map<String, JsonNode> caseDatawithOrganisationID =
             (Map<String, JsonNode>) caseDetails.getData().entrySet().stream()
-            .filter(cd -> cd.getKey().equals(ORGANISATIONID) &&
-                StringUtils.isNoneBlank(cd.getValue().toString()))
+            .filter(cd -> cd.getKey().equals(ORGANISATIONID)
+                && StringUtils.isNoneBlank(cd.getValue().toString()))
             .collect(Collectors.toList());
 
         JsonNode organisationIDdata = JacksonUtils.convertValueJsonNode(caseDatawithOrganisationID);
@@ -68,9 +77,13 @@ public class CaseDataAccessTypeRolesUtils {
         4. Add each case group ID to the caseAccessGroups collection in the case data, setting
            caseGroupType = CCD:all-cases-access
         */
-        for (CaseAccessGroup cag : caseAccessGroups){
+        for (CaseAccessGroup cag : caseAccessGroups) {
             cag.setCaseAccessGroupType(CCD_ALL_CASES);
         }
+
+        //Add caseAccessGroups to to the caseAccessGroups collection in the case data
+        //caseDetails.getCaseAccessGroupData().entrySet().add(caseAccessGroups)
+
     }
 
     public CaseDetails removeCCDAllCasesAccessFromCaseAccessGroups(CaseDetails currentCaseDetails) {
@@ -148,19 +161,19 @@ public class CaseDataAccessTypeRolesUtils {
     private Boolean isExitsCaseDetailsWithCaseAssignedRoleFieldOrganisationID(CaseDetails caseDetails,
                                                                               String caseAssignedRoleField) {
         Map<String, JsonNode> caseAccessGroupJsonNode = caseDetails.getData();
-         //part of 2. For the field retrieved from the case data,  Organisation.OrganisationID has a non-empty value.
+        //part of 2. For the field retrieved from the case data,  Organisation.OrganisationID has a non-empty value.
 
         if (caseDetails.getData().entrySet().contains(caseAssignedRoleField)) {
             Map<String, JsonNode> withcaseAssignedRoleField =
                 (Map<String, JsonNode>) caseAccessGroupJsonNode.entrySet().stream()
-                .filter(cd -> cd.getKey().equals(caseAssignedRoleField) &&
-                    StringUtils.isNoneBlank(cd.getValue().toString()))
+                .filter(cd -> cd.getKey().equals(caseAssignedRoleField)
+                    && StringUtils.isNoneBlank(cd.getValue().toString()))
                 .collect(Collectors.toList());
 
             Map<String, JsonNode> withCaseOrganisationID =
                 (Map<String, JsonNode>) withcaseAssignedRoleField.entrySet().stream()
-                .filter(cd -> cd.getKey().equals(ORGANISATIONID) &&
-                    StringUtils.isNoneBlank(cd.getValue().toString()))
+                .filter(cd -> cd.getKey().equals(ORGANISATIONID)
+                    && StringUtils.isNoneBlank(cd.getValue().toString()))
                 .collect(Collectors.toList());
 
 
