@@ -48,7 +48,7 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
     private final List<CategoryDefinition> categories = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
-    private List<AccessTypeRolesDefinition> accessTypeRoles = new ArrayList<>();
+    private List<AccessTypeRolesDefinition> accessTypeRolesDefinitions = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -258,14 +258,14 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
         return categories;
     }
 
-    public void setAccessTypeRoles(List<AccessTypeRolesDefinition> accessTypeRoles) {
+    public void setAccessTypeRolesDefinitions(List<AccessTypeRolesDefinition> accessTypeRoles) {
         if (accessTypeRoles != null) {
-            this.accessTypeRoles.addAll(accessTypeRoles);
+            this.accessTypeRolesDefinitions.addAll(accessTypeRoles);
         }
     }
 
-    public List<AccessTypeRolesDefinition> getAccessTypeRoles() {
-        return accessTypeRoles;
+    public List<AccessTypeRolesDefinition> getAccessTypeRolesDefinitions() {
+        return accessTypeRolesDefinitions;
     }
 
     @JsonIgnore
@@ -292,7 +292,7 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
         copy.setSearchCriterias(createCopyList(this.getSearchCriterias()));
         copy.setCategories(createCopyList(this.getCategories()));
         copy.setRoleToAccessProfiles(createCopyList(this.getRoleToAccessProfiles()));
-        copy.setAccessTypeRoles(createCopyList(this.getAccessTypeRoles()));
+        copy.setAccessTypeRolesDefinitions(createCopyList(this.getAccessTypeRolesDefinitions()));
 
         return copy;
     }

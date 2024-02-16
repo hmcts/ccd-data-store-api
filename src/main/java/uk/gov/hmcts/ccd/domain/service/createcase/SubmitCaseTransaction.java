@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
+import uk.gov.hmcts.ccd.ApplicationParams;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
@@ -47,6 +49,7 @@ public class SubmitCaseTransaction implements AccessControl {
     private final CaseDataAccessControl caseDataAccessControl;
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
+    private final ApplicationParams applicationParams;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -58,7 +61,8 @@ public class SubmitCaseTransaction implements AccessControl {
                                  final SecurityClassificationService securityClassificationService,
                                  final CaseDataAccessControl caseDataAccessControl,
                                  final @Qualifier("caseEventMessageService") MessageService messageService,
-                                 final CaseDocumentService caseDocumentService
+                                 final CaseDocumentService caseDocumentService,
+                                 final ApplicationParams applicationParams
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -69,6 +73,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.caseDataAccessControl = caseDataAccessControl;
         this.messageService = messageService;
         this.caseDocumentService = caseDocumentService;
+        this.applicationParams = applicationParams;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -122,7 +127,10 @@ public class SubmitCaseTransaction implements AccessControl {
         );
 
         //GA-28
-        //updateCaseAccessGroupsInCaseDetails(caseDetails, caseTypeDefinition);
+        //if (this.applicationParams.getCaseGroupAccessFilteringEnabled()) {
+            CaseAccessGroupUtils caseGroupAccessTypeUtils = new CaseAccessGroupUtils();
+            caseGroupAccessTypeUtils.updateCaseAccessGroupsInCaseDetails(caseDetails, caseTypeDefinition);
+        //}
 
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,

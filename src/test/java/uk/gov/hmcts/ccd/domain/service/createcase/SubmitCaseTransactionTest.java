@@ -1,8 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +17,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -20,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRolesDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -36,9 +44,11 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,6 +62,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
@@ -81,6 +92,8 @@ class SubmitCaseTransactionTest {
     private static final String ON_BEHALF_OF_ID = "24";
     private static final String ON_BEHALF_OF_FNAME = "Pierre OnBehalf";
     private static final String ON_BEHALF_OF_LNAME = "Martin OnBehalf";
+
+    private static final String ORGANISATION_PROFILE = "OrganisationProfile1";
 
 
     @Mock
@@ -112,6 +125,9 @@ class SubmitCaseTransactionTest {
     @Mock
     private MessageService messageService;
 
+    @Mock
+    private ApplicationParams applicationParams;
+
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -119,6 +135,8 @@ class SubmitCaseTransactionTest {
     private IdamUser idamUser;
     private CaseEventDefinition caseEventDefinition;
     private CaseStateDefinition state;
+
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
@@ -132,7 +150,8 @@ class SubmitCaseTransactionTest {
             securityClassificationService,
             caseDataAccessControl,
             messageService,
-            caseDocumentService
+            caseDocumentService,
+            applicationParams
         );
 
         event = buildEvent();
@@ -157,6 +176,12 @@ class SubmitCaseTransactionTest {
                                                                              null,
                                                                              this.caseDetails, caseTypeDefinition,
                                                                              IGNORE_WARNING);
+
+        objectMapper = new ObjectMapper()
+            .registerModule(new Jdk8Module())
+            .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
+            .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
 
     }
 
@@ -428,6 +453,7 @@ class SubmitCaseTransactionTest {
     @Test
     @DisplayName("should create a case With OrganisationID")
     void shouldPersistCreateCaseEventWithOrganisationID() throws IOException {
+        applicationParams.setCaseGroupAccessFilteringEnabled(true);
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setCaseTypeId("SomeCaseType");
         inputCaseDetails.setJurisdiction("SomeJurisdiction");
@@ -441,8 +467,33 @@ class SubmitCaseTransactionTest {
             caseTypeDefinition,
             IGNORE_WARNING);
 
-        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUploadWithOrgID.json");
+        //String fileContent = fromFileAsString("tests/FT-MasterCaseType-payload.json");
 
+        //caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
+
+        AccessTypeRolesDefinition accessTypeRolesDefinition = new AccessTypeRolesDefinition();
+        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition);
+        accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId");
+        accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName");
+        accessTypeRolesDefinition.setGroupRoleName("GroupRoleName");
+        accessTypeRolesDefinition.setCaseAccessGroupIdTemplate("SomeJurisdiction:CIVIL:bulk:[RESPONDENT01SOLICITOR]:$ORGID$");
+        accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedField");
+
+        List<AccessTypeRolesDefinition> accessTypeRolesDefinitions = new ArrayList<AccessTypeRolesDefinition>();
+        accessTypeRolesDefinitions.add(accessTypeRolesDefinition);
+
+        AccessTypeRolesDefinition accessTypeRolesDefinition1 = new AccessTypeRolesDefinition();
+        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition);
+        accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId1");
+        accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName1");
+        accessTypeRolesDefinition1.setGroupRoleName("GroupRoleName1");
+        accessTypeRolesDefinition1.setCaseAccessGroupIdTemplate("SomeJurisdictionCIVIL:bulk:[RESPONDENT01SOLICITOR]:$ORGID$");
+        accessTypeRolesDefinition1.setCaseAssignedRoleField("caseAssignedField");
+        accessTypeRolesDefinitions.add(accessTypeRolesDefinition1);
+
+        caseTypeDefinition.setAccessTypeRolesDefinitions(accessTypeRolesDefinitions);
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUploadWithOrgID.json");
         inputCaseDetails.setData(dataMap);
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
@@ -458,6 +509,8 @@ class SubmitCaseTransactionTest {
 
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+
+        applicationParams.setCaseGroupAccessFilteringEnabled(false);
     }
 
 }

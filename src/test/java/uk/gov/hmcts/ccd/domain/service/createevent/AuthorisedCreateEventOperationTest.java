@@ -154,6 +154,9 @@ class AuthorisedCreateEventOperationTest {
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
     private final List<CaseEventDefinition> events = Lists.newArrayList();
     private final String categoryId = "categoryId";
+
+    private final String accessTypeRole = "accessTypeRole";
+
     private final Map<String, JsonNode> documentData = new HashMap<>();
 
     @BeforeEach
@@ -185,7 +188,11 @@ class AuthorisedCreateEventOperationTest {
         caseTypeDefinition.setCategories(Lists.newArrayList(categoryDefinition));
 
         AccessTypeRolesDefinition accessTypeRolesDefinition = new AccessTypeRolesDefinition();
-        caseTypeDefinition.setAccessTypeRoles(Lists.newArrayList(accessTypeRolesDefinition));
+        accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedroleField");
+        accessTypeRolesDefinition.setGroupRoleName("groupRoleName");
+        accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedRoleField");
+
+        caseTypeDefinition.setAccessTypeRolesDefinitions(Lists.newArrayList(accessTypeRolesDefinition));
 
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
