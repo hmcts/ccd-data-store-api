@@ -71,7 +71,7 @@ public class CaseAccessGroupUtils {
                         && StringUtils.isNoneBlank(cd.getValue().toString()))
                     .collect(Collectors.toMap(Map.Entry::getKey,
                         Map.Entry::getValue,
-                        (x,y)->y,
+                        (x,y) -> y,
                         HashMap::new));
 
             JsonNode organisationIDdata = JacksonUtils.convertValueJsonNode(caseDatawithOrganisationID);
@@ -182,7 +182,7 @@ public class CaseAccessGroupUtils {
                     && StringUtils.isNoneBlank(cd.getValue().toString()))
                 .collect(Collectors.toMap(Map.Entry::getKey,
                     Map.Entry::getValue,
-                    (x,y)->y,
+                    (x,y) -> y,
                     HashMap::new));
 
             Map<String, JsonNode> withCaseOrganisationID =
@@ -191,7 +191,7 @@ public class CaseAccessGroupUtils {
                     && StringUtils.isNoneBlank(cd.getValue().toString()))
                 .collect(Collectors.toMap(Map.Entry::getKey,
                     Map.Entry::getValue,
-                    (x,y)->y,
+                    (x,y) -> y,
                     HashMap::new));
 
 

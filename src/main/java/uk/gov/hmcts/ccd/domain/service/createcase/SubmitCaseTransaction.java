@@ -128,8 +128,8 @@ public class SubmitCaseTransaction implements AccessControl {
 
         //GA-28
         //if (this.applicationParams.getCaseGroupAccessFilteringEnabled()) {
-            CaseAccessGroupUtils caseGroupAccessTypeUtils = new CaseAccessGroupUtils();
-            caseGroupAccessTypeUtils.updateCaseAccessGroupsInCaseDetails(caseDetails, caseTypeDefinition);
+        CaseAccessGroupUtils caseGroupAccessTypeUtils = new CaseAccessGroupUtils();
+        caseGroupAccessTypeUtils.updateCaseAccessGroupsInCaseDetails(caseDetails, caseTypeDefinition);
         //}
 
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(

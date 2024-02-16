@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
@@ -18,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -44,11 +46,12 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -62,7 +65,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
@@ -310,7 +312,8 @@ class SubmitCaseTransactionTest {
             IGNORE_WARNING,
             null);
 
-        verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null, caseDetails, caseTypeDefinition,
+        verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null,
+            caseDetails, caseTypeDefinition,
             IGNORE_WARNING);
     }
 
@@ -467,34 +470,39 @@ class SubmitCaseTransactionTest {
             caseTypeDefinition,
             IGNORE_WARNING);
 
-        //String fileContent = fromFileAsString("tests/FT-MasterCaseType-payload.json");
-
-        //caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
-
         AccessTypeRolesDefinition accessTypeRolesDefinition = new AccessTypeRolesDefinition();
         accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition);
         accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId");
         accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName");
         accessTypeRolesDefinition.setGroupRoleName("GroupRoleName");
-        accessTypeRolesDefinition.setCaseAccessGroupIdTemplate("SomeJurisdiction:CIVIL:bulk:[RESPONDENT01SOLICITOR]:$ORGID$");
+        accessTypeRolesDefinition.setCaseAccessGroupIdTemplate("SomeJurisdiction:CIVIL:bulk:"
+            + "[RESPONDENT01SOLICITOR]:$ORGID$");
         accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedField");
 
         List<AccessTypeRolesDefinition> accessTypeRolesDefinitions = new ArrayList<AccessTypeRolesDefinition>();
         accessTypeRolesDefinitions.add(accessTypeRolesDefinition);
 
-        AccessTypeRolesDefinition accessTypeRolesDefinition1 = new AccessTypeRolesDefinition();
         accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition);
         accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId1");
         accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName1");
+
+        AccessTypeRolesDefinition accessTypeRolesDefinition1 = new AccessTypeRolesDefinition();
         accessTypeRolesDefinition1.setGroupRoleName("GroupRoleName1");
-        accessTypeRolesDefinition1.setCaseAccessGroupIdTemplate("SomeJurisdictionCIVIL:bulk:[RESPONDENT01SOLICITOR]:$ORGID$");
+        accessTypeRolesDefinition1.setCaseAccessGroupIdTemplate("SomeJurisdictionCIVIL:bulk:"
+            + "[RESPONDENT01SOLICITOR]:$ORGID$");
         accessTypeRolesDefinition1.setCaseAssignedRoleField("caseAssignedField");
         accessTypeRolesDefinitions.add(accessTypeRolesDefinition1);
 
         caseTypeDefinition.setAccessTypeRolesDefinitions(accessTypeRolesDefinitions);
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUploadWithOrgID.json");
+
         inputCaseDetails.setData(dataMap);
+
+        Map<String, JsonNode> dataOrganisation = Collections.singletonMap("Organisation.OrganisationID",
+            new TextNode("550e8400-e29b-41d4-a716-446655440000"));
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
         doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
