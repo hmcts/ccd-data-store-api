@@ -42,6 +42,8 @@ steps:
     when:
       - runtime-amd64
       - runtime-arm64
+    retries: 3
+    retryDelay: 5
 
   - id: manifest-create
     cmd: docker manifest create {{.Run.Registry}}/{{CI_IMAGE_TAG}} {{.Run.Registry}}/{{CI_IMAGE_TAG}}-amd64 {{.Run.Registry}}/{{CI_IMAGE_TAG}}-arm64
