@@ -37,7 +37,7 @@ java:
           alias: IDAM_DATA_STORE_SYSTEM_USER_PASSWORD
 
   environment:
-    DATA_STORE_DB_PORT: 5432
+    DATA_STORE_DB_PORT: 5055
     DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&sslmode=require&gssEncMode=disable"
