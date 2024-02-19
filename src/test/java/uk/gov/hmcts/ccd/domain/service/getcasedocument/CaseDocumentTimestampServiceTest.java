@@ -82,7 +82,7 @@ class CaseDocumentTimestampServiceTest {
         assertFalse(listDocuments.isEmpty());
         assertEquals(18, listDocuments.size());
 
-        listDocuments.forEach(e -> System.out.println(e.get("document_url")));
+        listDocuments.forEach(e -> System.out.println(e.get(DOCUMENT_URL)));
     }
 
     @Test

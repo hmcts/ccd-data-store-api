@@ -17,8 +17,10 @@ import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.
 public class CaseDocumentTimestampService {
 
     public void addUploadTimestamps(CaseDetails caseDetailsModified, CaseDetails caseDetailsInDb) {
-
-        List<JsonNode> jsonNodes = findNodes(caseDetailsModified.getData().values());
+        List<JsonNode> jsonNodes = new ArrayList<>();
+        if (null != caseDetailsModified && null != caseDetailsModified.getData()) {
+            jsonNodes = findNodes(caseDetailsModified.getData().values());
+        }
         List<String> documentUrlsNew = findUrlsNotInOriginal(caseDetailsModified, caseDetailsInDb);
 
         final String uploadTimestamp = Instant.now().toString();
@@ -28,7 +30,10 @@ public class CaseDocumentTimestampService {
     protected List<String> findUrlsNotInOriginal(CaseDetails caseDetailsModified, CaseDetails caseDetailsInDb) {
         List<String> documentUrlsFromDb = getDocumentUrls(caseDetailsInDb);
 
-        List<JsonNode> jsonNodes = findNodes(caseDetailsModified.getData().values());
+        List<JsonNode> jsonNodes = new ArrayList<>();
+        if (null != caseDetailsModified && null != caseDetailsModified.getData()) {
+            jsonNodes = findNodes(caseDetailsModified.getData().values());
+        }
         List<String> documentUrlsFromRequest = getDocumentUrls(jsonNodes);
 
         return findUrlsNotInOriginal(documentUrlsFromDb, documentUrlsFromRequest);
@@ -46,10 +51,10 @@ public class CaseDocumentTimestampService {
     }
 
     protected List<String> getDocumentUrls(CaseDetails caseDetails) {
-        if (null == caseDetails || null == caseDetails.getData()) {
-            return new ArrayList<>();
+        List<JsonNode> jsonNodes = new ArrayList<>();
+        if (null != caseDetails && null != caseDetails.getData()) {
+            jsonNodes = findNodes(caseDetails.getData().values());
         }
-        List<JsonNode> jsonNodes = findNodes(caseDetails.getData().values());
         return findDocumentUrls(jsonNodes);
     }
 
@@ -70,7 +75,7 @@ public class CaseDocumentTimestampService {
         return documentUrls;
     }
 
-    protected List<JsonNode> findNodes(Collection<JsonNode> nodes) {
+    public List<JsonNode> findNodes(Collection<JsonNode> nodes) {
         return nodes.stream()
             .map(node -> node.findParents(DOCUMENT_URL))
             .flatMap(List::stream)
