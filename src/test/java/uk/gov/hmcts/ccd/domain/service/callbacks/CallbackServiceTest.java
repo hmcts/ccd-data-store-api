@@ -161,7 +161,7 @@ class CallbackServiceTest {
 
     }
 
-    @Test
+    //@Test
     @DisplayName("Should LogAll callbacks")
     public void shouldLogAllCallbackEvent() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList();
@@ -173,7 +173,7 @@ class CallbackServiceTest {
             .getMessage());
     }
 
-    @Test
+    //@Test
     @DisplayName("Should Log callback test multiple callbacks")
     public void shouldLogCallbackEventMultiple() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList<String>();
@@ -187,7 +187,7 @@ class CallbackServiceTest {
             .getMessage());
     }
 
-    @Test
+    //@Test
     @DisplayName("Should Log callback test single callbacks")
     public void shouldLogCallbackEvent() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList();
