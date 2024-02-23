@@ -129,6 +129,9 @@ module "postgresql_v15" {
   component            = var.component
   env                  = var.env
   subnet_suffix        = var.subnet_suffix
+  # Setup Access Reader db user
+  force_user_permissions_trigger = "1"
+
   pgsql_databases = [
     {
       name = var.database_name
