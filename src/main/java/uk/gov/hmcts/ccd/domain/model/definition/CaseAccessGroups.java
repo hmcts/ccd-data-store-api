@@ -1,16 +1,15 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
-@JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,6 +37,19 @@ public class CaseAccessGroups {
         return Objects.hash(
             caseAccessGroups
         );
+    }
+
+    public List<CaseAccessGroupCollectionItem> caseAccessGroupsAsCollection() {
+        List<CaseAccessGroupCollectionItem> all = new ArrayList();
+        for (CaseAccessGroup caseAccessGroup : caseAccessGroups) {
+            CaseAccessGroupCollectionItem ci = CaseAccessGroupCollectionItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(caseAccessGroup)
+                .build();
+            all.add(ci);
+        }
+
+        return all;
     }
 
 }

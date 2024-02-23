@@ -48,6 +48,7 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
     private final List<CategoryDefinition> categories = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
+    @JsonProperty("accessTypeRoles")
     private List<AccessTypeRolesDefinition> accessTypeRolesDefinitions = new ArrayList<>();
 
     public String getId() {

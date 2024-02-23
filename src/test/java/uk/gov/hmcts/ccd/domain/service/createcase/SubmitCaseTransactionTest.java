@@ -456,7 +456,7 @@ class SubmitCaseTransactionTest {
     @Test
     @DisplayName("should create a case With OrganisationID")
     void shouldPersistCreateCaseEventWithOrganisationID() throws IOException {
-        applicationParams.setCaseGroupAccessFilteringEnabled(true);
+        doReturn(true).when(applicationParams).getCaseGroupAccessFilteringEnabled();
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setCaseTypeId("SomeCaseType");
         inputCaseDetails.setJurisdiction("SomeJurisdiction");
@@ -471,7 +471,7 @@ class SubmitCaseTransactionTest {
             IGNORE_WARNING);
 
         AccessTypeRolesDefinition accessTypeRolesDefinition = new AccessTypeRolesDefinition();
-        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition);
+        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
         accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId");
         accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName");
         accessTypeRolesDefinition.setGroupRoleName("GroupRoleName");
@@ -482,7 +482,7 @@ class SubmitCaseTransactionTest {
         List<AccessTypeRolesDefinition> accessTypeRolesDefinitions = new ArrayList<AccessTypeRolesDefinition>();
         accessTypeRolesDefinitions.add(accessTypeRolesDefinition);
 
-        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition);
+        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
         accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId1");
         accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName1");
 
@@ -518,7 +518,6 @@ class SubmitCaseTransactionTest {
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
 
-        applicationParams.setCaseGroupAccessFilteringEnabled(false);
     }
 
 }
