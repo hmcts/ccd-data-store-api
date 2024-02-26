@@ -48,7 +48,10 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
     private final List<CategoryDefinition> categories = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
-    private List<AccessTypeRolesDefinition> accessTypeRolesDefinitions = new ArrayList<>();
+    @JsonProperty("accessTypes")
+    private List<AccessTypeDefinition> accessTypeDefinitions = new ArrayList<>();
+    @JsonProperty("accessTypeRoles")
+    private List<AccessTypeRoleDefinition> accessTypeRoleDefinitions = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -258,14 +261,24 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
         return categories;
     }
 
-    public void setAccessTypeRolesDefinitions(List<AccessTypeRolesDefinition> accessTypeRoles) {
+    public void setAccessTypeRolesDefinitions(List<AccessTypeRoleDefinition> accessTypeRoles) {
         if (accessTypeRoles != null) {
-            this.accessTypeRolesDefinitions.addAll(accessTypeRoles);
+            this.accessTypeRoleDefinitions.addAll(accessTypeRoles);
         }
     }
 
-    public List<AccessTypeRolesDefinition> getAccessTypeRolesDefinitions() {
-        return accessTypeRolesDefinitions;
+    public List<AccessTypeRoleDefinition> getAccessTypeRolesDefinitions() {
+        return accessTypeRoleDefinitions;
+    }
+
+    public void setAccessTypeDefinitions(List<AccessTypeDefinition> accessTypes) {
+        if (accessTypes != null) {
+            this.accessTypeDefinitions.addAll(accessTypes);
+        }
+    }
+
+    public List<AccessTypeDefinition> getAccessTypeDefinitions() {
+        return accessTypeDefinitions;
     }
 
     @JsonIgnore
@@ -293,6 +306,7 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
         copy.setCategories(createCopyList(this.getCategories()));
         copy.setRoleToAccessProfiles(createCopyList(this.getRoleToAccessProfiles()));
         copy.setAccessTypeRolesDefinitions(createCopyList(this.getAccessTypeRolesDefinitions()));
+        copy.setAccessTypeDefinitions(createCopyList(this.getAccessTypeDefinitions()));
 
         return copy;
     }

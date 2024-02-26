@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -17,8 +18,9 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class AccessTypeRolesDefinition implements Serializable, Copyable<AccessTypeRolesDefinition> {
+public class AccessTypeRoleDefinition implements Serializable, Copyable<AccessTypeRoleDefinition> {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -32,7 +34,7 @@ public class AccessTypeRolesDefinition implements Serializable, Copyable<AccessT
     private LocalDate liveTo;
 
     @JsonProperty("case_type_id")
-    private CaseTypeDefinition caseTypeId;
+    private String caseTypeId;
 
     @JsonProperty("access_type_id")
     private String accessTypeId;
@@ -57,8 +59,8 @@ public class AccessTypeRolesDefinition implements Serializable, Copyable<AccessT
 
     @JsonIgnore
     @Override
-    public AccessTypeRolesDefinition createCopy() {
-        return new AccessTypeRolesDefinition(
+    public AccessTypeRoleDefinition createCopy() {
+        return new AccessTypeRoleDefinition(
             this.id,
             this.liveFrom != null ? LocalDate.from(this.liveFrom) : null,
             this.liveTo != null ? LocalDate.from(this.liveTo) : null,

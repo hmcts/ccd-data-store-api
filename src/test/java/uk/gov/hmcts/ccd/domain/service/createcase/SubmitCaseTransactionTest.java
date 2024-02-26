@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRolesDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRoleDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -61,10 +63,8 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
@@ -456,7 +456,7 @@ class SubmitCaseTransactionTest {
     @Test
     @DisplayName("should create a case With OrganisationID")
     void shouldPersistCreateCaseEventWithOrganisationID() throws IOException {
-        applicationParams.setCaseGroupAccessFilteringEnabled(true);
+        doReturn(true).when(applicationParams).getCaseGroupAccessFilteringEnabled();
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setCaseTypeId("SomeCaseType");
         inputCaseDetails.setJurisdiction("SomeJurisdiction");
@@ -470,23 +470,23 @@ class SubmitCaseTransactionTest {
             caseTypeDefinition,
             IGNORE_WARNING);
 
-        AccessTypeRolesDefinition accessTypeRolesDefinition = new AccessTypeRolesDefinition();
-        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition);
+        AccessTypeRoleDefinition accessTypeRolesDefinition = new AccessTypeRoleDefinition();
+        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
         accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId");
         accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName");
         accessTypeRolesDefinition.setGroupRoleName("GroupRoleName");
         accessTypeRolesDefinition.setCaseAccessGroupIdTemplate("SomeJurisdiction:CIVIL:bulk:"
             + "[RESPONDENT01SOLICITOR]:$ORGID$");
-        accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedField");
+          accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedField");
 
-        List<AccessTypeRolesDefinition> accessTypeRolesDefinitions = new ArrayList<AccessTypeRolesDefinition>();
+        List<AccessTypeRoleDefinition> accessTypeRolesDefinitions = new ArrayList<AccessTypeRoleDefinition>();
         accessTypeRolesDefinitions.add(accessTypeRolesDefinition);
 
-        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition);
+        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
         accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId1");
         accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName1");
 
-        AccessTypeRolesDefinition accessTypeRolesDefinition1 = new AccessTypeRolesDefinition();
+        AccessTypeRoleDefinition accessTypeRolesDefinition1 = new AccessTypeRoleDefinition();
         accessTypeRolesDefinition1.setGroupRoleName("GroupRoleName1");
         accessTypeRolesDefinition1.setCaseAccessGroupIdTemplate("SomeJurisdictionCIVIL:bulk:"
             + "[RESPONDENT01SOLICITOR]:$ORGID$");
@@ -499,8 +499,10 @@ class SubmitCaseTransactionTest {
 
         inputCaseDetails.setData(dataMap);
 
-        Map<String, JsonNode> dataOrganisation = Collections.singletonMap("Organisation.OrganisationID",
-            new TextNode("550e8400-e29b-41d4-a716-446655440000"));
+        //Map<String, JsonNode> dataOrganisation = Collections.singletonMap("Organisation.OrganisationID",
+        //    new TextNode("550e8400-e29b-41d4-a716-446655440000"));
+        Map<String, JsonNode> dataOrganisation = organisationPolicyCaseData("caseAssignedField", "\"550e8400-e29b-41d4-a716-446655440000\"");
+
         JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
@@ -518,7 +520,24 @@ class SubmitCaseTransactionTest {
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
 
-        applicationParams.setCaseGroupAccessFilteringEnabled(false);
+    }
+
+    private Map<String, JsonNode> organisationPolicyCaseData(String role, String organisationId)
+        throws JsonProcessingException {
+
+        JsonNode data = MAPPER.readTree(""
+            + "{"
+            + "  \"Organisation\": {"
+            + "    \"OrganisationID\": " + organisationId + ","
+            + "    \"OrganisationName\": \"OrganisationName1\""
+            + "  },"
+            + "  \"OrgPolicyReference\": null,"
+            + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\""
+            + "}");
+
+        Map<String, JsonNode> result = new HashMap<>();
+        result.put("OrganisationPolicyField", data);
+        return result;
     }
 
 }

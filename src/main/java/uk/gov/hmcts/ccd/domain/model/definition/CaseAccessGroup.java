@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
-@JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
