@@ -61,10 +61,12 @@ public class CaseAccessGroupUtils {
 
             }
 
-            CaseAccessGroups groups = CaseAccessGroups.builder().caseAccessGroups(caseAccessGroups).build();
-            JsonNode node = mapper.convertValue(groups, JsonNode.class);
-            caseDetails.getData().put(CASE_ACCESS_GROUPS, node);
-            groups.getCaseAccessGroups();
+            if (!caseAccessGroups.isEmpty()) {
+                CaseAccessGroups groups = CaseAccessGroups.builder().caseAccessGroups(caseAccessGroups).build();
+                JsonNode node = mapper.convertValue(groups, JsonNode.class);
+                caseDetails.getData().put(CASE_ACCESS_GROUPS, node);
+                groups.getCaseAccessGroups();
+            }
 
         }
 

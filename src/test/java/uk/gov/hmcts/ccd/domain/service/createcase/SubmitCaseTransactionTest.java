@@ -7,11 +7,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -63,7 +60,10 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
@@ -477,7 +477,7 @@ class SubmitCaseTransactionTest {
         accessTypeRolesDefinition.setGroupRoleName("GroupRoleName");
         accessTypeRolesDefinition.setCaseAccessGroupIdTemplate("SomeJurisdiction:CIVIL:bulk:"
             + "[RESPONDENT01SOLICITOR]:$ORGID$");
-          accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedField");
+        accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedField");
 
         List<AccessTypeRoleDefinition> accessTypeRolesDefinitions = new ArrayList<AccessTypeRoleDefinition>();
         accessTypeRolesDefinitions.add(accessTypeRolesDefinition);
@@ -501,7 +501,8 @@ class SubmitCaseTransactionTest {
 
         //Map<String, JsonNode> dataOrganisation = Collections.singletonMap("Organisation.OrganisationID",
         //    new TextNode("550e8400-e29b-41d4-a716-446655440000"));
-        Map<String, JsonNode> dataOrganisation = organisationPolicyCaseData("caseAssignedField", "\"550e8400-e29b-41d4-a716-446655440000\"");
+        Map<String, JsonNode> dataOrganisation = organisationPolicyCaseData("caseAssignedField",
+            "\"550e8400-e29b-41d4-a716-446655440000\"");
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
