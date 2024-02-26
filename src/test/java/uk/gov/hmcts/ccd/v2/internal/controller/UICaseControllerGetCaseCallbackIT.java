@@ -125,7 +125,7 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_CASE)
                 .contentType(JSON_CONTENT_TYPE)
                 .headers(headers))
-            .andExpect(status().is(504))
+            .andExpect(status().isBadGateway())
             .andReturn();
     }
 
@@ -133,7 +133,7 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = { "classpath:sql/insert_cases.sql" })
-    public void shouldReturn504WhenReceivedErrorResponseFromCallback() throws Exception {
+    public void shouldReturnBadGatewayWhenReceivedErrorResponseFromCallback() throws Exception {
 
         stubFor(post(urlMatching(GET_CASE_CALLBACK + ".*"))
             .willReturn(aResponse().withStatus(500)));
@@ -141,7 +141,7 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_CASE)
                 .contentType(JSON_CONTENT_TYPE)
                 .headers(headers))
-            .andExpect(status().is(504))
+            .andExpect(status().isBadGateway())
             .andReturn();
     }
 
@@ -150,7 +150,7 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = { "classpath:sql/insert_cases.sql" })
-    public void shouldReturn504WhenGetCaseCallbackResponseReturns200ButInvalidResponseBody() throws Exception {
+    public void shouldReturnBadGatewayWhenGetCaseCallbackResponseReturns200ButInvalidResponseBody() throws Exception {
 
         stubFor(post(urlMatching(GET_CASE_CALLBACK + ".*"))
             .willReturn(okJson(getCaseCallbackJsonInvalidResponse())));
@@ -158,7 +158,7 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_CASE)
                 .contentType(JSON_CONTENT_TYPE)
                 .headers(headers))
-            .andExpect(status().is(504))
+            .andExpect(status().isBadGateway())
             .andReturn();
     }
 
@@ -167,7 +167,8 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = { "classpath:sql/insert_cases.sql" })
-    public void shouldReturn504WhenGetCaseCallbackResponseContainsMetadataFieldWithAnExistingId() throws Exception {
+    public void shouldReturnBadGatewayWhenGetCaseCallbackResponseContainsMetadataFieldWithAnExistingId()
+        throws Exception {
 
         stubFor(post(urlMatching(GET_CASE_CALLBACK + ".*"))
             .willReturn(okJson(getCaseCallbackJsonResponse("[CREATED_DATE]"))));
@@ -175,7 +176,7 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_CASE)
                 .contentType(JSON_CONTENT_TYPE)
                 .headers(headers))
-            .andExpect(status().is(504))
+            .andExpect(status().isBadGateway())
             .andReturn();
     }
 

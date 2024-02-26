@@ -143,9 +143,7 @@ public abstract class AbstractBaseIntegrationTest {
     public void initMock() throws IOException {
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
-        ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(roleAssignmentRepository, "securityUtils", securityUtils);
-        ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(documentManagementRestClient, "securityUtils", securityUtils);
@@ -332,7 +330,7 @@ public abstract class AbstractBaseIntegrationTest {
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
                                         String caseReference, String eventId) {
-        return generateEventToken(template, userId, jurisdictionId, caseTypeId, new Long(caseReference), eventId);
+        return generateEventToken(template, userId, jurisdictionId, caseTypeId, Long.valueOf(caseReference), eventId);
     }
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
@@ -365,7 +363,7 @@ public abstract class AbstractBaseIntegrationTest {
     }
 
     protected CaseDetails getCase(JdbcTemplate template, String caseReference) {
-        return getCase(template, new Long(caseReference));
+        return getCase(template, Long.valueOf(caseReference));
     }
 
     protected CaseDetails getCase(JdbcTemplate template, Long caseReference) {

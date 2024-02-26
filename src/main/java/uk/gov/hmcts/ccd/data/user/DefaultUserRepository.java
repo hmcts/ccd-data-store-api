@@ -43,6 +43,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefaultCollection;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -136,7 +137,7 @@ public class DefaultUserRepository implements UserRepository {
                 .getBody();
 
             if (userDefaultCollection == null || isEmpty(userDefaultCollection.getUserDefaults())) {
-                LOG.error("User Profile not exists for userId '{}'", userId);
+                LOG.debug("User Profile not exists for userId '{}'", userId);
                 return null;
             }
 
@@ -169,6 +170,12 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public String getUserId() {
         return securityUtils.getUserId();
+    }
+
+    @Override
+    public IdamUser getUserByUserId(String userId) {
+        UserDetails userDetails = securityUtils.getUserByUserId(userId);
+        return toIdamUser(userDetails);
     }
 
     @Override
@@ -235,6 +242,16 @@ public class DefaultUserRepository implements UserRepository {
         idamUser.setEmail(userInfo.getSub());
         idamUser.setForename(userInfo.getGivenName());
         idamUser.setSurname(userInfo.getFamilyName());
+        return idamUser;
+    }
+
+    private IdamUser toIdamUser(UserDetails userDetails) {
+        IdamUser idamUser = new IdamUser();
+        idamUser.setId(userDetails.getId());
+        idamUser.setEmail(userDetails.getEmail());
+        idamUser.setForename(userDetails.getForename());
+        Optional<String> surName = userDetails.getSurname();
+        idamUser.setSurname(surName.isPresent() ? surName.get() : null);
         return idamUser;
     }
 

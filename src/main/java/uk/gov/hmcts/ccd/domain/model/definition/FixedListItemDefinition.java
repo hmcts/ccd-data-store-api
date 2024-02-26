@@ -2,12 +2,13 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "")
-public class FixedListItemDefinition implements Serializable {
+public class FixedListItemDefinition implements Serializable, Copyable<FixedListItemDefinition> {
 
     private static final long serialVersionUID = 6196146295016140921L;
     private String code = null;
@@ -41,5 +42,15 @@ public class FixedListItemDefinition implements Serializable {
 
     public void setOrder(final String order) {
         this.order = order;
+    }
+
+    @JsonIgnore
+    @Override
+    public FixedListItemDefinition createCopy() {
+        FixedListItemDefinition copy = new FixedListItemDefinition();
+        copy.setCode(this.code);
+        copy.setLabel(this.label);
+        copy.setOrder(this.order);
+        return copy;
     }
 }

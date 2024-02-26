@@ -89,7 +89,7 @@ public class CaseAssignedUserRolesController {
             code = 201,
             message = ADD_SUCCESS_MESSAGE,
             response = CaseAssignedUserRolesResponse.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:\n"
@@ -98,21 +98,21 @@ public class CaseAssignedUserRolesController {
                 + "3. " + V2.Error.USER_ID_INVALID + ": has to be a string of length > 0, \n"
                 + "4. " + V2.Error.CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square brackets, \n"
                 + "5. " + V2.Error.ORGANISATION_ID_INVALID + ": has to be a non-empty string, when present."
-        ),
+            ),
         @ApiResponse(
             code = 401,
             message = V2.Error.AUTHENTICATION_TOKEN_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = "One of the following reasons:\n"
                 + "1. " + V2.Error.UNAUTHORISED_S2S_SERVICE + "\n"
                 + "2. " + V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.CASE_NOT_FOUND
-        )
+            )
     })
     @LogAudit(
         operationType = ADD_CASE_ASSIGNED_USER_ROLES,
@@ -146,7 +146,7 @@ public class CaseAssignedUserRolesController {
             code = 200,
             message = REMOVE_SUCCESS_MESSAGE,
             response = CaseAssignedUserRolesResponse.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:\n"
@@ -156,21 +156,21 @@ public class CaseAssignedUserRolesController {
                 + "4. " + V2.Error.CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square "
                 + "brackets, \n"
                 + "5. " + V2.Error.ORGANISATION_ID_INVALID + ": has to be a non-empty string, when present."
-        ),
+            ),
         @ApiResponse(
             code = 401,
             message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = "One of the following reasons:\n"
                 + "1. Unauthorised S2S service \n"
                 + "2. " + V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.CASE_NOT_FOUND
-        )
+            )
     })
     @LogAudit(
         operationType = REMOVE_CASE_ASSIGNED_USER_ROLES,
@@ -215,18 +215,18 @@ public class CaseAssignedUserRolesController {
             code = 200,
             message = "Case-User-Role assignments returned successfully",
             response = CaseAssignedUserRolesResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:\n"
                 + "1. " + V2.Error.CASE_ID_INVALID + ", \n"
                 + "2. " + V2.Error.EMPTY_CASE_ID_LIST + ", \n"
                 + "3. " + V2.Error.USER_ID_INVALID + "."
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = V2.Error.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED
-        )
+            )
     })
     @LogAudit(
         operationType = GET_CASE_ASSIGNED_USER_ROLES,
@@ -260,18 +260,18 @@ public class CaseAssignedUserRolesController {
             code = 200,
             message = "Case-User-Role assignments returned successfully",
             response = CaseAssignedUserRolesResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:\n"
                 + "1. " + V2.Error.CASE_ID_INVALID + ", \n"
                 + "2. " + V2.Error.EMPTY_CASE_ID_LIST + ", \n"
                 + "3. " + V2.Error.USER_ID_INVALID + "."
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = V2.Error.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED
-        )
+            )
     })
     @LogAudit(
         operationType = GET_CASE_ASSIGNED_USER_ROLES,
