@@ -42,7 +42,7 @@ public class CaseAccessGroupUtils {
             removeCCDAllCasesAccessFromCaseAccessGroups(caseDetails);
 
             List<AccessTypeRoleDefinition> accessTypeRoleDefinitions =
-                caseTypeDefinition.getAccessTypeRolesDefinitions();
+                caseTypeDefinition.getAccessTypeRoleDefinitions();
             List<AccessTypeRoleDefinition> filteredAccessTypeRolesDefinitions = filterAccessRoles(caseDetails,
                 accessTypeRoleDefinitions);
 

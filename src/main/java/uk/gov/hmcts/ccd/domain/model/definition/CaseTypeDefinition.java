@@ -261,13 +261,13 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
         return categories;
     }
 
-    public void setAccessTypeRolesDefinitions(List<AccessTypeRoleDefinition> accessTypeRoles) {
+    public void setAccessTypeRoleDefinitions(List<AccessTypeRoleDefinition> accessTypeRoles) {
         if (accessTypeRoles != null) {
             this.accessTypeRoleDefinitions.addAll(accessTypeRoles);
         }
     }
 
-    public List<AccessTypeRoleDefinition> getAccessTypeRolesDefinitions() {
+    public List<AccessTypeRoleDefinition> getAccessTypeRoleDefinitions() {
         return accessTypeRoleDefinitions;
     }
 
@@ -305,7 +305,7 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
         copy.setSearchCriterias(createCopyList(this.getSearchCriterias()));
         copy.setCategories(createCopyList(this.getCategories()));
         copy.setRoleToAccessProfiles(createCopyList(this.getRoleToAccessProfiles()));
-        copy.setAccessTypeRolesDefinitions(createCopyList(this.getAccessTypeRolesDefinitions()));
+        copy.setAccessTypeRoleDefinitions(createCopyList(this.getAccessTypeRoleDefinitions()));
         copy.setAccessTypeDefinitions(createCopyList(this.getAccessTypeDefinitions()));
 
         return copy;

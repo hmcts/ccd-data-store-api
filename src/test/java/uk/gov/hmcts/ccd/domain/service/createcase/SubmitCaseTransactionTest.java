@@ -498,7 +498,7 @@ class SubmitCaseTransactionTest {
         accessTypeRolesDefinition1.setCaseAssignedRoleField("caseAssignedField");
         accessTypeRolesDefinitions.add(accessTypeRolesDefinition1);
 
-        caseTypeDefinition.setAccessTypeRolesDefinitions(accessTypeRolesDefinitions);
+        caseTypeDefinition.setAccessTypeRoleDefinitions(accessTypeRolesDefinitions);
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUploadWithOrgID.json");
 
@@ -568,7 +568,7 @@ class SubmitCaseTransactionTest {
         accessTypeRolesDefinition1.setCaseAssignedRoleField("caseAssignedField");
         accessTypeRolesDefinitions.add(accessTypeRolesDefinition1);
 
-        caseTypeDefinition.setAccessTypeRolesDefinitions(accessTypeRolesDefinitions);
+        caseTypeDefinition.setAccessTypeRoleDefinitions(accessTypeRolesDefinitions);
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUploadWithOrgID.json");
 
@@ -646,7 +646,7 @@ class SubmitCaseTransactionTest {
         accessTypeRolesDefinition1.setCaseAssignedRoleField("caseAssignedField");
         accessTypeRolesDefinitions.add(accessTypeRolesDefinition1);
 
-        caseTypeDefinition.setAccessTypeRolesDefinitions(accessTypeRolesDefinitions);
+        caseTypeDefinition.setAccessTypeRoleDefinitions(accessTypeRolesDefinitions);
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUploadWithOrgID.json");
 
