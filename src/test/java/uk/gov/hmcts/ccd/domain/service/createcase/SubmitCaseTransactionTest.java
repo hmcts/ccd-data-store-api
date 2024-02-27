@@ -583,9 +583,9 @@ class SubmitCaseTransactionTest {
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
-        String caseAccessGroupType = "\"CCD:all-cases-access\"";
-        String caseAccessGroupID = "\"SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
-            + " 550e8400-e29b-41d4-a716-446655440000\"";
+        String caseAccessGroupType = "CCD:all-cases-access";
+        String caseAccessGroupID = "SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
+            + " 550e8400-e29b-41d4-a716-446655440000";
         Map<String, JsonNode> dataCaseAccessGroup = caseAccessGroupCaseData(caseAccessGroupType,
             caseAccessGroupID);
 
@@ -707,29 +707,15 @@ class SubmitCaseTransactionTest {
         caseAccessGroupsList.add(caseAccessGroup);
 
         caseAccessGroup = new CaseAccessGroup();
-        caseAccessGroup.setCaseAccessGroupType("\"CCD:all-cases-access\"");
-        caseAccessGroup.setCaseAccessGroupId("\"SomeJurisdictionCIVIL:bulk: [RESPONDENT02SOLICITOR]:"
-            + " 550e8400-e29b-41d4-a716-446655440000\"");
+        caseAccessGroup.setCaseAccessGroupType("CCD:all-cases-access");
+        caseAccessGroup.setCaseAccessGroupId("SomeJurisdictionCIVIL:bulk: [RESPONDENT02SOLICITOR]:"
+            + " 550e8400-e29b-41d4-a716-446655440000");
 
         caseAccessGroupsList.add(caseAccessGroup);
 
         CaseAccessGroups caseAccessGroups = new CaseAccessGroups();
         caseAccessGroups.setCaseAccessGroups(caseAccessGroupsList);
 
-        /*
-        JsonNode data = MAPPER.readTree(""
-            + "{"
-            + "  \"caseAccessGroups\": [{"
-            + "    \"caseAccessGroupType\": " + caseAccessGroupType + ","
-            + "    \"caseAccessGroupId\": " + caseAccessGroupID
-            + "  },"
-            + "  {"
-            + "    \"caseAccessGroupType\": \"CCD:all-cases-access\","
-            + "    \"caseAccessGroupId\": \"SomeJurisdictionCIVIL:bulk: [RESPONDENT02SOLICITOR]:"
-            + " 550e8400-e29b-41d4-a716-446655440000\""
-            + "  }]"
-            + "}");
-            */
         ObjectMapper mapper = new ObjectMapper();
         JsonNode data  = mapper.convertValue(caseAccessGroups, JsonNode.class);
         Map<String, JsonNode> result = new HashMap<>();

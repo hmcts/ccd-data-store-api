@@ -96,22 +96,21 @@ public class CaseAccessGroupUtils {
             ArrayNode caseAccessGroupsArrayNodes = (ArrayNode) caseAccessGroupsJsonNodes.get(CASE_ACCESS_GROUPS);
             if (caseAccessGroupsArrayNodes != null && !caseAccessGroupsArrayNodes.isEmpty()) {
                 for (int i = 0; i < caseAccessGroupsArrayNodes.size(); i++) {
-                    final JsonNode valueNode = caseAccessGroupsArrayNodes.get(i).get("value");
-                    if (valueNode != null) {
-                        final String caseAccessGroupType = getValueFromPath(CASE_ACCESS_GROUP_TYPE, valueNode);
-                        if (caseAccessGroupType.equals(CCD_ALL_CASES)) {
+                    final JsonNode caseAccessGroupTypeValueNode = caseAccessGroupsArrayNodes.get(i).get(CASE_ACCESS_GROUP_TYPE);
+                    if (caseAccessGroupTypeValueNode != null) {
+                         if (caseAccessGroupTypeValueNode.textValue().equals(CCD_ALL_CASES)) {
                             caseAccessGroupsArrayNodes.remove(i);
+                            i--;
                         }
                     }
                 }
+                if (caseAccessGroupsArrayNodes.isEmpty()){
+                    caseDetails.getData().remove(CASE_ACCESS_GROUPS);
+                }
+
             }
         }
 
-        if (caseDetails.getData() != null
-            && caseDetails.getData().get(CASE_ACCESS_GROUPS) != null
-            && caseDetails.getData().get(CASE_ACCESS_GROUPS).isEmpty()) {
-            caseDetails.getData().remove(CASE_ACCESS_GROUPS);
-        }
     }
 
     private List<AccessTypeRoleDefinition> filterAccessRoles(
