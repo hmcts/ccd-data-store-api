@@ -31,6 +31,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRoleDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroup;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroups;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -696,6 +698,25 @@ class SubmitCaseTransactionTest {
 
     private Map<String, JsonNode> caseAccessGroupCaseData(String caseAccessGroupType, String caseAccessGroupID)
         throws JsonProcessingException {
+
+        CaseAccessGroup caseAccessGroup = new CaseAccessGroup();
+        caseAccessGroup.setCaseAccessGroupType(caseAccessGroupType);
+        caseAccessGroup.setCaseAccessGroupId(caseAccessGroupID);
+
+        List<CaseAccessGroup> caseAccessGroupsList = new ArrayList<>();
+        caseAccessGroupsList.add(caseAccessGroup);
+
+        caseAccessGroup = new CaseAccessGroup();
+        caseAccessGroup.setCaseAccessGroupType("\"CCD:all-cases-access\"");
+        caseAccessGroup.setCaseAccessGroupId("\"SomeJurisdictionCIVIL:bulk: [RESPONDENT02SOLICITOR]:"
+            + " 550e8400-e29b-41d4-a716-446655440000\"");
+
+        caseAccessGroupsList.add(caseAccessGroup);
+
+        CaseAccessGroups caseAccessGroups = new CaseAccessGroups();
+        caseAccessGroups.setCaseAccessGroups(caseAccessGroupsList);
+
+        /*
         JsonNode data = MAPPER.readTree(""
             + "{"
             + "  \"caseAccessGroups\": [{"
@@ -708,7 +729,9 @@ class SubmitCaseTransactionTest {
             + " 550e8400-e29b-41d4-a716-446655440000\""
             + "  }]"
             + "}");
-
+            */
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode data  = mapper.convertValue(caseAccessGroups, JsonNode.class);
         Map<String, JsonNode> result = new HashMap<>();
         result.put("caseAccessGroups", data);
         return result;

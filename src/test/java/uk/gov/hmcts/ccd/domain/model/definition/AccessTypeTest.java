@@ -10,7 +10,9 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -98,4 +100,23 @@ class AccessTypeTest {
             .when(caseTypeDefinition).getAccessTypeRoleDefinitions();
     }
 
+    @Test
+    public void testAccessTypeRoleDefinitionCreateCopy() {
+        AccessTypeRoleDefinition p1 = new AccessTypeRoleDefinition();
+
+        Map<AccessTypeRoleDefinition, String> map = new HashMap<>();
+        map.put(p1, "dummy");
+
+        AccessTypeRoleDefinition p2 = p1.createCopy();
+        assertEquals("dummy", map.get(p2));
+    }
+
+    @Test
+    public void testAccessTypeDefinitionCreateCopy() {
+        AccessTypeDefinition p1 = new AccessTypeDefinition();
+        Map<AccessTypeDefinition, String> map = new HashMap<>();
+        map.put(p1, "dummy");
+        AccessTypeDefinition p2 = p1.createCopy();
+        assertEquals("dummy", map.get(p2));
+    }
 }
