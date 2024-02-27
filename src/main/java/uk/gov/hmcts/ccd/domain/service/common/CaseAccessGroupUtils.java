@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.config.JacksonUtils.getValueFromPath;
-
 public class CaseAccessGroupUtils {
 
     public static final String CASE_ACCESS_GROUPS = "caseAccessGroups";
@@ -96,15 +94,16 @@ public class CaseAccessGroupUtils {
             ArrayNode caseAccessGroupsArrayNodes = (ArrayNode) caseAccessGroupsJsonNodes.get(CASE_ACCESS_GROUPS);
             if (caseAccessGroupsArrayNodes != null && !caseAccessGroupsArrayNodes.isEmpty()) {
                 for (int i = 0; i < caseAccessGroupsArrayNodes.size(); i++) {
-                    final JsonNode caseAccessGroupTypeValueNode = caseAccessGroupsArrayNodes.get(i).get(CASE_ACCESS_GROUP_TYPE);
+                    final JsonNode caseAccessGroupTypeValueNode = caseAccessGroupsArrayNodes.get(i)
+                        .get(CASE_ACCESS_GROUP_TYPE);
                     if (caseAccessGroupTypeValueNode != null) {
-                         if (caseAccessGroupTypeValueNode.textValue().equals(CCD_ALL_CASES)) {
+                        if (caseAccessGroupTypeValueNode.textValue().equals(CCD_ALL_CASES)) {
                             caseAccessGroupsArrayNodes.remove(i);
                             i--;
                         }
                     }
                 }
-                if (caseAccessGroupsArrayNodes.isEmpty()){
+                if (caseAccessGroupsArrayNodes.isEmpty()) {
                     caseDetails.getData().remove(CASE_ACCESS_GROUPS);
                 }
 
