@@ -500,7 +500,7 @@ class SubmitCaseTransactionTest {
 
         caseTypeDefinition.setAccessTypeRoleDefinitions(accessTypeRolesDefinitions);
 
-        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUploadWithOrgID.json");
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
 
         inputCaseDetails.setData(dataMap);
 
@@ -570,7 +570,7 @@ class SubmitCaseTransactionTest {
 
         caseTypeDefinition.setAccessTypeRoleDefinitions(accessTypeRolesDefinitions);
 
-        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUploadWithOrgID.json");
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
 
         inputCaseDetails.setData(dataMap);
 
@@ -648,7 +648,7 @@ class SubmitCaseTransactionTest {
 
         caseTypeDefinition.setAccessTypeRoleDefinitions(accessTypeRolesDefinitions);
 
-        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUploadWithOrgID.json");
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
 
         inputCaseDetails.setData(dataMap);
 
