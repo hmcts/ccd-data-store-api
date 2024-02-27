@@ -5,10 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Builder
 @AllArgsConstructor
@@ -37,19 +35,6 @@ public class CaseAccessGroups {
         return Objects.hash(
             caseAccessGroups
         );
-    }
-
-    public List<CaseAccessGroupCollectionItem> caseAccessGroupsAsCollection() {
-        List<CaseAccessGroupCollectionItem> all = new ArrayList();
-        for (CaseAccessGroup caseAccessGroup : caseAccessGroups) {
-            CaseAccessGroupCollectionItem ci = CaseAccessGroupCollectionItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(caseAccessGroup)
-                .build();
-            all.add(ci);
-        }
-
-        return all;
     }
 
 }
