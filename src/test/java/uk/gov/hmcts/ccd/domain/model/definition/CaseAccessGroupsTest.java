@@ -12,7 +12,9 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class CaseAccessGroupsTest {
 
@@ -73,5 +75,30 @@ class CaseAccessGroupsTest {
         assertTrue(p1.equals(p2));
         assertEquals("dummy", map.get(p2));
     }
+
+    @Test
+    public void testCaseAccessGroupsHaseCodeNull() {
+        CaseAccessGroups p1 = new CaseAccessGroups();
+
+        Map<CaseAccessGroups, String> map = new HashMap<>();
+        map.put(p1, "dummy");
+
+        CaseAccessGroups p2 = null;
+        assertFalse(p1.equals(p2));
+        assertNotEquals("dummy", map.get(p2));
+    }
+
+    @Test
+    public void testCaseAccessGroupHaseCodeNull() {
+        CaseAccessGroup p1 = new CaseAccessGroup();
+
+        Map<CaseAccessGroup, String> map = new HashMap<>();
+        map.put(p1, "dummy");
+
+        Object p2 = null;
+        assertFalse(p1.equals(p2));
+        assertNotEquals("dummy", map.get(p2));
+    }
+
 
 }
