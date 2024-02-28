@@ -28,10 +28,6 @@ public class CaseAccessGroupUtils {
 
     private CaseTypeDefinition caseTypeDefinition;
 
-    public CaseAccessGroupUtils() {
-
-    }
-
     public void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
 
         this.caseTypeDefinition = caseTypeDefinition;

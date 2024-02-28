@@ -50,13 +50,26 @@ class CaseAccessGroupsTest {
     }
 
     @Test
-    public void testCaseAccessHaseCode() {
+    public void testCaseAccessGroupsHaseCode() {
         CaseAccessGroups p1 = new CaseAccessGroups();
 
         Map<CaseAccessGroups, String> map = new HashMap<>();
         map.put(p1, "dummy");
 
         CaseAccessGroups p2 = new CaseAccessGroups();
+        p1.equals(p2);
+        assertEquals("dummy", map.get(p2));
+    }
+
+    @Test
+    public void testCaseAccessGroupHaseCode() {
+        CaseAccessGroup p1 = new CaseAccessGroup();
+
+        Map<CaseAccessGroup, String> map = new HashMap<>();
+        map.put(p1, "dummy");
+
+        CaseAccessGroup p2 = new CaseAccessGroup();
+        p1.equals(p2);
         assertEquals("dummy", map.get(p2));
     }
 
