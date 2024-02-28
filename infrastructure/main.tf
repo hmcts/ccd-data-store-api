@@ -118,7 +118,7 @@ module "data-store-db-v11" {
 
 
 module "postgresql_v15" {
-  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
+  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=add-auto-grow-option"
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
   }
@@ -148,6 +148,7 @@ module "postgresql_v15" {
   name             = "${local.app_full_name}-postgres-db-v15"
   pgsql_sku        = var.pgsql_sku
   pgsql_storage_mb = var.pgsql_storage_mb
+  auto_grow_enabled = var.auto_grow_enabled
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER-V15" {
