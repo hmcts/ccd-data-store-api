@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -61,12 +62,15 @@ class AccessTypeTest {
         List<AccessTypeDefinition> accessTypes = new ArrayList<>();
         accessTypes.add(
             AccessTypeDefinition.builder()
+                .liveFrom(LocalDate.now())
+                .liveTo(LocalDate.now())
                 .accessTypeId("default")
                 .accessDefault(true)
                 .accessMandatory(true)
                 .description("description test")
                 .display(true)
                 .displayOrder(10)
+                .hint("hint")
                 .organisationProfileId("SOLICITOR_PROFILE")
                 .build());
         caseTypeDefinition.setAccessTypeDefinitions(accessTypes);
@@ -83,6 +87,8 @@ class AccessTypeTest {
         List<AccessTypeRoleDefinition> accessTypeRoles = new ArrayList<>();
         accessTypeRoles.add(
             AccessTypeRoleDefinition.builder()
+                .liveFrom(LocalDate.now())
+                .liveTo(LocalDate.now())
                 .accessTypeId("default")
                 .groupRoleName("groupRoleName")
                 .organisationalRoleName("OrgRoleName")

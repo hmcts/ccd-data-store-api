@@ -92,11 +92,10 @@ public class CaseAccessGroupUtils {
                 for (int i = 0; i < caseAccessGroupsArrayNodes.size(); i++) {
                     final JsonNode caseAccessGroupTypeValueNode = caseAccessGroupsArrayNodes.get(i)
                         .get(CASE_ACCESS_GROUP_TYPE);
-                    if (caseAccessGroupTypeValueNode != null) {
-                        if (caseAccessGroupTypeValueNode.textValue().equals(CCD_ALL_CASES)) {
-                            caseAccessGroupsArrayNodes.remove(i);
-                            i--;
-                        }
+                    if (caseAccessGroupTypeValueNode != null
+                        && caseAccessGroupTypeValueNode.textValue().equals(CCD_ALL_CASES)) {
+                        caseAccessGroupsArrayNodes.remove(i);
+                        i--;
                     }
                 }
                 if (caseAccessGroupsArrayNodes.isEmpty()) {

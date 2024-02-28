@@ -12,6 +12,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CaseAccessGroupsTest {
 
@@ -57,7 +58,7 @@ class CaseAccessGroupsTest {
         map.put(p1, "dummy");
 
         CaseAccessGroups p2 = p1;
-        p1.equals(p2);
+        assertTrue(p1.equals(p2));
         assertEquals("dummy", map.get(p2));
     }
 
@@ -69,7 +70,7 @@ class CaseAccessGroupsTest {
         map.put(p1, "dummy");
 
         CaseAccessGroup p2 = p1;
-        p1.equals(p2);
+        assertTrue(p1.equals(p2));
         assertEquals("dummy", map.get(p2));
     }
 
