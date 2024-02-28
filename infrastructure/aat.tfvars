@@ -4,5 +4,6 @@ database_sku_capacity    = "8"
 database_storage_mb      = "356352"
 
 pgsql_sku        = "MO_Standard_E8ds_v4"
-pgsql_storage_mb = 1048576 
+pgsql_storage_mb = 1048576
+auto_grow_enabled = true 
 subnet_suffix = "expanded"
