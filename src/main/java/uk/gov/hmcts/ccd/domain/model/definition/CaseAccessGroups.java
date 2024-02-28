@@ -27,7 +27,7 @@ public class CaseAccessGroups {
             return false;
         }
         CaseAccessGroups caseAccessGroup = (CaseAccessGroups) o;
-        return Objects.equals(caseAccessGroup, caseAccessGroup);
+        return Objects.equals(caseAccessGroup.getCaseAccessGroups(), caseAccessGroup.getCaseAccessGroups());
     }
 
     @Override
