@@ -31,7 +31,7 @@ public class CaseAccessGroupUtils {
     public void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
 
         this.caseTypeDefinition = caseTypeDefinition;
-        if (caseDetails.getData() != null && caseDetails.getData() != null && !caseDetails.getData().isEmpty()) {
+        if (caseDetails.getData() != null && !caseDetails.getData().isEmpty()) {
 
             removeCCDAllCasesAccessFromCaseAccessGroups(caseDetails);
 
