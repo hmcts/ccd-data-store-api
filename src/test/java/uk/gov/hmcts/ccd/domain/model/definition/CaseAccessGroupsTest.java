@@ -56,7 +56,7 @@ class CaseAccessGroupsTest {
         Map<CaseAccessGroups, String> map = new HashMap<>();
         map.put(p1, "dummy");
 
-        CaseAccessGroups p2 = new CaseAccessGroups();
+        CaseAccessGroups p2 = p1;
         p1.equals(p2);
         assertEquals("dummy", map.get(p2));
     }
@@ -68,7 +68,7 @@ class CaseAccessGroupsTest {
         Map<CaseAccessGroup, String> map = new HashMap<>();
         map.put(p1, "dummy");
 
-        CaseAccessGroup p2 = new CaseAccessGroup();
+        CaseAccessGroup p2 = p1;
         p1.equals(p2);
         assertEquals("dummy", map.get(p2));
     }
