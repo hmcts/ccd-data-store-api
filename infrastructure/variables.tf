@@ -81,9 +81,3 @@ variable "force_user_permissions_trigger" {
   type        = string
   description = "Update this to a new value to force the user permissions script to run again"
 }
-
-variable "auto_grow_enabled" {
-  type        = bool
-  default     = false
-  description = "Specifies whether the storage auto grow for PostgreSQL Flexible Server is enabled. Defaults to false."
-}
