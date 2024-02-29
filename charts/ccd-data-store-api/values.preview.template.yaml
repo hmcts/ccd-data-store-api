@@ -1,6 +1,6 @@
 java:
   image: ${IMAGE_NAME}
-  ingressHost: ${SERVICE_FQDN}
+  ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
   devmemoryRequests: 2048Mi
   devcpuRequests: 2000m
   devmemoryLimits: 4096Mi
