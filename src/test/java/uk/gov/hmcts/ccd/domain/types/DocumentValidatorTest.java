@@ -47,7 +47,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         "https://em-hrs-api-aat.service.core-compute-aat.internal/hearing-recordings/"
             + "b10ea9c4-a116-11eb-bcbc-0242ac130002/segments/3";
     private static final String VALID_EM_HRS_API_DOCUMENT_URL_2 =
-        "https://em-hrs-api-pr-155.preview.platform.hmcts.net/hearing-recordings/"
+        "https://em-hrs-api-pr-155.service.core-compute-preview.internal/hearing-recordings/"
             + "e5b96e94-4010-43b3-9196-44d8539f32b8/segments/0";
     private static final String VALID_EM_HRS_API_DOCUMENT_URL_3 =
         "https://em-hrs-api-aat.service.core-compute-aat.internal/hearing-recordings/"
