@@ -1,7 +1,7 @@
 # config used by staging aat pod
 java:
   image: ${IMAGE_NAME}
-  ingressHost: ${SERVICE_NAME}.aat.platform.hmcts.net
+  ingressHost: ${SERVICE_FQDN}
   devmemoryRequests: 2048Mi
   devcpuRequests: 2000m
   devmemoryLimits: 4096Mi

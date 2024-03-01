@@ -90,7 +90,7 @@ def vaultOverrides = [
 ]
 // vars needed for functional tests
 // Other env variables needed for BEFTA.
-env.DM_STORE_BASE_URL = "http://dm-store-aat.aat.platform.hmcts.net"
+env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
 env.RD_LOCATION_REF_API_BASE_URL = "http://rd-location-ref-api-aat.service.core-compute-aat.internal"
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
@@ -137,9 +137,9 @@ withPipeline(type, product, component) {
     // Check if the build should be wired to an environment higher than 'preview'.
     if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
         env.ELASTIC_SEARCH_FTA_ENABLED = "true"
-        env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.aat.platform.hmcts.net"
+        env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
-        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
 
