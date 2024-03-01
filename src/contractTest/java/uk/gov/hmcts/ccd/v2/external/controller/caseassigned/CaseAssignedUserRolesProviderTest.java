@@ -20,11 +20,14 @@ import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController;
 import uk.gov.hmcts.ccd.v2.external.controller.TestIdamConfiguration;
 
-import java.util.Arrays;
+import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -49,6 +52,9 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
     @Autowired
     CaseAssignedUserRolesController caseAssignedUserRolesController;
 
+    @Autowired
+    CaseAccessOperation caseAccessOperation;
+
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
@@ -71,6 +77,12 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
     @State("A User Role exists for a Case")
     public void setUpUserRoleExists() {
         when(securityUtils.getServiceNameFromS2SToken(anyString())).thenReturn("serviceName");
-        when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(Arrays.asList("serviceName"));
+        when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(List.of("serviceName"));
+
+        String caseId = "1583841721773828";
+        String userId = "0a5874a4-3f38-4bbd-ba4c";
+        String caseRole = "[CREATOR]";
+        CaseAssignedUserRole caseAssignedUserRole = new CaseAssignedUserRole(caseId, userId, caseRole);
+        when(caseAccessOperation.findCaseUserRoles(anyList(), anyList())).thenReturn(List.of(caseAssignedUserRole));
     }
 }
