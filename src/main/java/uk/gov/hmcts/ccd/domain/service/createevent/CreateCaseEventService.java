@@ -205,6 +205,7 @@ public class CreateCaseEventService {
 
         final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
 
+        // add upload timestamp
         caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
