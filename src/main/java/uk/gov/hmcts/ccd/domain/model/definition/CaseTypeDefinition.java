@@ -262,7 +262,7 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
     }
 
     public void setAccessTypeRoleDefinitions(List<AccessTypeRoleDefinition> accessTypeRoles) {
-        if (accessTypeRoles != null) {
+        if (accessTypeRoles != null && !accessTypeRoles.isEmpty()) {
             this.accessTypeRoleDefinitions.addAll(accessTypeRoles);
         }
     }
@@ -272,7 +272,7 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
     }
 
     public void setAccessTypeDefinitions(List<AccessTypeDefinition> accessTypes) {
-        if (accessTypes != null) {
+        if (accessTypes != null && !accessTypes.isEmpty()) {
             this.accessTypeDefinitions.addAll(accessTypes);
         }
     }

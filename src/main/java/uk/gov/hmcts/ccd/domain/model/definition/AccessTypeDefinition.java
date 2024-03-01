@@ -35,7 +35,7 @@ public class AccessTypeDefinition implements Serializable, Copyable<AccessTypeDe
     private LocalDate liveTo;
 
     @JsonProperty("case_type_id")
-    private CaseTypeDefinition caseTypeId;
+    private String caseTypeId;
 
     @JsonProperty("access_type_id")
     private String accessTypeId;
