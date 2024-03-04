@@ -75,3 +75,15 @@ variable "subnet_suffix" {
   type        = string
   description = "Suffix to append to the subnet name, the originally created one used by this module is full in a number of environments."
 }
+
+variable "force_user_permissions_trigger" {
+  default     = ""
+  type        = string
+  description = "Update this to a new value to force the user permissions script to run again"
+}
+
+variable "auto_grow_enabled" {
+  type        = bool
+  default     = false
+  description = "Specifies whether the storage auto grow for PostgreSQL Flexible Server is enabled? Defaults to false."
+}

@@ -129,6 +129,9 @@ module "postgresql_v15" {
   component            = var.component
   env                  = var.env
   subnet_suffix        = var.subnet_suffix
+  # Setup Access Reader db user
+  force_user_permissions_trigger = "1"
+
   pgsql_databases = [
     {
       name = var.database_name
@@ -145,6 +148,7 @@ module "postgresql_v15" {
   name             = "${local.app_full_name}-postgres-db-v15"
   pgsql_sku        = var.pgsql_sku
   pgsql_storage_mb = var.pgsql_storage_mb
+  auto_grow_enabled = var.auto_grow_enabled
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER-V15" {

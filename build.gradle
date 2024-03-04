@@ -32,7 +32,7 @@ def versions = [
         pact_version    : '4.1.7',
 ]
 
-ext['spring-security.version'] = '5.6.9'
+ext['spring-security.version'] = '5.7.10'
 ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.15.3'
 
@@ -910,7 +910,9 @@ task runProviderPactVerification(type:Test) {
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-    systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
+    if (project.hasProperty('pact.verifier.publishResults')) {
+        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+    }
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/ccd/v2/external/controller/**"
 }
