@@ -58,7 +58,7 @@ Docker must be installed on the machine you are running tests.
 To build project please execute the following:
 
 ```bash
-./gradlew clean build 
+./gradlew clean build
 ```
 
 ### Running
