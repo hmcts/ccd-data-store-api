@@ -10,5 +10,6 @@ public enum MatcherType {
     LOCATION,
     REGION,
     ROLENAME,
+    CASEACCESSGROUPID,
     SECURITYCLASSIFICATION
 }
