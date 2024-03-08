@@ -715,7 +715,7 @@ class SubmitCaseTransactionTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode data  = mapper.convertValue(caseAccessGroups, JsonNode.class);
         Map<String, JsonNode> result = new HashMap<>();
-        result.put("caseAccessGroups", data);
+        result.put("CaseAccessGroups", data);
         return result;
     }
 

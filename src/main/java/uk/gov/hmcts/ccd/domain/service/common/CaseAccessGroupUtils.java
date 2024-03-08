@@ -16,7 +16,7 @@ import java.util.List;
 
 public class CaseAccessGroupUtils {
 
-    public static final String CASE_ACCESS_GROUPS = "caseAccessGroups";
+    public static final String CASE_ACCESS_GROUPS = "CaseAccessGroups";
 
     protected static final String CCD_ALL_CASES = "CCD:all-cases-access";
     protected static final String ORGANISATION = "Organisation";
