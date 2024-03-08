@@ -86,23 +86,19 @@ public class CaseAccessGroupUtils {
     }
 
     private void removeCCDAllCasesAccessFromCaseAccessGroups(CaseDetails caseDetails) {
-        JsonNode caseAccessGroupsJsonNodes = caseDetails.getData().get(CASE_ACCESS_GROUPS);
-        if (caseAccessGroupsJsonNodes != null) {
-            ArrayNode caseAccessGroupsArrayNodes = (ArrayNode) caseAccessGroupsJsonNodes.get(CASE_ACCESS_GROUPS);
-            if (caseAccessGroupsArrayNodes != null && !caseAccessGroupsArrayNodes.isEmpty()) {
-                for (int i = 0; i < caseAccessGroupsArrayNodes.size(); i++) {
-                    final JsonNode caseAccessGroupTypeValueNode = caseAccessGroupsArrayNodes.get(i)
-                        .get(CASE_ACCESS_GROUP_TYPE);
-                    if (caseAccessGroupTypeValueNode != null
-                        && caseAccessGroupTypeValueNode.textValue().equals(CCD_ALL_CASES)) {
-                        caseAccessGroupsArrayNodes.remove(i);
-                        i--;
-                    }
+        ArrayNode caseAccessGroupsJsonNodes = (ArrayNode) caseDetails.getData().get(CASE_ACCESS_GROUPS);
+        if (caseAccessGroupsJsonNodes != null && !caseAccessGroupsJsonNodes.isEmpty()) {
+            for (int i = 0; i < caseAccessGroupsJsonNodes.size(); i++) {
+                final JsonNode caseAccessGroupTypeValueNode = caseAccessGroupsJsonNodes.get(i)
+                    .get(CASE_ACCESS_GROUP_TYPE);
+                if (caseAccessGroupTypeValueNode != null
+                    && caseAccessGroupTypeValueNode.textValue().equals(CCD_ALL_CASES)) {
+                    caseAccessGroupsJsonNodes.remove(i);
+                    i--;
                 }
-                if (caseAccessGroupsArrayNodes.isEmpty()) {
-                    caseDetails.getData().remove(CASE_ACCESS_GROUPS);
-                }
-
+            }
+            if (caseAccessGroupsJsonNodes.isEmpty()) {
+                caseDetails.getData().remove(CASE_ACCESS_GROUPS);
             }
         }
 
