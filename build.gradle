@@ -32,7 +32,7 @@ def versions = [
         pact_version    : '4.1.7',
 ]
 
-ext['spring-security.version'] = '5.7.10'
+ext['spring-security.version'] = '5.6.9'
 ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.15.3'
 
@@ -306,7 +306,7 @@ dependencies {
     implementation 'org.jooq:jool-java-8:0.9.14'
     implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.21.15'
+    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.21.14'
 
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
     testRuntimeOnly group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
@@ -861,6 +861,8 @@ task smoke() {
     outputs.upToDateWhen { false }
 }
 
+def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
+
 task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
@@ -875,7 +877,7 @@ task functional(type: JavaExec) {
         '--threads', '1',
         '--plugin', "json:${rootDir}/target/cucumber.json",
         '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-        '--tags', 'not @Ignore',
+        '--tags',"${tags}",
         '--glue', 'uk.gov.hmcts.befta.player',
         '--glue', 'uk.gov.hmcts.ccd.datastore.befta',
         'src/aat/resources/features'
