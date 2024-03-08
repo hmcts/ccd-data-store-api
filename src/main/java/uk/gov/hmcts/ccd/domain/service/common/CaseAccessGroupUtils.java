@@ -13,7 +13,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CaseAccessGroupUtils {
 
@@ -26,11 +25,9 @@ public class CaseAccessGroupUtils {
     protected static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
     protected static final String CASE_ACCESS_GROUP_TYPE = "caseAccessGroupType";
 
-    private CaseTypeDefinition caseTypeDefinition;
 
     public void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
 
-        this.caseTypeDefinition = caseTypeDefinition;
         if (caseDetails.getData() != null && !caseDetails.getData().isEmpty()) {
 
             removeCCDAllCasesAccessFromCaseAccessGroups(caseDetails);
@@ -114,15 +111,12 @@ public class CaseAccessGroupUtils {
     private List<AccessTypeRoleDefinition> filterAccessRoles(
         CaseDetails caseDetails,
         List<AccessTypeRoleDefinition> accessTypeRolesDefinitions) {
-        List<AccessTypeRoleDefinition> accessTypeRolesDefinitionWithCaseAssignedRoleField =
-            accessTypeRolesDefinitions.stream()
-                .filter(accessTypeRole ->
-                    StringUtils.isNoneBlank(accessTypeRole.getGroupRoleName())
-                        && StringUtils.isNoneBlank(accessTypeRole.getCaseAssignedRoleField())
-                        && hasOrganisationPolicyNodeForCaseRole(caseDetails, accessTypeRole.getCaseAssignedRoleField())
-                )
-                .collect(Collectors.toList());
 
-        return accessTypeRolesDefinitionWithCaseAssignedRoleField;
+        return accessTypeRolesDefinitions.stream()
+            .filter(accessTypeRole -> StringUtils.isNoneBlank(accessTypeRole.getGroupRoleName())
+                    && StringUtils.isNoneBlank(accessTypeRole.getCaseAssignedRoleField())
+                    && hasOrganisationPolicyNodeForCaseRole(caseDetails, accessTypeRole.getCaseAssignedRoleField())
+            )
+            .toList();
     }
 }

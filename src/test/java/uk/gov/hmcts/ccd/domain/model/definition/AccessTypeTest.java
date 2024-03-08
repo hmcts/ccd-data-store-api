@@ -41,9 +41,9 @@ class AccessTypeTest {
     void accessTypes() {
         List<AccessTypeDefinition> accessTypes = caseTypeDefinition.getAccessTypeDefinitions();
         assertAll(
-            () -> assertEquals(accessTypes.size(), 1),
-            () -> assertEquals(accessTypes.get(0).getAccessTypeId(), "default"),
-            () -> assertEquals(accessTypes.get(0).getOrganisationProfileId(), "SOLICITOR_PROFILE")
+            () -> assertEquals(1, accessTypes.size()),
+            () -> assertEquals("default", accessTypes.get(0).getAccessTypeId()),
+            () -> assertEquals("SOLICITOR_PROFILE", accessTypes.get(0).getOrganisationProfileId())
         );
     }
 
@@ -52,9 +52,9 @@ class AccessTypeTest {
     void accessTypeRoles() {
         List<AccessTypeDefinition> accessTypeRoles = caseTypeDefinition.getAccessTypeDefinitions();
         assertAll(
-            () -> assertEquals(accessTypeRoles.size(), 1),
-            () -> assertEquals(accessTypeRoles.get(0).getAccessTypeId(), "default"),
-            () -> assertEquals(accessTypeRoles.get(0).getOrganisationProfileId(), "SOLICITOR_PROFILE")
+            () -> assertEquals(1, accessTypeRoles.size()),
+            () -> assertEquals("default", accessTypeRoles.get(0).getAccessTypeId()),
+            () -> assertEquals("SOLICITOR_PROFILE", accessTypeRoles.get(0).getOrganisationProfileId())
         );
     }
 
@@ -107,7 +107,7 @@ class AccessTypeTest {
     }
 
     @Test
-    public void testAccessTypeRoleDefinitionCreateCopy() {
+    void testAccessTypeRoleDefinitionCreateCopy() {
         AccessTypeRoleDefinition p1 = new AccessTypeRoleDefinition();
 
         Map<AccessTypeRoleDefinition, String> map = new HashMap<>();
@@ -118,7 +118,7 @@ class AccessTypeTest {
     }
 
     @Test
-    public void testAccessTypeDefinitionCreateCopy() {
+    void testAccessTypeDefinitionCreateCopy() {
         AccessTypeDefinition p1 = new AccessTypeDefinition();
         Map<AccessTypeDefinition, String> map = new HashMap<>();
         map.put(p1, "dummy");

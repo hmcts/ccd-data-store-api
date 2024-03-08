@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class CaseAccessGroupsTest {
 
@@ -33,11 +32,11 @@ class CaseAccessGroupsTest {
     void caseAccessGroups() {
 
         assertAll(
-            () -> assertEquals(caseAccessGroups.getCaseAccessGroupsList().size(), 1),
-            () -> assertEquals(caseAccessGroups.getCaseAccessGroupsList().get(0).getCaseAccessGroupId(),
-                "caseaccessGroupID"),
-            () -> assertEquals(caseAccessGroups.getCaseAccessGroupsList().get(0).getCaseAccessGroupType(),
-                "caseAccessGroupType1")
+            () -> assertEquals(1,caseAccessGroups.getCaseAccessGroupsList().size()),
+            () -> assertEquals("caseaccessGroupID",
+                caseAccessGroups.getCaseAccessGroupsList().get(0).getCaseAccessGroupId()),
+            () -> assertEquals("caseAccessGroupType1",
+                caseAccessGroups.getCaseAccessGroupsList().get(0).getCaseAccessGroupType())
         );
     }
 
@@ -75,9 +74,9 @@ class CaseAccessGroupsTest {
         Map<CaseAccessGroups, String> map = new HashMap<>();
         map.put(p1, "dummy");
 
-        CaseAccessGroups test1 = p1;
+        CaseAccessGroups test1 = new CaseAccessGroups();
 
-        assertNotEquals(test1, map.get(test1));
+        assertNotEquals(p1, test1);
     }
 
     @Test
@@ -100,8 +99,8 @@ class CaseAccessGroupsTest {
         Map<CaseAccessGroup, String> map = new HashMap<>();
         map.put(p1, "dummy");
 
-        CaseAccessGroup test1 = p1;
-        assertNotEquals(test1, map.get(test1));
+        CaseAccessGroup test1 = new CaseAccessGroup();
+        assertNotEquals(p1, test1);
     }
 
     @Test
@@ -112,7 +111,7 @@ class CaseAccessGroupsTest {
         map.put(p1, "dummy");
 
         CaseAccessGroups p2 = null;
-        assertFalse(p1.equals(p2));
+        assertNotEquals(p1,p2);
         assertNotEquals("dummy", map.get(p2));
     }
 
@@ -124,7 +123,7 @@ class CaseAccessGroupsTest {
         map.put(p1, "dummy");
 
         Object p2 = null;
-        assertFalse(p1.equals(p2));
+        assertNotEquals(p1,p2);
         assertNotEquals("dummy", map.get(p2));
     }
 
