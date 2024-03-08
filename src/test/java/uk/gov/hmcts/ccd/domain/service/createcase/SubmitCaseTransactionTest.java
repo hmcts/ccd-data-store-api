@@ -714,7 +714,7 @@ class SubmitCaseTransactionTest {
         caseAccessGroupsList.add(caseAccessGroup);
 
         CaseAccessGroups caseAccessGroups = new CaseAccessGroups();
-        caseAccessGroups.setCaseAccessGroups(caseAccessGroupsList);
+        caseAccessGroups.setCaseAccessGroupsList(caseAccessGroupsList);
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode data  = mapper.convertValue(caseAccessGroups, JsonNode.class);
