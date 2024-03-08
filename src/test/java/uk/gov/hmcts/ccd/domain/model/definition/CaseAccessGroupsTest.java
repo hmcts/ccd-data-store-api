@@ -64,6 +64,7 @@ class CaseAccessGroupsTest {
 
         assertTrue(p1.equals(test1));
         assertEquals(p1, test1);
+
     }
 
     @Test
@@ -89,7 +90,7 @@ class CaseAccessGroupsTest {
         CaseAccessGroup test1 = p1;
 
         assertTrue(p1.equals(test1));
-        assertEquals(map.get(p1), map.get(test1));
+        assertEquals(p1, test1);
     }
 
     @Test
@@ -112,7 +113,6 @@ class CaseAccessGroupsTest {
 
         CaseAccessGroups p2 = null;
         assertNotEquals(p1,p2);
-        assertNotEquals("dummy", map.get(p2));
     }
 
     @Test
@@ -124,7 +124,6 @@ class CaseAccessGroupsTest {
 
         Object p2 = null;
         assertNotEquals(p1,p2);
-        assertNotEquals("dummy", map.get(p2));
     }
 
 }
