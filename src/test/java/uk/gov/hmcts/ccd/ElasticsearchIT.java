@@ -204,7 +204,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                                    @Value("${search.elastic.port}") final int httpPortValue)
         throws IOException, InterruptedException {
 
-        log.info("Starting Elastic search...");
+        log.info("Starting Elastic search... ");
         container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:" + elasticVersion)
             .withEnv("discovery.type", "single-node")
             .withExposedPorts(9200)
