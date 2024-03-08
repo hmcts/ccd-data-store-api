@@ -104,6 +104,18 @@ with their new equivalents using befta fw so that the new ones will be
 doing a lot more detailed verifications.  
 
 To find out more about BEFTA Framework, see the repository and its README [here](https://github.com/hmcts/befta-fw).
+#### To Run the Functional Tests (FT)
+
+#####  All Functional Tests
+Will run all the FT's
+
+_./gradlew functional_
+
+#####  Some Functional Tests
+Will run both F-1023 and F-777
+
+_./gradlew functional -P tags="@F-1023 or @F-777"_
+
 
 ## LICENSE
 
