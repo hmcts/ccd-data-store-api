@@ -54,24 +54,55 @@ class CaseAccessGroupsTest {
     }
 
     @Test
-    public void testCaseAccessGroupsHaseCode() {
+    public void testCaseAccessGroupsHaseCodeSame() {
 
-        CaseAccessGroups test2 = caseAccessGroups;
-        assertTrue(caseAccessGroups.equals(test2));
+        CaseAccessGroups p1 = caseAccessGroups;
 
-        assertEquals(caseAccessGroups, test2);
+        Map<CaseAccessGroups, String> map = new HashMap<>();
+        map.put(p1, "dummy");
+
+        CaseAccessGroups test1 = p1;
+
+        assertTrue(p1.equals(test1));
+        assertEquals(map.get(p1), map.get(test1));
+
     }
 
     @Test
-    public void testCaseAccessGroupHaseCode() {
+    public void testCaseAccessGroupsHaseCodeNotSame() {
+
+        CaseAccessGroups p1 = caseAccessGroups;
+
+        Map<CaseAccessGroups, String> map = new HashMap<>();
+        map.put(p1, "dummy");
+
+        CaseAccessGroups test1 = p1;
+
+        assertNotEquals(p1, map.get(test1));
+    }
+
+    @Test
+    public void testCaseAccessGroupHaseCodeSame() {
         CaseAccessGroup p1 = caseAccessGroups.getCaseAccessGroups().get(0);
 
         Map<CaseAccessGroup, String> map = new HashMap<>();
         map.put(p1, "dummy");
 
-        CaseAccessGroup p2 = caseAccessGroups.getCaseAccessGroups().get(0);
-        assertTrue(caseAccessGroups.getCaseAccessGroups().get(0).equals(p2));
-        assertNotEquals(p1, map.get(p2));
+        CaseAccessGroup test1 = p1;
+
+        assertTrue(p1.equals(test1));
+        assertEquals(map.get(p1), map.get(test1));
+    }
+
+    @Test
+    public void testCaseAccessGroupHaseCodeNotSame() {
+        CaseAccessGroup p1 = caseAccessGroups.getCaseAccessGroups().get(0);
+
+        Map<CaseAccessGroup, String> map = new HashMap<>();
+        map.put(p1, "dummy");
+
+        CaseAccessGroup test1 = p1;
+        assertNotEquals(p1, map.get(test1));
     }
 
     @Test
