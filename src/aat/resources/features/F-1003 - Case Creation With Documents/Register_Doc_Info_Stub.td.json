@@ -57,8 +57,7 @@
               "document_url" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_filename" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][originalDocumentName]}",
               "document_binary_url" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][binary][href]}",
-              "document_hash" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][hashToken]}",
-              "upload_timestamp": "[[ANYTHING_PRESENT]]"
+              "document_hash" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][hashToken]}"
             }
           }
         },
