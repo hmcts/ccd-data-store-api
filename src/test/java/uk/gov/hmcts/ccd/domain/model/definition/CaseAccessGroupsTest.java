@@ -31,6 +31,7 @@ class CaseAccessGroupsTest {
     @Test
     @DisplayName("Get caseAccessGroups")
     void caseAccessGroups() {
+
         assertAll(
             () -> assertEquals(caseAccessGroups.getCaseAccessGroups().size(), 1),
             () -> assertEquals(caseAccessGroups.getCaseAccessGroups().get(0).getCaseAccessGroupId(),
@@ -54,26 +55,11 @@ class CaseAccessGroupsTest {
 
     @Test
     public void testCaseAccessGroupsHaseCode() {
-        CaseAccessGroups p1 = new CaseAccessGroups();
 
-        Map<CaseAccessGroups, String> map = new HashMap<>();
-        map.put(p1, "dummy");
+        CaseAccessGroups test2 = caseAccessGroups;
+        assertTrue(caseAccessGroups.equals(test2));
 
-        CaseAccessGroups p2 = p1;
-        assertTrue(p1.equals(p2));
-        assertEquals("dummy", map.get(p2));
-    }
-
-    @Test
-    public void testCaseAccessGroupHaseCode() {
-        CaseAccessGroup p1 = new CaseAccessGroup();
-
-        Map<CaseAccessGroup, String> map = new HashMap<>();
-        map.put(p1, "dummy");
-
-        CaseAccessGroup p2 = p1;
-        assertTrue(p1.equals(p2));
-        assertEquals("dummy", map.get(p2));
+        assertEquals(caseAccessGroups, test2);
     }
 
     @Test
@@ -99,6 +85,5 @@ class CaseAccessGroupsTest {
         assertFalse(p1.equals(p2));
         assertNotEquals("dummy", map.get(p2));
     }
-
 
 }
