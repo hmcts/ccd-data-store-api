@@ -77,7 +77,7 @@ class CaseAccessGroupsTest {
 
         CaseAccessGroups test1 = p1;
 
-        assertNotEquals(p1, map.get(test1));
+        assertNotEquals(test1, map.get(test1));
     }
 
     @Test
@@ -101,7 +101,7 @@ class CaseAccessGroupsTest {
         map.put(p1, "dummy");
 
         CaseAccessGroup test1 = p1;
-        assertNotEquals(p1, map.get(test1));
+        assertNotEquals(test1, map.get(test1));
     }
 
     @Test
