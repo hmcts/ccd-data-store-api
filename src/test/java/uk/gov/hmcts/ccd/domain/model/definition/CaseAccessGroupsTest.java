@@ -33,10 +33,10 @@ class CaseAccessGroupsTest {
     void caseAccessGroups() {
 
         assertAll(
-            () -> assertEquals(caseAccessGroups.getCaseAccessGroups().size(), 1),
-            () -> assertEquals(caseAccessGroups.getCaseAccessGroups().get(0).getCaseAccessGroupId(),
+            () -> assertEquals(caseAccessGroups.getCaseAccessGroupsList().size(), 1),
+            () -> assertEquals(caseAccessGroups.getCaseAccessGroupsList().get(0).getCaseAccessGroupId(),
                 "caseaccessGroupID"),
-            () -> assertEquals(caseAccessGroups.getCaseAccessGroups().get(0).getCaseAccessGroupType(),
+            () -> assertEquals(caseAccessGroups.getCaseAccessGroupsList().get(0).getCaseAccessGroupType(),
                 "caseAccessGroupType1")
         );
     }
@@ -49,7 +49,7 @@ class CaseAccessGroupsTest {
         caseAccessGroup.setCaseAccessGroupId("caseaccessGroupID");
 
         caseAccessGroupsList.add(caseAccessGroup);
-        caseAccessGroups.setCaseAccessGroups(caseAccessGroupsList);
+        caseAccessGroups.setCaseAccessGroupsList(caseAccessGroupsList);
 
     }
 
@@ -64,8 +64,7 @@ class CaseAccessGroupsTest {
         CaseAccessGroups test1 = p1;
 
         assertTrue(p1.equals(test1));
-        assertEquals(map.get(p1), map.get(test1));
-
+        assertEquals(p1, test1);
     }
 
     @Test
@@ -83,7 +82,7 @@ class CaseAccessGroupsTest {
 
     @Test
     public void testCaseAccessGroupHaseCodeSame() {
-        CaseAccessGroup p1 = caseAccessGroups.getCaseAccessGroups().get(0);
+        CaseAccessGroup p1 = caseAccessGroups.getCaseAccessGroupsList().get(0);
 
         Map<CaseAccessGroup, String> map = new HashMap<>();
         map.put(p1, "dummy");
@@ -96,7 +95,7 @@ class CaseAccessGroupsTest {
 
     @Test
     public void testCaseAccessGroupHaseCodeNotSame() {
-        CaseAccessGroup p1 = caseAccessGroups.getCaseAccessGroups().get(0);
+        CaseAccessGroup p1 = caseAccessGroups.getCaseAccessGroupsList().get(0);
 
         Map<CaseAccessGroup, String> map = new HashMap<>();
         map.put(p1, "dummy");

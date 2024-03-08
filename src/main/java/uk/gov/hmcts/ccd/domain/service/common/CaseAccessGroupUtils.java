@@ -47,19 +47,23 @@ public class CaseAccessGroupUtils {
                     acd.getCaseAssignedRoleField());
                 String orgIdentifier = caseAssignedRoleFieldNode.get(ORGANISATION).get(ORGANISATIONID).textValue();
 
-                String caseGroupID = acd.getCaseAccessGroupIdTemplate()
-                    .replace(ORG_IDENTIFIER_TEMPLATE, orgIdentifier);
-                CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseGroupID)
-                    .caseAccessGroupType(CCD_ALL_CASES).build();
-                caseAccessGroups.add(caseAccessGroup);
+                if (orgIdentifier != null) {
+                    String caseGroupID = acd.getCaseAccessGroupIdTemplate()
+                        .replace(ORG_IDENTIFIER_TEMPLATE, orgIdentifier);
+
+                    CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseGroupID)
+                        .caseAccessGroupType(CCD_ALL_CASES).build();
+
+                    caseAccessGroups.add(caseAccessGroup);
+                }
 
             }
 
             if (!caseAccessGroups.isEmpty()) {
-                CaseAccessGroups groups = CaseAccessGroups.builder().caseAccessGroups(caseAccessGroups).build();
+                CaseAccessGroups groups = CaseAccessGroups.builder().caseAccessGroupsList(caseAccessGroups).build();
                 JsonNode node = mapper.convertValue(groups, JsonNode.class);
                 caseDetails.getData().put(CASE_ACCESS_GROUPS, node);
-                groups.getCaseAccessGroups();
+                groups.getCaseAccessGroupsList();
             }
 
         }

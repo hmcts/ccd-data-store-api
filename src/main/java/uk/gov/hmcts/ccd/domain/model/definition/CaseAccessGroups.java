@@ -16,7 +16,7 @@ public class CaseAccessGroups {
 
     public static final String CASE_ACCESS_GROUPS_FIELD_ID = "caseAccessGroups";
 
-    List<CaseAccessGroup> caseAccessGroups;
+    List<CaseAccessGroup> caseAccessGroupsList;
 
     @Override
     public boolean equals(Object o) {
@@ -26,14 +26,14 @@ public class CaseAccessGroups {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CaseAccessGroups caseAccessGroup = (CaseAccessGroups) o;
-        return Objects.equals(caseAccessGroup, caseAccessGroups);
+        CaseAccessGroups caseAccessGroups = (CaseAccessGroups) o;
+        return Objects.equals(caseAccessGroups, caseAccessGroupsList);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            caseAccessGroups
+            caseAccessGroupsList
         );
     }
 
