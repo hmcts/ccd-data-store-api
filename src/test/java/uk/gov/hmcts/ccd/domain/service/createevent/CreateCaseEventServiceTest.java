@@ -596,7 +596,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     void shouldNotReplaceUploadTimestampInDocument() throws Exception {
         Map<String, JsonNode> data = Maps.newHashMap();
         ObjectNode objectNode = createBasicDoc();
-        final String uploadTimestamp = "2001-01-01T01:02:03.000000Z";
+        final String uploadTimestamp = "2001-01-01T01:02:03.00Z";
         objectNode.put(UPLOAD_TIMESTAMP, new TextNode(uploadTimestamp));
         data.put("dataKey1", objectNode);
         caseDetails.setData(data);

@@ -60,7 +60,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 public class CallbackTest extends WireMockBaseTest {
 
     private static final String URL_BEFORE_COMMIT = "/before-commit.*";
-    private static final String UPLOAD_TIMESTAMP = "2001-01-01T00:00:00.000000Z";
+    private static final String UPLOAD_TIMESTAMP = "2001-01-01T00:00:00.00Z";
 
     private static JsonNode DATA = null;
     private static final String DATA_JSON_STRING =
