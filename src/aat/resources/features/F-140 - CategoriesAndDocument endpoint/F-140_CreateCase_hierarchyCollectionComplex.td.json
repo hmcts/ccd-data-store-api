@@ -34,7 +34,7 @@
               "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
               "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
-              "upload_timestamp": "2000-02-29T00:00:00"
+              "upload_timestamp": "2000-02-29T00:00:00Z"
             }
           },
           {
@@ -43,7 +43,7 @@
               "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
               "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
-              "upload_timestamp": "2000-02-29T00:00:00"
+              "upload_timestamp": "2000-02-29T00:00:00Z"
             }
           }
         ],
@@ -57,7 +57,7 @@
                 "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
                 "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
                 "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
-                "upload_timestamp": "2000-02-29T00:00:00"
+                "upload_timestamp": "2000-02-29T00:00:00Z"
               }
             }
           },
@@ -70,7 +70,7 @@
                 "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
                 "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
                 "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
-                "upload_timestamp": "2000-02-29T00:00:00"
+                "upload_timestamp": "2000-02-29T00:00:00Z"
               }
             }
           }
@@ -85,7 +85,7 @@
                 "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
                 "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
                 "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
-                "upload_timestamp": "2000-02-29T00:00:00"
+                "upload_timestamp": "2000-02-29T00:00:00Z"
               }
             },
             {
@@ -94,7 +94,7 @@
                 "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
                 "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
                 "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
-                "upload_timestamp": "2000-02-29T00:00:00"
+                "upload_timestamp": "2000-02-29T00:00:00Z"
               }
             }
           ]
@@ -106,7 +106,7 @@
               "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
               "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
-              "upload_timestamp": "2000-02-29T00:00:00"
+              "upload_timestamp": "2000-02-29T00:00:00Z"
             }
           },
           {
@@ -115,7 +115,7 @@
               "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
               "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
               "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
-              "upload_timestamp": "2000-02-29T00:00:00"
+              "upload_timestamp": "2000-02-29T00:00:00Z"
             }
           }
         ]
