@@ -31,6 +31,8 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Named
 public class CategoriesAndDocumentsService {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
     private static final String DOCUMENT_TYPE = "Document";
     private static final String UNCATEGORISED_KEY = "uncategorised_documents";
 
@@ -39,8 +41,6 @@ public class CategoriesAndDocumentsService {
     private static final String DOCUMENT_FILENAME = "document_filename";
     private static final String CATEGORY_ID = "category_id";
     private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
-
-    private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     private final CaseDataExtractor caseDataExtractor;
     private final CaseTypeService caseTypeService;
@@ -197,10 +197,7 @@ public class CategoriesAndDocumentsService {
 
     LocalDateTime parseUploadTimestamp(final String uploadTimestamp) {
         return Optional.ofNullable(uploadTimestamp)
-            .map(timestamp -> {
-                final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TIMESTAMP_PATTERN);
-                return LocalDateTime.parse(timestamp, dateTimeFormatter);
-            })
+            .map(timestamp -> LocalDateTime.parse(timestamp, DATE_TIME_FORMATTER))
             .orElse(null);
     }
 
