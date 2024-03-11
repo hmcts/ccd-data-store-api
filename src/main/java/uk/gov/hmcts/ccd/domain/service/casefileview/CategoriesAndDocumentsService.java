@@ -14,7 +14,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataExtractor;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +38,6 @@ public class CategoriesAndDocumentsService {
     private static final String DOCUMENT_FILENAME = "document_filename";
     private static final String CATEGORY_ID = "category_id";
     private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
-
-    private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     private final CaseDataExtractor caseDataExtractor;
     private final CaseTypeService caseTypeService;
@@ -197,10 +194,7 @@ public class CategoriesAndDocumentsService {
 
     LocalDateTime parseUploadTimestamp(final String uploadTimestamp) {
         return Optional.ofNullable(uploadTimestamp)
-            .map(timestamp -> {
-                final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TIMESTAMP_PATTERN);
-                return LocalDateTime.parse(timestamp, dateTimeFormatter);
-            })
+            .map(LocalDateTime::parse)
             .orElse(null);
     }
 
