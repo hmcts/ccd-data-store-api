@@ -7,3 +7,6 @@ pgsql_sku        = "MO_Standard_E16ds_v4"
 pgsql_storage_mb = 2097152
 auto_grow_enabled = true
 subnet_suffix = "expanded"
+
+enable_schema_ownership = true
+kv_subscription = "DCD-CNP-Prod"

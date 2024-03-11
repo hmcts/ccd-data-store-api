@@ -88,7 +88,7 @@ ext {
             'class'      : 98
     ]
     springCloudVersion = '2021.0.3'
-    beftaFwVersion = '8.8.3'
+    beftaFwVersion = '8.8.5'
 }
 
 java {
@@ -305,7 +305,7 @@ dependencies {
     implementation 'org.jooq:jool-java-8:0.9.14'
     implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.21.3'
+    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.21.13'
 
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
     testRuntimeOnly group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
