@@ -2,15 +2,15 @@
   "_guid_": "S-1023.1",
   "_extends_": "F-1023_Test_Data_Base",
   "title": "CaseAccessGroups field contains a value and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST",
-
+  
   "prerequisites" : [ {
-    "Token_Creation": "S-1023_GetCreateToken"
-  }
+      "Token_Creation": "S-1023_GetCreateToken"
+    }
   ],
   "specs": [
     "an active profile in CCD",
     "to create a token for case creation",
-    "contains correctly configured CaseAccessGroups field with Case caseAccessGroupType created in F-1023_CreateCasePreRequisiteCaseworkerBase",
+    "contains correctly configured CaseAccessGroups field with Case caseAccessGroupType created in F-1023_CreateCasePreRequisiteCaseworkerBase"
   ],
   "request": {
     "body": {
@@ -58,21 +58,20 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-          "CaseAccessGroups": []
-        },
-        "data_classification" : {
-          "CaseAccessGroups" : {
-            "classification" : "PUBLIC",
-            "value" : [ ]
-          }
-        }
+        "CaseAccessGroups": []
       },
-      "supplementary_data" : null,
-      "after_submit_callback_response": null,
-      "callback_response_status_code": null,
-      "callback_response_status": null,
-      "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null
-    }
+      "data_classification" : {
+        "CaseAccessGroups" : {
+          "classification" : "PUBLIC",
+          "value" : [ ]
+        }
+      }
+    },
+    "supplementary_data" : null,
+    "after_submit_callback_response": null,
+    "callback_response_status_code": null,
+    "callback_response_status": null,
+    "delete_draft_response_status_code": null,
+    "delete_draft_response_status": null
   }
 }
