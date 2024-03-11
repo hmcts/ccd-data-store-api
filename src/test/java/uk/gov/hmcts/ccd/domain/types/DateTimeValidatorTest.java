@@ -95,7 +95,7 @@ class DateTimeValidatorTest {
         @DisplayName("should validate date time: 2000-02-29T00:00:00.00Z")
         void shouldValidateDateTimeLeapYear() {
             final List<ValidationResult> results = validator.validate(FIELD_ID,
-                                                                      NODE_FACTORY.textNode("2000-02-29T00:00:00Z"),
+                                                                      NODE_FACTORY.textNode("2000-02-29T00:00:00.00Z"),
                     caseFieldDefinition);
             assertThat(results, hasSize(0));
         }
