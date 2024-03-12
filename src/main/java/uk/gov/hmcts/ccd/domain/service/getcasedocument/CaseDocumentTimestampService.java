@@ -20,7 +20,7 @@ import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.
 @Named
 public class CaseDocumentTimestampService {
     private final Clock clock;
-    private static final String UPLOAD_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+    private static final String UPLOAD_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS";
 
     @Inject
     public CaseDocumentTimestampService(@Qualifier("utcClock") Clock clock) {

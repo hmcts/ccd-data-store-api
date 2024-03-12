@@ -230,7 +230,7 @@ class CaseDocumentTimestampServiceTest {
                                 "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4",
                                 "document_filename": "PD36Q letter.pdf",
                                 "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4/binary",
-                                "upload_timestamp": "2023-03-01T12:34:56"
+                                "upload_timestamp": "2023-03-01T12:34:56.000000000"
                             },
                             "newDocument4": {
                                 "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1aaa",

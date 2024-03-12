@@ -40,7 +40,7 @@ public class CategoriesAndDocumentsService {
     private static final String CATEGORY_ID = "category_id";
     private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
 
-    private static final String UPLOAD_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+    private static final String UPLOAD_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS";
 
     private final CaseDataExtractor caseDataExtractor;
     private final CaseTypeService caseTypeService;
