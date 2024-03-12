@@ -104,8 +104,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private static final String VALID_DOCUMENT_URL = "https://dm.reform.hmcts.net/documents/a1-2Z-3-x";
     protected static final String NON_EXISTENT_CASE_REFERENCE = "1234123412341289";
 
-
-
     @Mock
     private CallbackInvoker callbackInvoker;
     @Mock
@@ -158,8 +156,10 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private UIDService uidService;
     @Mock
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
+
     @Spy
-    private CaseDocumentTimestampService caseDocumentTimestampService =  new CaseDocumentTimestampService(clock);
+    private CaseDocumentTimestampService caseDocumentTimestampService =
+        new CaseDocumentTimestampService(Clock.systemDefaultZone());
 
     @InjectMocks
     private CreateCaseEventService underTest;
