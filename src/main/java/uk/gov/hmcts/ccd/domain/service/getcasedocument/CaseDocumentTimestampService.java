@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.
 @Named
 public class CaseDocumentTimestampService {
     private final Clock clock;
+    private static final String UPLOAD_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
     @Inject
     public CaseDocumentTimestampService(@Qualifier("utcClock") Clock clock) {
@@ -32,7 +34,8 @@ public class CaseDocumentTimestampService {
         }
         List<String> documentUrlsNew = findUrlsNotInOriginal(caseDetailsModified, caseDetailsInDb);
 
-        final String uploadTimestamp = LocalDateTime.now(clock).toString();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(UPLOAD_TIMESTAMP_PATTERN);
+        final String uploadTimestamp = LocalDateTime.now(clock).format(formatter);
         addUploadTimestampToDocument(jsonNodes, documentUrlsNew, uploadTimestamp);
     }
 
