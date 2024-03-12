@@ -256,7 +256,7 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
 
     @Test
     void testShouldParseTimestamp() {
-        final String timestamp = "2022-04-06T16:44:52.000";
+        final String timestamp = "2022-04-06T16:44:52.000000000";
         final LocalDateTime expectedTimestamp = LocalDateTime.of(2022, 4, 6, 16,
             44, 52);
 
