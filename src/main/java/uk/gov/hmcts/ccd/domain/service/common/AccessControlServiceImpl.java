@@ -151,7 +151,8 @@ public class AccessControlServiceImpl implements AccessControlService {
                         }
                         return result;
                     } else {
-                        boolean result = !hasCaseFieldAccess(caseFieldDefinitions, accessProfiles, CAN_CREATE, newFieldName);
+                        boolean result = !hasCaseFieldAccess(caseFieldDefinitions,
+                                accessProfiles, CAN_CREATE, newFieldName);
                         if (result) {
                             errors.add(newFieldName);
                         }
