@@ -2,10 +2,13 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
+import javax.inject.Inject;
 import javax.inject.Named;
-import java.time.Instant;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +18,12 @@ import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.
 
 @Named
 public class CaseDocumentTimestampService {
+    private final Clock clock;
+
+    @Inject
+    public CaseDocumentTimestampService(@Qualifier("utcClock") Clock clock) {
+        this.clock = clock;
+    }
 
     public void addUploadTimestamps(CaseDetails caseDetailsModified, CaseDetails caseDetailsInDb) {
         List<JsonNode> jsonNodes = new ArrayList<>();
@@ -23,7 +32,7 @@ public class CaseDocumentTimestampService {
         }
         List<String> documentUrlsNew = findUrlsNotInOriginal(caseDetailsModified, caseDetailsInDb);
 
-        final String uploadTimestamp = Instant.now().toString();
+        final String uploadTimestamp = LocalDateTime.now(clock).toString();
         addUploadTimestampToDocument(jsonNodes, documentUrlsNew, uploadTimestamp);
     }
 

@@ -159,8 +159,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
     @Spy
-    private CaseDocumentTimestampService caseDocumentTimestampService = new CaseDocumentTimestampService();
-
+    private CaseDocumentTimestampService caseDocumentTimestampService =  new CaseDocumentTimestampService(clock);
 
     @InjectMocks
     private CreateCaseEventService underTest;

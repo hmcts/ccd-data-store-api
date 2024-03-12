@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -127,7 +127,7 @@ class CaseDocumentTimestampServiceTest {
     @Test
     void testInsertTimestampIfNotAlreadyPresent() {
         JsonNode jsonNode = generateTestNode(jsonDocumentNode);
-        String uploadTimestamp = Instant.now().toString();
+        String uploadTimestamp = LocalDateTime.now().toString();
         assertFalse(jsonNode.has(UPLOAD_TIMESTAMP));
 
         underTest.insertUploadTimestamp(jsonNode, uploadTimestamp);
@@ -138,7 +138,7 @@ class CaseDocumentTimestampServiceTest {
 
     @Test
     void testDoNotInsertTimestampIfAlreadyPresent() {
-        final String uploadTimestamp = Instant.now().minusNanos(5).toString();
+        final String uploadTimestamp = LocalDateTime.now().minusNanos(5).toString();
         JsonNode jsonNode = generateTestNode(jsonDocumentNode);
         assertFalse(jsonNode.has(UPLOAD_TIMESTAMP));
 
@@ -146,7 +146,7 @@ class CaseDocumentTimestampServiceTest {
         assertTrue(jsonNode.has(UPLOAD_TIMESTAMP));
         assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
 
-        String uploadTimestampNew = Instant.now().toString();
+        String uploadTimestampNew = LocalDateTime.now().toString();
         underTest.insertUploadTimestamp(jsonNode, uploadTimestampNew);
         assertNotEquals(uploadTimestampNew, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
         assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
