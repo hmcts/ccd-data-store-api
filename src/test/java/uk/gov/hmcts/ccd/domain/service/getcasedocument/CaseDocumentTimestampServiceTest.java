@@ -7,10 +7,14 @@ import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,11 +26,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_URL;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.UPLOAD_TIMESTAMP;
 
 @ExtendWith(MockitoExtension.class)
 class CaseDocumentTimestampServiceTest {
+    @Mock
+    private Clock clock;
 
     @InjectMocks
     private CaseDocumentTimestampService underTest;
@@ -36,6 +43,8 @@ class CaseDocumentTimestampServiceTest {
     private final String urlMicrosoft = "https://www.microsoft.com";
     private final String urlElastic = "https://www.elastic.com";
     private final String urlApple = "https://www.apple.com";
+    private final Instant timestamp = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+    private final Clock fixedClock = Clock.fixed(timestamp, ZoneOffset.UTC);
 
     @Test
     void testFindUrlsNotInOriginal() {
@@ -87,6 +96,10 @@ class CaseDocumentTimestampServiceTest {
 
     @Test
     void testAddTimestamp() {
+
+        doReturn(fixedClock.instant()).when(clock).instant();
+        doReturn(fixedClock.getZone()).when(clock).getZone();
+
         Map<String, JsonNode> dataMapOriginal = new HashMap<>();
         JsonNode resultOriginal = generateTestNode(jsonStringOriginal);
         dataMapOriginal.put("testNode", resultOriginal);
