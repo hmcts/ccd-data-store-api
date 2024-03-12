@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
@@ -40,6 +41,9 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
     private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
+    private ApplicationParams applicationParams;
+
+    @Mock
     private CaseStateDefinition caseStateDefinition;
 
     private AccessControlGrantTypeESQueryBuilder accessControlGrantTypeQueryBuilder;
@@ -48,11 +52,11 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
     void setUp() {
         MockitoAnnotations.openMocks(this);
         accessControlGrantTypeQueryBuilder = new AccessControlGrantTypeESQueryBuilder(
-            new BasicGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl),
-            new SpecificGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl),
-            new StandardGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl),
-            new ChallengedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl),
-            new ExcludedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl),
+            new BasicGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
+            new SpecificGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
+            new StandardGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
+            new ChallengedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
+            new ExcludedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
             caseDefinitionRepository,
             caseDataAccessControl);
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
@@ -75,6 +79,20 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
     @Test
     void shouldReturnBasicQueryWhenRoleAssignmentsWithBasicGrantTypeExists() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE", "", "", null);
+        when(caseDataAccessControl.generateRoleAssignments(any(CaseTypeDefinition.class)))
+            .thenReturn(Lists.newArrayList(roleAssignment));
+
+
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
+        assertNotNull(query);
+        assertEquals(1, query.must().size());
+    }
+
+    @Test
+    void shouldReturnBasicQueryWhenRoleAssignmentsWithCaseAccessGroupsExists() {
+        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, null, null, null, null, null, null,
+            null, null, "caseAccessGroupId");
         when(caseDataAccessControl.generateRoleAssignments(any(CaseTypeDefinition.class)))
             .thenReturn(Lists.newArrayList(roleAssignment));
 
