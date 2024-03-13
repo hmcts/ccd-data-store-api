@@ -32,11 +32,11 @@ class CaseAccessGroupsTest {
     void caseAccessGroups() {
 
         assertAll(
-            () -> assertEquals(1,caseAccessGroups.getCaseAccessGroupsList().size()),
+            () -> assertEquals(1,caseAccessGroups.getCaseAccessGroups().size()),
             () -> assertEquals("caseaccessGroupID",
-                caseAccessGroups.getCaseAccessGroupsList().get(0).getCaseAccessGroupId()),
+                caseAccessGroups.getCaseAccessGroups().get(0).getCaseAccessGroupId()),
             () -> assertEquals("caseAccessGroupType1",
-                caseAccessGroups.getCaseAccessGroupsList().get(0).getCaseAccessGroupType())
+                caseAccessGroups.getCaseAccessGroups().get(0).getCaseAccessGroupType())
         );
     }
 
@@ -48,7 +48,7 @@ class CaseAccessGroupsTest {
         caseAccessGroup.setCaseAccessGroupId("caseaccessGroupID");
 
         caseAccessGroupsList.add(caseAccessGroup);
-        caseAccessGroups.setCaseAccessGroupsList(caseAccessGroupsList);
+        caseAccessGroups.setCaseAccessGroups(caseAccessGroupsList);
 
     }
 
@@ -82,7 +82,7 @@ class CaseAccessGroupsTest {
 
     @Test
     public void testCaseAccessGroupHaseCodeSame() {
-        CaseAccessGroup p1 = caseAccessGroups.getCaseAccessGroupsList().get(0);
+        CaseAccessGroup p1 = caseAccessGroups.getCaseAccessGroups().get(0);
 
         Map<CaseAccessGroup, String> map = new HashMap<>();
         map.put(p1, "dummy");
@@ -95,7 +95,7 @@ class CaseAccessGroupsTest {
 
     @Test
     public void testCaseAccessGroupHaseCodeNotSame() {
-        CaseAccessGroup p1 = caseAccessGroups.getCaseAccessGroupsList().get(0);
+        CaseAccessGroup p1 = caseAccessGroups.getCaseAccessGroups().get(0);
 
         Map<CaseAccessGroup, String> map = new HashMap<>();
         map.put(p1, "dummy");

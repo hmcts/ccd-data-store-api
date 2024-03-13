@@ -15,8 +15,8 @@ public class CaseAccessGroup {
 
     public static final String CASE_ACCESS_GROUP_FIELD_ID = "caseAccessGroup";
 
-    private String caseAccessGroupType;
     private String caseAccessGroupId;
+    private String caseAccessGroupType;
 
     @Override
     public boolean equals(Object o) {

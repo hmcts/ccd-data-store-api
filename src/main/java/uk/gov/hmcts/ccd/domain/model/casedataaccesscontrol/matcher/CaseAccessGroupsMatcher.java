@@ -19,7 +19,6 @@ import java.util.Optional;
 @Slf4j
 @Component
 @ConditionalOnProperty(name = "enable-case-group-access-filtering", havingValue = "true")
-
 public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
 
     @Override
@@ -54,7 +53,7 @@ public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
 
     private Optional<List<String>> getCaseAccessGroupIds(CaseDetails caseDetails) {
         JsonNode caseAccessGroups = caseDetails.getData().get(CASE_ACCESS_GROUPS);
-        if (caseAccessGroups != null) {
+        if (caseAccessGroups != null && !caseAccessGroups.isEmpty()) {
             return Optional.ofNullable(getCaseAccessGroupIds(caseAccessGroups));
         }
         return Optional.empty();
