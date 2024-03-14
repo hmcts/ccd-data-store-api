@@ -1,15 +1,19 @@
 {
   "_guid_": "F-1023_CreateCasePreRequisiteCaseworkerBase",
-  "_extends_": "F-1023_CreateCasePreRequisiteCaseworker_noCaseAccessGroup",
+  "_extends_": "F-1023_Test_Data_Base",
 
   "request": {
     "body": {
       "data": {
-        "CaseAccessGroups": [{
-          "CaseAccessGroup": {
-            "caseAccessGroupId": "test",
-            "caseAccessGroupType": "CCD:all-cases-access"
-          }}],
+        "caseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupId": "test",
+              "caseAccessGroupType": "CCD:all-cases-access"
+            },
+            "id": null
+          }
+        ],
         "OrganisationPolicyField1": {
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": "ref",
@@ -33,7 +37,7 @@
   "expectedResponse": {
     "body": {
       "case_data": {
-        "CaseAccessGroups": [
+        "caseAccessGroups": [
           {
             "__ordering__": "UNORDERED",
             "__elementId__": "value"
