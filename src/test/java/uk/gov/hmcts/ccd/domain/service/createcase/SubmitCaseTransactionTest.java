@@ -27,7 +27,14 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroup;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroupForUI;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.Version;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRoleDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
@@ -703,7 +710,8 @@ class SubmitCaseTransactionTest {
         List<CaseAccessGroupForUI> caseAccessGroupForUIs = new ArrayList<>();
         caseAccessGroupForUIs.add(caseAccessGroupForUI);
 
-        CaseAccessGroup caseAccessGroup1 = CaseAccessGroup.builder().caseAccessGroupId("SomeJurisdictionCIVIL:bulk: [RESPONDENT02SOLICITOR]:$ORG$")
+        CaseAccessGroup caseAccessGroup1 = CaseAccessGroup.builder()
+            .caseAccessGroupId("SomeJurisdictionCIVIL:bulk: [RESPONDENT02SOLICITOR]:$ORG$")
             .caseAccessGroupType("CCD:all-cases-access").build();
 
         CaseAccessGroupForUI caseAccessGroupForUI1 = CaseAccessGroupForUI.builder()
