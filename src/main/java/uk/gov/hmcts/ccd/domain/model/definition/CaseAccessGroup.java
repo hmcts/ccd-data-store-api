@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,12 +12,13 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@JsonRootName(value = "value")
 public class CaseAccessGroup {
 
     public static final String CASE_ACCESS_GROUP_FIELD_ID = "caseAccessGroup";
 
-    private String caseAccessGroupId;
     private String caseAccessGroupType;
+    private String caseAccessGroupId;
 
     @Override
     public boolean equals(Object o) {

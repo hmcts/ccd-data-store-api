@@ -32,9 +32,7 @@ public class CaseAccessGroupUtils {
 
     public void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
 
-        if (caseDetails.getData() != null
-            && !caseDetails.getData().isEmpty()
-            && !caseDetails.getData().get(CASE_ACCESS_GROUPS).isEmpty()) {
+        if (isCaseAcessGroupAvailable(caseDetails)) {
 
             removeCCDAllCasesAccessFromCaseAccessGroups(caseDetails);
 
@@ -99,6 +97,12 @@ public class CaseAccessGroupUtils {
 
     }
 
+    private boolean isCaseAcessGroupAvailable(CaseDetails caseDetails) {
+        return caseDetails.getData() != null
+            && !caseDetails.getData().isEmpty()
+            && caseDetails.getData().get(CASE_ACCESS_GROUPS) != null
+            && !caseDetails.getData().get(CASE_ACCESS_GROUPS).isEmpty();
+    }
 
 
     public JsonNode findOrganisationPolicyNodeForCaseRole(CaseDetails caseDetails, String caseRoleId) {
