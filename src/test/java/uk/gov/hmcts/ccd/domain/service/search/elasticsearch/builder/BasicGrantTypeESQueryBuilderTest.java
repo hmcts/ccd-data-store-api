@@ -157,6 +157,6 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
 
         assertNotNull(query);
         assertTrue(query.hasClauses());
-        assertFalse(query.toString().contains("caseAccessGroups"));
+        assertFalse(query.toString().contains("CaseAccessGroups"));
     }
 }
