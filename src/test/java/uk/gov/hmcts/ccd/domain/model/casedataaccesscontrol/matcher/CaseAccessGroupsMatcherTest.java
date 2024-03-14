@@ -23,7 +23,7 @@ class CaseAccessGroupsMatcherTest extends BaseFilter {
 
     private CaseAccessGroupsMatcher classUnderTest;
     private final String simpleGAjsonRequest = "{\n"
-        + "  \"caseAccessGroups\": [\n"
+        + "  \"CaseAccessGroups\": [\n"
         + "    {\n"
         + "      \"id\": \"id1\",\n"
         + "      \"value\": {\n"
@@ -159,7 +159,7 @@ class CaseAccessGroupsMatcherTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails();
         ObjectMapper mapper = new ObjectMapper();
 
-        String missing = "{\n\"caseAccessGroups\": \"\"}\n";
+        String missing = "{\n\"CaseAccessGroups\": \"\"}\n";
 
         Map<String, JsonNode> dataMap = JacksonUtils.convertValue(mapper.readTree(missing));
 
