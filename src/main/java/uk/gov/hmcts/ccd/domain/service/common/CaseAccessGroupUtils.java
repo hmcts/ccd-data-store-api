@@ -34,6 +34,7 @@ public class CaseAccessGroupUtils {
 
         if (caseDetails.getData() != null
             && !caseDetails.getData().isEmpty()
+            && caseDetails.getData().get(CASE_ACCESS_GROUPS) != null
             && !caseDetails.getData().get(CASE_ACCESS_GROUPS).isEmpty()) {
 
             removeCCDAllCasesAccessFromCaseAccessGroups(caseDetails);
