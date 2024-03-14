@@ -7,13 +7,8 @@
       "data": {
         "CaseAccessGroups": [{
           "CaseAccessGroup": {
-            "caseAccessGroupId": "CCD:all-cases-access",
-            "caseAccessGroupType": "CaseAccessGroupType"
-          }
-        }, {
-          "CaseAccessGroup": {
-          "caseAccessGroupId": "CaseAccessGroupId",
-          "caseAccessGroupType": null
+            "caseAccessGroupId": "test",
+            "caseAccessGroupType": "CCD:all-cases-access"
           }}],
         "OrganisationPolicyField1": {
           "OrgPolicyCaseAssignedRole": "[Claimant]",
@@ -45,14 +40,8 @@
           },
           {
           "value": {
-            "caseAccessGroupId": "CCD:all-cases-access",
-            "caseAccessGroupType": "CaseAccessGroupType"
-          },
-            "id": "[[ANYTHING_PRESENT]]"
-        }, {
-          "value": {
-            "caseAccessGroupId": "CaseAccessGroupId",
-            "caseAccessGroupType": null
+            "caseAccessGroupId": "test",
+            "caseAccessGroupType": "CCD:all-cases-access"
           },
             "id": "[[ANYTHING_PRESENT]]"
         }]
