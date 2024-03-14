@@ -4,8 +4,7 @@
   "title": "caseAccessGroupType has CCD:all-cases-access, accessType has GroupRoleName, OrganisationPolicyField has CaseAssignedRoleField and value in Organisation.OrganisationID and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroupId created",
 
   "prerequisites" : [ {
-      "Token_Creation": "S-1023_GetCreateToken",
-      "Case_1": "F-1023_CreateCasePreRequisiteCaseworkerBase"
+      "Token_Creation": "S-1023_GetCreateToken"
     }
   ],
   "specs": [
@@ -62,7 +61,7 @@
         "CaseAccessGroups" : [ {
           "value" : {
             "caseAccessGroupType" : "CCD:all-cases-access",
-            "caseAccessGroupId" : ""
+            "caseAccessGroupId" : "test"
           },
           "id" : null
         } ]
@@ -73,7 +72,7 @@
           "value" : [ {
             "value" : {
               "caseAccessGroupType" : "CCD:all-cases-access",
-              "caseAccessGroupId" : ""
+              "caseAccessGroupId" : "test"
             },
             "id" : null
           } ]
