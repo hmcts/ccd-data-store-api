@@ -43,7 +43,7 @@ abstract class GrantTypeESQueryBuilderTest {
                                                                List<String> autorisations,
                                                                String caseId) {
         return createRoleAssignment(grantType, roleType, classification, jurisdiction,
-            location, region, autorisations, caseId, null);
+            location, region, autorisations, caseId, null, null);
     }
 
     protected static final RoleAssignment createRoleAssignment(GrantType grantType,
@@ -54,12 +54,14 @@ abstract class GrantTypeESQueryBuilderTest {
                                                                String region,
                                                                List<String> autorisations,
                                                                String caseId,
-                                                               String roleName) {
+                                                               String roleName,
+                                                               String caseAccessGroupId) {
         RoleAssignmentAttributes attributes = RoleAssignmentAttributes.builder()
             .jurisdiction(Optional.ofNullable(jurisdiction))
             .location(Optional.ofNullable(location))
             .region(Optional.ofNullable(region))
             .caseId(Optional.ofNullable(caseId))
+            .caseAccessGroupId(Optional.ofNullable(caseAccessGroupId))
             .build();
         return RoleAssignment.builder()
             .grantType(grantType.name())

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "enable-case-group-access-filtering", havingValue = "true")
 public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
 
     @Override
