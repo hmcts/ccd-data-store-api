@@ -5,29 +5,12 @@
   "request": {
     "body": {
       "data": {
-        "caseAccessGroups": [
-          {
-            "value": {
-              "caseAccessGroupId": "test",
-              "caseAccessGroupType": "CCD:all-cases-access"
-            },
-            "id": null
-          }
-        ],
-        "OrganisationPolicyField1": {
+        "OrganisationPolicyField": {
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
-          }
-        },
-        "OrganisationPolicyField2": {
-          "OrgPolicyCaseAssignedRole": "[Defendant]",
-          "OrgPolicyReference": "ref",
-          "Organisation": {
-            "OrganisationID": "orgID2",
-            "OrganisationName": "orgName2"
           }
         }
       }
@@ -37,6 +20,14 @@
   "expectedResponse": {
     "body": {
       "case_data": {
+        "OrganisationPolicyField": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        },
         "caseAccessGroups": [
           {
             "__ordering__": "UNORDERED",
@@ -47,7 +38,7 @@
             "caseAccessGroupId": "test",
             "caseAccessGroupType": "CCD:all-cases-access"
           },
-            "id": "[[ANYTHING_PRESENT]]"
+            "id": null
         }]
       },
       "data_classification": {
