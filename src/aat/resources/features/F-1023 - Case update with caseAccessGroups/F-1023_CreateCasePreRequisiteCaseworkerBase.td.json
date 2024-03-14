@@ -1,0 +1,66 @@
+{
+  "_guid_": "F-1023_CreateCasePreRequisiteCaseworkerBase",
+  "_extends_": "F-1023_CreateCasePreRequisiteCaseworker_noCaseAccessGroup",
+
+  "request": {
+    "body": {
+      "data": {
+        "CaseAccessGroups": [{
+          "CaseAccessGroup": {
+            "caseAccessGroupId": "CCD:all-cases-access",
+            "caseAccessGroupType": "CaseAccessGroupType"
+          }
+        }, {
+          "CaseAccessGroup": {
+          "caseAccessGroupId": "CaseAccessGroupId",
+          "caseAccessGroupType": null
+          }}],
+        "OrganisationPolicyField1": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        },
+        "OrganisationPolicyField2": {
+          "OrgPolicyCaseAssignedRole": "[Defendant]",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID2",
+            "OrganisationName": "orgName2"
+          }
+        }
+      }
+      }
+    },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "CaseAccessGroups": [
+          {
+            "__ordering__": "UNORDERED",
+            "__elementId__": "value"
+          },
+          {
+          "value": {
+            "caseAccessGroupId": "CCD:all-cases-access",
+            "caseAccessGroupType": "CaseAccessGroupType"
+          },
+            "id": "[[ANYTHING_PRESENT]]"
+        }, {
+          "value": {
+            "caseAccessGroupId": "CaseAccessGroupId",
+            "caseAccessGroupType": null
+          },
+            "id": "[[ANYTHING_PRESENT]]"
+        }]
+      },
+      "data_classification": {
+        "_extends_": "CaseAccessGroups_Classifications"
+      },
+      "supplementary_data": null
+    }
+  }
+}

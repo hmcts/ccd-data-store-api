@@ -4,6 +4,7 @@ import javax.inject.Inject;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
@@ -29,9 +30,10 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              SecurityClassificationService securityClassificationService,
                                              CaseDataAccessControl caseDataAccessControl,
                                              MessageService messageService,
-                                             CaseDocumentService caseDocumentService) {
+                                             CaseDocumentService caseDocumentService,
+                                             ApplicationParams applicationParams) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
-            caseDataAccessControl, messageService, caseDocumentService);
+            caseDataAccessControl, messageService, caseDocumentService, applicationParams);
     }
 }

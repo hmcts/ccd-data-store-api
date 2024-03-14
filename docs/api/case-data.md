@@ -312,3 +312,17 @@ A `CaseLink` is a field used to reference another CCD case using its universal 1
   }
 }
 ```
+
+### CaseAccessGroups
+
+An CaseAccessGroup field which accepts 'caseAccessGroupType' and 'caseAccessGroupId' as string values.
+
+```json
+{
+  "caseAccessGroups": [ {
+    "caseAccessGroupType": "CaseAccessGroupType1",
+    "caseAccessGroupId": "CaseAccessGroupId1"
+  }]
+}
+```
+
