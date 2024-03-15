@@ -20,7 +20,7 @@ class CaseAccessGroupTest {
     }
 
     @Test
-    public void testCaseAccessGroupHaseCodeSame() {
+   void testCaseAccessGroupHaseCodeSame() {
         CaseAccessGroup p1 = new CaseAccessGroup();
 
         Map<CaseAccessGroup, String> map = new HashMap<>();
@@ -33,7 +33,7 @@ class CaseAccessGroupTest {
     }
 
     @Test
-    public void testCaseAccessGroupHaseCodeNull() {
+    void testCaseAccessGroupHaseCodeNull() {
         CaseAccessGroup p1 = new CaseAccessGroup();
 
         Map<CaseAccessGroup, String> map = new HashMap<>();

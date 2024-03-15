@@ -401,7 +401,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
     @Test
     @DisplayName("should create a case With OrganisationID and any caseAccesstype in CaseAccessGroup")
-    void shouldValidationExceptionCreateCaseEventWithOrganisationID() throws IOException {
+    void shouldCreateCaseEventWithOrganisationID() throws IOException {
         doReturn(true).when(applicationParams).getCaseGroupAccessFilteringEnabled();
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setCaseTypeId("SomeCaseType");
@@ -542,6 +542,98 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
         String caseAccessGroupType = "CCD:all-cases-access";
+        String caseAccessGroupID = "SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
+            + " 550e8400-e29b-41d4-a716-446655440000";
+
+        List<CaseAccessGroupForUI> caseAccessGroupForUIs = new ArrayList<>();
+
+        CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseAccessGroupID)
+            .caseAccessGroupType(caseAccessGroupType).build();
+
+        CaseAccessGroupForUI caseAccessGroupForUI = CaseAccessGroupForUI.builder()
+            .caseAccessGroup(caseAccessGroup)
+            .id(UUID.randomUUID().toString()).build();
+        caseAccessGroupForUIs.add(caseAccessGroupForUI);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
+        Map<String, JsonNode> dataCaseAccessGroup = new HashMap<>();
+        dataCaseAccessGroup.put("CaseAccessGroups", data);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
+
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
+        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            inputCaseDetails,
+            IGNORE_WARNING,
+            null);
+
+
+        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+
+    }
+
+    @Test
+    @DisplayName("should create a case With OrganisationID, CaseAccessGroup caseAccesstype"
+        + " has CCD:all-cases-access and any string")
+    void shouldPersistCreateCaseEventWithOrganisationIDMergeCaseAccessGroup() throws IOException {
+        doReturn(true).when(applicationParams).getCaseGroupAccessFilteringEnabled();
+        CaseDetails inputCaseDetails = new CaseDetails();
+        inputCaseDetails.setCaseTypeId("SomeCaseType");
+        inputCaseDetails.setJurisdiction("SomeJurisdiction");
+        inputCaseDetails.setState("SomeState");
+
+        AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn(inputCaseDetails).when(caseDocumentService).stripDocumentHashes(inputCaseDetails);
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
+            null,
+            inputCaseDetails,
+            caseTypeDefinition,
+            IGNORE_WARNING);
+
+        AccessTypeRoleDefinition accessTypeRolesDefinition = new AccessTypeRoleDefinition();
+        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
+        accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId");
+        accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName");
+        accessTypeRolesDefinition.setGroupRoleName("GroupRoleName");
+        accessTypeRolesDefinition.setCaseAccessGroupIdTemplate("SomeJurisdiction:CIVIL:bulk:"
+            + "[RESPONDENT01SOLICITOR]:$ORGID$");
+        accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedField");
+
+        List<AccessTypeRoleDefinition> accessTypeRolesDefinitions = new ArrayList<AccessTypeRoleDefinition>();
+        accessTypeRolesDefinitions.add(accessTypeRolesDefinition);
+
+        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
+        accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId1");
+        accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName1");
+
+        AccessTypeRoleDefinition accessTypeRolesDefinition1 = new AccessTypeRoleDefinition();
+        accessTypeRolesDefinition1.setGroupRoleName("GroupRoleName1");
+        accessTypeRolesDefinition1.setCaseAccessGroupIdTemplate("SomeJurisdictionCIVIL:bulk:"
+            + "[RESPONDENT01SOLICITOR]:$ORGID$");
+        accessTypeRolesDefinition1.setCaseAssignedRoleField("caseAssignedField");
+        accessTypeRolesDefinitions.add(accessTypeRolesDefinition1);
+
+        caseTypeDefinition.setAccessTypeRoleDefinitions(accessTypeRolesDefinitions);
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+
+        inputCaseDetails.setData(dataMap);
+
+        //Map<String, JsonNode> dataOrganisation = Collections.singletonMap("Organisation.OrganisationID",
+        //    new TextNode("550e8400-e29b-41d4-a716-446655440000"));
+        Map<String, JsonNode> dataOrganisation = organisationPolicyCaseData("caseAssignedField",
+            "\"550e8400-e29b-41d4-a716-446655440000\"");
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+        String caseAccessGroupType = "Any String";
         String caseAccessGroupID = "SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
             + " 550e8400-e29b-41d4-a716-446655440000";
 
