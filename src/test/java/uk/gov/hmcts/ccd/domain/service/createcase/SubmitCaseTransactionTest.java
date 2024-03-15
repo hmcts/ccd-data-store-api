@@ -1,17 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,21 +11,16 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroup;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroupForUI;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRoleDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
@@ -46,34 +32,27 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.ApplicationParams;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Collections;
-import java.util.UUID;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
@@ -103,8 +82,6 @@ class SubmitCaseTransactionTest {
     private static final String ON_BEHALF_OF_ID = "24";
     private static final String ON_BEHALF_OF_FNAME = "Pierre OnBehalf";
     private static final String ON_BEHALF_OF_LNAME = "Martin OnBehalf";
-
-    private static final String ORGANISATION_PROFILE = "OrganisationProfile1";
 
 
     @Mock
@@ -136,9 +113,6 @@ class SubmitCaseTransactionTest {
     @Mock
     private MessageService messageService;
 
-    @Mock
-    private ApplicationParams applicationParams;
-
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -146,8 +120,8 @@ class SubmitCaseTransactionTest {
     private IdamUser idamUser;
     private CaseEventDefinition caseEventDefinition;
     private CaseStateDefinition state;
-
-    private ObjectMapper objectMapper;
+    @Mock
+    private ApplicationParams applicationParams;
 
     @BeforeEach
     void setup() {
@@ -187,12 +161,6 @@ class SubmitCaseTransactionTest {
                                                                              null,
                                                                              this.caseDetails, caseTypeDefinition,
                                                                              IGNORE_WARNING);
-
-        objectMapper = new ObjectMapper()
-            .registerModule(new Jdk8Module())
-            .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
-            .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
 
     }
 
@@ -321,8 +289,7 @@ class SubmitCaseTransactionTest {
             IGNORE_WARNING,
             null);
 
-        verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null,
-            caseDetails, caseTypeDefinition,
+        verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null, caseDetails, caseTypeDefinition,
             IGNORE_WARNING);
     }
 
@@ -459,272 +426,6 @@ class SubmitCaseTransactionTest {
             new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {
             });
 
-        return result;
-    }
-
-    @Test
-    @DisplayName("should create a case With OrganisationID and update CaseAccessGroup")
-    void shouldPersistCreateCaseEventWithOrganisationIDUpdateCaseAccessGroup() throws IOException {
-        doReturn(true).when(applicationParams).getCaseGroupAccessFilteringEnabled();
-        CaseDetails inputCaseDetails = new CaseDetails();
-        inputCaseDetails.setCaseTypeId("SomeCaseType");
-        inputCaseDetails.setJurisdiction("SomeJurisdiction");
-        inputCaseDetails.setState("SomeState");
-
-        AboutToSubmitCallbackResponse response = buildResponse();
-        doReturn(inputCaseDetails).when(caseDocumentService).stripDocumentHashes(inputCaseDetails);
-        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
-            null,
-            inputCaseDetails,
-            caseTypeDefinition,
-            IGNORE_WARNING);
-
-        AccessTypeRoleDefinition accessTypeRolesDefinition = new AccessTypeRoleDefinition();
-        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
-        accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId");
-        accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName");
-        accessTypeRolesDefinition.setGroupRoleName("GroupRoleName");
-        accessTypeRolesDefinition.setCaseAccessGroupIdTemplate("SomeJurisdiction:CIVIL:bulk:"
-            + "[RESPONDENT01SOLICITOR]:$ORGID$");
-        accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedField");
-
-        List<AccessTypeRoleDefinition> accessTypeRolesDefinitions = new ArrayList<AccessTypeRoleDefinition>();
-        accessTypeRolesDefinitions.add(accessTypeRolesDefinition);
-
-        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
-        accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId1");
-        accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName1");
-
-        AccessTypeRoleDefinition accessTypeRolesDefinition1 = new AccessTypeRoleDefinition();
-        accessTypeRolesDefinition1.setGroupRoleName("GroupRoleName1");
-        accessTypeRolesDefinition1.setCaseAccessGroupIdTemplate("SomeJurisdictionCIVIL:bulk:"
-            + "[RESPONDENT01SOLICITOR]:$ORGID$");
-        accessTypeRolesDefinition1.setCaseAssignedRoleField("caseAssignedField");
-        accessTypeRolesDefinitions.add(accessTypeRolesDefinition1);
-
-        caseTypeDefinition.setAccessTypeRoleDefinitions(accessTypeRolesDefinitions);
-
-        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-
-        inputCaseDetails.setData(dataMap);
-
-        //Map<String, JsonNode> dataOrganisation = Collections.singletonMap("Organisation.OrganisationID",
-        //    new TextNode("550e8400-e29b-41d4-a716-446655440000"));
-        Map<String, JsonNode> dataOrganisation = organisationPolicyCaseData("caseAssignedField",
-            "\"550e8400-e29b-41d4-a716-446655440000\"");
-
-        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
-
-        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
-        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
-        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
-        submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
-            idamUser,
-            caseEventDefinition,
-            inputCaseDetails,
-            IGNORE_WARNING,
-            null);
-
-
-        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
-    }
-
-    @Test
-    @DisplayName("should create a case With OrganisationID, CaseAccessGroup and update CaseAccessGroup")
-    void shouldPersistCreateCaseEventWithOrganisationIDCaseAccessGroupUpdateCaseAccessGroup() throws IOException {
-        doReturn(true).when(applicationParams).getCaseGroupAccessFilteringEnabled();
-        CaseDetails inputCaseDetails = new CaseDetails();
-        inputCaseDetails.setCaseTypeId("SomeCaseType");
-        inputCaseDetails.setJurisdiction("SomeJurisdiction");
-        inputCaseDetails.setState("SomeState");
-
-        AboutToSubmitCallbackResponse response = buildResponse();
-        doReturn(inputCaseDetails).when(caseDocumentService).stripDocumentHashes(inputCaseDetails);
-        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
-            null,
-            inputCaseDetails,
-            caseTypeDefinition,
-            IGNORE_WARNING);
-
-        AccessTypeRoleDefinition accessTypeRolesDefinition = new AccessTypeRoleDefinition();
-        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
-        accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId");
-        accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName");
-        accessTypeRolesDefinition.setGroupRoleName("GroupRoleName");
-        accessTypeRolesDefinition.setCaseAccessGroupIdTemplate("SomeJurisdiction:CIVIL:bulk:"
-            + "[RESPONDENT01SOLICITOR]:$ORGID$");
-        accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedField");
-
-        List<AccessTypeRoleDefinition> accessTypeRolesDefinitions = new ArrayList<AccessTypeRoleDefinition>();
-        accessTypeRolesDefinitions.add(accessTypeRolesDefinition);
-
-        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
-        accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId1");
-        accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName1");
-
-        AccessTypeRoleDefinition accessTypeRolesDefinition1 = new AccessTypeRoleDefinition();
-        accessTypeRolesDefinition1.setGroupRoleName("GroupRoleName1");
-        accessTypeRolesDefinition1.setCaseAccessGroupIdTemplate("SomeJurisdictionCIVIL:bulk:"
-            + "[RESPONDENT01SOLICITOR]:$ORGID$");
-        accessTypeRolesDefinition1.setCaseAssignedRoleField("caseAssignedField");
-        accessTypeRolesDefinitions.add(accessTypeRolesDefinition1);
-
-        caseTypeDefinition.setAccessTypeRoleDefinitions(accessTypeRolesDefinitions);
-
-        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-
-        inputCaseDetails.setData(dataMap);
-
-        //Map<String, JsonNode> dataOrganisation = Collections.singletonMap("Organisation.OrganisationID",
-        //    new TextNode("550e8400-e29b-41d4-a716-446655440000"));
-        Map<String, JsonNode> dataOrganisation = organisationPolicyCaseData("caseAssignedField",
-            "\"550e8400-e29b-41d4-a716-446655440000\"");
-
-        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
-
-        String caseAccessGroupType = "CCD:all-cases-access";
-        String caseAccessGroupID = "SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
-            + " 550e8400-e29b-41d4-a716-446655440000";
-        Map<String, JsonNode> dataCaseAccessGroup = caseAccessGroupCaseData(caseAccessGroupType,
-            caseAccessGroupID);
-
-        JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
-
-        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
-        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
-        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
-        submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
-            idamUser,
-            caseEventDefinition,
-            inputCaseDetails,
-            IGNORE_WARNING,
-            null);
-
-
-        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
-    }
-
-    @Ignore //This no longer occurs
-    @DisplayName("should throw ValidationException when create a case With OrganisationID")
-    void shouldValidationExceptionCreateCaseEventWithOrganisationID() throws IOException {
-        doReturn(true).when(applicationParams).getCaseGroupAccessFilteringEnabled();
-        CaseDetails inputCaseDetails = new CaseDetails();
-        inputCaseDetails.setCaseTypeId("SomeCaseType");
-        inputCaseDetails.setJurisdiction("SomeJurisdiction");
-        inputCaseDetails.setState("SomeState");
-
-        AboutToSubmitCallbackResponse response = buildResponse();
-        doReturn(inputCaseDetails).when(caseDocumentService).stripDocumentHashes(inputCaseDetails);
-        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
-            null,
-            inputCaseDetails,
-            caseTypeDefinition,
-            IGNORE_WARNING);
-
-        AccessTypeRoleDefinition accessTypeRolesDefinition = new AccessTypeRoleDefinition();
-        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
-        accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId");
-        accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName");
-        accessTypeRolesDefinition.setGroupRoleName("GroupRoleName");
-        accessTypeRolesDefinition.setCaseAccessGroupIdTemplate("SomeJurisdiction:CIVIL:bulk:"
-            + "[RESPONDENT01SOLICITOR]:$ORGID$");
-        accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedField");
-
-        List<AccessTypeRoleDefinition> accessTypeRolesDefinitions = new ArrayList<AccessTypeRoleDefinition>();
-        accessTypeRolesDefinitions.add(accessTypeRolesDefinition);
-
-        accessTypeRolesDefinition.setCaseTypeId(caseTypeDefinition.getId());
-        accessTypeRolesDefinition.setAccessTypeId("someAccessTypeId1");
-        accessTypeRolesDefinition.setOrganisationalRoleName("someOrgProfileName1");
-
-        AccessTypeRoleDefinition accessTypeRolesDefinition1 = new AccessTypeRoleDefinition();
-        accessTypeRolesDefinition1.setGroupRoleName("GroupRoleName1");
-        accessTypeRolesDefinition1.setCaseAccessGroupIdTemplate("SomeJurisdictionCIVIL:bulk:"
-            + "[RESPONDENT02SOLICITOR]:$ORGID$");
-        accessTypeRolesDefinition1.setCaseAssignedRoleField("caseAssignedField");
-        accessTypeRolesDefinitions.add(accessTypeRolesDefinition1);
-
-        caseTypeDefinition.setAccessTypeRoleDefinitions(accessTypeRolesDefinitions);
-
-        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-
-        inputCaseDetails.setData(dataMap);
-
-        Map<String, JsonNode> dataOrganisation = Collections.singletonMap("Organisation.OrganisationID",
-            new TextNode("550e8400-e29b-41d4-a716-446655440000"));
-        //Map<String, JsonNode> dataOrganisation = organisationPolicyCaseData("caseAssignedField",
-        //    "\"550e8400-e29b-41d4-a716-446655440000\"");
-
-        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
-
-        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
-        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
-        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
-        final ValidationException exception = assertThrows(ValidationException.class, ()
-            -> submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
-            idamUser,
-            caseEventDefinition,
-            inputCaseDetails,
-            IGNORE_WARNING,
-            null));
-
-        assertEquals("No Organisation Policy found with case role ID 'caseAssignedField'", exception.getMessage());
-
-    }
-
-    private Map<String, JsonNode> organisationPolicyCaseData(String role, String organisationId)
-        throws JsonProcessingException {
-
-        JsonNode data = MAPPER.readTree(""
-            + "{"
-            + "  \"Organisation\": {"
-            + "    \"OrganisationID\": " + organisationId + ","
-            + "    \"OrganisationName\": \"OrganisationName1\""
-            + "  },"
-            + "  \"OrgPolicyReference\": null,"
-            + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\""
-            + "}");
-
-        Map<String, JsonNode> result = new HashMap<>();
-        result.put("OrganisationPolicyField", data);
-        return result;
-    }
-
-    private Map<String, JsonNode> caseAccessGroupCaseData(String caseAccessGroupType, String caseAccessGroupID)
-        throws JsonProcessingException {
-
-        CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseAccessGroupID)
-            .caseAccessGroupType(caseAccessGroupType).build();
-
-        CaseAccessGroupForUI caseAccessGroupForUI = CaseAccessGroupForUI.builder()
-            .caseAccessGroup(caseAccessGroup)
-            .id(UUID.randomUUID().toString()).build();
-
-        List<CaseAccessGroupForUI> caseAccessGroupForUIs = new ArrayList<>();
-        caseAccessGroupForUIs.add(caseAccessGroupForUI);
-
-        CaseAccessGroup caseAccessGroup1 = CaseAccessGroup.builder()
-            .caseAccessGroupId("SomeJurisdictionCIVIL:bulk: [RESPONDENT02SOLICITOR]:$ORG$")
-            .caseAccessGroupType("CCD:all-cases-access").build();
-
-        CaseAccessGroupForUI caseAccessGroupForUI1 = CaseAccessGroupForUI.builder()
-            .caseAccessGroup(caseAccessGroup)
-            .id(UUID.randomUUID().toString()).build();
-
-        caseAccessGroupForUIs.add(caseAccessGroupForUI1);
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
-        Map<String, JsonNode> result = new HashMap<>();
-        result.put("CaseAccessGroups", data);
         return result;
     }
 
