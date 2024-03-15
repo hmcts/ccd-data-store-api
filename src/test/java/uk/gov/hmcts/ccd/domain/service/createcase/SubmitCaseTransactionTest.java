@@ -57,6 +57,7 @@ import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -705,7 +706,7 @@ class SubmitCaseTransactionTest {
 
         CaseAccessGroupForUI caseAccessGroupForUI = CaseAccessGroupForUI.builder()
             .caseAccessGroup(caseAccessGroup)
-            .id(1).build();
+            .id(UUID.randomUUID().toString()).build();
 
         List<CaseAccessGroupForUI> caseAccessGroupForUIs = new ArrayList<>();
         caseAccessGroupForUIs.add(caseAccessGroupForUI);
@@ -716,7 +717,7 @@ class SubmitCaseTransactionTest {
 
         CaseAccessGroupForUI caseAccessGroupForUI1 = CaseAccessGroupForUI.builder()
             .caseAccessGroup(caseAccessGroup)
-            .id(2).build();
+            .id(UUID.randomUUID().toString()).build();
 
         caseAccessGroupForUIs.add(caseAccessGroupForUI1);
 
