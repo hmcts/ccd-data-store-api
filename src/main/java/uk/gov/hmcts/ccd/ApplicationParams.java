@@ -182,12 +182,8 @@ public class ApplicationParams {
     @Value("${enable-case-users-db-sync}")
     private boolean enableCaseUsersDbSync;
 
-    @Value("${ccd.jurisdiction-upload-timestamp-enabled}")
-    private boolean jurisdictionUploadTimestampEnabled;
-
-    @Value("${ccd.upload-timestamp-featured-jurisdiction}")
-    private String uploadTimestampFeaturedJurisdiction;
-
+    @Value("#{'${ccd.upload-timestamp.enabled-jurisdictions}'.split(',')}")
+    private List<String> uploadTimestampEnabledJurisdictions;
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
