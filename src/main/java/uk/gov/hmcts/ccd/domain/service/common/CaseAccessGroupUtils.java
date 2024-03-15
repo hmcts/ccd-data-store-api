@@ -141,6 +141,7 @@ public class CaseAccessGroupUtils {
                     if (field != null
                         && field.get(CASE_ACCESS_GROUP_TYPE) != null
                         && field.get(CASE_ACCESS_GROUP_TYPE).textValue().equals(CCD_ALL_CASES)) {
+                        removeClassificationForId(caseAccessGroupTypeValueNode);
                         caseAccessGroupsJsonNodes.remove(i);
                         i--;
                         break;
@@ -165,5 +166,11 @@ public class CaseAccessGroupUtils {
                     && hasOrganisationPolicyNodeForCaseRole(caseDetails, accessTypeRole.getCaseAssignedRoleField())
             )
             .toList();
+    }
+
+    private void removeClassificationForId(JsonNode caseAccessGroupTypeValueNode){
+
+
+
     }
 }
