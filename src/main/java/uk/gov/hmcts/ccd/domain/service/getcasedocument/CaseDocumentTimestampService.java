@@ -121,7 +121,7 @@ public class CaseDocumentTimestampService {
         }
     }
 
-    protected boolean isJurisdictionUploadTimestampFeatureEnabled(String caseJurisdiction) {
+    private boolean isJurisdictionUploadTimestampFeatureEnabled(String caseJurisdiction) {
         return (applicationParams.isJurisdictionUploadTimestampEnabled()
             && null != applicationParams.getUploadTimestampFeaturedJurisdiction()
             && caseJurisdiction.equalsIgnoreCase(applicationParams.getUploadTimestampFeaturedJurisdiction()));
