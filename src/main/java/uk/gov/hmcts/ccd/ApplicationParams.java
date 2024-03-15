@@ -182,6 +182,12 @@ public class ApplicationParams {
     @Value("${enable-case-users-db-sync}")
     private boolean enableCaseUsersDbSync;
 
+    @Value("${ccd.jurisdiction-upload-timestamp-enabled}")
+    private boolean jurisdictionUploadTimestampEnabled;
+
+    @Value("${ccd.upload-timestamp-featured-jurisdiction}")
+    private String uploadTimestampFeaturedJurisdiction;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
@@ -622,5 +628,13 @@ public class ApplicationParams {
 
     public boolean getCaseGroupAccessFilteringEnabled() {
         return enableCaseGroupAccessFiltering;
+    }
+
+    public boolean isJurisdictionUploadTimestampEnabled() {
+        return jurisdictionUploadTimestampEnabled;
+    }
+
+    public String getUploadTimestampFeaturedJurisdiction() {
+        return uploadTimestampFeaturedJurisdiction;
     }
 }

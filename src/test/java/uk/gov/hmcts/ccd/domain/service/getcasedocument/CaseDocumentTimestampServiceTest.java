@@ -101,9 +101,6 @@ class CaseDocumentTimestampServiceTest {
     @Test
     void testAddTimestamp() {
 
-        //when(clock.instant()).thenReturn(fixedClock.instant());
-        //when(clock.getZone()).thenReturn(fixedClock.getZone());
-
         Map<String, JsonNode> dataMapOriginal = new HashMap<>();
         JsonNode resultOriginal = generateTestNode(jsonStringOriginal);
         dataMapOriginal.put("testNode", resultOriginal);
