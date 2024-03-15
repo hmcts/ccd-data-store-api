@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroup;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroupForUI;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +76,6 @@ public class CaseAccessGroupUtils {
         if (!caseAccessGroupForUIs.isEmpty()) {
             JsonNode caseAccessGroupForUIsNode = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
             if (caseDetails.getData().get(CASE_ACCESS_GROUPS) != null) {
-                ObjectMapper objMapper = new ObjectMapper();
                 JsonNode caseDataCaseAccessGroup = caseDetails.getData().get(CASE_ACCESS_GROUPS);
                 String mergedValue = caseDataCaseAccessGroup.toString() + caseAccessGroupForUIsNode.toString();
                 mergedValue = mergedValue.replace("][",",");
@@ -84,18 +84,16 @@ public class CaseAccessGroupUtils {
                     // remove the duplicate entry and convert string to json
                     mergedNode = new ObjectMapper().readTree(mergedValue);
                 } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+                    throw new ValidationException(String.format(e.getMessage()));
                 }
 
                 caseDetails.getData().put(CASE_ACCESS_GROUPS, mergedNode);
 
             } else {
-                ObjectMapper objMapper = new ObjectMapper();
                 caseDetails.getData().put(CASE_ACCESS_GROUPS, caseAccessGroupForUIsNode);
             }
 
-            //Output will be: {"k":"v","secondK":"secondV"}
-            LOG.debug("" + caseDetails.getData().get(CASE_ACCESS_GROUPS));
+            LOG.debug("CASE_ACCESS_GROUPS = " + caseDetails.getData().get(CASE_ACCESS_GROUPS));
         }
     }
 
