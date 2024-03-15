@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -156,10 +157,12 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private UIDService uidService;
     @Mock
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    @Mock
+    private ApplicationParams applicationParams;
 
     @Spy
     private CaseDocumentTimestampService caseDocumentTimestampService =
-        new CaseDocumentTimestampService(Clock.systemDefaultZone());
+        new CaseDocumentTimestampService(Clock.systemDefaultZone(), applicationParams);
 
     @InjectMocks
     private CreateCaseEventService underTest;

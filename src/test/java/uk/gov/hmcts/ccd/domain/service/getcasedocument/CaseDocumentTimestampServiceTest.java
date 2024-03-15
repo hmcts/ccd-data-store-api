@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.time.Clock;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_URL;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.UPLOAD_TIMESTAMP;
 
@@ -34,6 +35,9 @@ import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.
 class CaseDocumentTimestampServiceTest {
     @Mock
     private Clock clock;
+
+    @Mock
+    private ApplicationParams applicationParams;;
 
     @InjectMocks
     private CaseDocumentTimestampService underTest;
@@ -97,8 +101,8 @@ class CaseDocumentTimestampServiceTest {
     @Test
     void testAddTimestamp() {
 
-        doReturn(fixedClock.instant()).when(clock).instant();
-        doReturn(fixedClock.getZone()).when(clock).getZone();
+        //when(clock.instant()).thenReturn(fixedClock.instant());
+        //when(clock.getZone()).thenReturn(fixedClock.getZone());
 
         Map<String, JsonNode> dataMapOriginal = new HashMap<>();
         JsonNode resultOriginal = generateTestNode(jsonStringOriginal);
@@ -113,6 +117,11 @@ class CaseDocumentTimestampServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(caseDetailsDb.getReference());
         caseDetails.setData(dataMap);
+
+        when(applicationParams.isJurisdictionUploadTimestampEnabled()).thenReturn(true);
+        when(applicationParams.getUploadTimestampFeaturedJurisdiction()).thenReturn(caseDetails.getJurisdiction());
+
+
 
         final int countExpectedChanges = 5;
 
@@ -181,6 +190,35 @@ class CaseDocumentTimestampServiceTest {
         assertEquals(5, listUrlsNew.size());
 
         listUrlsNew.forEach(System.out::println);
+    }
+
+    @Test
+    void testIsJurisdictionUploadTimestampFeatureEnabledForNullJurisdiction() {
+        final String jurisdiction = "Case Jurisdiction";
+        when(applicationParams.isJurisdictionUploadTimestampEnabled()).thenReturn(true);
+        when(applicationParams.getUploadTimestampFeaturedJurisdiction()).thenReturn(null);
+
+        assertFalse(underTest.isJurisdictionUploadTimestampFeatureEnabled(jurisdiction));
+    }
+
+    @Test
+    void testIsJurisdictionUploadTimestampFeatureEnabledForMatchedJurisdiction() {
+        final String jurisdiction = "Case Jurisdiction";
+
+        when(applicationParams.isJurisdictionUploadTimestampEnabled()).thenReturn(true);
+        when(applicationParams.getUploadTimestampFeaturedJurisdiction()).thenReturn(jurisdiction);
+
+        assertTrue(underTest.isJurisdictionUploadTimestampFeatureEnabled(jurisdiction));
+    }
+
+    @Test
+    void testIsJurisdictionUploadTimestampFeatureEnabledForNonMatchedJurisdiction() {
+        final String jurisdiction = "Case Jurisdiction";
+
+        when(applicationParams.isJurisdictionUploadTimestampEnabled()).thenReturn(true);
+        when(applicationParams.getUploadTimestampFeaturedJurisdiction()).thenReturn("Another Jurisdiction");
+
+        assertFalse(underTest.isJurisdictionUploadTimestampFeatureEnabled(jurisdiction));
     }
 
     private List<String> generateListOfUrls(String jsonString) {
