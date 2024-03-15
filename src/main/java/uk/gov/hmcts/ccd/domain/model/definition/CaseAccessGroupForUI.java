@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 //be authorised and seen in the UI
 @JsonRootName(value = "value")
 public class CaseAccessGroupForUI {
+    String id;
     @JsonProperty("value")
     CaseAccessGroup caseAccessGroup;
-    long id;
 }

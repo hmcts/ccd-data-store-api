@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class CaseAccessGroupUtils {
 
@@ -22,7 +23,7 @@ public class CaseAccessGroupUtils {
     public static final String CASE_ACCESS_GROUPS = "CaseAccessGroups";
 
     protected static final String CCD_ALL_CASES = "CCD:all-cases-access";
-    protected static final String ORGANISATION_POLICY_FIELD = "OrganisationPolicyField";
+
     protected static final String ORGANISATION = "Organisation";
     protected static final String ORGANISATIONID = "OrganisationID";
     protected static final String ORG_IDENTIFIER_TEMPLATE = "$ORGID$";
@@ -41,7 +42,6 @@ public class CaseAccessGroupUtils {
             List<AccessTypeRoleDefinition> filteredAccessTypeRolesDefinitions = filterAccessRoles(caseDetails,
                 accessTypeRoleDefinitions);
             if (filteredAccessTypeRolesDefinitions != null) {
-                ObjectMapper mapper = new ObjectMapper();
                 List<CaseAccessGroupForUI> caseAccessGroupForUIs = new ArrayList<>();
                 for (AccessTypeRoleDefinition acd : filteredAccessTypeRolesDefinitions) {
                     JsonNode caseAssignedRoleFieldNode = findOrganisationPolicyNodeForCaseRole(caseDetails,
@@ -57,44 +57,46 @@ public class CaseAccessGroupUtils {
                             CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseGroupID)
                                 .caseAccessGroupType(CCD_ALL_CASES).build();
                             CaseAccessGroupForUI caseAccessGroupForUI = CaseAccessGroupForUI.builder()
-                                .caseAccessGroup(caseAccessGroup).id(1).build();
+                                .caseAccessGroup(caseAccessGroup).id(UUID.randomUUID().toString()).build();
 
                             caseAccessGroupForUIs.add(caseAccessGroupForUI);
                         }
                     }
                 }
-
-
-                if (!caseAccessGroupForUIs.isEmpty()) {
-                    //CaseAccessGroups groups = CaseAccessGroups.builder().caseAccessGroups(caseAccessGroups).build();
-                    JsonNode caseAccessGroupForUIsNode = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
-                    //caseDetails.getData().put(CASE_ACCESS_GROUPS, node); // this overwrites
-                    //JacksonUtils.merge(nodes, caseDetails.getData()); //does not work
-                    if (caseDetails.getData().get(CASE_ACCESS_GROUPS) != null) {
-                        ObjectMapper objMapper = new ObjectMapper();
-                        JsonNode caseDataCaseAccessGroup = caseDetails.getData().get(CASE_ACCESS_GROUPS);
-                        String mergedValue = caseDataCaseAccessGroup.toString() + caseAccessGroupForUIsNode.toString();
-                        mergedValue = mergedValue.replace("}{",",");
-                        JsonNode mergedNode = null; // remove the duplicate entry and convert string to json
-                        try {
-                            mergedNode = new ObjectMapper().readTree(mergedValue);
-                        } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        caseDetails.getData().put(CASE_ACCESS_GROUPS, mergedNode);
-
-                    } else {
-                        ObjectMapper objMapper = new ObjectMapper();
-                        caseDetails.getData().put(CASE_ACCESS_GROUPS, caseAccessGroupForUIsNode);
-                    }
-
-                    //Output will be: {"k":"v","secondK":"secondV"}
-                    LOG.debug("" + caseDetails.getData().get(CASE_ACCESS_GROUPS));
-                }
+                setUpModifiedCaseAccessGroups(caseDetails, caseAccessGroupForUIs);
             }
         }
 
+    }
+
+    private void setUpModifiedCaseAccessGroups(CaseDetails caseDetails,
+                                               List<CaseAccessGroupForUI> caseAccessGroupForUIs) {
+        ObjectMapper mapper = new ObjectMapper();
+        if (!caseAccessGroupForUIs.isEmpty()) {
+            JsonNode caseAccessGroupForUIsNode = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
+            if (caseDetails.getData().get(CASE_ACCESS_GROUPS) != null) {
+                ObjectMapper objMapper = new ObjectMapper();
+                JsonNode caseDataCaseAccessGroup = caseDetails.getData().get(CASE_ACCESS_GROUPS);
+                String mergedValue = caseDataCaseAccessGroup.toString() + caseAccessGroupForUIsNode.toString();
+                mergedValue = mergedValue.replace("][",",");
+                JsonNode mergedNode = null;
+                try {
+                    // remove the duplicate entry and convert string to json
+                    mergedNode = new ObjectMapper().readTree(mergedValue);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+
+                caseDetails.getData().put(CASE_ACCESS_GROUPS, mergedNode);
+
+            } else {
+                ObjectMapper objMapper = new ObjectMapper();
+                caseDetails.getData().put(CASE_ACCESS_GROUPS, caseAccessGroupForUIsNode);
+            }
+
+            //Output will be: {"k":"v","secondK":"secondV"}
+            LOG.debug("" + caseDetails.getData().get(CASE_ACCESS_GROUPS));
+        }
     }
 
     private boolean isCaseAcessGroupAvailable(CaseDetails caseDetails) {
@@ -106,15 +108,24 @@ public class CaseAccessGroupUtils {
 
 
     public JsonNode findOrganisationPolicyNodeForCaseRole(CaseDetails caseDetails, String caseRoleId) {
-        JsonNode caseOrganisationPolicyFieldNode = caseDetails.getData().get(ORGANISATION_POLICY_FIELD);
-        if (caseOrganisationPolicyFieldNode != null
-            && !caseOrganisationPolicyFieldNode.isEmpty()
-            && caseOrganisationPolicyFieldNode.get(ORG_POLICY_CASE_ASSIGNED_ROLE) != null
-            && caseOrganisationPolicyFieldNode.get(ORG_POLICY_CASE_ASSIGNED_ROLE)
-            .asText().equalsIgnoreCase(caseRoleId)) {
-            return caseOrganisationPolicyFieldNode;
-        }
-        return null;
+        JsonNode caseRoleNode = caseDetails.getData().values().stream()
+            .filter(node -> node.get(ORG_POLICY_CASE_ASSIGNED_ROLE) != null
+                && node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equalsIgnoreCase(caseRoleId))
+            .reduce((a, b) -> {
+                LOG.info("No Organisation found for CASE_ACCESS_GROUPS={} caseType={} version={} ORGANISATION={},"
+                    + "ORGANISATIONID={}, ORG_POLICY_CASE_ASSIGNED_ROLE={}.",
+                    CASE_ACCESS_GROUPS,
+                    caseDetails.getCaseTypeId(),caseDetails.getVersion(),
+                    ORGANISATION,ORGANISATIONID,ORG_POLICY_CASE_ASSIGNED_ROLE);
+                return null;
+            }).orElse(null);
+
+        LOG.debug("Organisation found for CASE_ACCESS_GROUPS={} caseType={} version={} ORGANISATION={},"
+                + "ORGANISATIONID={}, ORG_POLICY_CASE_ASSIGNED_ROLE={}.",
+            CASE_ACCESS_GROUPS,
+            caseDetails.getCaseTypeId(),caseDetails.getVersion(),
+            ORGANISATION,ORGANISATIONID,ORG_POLICY_CASE_ASSIGNED_ROLE);
+        return caseRoleNode;
     }
 
 
