@@ -10,7 +10,8 @@
   "specs": [
     "an active profile in CCD",
     "is of caseType where caseAccessGroupType = CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData and case data has Organisation.OrganisationID value not set to empty value",
-    "Submit case creation as Case worker"
+    "Submit case creation as Case worker",
+    "contains correctly configured values"
   ],
   "request": {
     "body": {
@@ -71,8 +72,8 @@
           "classification" : "PUBLIC",
           "value" : [ {
             "value" : {
-              "caseAccessGroupType" : "CCD:all-cases-access",
-              "caseAccessGroupId" : "test"
+              "caseAccessGroupType" : "PUBLIC",
+              "caseAccessGroupId" : "PUBLIC"
             },
             "id" : null
           } ]
