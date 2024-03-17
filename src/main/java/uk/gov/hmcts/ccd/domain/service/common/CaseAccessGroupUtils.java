@@ -153,11 +153,16 @@ public class CaseAccessGroupUtils {
                 }
             }
 
-            if (caseAccessGroupsJsonNodes.isEmpty()) {
-                caseDetails.getData().remove(CASE_ACCESS_GROUPS);
-            }
+            removeCaseAccessGroup(caseAccessGroupsJsonNodes, caseDetails);
         }
 
+    }
+
+    private void removeCaseAccessGroup(ArrayNode caseAccessGroupsJsonNodes, CaseDetails caseDetails){
+
+        if (caseAccessGroupsJsonNodes.isEmpty()) {
+            caseDetails.getData().remove(CASE_ACCESS_GROUPS);
+        }
     }
 
     private boolean isAccessGroupsJsonNodesAvailable(ArrayNode caseAccessGroupsJsonNodes) {
