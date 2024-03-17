@@ -96,7 +96,7 @@ public class CaseAccessGroupUtils {
                 caseDetails.getData().put(CASE_ACCESS_GROUPS, caseAccessGroupForUIsNode);
             }
 
-            LOG.debug("CASE_ACCESS_GROUPS = " + caseDetails.getData().get(CASE_ACCESS_GROUPS));
+            LOG.debug("CASE_ACCESS_GROUPS {} ", caseDetails.getData().get(CASE_ACCESS_GROUPS));
         }
     }
 
@@ -106,7 +106,6 @@ public class CaseAccessGroupUtils {
             && caseDetails.getData().get(CASE_ACCESS_GROUPS) != null
             && !caseDetails.getData().get(CASE_ACCESS_GROUPS).isEmpty();
     }
-
 
     public JsonNode findOrganisationPolicyNodeForCaseRole(CaseDetails caseDetails, String caseRoleId) {
         JsonNode caseRoleNode = caseDetails.getData().values().stream()
@@ -137,14 +136,12 @@ public class CaseAccessGroupUtils {
 
     private void removeCCDAllCasesAccessFromCaseAccessGroups(CaseDetails caseDetails) {
         ArrayNode caseAccessGroupsJsonNodes = (ArrayNode) caseDetails.getData().get(CASE_ACCESS_GROUPS);
-        if (caseAccessGroupsJsonNodes != null && !caseAccessGroupsJsonNodes.isEmpty()) {
+        if (isAccessGroupsJsonNodesAvailable(caseAccessGroupsJsonNodes)) {
             for (int i = 0; i < caseAccessGroupsJsonNodes.size(); i++) {
                 JsonNode caseAccessGroupTypeValueNode = caseAccessGroupsJsonNodes.get(i);
                 String idToRemove = null;
-                if (caseAccessGroupTypeValueNode.get("id") != null) {
+                if (hasNodeValueAndId(caseAccessGroupTypeValueNode)) {
                     idToRemove = caseAccessGroupTypeValueNode.get("id").textValue();
-                }
-                if (caseAccessGroupTypeValueNode.get("value") != null) {
                     for (JsonNode field : caseAccessGroupTypeValueNode) {
                         if (isCaseAccessGroupTypeField(field)) {
                             removeDataClassificationForId(caseDetails, idToRemove);
@@ -161,6 +158,15 @@ public class CaseAccessGroupUtils {
             }
         }
 
+    }
+
+    private boolean isAccessGroupsJsonNodesAvailable(ArrayNode caseAccessGroupsJsonNodes) {
+        return (caseAccessGroupsJsonNodes != null && !caseAccessGroupsJsonNodes.isEmpty());
+    }
+
+    private boolean hasNodeValueAndId(JsonNode caseAccessGroupTypeValueNode) {
+        return (caseAccessGroupTypeValueNode.get("id") != null
+            && caseAccessGroupTypeValueNode.get("value") != null);
     }
 
     private boolean isCaseAccessGroupTypeField(JsonNode field) {
