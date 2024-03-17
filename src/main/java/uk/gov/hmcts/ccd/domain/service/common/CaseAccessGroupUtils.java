@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +78,8 @@ public class CaseAccessGroupUtils {
             JsonNode caseAccessGroupForUIsNode = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
             if (caseDetails.getData().get(CASE_ACCESS_GROUPS) != null) {
                 JsonNode caseDataCaseAccessGroup = caseDetails.getData().get(CASE_ACCESS_GROUPS);
+
+                addDataClassificationForId(caseDetails, caseAccessGroupForUIsNode);
                 String mergedValue = caseDataCaseAccessGroup.toString() + caseAccessGroupForUIsNode.toString();
                 mergedValue = mergedValue.replace("][",",");
                 JsonNode mergedNode = null;
@@ -141,7 +144,7 @@ public class CaseAccessGroupUtils {
                     if (field != null
                         && field.get(CASE_ACCESS_GROUP_TYPE) != null
                         && field.get(CASE_ACCESS_GROUP_TYPE).textValue().equals(CCD_ALL_CASES)) {
-                        removeClassificationForId(caseAccessGroupTypeValueNode);
+                        removeDataClassificationForId(caseDetails, field);
                         caseAccessGroupsJsonNodes.remove(i);
                         i--;
                         break;
@@ -156,6 +159,31 @@ public class CaseAccessGroupUtils {
 
     }
 
+    private void removeDataClassificationForId(CaseDetails caseDetails, JsonNode field) {
+        if (isCaseAccessGroupDataClassificationAvailable(caseDetails) ) {
+            ArrayNode caseAccessGroupsJsonNodes = (ArrayNode) caseDetails.getDataClassification().get(CASE_ACCESS_GROUPS);
+            if (caseAccessGroupsJsonNodes.has(field.textValue())) {
+                ObjectNode object = (ObjectNode) caseAccessGroupsJsonNodes.get(field.textValue());
+                object.remove(String.valueOf(caseAccessGroupsJsonNodes.get(field.textValue())));
+            }
+        }
+    }
+
+    private void addDataClassificationForId(CaseDetails caseDetails, JsonNode field) {
+        if (isCaseAccessGroupDataClassificationAvailable(caseDetails)) {
+            ArrayNode caseAccessGroupsJsonNodes = (ArrayNode) caseDetails.getDataClassification().get(CASE_ACCESS_GROUPS);
+            caseAccessGroupsJsonNodes.add(field);
+        }
+    }
+
+    private boolean isCaseAccessGroupDataClassificationAvailable(CaseDetails caseDetails) {
+        return caseDetails.getData() != null
+            && !caseDetails.getData().isEmpty()
+            && caseDetails.getDataClassification() != null
+            && caseDetails.getDataClassification().get(CASE_ACCESS_GROUPS) != null
+            && !caseDetails.getDataClassification().get(CASE_ACCESS_GROUPS).isEmpty();
+    }
+
     private List<AccessTypeRoleDefinition> filterAccessRoles(
         CaseDetails caseDetails,
         List<AccessTypeRoleDefinition> accessTypeRolesDefinitions) {
@@ -168,9 +196,4 @@ public class CaseAccessGroupUtils {
             .toList();
     }
 
-    private void removeClassificationForId(JsonNode caseAccessGroupTypeValueNode){
-
-
-
-    }
 }
