@@ -146,9 +146,7 @@ public class CaseAccessGroupUtils {
                 }
                 if (caseAccessGroupTypeValueNode.get("value") != null) {
                     for (JsonNode field : caseAccessGroupTypeValueNode) {
-                        if (field != null
-                            && field.get(CASE_ACCESS_GROUP_TYPE) != null
-                            && field.get(CASE_ACCESS_GROUP_TYPE).textValue().equals(CCD_ALL_CASES)) {
+                        if (isCaseAccessGroupTypeField(field)) {
                             removeDataClassificationForId(caseDetails, idToRemove);
                             caseAccessGroupsJsonNodes.remove(i);
                             i--;
@@ -163,6 +161,12 @@ public class CaseAccessGroupUtils {
             }
         }
 
+    }
+
+    private boolean isCaseAccessGroupTypeField(JsonNode field) {
+        return (field != null
+            && field.get(CASE_ACCESS_GROUP_TYPE) != null
+            && field.get(CASE_ACCESS_GROUP_TYPE).textValue().equals(CCD_ALL_CASES));
     }
 
     private void removeDataClassificationForId(CaseDetails caseDetails, String idToRemove) {
