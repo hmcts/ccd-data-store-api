@@ -158,7 +158,7 @@ public class CaseAccessGroupUtils {
 
     }
 
-    private void removeCaseAccessGroup(ArrayNode caseAccessGroupsJsonNodes, CaseDetails caseDetails){
+    private void removeCaseAccessGroup(ArrayNode caseAccessGroupsJsonNodes, CaseDetails caseDetails) {
 
         if (caseAccessGroupsJsonNodes.isEmpty()) {
             caseDetails.getData().remove(CASE_ACCESS_GROUPS);
