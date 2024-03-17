@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -41,6 +42,7 @@ import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,8 +90,10 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     private static final String ON_BEHALF_OF_FNAME = "Pierre OnBehalf";
     private static final String ON_BEHALF_OF_LNAME = "Martin OnBehalf";
 
-    private static final String ORGANISATION_PROFILE = "OrganisationProfile1";
+    private static final String CaseAccessGroups = "CaseAccessGroups";
 
+    private static final String DATA_FNAME = "PUBLIC";
+    private static final String DATA_CASEGROUPID = "id";
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -304,6 +308,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
+        inputCaseDetails.setDataClassification(buildCaseDataClassification(null));
+
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
         doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
@@ -381,6 +387,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             caseAccessGroupID);
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
+
+        inputCaseDetails.setDataClassification(null);
 
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
@@ -461,16 +469,20 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseAccessGroupID)
             .caseAccessGroupType(caseAccessGroupType).build();
 
+        String uuid = UUID.randomUUID().toString();
+
         CaseAccessGroupForUI caseAccessGroupForUI = CaseAccessGroupForUI.builder()
             .caseAccessGroup(caseAccessGroup)
-            .id(UUID.randomUUID().toString()).build();
+            .id(uuid).build();
         caseAccessGroupForUIs.add(caseAccessGroupForUI);
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
         Map<String, JsonNode> dataCaseAccessGroup = new HashMap<>();
-        dataCaseAccessGroup.put("CaseAccessGroups", data);
+        dataCaseAccessGroup.put(CaseAccessGroups, data);
         JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
+
+        inputCaseDetails.setDataClassification(buildCaseDataClassification(uuid));
 
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
@@ -550,17 +562,20 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseAccessGroupID)
             .caseAccessGroupType(caseAccessGroupType).build();
 
+        String uuid = UUID.randomUUID().toString();
         CaseAccessGroupForUI caseAccessGroupForUI = CaseAccessGroupForUI.builder()
             .caseAccessGroup(caseAccessGroup)
-            .id(UUID.randomUUID().toString()).build();
+            .id(uuid).build();
         caseAccessGroupForUIs.add(caseAccessGroupForUI);
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
         Map<String, JsonNode> dataCaseAccessGroup = new HashMap<>();
-        dataCaseAccessGroup.put("CaseAccessGroups", data);
+        dataCaseAccessGroup.put(CaseAccessGroups, data);
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
+
+        //***inputCaseDetails.setDataClassification(buildCaseDataClassification(uuid));
 
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
@@ -641,18 +656,21 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
         CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseAccessGroupID)
             .caseAccessGroupType(caseAccessGroupType).build();
+        String uuid = UUID.randomUUID().toString();
 
         CaseAccessGroupForUI caseAccessGroupForUI = CaseAccessGroupForUI.builder()
             .caseAccessGroup(caseAccessGroup)
-            .id(UUID.randomUUID().toString()).build();
+            .id(uuid).build();
         caseAccessGroupForUIs.add(caseAccessGroupForUI);
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
         Map<String, JsonNode> dataCaseAccessGroup = new HashMap<>();
-        dataCaseAccessGroup.put("CaseAccessGroups", data);
+        dataCaseAccessGroup.put(CaseAccessGroups, data);
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
+
+        //***inputCaseDetails.setDataClassification(buildCaseDataClassification(uuid));
 
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
@@ -715,8 +733,66 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
         Map<String, JsonNode> result = new HashMap<>();
-        result.put("CaseAccessGroups", data);
+        result.put(CaseAccessGroups, data);
         return result;
     }
 
+    private Map<String, JsonNode> buildCaseDataStructure(String fnameValue, String id) {
+        final HashMap<String, JsonNode> data = new HashMap<>();
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final ObjectNode caseAccessGroupNode = objectMapper.createObjectNode();
+        caseAccessGroupNode.set(DATA_FNAME, new TextNode(fnameValue));
+        if (id == null) {
+            CaseAccessGroupForUI caseAccessGroupForUI = CaseAccessGroupForUI.builder()
+                .build();
+        } else {
+            CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder()
+                .caseAccessGroupId("PUBLIC")
+                .caseAccessGroupType("PUBLIC").build();
+
+            CaseAccessGroupForUI caseAccessGroupForUI = CaseAccessGroupForUI.builder()
+                .caseAccessGroup(caseAccessGroup)
+                .id(id).build();
+
+            caseAccessGroupNode.put("value", String.valueOf(caseAccessGroupForUI));
+        }
+        data.put(CaseAccessGroups, caseAccessGroupNode);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode data1  = mapper.convertValue(data, JsonNode.class);
+        Map<String, JsonNode> result = new HashMap<>();
+        result.put(CaseAccessGroups, data1);
+
+        return result;
+    }
+
+    private Map<String, JsonNode> buildCaseDataClassification(String id) {
+        return buildCaseDataStructure(DATA_FNAME, id);
+    }
+
+    private Map<String, JsonNode> buildCaseDataClassificationFromDataCaseAccessGroup(Map<String, JsonNode>
+                                                                                         dataCaseAccessGroup) {
+        Map<String, JsonNode> data = new HashMap<>();
+
+        String mergedValue = "";
+
+        JsonNode caseAccessGroup = dataCaseAccessGroup.get("value");
+        for (JsonNode caseAccessGroupValue : dataCaseAccessGroup.values()) {
+            data = buildCaseDataClassification(caseAccessGroupValue.get("id").textValue());
+
+            mergedValue += data.toString();
+            mergedValue = mergedValue.replace("][",",");
+        }
+
+        //JsonNode mergedNode = null;
+        Map<String, JsonNode> mergedNode;
+        try {
+            mergedNode = new ObjectMapper().readValue(mergedValue, HashMap.class);
+        } catch (JsonProcessingException e) {
+            throw new ValidationException(String.format(e.getMessage()));
+        }
+
+        return mergedNode;
+    }
 }

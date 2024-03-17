@@ -84,7 +84,6 @@ public class CaseAccessGroupUtils {
                 mergedValue = mergedValue.replace("][",",");
                 JsonNode mergedNode = null;
                 try {
-                    // remove the duplicate entry and convert string to json
                     mergedNode = new ObjectMapper().readTree(mergedValue);
                 } catch (JsonProcessingException e) {
                     throw new ValidationException(String.format(e.getMessage()));
@@ -93,6 +92,7 @@ public class CaseAccessGroupUtils {
                 caseDetails.getData().put(CASE_ACCESS_GROUPS, mergedNode);
 
             } else {
+                addDataClassificationForId(caseDetails, caseAccessGroupForUIsNode);
                 caseDetails.getData().put(CASE_ACCESS_GROUPS, caseAccessGroupForUIsNode);
             }
 
@@ -140,14 +140,20 @@ public class CaseAccessGroupUtils {
         if (caseAccessGroupsJsonNodes != null && !caseAccessGroupsJsonNodes.isEmpty()) {
             for (int i = 0; i < caseAccessGroupsJsonNodes.size(); i++) {
                 JsonNode caseAccessGroupTypeValueNode = caseAccessGroupsJsonNodes.get(i);
-                for (JsonNode field : caseAccessGroupTypeValueNode) {
-                    if (field != null
-                        && field.get(CASE_ACCESS_GROUP_TYPE) != null
-                        && field.get(CASE_ACCESS_GROUP_TYPE).textValue().equals(CCD_ALL_CASES)) {
-                        removeDataClassificationForId(caseDetails, field);
-                        caseAccessGroupsJsonNodes.remove(i);
-                        i--;
-                        break;
+                String idToRemove = null;
+                if (caseAccessGroupTypeValueNode.get("id") != null) {
+                    idToRemove = caseAccessGroupTypeValueNode.get("id").textValue();
+                }
+                if (caseAccessGroupTypeValueNode.get("value") != null) {
+                    for (JsonNode field : caseAccessGroupTypeValueNode) {
+                        if (field != null
+                            && field.get(CASE_ACCESS_GROUP_TYPE) != null
+                            && field.get(CASE_ACCESS_GROUP_TYPE).textValue().equals(CCD_ALL_CASES)) {
+                            removeDataClassificationForId(caseDetails, idToRemove);
+                            caseAccessGroupsJsonNodes.remove(i);
+                            i--;
+                            break;
+                        }
                     }
                 }
             }
@@ -159,19 +165,21 @@ public class CaseAccessGroupUtils {
 
     }
 
-    private void removeDataClassificationForId(CaseDetails caseDetails, JsonNode field) {
-        if (isCaseAccessGroupDataClassificationAvailable(caseDetails) ) {
-            ArrayNode caseAccessGroupsJsonNodes = (ArrayNode) caseDetails.getDataClassification().get(CASE_ACCESS_GROUPS);
-            if (caseAccessGroupsJsonNodes.has(field.textValue())) {
-                ObjectNode object = (ObjectNode) caseAccessGroupsJsonNodes.get(field.textValue());
-                object.remove(String.valueOf(caseAccessGroupsJsonNodes.get(field.textValue())));
+    private void removeDataClassificationForId(CaseDetails caseDetails, String idToRemove) {
+        if (isCaseAccessGroupDataClassificationAvailable(caseDetails) && idToRemove != null) {
+            ArrayNode caseAccessGroupsJsonNodes = (ArrayNode) caseDetails.getDataClassification()
+                .get(CASE_ACCESS_GROUPS);
+            if (caseAccessGroupsJsonNodes.has(idToRemove)) {
+                ObjectNode object = (ObjectNode) caseAccessGroupsJsonNodes.get(idToRemove);
+                object.remove(String.valueOf(caseAccessGroupsJsonNodes.get(idToRemove)));
             }
         }
     }
 
     private void addDataClassificationForId(CaseDetails caseDetails, JsonNode field) {
         if (isCaseAccessGroupDataClassificationAvailable(caseDetails)) {
-            ArrayNode caseAccessGroupsJsonNodes = (ArrayNode) caseDetails.getDataClassification().get(CASE_ACCESS_GROUPS);
+            ArrayNode caseAccessGroupsJsonNodes = (ArrayNode) caseDetails.getDataClassification()
+                .get(CASE_ACCESS_GROUPS);
             caseAccessGroupsJsonNodes.add(field);
         }
     }
