@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -153,8 +154,7 @@ class CaseDocumentTimestampServiceTest {
     @Test
     void testDoNotInsertTimestampIfAlreadyPresent() {
         final String uploadTimestamp = LocalDateTime.now().minusNanos(5).toString();
-        JsonNode jsonNode = generateTestNode(jsonDocumentNode);
-        assertFalse(jsonNode.has(UPLOAD_TIMESTAMP));
+        JsonNode jsonNode = generateTestNode(jsonDocumentNodeWithValidTimestamp);
 
         underTest.insertUploadTimestamp(jsonNode, uploadTimestamp);
         assertTrue(jsonNode.has(UPLOAD_TIMESTAMP));
@@ -168,6 +168,23 @@ class CaseDocumentTimestampServiceTest {
         System.out.println(jsonNode.asText());
     }
 
+    @Test
+    void insertTimestampIfPresentButNull() {
+        final String uploadTimestamp = LocalDateTime.now().minusNanos(5).toString();
+        JsonNode jsonNode = generateTestNode(jsonDocumentNodeWithNullTimestamp);
+
+        underTest.insertUploadTimestamp(jsonNode, uploadTimestamp);
+        assertTrue(jsonNode.has(UPLOAD_TIMESTAMP));
+        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
+        System.out.println(jsonNode.asText());
+
+        String uploadTimestampNew = LocalDateTime.now().toString();
+        underTest.insertUploadTimestamp(jsonNode, uploadTimestampNew);
+        assertNotEquals(uploadTimestampNew, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
+        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
+
+        System.out.println(jsonNode.asText());
+    }
     @Test
     void testFindNewDocuments() {
         List<String> listUrlsDb = generateListOfUrls(jsonStringOriginal);
@@ -211,6 +228,29 @@ class CaseDocumentTimestampServiceTest {
         assertFalse(underTest.isCaseTypeUploadTimestampFeatureEnabled(caseType));
     }
 
+    @Test
+    void isToBeUpdatedWithTimestampForNoUploadTimestamp() {
+        JsonNode node = generateTestNode(jsonDocumentNode);
+
+        assertTrue(underTest.isToBeUpdatedWithTimestamp(node));
+    }
+
+    @Test
+    void isToBeUpdatedWithTimestampForUploadTimestampWithNullValue() {
+        JsonNode node = generateTestNode(jsonDocumentNode);
+        ((ObjectNode) node).put(UPLOAD_TIMESTAMP, (String) null);
+
+        assertTrue(underTest.isToBeUpdatedWithTimestamp(node));
+    }
+
+    @Test
+    void isNotToBeUpdatedWithTimestampForUploadTimestampWithValue() {
+        JsonNode node = generateTestNode(jsonDocumentNode);
+        ((ObjectNode) node).put(UPLOAD_TIMESTAMP, "2010-11-12T00:00:00Z");
+
+        assertFalse(underTest.isToBeUpdatedWithTimestamp(node));
+    }
+
     private List<String> generateListOfUrls(String jsonString) {
         JsonNode result = generateTestNode(jsonString);
         Map<String, JsonNode> dataMap = Maps.newHashMap();
@@ -242,6 +282,26 @@ class CaseDocumentTimestampServiceTest {
                  "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4",
                  "document_filename": "PD36Q letter.pdf",
                  "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4/binary"
+               }
+            }""";
+
+    private static final String jsonDocumentNodeWithNullTimestamp = """
+            {
+              "document": {
+                 "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4",
+                 "document_filename": "PD36Q letter.pdf",
+                 "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4/binary",
+                 "upload_timestamp": null
+               }
+            }""";
+
+    private static final String jsonDocumentNodeWithValidTimestamp = """
+            {
+              "document": {
+                 "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4",
+                 "document_filename": "PD36Q letter.pdf",
+                 "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4/binary",
+                 "upload_timestamp": "2010-11-12T01:02:03.000000000"
                }
             }""";
 

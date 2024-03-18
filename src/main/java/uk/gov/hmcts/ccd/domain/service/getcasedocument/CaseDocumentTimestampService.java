@@ -109,16 +109,21 @@ public class CaseDocumentTimestampService {
                                                 String uploadTimestamp) {
         List<JsonNode> jsonNodes = findNodes(nodes);
         jsonNodes.forEach(jsonNode -> {
-            if (documentUrlsNew.contains(jsonNode.get(DOCUMENT_URL).asText()) && !jsonNode.has(UPLOAD_TIMESTAMP)) {
+            if (documentUrlsNew.contains(jsonNode.get(DOCUMENT_URL).asText()) && isToBeUpdatedWithTimestamp(jsonNode)) {
                 insertUploadTimestamp(jsonNode, uploadTimestamp);
             }
         });
     }
 
     protected void insertUploadTimestamp(JsonNode node, String uploadTimestamp) {
-        if (!node.has(UPLOAD_TIMESTAMP)) {
+        if (isToBeUpdatedWithTimestamp(node)) {
             ((ObjectNode) node).put(UPLOAD_TIMESTAMP, uploadTimestamp);
         }
+    }
+
+    protected boolean isToBeUpdatedWithTimestamp(JsonNode node) {
+        return (!node.has(UPLOAD_TIMESTAMP)
+            || (node.has(UPLOAD_TIMESTAMP) && node.get(UPLOAD_TIMESTAMP).isNull()));
     }
 
     public boolean isCaseTypeUploadTimestampFeatureEnabled(String caseTypeId) {
