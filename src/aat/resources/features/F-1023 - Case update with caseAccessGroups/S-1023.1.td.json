@@ -1,7 +1,7 @@
 {
   "_guid_": "S-1023.1",
   "_extends_": "F-1023_CreateCasePreRequisiteCaseworkerBase",
-  "title": "caseAccessGroupType has CCD:all-cases-access, accessType has GroupRoleName, OrganisationPolicyField has CaseAssignedRoleField and value in Organisation.OrganisationID and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroupId created",
+  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroupId created",
 
   "prerequisites" : [ {
       "Token_Creation": "S-1023_GetCreateToken"
