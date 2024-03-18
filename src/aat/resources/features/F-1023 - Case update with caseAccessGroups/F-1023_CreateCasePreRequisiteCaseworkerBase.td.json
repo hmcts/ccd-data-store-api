@@ -2,26 +2,11 @@
   "_guid_": "F-1023_CreateCasePreRequisiteCaseworkerBase",
   "_extends_": "F-1023_Test_Data_Base",
 
-  "request": {
-    "body": {
-      "data": {
-        "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "[Claimant]",
-          "OrgPolicyReference": "ref",
-          "Organisation": {
-            "OrganisationID": "orgID1",
-            "OrganisationName": "orgName1"
-          }
-        }
-      }
-      }
-    },
-
   "expectedResponse": {
     "body": {
       "case_data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyCaseAssignedRole": "GroupRole1",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1",
