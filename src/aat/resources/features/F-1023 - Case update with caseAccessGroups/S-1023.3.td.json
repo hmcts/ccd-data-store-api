@@ -1,29 +1,45 @@
 {
   "_guid_": "S-1023.3",
-  "_extends_": "F-1023_Test_Data_Base",
-  "title": "CaseAccessGroups field contains blank value and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST",
+  "_extends_": "F-1023_CreateCasePreRequisiteCaseworkerBase",
+  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroupId not created when caseGroupType != CCD:all-cases-access",
 
   "prerequisites" : [ {
-      "Token_Creation": "S-1023_GetCreateToken"
-    }
+    "Token_Creation": "S-1023_GetCreateToken"
+  }
   ],
   "specs": [
     "an active profile in CCD",
-    "contains blank/null value in the CaseAccessGroups field",
-    "contains an empty CaseAccessGroups, along with an HTTP-201 OK"
+    "is of caseType where caseAccessGroupType != CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData and case data has Organisation.OrganisationID value not set to empty value",
+    "Submit case creation as Case worker",
+    "contains correctly configured values"
   ],
   "request": {
     "body": {
       "data": {
-        "CaseAccessGroups": []
+        "CaseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupId": "test",
+              "caseAccessGroupType": "somethingelse"
+            },
+            "id": null
+          }
+        ]
       },
       "event": {
         "id": "createCase"
       },
       "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
       "event_data": {
-        "CaseAccessGroups": [],
-        "id": null
+        "CaseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupId": "test",
+              "caseAccessGroupType": "somethingelse"
+            },
+            "id": null
+          }
+        ]
       }
     }
   },
@@ -43,12 +59,24 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "CaseAccessGroups": []
+        "CaseAccessGroups" : [ {
+          "value" : {
+            "caseAccessGroupType" : "somethingelse",
+            "caseAccessGroupId" : "test"
+          },
+          "id" : null
+        } ]
       },
       "data_classification" : {
         "CaseAccessGroups" : {
           "classification" : "PUBLIC",
-          "value" : [ ]
+          "value" : [ {
+            "value" : {
+              "caseAccessGroupType" : "PUBLIC",
+              "caseAccessGroupId" : "PUBLIC"
+            },
+            "id" : null
+          } ]
         }
       }
     },
