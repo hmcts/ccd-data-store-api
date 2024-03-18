@@ -35,27 +35,25 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     And       the request [is of caseType where caseAccessGroupType != CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData and case data has Organisation.OrganisationID value not set to empty value]
     And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
     Then      a positive response is received
-    #And       in database [case group ID is set in caseAccessGroups collection in the case data and caseGroupType = CCD:all-cases-access]
+    #And       in database [case group ID is not set in caseAccessGroups collection in the case data and caseGroupType != CCD:all-cases-access]
 
-  @S-1023.4 @Ignore #AC-3
-    Scenario: CaseAccessGroups field contains Invalid caseAccessGroupType value and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
-      Given   a user with [an active profile in CCD]
-      When    a request is prepared with appropriate values
-      And     the request [contains correctly configured CaseLink field with Invalid Case Reference]
-      And     it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
-      Then    a negative response is received,
-      And     the response [has the 422 return code],
-      And     the response has all other details as expected.
+  @S-1023.4 #AC-3
+  Scenario: CaseAccessGroups field contains Invalid caseAccessGroupType value and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
+    Given     a user with [an active profile in CCD]
+    When      a request is prepared with appropriate values
+    And       the request [contains correctly configured values]
+    And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData but case data has Organisation.OrganisationID value is empty value]
+    And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
+    Then      a positive response is received
+    #And       in database [case group ID is not set in caseAccessGroups collection in the case data and caseGroupType = CCD:all-cases-access]
 
-    @S-1023.5 @Ignore #AC-4
-    Scenario: CaseAccessGroups field contains valid caseAccessGroupType value but case data invalid and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
-      Given   a user with [an active profile in CCD]
-      And     a successful call [to create a case] as in [F-1019_CreateCasePreRequisiteCaseworkerBase]
-      When    a request is prepared with appropriate values
-      And     the request [contains correctly configured CaseLink field with valid Case Reference]
-      And     the request [contains some invalid case data]
-      And     it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
-      Then    a negative response is received,
-      And     the response [has the 422 return code],
-      And     the response has all other details as expected.
+  @S-1023.5 #AC-4
+  Scenario: CaseAccessGroups field contains valid caseAccessGroupType value but case data invalid and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
+    Given     a user with [an active profile in CCD]
+    When      a request is prepared with appropriate values
+    And       the request [contains correctly configured values]
+    And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access and -OrganisationPolicyField- CaseAssignedRoleField  field exists in caseData and case data has Organisation.OrganisationID value not set to empty value but accessType does not have GroupRoleName]
+    And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
+    Then      a positive response is received
+    #And       in database [case group ID is not set in caseAccessGroups collection in the case data and caseGroupType = CCD:all-cases-access]
 
