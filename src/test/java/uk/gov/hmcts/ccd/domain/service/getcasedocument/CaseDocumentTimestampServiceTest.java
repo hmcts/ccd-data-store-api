@@ -13,10 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,8 +31,6 @@ import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.
 
 @ExtendWith(MockitoExtension.class)
 class CaseDocumentTimestampServiceTest {
-    @Mock
-    private Clock clock;
 
     @Mock
     private ApplicationParams applicationParams;
@@ -48,8 +43,6 @@ class CaseDocumentTimestampServiceTest {
     private final String urlMicrosoft = "https://www.microsoft.com";
     private final String urlElastic = "https://www.elastic.com";
     private final String urlApple = "https://www.apple.com";
-    private final Instant timestamp = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-    private final Clock fixedClock = Clock.fixed(timestamp, ZoneOffset.UTC);
 
     @Test
     void testFindUrlsNotInOriginal() {
@@ -185,6 +178,7 @@ class CaseDocumentTimestampServiceTest {
 
         System.out.println(jsonNode.asText());
     }
+
     @Test
     void testFindNewDocuments() {
         List<String> listUrlsDb = generateListOfUrls(jsonStringOriginal);
