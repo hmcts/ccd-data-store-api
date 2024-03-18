@@ -187,7 +187,7 @@ class CaseDocumentTimestampServiceTest {
     @Test
     void testIsCaseTypeUploadTimestampFeatureEnabledForNullCaseType() {
         String caseType = "Case Type 1";
-        when(applicationParams.getUploadTimestampEnabledCaseTypes()).thenReturn(null);
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(null);
 
         assertFalse(underTest.isCaseTypeUploadTimestampFeatureEnabled(caseType));
     }
@@ -196,7 +196,7 @@ class CaseDocumentTimestampServiceTest {
     void testIsCaseTypeUploadTimestampFeatureEnabledForExpectedCaseType() {
         final String caseType = "Case Type 1";
 
-        when(applicationParams.getUploadTimestampEnabledCaseTypes()).thenReturn(List.of(caseType));
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseType));
 
         assertTrue(underTest.isCaseTypeUploadTimestampFeatureEnabled(caseType));
     }
@@ -205,7 +205,7 @@ class CaseDocumentTimestampServiceTest {
     void testIsCaseTypeUploadTimestampFeatureEnabledForNotExpectedCaseType() {
         final String caseType = "Case Type Not This One";
 
-        when(applicationParams.getUploadTimestampEnabledCaseTypes())
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes())
             .thenReturn(List.of("Another Case Type"));
 
         assertFalse(underTest.isCaseTypeUploadTimestampFeatureEnabled(caseType));

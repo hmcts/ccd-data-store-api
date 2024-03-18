@@ -182,8 +182,8 @@ public class ApplicationParams {
     @Value("${enable-case-users-db-sync}")
     private boolean enableCaseUsersDbSync;
 
-    @Value("#{'${ccd.upload-timestamp.enabled-case-types}'.split(',')}")
-    private List<String> uploadTimestampEnabledCaseTypes;
+    @Value("#{'${ccd.upload-timestamp-featured-case-types}'.split(',')}")
+    private List<String> uploadTimestampFeaturedCaseTypes;
 
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
@@ -627,7 +627,7 @@ public class ApplicationParams {
         return enableCaseGroupAccessFiltering;
     }
 
-    public List<String> getUploadTimestampEnabledCaseTypes() {
-        return uploadTimestampEnabledCaseTypes;
+    public List<String> getUploadTimestampFeaturedCaseTypes() {
+        return uploadTimestampFeaturedCaseTypes;
     }
 }

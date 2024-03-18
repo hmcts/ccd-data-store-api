@@ -122,8 +122,8 @@ public class CaseDocumentTimestampService {
     }
 
     protected boolean isCaseTypeUploadTimestampFeatureEnabled(String caseTypeId) {
-        return (null != applicationParams.getUploadTimestampEnabledCaseTypes()
-            && applicationParams.getUploadTimestampEnabledCaseTypes().contains(caseTypeId));
+        return (null != applicationParams.getUploadTimestampFeaturedCaseTypes()
+            && applicationParams.getUploadTimestampFeaturedCaseTypes().contains(caseTypeId));
 
     }
 
