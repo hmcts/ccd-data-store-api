@@ -37,7 +37,7 @@ class CaseDocumentTimestampServiceTest {
     private Clock clock;
 
     @Mock
-    private ApplicationParams applicationParams;;
+    private ApplicationParams applicationParams;
 
     @InjectMocks
     private CaseDocumentTimestampService underTest;
@@ -115,11 +115,6 @@ class CaseDocumentTimestampServiceTest {
         caseDetails.setReference(caseDetailsDb.getReference());
         caseDetails.setData(dataMap);
 
-        when(applicationParams.isJurisdictionUploadTimestampEnabled()).thenReturn(true);
-        when(applicationParams.getUploadTimestampFeaturedJurisdiction()).thenReturn(caseDetails.getJurisdiction());
-
-
-
         final int countExpectedChanges = 5;
 
         List<String> lstDocumentUrls = underTest.findUrlsNotInOriginal(caseDetails, caseDetailsDb);
@@ -190,32 +185,30 @@ class CaseDocumentTimestampServiceTest {
     }
 
     @Test
-    void testIsJurisdictionUploadTimestampFeatureEnabledForNullJurisdiction() {
-        final String jurisdiction = "Case Jurisdiction";
-        when(applicationParams.isJurisdictionUploadTimestampEnabled()).thenReturn(true);
-        when(applicationParams.getUploadTimestampFeaturedJurisdiction()).thenReturn(null);
+    void testIsCaseTypeUploadTimestampFeatureEnabledForNullCaseType() {
+        String caseType = "Case Type 1";
+        when(applicationParams.getUploadTimestampEnabledCaseTypes()).thenReturn(null);
 
-        assertFalse(underTest.isJurisdictionUploadTimestampFeatureEnabled(jurisdiction));
+        assertFalse(underTest.isCaseTypeUploadTimestampFeatureEnabled(caseType));
     }
 
     @Test
-    void testIsJurisdictionUploadTimestampFeatureEnabledForMatchedJurisdiction() {
-        final String jurisdiction = "Case Jurisdiction";
+    void testIsCaseTypeUploadTimestampFeatureEnabledForExpectedCaseType() {
+        final String caseType = "Case Type 1";
 
-        when(applicationParams.isJurisdictionUploadTimestampEnabled()).thenReturn(true);
-        when(applicationParams.getUploadTimestampFeaturedJurisdiction()).thenReturn(jurisdiction);
+        when(applicationParams.getUploadTimestampEnabledCaseTypes()).thenReturn(List.of(caseType));
 
-        assertTrue(underTest.isJurisdictionUploadTimestampFeatureEnabled(jurisdiction));
+        assertTrue(underTest.isCaseTypeUploadTimestampFeatureEnabled(caseType));
     }
 
     @Test
-    void testIsJurisdictionUploadTimestampFeatureEnabledForNonMatchedJurisdiction() {
-        final String jurisdiction = "Case Jurisdiction";
+    void testIsCaseTypeUploadTimestampFeatureEnabledForNotExpectedCaseType() {
+        final String caseType = "Case Type Not This One";
 
-        when(applicationParams.isJurisdictionUploadTimestampEnabled()).thenReturn(true);
-        when(applicationParams.getUploadTimestampFeaturedJurisdiction()).thenReturn("Another Jurisdiction");
+        when(applicationParams.getUploadTimestampEnabledCaseTypes())
+            .thenReturn(List.of("Another Case Type"));
 
-        assertFalse(underTest.isJurisdictionUploadTimestampFeatureEnabled(jurisdiction));
+        assertFalse(underTest.isCaseTypeUploadTimestampFeatureEnabled(caseType));
     }
 
     private List<String> generateListOfUrls(String jsonString) {

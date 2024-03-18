@@ -34,7 +34,7 @@ public class CaseDocumentTimestampService {
 
     public void addUploadTimestamps(CaseDetails caseDetailsModified, CaseDetails caseDetailsInDb) {
 
-        if (!isJurisdictionUploadTimestampFeatureEnabled(caseDetailsModified.getJurisdiction())) {
+        if (!isCaseTypeUploadTimestampFeatureEnabled(caseDetailsModified.getCaseTypeId())) {
             return;
         }
 
@@ -121,10 +121,9 @@ public class CaseDocumentTimestampService {
         }
     }
 
-    private boolean isJurisdictionUploadTimestampFeatureEnabled(String caseJurisdiction) {
-        return (applicationParams.isJurisdictionUploadTimestampEnabled()
-            && null != applicationParams.getUploadTimestampFeaturedJurisdiction()
-            && caseJurisdiction.equalsIgnoreCase(applicationParams.getUploadTimestampFeaturedJurisdiction()));
+    protected boolean isCaseTypeUploadTimestampFeatureEnabled(String caseTypeId) {
+        return (null != applicationParams.getUploadTimestampEnabledCaseTypes()
+            && applicationParams.getUploadTimestampEnabledCaseTypes().contains(caseTypeId));
 
     }
 
