@@ -1,0 +1,90 @@
+{
+  "_guid_": "S-1023.5",
+  "_extends_": "F-1023_CreateCasePreRequisiteCaseworkerBase",
+  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroupId created",
+
+  "prerequisites" : [ {
+      "Token_Creation": "S-1023_GetCreateToken"
+    }
+  ],
+  "specs": [
+    "an active profile in CCD",
+    "is of caseType where caseAccessGroupType = CCD:all-cases-access and -OrganisationPolicyField- CaseAssignedRoleField  field exists in caseData and case data has Organisation.OrganisationID value not set to empty value but accessType does not have GroupRoleName",
+    "Submit case creation as Case worker",
+    "contains correctly configured values"
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "CaseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupId": "test",
+              "caseAccessGroupType": "CCD:all-cases-access"
+            },
+            "id": null
+          }
+        ]
+      },
+      "event": {
+        "id": "createCase"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "event_data": {
+        "CaseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupId": "test",
+              "caseAccessGroupType": "CCD:all-cases-access"
+            },
+            "id": null
+          }
+        ]
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type_id": "FT_CaseAccessGroups",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "case_data": {
+        "CaseAccessGroups" : [ {
+          "value" : {
+            "caseAccessGroupType" : "CCD:all-cases-access",
+            "caseAccessGroupId" : "test"
+          },
+          "id" : null
+        } ]
+      },
+      "data_classification" : {
+        "CaseAccessGroups" : {
+          "classification" : "PUBLIC",
+          "value" : [ {
+            "value" : {
+              "caseAccessGroupType" : "PUBLIC",
+              "caseAccessGroupId" : "PUBLIC"
+            },
+            "id" : null
+          } ]
+        }
+      }
+    },
+    "supplementary_data" : null,
+    "after_submit_callback_response": null,
+    "callback_response_status_code": null,
+    "callback_response_status": null,
+    "delete_draft_response_status_code": null,
+    "delete_draft_response_status": null
+  }
+}
