@@ -1,0 +1,96 @@
+{
+	"_guid_": "S-960",
+	"title": "should retrieve case when the case reference exists",
+
+  "productName": "CCD Data Store",
+  "operationName": "retrieve a case by id",
+
+  "method": "GET",
+  "uri": "/cases/{cid}",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "GroupAccessCaseworkerAutotest"
+    }
+  },
+
+	"specs": [
+		"an active profile in CCD",
+		"contains the case reference of the case just created",
+		"contains the details of the case just created, along with an HTTP-200 OK"
+	],
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][GroupAccess_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+		"_extends_": "Common_200_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+		"body" : {
+      "id": "[[ANYTHING_PRESENT]]",
+      "version": 0,
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null,
+      "jurisdiction": "BEFTA_JURISDICTION_1",
+      "case_type_id": "CaseAccessGroups_Casetype",
+      "state": "CaseCreated",
+      "case_data": {
+        "caseAccessGroups": [
+          {
+            "id": "6847d5f4-3c2b-4340-997f-cf12eae4dc84",
+            "value": {
+              "caseAccessGroupId": "BEFTA_JURISDICTION_1:BEFTA_CaseType:[aSolicitorGroupRole]:HM2OHHS",
+              "caseAccessGroupType": "CCD:all-cases-access"
+            }
+          },
+          {
+            "id": "8ae1baca-727b-44d4-9fc8-36e9e1cde912",
+            "value": {
+              "caseAccessGroupId": "BEFTA_JURISDICTION_1:BEFTA_CaseType:[GrpRoleName1]:6SE8QQF",
+              "caseAccessGroupType": "CCD:all-cases-access"
+            }
+          }
+        ]
+      },
+      "supplementary_data": null,
+      "data_classification": {
+        "caseAccessGroups": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "caseAccessGroupId": "PUBLIC",
+                "caseAccessGroupType": "PUBLIC"
+              },
+              "id": "6847d5f4-3c2b-4340-997f-cf12eae4dc84"
+            },
+            {
+              "value": {
+                "caseAccessGroupId": "PUBLIC",
+                "caseAccessGroupType": "PUBLIC"
+              },
+              "id": "8ae1baca-727b-44d4-9fc8-36e9e1cde912"
+            }
+          ]
+        }
+      }
+    }
+	}
+}
