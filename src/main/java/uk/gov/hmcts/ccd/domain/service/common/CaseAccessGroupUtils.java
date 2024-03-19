@@ -79,8 +79,14 @@ public class CaseAccessGroupUtils {
             if (caseDetails.getData().get(CASE_ACCESS_GROUPS) != null) {
                 JsonNode caseDataCaseAccessGroup = caseDetails.getData().get(CASE_ACCESS_GROUPS);
 
-                String mergedValue = caseDataCaseAccessGroup.toString() + caseAccessGroupWithIdsNode.toString();
-                mergedValue = mergedValue.replace("][",",");
+                String mergedValue = null;
+                if (caseDataCaseAccessGroup != null && !caseDataCaseAccessGroup.isEmpty()) {
+                    mergedValue = caseDataCaseAccessGroup.toString() + caseAccessGroupWithIdsNode.toString();
+                    mergedValue = mergedValue.replace("][",",");
+                } else {
+                    mergedValue = caseAccessGroupWithIdsNode.toString();
+                }
+
                 JsonNode mergedNode = null;
                 try {
                     mergedNode = new ObjectMapper().readTree(mergedValue);
