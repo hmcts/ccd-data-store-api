@@ -36,41 +36,37 @@ public class CaseAccessGroupUtils {
     protected static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
     protected static final String CASE_ACCESS_GROUP_TYPE = "caseAccessGroupType";
 
-
     public void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
 
-        if (isCaseAccessGroupsFieldPresent(caseDetails.getData())) {
+        removeCCDAllCasesAccessFromCaseAccessGroups(caseDetails);
 
-            removeCCDAllCasesAccessFromCaseAccessGroups(caseDetails);
+        List<AccessTypeRoleDefinition> accessTypeRoleDefinitions =
+            caseTypeDefinition.getAccessTypeRoleDefinitions();
+        List<AccessTypeRoleDefinition> filteredAccessTypeRolesDefinitions = filterAccessRoles(caseDetails,
+            accessTypeRoleDefinitions);
+        if (filteredAccessTypeRolesDefinitions != null) {
+            List<CaseAccessGroupWithId> caseAccessGroupWithIds = new ArrayList<>();
+            for (AccessTypeRoleDefinition acd : filteredAccessTypeRolesDefinitions) {
+                JsonNode caseAssignedRoleFieldNode = findOrganisationPolicyNodeForCaseRole(caseDetails,
+                    acd.getCaseAssignedRoleField());
+                if (caseAssignedRoleFieldNode != null) {
+                    String orgIdentifier = caseAssignedRoleFieldNode.get(ORGANISATION)
+                        .get(ORGANISATIONID).textValue();
 
-            List<AccessTypeRoleDefinition> accessTypeRoleDefinitions =
-                caseTypeDefinition.getAccessTypeRoleDefinitions();
-            List<AccessTypeRoleDefinition> filteredAccessTypeRolesDefinitions = filterAccessRoles(caseDetails,
-                accessTypeRoleDefinitions);
-            if (filteredAccessTypeRolesDefinitions != null) {
-                List<CaseAccessGroupWithId> caseAccessGroupWithIds = new ArrayList<>();
-                for (AccessTypeRoleDefinition acd : filteredAccessTypeRolesDefinitions) {
-                    JsonNode caseAssignedRoleFieldNode = findOrganisationPolicyNodeForCaseRole(caseDetails,
-                        acd.getCaseAssignedRoleField());
-                    if (caseAssignedRoleFieldNode != null) {
-                        String orgIdentifier = caseAssignedRoleFieldNode.get(ORGANISATION)
-                            .get(ORGANISATIONID).textValue();
+                    if (orgIdentifier != null) {
+                        String caseGroupID = acd.getCaseAccessGroupIdTemplate()
+                            .replace(ORG_IDENTIFIER_TEMPLATE, orgIdentifier);
 
-                        if (orgIdentifier != null) {
-                            String caseGroupID = acd.getCaseAccessGroupIdTemplate()
-                                .replace(ORG_IDENTIFIER_TEMPLATE, orgIdentifier);
+                        CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseGroupID)
+                            .caseAccessGroupType(CCD_ALL_CASES).build();
+                        CaseAccessGroupWithId caseAccessGroupWithId = CaseAccessGroupWithId.builder()
+                            .caseAccessGroup(caseAccessGroup).id(UUID.randomUUID().toString()).build();
 
-                            CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseGroupID)
-                                .caseAccessGroupType(CCD_ALL_CASES).build();
-                            CaseAccessGroupWithId caseAccessGroupWithId = CaseAccessGroupWithId.builder()
-                                .caseAccessGroup(caseAccessGroup).id(UUID.randomUUID().toString()).build();
-
-                            caseAccessGroupWithIds.add(caseAccessGroupWithId);
-                        }
+                        caseAccessGroupWithIds.add(caseAccessGroupWithId);
                     }
                 }
-                setUpModifiedCaseAccessGroups(caseDetails, caseAccessGroupWithIds);
             }
+            setUpModifiedCaseAccessGroups(caseDetails, caseAccessGroupWithIds);
         }
 
     }
@@ -98,6 +94,8 @@ public class CaseAccessGroupUtils {
                 caseDetails.getData().put(CASE_ACCESS_GROUPS, caseAccessGroupWithIdsNode);
             }
 
+            LOG.debug("CASE ACCESS GROUPS : {} ", caseDetails.getData().get(CASE_ACCESS_GROUPS));
+
             // update CaseAccessGroup in data classification
             JsonNode justCaseAccessGroupDataClassification =
                 caseDetails.getData().get(CASE_ACCESS_GROUPS);
@@ -105,16 +103,9 @@ public class CaseAccessGroupUtils {
                 updateCaseDataClassificationWithCaseGroupAccess(caseDetails.getSecurityClassification(),
                     caseDetails.getData(), caseDetails.getDataClassification(), justCaseAccessGroupDataClassification);
 
-            LOG.debug("CASE_ACCESS_GROUPS {} ", caseDetails.getData().get(CASE_ACCESS_GROUPS));
+            caseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
+            LOG.debug("Case data classification : {} ", caseDetails.getDataClassification());
         }
-    }
-
-    private boolean isCaseAccessGroupsFieldPresent(Map<String, JsonNode> data) {
-        return data != null
-            && !data.isEmpty()
-            && data.get(CASE_ACCESS_GROUPS) != null
-            && !data.get(CASE_ACCESS_GROUPS).isEmpty();
-
     }
 
     public JsonNode findOrganisationPolicyNodeForCaseRole(CaseDetails caseDetails, String caseRoleId) {
@@ -161,7 +152,6 @@ public class CaseAccessGroupUtils {
                     }
                 }
             }
-
             removeCaseAccessGroup(caseAccessGroupsJsonNodes, caseDetails);
         }
     }
