@@ -23,32 +23,12 @@
             "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
           }
-        },
-        "CaseAccessGroups": [
-          {
-            "value": {
-              "caseAccessGroupId": "test",
-              "caseAccessGroupType": "CCD:all-cases-access"
-            },
-            "id": null
-          }
-        ]
+        }
       },
       "event": {
         "id": "createCase"
       },
-      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "event_data": {
-        "CaseAccessGroups": [
-          {
-            "value": {
-              "caseAccessGroupId": "test",
-              "caseAccessGroupType": "CCD:all-cases-access"
-            },
-            "id": null
-          }
-        ]
-      }
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
   "expectedResponse": {
