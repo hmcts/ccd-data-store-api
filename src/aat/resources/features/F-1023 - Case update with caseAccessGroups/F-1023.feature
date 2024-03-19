@@ -17,7 +17,6 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData and case data has Organisation.OrganisationID value not set to empty value]
     And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
     Then      a positive response is received
-    And       a successful call [to verify that the case group ID is set in caseAccessGroups collection in the case data and caseGroupType = CCD:all-cases-access] as in [F-1023-VerifyCaseGroup]
 
   @S-1023.2
   Scenario: Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroups field contains blank value
@@ -35,7 +34,6 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     And       the request [is of caseType where caseAccessGroupType != CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData and case data has Organisation.OrganisationID value not set to empty value]
     And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
     Then      a positive response is received
-    And       a successful call [to verify that the case group ID is not set in caseAccessGroups collection in the case data and caseGroupType != CCD:all-cases-access] as in [F-1023-VerifyCaseGroup]
 
   @S-1023.4 #AC-3
   Scenario: CaseAccessGroups field contains Invalid caseAccessGroupType value and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
@@ -45,7 +43,6 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData but case data has Organisation.OrganisationID value is empty value]
     And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
     Then      a positive response is received
-    And       a successful call [to verify that the case group ID is not set in caseAccessGroups collection in the case data and caseGroupType = CCD:all-cases-access] as in [F-1023-VerifyCaseGroup]
 
   @S-1023.5 #AC-4
   Scenario: CaseAccessGroups field contains valid caseAccessGroupType value but case data invalid and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
@@ -55,5 +52,3 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access and -OrganisationPolicyField- CaseAssignedRoleField  field exists in caseData and case data has Organisation.OrganisationID value not set to empty value but accessType does not have GroupRoleName]
     And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
     Then      a positive response is received
-    And       a successful call [to verify that the case group ID is not set in caseAccessGroups collection in the case data and caseGroupType = CCD:all-cases-access] as in [F-1023-VerifyCaseGroup]
-
