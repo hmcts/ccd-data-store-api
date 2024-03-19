@@ -16,6 +16,14 @@
   "request": {
     "body": {
       "data": {
+        "OrganisationPolicyField": {
+          "OrgPolicyCaseAssignedRole": "GroupRole2",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        },
         "CaseAccessGroups": [
           {
             "value": {
