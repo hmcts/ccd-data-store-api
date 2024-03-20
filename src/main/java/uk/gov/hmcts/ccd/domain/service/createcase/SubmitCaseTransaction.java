@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -49,20 +50,22 @@ public class SubmitCaseTransaction implements AccessControl {
     private final CaseDataAccessControl caseDataAccessControl;
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
+    private final CaseDataService caseDataService;
     private final ApplicationParams applicationParams;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                      final CaseDetailsRepository caseDetailsRepository,
-                                 final CaseAuditEventRepository caseAuditEventRepository,
-                                 final CaseTypeService caseTypeService,
-                                 final CallbackInvoker callbackInvoker,
-                                 final UIDService uidService,
-                                 final SecurityClassificationService securityClassificationService,
-                                 final CaseDataAccessControl caseDataAccessControl,
-                                 final @Qualifier("caseEventMessageService") MessageService messageService,
-                                 final CaseDocumentService caseDocumentService,
-                                 final ApplicationParams applicationParams
+                                    final CaseAuditEventRepository caseAuditEventRepository,
+                                    final CaseTypeService caseTypeService,
+                                    final CallbackInvoker callbackInvoker,
+                                    final UIDService uidService,
+                                    final SecurityClassificationService securityClassificationService,
+                                    final CaseDataAccessControl caseDataAccessControl,
+                                    final @Qualifier("caseEventMessageService") MessageService messageService,
+                                    final CaseDocumentService caseDocumentService,
+                                    final CaseDataService caseDataService,
+                                    final ApplicationParams applicationParams
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -73,6 +76,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.caseDataAccessControl = caseDataAccessControl;
         this.messageService = messageService;
         this.caseDocumentService = caseDocumentService;
+        this.caseDataService = caseDataService;
         this.applicationParams = applicationParams;
     }
 
@@ -130,7 +134,7 @@ public class SubmitCaseTransaction implements AccessControl {
         if (this.applicationParams.getCaseGroupAccessFilteringEnabled()) {
             CaseAccessGroupUtils caseGroupAccessTypeUtils = new CaseAccessGroupUtils();
             caseGroupAccessTypeUtils.updateCaseAccessGroupsInCaseDetails(caseDetailsAfterCallbackWithoutHashes,
-                caseTypeDefinition);
+                caseTypeDefinition, caseDataService);
         }
 
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(

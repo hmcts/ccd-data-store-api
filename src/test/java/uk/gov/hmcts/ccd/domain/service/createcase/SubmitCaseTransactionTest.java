@@ -27,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
@@ -113,6 +114,9 @@ class SubmitCaseTransactionTest {
     @Mock
     private MessageService messageService;
 
+    @Mock
+    private CaseDataService caseDataService;
+
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -136,6 +140,7 @@ class SubmitCaseTransactionTest {
             caseDataAccessControl,
             messageService,
             caseDocumentService,
+            caseDataService,
             applicationParams
         );
 
