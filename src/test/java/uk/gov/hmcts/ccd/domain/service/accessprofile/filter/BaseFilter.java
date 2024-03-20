@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.accessprofile.filter;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Optional;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -14,6 +16,8 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,7 +29,6 @@ public class BaseFilter {
     protected static final String CASE_ID_1 = "CASE_ID_1";
     protected static final String CASE_ID_2 = "CASE_ID_2";
     protected static final String CASE_TYPE_ID_1 = "CASE_TYPE_ID_1";
-    protected static final String CASE_TYPE_ID_2 = "CASE_TYPE_ID_2";
     protected static final String ROLE_NAME_1 = "RoleName1";
 
     protected RoleAssignment createRoleAssignmentWithRoleName(String roleName) {
@@ -63,6 +66,26 @@ public class BaseFilter {
             Optional.of("")
         );
     }
+
+    protected RoleAssignment createRoleAssignment(String caseId,
+                                                  String jurisdiction,
+                                                  Instant startDate,
+                                                  Instant endDate,
+                                                  String securityClassification,
+                                                  String caseAccessGroupId) {
+
+        return createRoleAssignment(
+            startDate,
+            endDate,
+            securityClassification,
+            Optional.of(caseId),
+            Optional.of(jurisdiction),
+            Optional.of(""),
+            Optional.of(""),
+            Optional.of(caseAccessGroupId)
+        );
+    }
+
 
     protected RoleAssignment createRoleAssignment(String caseId,
                                                   String jurisdiction,
@@ -188,6 +211,54 @@ public class BaseFilter {
 
     protected CaseDetails mockCaseDetails(SecurityClassification securityClassification) {
         return mockCaseDetails(securityClassification, JURISDICTION_1);
+    }
+
+
+    protected CaseDetails mockCaseDetails(Map<String,JsonNode> caseAccessGroups,
+                                          CaseDataService caseDataService,
+                                          CaseTypeDefinition caseTypeDefinition) {
+        return mockCaseDetails(SecurityClassification.PUBLIC,caseAccessGroups, JURISDICTION_1,
+            caseDataService, caseTypeDefinition);
+    }
+
+    protected CaseDetails mockCaseDetails(SecurityClassification securityClassification,
+                                          Map<String,JsonNode> caseAccessGroups,
+                                          CaseDataService caseDataService,
+                                          CaseTypeDefinition caseTypeDefinition) {
+        CaseDetails caseDetails = mock(CaseDetails.class);
+
+        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
+        Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
+            caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
+                caseDetails.getDataClassification(), caseAccessGroups,
+                caseDataService, caseTypeDefinition);
+
+        when(caseDetails.getSecurityClassification()).thenReturn(securityClassification);
+        when(caseDetails.getReferenceAsString()).thenReturn(CASE_ID_1);
+        when(caseDetails.getCaseTypeId()).thenReturn("TEST_CASE_TYPE");
+        when(caseDetails.getData()).thenReturn(caseAccessGroups);
+        when(caseDetails.getDataClassification()).thenReturn(caseDataClassificationWithCaseAccessGroup);
+        return caseDetails;
+    }
+
+    protected CaseDetails mockCaseDetails(SecurityClassification securityClassification,
+                                          Map<String,JsonNode> caseAccessGroups, String jurisdiction,
+                                          CaseDataService caseDataService, CaseTypeDefinition caseTypeDefinition) {
+
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
+        Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
+            caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
+                caseDetails.getDataClassification(), caseAccessGroups,
+                caseDataService, caseTypeDefinition);
+
+        when(caseDetails.getSecurityClassification()).thenReturn(securityClassification);
+        when(caseDetails.getReferenceAsString()).thenReturn(CASE_ID_1);
+        when(caseDetails.getJurisdiction()).thenReturn(jurisdiction);
+        when(caseDetails.getCaseTypeId()).thenReturn("TEST_CASE_TYPE");
+        when(caseDetails.getData()).thenReturn(caseAccessGroups);
+        when(caseDetails.getDataClassification()).thenReturn(caseDataClassificationWithCaseAccessGroup);
+        return caseDetails;
     }
 
     protected CaseDetails mockCaseDetails(SecurityClassification securityClassification, String jurisdiction) {
