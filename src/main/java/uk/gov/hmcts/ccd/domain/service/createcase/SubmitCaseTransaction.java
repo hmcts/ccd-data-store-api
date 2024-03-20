@@ -130,7 +130,6 @@ public class SubmitCaseTransaction implements AccessControl {
             caseDetailsAfterCallback
         );
 
-        //GA-28
         if (this.applicationParams.getCaseGroupAccessFilteringEnabled()) {
             CaseAccessGroupUtils caseGroupAccessTypeUtils = new CaseAccessGroupUtils();
             caseGroupAccessTypeUtils.updateCaseAccessGroupsInCaseDetails(caseDetailsAfterCallbackWithoutHashes,

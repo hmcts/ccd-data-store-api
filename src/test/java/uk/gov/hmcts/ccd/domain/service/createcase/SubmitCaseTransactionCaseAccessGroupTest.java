@@ -65,6 +65,8 @@ import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 class SubmitCaseTransactionCaseAccessGroupTest {
 
@@ -407,9 +409,6 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
 
-        //Map<String, JsonNode> dataClassificationNode =
-        //    buildCaseDataClassificationFromDataCaseAccessGroup(dataCaseAccessGroup);
-        // update CaseAccessGroup in data classification
         inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
         dataCaseAccessGroup.put(CaseAccessGroups, inputCaseDetails.getData().get(CaseAccessGroups));
 
@@ -486,8 +485,6 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
         Map<String, JsonNode> dataOrganisation = Collections.singletonMap("Organisation.OrganisationID",
             new TextNode("550e8400-e29b-41d4-a716-446655440000"));
-        //Map<String, JsonNode> dataOrganisation = organisationPolicyCaseData("caseAssignedField",
-        //    "\"550e8400-e29b-41d4-a716-446655440000\"");
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
@@ -585,8 +582,6 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
         inputCaseDetails.setData(dataMap);
 
-        //Map<String, JsonNode> dataOrganisation = Collections.singletonMap("Organisation.OrganisationID",
-        //    new TextNode("550e8400-e29b-41d4-a716-446655440000"));
         Map<String, JsonNode> dataOrganisation = organisationPolicyCaseData("caseAssignedField",
             "\"550e8400-e29b-41d4-a716-446655440000\"");
 
@@ -739,7 +734,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup);
+        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup, 3, "Any String");
     }
 
     private Map<String, JsonNode> organisationPolicyCaseData(String role, String organisationId)
@@ -790,10 +785,12 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         return result;
     }
 
-    private void assertCaseDataCaseAccessGroup(final CaseDetails caseDetails) {
+    private void assertCaseDataCaseAccessGroup(final CaseDetails caseDetails, int size, String caseAccessGroupType) {
+        JsonNode caseAccessGroupsJsonNode = caseDetails.getData().get(CaseAccessGroups);
         assertAll("Assert Casedetails, Data, CaseAccessGroups",
             //() -> assertThat(caseDetails.getData().get(CaseAccessGroups), isNotNull()),
-            () -> assertEquals(3, caseDetails.getData().get(CaseAccessGroups).size())
+            () -> assertEquals(size, caseAccessGroupsJsonNode.size()),
+            () -> assertTrue((caseAccessGroupsJsonNode.toString().contains(caseAccessGroupType)))
         );
     }
 
