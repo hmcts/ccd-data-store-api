@@ -37,6 +37,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -61,6 +62,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SubmitCaseTransactionCaseAccessGroupTest {
 
@@ -90,7 +94,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     private static final String ON_BEHALF_OF_FNAME = "Pierre OnBehalf";
     private static final String ON_BEHALF_OF_LNAME = "Martin OnBehalf";
 
-    private static final String CaseAccessGroups = "CaseAccessGroups";
+    private static final String CaseAccessGroups = CaseAccessGroupUtils.CASE_ACCESS_GROUPS;
 
     private static final String DATA_FNAME = "PUBLIC";
     private static final String DATA_CASEGROUPID = "id";
@@ -125,6 +129,9 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     private MessageService messageService;
 
     @Mock
+    private CaseDataService caseDataService;
+
+    @Mock
     private ApplicationParams applicationParams;
 
     @InjectMocks
@@ -150,6 +157,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             caseDataAccessControl,
             messageService,
             caseDocumentService,
+            caseDataService,
             applicationParams
         );
 
@@ -309,12 +317,15 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
         inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
+
+        Map<String, JsonNode> dataCaseAccessGroup = new HashMap<>();
+        dataCaseAccessGroup.put(CaseAccessGroups, inputCaseDetails.getData().get(CaseAccessGroups));
+
         CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
-        JsonNode justCaseAccessGroupDataClassification = inputCaseDetails.getData().get(CaseAccessGroups);
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                inputCaseDetails.getSecurityClassification(),inputCaseDetails.getData(),
-                inputCaseDetails.getDataClassification(), justCaseAccessGroupDataClassification);
+                caseDetails.getDataClassification(), dataCaseAccessGroup,
+                caseDataService, caseTypeDefinition);
 
         inputCaseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
 
@@ -400,12 +411,13 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         //    buildCaseDataClassificationFromDataCaseAccessGroup(dataCaseAccessGroup);
         // update CaseAccessGroup in data classification
         inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
+        dataCaseAccessGroup.put(CaseAccessGroups, inputCaseDetails.getData().get(CaseAccessGroups));
+
         CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
-        JsonNode justCaseAccessGroupDataClassification = inputCaseDetails.getData().get(CaseAccessGroups);
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                inputCaseDetails.getSecurityClassification(),inputCaseDetails.getData(),
-                inputCaseDetails.getDataClassification(), justCaseAccessGroupDataClassification);
+                caseDetails.getDataClassification(), dataCaseAccessGroup,
+                caseDataService, caseTypeDefinition);
 
         inputCaseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
 
@@ -502,12 +514,12 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
 
         inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
+
         CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
-        JsonNode justCaseAccessGroupDataClassification = inputCaseDetails.getData().get(CaseAccessGroups);
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                inputCaseDetails.getSecurityClassification(),inputCaseDetails.getData(),
-                inputCaseDetails.getDataClassification(), justCaseAccessGroupDataClassification);
+                caseDetails.getDataClassification(), dataCaseAccessGroup,
+                caseDataService, caseTypeDefinition);
 
         inputCaseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
 
@@ -603,12 +615,14 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
 
         inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
+
+        dataCaseAccessGroup.put(CaseAccessGroups, inputCaseDetails.getData().get(CaseAccessGroups));
+
         CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
-        JsonNode justCaseAccessGroupDataClassification = inputCaseDetails.getData().get(CaseAccessGroups);
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                inputCaseDetails.getSecurityClassification(),inputCaseDetails.getData(),
-                inputCaseDetails.getDataClassification(), justCaseAccessGroupDataClassification);
+                caseDetails.getDataClassification(), dataCaseAccessGroup,
+                caseDataService, caseTypeDefinition);
 
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
@@ -703,12 +717,12 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
         inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
+
         CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
-        JsonNode justCaseAccessGroupDataClassification = inputCaseDetails.getData().get(CaseAccessGroups);
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                inputCaseDetails.getSecurityClassification(),inputCaseDetails.getData(),
-                inputCaseDetails.getDataClassification(), justCaseAccessGroupDataClassification);
+                caseDetails.getDataClassification(), dataCaseAccessGroup,
+                caseDataService, caseTypeDefinition);
 
         inputCaseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
 
@@ -716,7 +730,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
         doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
 
-        submitCaseTransaction.submitCase(event,
+        CaseDetails caseDetailsWithCaseAccessGroup = submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
             idamUser,
             caseEventDefinition,
@@ -724,9 +738,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             IGNORE_WARNING,
             null);
 
-
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
+        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup);
     }
 
     private Map<String, JsonNode> organisationPolicyCaseData(String role, String organisationId)
@@ -775,6 +788,13 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         Map<String, JsonNode> result = new HashMap<>();
         result.put(CaseAccessGroups, data);
         return result;
+    }
+
+    private void assertCaseDataCaseAccessGroup(final CaseDetails caseDetails) {
+        assertAll("Assert Casedetails, Data, CaseAccessGroups",
+            //() -> assertThat(caseDetails.getData().get(CaseAccessGroups), isNotNull()),
+            () -> assertEquals(3, caseDetails.getData().get(CaseAccessGroups).size())
+        );
     }
 
 }
