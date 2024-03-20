@@ -33,6 +33,7 @@ public class CaseAccessGroupUtils {
     protected static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
     protected static final String CASE_ACCESS_GROUP_TYPE = "caseAccessGroupType";
     protected static final String GROUPACCESS_VALUE = "value";
+    protected static final String GROUPACCESS_ID = "id";
 
     private CaseDataService caseDataService;
     private CaseTypeDefinition caseTypeDefinition;
@@ -174,9 +175,7 @@ public class CaseAccessGroupUtils {
         if (isAccessGroupsJsonNodesAvailable(caseAccessGroupsJsonNodes)) {
             for (int i = 0; i < caseAccessGroupsJsonNodes.size(); i++) {
                 JsonNode caseAccessGroupTypeValueNode = caseAccessGroupsJsonNodes.get(i);
-                String idToRemove = null;
                 if (hasNodeValueAndId(caseAccessGroupTypeValueNode)) {
-                    idToRemove = caseAccessGroupTypeValueNode.get("id").textValue();
                     for (JsonNode field : caseAccessGroupTypeValueNode) {
                         if (isCaseAccessGroupTypeField(field)) {
                             caseAccessGroupsJsonNodes.remove(i);
@@ -202,8 +201,8 @@ public class CaseAccessGroupUtils {
     }
 
     private boolean hasNodeValueAndId(JsonNode caseAccessGroupTypeValueNode) {
-        return (caseAccessGroupTypeValueNode.get("id") != null
-            && caseAccessGroupTypeValueNode.get("value") != null);
+        return (caseAccessGroupTypeValueNode.get(GROUPACCESS_ID) != null
+            && caseAccessGroupTypeValueNode.get(GROUPACCESS_VALUE) != null);
     }
 
     private boolean isCaseAccessGroupTypeField(JsonNode field) {
@@ -223,32 +222,6 @@ public class CaseAccessGroupUtils {
             )
             .toList();
     }
-
-    /*public Map<String, JsonNode>
-        updateCaseDataClassificationWithCaseGroupAccess(SecurityClassification securityClassification,
-                                                        Map<String, JsonNode> data,
-                                                        Map<String, JsonNode> dataClassification,
-                                                        JsonNode justCaseAccessGroupDataClassification) {
-
-        Map<String, JsonNode> outputDataClassification = dataClassification;
-
-        // .. then clone current data classification and set the CaseAccessGroup classification
-        outputDataClassification = cloneOrNewJsonMap(dataClassification);
-        if (justCaseAccessGroupDataClassification != null && !justCaseAccessGroupDataClassification.isEmpty()) {
-            ObjectMapper mapper = new JsonMapper();
-
-            ObjectNode groupAccessNode = mapper.createObjectNode();
-            groupAccessNode.put(GROUPACCESS_CLASSIFICATION, securityClassification.name());
-            groupAccessNode.put(GROUPACCESS_VALUE, justCaseAccessGroupDataClassification);
-
-            ObjectNode root = mapper.createObjectNode();
-            root.put(CASE_ACCESS_GROUPS,groupAccessNode);
-            outputDataClassification = mapper.convertValue(root, Map.class);
-
-        }
-
-        return outputDataClassification;
-    }*/
 
     private Map<String, JsonNode> cloneOrNewJsonMap(Map<String, JsonNode> jsonMap) {
         if (jsonMap != null) {
