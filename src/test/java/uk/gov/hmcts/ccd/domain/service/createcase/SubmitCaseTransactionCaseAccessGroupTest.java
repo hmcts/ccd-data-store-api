@@ -788,7 +788,6 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     private void assertCaseDataCaseAccessGroup(final CaseDetails caseDetails, int size, String caseAccessGroupType) {
         JsonNode caseAccessGroupsJsonNode = caseDetails.getData().get(CaseAccessGroups);
         assertAll("Assert Casedetails, Data, CaseAccessGroups",
-            //() -> assertThat(caseDetails.getData().get(CaseAccessGroups), isNotNull()),
             () -> assertEquals(size, caseAccessGroupsJsonNode.size()),
             () -> assertTrue((caseAccessGroupsJsonNode.toString().contains(caseAccessGroupType)))
         );
