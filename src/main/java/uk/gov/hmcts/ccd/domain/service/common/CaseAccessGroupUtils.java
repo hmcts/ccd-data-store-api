@@ -61,7 +61,7 @@ public class CaseAccessGroupUtils {
                     String orgIdentifier = caseAssignedRoleFieldNode.get(ORGANISATION)
                         .get(ORGANISATIONID).textValue();
 
-                    if (orgIdentifier != null) {
+                    if (orgIdentifier != null && !orgIdentifier.isEmpty()) {
                         String caseGroupID = acd.getCaseAccessGroupIdTemplate()
                             .replace(ORG_IDENTIFIER_TEMPLATE, orgIdentifier);
 

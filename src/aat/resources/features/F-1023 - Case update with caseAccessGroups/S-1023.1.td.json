@@ -10,7 +10,7 @@
   "specs": [
     "an active profile in CCD",
     "contains some OrganisationPolicy fields with all correct values",
-    "is of caseType where caseAccessGroupType = CCD:all-cases-access",
+    "is of caseType where case_data has caseAccessGroupType of CCD:all-cases-access",
     "Submit case creation as Case worker",
     "contains correctly configured values"
   ],
@@ -24,7 +24,14 @@
             "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
           }
-        }
+        },
+        "CaseAccessGroups" : [ {
+          "value" : {
+            "caseAccessGroupType" : "CCD:all-cases-access",
+            "caseAccessGroupId" : "test"
+          },
+          "id" : null
+        } ]
       },
       "event": {
         "id": "createCase"
