@@ -1,7 +1,7 @@
 {
   "_guid_": "S-1023.5",
-  "_extends_": "F-1023_CreateCasePreRequisiteCaseworkerBase",
-  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroupId created",
+  "_extends_": "F-1023_Test_Data_Base",
+  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroups field contains blank value",
 
   "prerequisites" : [ {
       "Token_Creation": "S-1023_GetCreateToken"
@@ -10,45 +10,28 @@
   "specs": [
     "an active profile in CCD",
     "contains some OrganisationPolicy fields with all correct values",
-    "is of caseType where caseAccessGroupType = CCD:all-cases-access and -OrganisationPolicyField- CaseAssignedRoleField  field exists in caseData and case data has Organisation.OrganisationID value not set to empty value but accessType does not have GroupRoleName",
-    "Submit case creation as Case worker",
-    "contains correctly configured values"
+    "Submit case creation as Case worker"
   ],
   "request": {
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "GroupRole2",
+          "OrgPolicyCaseAssignedRole": "GroupRole1",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
           }
         },
-        "CaseAccessGroups": [
-          {
-            "value": {
-              "caseAccessGroupId": "test",
-              "caseAccessGroupType": "CCD:all-cases-access"
-            },
-            "id": null
-          }
-        ]
+        "CaseAccessGroups": []
       },
       "event": {
         "id": "createCase"
       },
       "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
       "event_data": {
-        "CaseAccessGroups": [
-          {
-            "value": {
-              "caseAccessGroupId": "test",
-              "caseAccessGroupType": "CCD:all-cases-access"
-            },
-            "id": null
-          }
-        ]
+        "CaseAccessGroups": [],
+        "id": null
       }
     }
   },
@@ -68,24 +51,12 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "CaseAccessGroups" : [ {
-          "value" : {
-            "caseAccessGroupType" : "CCD:all-cases-access",
-            "caseAccessGroupId" : "test"
-          },
-          "id" : null
-        } ]
+        "CaseAccessGroups": []
       },
       "data_classification" : {
         "CaseAccessGroups" : {
           "classification" : "PUBLIC",
-          "value" : [ {
-            "value" : {
-              "caseAccessGroupType" : "PUBLIC",
-              "caseAccessGroupId" : "PUBLIC"
-            },
-            "id" : null
-          } ]
+          "value" : [ ]
         }
       }
     },
