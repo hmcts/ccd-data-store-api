@@ -14,7 +14,8 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     Given     a user with [an active profile in CCD]
     When      a request is prepared with appropriate values
     And       the request [contains correctly configured values]
-    And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData and case data has Organisation.OrganisationID value not set to empty value]
+    And       the request [contains some OrganisationPolicy fields with all correct values]
+    And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access]
     And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
     Then      a positive response is received
 
@@ -22,7 +23,7 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
   Scenario: Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroups field contains blank value
     Given     a user with [an active profile in CCD]
     When      a request is prepared with appropriate values
-    And       the request [is of caseType where caseAccessGroupType != CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData and case data has Organisation.OrganisationID value not set to empty value]
+    And       the request [contains some OrganisationPolicy fields with all correct values]
     And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
     Then      a positive response is received
 
@@ -31,7 +32,8 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     Given     a user with [an active profile in CCD]
     When      a request is prepared with appropriate values
     And       the request [contains correctly configured values]
-    And       the request [is of caseType where caseAccessGroupType != CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData and case data has Organisation.OrganisationID value not set to empty value]
+    And       the request [contains some OrganisationPolicy fields with all correct values]
+    And       the request [is of caseType where caseAccessGroupType != CCD:all-cases-access]
     And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
     Then      a positive response is received
 
@@ -40,7 +42,9 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     Given     a user with [an active profile in CCD]
     When      a request is prepared with appropriate values
     And       the request [contains correctly configured values]
-    And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData but case data has Organisation.OrganisationID value is empty value]
+    And       the request [contains some OrganisationPolicy fields with all correct values]
+    And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access],
+    And       the request [caseData Organisation.OrganisationID value is empty value],
     And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
     Then      a positive response is received
 

@@ -9,7 +9,7 @@
   ],
   "specs": [
     "an active profile in CCD",
-    "is of caseType where caseAccessGroupType != CCD:all-cases-access and accessType has a GroupRoleName, -OrganisationPolicyField- CaseAssignedRoleField field exists in caseData and case data has Organisation.OrganisationID value not set to empty value",
+    "contains some OrganisationPolicy fields with all correct values",
     "Submit case creation as Case worker"
   ],
   "request": {
