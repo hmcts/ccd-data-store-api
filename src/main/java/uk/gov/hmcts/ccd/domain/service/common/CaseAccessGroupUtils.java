@@ -122,7 +122,7 @@ public class CaseAccessGroupUtils {
         Map<String, JsonNode> dataClassification = caseDetails.getDataClassification();
         JsonNode caseAccessGroupJsonNode = caseDetails.getData().get(CASE_ACCESS_GROUPS);
 
-        Map<String,JsonNode> caseAccessGroupdata =null;
+        Map<String,JsonNode> caseAccessGroupdata = null;
         if (caseAccessGroupJsonNode != null) {
             caseAccessGroupdata = Map.of(CASE_ACCESS_GROUPS, caseAccessGroupJsonNode);
         }
