@@ -230,7 +230,7 @@ public class BaseFilter {
         CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                caseDetails.getDataClassification(), caseAccessGroups,
+                caseDetails,
                 caseDataService, caseTypeDefinition);
 
         when(caseDetails.getSecurityClassification()).thenReturn(securityClassification);
@@ -249,7 +249,7 @@ public class BaseFilter {
         CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                caseDetails.getDataClassification(), caseAccessGroups,
+                caseDetails,
                 caseDataService, caseTypeDefinition);
 
         when(caseDetails.getSecurityClassification()).thenReturn(securityClassification);

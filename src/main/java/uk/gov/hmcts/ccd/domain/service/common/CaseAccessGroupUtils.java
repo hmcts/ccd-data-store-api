@@ -109,22 +109,24 @@ public class CaseAccessGroupUtils {
             }
 
             LOG.debug("CASE ACCESS GROUPS : {} ", caseDetails.getData().get(CASE_ACCESS_GROUPS));
-
-            JsonNode caseAccessGroupJsonNode = caseDetails.getData().get(CASE_ACCESS_GROUPS);
-            Map<String,JsonNode> caseDataWithCaseAccessGroup = Map.of(CASE_ACCESS_GROUPS, caseAccessGroupJsonNode);
-            Map<String,JsonNode> caseDataClassificationWithCaseAccessGroup =
-                updateCaseDataClassificationWithCaseGroupAccess(caseDataWithCaseAccessGroup,
-                caseDetails.getDataClassification(),
-                caseDataService,
-                caseTypeDefinition);
-            caseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
         }
+
+        Map<String,JsonNode> caseDataClassificationWithCaseAccessGroup =
+            updateCaseDataClassificationWithCaseGroupAccess(caseDetails,caseDataService, caseTypeDefinition);
+        caseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
     }
 
     public Map<String, JsonNode> updateCaseDataClassificationWithCaseGroupAccess(
-        Map<String, JsonNode> caseAccessGroupdata, Map<String, JsonNode> dataClassification,
+        CaseDetails caseDetails,
         CaseDataService caseDataService, CaseTypeDefinition caseTypeDefinition) {
-        Map<String, JsonNode> outputDataClassification = null;
+        Map<String, JsonNode> dataClassification = caseDetails.getDataClassification();
+        JsonNode caseAccessGroupJsonNode = caseDetails.getData().get(CASE_ACCESS_GROUPS);
+
+        Map<String,JsonNode> caseAccessGroupdata =null;
+        if (caseAccessGroupJsonNode != null) {
+            caseAccessGroupdata = Map.of(CASE_ACCESS_GROUPS, caseAccessGroupJsonNode);
+        }
+        Map<String, JsonNode> outputDataClassification = caseDetails.getDataClassification();
         if (caseAccessGroupdata != null && !caseAccessGroupdata.isEmpty()) {
             // generate just the CaseAccessGroups data classification from just CaseAccessGroups field data
             Map<String, JsonNode> justCaseAccessGroupsDataClassification =
@@ -190,7 +192,6 @@ public class CaseAccessGroupUtils {
     }
 
     private void removeCaseAccessGroup(ArrayNode caseAccessGroupsJsonNodes, CaseDetails caseDetails) {
-
         if (caseAccessGroupsJsonNodes.isEmpty()) {
             caseDetails.getData().remove(CASE_ACCESS_GROUPS);
         }
