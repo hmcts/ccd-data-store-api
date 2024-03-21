@@ -24,27 +24,22 @@ public class CaseAccessGroupUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseAccessGroupUtils.class);
     public static final String CASE_ACCESS_GROUPS = "CaseAccessGroups";
+    private static final String CCD_ALL_CASES = "CCD:all-cases-access";
 
-    protected static final String CCD_ALL_CASES = "CCD:all-cases-access";
-
-    protected static final String ORGANISATION = "Organisation";
-    protected static final String ORGANISATIONID = "OrganisationID";
-    protected static final String ORG_IDENTIFIER_TEMPLATE = "$ORGID$";
-    protected static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
-    protected static final String CASE_ACCESS_GROUP_TYPE = "caseAccessGroupType";
-    protected static final String GROUPACCESS_VALUE = "value";
-    protected static final String GROUPACCESS_ID = "id";
+    private static final String ORGANISATION = "Organisation";
+    private static final String ORGANISATIONID = "OrganisationID";
+    private static final String ORG_IDENTIFIER_TEMPLATE = "$ORGID$";
+    private static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
+    private static final String CASE_ACCESS_GROUP_TYPE = "caseAccessGroupType";
+    private static final String GROUPACCESS_VALUE = "value";
+    private static final String GROUPACCESS_ID = "id";
 
     private CaseDataService caseDataService;
-    private CaseTypeDefinition caseTypeDefinition;
-
-    protected static final String GROUPACCESS_CLASSIFICATION = "classification";
 
     public void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails,
                                                     CaseTypeDefinition caseTypeDefinition,
                                                     CaseDataService caseDataService) {
         this.caseDataService = caseDataService;
-        this.caseTypeDefinition = caseTypeDefinition;
 
         removeCCDAllCasesAccessFromCaseAccessGroups(caseDetails);
 
@@ -74,13 +69,14 @@ public class CaseAccessGroupUtils {
                     }
                 }
             }
-            setUpModifiedCaseAccessGroups(caseDetails, caseAccessGroupWithIds);
+            setUpModifiedCaseAccessGroups(caseDetails, caseAccessGroupWithIds, caseTypeDefinition);
         }
 
     }
 
     private void setUpModifiedCaseAccessGroups(CaseDetails caseDetails,
-                                               List<CaseAccessGroupWithId> caseAccessGroupWithIds) {
+                                               List<CaseAccessGroupWithId> caseAccessGroupWithIds,
+                                               CaseTypeDefinition caseTypeDefinition) {
         ObjectMapper mapper = new ObjectMapper();
         if (!caseAccessGroupWithIds.isEmpty()) {
             JsonNode caseAccessGroupWithIdsNode = mapper.convertValue(caseAccessGroupWithIds, JsonNode.class);
