@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRoleDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroup;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroupWithId;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
 
+@Component
 public class CaseAccessGroupUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseAccessGroupUtils.class);
@@ -41,7 +43,7 @@ public class CaseAccessGroupUtils {
                                                     CaseDataService caseDataService) {
         this.caseDataService = caseDataService;
 
-        removeCCDAllCasesAccessFromCaseAccessGroups(caseDetails);
+        removeCCDAllCasesAccessFromFromCaseDataCaseAccessGroups(caseDetails);
 
         List<AccessTypeRoleDefinition> accessTypeRoleDefinitions =
             caseTypeDefinition.getAccessTypeRoleDefinitions();
@@ -72,6 +74,35 @@ public class CaseAccessGroupUtils {
             setUpModifiedCaseAccessGroups(caseDetails, caseAccessGroupWithIds, caseTypeDefinition);
         }
 
+    }
+
+    public Map<String, JsonNode> updateCaseDataClassificationWithCaseGroupAccess(
+        CaseDetails caseDetails,
+        CaseDataService caseDataService, CaseTypeDefinition caseTypeDefinition) {
+        Map<String, JsonNode> dataClassification = caseDetails.getDataClassification();
+        JsonNode caseAccessGroupJsonNode = caseDetails.getData().get(CASE_ACCESS_GROUPS);
+
+        Map<String,JsonNode> caseAccessGroupdata = null;
+        if (caseAccessGroupJsonNode != null) {
+            caseAccessGroupdata = Map.of(CASE_ACCESS_GROUPS, caseAccessGroupJsonNode);
+        }
+        Map<String, JsonNode> outputDataClassification = caseDetails.getDataClassification();
+        if (caseAccessGroupdata != null && !caseAccessGroupdata.isEmpty()) {
+            // generate just the CaseAccessGroups data classification from just CaseAccessGroups field data
+            Map<String, JsonNode> justCaseAccessGroupsDataClassification =
+                caseDataService.getDefaultSecurityClassifications(
+                    caseTypeDefinition,
+                    Map.of(CASE_ACCESS_GROUPS, caseAccessGroupdata.get(CASE_ACCESS_GROUPS)),
+                    new HashMap<>()
+                );
+
+            // .. then clone current data classification and set the CaseAccessGroup classification
+            outputDataClassification = cloneOrNewJsonMap(dataClassification);
+            outputDataClassification.put(CASE_ACCESS_GROUPS,
+                justCaseAccessGroupsDataClassification.get(CASE_ACCESS_GROUPS));
+        }
+        LOG.debug("CaseAccessGroup data classification : {} ", outputDataClassification);
+        return outputDataClassification;
     }
 
     private void setUpModifiedCaseAccessGroups(CaseDetails caseDetails,
@@ -112,35 +143,6 @@ public class CaseAccessGroupUtils {
         caseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
     }
 
-    public Map<String, JsonNode> updateCaseDataClassificationWithCaseGroupAccess(
-        CaseDetails caseDetails,
-        CaseDataService caseDataService, CaseTypeDefinition caseTypeDefinition) {
-        Map<String, JsonNode> dataClassification = caseDetails.getDataClassification();
-        JsonNode caseAccessGroupJsonNode = caseDetails.getData().get(CASE_ACCESS_GROUPS);
-
-        Map<String,JsonNode> caseAccessGroupdata = null;
-        if (caseAccessGroupJsonNode != null) {
-            caseAccessGroupdata = Map.of(CASE_ACCESS_GROUPS, caseAccessGroupJsonNode);
-        }
-        Map<String, JsonNode> outputDataClassification = caseDetails.getDataClassification();
-        if (caseAccessGroupdata != null && !caseAccessGroupdata.isEmpty()) {
-            // generate just the CaseAccessGroups data classification from just CaseAccessGroups field data
-            Map<String, JsonNode> justCaseAccessGroupsDataClassification =
-                caseDataService.getDefaultSecurityClassifications(
-                caseTypeDefinition,
-                Map.of(CASE_ACCESS_GROUPS, caseAccessGroupdata.get(CASE_ACCESS_GROUPS)),
-                new HashMap<>()
-            );
-
-            // .. then clone current data classification and set the CaseAccessGroup classification
-            outputDataClassification = cloneOrNewJsonMap(dataClassification);
-            outputDataClassification.put(CASE_ACCESS_GROUPS,
-                justCaseAccessGroupsDataClassification.get(CASE_ACCESS_GROUPS));
-        }
-        LOG.debug("CaseAccessGroup data classification : {} ", outputDataClassification);
-        return outputDataClassification;
-    }
-
     public JsonNode findOrganisationPolicyNodeForCaseRole(CaseDetails caseDetails, String caseRoleId) {
         JsonNode caseRoleNode = caseDetails.getData().values().stream()
             .filter(node -> node.get(ORG_POLICY_CASE_ASSIGNED_ROLE) != null
@@ -168,7 +170,7 @@ public class CaseAccessGroupUtils {
         return (organisationPolicyNodeForCaseRole != null && !organisationPolicyNodeForCaseRole.isEmpty());
     }
 
-    private void removeCCDAllCasesAccessFromCaseAccessGroups(CaseDetails caseDetails) {
+    private void removeCCDAllCasesAccessFromFromCaseDataCaseAccessGroups(CaseDetails caseDetails) {
         ArrayNode caseAccessGroupsJsonNodes = (ArrayNode) caseDetails.getData().get(CASE_ACCESS_GROUPS);
         if (isAccessGroupsJsonNodesAvailable(caseAccessGroupsJsonNodes)) {
             for (int i = 0; i < caseAccessGroupsJsonNodes.size(); i++) {
@@ -183,13 +185,17 @@ public class CaseAccessGroupUtils {
                     }
                 }
             }
-            removeCaseAccessGroup(caseAccessGroupsJsonNodes, caseDetails);
         }
+        removeCaseAccessGroupFromCaseData(caseAccessGroupsJsonNodes, caseDetails);
     }
 
-    private void removeCaseAccessGroup(ArrayNode caseAccessGroupsJsonNodes, CaseDetails caseDetails) {
-        if (caseAccessGroupsJsonNodes.isEmpty()) {
+    private void removeCaseAccessGroupFromCaseData(ArrayNode caseAccessGroupsJsonNodes, CaseDetails caseDetails) {
+        if (caseAccessGroupsJsonNodes != null && caseAccessGroupsJsonNodes.isEmpty()) {
             caseDetails.getData().remove(CASE_ACCESS_GROUPS);
+
+            if (isCaseAccessGroupFromDataClassificationAvailable(caseDetails)) {
+                caseDetails.getDataClassification().remove(CASE_ACCESS_GROUPS);
+            }
         }
     }
 
@@ -206,6 +212,11 @@ public class CaseAccessGroupUtils {
         return (field != null
             && field.get(CASE_ACCESS_GROUP_TYPE) != null
             && field.get(CASE_ACCESS_GROUP_TYPE).textValue().equals(CCD_ALL_CASES));
+    }
+
+    private boolean isCaseAccessGroupFromDataClassificationAvailable(CaseDetails caseDetails) {
+        return (caseDetails.getDataClassification() != null
+            && caseDetails.getDataClassification().get(CASE_ACCESS_GROUPS) != null);
     }
 
     private List<AccessTypeRoleDefinition> filterAccessRoles(
