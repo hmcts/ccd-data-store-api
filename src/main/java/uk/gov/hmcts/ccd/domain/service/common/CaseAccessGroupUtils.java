@@ -148,7 +148,7 @@ public class CaseAccessGroupUtils {
             .filter(node -> node.get(ORG_POLICY_CASE_ASSIGNED_ROLE) != null
                 && node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equalsIgnoreCase(caseRoleId))
             .reduce((a, b) -> {
-                LOG.info("No Organisation found for CASE_ACCESS_GROUPS={} caseType={} version={} ORGANISATION={},"
+                LOG.debug("No Organisation found for CASE_ACCESS_GROUPS={} caseType={} version={} ORGANISATION={},"
                     + "ORGANISATIONID={}, ORG_POLICY_CASE_ASSIGNED_ROLE={}.",
                     CASE_ACCESS_GROUPS,
                     caseDetails.getCaseTypeId(),caseDetails.getVersion(),
