@@ -4,7 +4,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.is;
@@ -38,6 +37,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -290,7 +290,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
         // Builds a new callback service to avoid wiremock exception to get in the way
         final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class), restTemplate,
-            Mockito.mock(ApplicationParams.class), Mockito.mock(AppInsights.class));
+            Mockito.mock(ApplicationParams.class), Mockito.mock(AppInsights.class),
+            Mockito.mock(HttpServletRequest.class));
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("TEST-EVENT");

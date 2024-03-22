@@ -13,6 +13,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +31,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -39,6 +42,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
@@ -52,20 +57,18 @@ class CallbackServiceTest {
     public static final CallbackType CALLBACK_TYPE = CallbackType.ABOUT_TO_START;
     @Mock
     private SecurityUtils securityUtils;
-
     @Mock
     private RestTemplate restTemplate;
     @Mock
     private ApplicationParams applicationParams;
     @Mock
     private AppInsights appinsights;
-
+    @Mock
+    private HttpServletRequest request;
     @Mock
     private Authentication authentication;
-
     @Mock
     private SecurityContext securityContext;
-
     @Mock
     private Jwt principal;
 
@@ -92,7 +95,7 @@ class CallbackServiceTest {
         callbackResponse.setData(caseDetails.getData());
 
         initSecurityContext();
-        callbackService = new CallbackService(securityUtils, restTemplate, applicationParams, appinsights);
+        callbackService = new CallbackService(securityUtils, restTemplate, applicationParams, appinsights, request);
 
         final ResponseEntity<CallbackResponse> responseEntity = new ResponseEntity<>(callbackResponse, HttpStatus.OK);
         when(restTemplate
@@ -112,7 +115,7 @@ class CallbackServiceTest {
 
     @Test
     @DisplayName("Should set ignore warning flag in callback request if set by client")
-    public void shouldSetIgnoreWarningsFlagInCallbackRequestIfSetByClient() throws Exception {
+    void shouldSetIgnoreWarningsFlagInCallbackRequestIfSetByClient() throws Exception {
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, true);
 
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
@@ -121,7 +124,7 @@ class CallbackServiceTest {
 
     @Test
     @DisplayName("Should not set ignore warning flag in callback request if not set by client")
-    public void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNotSetByClient() throws Exception {
+    void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNotSetByClient() throws Exception {
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, false);
 
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
@@ -130,7 +133,7 @@ class CallbackServiceTest {
 
     @Test
     @DisplayName("Should not set ignore warning flag in callback request if null set by client")
-    public void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNullSetByClient() throws Exception {
+    void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNullSetByClient() throws Exception {
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
 
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
@@ -139,7 +142,7 @@ class CallbackServiceTest {
 
     @Test
     @DisplayName("Should track callback event")
-    public void shouldTrackCallbackEvent() throws Exception {
+    void shouldTrackCallbackEvent() throws Exception {
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
 
         verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
@@ -147,7 +150,7 @@ class CallbackServiceTest {
 
     @Test
     @DisplayName("Should track callback event on exception")
-    public void shouldTrackCallbackEventOnException() throws Exception {
+    void shouldTrackCallbackEventOnException() throws Exception {
         when(restTemplate
             .exchange(eq(URL), eq(HttpMethod.POST), isA(HttpEntity.class), eq(CallbackResponse.class)))
             .thenThrow(new HttpStatusCodeException(HttpStatus.BAD_REQUEST) {
@@ -163,7 +166,7 @@ class CallbackServiceTest {
 
     @Test
     @DisplayName("Should LogAll callbacks")
-    public void shouldLogAllCallbackEvent() throws Exception {
+    void shouldLogAllCallbackEvent() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList();
         ccdCallbackLogControl.add("*");
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
@@ -175,7 +178,7 @@ class CallbackServiceTest {
 
     @Test
     @DisplayName("Should Log callback test multiple callbacks")
-    public void shouldLogCallbackEventMultiple() throws Exception {
+    void shouldLogCallbackEventMultiple() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList<String>();
         ccdCallbackLogControl.add("abc-callback");
         ccdCallbackLogControl.add("xyz-callback");
@@ -189,7 +192,7 @@ class CallbackServiceTest {
 
     @Test
     @DisplayName("Should Log callback test single callbacks")
-    public void shouldLogCallbackEvent() throws Exception {
+    void shouldLogCallbackEvent() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList();
         ccdCallbackLogControl.add("test-callback");
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
@@ -203,7 +206,7 @@ class CallbackServiceTest {
 
     @Test
     @DisplayName("Should Not Log callback event")
-    public void shouldNotLogCallbackEvent() throws Exception {
+    void shouldNotLogCallbackEvent() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList();
         ccdCallbackLogControl.add("Notest-callback");
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
@@ -214,13 +217,34 @@ class CallbackServiceTest {
 
     @Test
     @DisplayName("Should Not Log callback event when empty")
-    public void shouldNotLogCallbackEventEmpty() throws Exception {
+    void shouldNotLogCallbackEventEmpty() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList<String>();
         ccdCallbackLogControl.add("");
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals(0,logsList.size());
+    }
+
+    @Test
+    @DisplayName("Should add callback passthru headers")
+    void shouldAddCallbackPassthruHeaders() throws Exception {
+        List<String> customHeaders = List.of("Client-Context","Dummy-Context1","DummyContext-2");
+
+        when(applicationParams.getCallbackPassthruHeaderContexts()).thenReturn(customHeaders);
+        when(request.getHeaders(customHeaders.get(0)))
+            .thenReturn(Collections.enumeration(Collections.singletonList("{1}")));
+        when(request.getHeaders(customHeaders.get(1)))
+            .thenReturn(Collections.enumeration(Collections.singletonList("{2}")));
+        when(request.getHeaders(customHeaders.get(2))).thenReturn(null);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        callbackService.addPassThroughHeaders(httpHeaders);
+
+        assertEquals(2, httpHeaders.size());
+        assertTrue(httpHeaders.containsKey(customHeaders.get(0)));
+        assertTrue(httpHeaders.containsKey(customHeaders.get(1)));
+        assertFalse(httpHeaders.containsKey(customHeaders.get(2)));
     }
 
     private void initSecurityContext() {
