@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.time.Clock;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_URL;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.UPLOAD_TIMESTAMP;
 
@@ -34,6 +35,9 @@ import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.
 class CaseDocumentTimestampServiceTest {
     @Mock
     private Clock clock;
+
+    @Mock
+    private ApplicationParams applicationParams;
 
     @InjectMocks
     private CaseDocumentTimestampService underTest;
@@ -96,9 +100,6 @@ class CaseDocumentTimestampServiceTest {
 
     @Test
     void testAddTimestamp() {
-
-        doReturn(fixedClock.instant()).when(clock).instant();
-        doReturn(fixedClock.getZone()).when(clock).getZone();
 
         Map<String, JsonNode> dataMapOriginal = new HashMap<>();
         JsonNode resultOriginal = generateTestNode(jsonStringOriginal);
@@ -181,6 +182,33 @@ class CaseDocumentTimestampServiceTest {
         assertEquals(5, listUrlsNew.size());
 
         listUrlsNew.forEach(System.out::println);
+    }
+
+    @Test
+    void testIsCaseTypeUploadTimestampFeatureEnabledForNullCaseType() {
+        String caseType = "Case Type 1";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(null);
+
+        assertFalse(underTest.isCaseTypeUploadTimestampFeatureEnabled(caseType));
+    }
+
+    @Test
+    void testIsCaseTypeUploadTimestampFeatureEnabledForExpectedCaseType() {
+        final String caseType = "Case Type 1";
+
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseType));
+
+        assertTrue(underTest.isCaseTypeUploadTimestampFeatureEnabled(caseType));
+    }
+
+    @Test
+    void testIsCaseTypeUploadTimestampFeatureEnabledForNotExpectedCaseType() {
+        final String caseType = "Case Type Not This One";
+
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes())
+            .thenReturn(List.of("Another Case Type"));
+
+        assertFalse(underTest.isCaseTypeUploadTimestampFeatureEnabled(caseType));
     }
 
     private List<String> generateListOfUrls(String jsonString) {

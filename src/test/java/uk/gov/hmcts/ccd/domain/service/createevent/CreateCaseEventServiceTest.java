@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -82,6 +83,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_BINARY_URL;
@@ -159,7 +161,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     @Spy
     private CaseDocumentTimestampService caseDocumentTimestampService =
-        new CaseDocumentTimestampService(Clock.systemDefaultZone());
+        new CaseDocumentTimestampService(Clock.systemDefaultZone(), new ApplicationParams());
 
     @InjectMocks
     private CreateCaseEventService underTest;
@@ -241,6 +243,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         doReturn(emptyMap()).when(caseSanitiser).sanitise(any(CaseTypeDefinition.class), anyMap());
         doReturn(caseDetails).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
+
+        when(caseDocumentTimestampService.isCaseTypeUploadTimestampFeatureEnabled(any())).thenReturn(false);
     }
 
     @Test
@@ -575,6 +579,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        when(caseDocumentTimestampService.isCaseTypeUploadTimestampFeatureEnabled(any())).thenReturn(true);
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
