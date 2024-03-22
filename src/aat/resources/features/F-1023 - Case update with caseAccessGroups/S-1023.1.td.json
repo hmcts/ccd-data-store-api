@@ -12,7 +12,8 @@
     "contains some OrganisationPolicy fields with all correct values",
     "is of caseType where case_data has caseAccessGroupType of CCD:all-cases-access",
     "Submit case creation as Case worker",
-    "contains correctly configured values"
+    "contains correctly configured values",
+    "contains updated values for case_data and data_classification"
   ],
   "request": {
     "body": {

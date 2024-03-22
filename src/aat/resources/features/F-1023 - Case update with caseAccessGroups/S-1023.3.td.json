@@ -13,7 +13,9 @@
     "is of caseType where caseAccessGroupType = CCD:all-cases-access",
     "caseData Organisation.OrganisationID value is empty value",
     "Submit case creation as Case worker",
-    "contains correctly configured values"
+    "contains correctly configured values",
+    "contains updated values for case_data and data_classification"
+
   ],
   "request": {
     "body": {

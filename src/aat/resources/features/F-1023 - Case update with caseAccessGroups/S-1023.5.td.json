@@ -10,7 +10,8 @@
   "specs": [
     "an active profile in CCD",
     "contains some OrganisationPolicy fields with all correct values",
-    "Submit case creation as Case worker"
+    "Submit case creation as Case worker",
+    "contains updated values for case_data and data_classification"
   ],
   "request": {
     "body": {
