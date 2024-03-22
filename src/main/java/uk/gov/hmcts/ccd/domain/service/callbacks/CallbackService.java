@@ -192,7 +192,7 @@ public class CallbackService {
     }
 
     private boolean logCallbackDetails(final String url) {
-        return (applicationParams.getCcdCallbackLogControl().isEmpty()
+        return (applicationParams.getCcdCallbackLogControl().size() > 0
             && (WILDCARD.equals(applicationParams.getCcdCallbackLogControl().get(0))
             || applicationParams.getCcdCallbackLogControl().stream()
             .filter(Objects::nonNull).filter(Predicate.not(String::isEmpty)).anyMatch(url::contains)));
