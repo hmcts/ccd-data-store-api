@@ -178,9 +178,7 @@ public class CallbackService {
 
     protected void addPassThroughHeaders(final HttpHeaders httpHeaders) {
         if (null == request || null == applicationParams
-            || null == applicationParams.getCallbackPassthruHeaderContexts()
-            || (applicationParams.getCallbackPassthruHeaderContexts().size() == 1
-            && StringUtils.hasLength(applicationParams.getCallbackPassthruHeaderContexts().get(0)))) {
+            || null == applicationParams.getCallbackPassthruHeaderContexts()) {
             return;
         }
 
