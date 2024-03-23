@@ -185,8 +185,8 @@ public class CallbackService {
         }
 
         for (String context : applicationParams.getCallbackPassthruHeaderContexts()) {
-            if (StringUtils.hasLength(context) && null != request.getHeaders(context)) {
-                httpHeaders.add(context, request.getHeaders(context).nextElement());
+            if (StringUtils.hasLength(context) && null != request.getHeader(context)) {
+                httpHeaders.add(context, request.getHeader(context));
             }
         }
     }

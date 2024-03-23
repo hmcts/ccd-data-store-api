@@ -34,7 +34,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -230,20 +229,21 @@ class CallbackServiceTest {
     @DisplayName("Should add callback passthru headers")
     void shouldAddCallbackPassthruHeaders() throws Exception {
         List<String> customHeaders = List.of("Client-Context","Dummy-Context1","DummyContext-2");
+        List<String> customHeaderValues = List.of("{json1:{test:1221}}","{json2:{test:2332}}");
 
         when(applicationParams.getCallbackPassthruHeaderContexts()).thenReturn(customHeaders);
-        when(request.getHeaders(customHeaders.get(0)))
-            .thenReturn(Collections.enumeration(Collections.singletonList("{1}")));
-        when(request.getHeaders(customHeaders.get(1)))
-            .thenReturn(Collections.enumeration(Collections.singletonList("{2}")));
-        when(request.getHeaders(customHeaders.get(2))).thenReturn(null);
+        when(request.getHeader(customHeaders.get(0))).thenReturn(customHeaderValues.get(0));
+        when(request.getHeader(customHeaders.get(1))).thenReturn(customHeaderValues.get(1));
+        when(request.getHeader(customHeaders.get(2))).thenReturn(null);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         callbackService.addPassThroughHeaders(httpHeaders);
 
         assertEquals(2, httpHeaders.size());
         assertTrue(httpHeaders.containsKey(customHeaders.get(0)));
+        assertEquals(customHeaderValues.get(0), httpHeaders.get(customHeaders.get(0)).get(0));
         assertTrue(httpHeaders.containsKey(customHeaders.get(1)));
+        assertEquals(customHeaderValues.get(1), httpHeaders.get(customHeaders.get(1)).get(0));
         assertFalse(httpHeaders.containsKey(customHeaders.get(2)));
     }
 
