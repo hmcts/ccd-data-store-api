@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -21,6 +22,8 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
 
 public class BaseFilter {
 
@@ -246,17 +249,22 @@ public class BaseFilter {
                                           CaseDataService caseDataService, CaseTypeDefinition caseTypeDefinition) {
 
         CaseDetails caseDetails = mock(CaseDetails.class);
-        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
-        Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
-            caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                caseDetails,
-                caseDataService, caseTypeDefinition);
 
         when(caseDetails.getSecurityClassification()).thenReturn(securityClassification);
         when(caseDetails.getReferenceAsString()).thenReturn(CASE_ID_1);
         when(caseDetails.getJurisdiction()).thenReturn(jurisdiction);
         when(caseDetails.getCaseTypeId()).thenReturn("TEST_CASE_TYPE");
         when(caseDetails.getData()).thenReturn(caseAccessGroups);
+        when(caseDetails.getDataClassification()).thenReturn(caseAccessGroups);
+
+        mockGetDefaultSecurityClassificationsResponse(caseDataService, caseDetails);
+
+        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
+        Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
+            caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
+                caseDetails,
+                caseDataService, caseTypeDefinition);
+
         when(caseDetails.getDataClassification()).thenReturn(caseDataClassificationWithCaseAccessGroup);
         return caseDetails;
     }
@@ -285,5 +293,16 @@ public class BaseFilter {
         when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE_ID_1);
         when(caseTypeDefinition.getJurisdictionId()).thenReturn(jurisdiction);
         return caseTypeDefinition;
+    }
+
+    private void mockGetDefaultSecurityClassificationsResponse(CaseDataService caseDataService,
+                                                               CaseDetails caseDetails) {
+        JsonNode caseAccessGroupJsonNode = caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS);
+        Map<String, JsonNode> dataClassification = new HashMap<>();
+        dataClassification.put(CaseAccessGroupUtils.CASE_ACCESS_GROUPS, caseAccessGroupJsonNode);
+
+        doReturn(dataClassification).when(caseDataService).getDefaultSecurityClassifications(
+            any(), any(), any()
+        );
     }
 }

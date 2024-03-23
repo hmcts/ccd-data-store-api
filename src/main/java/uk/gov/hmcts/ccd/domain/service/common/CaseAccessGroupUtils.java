@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRoleDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroup;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroupWithId;
@@ -21,12 +20,12 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
 
-@Component
 public class CaseAccessGroupUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseAccessGroupUtils.class);
+
     public static final String CASE_ACCESS_GROUPS = "CaseAccessGroups";
-    private static final String CCD_ALL_CASES = "CCD:all-cases-access";
+    public static final String CCD_ALL_CASES = "CCD:all-cases-access";
 
     private static final String ORGANISATION = "Organisation";
     private static final String ORGANISATIONID = "OrganisationID";
@@ -36,12 +35,9 @@ public class CaseAccessGroupUtils {
     private static final String GROUPACCESS_VALUE = "value";
     private static final String GROUPACCESS_ID = "id";
 
-    private CaseDataService caseDataService;
-
     public void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails,
                                                     CaseTypeDefinition caseTypeDefinition,
                                                     CaseDataService caseDataService) {
-        this.caseDataService = caseDataService;
 
         removeCCDAllCasesAccessFromFromCaseDataCaseAccessGroups(caseDetails);
 
@@ -71,7 +67,7 @@ public class CaseAccessGroupUtils {
                     }
                 }
             }
-            setUpModifiedCaseAccessGroups(caseDetails, caseAccessGroupWithIds, caseTypeDefinition);
+            setUpModifiedCaseAccessGroups(caseDetails, caseAccessGroupWithIds, caseDataService, caseTypeDefinition);
         }
 
     }
@@ -107,6 +103,7 @@ public class CaseAccessGroupUtils {
 
     private void setUpModifiedCaseAccessGroups(CaseDetails caseDetails,
                                                List<CaseAccessGroupWithId> caseAccessGroupWithIds,
+                                               CaseDataService caseDataService,
                                                CaseTypeDefinition caseTypeDefinition) {
         ObjectMapper mapper = new ObjectMapper();
         if (!caseAccessGroupWithIds.isEmpty()) {
@@ -139,7 +136,7 @@ public class CaseAccessGroupUtils {
         }
 
         Map<String,JsonNode> caseDataClassificationWithCaseAccessGroup =
-            updateCaseDataClassificationWithCaseGroupAccess(caseDetails,caseDataService, caseTypeDefinition);
+            updateCaseDataClassificationWithCaseGroupAccess(caseDetails, caseDataService, caseTypeDefinition);
         caseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
     }
 

@@ -12,6 +12,7 @@ import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -57,6 +58,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.initMocks(this);
         List<RoleAttributeMatcher> roleAttributeMatchers = Lists.newArrayList(new BeginDateEndDateMatcher(),
             new CaseIdMatcher(),
             new CaseTypeMatcher(),
