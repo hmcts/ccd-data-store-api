@@ -48,7 +48,7 @@ public class CallbackService {
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final AppInsights appinsights;
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
