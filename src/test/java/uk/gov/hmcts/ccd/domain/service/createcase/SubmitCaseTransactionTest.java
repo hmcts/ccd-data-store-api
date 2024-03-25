@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -126,10 +127,15 @@ class SubmitCaseTransactionTest {
     private CaseStateDefinition state;
     @Mock
     private ApplicationParams applicationParams;
+    private CaseAccessGroupUtils caseAccessGroupUtils;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.initMocks(this);
+
+        event = buildEvent();
+        caseTypeDefinition = buildCaseType();
+        caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService);
 
         submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
             caseAuditEventRepository,
@@ -141,11 +147,10 @@ class SubmitCaseTransactionTest {
             messageService,
             caseDocumentService,
             caseDataService,
-            applicationParams
+            applicationParams,
+            caseAccessGroupUtils
         );
 
-        event = buildEvent();
-        caseTypeDefinition = buildCaseType();
         idamUser = buildIdamUser();
         caseEventDefinition = buildEventTrigger();
         state = buildState();

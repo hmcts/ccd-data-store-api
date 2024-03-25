@@ -230,11 +230,10 @@ public class BaseFilter {
                                           CaseTypeDefinition caseTypeDefinition) {
         CaseDetails caseDetails = mock(CaseDetails.class);
 
-        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
+        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService);
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                caseDetails,
-                caseDataService, caseTypeDefinition);
+                caseDetails, caseTypeDefinition);
 
         when(caseDetails.getSecurityClassification()).thenReturn(securityClassification);
         when(caseDetails.getReferenceAsString()).thenReturn(CASE_ID_1);
@@ -259,11 +258,10 @@ public class BaseFilter {
 
         mockGetDefaultSecurityClassificationsResponse(caseDataService, caseDetails);
 
-        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
+        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService);
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                caseDetails,
-                caseDataService, caseTypeDefinition);
+                caseDetails, caseTypeDefinition);
 
         when(caseDetails.getDataClassification()).thenReturn(caseDataClassificationWithCaseAccessGroup);
         return caseDetails;
