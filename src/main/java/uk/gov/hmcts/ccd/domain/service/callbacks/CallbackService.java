@@ -177,15 +177,11 @@ public class CallbackService {
     }
 
     protected void addPassThroughHeaders(final HttpHeaders httpHeaders) {
-        if (null == request || null == applicationParams
-            || null == applicationParams.getCallbackPassthruHeaderContexts()) {
-            return;
-        }
-
-        for (String context : applicationParams.getCallbackPassthruHeaderContexts()) {
-            if (StringUtils.hasLength(context) && null != request.getHeader(context)) {
-                httpHeaders.add(context, request.getHeader(context));
-            }
+        if (null != request && null != applicationParams
+            && null != applicationParams.getCallbackPassthruHeaderContexts()) {
+            applicationParams.getCallbackPassthruHeaderContexts().stream()
+                .filter(context -> StringUtils.hasLength(context) && null != request.getHeader(context))
+                .forEach(context -> httpHeaders.add(context, request.getHeader(context)));
         }
     }
 
