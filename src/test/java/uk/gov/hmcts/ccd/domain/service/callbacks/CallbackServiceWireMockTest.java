@@ -15,12 +15,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.POST;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.client.RestClientException;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
@@ -40,7 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,17 +56,6 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 public class CallbackServiceWireMockTest extends WireMockBaseTest {
     private static final ObjectMapper mapper = new ObjectMapper();
     public static final CallbackType TEST_CALLBACK = CallbackType.ABOUT_TO_START;
-
-    @Mock
-    private HttpServletRequest request;
-
-    @Inject
-    private CallbackService callbackService;
-
-    @BeforeEach
-    public void setUp() throws Exception {
-        when(request.getHeader(anyString())).thenReturn(null);
-    }
 
     @Test
     public void happyPathWithNoErrorsOrWarnings() throws Exception {

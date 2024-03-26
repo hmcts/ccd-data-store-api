@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +26,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
@@ -57,6 +60,7 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -118,7 +122,7 @@ public abstract class AbstractBaseIntegrationTest {
     @Inject
     private CaseDataIssueLogger caseDataIssueLogger;
     @Inject
-    private CallbackService callbackService;
+    protected CallbackService callbackService;
     @Inject
     private EventTokenService eventTokenService;
     @Inject
@@ -137,11 +141,17 @@ public abstract class AbstractBaseIntegrationTest {
     protected Authentication authentication;
     @Mock
     protected SecurityContext securityContext;
+    @Mock
+    private HttpServletRequest request;
 
     @Before
     @BeforeEach
     public void initMock() throws IOException {
         MockitoAnnotations.initMocks(this);
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(roleAssignmentRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
