@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1023.3",
-  "_extends_": "F-1023_CreateCasePreRequisiteCaseworkerBase",
+  "_extends_": "F-1023_Test_Data_Base",
   "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroupId created",
 
   "prerequisites" : [ {
@@ -60,24 +60,27 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "CaseAccessGroups" : [ {
-          "value" : {
-            "caseAccessGroupType" : "CCD:all-cases-access",
-            "caseAccessGroupId" : "test"
-          },
-          "id" : null
-        } ]
+        "CaseAccessGroups": []
       },
       "data_classification" : {
         "CaseAccessGroups" : {
           "classification" : "PUBLIC",
-          "value" : [ {
-            "value" : {
-              "caseAccessGroupType" : "PUBLIC",
-              "caseAccessGroupId" : "PUBLIC"
+          "value": [
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "value": {
+                "caseAccessGroupType" : "CCD:all-cases-access",
+                "caseAccessGroupId" : "BEFTA_MASTER:"
+              }
             },
-            "id" : null
-          } ]
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "value": {
+                "caseAccessGroupType" : "CCD:all-cases-access",
+                "caseAccessGroupId" : "BEFTA_MASTER:"
+              }
+            }
+          ]
         }
       }
     },
