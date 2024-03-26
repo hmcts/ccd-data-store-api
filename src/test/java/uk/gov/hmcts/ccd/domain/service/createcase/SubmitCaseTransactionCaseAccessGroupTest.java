@@ -164,7 +164,6 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             caseDataAccessControl,
             messageService,
             caseDocumentService,
-            caseDataService,
             applicationParams,
             caseAccessGroupUtils
 

@@ -50,7 +50,6 @@ public class SubmitCaseTransaction implements AccessControl {
     private final CaseDataAccessControl caseDataAccessControl;
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
-    private final CaseDataService caseDataService;
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
 
@@ -65,7 +64,6 @@ public class SubmitCaseTransaction implements AccessControl {
                                     final CaseDataAccessControl caseDataAccessControl,
                                     final @Qualifier("caseEventMessageService") MessageService messageService,
                                     final CaseDocumentService caseDocumentService,
-                                    final CaseDataService caseDataService,
                                     final ApplicationParams applicationParams,
                                     final CaseAccessGroupUtils caseAccessGroupUtils
                                  ) {
@@ -78,7 +76,6 @@ public class SubmitCaseTransaction implements AccessControl {
         this.caseDataAccessControl = caseDataAccessControl;
         this.messageService = messageService;
         this.caseDocumentService = caseDocumentService;
-        this.caseDataService = caseDataService;
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
     }
