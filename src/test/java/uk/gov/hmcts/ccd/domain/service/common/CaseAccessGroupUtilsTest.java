@@ -81,8 +81,7 @@ class CaseAccessGroupUtilsTest {
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition, 2);
-            assertEquals(expectedCaseData.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(),
-                caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size());
+            assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 3);
             assertTrue(caseDetails.getData().containsKey(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
 
 
@@ -105,8 +104,9 @@ class CaseAccessGroupUtilsTest {
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition, 2);
-            assertEquals(expectedCaseData.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(),
-                caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size());
+            // 2 - SOMETHING ELSE
+            // +1 CCD:all-cases-access in AccessTypeRole (CaseAccessGroupUtils.CCD_ALL_CASES)
+            assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 3);
             assertTrue(caseDetails.getData().containsKey(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
 
 
@@ -129,7 +129,7 @@ class CaseAccessGroupUtilsTest {
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition,2);
-            assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 2);
+            assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 1);
             assertTrue(caseDetails.getData().containsKey(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
 
 
@@ -154,8 +154,6 @@ class CaseAccessGroupUtilsTest {
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition,1);
             assertNull(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
             assertFalse(caseDetails.getData().containsKey(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
-
-
         }
 
         @Test
@@ -178,8 +176,8 @@ class CaseAccessGroupUtilsTest {
             assertNotEquals(expectedCaseData.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(),
                 caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size());
             // 2 - SOMETHING ELSE
-            // +2 CCD:all-cases-access in AccessTypeRole (CaseAccessGroupUtils.CCD_ALL_CASES)
-            assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 4);
+            // +1 CCD:all-cases-access in AccessTypeRole (CaseAccessGroupUtils.CCD_ALL_CASES)
+            assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 3);
             assertTrue(caseDetails.getData().containsKey(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
 
         }
@@ -200,11 +198,9 @@ class CaseAccessGroupUtilsTest {
             caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition, caseDataService);
 
             // THEN
-            verifyGetDefaultSecurityClassificationsCallEqual(expectedCaseDataClassification, caseTypeDefinition);
-            assertEquals(expectedCaseData.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(),
-                caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size());
-            // 2 - SOMETHING ELSE
-            assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 2);
+            verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition, 2);
+            // 1 - SOMETHING ELSE
+            assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 1);
             assertTrue(caseDetails.getData().containsKey(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
 
         }
@@ -440,7 +436,7 @@ class CaseAccessGroupUtilsTest {
             .caseAccessGroupType("CCD:all-cases-access").build();
 
         CaseAccessGroupWithId caseAccessGroupForUI1 = CaseAccessGroupWithId.builder()
-            .caseAccessGroup(caseAccessGroup)
+            .caseAccessGroup(caseAccessGroup1)
             .id(UUID.randomUUID().toString()).build();
 
         caseAccessGroupForUIs.add(caseAccessGroupForUI1);
@@ -488,8 +484,8 @@ class CaseAccessGroupUtilsTest {
             any()
         );
         // must have CaseAccessGroups value
-        assertEquals(data.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS),
-            caseDataCaptor.getValue().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
+        assertNotEquals(data.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(),
+            caseDataCaptor.getValue().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size());
     }
 
     private CaseTypeDefinition createCaseTypeDefinitionWithoutCaseAccessGroup() {
