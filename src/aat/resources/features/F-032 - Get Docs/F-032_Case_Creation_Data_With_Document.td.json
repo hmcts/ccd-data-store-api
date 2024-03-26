@@ -25,7 +25,8 @@
 				"DocumentField1": {
 					"document_url": "[[ANYTHING_PRESENT]]",
 					"document_binary_url": "[[ANYTHING_PRESENT]]",
-					"document_filename": "[[ANYTHING_PRESENT]]"
+					"document_filename": "[[ANYTHING_PRESENT]]",
+          "upload_timestamp": "[[ANYTHING_PRESENT]]"
 				}
 			},
 			"data_classification": {

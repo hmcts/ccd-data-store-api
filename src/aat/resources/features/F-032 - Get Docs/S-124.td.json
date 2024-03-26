@@ -34,7 +34,8 @@
 		"data" : {
 			"DocumentField" : {
 				"document_url" : "[[ANYTHING_PRESENT]]",
-				"document_binary_url" : "[[ANYTHING_PRESENT]]"
+				"document_binary_url" : "[[ANYTHING_PRESENT]]",
+        "upload_timestamp": "[[ANYTHING_PRESENT]]"
 			}
 		}
 	}

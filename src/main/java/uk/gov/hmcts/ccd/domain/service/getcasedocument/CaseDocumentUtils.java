@@ -31,6 +31,8 @@ public class CaseDocumentUtils {
     public static final String DOCUMENT_URL = "document_url";
     public static final String DOCUMENT_BINARY_URL = "document_url";
     public static final String DOCUMENT_HASH = "document_hash";
+    public static final String UPLOAD_TIMESTAMP = "upload_timestamp";
+
     public static final String BINARY = "/binary";
     public static final String HEARING_RECORDINGS = "hearing-recordings";
 

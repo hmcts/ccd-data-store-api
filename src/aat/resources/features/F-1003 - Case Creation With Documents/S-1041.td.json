@@ -60,7 +60,8 @@
         "DocumentField" : {
           "document_url" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][self][href]}",
           "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][originalDocumentName]}",
-          "document_binary_url" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][binary][href]}"
+          "document_binary_url" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "upload_timestamp": "[[ANYTHING_PRESENT]]"
         },
         "TextField" : "Test1",
         "SearchCriteria" : { }
