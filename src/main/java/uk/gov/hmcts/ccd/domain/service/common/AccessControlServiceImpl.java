@@ -140,15 +140,29 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                 final List<CaseFieldDefinition> caseFieldDefinitions,
                                                 final Set<AccessProfile> accessProfiles) {
         if (newData != null) {
+            List<String> errors = new ArrayList<>();
             final boolean noAccessGranted = getStream(newData)
                 .anyMatch(newFieldName -> {
                     if (existingData.has(newFieldName)) {
-                        return !valueDifferentAndHasUpdateAccess(newData, existingData, newFieldName,
-                            caseFieldDefinitions, accessProfiles);
+                        boolean result = !valueDifferentAndHasUpdateAccess(newData, existingData, newFieldName,
+                                caseFieldDefinitions, accessProfiles);
+                        if (result) {
+                            errors.add(newFieldName);
+                        }
+                        return result;
                     } else {
-                        return !hasCaseFieldAccess(caseFieldDefinitions, accessProfiles, CAN_CREATE, newFieldName);
+                        boolean result = !hasCaseFieldAccess(caseFieldDefinitions,
+                                accessProfiles, CAN_CREATE, newFieldName);
+                        if (result) {
+                            errors.add(newFieldName);
+                        }
+                        return result;
                     }
                 });
+            if (noAccessGranted) {
+                String listString = String.join(", ", errors);
+                LOG.info("Fields have no access {}", listString);
+            }
             return !noAccessGranted;
         }
         return true;
