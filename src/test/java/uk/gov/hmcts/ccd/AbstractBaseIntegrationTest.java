@@ -142,7 +142,7 @@ public abstract class AbstractBaseIntegrationTest {
     @Mock
     protected SecurityContext securityContext;
     @Mock
-    private HttpServletRequest request;
+    protected HttpServletRequest request;
 
     @Before
     @BeforeEach
