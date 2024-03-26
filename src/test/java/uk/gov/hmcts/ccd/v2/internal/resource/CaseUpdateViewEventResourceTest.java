@@ -16,11 +16,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
+import uk.gov.hmcts.ccd.v2.AbstractBaseResourceTest;
 
 import java.util.Optional;
 
 @DisplayName("CaseResource")
-class CaseUpdateViewEventResourceTest {
+class CaseUpdateViewEventResourceTest extends AbstractBaseResourceTest {
     private static final String NAME = "eventName";
     private static final String DESCRIPTION = "eventDescription";
     private static final String TOKEN = "Token";
@@ -106,7 +107,7 @@ class CaseUpdateViewEventResourceTest {
                 CaseUpdateViewEventResource.forCaseType(caseUpdateViewEvent, CASE_TYPE_ID, ignoreWarning);
 
             Optional<Link> self = caseUpdateViewEventResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(linkSelfForCase));
+            assertThat(getActualPath(self.get().getHref()), equalTo(linkSelfForCase));
         }
 
     }
@@ -153,7 +154,7 @@ class CaseUpdateViewEventResourceTest {
                 CaseUpdateViewEventResource.forCase(caseUpdateViewEvent, caseReference.toString(), ignoreWarning);
 
             Optional<Link> self = caseUpdateViewEventResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(linkSelfForEvent));
+            assertThat(getActualPath(self.get().getHref()), equalTo(linkSelfForEvent));
         }
 
     }
@@ -200,7 +201,7 @@ class CaseUpdateViewEventResourceTest {
                 CaseUpdateViewEventResource.forDraft(caseUpdateViewEvent, draftReference, ignoreWarning);
 
             Optional<Link> self = caseUpdateViewEventResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(linkSelfForEvent));
+            assertThat(getActualPath(self.get().getHref()), equalTo(linkSelfForEvent));
         }
 
     }

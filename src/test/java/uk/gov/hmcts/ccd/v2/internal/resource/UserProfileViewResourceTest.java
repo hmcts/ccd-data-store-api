@@ -16,11 +16,12 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.DefaultSettings;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.User;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
+import uk.gov.hmcts.ccd.v2.AbstractBaseResourceTest;
 
 import java.util.Optional;
 
 @DisplayName("UserProfileResource")
-class UserProfileViewResourceTest {
+class UserProfileViewResourceTest extends AbstractBaseResourceTest {
     private static final String LINK_SELF = String.format("/internal/profile");
 
     @Mock
@@ -80,7 +81,7 @@ class UserProfileViewResourceTest {
 
         Optional<Link> self = resource.getLink("self");
 
-        assertThat(self.get().getHref(), equalTo(LINK_SELF));
+        assertThat(getActualPath(self.get().getHref()), equalTo(LINK_SELF));
     }
 
 }

@@ -19,8 +19,9 @@ import org.springframework.hateoas.Link;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.v2.AbstractBaseResourceTest;
 
-class WorkbasketInputsViewResourceTest {
+class WorkbasketInputsViewResourceTest extends AbstractBaseResourceTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final String LINK_SELF = String.format("/internal/case-types/%s/work-basket-inputs", CASE_TYPE_ID);
     private WorkbasketInput workbasketInput1 = aWorkbasketInput().withFieldId("field1").build();
@@ -48,7 +49,7 @@ class WorkbasketInputsViewResourceTest {
 
         Optional<Link> self = resource.getLink("self");
 
-        assertThat(self.get().getHref(), equalTo(LINK_SELF));
+        assertThat(getActualPath(self.get().getHref()), equalTo(LINK_SELF));
     }
 
 }

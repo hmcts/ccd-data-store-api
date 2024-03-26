@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.v2.AbstractBaseResourceTest;
 
 import java.util.Optional;
 
@@ -49,7 +50,7 @@ class StartEventResourceTest {
 
     @Nested
     @DisplayName("Start case trigger")
-    class StartTriggerForCase {
+    class StartTriggerForCase extends AbstractBaseResourceTest {
 
         @Test
         @DisplayName("should copy case details")
@@ -73,13 +74,13 @@ class StartEventResourceTest {
                             false);
 
             Optional<Link> self = startEventResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(LINK_SELF_FOR_CASE));
+            assertThat(getActualPath(self.get().getHref()), equalTo(LINK_SELF_FOR_CASE));
         }
     }
 
     @Nested
     @DisplayName("Start event trigger")
-    class StartTriggerForEvent {
+    class StartTriggerForEvent extends AbstractBaseResourceTest {
 
         @BeforeEach
         void setUp() {
@@ -110,7 +111,7 @@ class StartEventResourceTest {
                     new uk.gov.hmcts.ccd.v2.external.resource.StartEventResource(startEventResult, ignoreWarning, true);
 
             Optional<Link> self = startEventResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(LINK_SELF_FOR_EVENT));
+            assertThat(getActualPath(self.get().getHref()), equalTo(LINK_SELF_FOR_EVENT));
         }
     }
 }

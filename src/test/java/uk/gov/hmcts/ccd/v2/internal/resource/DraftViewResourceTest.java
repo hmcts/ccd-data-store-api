@@ -13,10 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
+import uk.gov.hmcts.ccd.v2.AbstractBaseResourceTest;
 
 import java.util.Optional;
 
-class DraftViewResourceTest {
+class DraftViewResourceTest extends AbstractBaseResourceTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final String LINK_SELF = String.format("/internal/case-types/%s/drafts", CASE_TYPE_ID);
     private DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withCaseTypeId(CASE_TYPE_ID)
@@ -44,7 +45,7 @@ class DraftViewResourceTest {
 
         Optional<Link> self = resource.getLink("self");
 
-        assertThat(self.get().getHref(), equalTo(LINK_SELF));
+        assertThat(getActualPath(self.get().getHref()), equalTo(LINK_SELF));
     }
 
 }

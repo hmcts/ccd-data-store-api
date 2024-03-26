@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.v2.AbstractBaseResourceTest;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("UICaseViewResource")
-class CaseViewResourceTest {
+class CaseViewResourceTest extends AbstractBaseResourceTest {
     private static final String REFERENCE = "1234123412341238";
     private static final String LINK_SELF = String.format("/internal/cases/%s", REFERENCE);
 
@@ -73,7 +74,7 @@ class CaseViewResourceTest {
         final CaseViewResource resource = new CaseViewResource(caseView);
 
         Optional<Link> self = resource.getLink("self");
-        assertThat(self.get().getHref(), equalTo(LINK_SELF));
+        assertThat(getActualPath(self.get().getHref()), equalTo(LINK_SELF));
     }
 
     private void mockArrays() {
