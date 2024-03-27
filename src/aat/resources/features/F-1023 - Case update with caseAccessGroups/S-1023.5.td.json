@@ -2,8 +2,8 @@
   "_guid_": "S-1023.5",
   "_extends_": "F-1023_Test_Data_Base",
   "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroups field contains blank value",
-
-  "prerequisites" : [ {
+  "prerequisites": [
+    {
       "Token_Creation": "S-1023_GetCreateToken"
     }
   ],
@@ -51,16 +51,51 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "CaseAccessGroups": "[[ANYTHING_PRESENT]]"
+        "CaseAccessGroups": [
+          {
+            "id": "[[ANYTHING_PRESENT]]",
+            "value": {
+              "caseAccessGroupType": "CCD:all-cases-access",
+              "caseAccessGroupId": "BEFTA_MASTER:orgID1"
+            }
+          },
+          {
+            "id": "[[ANYTHING_PRESENT]]",
+            "value": {
+              "caseAccessGroupType": "CCD:all-cases-access",
+              "caseAccessGroupId": "BEFTA_MASTER:orgID1"
+            }
+          }
+        ],
+        "OrganisationPolicyField": {
+          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        }
       },
-      "data_classification" : {
+      "data_classification": {
         "CaseAccessGroups" : {
           "classification" : "PUBLIC",
-          "value" : "[[ANYTHING_PRESENT]]"
+          "value" : [ {
+            "id" : "[[ANYTHING_PRESENT]]",
+            "value" : {
+              "caseAccessGroupType" : "PUBLIC",
+              "caseAccessGroupId" : "PUBLIC"
+            }
+          }, {
+            "id" : "[[ANYTHING_PRESENT]]",
+            "value" : {
+              "caseAccessGroupType" : "PUBLIC",
+              "caseAccessGroupId" : "PUBLIC"
+            }
+          } ]
         }
       }
     },
-    "supplementary_data" : null,
+    "supplementary_data": null,
     "after_submit_callback_response": null,
     "callback_response_status_code": null,
     "callback_response_status": null,
