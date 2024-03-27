@@ -63,7 +63,7 @@ class CaseAccessGroupUtilsTest {
     class UpdateCaseDataWithCaseAccessGroups {
 
         @BeforeEach
-        void setup(){
+        void setup() {
             caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
         }
 
@@ -243,7 +243,7 @@ class CaseAccessGroupUtilsTest {
     class UpdateCaseDataClassificationWithCaseAccessGroups {
 
         @BeforeEach
-        void setup(){
+        void setup() {
             caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
         }
 
