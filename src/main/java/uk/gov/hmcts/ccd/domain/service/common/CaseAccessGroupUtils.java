@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +39,13 @@ public class CaseAccessGroupUtils {
     private static final String GROUPACCESS_VALUE = "value";
     private static final String GROUPACCESS_ID = "id";
     private CaseDataService caseDataService;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    public CaseAccessGroupUtils(CaseDataService caseDataService) {
+    public CaseAccessGroupUtils(CaseDataService caseDataService, ObjectMapper objectMapper) {
         this.caseDataService = caseDataService;
+        this.objectMapper = objectMapper;
     }
-
 
     public void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
 
@@ -111,9 +113,9 @@ public class CaseAccessGroupUtils {
     private void setUpModifiedCaseAccessGroups(CaseDetails caseDetails,
                                                List<CaseAccessGroupWithId> caseAccessGroupWithIds,
                                                CaseTypeDefinition caseTypeDefinition) {
-        ObjectMapper mapper = new ObjectMapper();
+
         if (!caseAccessGroupWithIds.isEmpty()) {
-            JsonNode caseAccessGroupWithIdsNode = mapper.convertValue(caseAccessGroupWithIds, JsonNode.class);
+            JsonNode caseAccessGroupWithIdsNode = objectMapper.convertValue(caseAccessGroupWithIds, JsonNode.class);
             if (caseDetails.getData().get(CASE_ACCESS_GROUPS) != null) {
                 JsonNode caseDataCaseAccessGroup = caseDetails.getData().get(CASE_ACCESS_GROUPS);
 

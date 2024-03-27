@@ -128,6 +128,7 @@ class SubmitCaseTransactionTest {
     @Mock
     private ApplicationParams applicationParams;
     private CaseAccessGroupUtils caseAccessGroupUtils;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
@@ -135,7 +136,8 @@ class SubmitCaseTransactionTest {
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
-        caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService);
+        objectMapper = new ObjectMapper();
+        caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
 
         submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
             caseAuditEventRepository,
