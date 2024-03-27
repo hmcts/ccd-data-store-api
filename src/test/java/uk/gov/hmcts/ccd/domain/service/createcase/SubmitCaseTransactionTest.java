@@ -288,7 +288,6 @@ class SubmitCaseTransactionTest {
         );
     }
 
-
     @Test
     @DisplayName("should invoke callback")
     void shouldInvokeCallback() {

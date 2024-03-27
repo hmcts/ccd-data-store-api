@@ -89,8 +89,6 @@ class CaseAccessGroupUtilsTest {
                 .toString().contains(TEST_SOMETHING_ELSE));
             assertTrue(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS)
                 .toString().contains(TEST_ORGID));
-
-
         }
 
         @Test
@@ -396,7 +394,7 @@ class CaseAccessGroupUtilsTest {
 
         String mergedValue = null;
         if (caseDataCaseAccessGroup != null && !caseDataCaseAccessGroup.isEmpty()) {
-            mergedValue = caseDataCaseAccessGroup.toString() + newCaseAccessGroup.toString();
+            mergedValue = caseDataCaseAccessGroup + newCaseAccessGroup.toString();
             mergedValue = mergedValue.replace("][",",");
         } else {
             mergedValue = newCaseAccessGroup.toString();
