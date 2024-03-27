@@ -35,6 +35,8 @@ public class CaseAccessGroupUtils {
     private static final String GROUPACCESS_VALUE = "value";
     private static final String GROUPACCESS_ID = "id";
 
+    private ObjectMapper mapper = new ObjectMapper();
+
     public void updateCaseAccessGroupsInCaseDetails(CaseDetails caseDetails,
                                                     CaseTypeDefinition caseTypeDefinition,
                                                     CaseDataService caseDataService) {
@@ -105,7 +107,6 @@ public class CaseAccessGroupUtils {
                                                List<CaseAccessGroupWithId> caseAccessGroupWithIds,
                                                CaseDataService caseDataService,
                                                CaseTypeDefinition caseTypeDefinition) {
-        ObjectMapper mapper = new ObjectMapper();
         if (!caseAccessGroupWithIds.isEmpty()) {
             JsonNode caseAccessGroupWithIdsNode = mapper.convertValue(caseAccessGroupWithIds, JsonNode.class);
             if (caseDetails.getData().get(CASE_ACCESS_GROUPS) != null) {
@@ -121,7 +122,7 @@ public class CaseAccessGroupUtils {
 
                 JsonNode mergedNode = null;
                 try {
-                    mergedNode = new ObjectMapper().readTree(mergedValue);
+                    mergedNode = mapper.readTree(mergedValue);
                 } catch (JsonProcessingException e) {
                     throw new ValidationException(String.format(e.getMessage()));
                 }

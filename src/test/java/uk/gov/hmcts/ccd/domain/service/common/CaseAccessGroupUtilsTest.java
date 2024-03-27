@@ -60,8 +60,8 @@ class CaseAccessGroupUtilsTest {
 
     private CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
 
-    private String TEST_SOMETHING_ELSE = "some thing else";
-    private String TEST_ORGID = "550e8400-e29b-41d4-a716-446655440000";
+    public static final String TEST_SOMETHING_ELSE = "some thing else";
+    public static final String TEST_ORGID = "550e8400-e29b-41d4-a716-446655440000";
 
     @Nested
     @DisplayName("updateCaseDataWithCaseAccessGroups")
