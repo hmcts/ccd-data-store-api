@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,29 +44,28 @@ import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 
-@SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
 @ExtendWith(MockitoExtension.class)
 class CaseAccessGroupUtilsTest {
 
     @Spy
     private ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
-
     @Captor
     private ArgumentCaptor<Map<String, JsonNode>> caseDataCaptor;
-
     private final Map<String, JsonNode> caseData = new HashMap<>();
-
     @Mock
     private CaseDataService caseDataService;
-
-    private CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
-
+    private CaseAccessGroupUtils caseAccessGroupUtils;
     public static final String TEST_SOMETHING_ELSE = "some thing else";
     public static final String TEST_ORGID = "550e8400-e29b-41d4-a716-446655440000";
 
     @Nested
     @DisplayName("updateCaseDataWithCaseAccessGroups")
     class UpdateCaseDataWithCaseAccessGroups {
+
+        @BeforeEach
+        void setup(){
+            caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
+        }
 
         @Test
         void updateCaseDataWithCaseAccessGroups_WithCcd_All_Cases() {
@@ -79,7 +79,7 @@ class CaseAccessGroupUtilsTest {
                 getClonedCaseAccessGroups(caseDetails.getDataClassification());
 
             // WHEN
-            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition, caseDataService);
+            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition);
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition, 2);
@@ -106,7 +106,7 @@ class CaseAccessGroupUtilsTest {
                 getClonedCaseAccessGroups(caseDetails.getDataClassification());
 
             // WHEN
-            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition, caseDataService);
+            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition);
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition, 2);
@@ -133,7 +133,7 @@ class CaseAccessGroupUtilsTest {
                 getClonedCaseAccessGroups(caseDetails.getDataClassification());
 
             // WHEN
-            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition, caseDataService);
+            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition);
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition,2);
@@ -158,7 +158,7 @@ class CaseAccessGroupUtilsTest {
                 getClonedCaseAccessGroups(caseDetails.getDataClassification());
 
             // WHEN
-            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition, caseDataService);
+            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition);
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition,1);
@@ -179,7 +179,7 @@ class CaseAccessGroupUtilsTest {
                 getClonedCaseAccessGroups(caseDetails.getDataClassification());
 
             // WHEN
-            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition, caseDataService);
+            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition);
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition, 2);
@@ -208,7 +208,7 @@ class CaseAccessGroupUtilsTest {
                 getClonedCaseAccessGroups(caseDetails.getDataClassification());
 
             // WHEN
-            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition, caseDataService);
+            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition);
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition, 2);
@@ -231,7 +231,7 @@ class CaseAccessGroupUtilsTest {
             var caseDetails = setUpCaseDetails();
 
             // WHEN
-            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition, caseDataService);
+            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition);
 
             // THEN
             assertNull(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
@@ -241,6 +241,11 @@ class CaseAccessGroupUtilsTest {
     @Nested
     @DisplayName("updateCaseDataClassificationWithCaseAccessGroups")
     class UpdateCaseDataClassificationWithCaseAccessGroups {
+
+        @BeforeEach
+        void setup(){
+            caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
+        }
 
         @Test
         void updateCaseDataClassificationWithCaseAccessGroups_Everthing() {
@@ -256,7 +261,7 @@ class CaseAccessGroupUtilsTest {
 
             // WHEN
             var output = caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(caseDetails,
-                caseDataService, caseTypeDefinition);
+                caseTypeDefinition);
 
             // THEN
             assertEquals(expectedCaseDataClassification, caseDetails.getDataClassification());
@@ -274,7 +279,7 @@ class CaseAccessGroupUtilsTest {
 
             // WHEN
             var output = caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                caseDetails, caseDataService, caseTypeDefinition);
+                caseDetails, caseTypeDefinition);
 
             // THEN
             assertEquals(caseDetails.getDataClassification(), output);
@@ -482,8 +487,7 @@ class CaseAccessGroupUtilsTest {
 
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                caseDetails,
-                caseDataService, caseTypeDefinition);
+                caseDetails, caseTypeDefinition);
 
         caseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
 
