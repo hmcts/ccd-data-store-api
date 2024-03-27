@@ -19,9 +19,9 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.v2.AbstractBaseResourceTest;
+import uk.gov.hmcts.ccd.util.PathFromUrlUtil;
 
-class SearchInputsViewResourceTest extends AbstractBaseResourceTest {
+class SearchInputsViewResourceTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final String LINK_SELF = String.format("/internal/case-types/%s/search-inputs", CASE_TYPE_ID);
     private SearchInput searchInput1 = aSearchInput().withFieldId("field1").build();
@@ -48,7 +48,7 @@ class SearchInputsViewResourceTest extends AbstractBaseResourceTest {
         final SearchInputsViewResource resource = new SearchInputsViewResource(searchInputs, CASE_TYPE_ID);
 
         Optional<Link> self = resource.getLink("self");
-        assertThat(getActualPath(self.get().getHref()), equalTo(LINK_SELF));
+        assertThat(PathFromUrlUtil.getActualPath(self.get().getHref()), equalTo(LINK_SELF));
     }
 
 }

@@ -1,8 +1,8 @@
-package uk.gov.hmcts.ccd.v2;
+package uk.gov.hmcts.ccd.util;
 
-public abstract class AbstractBaseResourceTest {
+public class PathFromUrlUtil {
 
-    protected String getActualPath(String actualUrl) {
+    public static String getActualPath(String actualUrl) {
         String actualPath = actualUrl;
         if (actualUrl.contains("://localhost")) {
             actualPath = actualUrl.substring(actualUrl.indexOf("/", actualUrl.indexOf("//") + 2));

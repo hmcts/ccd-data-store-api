@@ -16,12 +16,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
-import uk.gov.hmcts.ccd.v2.AbstractBaseResourceTest;
+import uk.gov.hmcts.ccd.util.PathFromUrlUtil;
 
 import java.util.Optional;
 
 @DisplayName("CaseResource")
-class CaseUpdateViewEventResourceTest extends AbstractBaseResourceTest {
+class CaseUpdateViewEventResourceTest {
     private static final String NAME = "eventName";
     private static final String DESCRIPTION = "eventDescription";
     private static final String TOKEN = "Token";
@@ -107,7 +107,7 @@ class CaseUpdateViewEventResourceTest extends AbstractBaseResourceTest {
                 CaseUpdateViewEventResource.forCaseType(caseUpdateViewEvent, CASE_TYPE_ID, ignoreWarning);
 
             Optional<Link> self = caseUpdateViewEventResource.getLink("self");
-            assertThat(getActualPath(self.get().getHref()), equalTo(linkSelfForCase));
+            assertThat(PathFromUrlUtil.getActualPath(self.get().getHref()), equalTo(linkSelfForCase));
         }
 
     }
@@ -154,7 +154,7 @@ class CaseUpdateViewEventResourceTest extends AbstractBaseResourceTest {
                 CaseUpdateViewEventResource.forCase(caseUpdateViewEvent, caseReference.toString(), ignoreWarning);
 
             Optional<Link> self = caseUpdateViewEventResource.getLink("self");
-            assertThat(getActualPath(self.get().getHref()), equalTo(linkSelfForEvent));
+            assertThat(PathFromUrlUtil.getActualPath(self.get().getHref()), equalTo(linkSelfForEvent));
         }
 
     }
@@ -201,7 +201,7 @@ class CaseUpdateViewEventResourceTest extends AbstractBaseResourceTest {
                 CaseUpdateViewEventResource.forDraft(caseUpdateViewEvent, draftReference, ignoreWarning);
 
             Optional<Link> self = caseUpdateViewEventResource.getLink("self");
-            assertThat(getActualPath(self.get().getHref()), equalTo(linkSelfForEvent));
+            assertThat(PathFromUrlUtil.getActualPath(self.get().getHref()), equalTo(linkSelfForEvent));
         }
 
     }
