@@ -380,7 +380,6 @@ class CaseAccessGroupUtilsTest {
         Map<String, JsonNode> dataCaseAccessGroup = caseAccessGroupCaseData(caseAccessGroupType,
             caseAccessGroupID);
 
-        //JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), caseDetails.getData());
         JsonNode caseAccessGroupNode = objectMapper
             .convertValue(dataCaseAccessGroup.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS), JsonNode.class);
         mergeCaseAccessGroupsWithNew(caseDetails, caseAccessGroupNode);
