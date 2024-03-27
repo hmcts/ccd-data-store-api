@@ -48,7 +48,8 @@ public class GlobalSearchProcessorService {
                                                           Map<String, JsonNode> data) {
 
         // NB: only need to generate GlobalSearch data if 'SearchCriteria' field is present in the case type definition
-        if (caseTypeDefinition.getCaseField(SEARCH_CRITERIA).isPresent()) {
+        if (caseTypeDefinition.getCaseField(SEARCH_CRITERIA).isPresent()
+            && caseTypeDefinition.getSearchCriterias().isEmpty()) {
             Map<String, JsonNode> clonedData = null;
             if (data != null) {
                 clonedData = new HashMap<>(data);
@@ -94,7 +95,9 @@ public class GlobalSearchProcessorService {
                         .id(UUID.randomUUID().toString())
                         .value(getNestedValueAsString(jsonNode, currentSearchCriteria.getOtherCaseReference()))
                         .build());
+                    log.info("GlobalSearch: Found getOtherCaseReference: {}", jsonNode.textValue());
                 } else if (key.equals(currentSearchCriteria.getOtherCaseReference())) {
+                    log.info("GlobalSearch: Found generated: {}", jsonNode.textValue());
                     otherCaseReferences.add(OtherCaseReference.builder()
                         .id(UUID.randomUUID().toString())
                         .value(jsonNode.textValue())

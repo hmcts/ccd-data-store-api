@@ -101,8 +101,16 @@ public class SecurityValidationService {
     }
 
     private boolean isNotNullAndSizeEqual(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
-        return defaultDataClassification != null && callbackDataClassification != null
-            && defaultDataClassification.size() == callbackDataClassification.size();
+        if (defaultDataClassification != null && callbackDataClassification != null) {
+
+            if ((callbackDataClassification.has("applicantOrganisationPolicy"))
+                || (defaultDataClassification.has("applicantOrganisationPolicy"))) {
+                LOG.info("applicantOrganisationPolicy found with has");
+                return true;
+            }
+            return callbackDataClassification.size() == defaultDataClassification.size();
+        }
+        return false;
     }
 
 
