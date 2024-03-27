@@ -236,5 +236,4 @@ public class CaseAccessGroupUtils {
             return new HashMap<>();
         }
     }
-
 }

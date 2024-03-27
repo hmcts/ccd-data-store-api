@@ -213,6 +213,7 @@ class CaseAccessGroupUtilsTest {
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition, 2);
             // 1 - SOMETHING ELSE
+            // 0 CCD:all-cases-access in AccessTypeRole (CaseAccessGroupUtils.CCD_ALL_CASES)
             assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 1);
             assertTrue(caseDetails.getData().containsKey(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
             assertTrue(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS)
@@ -222,6 +223,19 @@ class CaseAccessGroupUtilsTest {
 
         }
 
+        @Test
+        void updateCaseDataWithCaseAccessGroups_WithNothing() {
+
+            // GIVEN
+            var caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
+            var caseDetails = setUpCaseDetails();
+
+            // WHEN
+            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition, caseDataService);
+
+            // THEN
+            assertNull(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
+        }
     }
 
     @Nested
@@ -489,19 +503,6 @@ class CaseAccessGroupUtilsTest {
         // must have CaseAccessGroups value
         assertNotEquals(data.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS),
             caseDataCaptor.getValue().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
-    }
-
-    private void verifyGetDefaultSecurityClassificationsCallEqual(Map<String, JsonNode> data,
-                                                             CaseTypeDefinition caseTypeDefinition) {
-
-        verify(caseDataService, times(2)).getDefaultSecurityClassifications(
-            eq(caseTypeDefinition),
-            caseDataCaptor.capture(),
-            any()
-        );
-        // must have CaseAccessGroups value
-        assertNotEquals(data.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(),
-            caseDataCaptor.getValue().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size());
     }
 
     private CaseTypeDefinition createCaseTypeDefinitionWithoutCaseAccessGroup() {
