@@ -128,7 +128,7 @@ public class CaseAccessGroupUtils {
 
                 JsonNode mergedNode = null;
                 try {
-                    mergedNode = new ObjectMapper().readTree(mergedValue);
+                    mergedNode = objectMapper.readTree(mergedValue);
                 } catch (JsonProcessingException e) {
                     throw new ValidationException(String.format(e.getMessage()));
                 }
