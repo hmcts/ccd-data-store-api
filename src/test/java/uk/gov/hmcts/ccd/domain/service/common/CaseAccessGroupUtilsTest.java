@@ -480,7 +480,6 @@ class CaseAccessGroupUtilsTest {
     private CaseDetails mockCaseDetails(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
         mockGetDefaultSecurityClassificationsResponse(caseDetails);
 
-        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
                 caseDetails,
