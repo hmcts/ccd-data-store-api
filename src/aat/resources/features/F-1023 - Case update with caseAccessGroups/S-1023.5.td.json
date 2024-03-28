@@ -83,19 +83,26 @@
       "data_classification": {
         "CaseAccessGroups" : {
           "classification" : "PUBLIC",
-          "value" : [ {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "value" : {
-              "caseAccessGroupType" : "PUBLIC",
-              "caseAccessGroupId" : "PUBLIC"
+          "value" : [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "id"
+            },
+            {
+              "id" : "[[ANYTHING_PRESENT]]",
+              "value" : {
+                "caseAccessGroupType" : "PUBLIC",
+                "caseAccessGroupId" : "PUBLIC"
+              }
+            },
+            {
+              "id" : "[[ANYTHING_PRESENT]]",
+              "value" : {
+                "caseAccessGroupType" : "PUBLIC",
+                "caseAccessGroupId" : "PUBLIC"
+              }
             }
-          }, {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "value" : {
-              "caseAccessGroupType" : "PUBLIC",
-              "caseAccessGroupId" : "PUBLIC"
-            }
-          } ]
+          ]
         }
       }
     },
