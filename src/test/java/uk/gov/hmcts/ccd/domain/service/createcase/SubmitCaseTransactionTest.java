@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -126,10 +127,17 @@ class SubmitCaseTransactionTest {
     private CaseStateDefinition state;
     @Mock
     private ApplicationParams applicationParams;
+    private CaseAccessGroupUtils caseAccessGroupUtils;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.initMocks(this);
+
+        event = buildEvent();
+        caseTypeDefinition = buildCaseType();
+        objectMapper = new ObjectMapper();
+        caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
 
         submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
             caseAuditEventRepository,
@@ -140,12 +148,10 @@ class SubmitCaseTransactionTest {
             caseDataAccessControl,
             messageService,
             caseDocumentService,
-            caseDataService,
-            applicationParams
+            applicationParams,
+            caseAccessGroupUtils
         );
 
-        event = buildEvent();
-        caseTypeDefinition = buildCaseType();
         idamUser = buildIdamUser();
         caseEventDefinition = buildEventTrigger();
         state = buildState();
@@ -281,7 +287,6 @@ class SubmitCaseTransactionTest {
             () -> assertAuditEventWithSignificantDocument(auditEventCaptor.getValue())
         );
     }
-
 
     @Test
     @DisplayName("should invoke callback")

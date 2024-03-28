@@ -107,14 +107,18 @@ To find out more about BEFTA Framework, see the repository and its README [here]
 #### To Run the Functional Tests (FT)
 
 #####  All Functional Tests
-Will run all the FT's
+Will run all the FT's:
 
-_./gradlew functional_
+    _./gradlew functional_
 
 #####  Some Functional Tests
-Will run both F-1023 and F-777
+Will run both F-1023 and F-777:
 
-_./gradlew functional -P tags="@F-1023 or @F-777"_
+    _./gradlew functional -P tags="@F-1023 or @F-777"_
+
+Will run only S-1023.5:
+
+    ./gradlew functional -P tags="@S-1023.5"
 
 
 ## LICENSE

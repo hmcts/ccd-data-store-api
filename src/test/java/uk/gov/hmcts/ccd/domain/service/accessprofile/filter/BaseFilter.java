@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.accessprofile.filter;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -217,24 +218,21 @@ public class BaseFilter {
     }
 
 
-    protected CaseDetails mockCaseDetails(Map<String,JsonNode> caseAccessGroups,
-                                          CaseDataService caseDataService,
-                                          CaseTypeDefinition caseTypeDefinition) {
+    protected CaseDetails mockCaseDetails(Map<String,JsonNode> caseAccessGroups, CaseDataService caseDataService,
+                                          CaseTypeDefinition caseTypeDefinition, ObjectMapper objectMapper) {
         return mockCaseDetails(SecurityClassification.PUBLIC,caseAccessGroups, JURISDICTION_1,
-            caseDataService, caseTypeDefinition);
+            caseDataService, caseTypeDefinition, objectMapper);
     }
 
     protected CaseDetails mockCaseDetails(SecurityClassification securityClassification,
-                                          Map<String,JsonNode> caseAccessGroups,
-                                          CaseDataService caseDataService,
-                                          CaseTypeDefinition caseTypeDefinition) {
+                                          Map<String,JsonNode> caseAccessGroups, CaseDataService caseDataService,
+                                          CaseTypeDefinition caseTypeDefinition, ObjectMapper objectMapper) {
         CaseDetails caseDetails = mock(CaseDetails.class);
 
-        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
+        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                caseDetails,
-                caseDataService, caseTypeDefinition);
+                caseDetails, caseTypeDefinition);
 
         when(caseDetails.getSecurityClassification()).thenReturn(securityClassification);
         when(caseDetails.getReferenceAsString()).thenReturn(CASE_ID_1);
@@ -246,7 +244,8 @@ public class BaseFilter {
 
     protected CaseDetails mockCaseDetails(SecurityClassification securityClassification,
                                           Map<String,JsonNode> caseAccessGroups, String jurisdiction,
-                                          CaseDataService caseDataService, CaseTypeDefinition caseTypeDefinition) {
+                                          CaseDataService caseDataService, CaseTypeDefinition caseTypeDefinition,
+                                          ObjectMapper objectMapper) {
 
         CaseDetails caseDetails = mock(CaseDetails.class);
 
@@ -259,11 +258,10 @@ public class BaseFilter {
 
         mockGetDefaultSecurityClassificationsResponse(caseDataService, caseDetails);
 
-        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils();
+        CaseAccessGroupUtils caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                caseDetails,
-                caseDataService, caseTypeDefinition);
+                caseDetails, caseTypeDefinition);
 
         when(caseDetails.getDataClassification()).thenReturn(caseDataClassificationWithCaseAccessGroup);
         return caseDetails;

@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1023.2",
-  "_extends_": "F-1023_CreateCasePreRequisiteCaseworkerBase",
+  "_extends_": "F-1023_Test_Data_Base",
   "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroupId not created when caseGroupType != CCD:all-cases-access",
 
   "prerequisites" : [ {
@@ -57,24 +57,63 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "CaseAccessGroups" : [ {
-          "value" : {
-            "caseAccessGroupType" : "somethingelse",
-            "caseAccessGroupId" : "test"
+        "CaseAccessGroups": [
+          {
+            "id" : "[[ANY_STRING_NOT_NULLABLE]]",
+            "value" : {
+              "caseAccessGroupType" : "some thing else",
+              "caseAccessGroupId" : "test"
+            }
           },
-          "id" : null
-        } ]
+          {
+            "id" : "[[ANY_STRING_NOT_NULLABLE]]",
+            "value" : {
+              "caseAccessGroupType" : "CCD:all-cases-access",
+              "caseAccessGroupId" : "BEFTA_MASTER:orgID1"
+            }
+          },
+          {
+            "id" : "[[ANY_STRING_NOT_NULLABLE]]",
+            "value" : {
+              "caseAccessGroupType" : "CCD:all-cases-access",
+              "caseAccessGroupId" : "BEFTA_MASTER:orgID1"
+          }
+        }],
+        "OrganisationPolicyField" : {
+          "OrgPolicyCaseAssignedRole" : "GroupRole1",
+          "OrgPolicyReference" : "ref",
+          "Organisation" : {
+            "OrganisationID" : "orgID1",
+            "OrganisationName" : "orgName1"
+          }
+        }
       },
       "data_classification" : {
         "CaseAccessGroups" : {
           "classification" : "PUBLIC",
-          "value" : [ {
-            "value" : {
+          "value" : [
+            {
+              "id" : "[[ANY_STRING_NOT_NULLABLE]]",
+              "value" : {
               "caseAccessGroupType" : "PUBLIC",
               "caseAccessGroupId" : "PUBLIC"
+            }
             },
-            "id" : null
-          } ]
+            {
+              "id" : "[[ANY_STRING_NOT_NULLABLE]]",
+              "value" : {
+                "caseAccessGroupType" : "PUBLIC",
+                "caseAccessGroupId" : "PUBLIC"
+              }
+            },
+            {
+              "id" : "[[ANY_STRING_NOT_NULLABLE]]",
+              "value" : {
+                "caseAccessGroupType" : "PUBLIC",
+                "caseAccessGroupId" : "PUBLIC"
+              }
+            }
+          ]
         }
       }
     },

@@ -56,6 +56,8 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
     @Mock
     private CaseDataService caseDataService;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -284,7 +286,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
 
         CaseDetails caseDetails =  mockCaseDetails(securityClassification, dataCaseAccessGroup,
-            caseDataService, caseTypeDefinition);
+            caseDataService, caseTypeDefinition, objectMapper);
         return caseDetails;
     }
 
@@ -294,7 +296,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         dataCaseAccessGroup.put(CASE_ACCESS_GROUPS, getCaseAccessGroups());
         CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
 
-        return mockCaseDetails(dataCaseAccessGroup, caseDataService, caseTypeDefinition);
+        return mockCaseDetails(dataCaseAccessGroup, caseDataService, caseTypeDefinition, objectMapper);
 
     }
 

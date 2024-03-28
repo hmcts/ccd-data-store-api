@@ -8,8 +8,8 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.SubmitCaseTransaction;
@@ -32,10 +32,11 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              CaseDataAccessControl caseDataAccessControl,
                                              MessageService messageService,
                                              CaseDocumentService caseDocumentService,
-                                             CaseDataService caseDataService,
-                                             ApplicationParams applicationParams) {
+                                             ApplicationParams applicationParams,
+                                             CaseAccessGroupUtils caseAccessGroupUtils) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
-            caseDataAccessControl, messageService, caseDocumentService, caseDataService, applicationParams);
+            caseDataAccessControl, messageService, caseDocumentService, applicationParams,
+            caseAccessGroupUtils);
     }
 }

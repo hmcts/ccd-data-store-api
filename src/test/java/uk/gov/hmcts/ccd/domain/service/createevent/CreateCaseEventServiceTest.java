@@ -10,6 +10,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -146,6 +147,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     @Mock
     private CaseLinkService caseLinkService;
+
+    @Mock
+    private ApplicationParams applicationParams;
 
     @Mock
     private CaseDetailsJsonParser caseDetailsJsonParser;
