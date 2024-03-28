@@ -59,6 +59,9 @@
       "case_data": {
         "CaseAccessGroups": [
           {
+            "__ordering__": "ordered"
+          },
+          {
             "id" : "[[ANY_STRING_NOT_NULLABLE]]",
             "value" : {
               "caseAccessGroupType" : "some thing else",
@@ -92,6 +95,9 @@
         "CaseAccessGroups" : {
           "classification" : "PUBLIC",
           "value" : [
+            {
+              "__ordering__": "ordered"
+            },
             {
               "id" : "[[ANY_STRING_NOT_NULLABLE]]",
               "value" : {
