@@ -611,6 +611,22 @@
                     "_extends_": "CaseworkerAutotest1AccessControlList"
                   }
                 ]
+              },
+              {
+                "_extends_": "CaseFieldDefinitionWithoutACLs",
+                "id": "UPRN",
+                "label": "UPRN",
+                "hidden": null,
+                "field_type": {
+                  "_extends_": "BaseTextFieldType",
+                  "id": "Text",
+                  "max": null
+                },
+                "acls": [
+                  {
+                    "_extends_": "CaseworkerAutotest1AccessControlList"
+                  }
+                ]
               }
             ]
           },
