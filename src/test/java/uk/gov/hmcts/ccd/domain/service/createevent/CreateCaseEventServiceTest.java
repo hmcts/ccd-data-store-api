@@ -155,8 +155,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private ApplicationParams applicationParams;
     @Mock
-    private CaseDetailsJsonParser caseDetailsJsonParser;
-
     private UserRepository userRepository;
     @Mock
     private UIDService uidService;
