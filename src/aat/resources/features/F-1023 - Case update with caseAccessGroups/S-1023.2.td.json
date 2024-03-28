@@ -62,21 +62,21 @@
             "__elementId__": "id"
           },
           {
-            "id" : "[[ANYTHING_PRESENT]]",
+            "id" : "[[ANY_STRING_NOT_NULLABLE]]",
             "value" : {
               "caseAccessGroupType" : "some thing else",
               "caseAccessGroupId" : "test"
             }
           },
           {
-            "id" : "[[ANYTHING_PRESENT]]",
+            "id" : "[[ANY_STRING_NOT_NULLABLE]]",
             "value" : {
               "caseAccessGroupType" : "CCD:all-cases-access",
               "caseAccessGroupId" : "BEFTA_MASTER:orgID1"
             }
           },
           {
-            "id" : "[[ANYTHING_PRESENT]]",
+            "id" : "[[ANY_STRING_NOT_NULLABLE]]",
             "value" : {
               "caseAccessGroupType" : "CCD:all-cases-access",
               "caseAccessGroupId" : "BEFTA_MASTER:orgID1"
@@ -99,21 +99,21 @@
               "__elementId__": "id"
             },
             {
-              "id" : "[[ANY_NOT_NULLABLE]]",
+              "id" : "[[ANY_STRING_NOT_NULLABLE]]",
               "value" : {
               "caseAccessGroupType" : "PUBLIC",
               "caseAccessGroupId" : "PUBLIC"
             }
             },
             {
-              "id" : "[[ANY_NOT_NULLABLE]]",
+              "id" : "[[ANY_STRING_NOT_NULLABLE]]",
               "value" : {
                 "caseAccessGroupType" : "PUBLIC",
                 "caseAccessGroupId" : "PUBLIC"
               }
             },
             {
-              "id" : "[[ANY_NOT_NULLABLE]]",
+              "id" : "[[ANY_STRING_NOT_NULLABLE]]",
               "value" : {
                 "caseAccessGroupType" : "PUBLIC",
                 "caseAccessGroupId" : "PUBLIC"
