@@ -29,9 +29,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -58,6 +56,12 @@ public class CallbackService {
         this.appinsights = appinsights;
     }
 
+    private void jcdebug(String msg) {
+        LOG.debug("JCDEBUG.debug: CallbackService: {}", msg);
+        LOG.warn("JCDEBUG.warn:  CallbackService: {}", msg);
+        LOG.info("JCDEBUG.info:  CallbackService: {}", msg);
+    }
+
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
     @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public Optional<CallbackResponse> send(final String url,
@@ -66,7 +70,7 @@ public class CallbackService {
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails,
                                            final Boolean ignoreWarning) {
-
+        jcdebug("send1");
         return sendSingleRequest(url, callbackType, caseEvent, caseDetailsBefore, caseDetails, ignoreWarning);
     }
 
@@ -78,6 +82,7 @@ public class CallbackService {
                                       final CaseDetails caseDetailsBefore,
                                       final CaseDetails caseDetails,
                                       final Class<T> clazz) {
+        jcdebug("send2");
         return sendSingleRequest(url, callbackType, caseEvent, caseDetailsBefore, caseDetails, clazz);
     }
 
@@ -87,6 +92,7 @@ public class CallbackService {
                                                         final CaseDetails caseDetailsBefore,
                                                         final CaseDetails caseDetails,
                                                         final Boolean ignoreWarning) {
+        jcdebug("sendSingleRequest1");
         if (url == null || url.isEmpty()) {
             return Optional.empty();
         }
@@ -110,6 +116,7 @@ public class CallbackService {
                                                    final CaseDetails caseDetailsBefore,
                                                    final CaseDetails caseDetails,
                                                    final Class<T> clazz) {
+        jcdebug("sendSingleRequest2");
         final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
         final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, callbackType, clazz, callbackRequest);
         return requestEntity.orElseThrow(() -> {
@@ -124,7 +131,7 @@ public class CallbackService {
                                                         final Class<T> clazz,
 
                                                         final CallbackRequest callbackRequest) {
-
+        jcdebug("sendRequest");
         HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
 
         CallbackTelemetryThreadContext.setTelemetryContext(new CallbackTelemetryContext(callbackType));
@@ -163,6 +170,7 @@ public class CallbackService {
 
     public void validateCallbackErrorsAndWarnings(final CallbackResponse callbackResponse,
                                                   final Boolean ignoreWarning) {
+        jcdebug("validateCallbackErrorsAndWarnings");
         if (!isEmpty(callbackResponse.getErrors())
             || (!isEmpty(callbackResponse.getWarnings()) && (ignoreWarning == null || !ignoreWarning))) {
             throw new ApiException("Unable to proceed because there are one or more callback Errors or Warnings")
@@ -172,9 +180,13 @@ public class CallbackService {
     }
 
     private boolean logCallbackDetails(final String url) {
+        jcdebug("logCallbackDetails");
+        return true;
+        /*
         return (applicationParams.getCcdCallbackLogControl().size() > 0
             && (WILDCARD.equals(applicationParams.getCcdCallbackLogControl().get(0))
             || applicationParams.getCcdCallbackLogControl().stream()
             .filter(Objects::nonNull).filter(Predicate.not(String::isEmpty)).anyMatch(url::contains)));
+        */
     }
 }
