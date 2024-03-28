@@ -53,7 +53,6 @@
       "case_data": {
         "CaseAccessGroups": [
           {
-            "__ordering__": "unordered",
             "__elementId__": "id"
           },
           {
@@ -85,7 +84,6 @@
           "classification" : "PUBLIC",
           "value" : [
             {
-              "__ordering__": "unordered",
               "__elementId__": "id"
             },
             {
