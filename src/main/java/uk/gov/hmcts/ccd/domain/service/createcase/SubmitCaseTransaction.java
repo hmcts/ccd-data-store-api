@@ -51,6 +51,7 @@ public class SubmitCaseTransaction implements AccessControl {
     private final CaseDocumentService caseDocumentService;
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
+    private final CaseDocumentTimestampService caseDocumentTimestampService;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -64,7 +65,8 @@ public class SubmitCaseTransaction implements AccessControl {
                                     final @Qualifier("caseEventMessageService") MessageService messageService,
                                     final CaseDocumentService caseDocumentService,
                                     final ApplicationParams applicationParams,
-                                    final CaseAccessGroupUtils caseAccessGroupUtils
+                                    final CaseAccessGroupUtils caseAccessGroupUtils,
+                                    final CaseDocumentTimestampService caseDocumentTimestampService
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -77,6 +79,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.caseDocumentService = caseDocumentService;
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
+        this.caseDocumentTimestampService = caseDocumentTimestampService;
 
     }
 
