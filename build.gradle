@@ -253,7 +253,7 @@ dependencies {
 
 //    FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
-    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.5.1'
+    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.5.5'
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '4.0.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
