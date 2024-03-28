@@ -34,7 +34,7 @@ def versions = [
 
 ext['spring-security.version'] = '5.7.10'
 ext['spring-framework.version'] = '5.3.27'
-ext['jackson.version'] = '2.15.3'
+ext['jackson.version'] = '2.16.0'
 
 configurations {
     compileClasspath {
