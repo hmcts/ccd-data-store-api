@@ -34,11 +34,12 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              MessageService messageService,
                                              CaseDocumentService caseDocumentService,
                                              ApplicationParams applicationParams,
-                                             CaseAccessGroupUtils caseAccessGroupUtils) {
+                                             CaseAccessGroupUtils caseAccessGroupUtils,
+                                             CaseDocumentTimestampService caseDocumentTimestampService) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
             caseDataAccessControl, messageService, caseDocumentService, applicationParams,
-            caseAccessGroupUtils);
+            caseAccessGroupUtils, caseDocumentTimestampService);
 
     }
 }
