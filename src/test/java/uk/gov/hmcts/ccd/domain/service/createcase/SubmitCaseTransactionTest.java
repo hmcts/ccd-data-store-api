@@ -152,7 +152,8 @@ class SubmitCaseTransactionTest {
             messageService,
             caseDocumentService,
             applicationParams,
-            caseAccessGroupUtils
+            caseAccessGroupUtils,
+            caseDocumentTimestampService
 
         );
 

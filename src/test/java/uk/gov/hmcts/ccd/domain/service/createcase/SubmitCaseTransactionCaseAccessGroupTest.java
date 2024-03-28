@@ -40,6 +40,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -121,6 +122,9 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     private CaseDocumentService caseDocumentService;
 
     @Mock
+    private CaseDocumentTimestampService caseDocumentTimestampService;
+
+    @Mock
     private MessageService messageService;
 
     @Mock
@@ -159,7 +163,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             messageService,
             caseDocumentService,
             applicationParams,
-            caseAccessGroupUtils
+            caseAccessGroupUtils,
+            caseDocumentTimestampService
         );
 
         idamUser = buildIdamUser();
