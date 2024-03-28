@@ -83,7 +83,7 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), caseTypeDefinition);
 
         assertNotNull(query);
-        String expectedValue =  "( data->'caseAccessGroups' @> '[{\"value\":{\"caseAccessGroupId\": "
+        String expectedValue =  "( data->'CaseAccessGroups' @> '[{\"value\":{\"caseAccessGroupId\": "
             + "\"caseAccessGroupId\"}}]' AND state in (:states_1_basic) "
             + "AND security_classification in (:classifications_1_basic) )";
         assertEquals(expectedValue, query);

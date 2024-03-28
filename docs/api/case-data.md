@@ -312,3 +312,41 @@ A `CaseLink` is a field used to reference another CCD case using its universal 1
   }
 }
 ```
+
+### CaseAccessGroups
+
+A CaseAccessGroups field which accepts 'caseAccessGroupType' and 'caseAccessGroupId' as string values.
+Also shows the optional required OrganisationPolicyField field.
+#### Example JSON String.
+```json
+{
+  "CaseAccessGroups": [
+    {
+      "id": "652027f5-93db-4251-9cd3-a823516b83ea",
+      "value": {
+        "caseAccessGroupId": "BEFTA_MASTER:1OXC2AA",
+        "caseAccessGroupType": "CCD:all-cases-access"
+      }
+    },
+    {
+      "id": "e6a7cef1-9af2-42ba-9897-76d7c3f84dbd",
+      "value": {
+        "caseAccessGroupId": "BEFTA_MASTER:1OXC2AA",
+        "caseAccessGroupType": "CCD:all-cases-access"
+      }
+    }
+  ],
+  "OrganisationPolicyField": {
+    "Organisation": {
+      "OrganisationID": "1OXC2AA",
+      "OrganisationName": "groupname1"
+    },
+    "LastNoCRequestedBy": null,
+    "OrgPolicyReference": null,
+    "PreviousOrganisations": [],
+    "OrgPolicyCaseAssignedRole": "groupname1",
+    "PrepopulateToUsersOrganisation": null
+  }
+}
+```
+

@@ -24,15 +24,18 @@ import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.ApplicationParams;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -115,6 +118,9 @@ class SubmitCaseTransactionTest {
     @Mock
     private MessageService messageService;
 
+    @Mock
+    private CaseDataService caseDataService;
+
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -122,10 +128,19 @@ class SubmitCaseTransactionTest {
     private IdamUser idamUser;
     private CaseEventDefinition caseEventDefinition;
     private CaseStateDefinition state;
+    @Mock
+    private ApplicationParams applicationParams;
+    private CaseAccessGroupUtils caseAccessGroupUtils;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.initMocks(this);
+
+        event = buildEvent();
+        caseTypeDefinition = buildCaseType();
+        objectMapper = new ObjectMapper();
+        caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
 
         submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
             caseAuditEventRepository,
@@ -136,11 +151,12 @@ class SubmitCaseTransactionTest {
             caseDataAccessControl,
             messageService,
             caseDocumentService,
+            applicationParams,
+            caseAccessGroupUtils,
             caseDocumentTimestampService
+
         );
 
-        event = buildEvent();
-        caseTypeDefinition = buildCaseType();
         idamUser = buildIdamUser();
         caseEventDefinition = buildEventTrigger();
         state = buildState();

@@ -48,6 +48,10 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
     private final List<CategoryDefinition> categories = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
+    @JsonProperty("accessTypes")
+    private List<AccessTypeDefinition> accessTypeDefinitions = new ArrayList<>();
+    @JsonProperty("accessTypeRoles")
+    private List<AccessTypeRoleDefinition> accessTypeRoleDefinitions = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -257,6 +261,26 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
         return categories;
     }
 
+    public void setAccessTypeRoleDefinitions(List<AccessTypeRoleDefinition> accessTypeRoles) {
+        if (accessTypeRoles != null && !accessTypeRoles.isEmpty()) {
+            this.accessTypeRoleDefinitions.addAll(accessTypeRoles);
+        }
+    }
+
+    public List<AccessTypeRoleDefinition> getAccessTypeRoleDefinitions() {
+        return accessTypeRoleDefinitions;
+    }
+
+    public void setAccessTypeDefinitions(List<AccessTypeDefinition> accessTypes) {
+        if (accessTypes != null && !accessTypes.isEmpty()) {
+            this.accessTypeDefinitions.addAll(accessTypes);
+        }
+    }
+
+    public List<AccessTypeDefinition> getAccessTypeDefinitions() {
+        return accessTypeDefinitions;
+    }
+
     @JsonIgnore
     @Override
     public CaseTypeDefinition createCopy() {
@@ -281,6 +305,8 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
         copy.setSearchCriterias(createCopyList(this.getSearchCriterias()));
         copy.setCategories(createCopyList(this.getCategories()));
         copy.setRoleToAccessProfiles(createCopyList(this.getRoleToAccessProfiles()));
+        copy.setAccessTypeRoleDefinitions(createCopyList(this.getAccessTypeRoleDefinitions()));
+        copy.setAccessTypeDefinitions(createCopyList(this.getAccessTypeDefinitions()));
 
         return copy;
     }
