@@ -311,7 +311,6 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             IGNORE_WARNING, null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
     }
 
     @Test
@@ -341,12 +340,11 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             IGNORE_WARNING, null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
     }
 
     @Test
     @DisplayName("should create a case With OrganisationID and any caseAccesstype in CaseAccessGroup")
-    void shouldCreateCaseEventWithOrganisationID() throws IOException {
+    void shouldCreateCaseEventWithOrganisationID() {
 
         String caseAccessGroupType = "Any String";
         String caseAccessGroupID = "SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
@@ -381,10 +379,11 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
         doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
 
-        submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser, caseEventDefinition, inputCaseDetails,
+        CaseDetails caseDetailsWithCaseAccessGroup = submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser, caseEventDefinition, inputCaseDetails,
             IGNORE_WARNING, null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup, 3, caseAccessGroupType);
 
     }
 
@@ -428,7 +427,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
         doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
 
-        submitCaseTransaction.submitCase(event,
+        CaseDetails caseDetailsWithCaseAccessGroup = submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
             idamUser,
             caseEventDefinition,
@@ -437,13 +436,14 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup, 2, caseAccessGroupType);
 
     }
 
     @Test
     @DisplayName("should create a case With OrganisationID, CaseAccessGroup caseAccesstype"
         + " has CCD:all-cases-access and any string")
-    void shouldPersistCreateCaseEventWithOrganisationIDMergeCaseAccessGroup() throws IOException {
+    void shouldPersistCreateCaseEventWithOrganisationIDMergeCaseAccessGroup() {
 
         String caseAccessGroupType = "Any String";
         String caseAccessGroupID = "SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
@@ -486,7 +486,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup, 3, "Any String");
+        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup, 3, caseAccessGroupType);
     }
 
     private Map<String, JsonNode> organisationPolicyCaseData(String role, String organisationId)
