@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -56,6 +57,15 @@ class CaseDocumentServiceTest extends TestFixtures {
 
     @InjectMocks
     private CaseDocumentService underTest;
+
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final String CASE_DETAIL_FIELD = "dataTestField1";
+
+    private final String urlGoogle = "https://www.google.com";
+    private final String urlYahoo = "https://www.yahoo.com";
+    private final String urlMicrosoft = "https://www.microsoft.com";
+    private final String urlElastic = "https://www.elastic.com";
+    private final String urlApple = "https://www.apple.com";
 
     @Test
     void testShouldReturnClonedCaseDetailsWithoutHashes() throws Exception {
@@ -282,4 +292,5 @@ class CaseDocumentServiceTest extends TestFixtures {
 
         verifyNoMoreInteractions(documentUtils);
     }
+
 }
