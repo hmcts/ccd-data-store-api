@@ -336,10 +336,11 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
         doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
 
-        submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser, caseEventDefinition, inputCaseDetails,
+        CaseDetails caseDetailsWithCaseAccessGroup = submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser, caseEventDefinition, inputCaseDetails,
             IGNORE_WARNING, null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup, 2, caseAccessGroupType);
     }
 
     @Test
