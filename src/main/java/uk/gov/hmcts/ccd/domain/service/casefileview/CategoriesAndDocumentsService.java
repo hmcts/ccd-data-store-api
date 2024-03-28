@@ -40,7 +40,7 @@ public class CategoriesAndDocumentsService {
     private static final String CATEGORY_ID = "category_id";
     private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
 
-    private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private static final String UPLOAD_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS";
 
     private final CaseDataExtractor caseDataExtractor;
     private final CaseTypeService caseTypeService;
@@ -198,7 +198,7 @@ public class CategoriesAndDocumentsService {
     LocalDateTime parseUploadTimestamp(final String uploadTimestamp) {
         return Optional.ofNullable(uploadTimestamp)
             .map(timestamp -> {
-                final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TIMESTAMP_PATTERN);
+                final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(UPLOAD_TIMESTAMP_PATTERN);
                 return LocalDateTime.parse(timestamp, dateTimeFormatter);
             })
             .orElse(null);

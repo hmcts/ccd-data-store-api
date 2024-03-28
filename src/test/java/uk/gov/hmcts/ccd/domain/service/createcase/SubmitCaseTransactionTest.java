@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
@@ -85,7 +86,6 @@ class SubmitCaseTransactionTest {
     private static final String ON_BEHALF_OF_FNAME = "Pierre OnBehalf";
     private static final String ON_BEHALF_OF_LNAME = "Martin OnBehalf";
 
-
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
     @Mock
@@ -111,6 +111,9 @@ class SubmitCaseTransactionTest {
 
     @Mock
     private CaseDocumentService caseDocumentService;
+
+    @Mock
+    private CaseDocumentTimestampService caseDocumentTimestampService;
 
     @Mock
     private MessageService messageService;
@@ -150,6 +153,7 @@ class SubmitCaseTransactionTest {
             caseDocumentService,
             applicationParams,
             caseAccessGroupUtils
+
         );
 
         idamUser = buildIdamUser();
@@ -409,7 +413,6 @@ class SubmitCaseTransactionTest {
         event.setName(EVENT_NAME);
         return event;
     }
-
 
     private IdamUser buildIdamUser() {
         final IdamUser idamUser = new IdamUser();

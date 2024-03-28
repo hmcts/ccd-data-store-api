@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
@@ -35,7 +36,6 @@ import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-
 
 @Service
 public class SubmitCaseTransaction implements AccessControl {
@@ -77,6 +77,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.caseDocumentService = caseDocumentService;
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
+
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -116,6 +117,8 @@ public class SubmitCaseTransaction implements AccessControl {
             caseTypeDefinition,
             ignoreWarning
         );
+
+        caseDocumentTimestampService.addUploadTimestamps(caseDetailsWithoutHashes, null);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = caseDetailsWithoutHashes;

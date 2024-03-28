@@ -36,6 +36,7 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
@@ -128,6 +129,7 @@ public class CreateCaseEventService {
                                   final CaseLinkService caseLinkService,
                                   final ApplicationParams applicationParams,
                                   final CaseAccessGroupUtils caseAccessGroupUtils) {
+      
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -156,6 +158,7 @@ public class CreateCaseEventService {
         this.defaultCaseDetailsRepository = defaultCaseDetailsRepository;
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
+
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -206,6 +209,9 @@ public class CreateCaseEventService {
         );
 
         final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
+
+        // add upload timestamp
+        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
@@ -301,6 +307,8 @@ public class CreateCaseEventService {
         );
 
         final Optional<String> newState = Optional.ofNullable(oldState);
+
+        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
