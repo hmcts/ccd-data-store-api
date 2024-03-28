@@ -54,6 +54,7 @@ class CaseAccessGroupUtilsTest {
     private final Map<String, JsonNode> caseData = new HashMap<>();
     @Mock
     private CaseDataService caseDataService;
+    private CaseTypeDefinition caseTypeDefinition;
     private CaseAccessGroupUtils caseAccessGroupUtils;
     public static final String TEST_SOMETHING_ELSE = "some thing else";
     public static final String TEST_ORGID = "550e8400-e29b-41d4-a716-446655440000";
@@ -65,37 +66,13 @@ class CaseAccessGroupUtilsTest {
         @BeforeEach
         void setup() {
             caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
-        }
-
-        @Test
-        void updateCaseDataWithCaseAccessGroups_WithCcd_All_Cases() {
-
-            // GIVEN
-            var caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
-            var caseDetails = setupEverythingForTest(caseTypeDefinition);
-            mockCaseDetails(caseDetails, caseTypeDefinition);
-
-            Map<String, JsonNode> expectedCaseDataClassification =
-                getClonedCaseAccessGroups(caseDetails.getDataClassification());
-
-            // WHEN
-            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition);
-
-            // THEN
-            verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition, 2);
-            assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 3);
-            assertTrue(caseDetails.getData().containsKey(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
-            assertTrue(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS)
-                .toString().contains(TEST_SOMETHING_ELSE));
-            assertTrue(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS)
-                .toString().contains(TEST_ORGID));
+            caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
         }
 
         @Test
         void updateCaseDataWithCaseAccessGroups_WithCcdAllCasesAndSomething() {
 
             // GIVEN
-            var caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
             var caseDetails = setupEverythingForTest(caseTypeDefinition);
             mockCaseDetails(caseDetails, caseTypeDefinition);
 
@@ -108,8 +85,8 @@ class CaseAccessGroupUtilsTest {
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition, 2);
-            // 1 - SOMETHING ELSE
-            // +2 CCD:all-cases-access in AccessTypeRole (CaseAccessGroupUtils.CCD_ALL_CASES)
+            assertNotEquals(expectedCaseData.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(),
+                caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size());
             assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 3);
             assertTrue(caseDetails.getData().containsKey(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
             assertTrue(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS)
@@ -123,7 +100,6 @@ class CaseAccessGroupUtilsTest {
         void updateCaseDataWithCaseAccessGroups_WithNoOrgCcdAllCasesAndSomething() {
 
             // GIVEN
-            var caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
             var caseDetails = setupEverythingNoOrgForTest(caseTypeDefinition);
             mockCaseDetails(caseDetails, caseTypeDefinition);
 
@@ -148,7 +124,6 @@ class CaseAccessGroupUtilsTest {
         void updateCaseDataWithCaseAccessGroups_WithNoOrgCcdAllCases() {
 
             // GIVEN
-            var caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
             var caseDetails = setupNoOrgCcdAllCasesForTest(caseTypeDefinition);
             mockCaseDetails(caseDetails, caseTypeDefinition);
 
@@ -168,7 +143,6 @@ class CaseAccessGroupUtilsTest {
         void updateCaseDataWithCaseAccessGroups_WithSomething() {
 
             // GIVEN
-            var caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
             var caseDetails = setupCaseAccessGroupSomething(caseTypeDefinition);
             mockCaseDetails(caseDetails, caseTypeDefinition);
 
@@ -198,10 +172,10 @@ class CaseAccessGroupUtilsTest {
         void updateCaseDataWithCaseAccessGroups_WithSomethingOnly() {
 
             // GIVEN
-            var caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
             var caseDetails = setupCaseAccessGroupSomethingOnly(caseTypeDefinition);
             mockCaseDetails(caseDetails, caseTypeDefinition);
 
+            Map<String, JsonNode> expectedCaseData = getClonedCaseAccessGroups(caseDetails.getData());
             Map<String, JsonNode> expectedCaseDataClassification =
                 getClonedCaseAccessGroups(caseDetails.getDataClassification());
 
@@ -210,6 +184,8 @@ class CaseAccessGroupUtilsTest {
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition, 2);
+            assertNotEquals(expectedCaseData.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(),
+                caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size());
             // 1 - SOMETHING ELSE
             // 0 CCD:all-cases-access in AccessTypeRole (CaseAccessGroupUtils.CCD_ALL_CASES)
             assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 1);
@@ -225,7 +201,6 @@ class CaseAccessGroupUtilsTest {
         void updateCaseDataWithCaseAccessGroups_WithNothing() {
 
             // GIVEN
-            var caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
             var caseDetails = setUpCaseDetails();
 
             // WHEN
@@ -243,13 +218,13 @@ class CaseAccessGroupUtilsTest {
         @BeforeEach
         void setup() {
             caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
+            caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
         }
 
         @Test
         void updateCaseDataClassificationWithCaseAccessGroups_Everthing() {
 
             // GIVEN
-            var caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
             var caseDetails = setupEverythingForTest(caseTypeDefinition);
 
             mockCaseDetails(caseDetails, caseTypeDefinition);
@@ -262,6 +237,7 @@ class CaseAccessGroupUtilsTest {
                 caseTypeDefinition);
 
             // THEN
+            assertEquals(caseDetails.getDataClassification(), output);
             assertEquals(expectedCaseDataClassification, caseDetails.getDataClassification());
             assertEquals(expectedCaseDataClassification.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(),
                 caseDetails.getDataClassification().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size());
@@ -272,7 +248,6 @@ class CaseAccessGroupUtilsTest {
         void updateCaseDataClassificationWithCaseAccessGroups_unchangedWhenCaseDataMissingCaseAccessGroups() {
 
             // GIVEN
-            var caseTypeDefinition = createCaseTypeDefinitionWithCaseAccessGroup();
             var caseDetails = setupOrganisation(caseTypeDefinition);
 
             // WHEN
