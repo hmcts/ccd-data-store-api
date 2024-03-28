@@ -107,10 +107,13 @@ class CaseAccessGroupUtilsTest {
                 getClonedCaseAccessGroups(caseDetails.getDataClassification());
 
             // WHEN
+            Map<String, JsonNode> expectedCaseData = getClonedCaseAccessGroups(caseDetails.getData());
             caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetails,  caseTypeDefinition);
 
             // THEN
             verifyGetDefaultSecurityClassificationsCall(expectedCaseDataClassification, caseTypeDefinition,2);
+            assertNotEquals(expectedCaseData.get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(),
+                caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size());
             assertEquals(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS).size(), 1);
             assertTrue(caseDetails.getData().containsKey(CaseAccessGroupUtils.CASE_ACCESS_GROUPS));
             assertTrue(caseDetails.getData().get(CaseAccessGroupUtils.CASE_ACCESS_GROUPS)
