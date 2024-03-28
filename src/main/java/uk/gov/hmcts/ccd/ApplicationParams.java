@@ -624,7 +624,11 @@ public class ApplicationParams {
     }
 
     public boolean getCaseGroupAccessFilteringEnabled() {
-        return enableCaseGroupAccessFiltering;
+        return this.enableCaseGroupAccessFiltering;
+    }
+
+    public void setCaseGroupAccessFilteringEnabled(boolean enableCaseGroupAccessFiltering) {
+        this.enableCaseGroupAccessFiltering = enableCaseGroupAccessFiltering;
     }
 
     public List<String> getUploadTimestampFeaturedCaseTypes() {

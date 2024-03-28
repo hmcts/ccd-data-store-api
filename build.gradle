@@ -285,7 +285,8 @@ dependencies {
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testImplementation 'io.github.openfeign:feign-jackson:9.7.0'
-    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.18.3'
+    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.19.3'
+    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.19.3'
     testImplementation 'com.github.hmcts:fortify-client:1.3.0:all'
     testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
@@ -305,7 +306,7 @@ dependencies {
     implementation 'org.jooq:jool-java-8:0.9.14'
     implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.21.13'
+    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.21.19'
 
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
     testRuntimeOnly group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
@@ -861,6 +862,8 @@ task smoke() {
     outputs.upToDateWhen { false }
 }
 
+def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
+
 task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
@@ -875,7 +878,7 @@ task functional(type: JavaExec) {
         '--threads', '1',
         '--plugin', "json:${rootDir}/target/cucumber.json",
         '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-        '--tags', 'not @Ignore',
+        '--tags',"${tags}",
         '--glue', 'uk.gov.hmcts.befta.player',
         '--glue', 'uk.gov.hmcts.ccd.datastore.befta',
         'src/aat/resources/features'
