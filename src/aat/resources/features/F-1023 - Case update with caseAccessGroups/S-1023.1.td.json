@@ -61,14 +61,14 @@
             "__elementId__": "id"
           },
           {
-            "id" : "[[ANYTHING_PRESENT]]",
+            "id" : "[[ANY_NOT_NULLABLE]]",
             "value" : {
               "caseAccessGroupType" : "CCD:all-cases-access",
               "caseAccessGroupId" : "BEFTA_MASTER:orgID1"
             }
           },
           {
-            "id" : "[[ANYTHING_PRESENT]]",
+            "id" : "[[ANY_NOT_NULLABLE]]",
             "value" : {
               "caseAccessGroupType" : "CCD:all-cases-access",
               "caseAccessGroupId" : "BEFTA_MASTER:orgID1"
@@ -92,14 +92,14 @@
               "__elementId__": "id"
             },
             {
-              "id" : "[[ANYTHING_PRESENT]]",
+              "id" : "[[ANY_NOT_NULLABLE]]",
               "value" : {
                 "caseAccessGroupType" : "PUBLIC",
                 "caseAccessGroupId" : "PUBLIC"
               }
             },
             {
-              "id" : "[[ANYTHING_PRESENT]]",
+              "id" : "[[ANY_NOT_NULLABLE]]",
               "value" : {
                 "caseAccessGroupType" : "PUBLIC",
                 "caseAccessGroupId" : "PUBLIC"

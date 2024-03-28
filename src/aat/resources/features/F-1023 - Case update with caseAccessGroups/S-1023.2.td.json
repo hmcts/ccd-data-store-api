@@ -99,21 +99,21 @@
               "__elementId__": "id"
             },
             {
-              "id" : "[[ANYTHING_PRESENT]]",
+              "id" : "[[ANY_NOT_NULLABLE]]",
               "value" : {
               "caseAccessGroupType" : "PUBLIC",
               "caseAccessGroupId" : "PUBLIC"
             }
             },
             {
-              "id" : "[[ANYTHING_PRESENT]]",
+              "id" : "[[ANY_NOT_NULLABLE]]",
               "value" : {
                 "caseAccessGroupType" : "PUBLIC",
                 "caseAccessGroupId" : "PUBLIC"
               }
             },
             {
-              "id" : "[[ANYTHING_PRESENT]]",
+              "id" : "[[ANY_NOT_NULLABLE]]",
               "value" : {
                 "caseAccessGroupType" : "PUBLIC",
                 "caseAccessGroupId" : "PUBLIC"
