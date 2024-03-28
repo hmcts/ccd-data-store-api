@@ -53,6 +53,10 @@
       "case_data": {
         "CaseAccessGroups": [
           {
+            "__ordering__": "unordered",
+            "__elementId__": "id"
+          },
+          {
             "id": "[[ANYTHING_PRESENT]]",
             "value": {
               "caseAccessGroupType": "CCD:all-cases-access",
