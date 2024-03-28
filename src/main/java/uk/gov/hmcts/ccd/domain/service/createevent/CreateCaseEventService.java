@@ -94,6 +94,7 @@ public class CreateCaseEventService {
     private final CaseDetailsJsonParser caseDetailsJsonParser;
     private final TimeToLiveService timeToLiveService;
     private final CaseLinkService caseLinkService;
+    private final CaseDocumentTimestampService caseDocumentTimestampService;
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
 
@@ -128,8 +129,9 @@ public class CreateCaseEventService {
                                   final TimeToLiveService timeToLiveService,
                                   final CaseLinkService caseLinkService,
                                   final ApplicationParams applicationParams,
-                                  final CaseAccessGroupUtils caseAccessGroupUtils) {
-      
+                                  final CaseAccessGroupUtils caseAccessGroupUtils,
+                                  final CaseDocumentTimestampService caseDocumentTimestampService) {
+
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -158,6 +160,7 @@ public class CreateCaseEventService {
         this.defaultCaseDetailsRepository = defaultCaseDetailsRepository;
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
+        this.caseDocumentTimestampService = caseDocumentTimestampService;
 
     }
 
