@@ -53,9 +53,6 @@
       "case_data": {
         "CaseAccessGroups": [
           {
-            "__elementId__": "id"
-          },
-          {
             "id": "[[ANY_STRING_NOT_NULLABLE]]",
             "value": {
               "caseAccessGroupType": "CCD:all-cases-access",
@@ -83,9 +80,6 @@
         "CaseAccessGroups" : {
           "classification" : "PUBLIC",
           "value" : [
-            {
-              "__elementId__": "id"
-            },
             {
               "id" : "[[ANY_STRING_NOT_NULLABLE]]",
               "value" : {
