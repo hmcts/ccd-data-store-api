@@ -34,7 +34,6 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
-import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
@@ -93,7 +92,7 @@ public class CreateCaseEventService {
     private final CaseDetailsJsonParser caseDetailsJsonParser;
     private final TimeToLiveService timeToLiveService;
     private final CaseLinkService caseLinkService;
-    private final CaseDocumentTimestampService caseDocumentTimestampService;
+
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -124,8 +123,7 @@ public class CreateCaseEventService {
                                   final GlobalSearchProcessorService globalSearchProcessorService,
                                   final CaseDetailsJsonParser jsonPathParser,
                                   final TimeToLiveService timeToLiveService,
-                                  final CaseLinkService caseLinkService,
-                                  final CaseDocumentTimestampService caseDocumentTimestampService) {
+                                  final CaseLinkService caseLinkService) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -152,7 +150,6 @@ public class CreateCaseEventService {
         this.timeToLiveService = timeToLiveService;
         this.caseLinkService = caseLinkService;
         this.defaultCaseDetailsRepository = defaultCaseDetailsRepository;
-        this.caseDocumentTimestampService = caseDocumentTimestampService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -203,9 +200,6 @@ public class CreateCaseEventService {
         );
 
         final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
-
-        // add upload timestamp
-        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
@@ -296,8 +290,6 @@ public class CreateCaseEventService {
         );
 
         final Optional<String> newState = Optional.ofNullable(oldState);
-
-        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
