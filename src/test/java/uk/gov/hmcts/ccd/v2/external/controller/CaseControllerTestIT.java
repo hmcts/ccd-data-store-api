@@ -64,7 +64,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.UPLOAD_TIMESTAMP;
 import static uk.gov.hmcts.ccd.v2.V2.EXPERIMENTAL_HEADER;
 import static uk.gov.hmcts.ccd.v2.V2.Error.CASE_ID_INVALID;
 import static uk.gov.hmcts.ccd.v2.V2.Error.CASE_NOT_FOUND;
@@ -488,8 +487,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         assertAll(() -> {
             assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
+            assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
             assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
-            assertTrue(savedCaseResource.getData().values().stream().findFirst().get().has(UPLOAD_TIMESTAMP));
             assertThat(captor.getValue().getIdamId(), is(UID));
             assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
             assertThat(captor.getValue().getHttpStatus(), is(201));

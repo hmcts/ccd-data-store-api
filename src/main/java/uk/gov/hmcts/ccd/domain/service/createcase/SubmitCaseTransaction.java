@@ -22,7 +22,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
-import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
@@ -34,6 +33,7 @@ import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+
 
 @Service
 public class SubmitCaseTransaction implements AccessControl {
@@ -47,7 +47,6 @@ public class SubmitCaseTransaction implements AccessControl {
     private final CaseDataAccessControl caseDataAccessControl;
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
-    private final CaseDocumentTimestampService caseDocumentTimestampService;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -59,8 +58,7 @@ public class SubmitCaseTransaction implements AccessControl {
                                  final SecurityClassificationService securityClassificationService,
                                  final CaseDataAccessControl caseDataAccessControl,
                                  final @Qualifier("caseEventMessageService") MessageService messageService,
-                                 final CaseDocumentService caseDocumentService,
-                                 final CaseDocumentTimestampService caseDocumentTimestampService
+                                 final CaseDocumentService caseDocumentService
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -71,7 +69,6 @@ public class SubmitCaseTransaction implements AccessControl {
         this.caseDataAccessControl = caseDataAccessControl;
         this.messageService = messageService;
         this.caseDocumentService = caseDocumentService;
-        this.caseDocumentTimestampService = caseDocumentTimestampService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -111,8 +108,6 @@ public class SubmitCaseTransaction implements AccessControl {
             caseTypeDefinition,
             ignoreWarning
         );
-
-        caseDocumentTimestampService.addUploadTimestamps(caseDetailsWithoutHashes, null);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = caseDetailsWithoutHashes;

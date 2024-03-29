@@ -12,7 +12,6 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.SubmitCaseTransaction;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
-import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 
@@ -30,10 +29,9 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              SecurityClassificationService securityClassificationService,
                                              CaseDataAccessControl caseDataAccessControl,
                                              MessageService messageService,
-                                             CaseDocumentService caseDocumentService,
-                                             CaseDocumentTimestampService caseDocumentTimestampService) {
+                                             CaseDocumentService caseDocumentService) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
-            caseDataAccessControl, messageService, caseDocumentService, caseDocumentTimestampService);
+            caseDataAccessControl, messageService, caseDocumentService);
     }
 }
