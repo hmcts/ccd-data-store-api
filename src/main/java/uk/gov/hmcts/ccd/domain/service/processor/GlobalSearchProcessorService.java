@@ -92,13 +92,12 @@ public class GlobalSearchProcessorService {
                     && key.equals(currentSearchCriteria.getOtherCaseReference().split("\\.")[0])) {
                     String nestedValueAsString = getNestedValueAsString(jsonNode,
                         currentSearchCriteria.getOtherCaseReference());
-                    if (nestedValueAsString != null) {
-                        otherCaseReferences.add(OtherCaseReference.builder()
-                            .id(UUID.randomUUID().toString())
-                            .value(nestedValueAsString)
-                            .build());
-                    }
-                } else if (key.equals(currentSearchCriteria.getOtherCaseReference()) && !jsonNode.isNull()) {
+
+                    otherCaseReferences.add(OtherCaseReference.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(nestedValueAsString)
+                        .build());
+                } else if (key.equals(currentSearchCriteria.getOtherCaseReference())) {
                     otherCaseReferences.add(OtherCaseReference.builder()
                         .id(UUID.randomUUID().toString())
                         .value(jsonNode.textValue())
