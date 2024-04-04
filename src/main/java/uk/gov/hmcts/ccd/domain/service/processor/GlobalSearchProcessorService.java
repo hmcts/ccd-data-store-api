@@ -83,7 +83,6 @@ public class GlobalSearchProcessorService {
     private SearchCriteria populateSearchCriteria(Map<String, JsonNode> data,
                                                   List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria>
                                                       searchCriterias) {
-
         List<OtherCaseReference> otherCaseReferences = new ArrayList<>();
         SearchCriteria returnValue = new SearchCriteria();
 
