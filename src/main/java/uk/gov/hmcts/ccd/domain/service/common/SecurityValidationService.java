@@ -53,7 +53,17 @@ public class SecurityValidationService {
     private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
 
         if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
-            LOG.warn("callbackClassification={} and defaultClassification={} sizes differ", callbackDataClassification,
+            LOG.warn("JCDEBUG2: warn: callbackClassification={} and defaultClassification={} sizes differ",
+                callbackDataClassification,
+                defaultDataClassification);
+            LOG.info("JCDEBUG2: info: callbackClassification={} and defaultClassification={} sizes differ",
+                callbackDataClassification,
+                defaultDataClassification);
+            LOG.error("JCDEBUG2: error: callbackClassification={} and defaultClassification={} sizes differ",
+                callbackDataClassification,
+                defaultDataClassification);
+            LOG.debug("JCDEBUG2: debug: callbackClassification={} and defaultClassification={} sizes differ",
+                callbackDataClassification,
                 defaultDataClassification);
             throw new ValidationException("JCDEBUG2: " + VALIDATION_ERR_MSG);
         }
