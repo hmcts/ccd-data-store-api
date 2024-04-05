@@ -229,14 +229,14 @@ public class CallbackInvoker {
         if (callbackResponse.getData() != null) {
             validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
-                LOG.warn("JCDEBUG: warn: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> " +
-                    "setClassificationFromCallbackIfValid");
-                LOG.info("JCDEBUG: info: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> " +
-                    "setClassificationFromCallbackIfValid");
-                LOG.error("JCDEBUG: error: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> " +
-                    "setClassificationFromCallbackIfValid");
-                LOG.debug("JCDEBUG: debug: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> " +
-                    "setClassificationFromCallbackIfValid");
+                LOG.warn("JCDEBUG: warn: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> "
+                    + "setClassificationFromCallbackIfValid");
+                LOG.info("JCDEBUG: info: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> "
+                    + "setClassificationFromCallbackIfValid");
+                LOG.error("JCDEBUG: error: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> "
+                    + "setClassificationFromCallbackIfValid");
+                LOG.debug("JCDEBUG: debug: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> "
+                    + "setClassificationFromCallbackIfValid");
                 securityValidationService.setClassificationFromCallbackIfValid(
                     callbackResponse,
                     caseDetails,
