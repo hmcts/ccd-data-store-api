@@ -43,6 +43,7 @@ import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
+import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -113,6 +114,7 @@ public class CreateCaseEventService {
                                   final CallbackInvoker callbackInvoker,
                                   final UIDService uidService,
                                   final SecurityClassificationServiceImpl securityClassificationService,
+                                  @Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER)
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                   final UserAuthorisation userAuthorisation,
                                   final FieldProcessorService fieldProcessorService,
