@@ -616,7 +616,7 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals("Incorrect Response Status Code", 422, mvcResult.getResponse().getStatus());
         //assertEquals("Incorrect Error Message", "\"JCDEBUG2: The event cannot be complete due to a callback returned "
         //        + "data validation error (c)\"",
-            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").toString());
+        //    mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").toString());
     }
 
     @Test
