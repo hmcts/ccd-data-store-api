@@ -53,19 +53,19 @@ public class SecurityValidationService {
     private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
 
         if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
-            LOG.warn("JCDEBUG2: warn: callbackClassification={} and defaultClassification={} sizes differ",
+            LOG.warn("JCDEBUG2 (9th April) warn: callbackClassification={} and defaultClassification={} sizes differ",
                 callbackDataClassification,
                 defaultDataClassification);
-            LOG.info("JCDEBUG2: info: callbackClassification={} and defaultClassification={} sizes differ",
+            LOG.info("JCDEBUG2 (9th April) info: callbackClassification={} and defaultClassification={} sizes differ",
                 callbackDataClassification,
                 defaultDataClassification);
-            LOG.error("JCDEBUG2: error: callbackClassification={} and defaultClassification={} sizes differ",
+            LOG.error("JCDEBUG2 (9th April) error: callbackClassification={} and defaultClassification={} sizes differ",
                 callbackDataClassification,
                 defaultDataClassification);
-            LOG.debug("JCDEBUG2: debug: callbackClassification={} and defaultClassification={} sizes differ",
+            LOG.debug("JCDEBUG2 (9th April) debug: callbackClassification={} and defaultClassification={} sizes differ",
                 callbackDataClassification,
                 defaultDataClassification);
-            throw new ValidationException("JCDEBUG2: " + VALIDATION_ERR_MSG);
+            throw new ValidationException("JCDEBUG2: (9th April) " + VALIDATION_ERR_MSG);
         }
 
         Iterator<Map.Entry<String, JsonNode>> callbackDataClassificationIterator = callbackDataClassification.fields();
