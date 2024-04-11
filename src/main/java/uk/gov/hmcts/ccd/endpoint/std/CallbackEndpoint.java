@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +26,8 @@ import java.util.List;
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(description = "Default callbacks")
 public class CallbackEndpoint {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CallbackEndpoint.class);
     private final PrintableDocumentListOperation printableDocumentListOperation;
 
     @Autowired
@@ -43,5 +47,14 @@ public class CallbackEndpoint {
         @PathVariable("ctid") final String caseTypeId,
         @RequestBody final CaseDetails caseDetails) {
         return printableDocumentListOperation.getPrintableDocumentList(jurisdictionId, caseTypeId, caseDetails);
+    }
+
+    @RequestMapping(value = "jcdebug", method = RequestMethod.POST)
+    public ResponseEntity<String> jcdebug(@RequestParam("message") String message) {
+        LOG.debug("JCDEBUG: debug: Message: " + message);
+        LOG.error("JCDEBUG: error: Message: " + message);
+        LOG.warn("JCDEBUG: warn: Message: " + message);
+        LOG.info("JCDEBUG: info: Message: " + message);
+        return new ResponseEntity<>("Message: " + message, HttpStatus.OK);
     }
 }
