@@ -145,11 +145,12 @@ withPipeline(type, product, component) {
 
     echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
 
-    syncBranchesWithMaster(branchesToSync)
     overrideVaultEnvironments(vaultOverrides)
-    enableAksStagingDeployment()
-    disableLegacyDeploymentOnAAT()
     loadVaultSecrets(secrets)
+    syncBranchesWithMaster(branchesToSync)
+    enableAksStagingDeployment()
+
+    disableLegacyDeploymentOnAAT()
     disableLegacyDeployment()
     enableHighLevelDataSetup()
 
