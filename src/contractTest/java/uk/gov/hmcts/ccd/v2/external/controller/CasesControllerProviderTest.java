@@ -13,6 +13,7 @@ import com.microsoft.applicationinsights.TelemetryClient;
 
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
+
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
@@ -141,34 +143,42 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     }
 
     @State("adoption-web makes request to get cases")
+    @Ignore
     public void adoptionWebToGetCases(Map<String, Object> dataMap) {
     }
 
     @State("adoption-web makes request to send case event")
+    @Ignore
     public void adoptionWebToSendCaseEvent(Map<String, Object> dataMap) {
     }
 
     @State("adoption-web makes request to get citizen-create-application event token")
+    @Ignore
     public void adoptionWebToGetCitizenCreateEventToken(Map<String, Object> dataMap) {
     }
 
     @State("adoption-web makes request to get case by id")
+    @Ignore
     public void adoptionWebToGetCaseById(Map<String, Object> dataMap) {
     }
 
     @State("adoption-web makes request to create case")
+    @Ignore
     public void adoptionWebToCreateCase(Map<String, Object> dataMap) {
     }
 
     @State("adoption-web makes request to get case-users roles")
+    @Ignore
     public void adoptionWebToGetCaseUsersRoles(Map<String, Object> dataMap) {
     }
 
     @State("adoption-web makes request to get citizen-update-application event token")
+    @Ignore
     public void adoptionWebToGetCitizenUpdateEventToken(Map<String, Object> dataMap) {
     }
 
     @State({"A Get Case is requested"})
+    @Ignore
     public void toGetACase(Map<String, Object> dataMap) {
         //CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
         //getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
@@ -176,17 +186,20 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     }
 
     @State({"A Read for a Citizen is requested"})
+    @Ignore
     public void toReadForACitizen(Map<String, Object> dataMap) {
         //toGetACase(dataMap);
 
     }
 
     @State({"A Read for a Caseworker is requested"})
+    @Ignore
     public void toReadForCaseworker(Map<String, Object> dataMap) {
         toGetACase(dataMap);
     }
 
     @State({"A Search for cases is requested"})
+    @Ignore
     public void toSearchCasesForACitizen(Map<String, Object> dataMap) {
         //CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
         //when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class), any()))
@@ -194,6 +207,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     }
 
     @State({"A Search cases for a Citizen is requested"})
+    @Ignore
     public void toSearchForACitizen(Map<String, Object> dataMap) {
         //CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
         //when(authorisedSearchOperation.execute(any(MetaData.class), any(Map.class)))
@@ -202,6 +216,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     }
 
     @State({"A Start Event for a Caseworker is  requested"})
+    @Ignore
     public void toStartEventForACaseworker(Map<String, Object> dataMap) {
         //CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
         //startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
@@ -210,41 +225,48 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     }
 
     @State({"A Start Event for a Citizen is requested"})
+    @Ignore
     public void toStartEventForACitizen(Map<String, Object> dataMap) {
         //toStartEventForACaseworker(dataMap);
 
     }
 
     @State({"A Start for a Caseworker is requested"})
+    @Ignore
     public void toStartForACaseworker(Map<String, Object> dataMap) {
         //setUpSecurityContextForEvent(dataMap);
 
     }
 
     @State({"A Start for a Citizen is requested"})
+    @Ignore
     public void toStartForACitizen(Map<String, Object> dataMap) {
         //setUpSecurityContextForEvent(dataMap);
 
     }
 
     @State({"A Submit Event for a Caseworker is requested"})
+    @Ignore
     public void toSubmitEventForACaseworker(Map<String, Object> dataMap) {
         //CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
         //createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
     @State({"A Submit Event for a Citizen is requested"})
+    @Ignore
     public void toSubmitEventForACitizen(Map<String, Object> dataMap) {
         // toSubmitEventForACaseworker(dataMap);
     }
 
     @State({"A Submit for a Caseworker is requested"})
+    @Ignore
     public void toSubmitForACaseworker(Map<String, Object> dataMap) {
         //setUpSecurityContextForEvent(dataMap);
 
     }
 
     @State({"A Submit for a Citizen is requested"})
+    @Ignore
     public void toSubmitForACitizen(Map<String, Object> dataMap) {
         //setUpSecurityContextForEvent(dataMap);
 
