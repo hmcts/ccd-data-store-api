@@ -46,16 +46,26 @@ public class SecurityValidationService {
                 caseDetails.getReference(),
                 caseDetails.getJurisdiction(),
                 caseDetails.getCaseTypeId());
-            throw new ValidationException(VALIDATION_ERR_MSG);
+            throw new ValidationException("JCDEBUG1: " + VALIDATION_ERR_MSG);
         }
     }
 
     private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
 
         if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
-            LOG.warn("callbackClassification={} and defaultClassification={} sizes differ", callbackDataClassification,
+            LOG.warn("JCDEBUG2 (9th April) warn: callbackClassification={} and defaultClassification={} sizes differ",
+                callbackDataClassification,
                 defaultDataClassification);
-            throw new ValidationException(VALIDATION_ERR_MSG);
+            LOG.info("JCDEBUG2 (9th April) info: callbackClassification={} and defaultClassification={} sizes differ",
+                callbackDataClassification,
+                defaultDataClassification);
+            LOG.error("JCDEBUG2 (9th April) error: callbackClassification={} and defaultClassification={} sizes differ",
+                callbackDataClassification,
+                defaultDataClassification);
+            LOG.debug("JCDEBUG2 (9th April) debug: callbackClassification={} and defaultClassification={} sizes differ",
+                callbackDataClassification,
+                defaultDataClassification);
+            throw new ValidationException("JCDEBUG2: (9th April) " + VALIDATION_ERR_MSG);
         }
 
         Iterator<Map.Entry<String, JsonNode>> callbackDataClassificationIterator = callbackDataClassification.fields();
@@ -70,7 +80,7 @@ public class SecurityValidationService {
                     LOG.warn("callbackClassificationItem={} has lower classification than defaultClassificationItem={}",
                         callbackClassificationValue,
                         defaultClassificationItem);
-                    throw new ValidationException(VALIDATION_ERR_MSG);
+                    throw new ValidationException("JCDEBUG3: " + VALIDATION_ERR_MSG);
                 }
                 if (callbackClassificationValue.has(VALUE)) {
                     JsonNode defaultClassificationValue = defaultClassificationItem.get(VALUE);
@@ -83,18 +93,18 @@ public class SecurityValidationService {
                 } else {
                     LOG.warn("callbackClassification={} is complex object with classification but no value",
                         callbackDataClassification);
-                    throw new ValidationException(VALIDATION_ERR_MSG);
+                    throw new ValidationException("JCDEBUG4: " + VALIDATION_ERR_MSG);
                 }
             } else if (callbackClassificationValue.has(VALUE)) {
                 LOG.warn("callbackClassification={} is complex object with value but no classification",
                     callbackDataClassification);
-                throw new ValidationException(VALIDATION_ERR_MSG);
+                throw new ValidationException("JCDEBUG5: " + VALIDATION_ERR_MSG);
             } else {
                 if (!isValidClassification(callbackClassificationValue, defaultClassificationItem)) {
                     LOG.warn("callbackClassificationItem={} has lower classification than defaultClassificationItem={}",
                         JacksonUtils.convertValueJsonNode(callbackClassificationMap),
                         defaultDataClassification);
-                    throw new ValidationException(VALIDATION_ERR_MSG);
+                    throw new ValidationException("JCDEBUG6: " + VALIDATION_ERR_MSG);
                 }
             }
         }
@@ -111,7 +121,7 @@ public class SecurityValidationService {
             JsonNode defaultItem = getDataClassificationForData(callbackItem, defaultClassificationItem.iterator());
             if (defaultItem.isNull()) {
                 LOG.warn("No defaultClassificationItem for callbackItem={}", callbackItem);
-                throw new ValidationException(VALIDATION_ERR_MSG);
+                throw new ValidationException("JCDEBUG7: " + VALIDATION_ERR_MSG);
             }
             JsonNode callbackItemValue = callbackItem.get(VALUE);
             JsonNode defaultItemValue = defaultItem.get(VALUE);
@@ -126,11 +136,11 @@ public class SecurityValidationService {
             getSecurityClassification(defaultClassificationValue);
         if (!defaultSecurityClassification.isPresent()) {
             LOG.warn("defaultSecurityClassificationValue={} cannot be parsed", defaultClassificationValue);
-            throw new ValidationException(VALIDATION_ERR_MSG);
+            throw new ValidationException("JCDEBUG8: " + VALIDATION_ERR_MSG);
         }
         if (!callbackSecurityClassification.isPresent()) {
             LOG.warn("callbackSecurityClassificationValue={} cannot be parsed", callbackClassificationValue);
-            throw new ValidationException(VALIDATION_ERR_MSG);
+            throw new ValidationException("JCDEBUG9: " + VALIDATION_ERR_MSG);
         }
         return callbackSecurityClassification.get().higherOrEqualTo(defaultSecurityClassification.get());
     }
