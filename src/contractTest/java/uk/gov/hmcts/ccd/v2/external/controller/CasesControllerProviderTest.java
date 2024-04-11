@@ -59,7 +59,7 @@ import static org.mockito.Mockito.when;
         + "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/((segments/[0-9]+)|(file/S+))))}"
 
 })
-@TestPropertySource(locations = "/application.properties")
+@TestPropertySource(locations = "/contract-test.properties")
 @ActiveProfiles("SECURITY_MOCK")
 @IgnoreNoPactsToVerify
 public class CasesControllerProviderTest extends WireMockBaseTest {
