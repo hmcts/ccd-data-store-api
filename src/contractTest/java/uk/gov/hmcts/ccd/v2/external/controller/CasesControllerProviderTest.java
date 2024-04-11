@@ -10,8 +10,10 @@ import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.applicationinsights.TelemetryClient;
+
 import java.util.Arrays;
 import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,14 +50,14 @@ import static org.mockito.Mockito.when;
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}",
     port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-        @VersionSelector(tag = "master")})
+    @VersionSelector(tag = "master")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
     "ccd.document.url.pattern=${CCD_DOCUMENT_URL_PATTERN:https?://(((?:api-gateway.preprod.dm.reform.hmcts.net|"
-        + "(dm-store-aat.service.core-compute-aat|dm-store-(pr-[0-9]+|preview).service.core-compute-preview)."
-        + "internal(?::d+)?)/documents/[A-Za-z0-9-]+(?:/binary)?)|((em-hrs-api-aat.service.core-compute-aat|"
-        + "em-hrs-api-(pr-[0-9]+|preview).service.core-compute-preview).internal(?::d+)?/hearing-recordings/"
-        + "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/((segments/[0-9]+)|(file/S+))))}"
+    + "(dm-store-aat.service.core-compute-aat|dm-store-(pr-[0-9]+|preview).service.core-compute-preview)."
+    + "internal(?::d+)?)/documents/[A-Za-z0-9-]+(?:/binary)?)|((em-hrs-api-aat.service.core-compute-aat|"
+    + "em-hrs-api-(pr-[0-9]+|preview).service.core-compute-preview).internal(?::d+)?/hearing-recordings/"
+    + "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/((segments/[0-9]+)|(file/S+))))}"
 
 })
 @TestPropertySource(locations = "/application.properties")
@@ -141,8 +143,8 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         }
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
         //System.getProperties().setProperty("pact.verifier.publishResults", "true");
-         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
-         when(userAuthorisation.getUserId()).thenReturn("userId");
+        when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
+        when(userAuthorisation.getUserId()).thenReturn("userId");
     }
 
     @State("adoption-web makes request to get cases")
@@ -188,7 +190,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Read for a Caseworker is requested"})
     public void toReadForCaseworker(Map<String, Object> dataMap) {
-         toGetACase(dataMap);
+        toGetACase(dataMap);
     }
 
     @State({"A Search for cases is requested"})
@@ -240,7 +242,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Submit Event for a Citizen is requested"})
     public void toSubmitEventForACitizen(Map<String, Object> dataMap) {
-         toSubmitEventForACaseworker(dataMap);
+        toSubmitEventForACaseworker(dataMap);
     }
 
     @State({"A Submit for a Caseworker is requested"})
