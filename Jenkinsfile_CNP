@@ -117,9 +117,6 @@ env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
-        enablePactAs([
-                AppPipelineDsl.PactRoles.PROVIDER
-        ])
     }
     if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
         enableSlackNotifications('#ccd-develop-builds')
@@ -130,9 +127,6 @@ withPipeline(type, product, component) {
     }
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
-        enablePactAs([
-                AppPipelineDsl.PactRoles.PROVIDER
-        ])
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
