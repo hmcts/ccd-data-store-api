@@ -5,17 +5,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
@@ -29,8 +24,6 @@ import java.util.List;
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(description = "Default callbacks")
 public class CallbackEndpoint {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CallbackEndpoint.class);
     private final PrintableDocumentListOperation printableDocumentListOperation;
 
     @Autowired
@@ -50,24 +43,5 @@ public class CallbackEndpoint {
         @PathVariable("ctid") final String caseTypeId,
         @RequestBody final CaseDetails caseDetails) {
         return printableDocumentListOperation.getPrintableDocumentList(jurisdictionId, caseTypeId, caseDetails);
-    }
-
-    @RequestMapping(value = "jcdebug", method = RequestMethod.POST,
-        produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> jcdebug(@RequestParam("message") String message) {
-        if (message != null) {
-            message = message.replaceAll("[\n\r]", "_");
-            LOG.debug("JCDEBUG: debug: Message: " + message);
-            LOG.error("JCDEBUG: error: Message: " + message);
-            LOG.warn("JCDEBUG: warn: Message: " + message);
-            LOG.info("JCDEBUG: info: Message: " + message);
-        }
-        return new ResponseEntity<>("Message: " + message == null ? "NULL" : message, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "jcdebugtest", method = RequestMethod.GET,
-        produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> jcdebugtest() {
-        return new ResponseEntity<>("jcdebugtest", HttpStatus.OK);
     }
 }
