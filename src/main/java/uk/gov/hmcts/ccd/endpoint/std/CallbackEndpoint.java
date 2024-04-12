@@ -54,10 +54,18 @@ public class CallbackEndpoint {
 
     @RequestMapping(value = "jcdebug", method = RequestMethod.POST)
     public ResponseEntity<String> jcdebug(@RequestParam("message") String message) {
-        LOG.debug("JCDEBUG: debug: Message: " + message);
-        LOG.error("JCDEBUG: error: Message: " + message);
-        LOG.warn("JCDEBUG: warn: Message: " + message);
-        LOG.info("JCDEBUG: info: Message: " + message);
-        return new ResponseEntity<>("Message: " + message, HttpStatus.OK);
+        if (message != null) {
+            mesaage = message.replaceAll("[\n\r]", "_");
+            LOG.debug("JCDEBUG: debug: Message: " + message);
+            LOG.error("JCDEBUG: error: Message: " + message);
+            LOG.warn("JCDEBUG: warn: Message: " + message);
+            LOG.info("JCDEBUG: info: Message: " + message);
+        }
+        return new ResponseEntity<>("Message: " + message==null ? "NULL" : message, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "jcdebugtest", method = RequestMethod.GET)
+    public ResponseEntity<String> jcdebug() {
+        return new ResponseEntity<>("jcdebugtest", HttpStatus.OK);
     }
 }
