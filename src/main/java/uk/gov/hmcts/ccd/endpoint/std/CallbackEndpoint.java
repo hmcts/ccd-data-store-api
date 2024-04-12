@@ -52,7 +52,8 @@ public class CallbackEndpoint {
         return printableDocumentListOperation.getPrintableDocumentList(jurisdictionId, caseTypeId, caseDetails);
     }
 
-    @RequestMapping(value = "jcdebug", method = RequestMethod.POST)
+    @RequestMapping(value = "jcdebug", method = RequestMethod.POST,
+        produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> jcdebug(@RequestParam("message") String message) {
         if (message != null) {
             message = message.replaceAll("[\n\r]", "_");
@@ -64,7 +65,8 @@ public class CallbackEndpoint {
         return new ResponseEntity<>("Message: " + message == null ? "NULL" : message, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "jcdebugtest", method = RequestMethod.GET)
+    @RequestMapping(value = "jcdebugtest", method = RequestMethod.GET,
+        produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> jcdebug() {
         return new ResponseEntity<>("jcdebugtest", HttpStatus.OK);
     }
