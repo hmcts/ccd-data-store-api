@@ -67,7 +67,7 @@ public class CallbackEndpoint {
 
     @RequestMapping(value = "jcdebugtest", method = RequestMethod.GET,
         produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> jcdebug() {
+    public ResponseEntity<String> jcdebugtest() {
         return new ResponseEntity<>("jcdebugtest", HttpStatus.OK);
     }
 }
