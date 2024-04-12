@@ -61,7 +61,7 @@ public class CallbackEndpoint {
             LOG.warn("JCDEBUG: warn: Message: " + message);
             LOG.info("JCDEBUG: info: Message: " + message);
         }
-        return new ResponseEntity<>("Message: " + message==null ? "NULL" : message, HttpStatus.OK);
+        return new ResponseEntity<>("Message: " + message == null ? "NULL" : message, HttpStatus.OK);
     }
 
     @RequestMapping(value = "jcdebugtest", method = RequestMethod.GET)
