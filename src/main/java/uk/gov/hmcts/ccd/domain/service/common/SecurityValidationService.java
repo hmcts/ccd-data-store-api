@@ -11,6 +11,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Iterator;
@@ -54,52 +56,65 @@ public class SecurityValidationService {
     }
 
     /*
-     * Log message.
+     * ==== Log message. ====
      */
-    private String jcdebugtest(final String message) {
+    private String jcLog(final String message) {
         String rc;
-
         try {
             final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
-
             URL apiUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
-
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "text/plain");
-
             // Write the string payload to the HTTP request body
             OutputStream outputStream = connection.getOutputStream();
             outputStream.write(message.getBytes());
             outputStream.flush();
             outputStream.close();
-
             rc = "Response Code: " + connection.getResponseCode();
         } catch (Exception e) {
             rc = "EXCEPTION";
             e.printStackTrace();
         }
-        return "jcdebugtest: " + rc;
+        return "jcLog: " + rc;
     }
 
+    /*
+     * ==== Get call start as string. ====
+     */
+    public static String getCallStackString() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        new Throwable().printStackTrace(printWriter);
+        return stringWriter.toString();
+    }
+
+    /*
+     * callbackDataClassification = JacksonUtils.convertValueJsonNode( callbackResponse.getDataClassification() )
+     * defaultDataClassification  = JacksonUtils.convertValueJsonNode( defaultDataClassification )
+     */
     private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
 
         if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
-            LOG.warn("JCDEBUG2 (9th April) warn: callbackClassification={} and defaultClassification={} sizes differ",
-                callbackDataClassification,
-                defaultDataClassification);
-            LOG.info("JCDEBUG2 (9th April) info: callbackClassification={} and defaultClassification={} sizes differ",
-                callbackDataClassification,
-                defaultDataClassification);
-            LOG.error("JCDEBUG2 (9th April) error: callbackClassification={} and defaultClassification={} sizes differ",
-                callbackDataClassification,
-                defaultDataClassification);
-            LOG.debug("JCDEBUG2 (9th April) debug: callbackClassification={} and defaultClassification={} sizes differ",
-                callbackDataClassification,
-                defaultDataClassification);
-            jcdebugtest("JCDEBUG2 (15th April) validateObject");
-            throw new ValidationException("JCDEBUG2: (9th April) " + VALIDATION_ERR_MSG);
+            jcLog("JCDEBUG2: validateObject: SIZES DIFFER");
+            if (callbackDataClassification != null) {
+                jcLog("JCDEBUG2: validateObject: callbackDataClassification.size = "
+                    + callbackDataClassification.size());
+                jcLog("JCDEBUG2: validateObject: callbackDataClassification = "
+                    + callbackDataClassification.toString());
+            }
+            if (defaultDataClassification != null) {
+                jcLog("JCDEBUG2: validateObject: defaultDataClassification.size  = "
+                    + defaultDataClassification.size());
+                jcLog("JCDEBUG2: validateObject: defaultDataClassification  = " + defaultDataClassification.toString());
+            }
+            jcLog("JCDEBUG2: validateObject: CALL STACK = " + getCallStackString());
+            throw new ValidationException("JCDEBUG2: " + VALIDATION_ERR_MSG);
+        } else {
+            jcLog("JCDEBUG2: validateObject: SIZES OK");
+            jcLog("JCDEBUG2: validateObject: callbackDataClassification.size = " + callbackDataClassification.size());
+            jcLog("JCDEBUG2: validateObject: defaultDataClassification.size  = " + defaultDataClassification.size());
         }
 
         Iterator<Map.Entry<String, JsonNode>> callbackDataClassificationIterator = callbackDataClassification.fields();

@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.GetCaseCallbackResponse;
@@ -214,33 +215,28 @@ public class CallbackInvoker {
     }
 
     /*
-     * Log message.
+     * ==== Log message. ====
      */
-    private String jcdebugtest(final String message) {
+    private String jcLog(final String message) {
         String rc;
-
         try {
             final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
-
             URL apiUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
-
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "text/plain");
-
             // Write the string payload to the HTTP request body
             OutputStream outputStream = connection.getOutputStream();
             outputStream.write(message.getBytes());
             outputStream.flush();
             outputStream.close();
-
             rc = "Response Code: " + connection.getResponseCode();
         } catch (Exception e) {
             rc = "EXCEPTION";
             e.printStackTrace();
         }
-        return "jcdebugtest: " + rc;
+        return "jcLog: " + rc;
     }
 
     private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition
@@ -262,19 +258,21 @@ public class CallbackInvoker {
         if (callbackResponse.getData() != null) {
             validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
-                LOG.warn("JCDEBUG: warn: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> "
-                    + "setClassificationFromCallbackIfValid");
-                LOG.info("JCDEBUG: info: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> "
-                    + "setClassificationFromCallbackIfValid");
-                LOG.error("JCDEBUG: error: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> "
-                    + "setClassificationFromCallbackIfValid");
-                LOG.debug("JCDEBUG: debug: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> "
-                    + "setClassificationFromCallbackIfValid");
-                jcdebugtest("JCDEBUG (15th April) validateAndSetFromAboutToSubmitCallback");
-                securityValidationService.setClassificationFromCallbackIfValid(
-                    callbackResponse,
-                    caseDetails,
-                    deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails)
+                Map<String, JsonNode> defaultDataClassification =
+                    deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails);
+
+                JsonNode callbackDataClassificationDebug =
+                    JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification());
+                JsonNode defaultDataClassificationDebug  =
+                    JacksonUtils.convertValueJsonNode(defaultDataClassification);
+
+                jcLog("JCDEBUG2: validateAndSetFromAboutToSubmitCallback: callbackDataClassificationDebug.size = "
+                    + (callbackDataClassificationDebug == null ? "NULL" : callbackDataClassificationDebug.size()));
+                jcLog("JCDEBUG2: validateAndSetFromAboutToSubmitCallback: defaultDataClassificationDebug.size = "
+                    + (defaultDataClassificationDebug == null ? "NULL" : defaultDataClassificationDebug.size()));
+
+                securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+                    defaultDataClassification
                 );
             }
         }
