@@ -27,9 +27,6 @@ public class TestController {
         if (message != null) {
             message = message.replaceAll("[\n\r]", "_");
             LOG.debug("JCDEBUG: debug: Message: " + message);
-            LOG.error("JCDEBUG: error: Message: " + message);
-            LOG.warn("JCDEBUG: warn: Message: " + message);
-            LOG.info("JCDEBUG: info: Message: " + message);
         }
         return ResponseEntity.ok("Message: " + (message == null ? "NULL" : message));
     }
