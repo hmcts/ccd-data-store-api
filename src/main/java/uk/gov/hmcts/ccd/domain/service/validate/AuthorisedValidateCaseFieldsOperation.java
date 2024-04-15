@@ -63,8 +63,8 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         content.setData(JacksonUtils.convertValue(data));
 
         String caseReference = content.getCaseReference();
-        Set<AccessProfile> accessProfiles = StringUtils.isNotEmpty(caseReference)?
-            caseAccessService.getAccessProfilesByCaseReference(caseReference) :
+        Set<AccessProfile> accessProfiles = StringUtils.isNotEmpty(caseReference)
+            ? caseAccessService.getAccessProfilesByCaseReference(caseReference) :
             caseAccessService.getCaseCreationRoles(caseTypeId);
 
         verifyReadAccess(caseTypeId, content, accessProfiles);
