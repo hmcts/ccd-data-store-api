@@ -10,6 +10,9 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -50,6 +53,36 @@ public class SecurityValidationService {
         }
     }
 
+    /*
+     * Log message.
+     */
+    private String jcdebugtest(final String message) {
+        String rc;
+
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+            e.printStackTrace();
+        }
+        return "jcdebugtest: " + rc;
+    }
+
     private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
 
         if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
@@ -65,6 +98,7 @@ public class SecurityValidationService {
             LOG.debug("JCDEBUG2 (9th April) debug: callbackClassification={} and defaultClassification={} sizes differ",
                 callbackDataClassification,
                 defaultDataClassification);
+            jcdebugtest("JCDEBUG2 (15th April) validateObject");
             throw new ValidationException("JCDEBUG2: (9th April) " + VALIDATION_ERR_MSG);
         }
 

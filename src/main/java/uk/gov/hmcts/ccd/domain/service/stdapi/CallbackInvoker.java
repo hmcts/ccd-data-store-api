@@ -22,6 +22,9 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -210,6 +213,36 @@ public class CallbackInvoker {
         }
     }
 
+    /*
+     * Log message.
+     */
+    private String jcdebugtest(final String message) {
+        String rc;
+
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+            e.printStackTrace();
+        }
+        return "jcdebugtest: " + rc;
+    }
+
     private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition
                                                                                       caseTypeDefinition,
                                                                                   final CaseDetails caseDetails,
@@ -237,6 +270,7 @@ public class CallbackInvoker {
                     + "setClassificationFromCallbackIfValid");
                 LOG.debug("JCDEBUG: debug: CallbackInvoker.validateAndSetFromAboutToSubmitCallback -> "
                     + "setClassificationFromCallbackIfValid");
+                jcdebugtest("JCDEBUG (15th April) validateAndSetFromAboutToSubmitCallback");
                 securityValidationService.setClassificationFromCallbackIfValid(
                     callbackResponse,
                     caseDetails,

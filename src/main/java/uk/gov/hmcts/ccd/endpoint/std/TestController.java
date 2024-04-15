@@ -35,8 +35,8 @@ public class TestController {
     }
 
     /*
-     * Use this method to test message logging.
-     * If this works then copy to SecurityValidationService , CallbackInvoker , (and CallbackService).
+     * Method to test message logging.
+     * Copy to SecurityValidationService , CallbackInvoker , (and CallbackService).
      */
     @GetMapping("/jcdebugtest")
     public String jcdebugtest() {
@@ -44,7 +44,7 @@ public class TestController {
 
         try {
             final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
-            final String payload = "TESTING POST";
+            final String message = "TESTING POST";
 
             URL apiUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
@@ -55,7 +55,7 @@ public class TestController {
 
             // Write the string payload to the HTTP request body
             OutputStream outputStream = connection.getOutputStream();
-            outputStream.write(payload.getBytes());
+            outputStream.write(message.getBytes());
             outputStream.flush();
             outputStream.close();
 
