@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.validate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -61,7 +62,12 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
 
         content.setData(JacksonUtils.convertValue(data));
 
-        verifyReadAccess(caseTypeId, content);
+        String caseReference = content.getCaseReference();
+        Set<AccessProfile> accessProfiles = StringUtils.isNotEmpty(caseReference)?
+            caseAccessService.getAccessProfilesByCaseReference(caseReference) :
+            caseAccessService.getCaseCreationRoles(caseTypeId);
+
+        verifyReadAccess(caseTypeId, content, accessProfiles);
 
         return content.getData();
     }
@@ -72,15 +78,12 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         validateCaseFieldsOperation.validateData(data, caseTypeDefinition, content);
     }
 
-    private void verifyReadAccess(final String caseTypeId, CaseDataContent content) {
+    private void verifyReadAccess(final String caseTypeId, CaseDataContent content, Set<AccessProfile> accessProfiles) {
         final CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(caseTypeId);
-
-        Set<AccessProfile> caseAccessProfiles =
-            caseAccessService.getAccessProfilesByCaseReference(content.getCaseReference());
 
         if (!accessControlService.canAccessCaseTypeWithCriteria(
             caseTypeDefinition,
-            caseAccessProfiles,
+            accessProfiles,
             CAN_READ)) {
             content.setData(newHashMap());
             return;
@@ -90,7 +93,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
             accessControlService.filterCaseFieldsByAccess(
                 JacksonUtils.convertValueJsonNode(content.getData().get(JacksonUtils.DATA)),
                 caseTypeDefinition.getCaseFieldDefinitions(),
-                caseAccessProfiles,
+                accessProfiles,
                 CAN_READ,
                 false)));
     }
