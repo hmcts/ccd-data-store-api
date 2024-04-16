@@ -96,6 +96,8 @@ public class CallbackInvoker {
                                                                      final CaseDetails caseDetails,
                                                                      final CaseTypeDefinition caseTypeDefinition,
                                                                      final Boolean ignoreWarning) {
+        jcLog("JCDEBUG2: invokeAboutToSubmitCallback");
+
         final Optional<CallbackResponse> callbackResponse;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLAboutToSubmitEvent())) {
             callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
@@ -245,6 +247,7 @@ public class CallbackInvoker {
                                                                                   final Boolean ignoreWarning,
                                                                                   final CallbackResponse
                                                                                       callbackResponse) {
+        jcLog("JCDEBUG2: validateAndSetFromAboutToSubmitCallback");
 
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
@@ -265,8 +268,6 @@ public class CallbackInvoker {
                     JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification());
                 JsonNode defaultDataClassificationDebug  =
                     JacksonUtils.convertValueJsonNode(defaultDataClassification);
-
-                // TODO: Work through all EXUI "Next Steps" , to see if any call validateAndSetFromAboutToSubmitCallback
 
                 jcLog("JCDEBUG2: validateAndSetFromAboutToSubmitCallback: callbackDataClassificationDebug.size = "
                     + (callbackDataClassificationDebug == null ? "NULL" : callbackDataClassificationDebug.size()));

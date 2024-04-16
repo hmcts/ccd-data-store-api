@@ -45,6 +45,9 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -341,6 +344,31 @@ public class CaseDetailsEndpoint {
                                        pageId);
     }
 
+    /*
+     * ==== Log message. ====
+     */
+    private String jcLog(final String message) {
+        String rc;
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+            e.printStackTrace();
+        }
+        return "jcLog: " + rc;
+    }
+
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
@@ -365,6 +393,9 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
+
+        jcLog("JCDEBUG2: createCaseEventForCaseWorker");
+
         return createEventOperation.createCaseEvent(caseId,
                                                     content);
     }

@@ -18,6 +18,10 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
@@ -41,10 +45,37 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
+    /*
+     * ==== Log message. ====
+     */
+    private String jcLog(final String message) {
+        String rc;
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+            e.printStackTrace();
+        }
+        return "jcLog: " + rc;
+    }
+
     @Transactional
     @Override
     public CaseDetails createCaseEvent(final String caseReference,
                                        final CaseDataContent content) {
+        jcLog("JCDEBUG2: createCaseEvent:77");
+
         eventValidator.validate(content.getEvent());
 
         final CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(caseReference, content);
