@@ -270,6 +270,8 @@ public class CallbackTest extends WireMockBaseTest {
             mapper.readTree(sanitizedModifiedDataWithMissingBinaryLinkString);
     }
 
+    // ./gradlew test --tests
+    //         uk.gov.hmcts.ccd.endpoint.std.CallbackTest.shouldReturn201WhenPostCreateCaseWithModifiedDataForCaseworker
     @Test
     public void shouldReturn201WhenPostCreateCaseWithModifiedDataForCaseworker() throws Exception {
         final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases", USER_ID,

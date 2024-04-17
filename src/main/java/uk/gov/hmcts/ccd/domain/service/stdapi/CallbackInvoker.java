@@ -29,6 +29,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -91,24 +92,39 @@ public class CallbackInvoker {
             response));
     }
 
+    /**
+     * NOTES:-
+     * callbackResponse.getDataClassification()  --  obtained from callbackService.sendSingleRequest() OR send()
+     * defaultDataClassification                 --  obtained from deduceDefaultClassificationForExistingFields()
+     */
     public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEventDefinition caseEventDefinition,
                                                                      final CaseDetails caseDetailsBefore,
                                                                      final CaseDetails caseDetails,
                                                                      final CaseTypeDefinition caseTypeDefinition,
                                                                      final Boolean ignoreWarning) {
-        jcLog("JCDEBUG2: invokeAboutToSubmitCallback");
+        // TODO: Called four times ?
+        jcLog("JCDEBUG2: invokeAboutToSubmitCallback  (called four times ?  ,  jcDebug below)");
 
         final Optional<CallbackResponse> callbackResponse;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLAboutToSubmitEvent())) {
+            jcLog("JCDEBUG2: invokeAboutToSubmitCallback -> sendSingleRequest  ,  *URL* = "
+                + caseEventDefinition.getCallBackURLAboutToSubmitEvent());
             callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
                 ABOUT_TO_SUBMIT, caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         } else {
+            jcLog("JCDEBUG2: invokeAboutToSubmitCallback -> send  ,  *URL* = "
+                + caseEventDefinition.getCallBackURLAboutToSubmitEvent());
             callbackResponse = callbackService.send(
                 caseEventDefinition.getCallBackURLAboutToSubmitEvent(), ABOUT_TO_SUBMIT,
                 caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         }
 
+        final Map<String, JsonNode> defaultDataClassification =
+            deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails);
+        jcDebug(callbackResponse, defaultDataClassification);
+
         if (callbackResponse.isPresent()) {
+            // TODO: Only called in error scenario ?
             return validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
                 caseDetails,
                 ignoreWarning,
@@ -241,13 +257,52 @@ public class CallbackInvoker {
         return "jcLog: " + rc;
     }
 
+    /**
+     * Logs:- callbackResponse.getDataClassification()  --  obtained from callbackService.sendSingleRequest() OR send()
+     *        defaultDataClassification                 --  obtained from deduceDefaultClassificationForExistingFields()
+     */
+    private void jcDebug(final CallbackResponse callbackResponse,
+                         final Map<String, JsonNode> defaultDataClassification) {
+        JsonNode callbackDataClassificationDebug =
+            JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification());
+        jcLog("JCDEBUG2:      callbackDataClassificationDebug.size = "
+            + (callbackDataClassificationDebug == null ? "NULL" : callbackDataClassificationDebug.size()));
+
+        JsonNode defaultDataClassificationDebug  =
+            JacksonUtils.convertValueJsonNode(defaultDataClassification);
+        jcLog("JCDEBUG2:      defaultDataClassificationDebug.size = "
+            + (defaultDataClassificationDebug == null ? "NULL" : defaultDataClassificationDebug.size()));
+    }
+
+    private void jcDebug(final Optional<CallbackResponse> callbackResponse,
+                         final Map<String, JsonNode> defaultDataClassification) {
+        try {
+            JsonNode callbackDataClassificationDebug =
+                JacksonUtils.convertValueJsonNode(callbackResponse.get().getDataClassification());
+            jcLog("JCDEBUG2:      callbackDataClassificationDebug.size = "
+                + (callbackDataClassificationDebug == null ? "NULL" : callbackDataClassificationDebug.size()));
+        } catch (NoSuchElementException e) {
+            jcLog("JCDEBUG2:      callbackDataClassificationDebug.size = NoSuchElementException");
+        }
+
+        JsonNode defaultDataClassificationDebug  =
+            JacksonUtils.convertValueJsonNode(defaultDataClassification);
+        jcLog("JCDEBUG2:      defaultDataClassificationDebug.size = "
+            + (defaultDataClassificationDebug == null ? "NULL" : defaultDataClassificationDebug.size()));
+    }
+
     private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition
                                                                                       caseTypeDefinition,
                                                                                   final CaseDetails caseDetails,
                                                                                   final Boolean ignoreWarning,
                                                                                   final CallbackResponse
                                                                                       callbackResponse) {
-        jcLog("JCDEBUG2: validateAndSetFromAboutToSubmitCallback");
+        // TODO: Only called in error scenario ?
+        jcLog("JCDEBUG2: validateAndSetFromAboutToSubmitCallback  (Only called in error scenario ?  ,  jcDebug below)");
+
+        final Map<String, JsonNode> defaultDataClassification =
+            deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails);
+        jcDebug(callbackResponse, defaultDataClassification);
 
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
@@ -261,19 +316,6 @@ public class CallbackInvoker {
         if (callbackResponse.getData() != null) {
             validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
-                Map<String, JsonNode> defaultDataClassification =
-                    deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails);
-
-                JsonNode callbackDataClassificationDebug =
-                    JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification());
-                JsonNode defaultDataClassificationDebug  =
-                    JacksonUtils.convertValueJsonNode(defaultDataClassification);
-
-                jcLog("JCDEBUG2: validateAndSetFromAboutToSubmitCallback: callbackDataClassificationDebug.size = "
-                    + (callbackDataClassificationDebug == null ? "NULL" : callbackDataClassificationDebug.size()));
-                jcLog("JCDEBUG2: validateAndSetFromAboutToSubmitCallback: defaultDataClassificationDebug.size = "
-                    + (defaultDataClassificationDebug == null ? "NULL" : defaultDataClassificationDebug.size()));
-
                 securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                     defaultDataClassification
                 );
@@ -282,7 +324,6 @@ public class CallbackInvoker {
         return aboutToSubmitCallbackResponse;
     }
 
-
     private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
         return (callbackResponse.getSecurityClassification() != null
             && callbackResponse.getDataClassification() != null) ? true : false;
@@ -290,6 +331,8 @@ public class CallbackInvoker {
 
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseTypeDefinition caseTypeDefinition,
                                                                                CaseDetails caseDetails) {
+        jcLog("JCDEBUG2: deduceDefaultClassificationForExistingFields -> "
+            + "caseDataService.getDefaultSecurityClassifications");
         Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
             caseTypeDefinition,
             caseDetails.getData(),
