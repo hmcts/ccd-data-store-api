@@ -8,6 +8,9 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -63,11 +66,48 @@ public class CallbackResponse {
         this.warnings = warnings;
     }
 
+    /*
+     * ==== Log message. ====
+     */
+    private String jcLog(final String message) {
+        String rc;
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+            e.printStackTrace();
+        }
+        return "jcLog: " + rc;
+    }
+
+    /*
+     * ==== Get call start as string. ====
+     */
+    private String getCallStackString() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        new Throwable().printStackTrace(printWriter);
+        return stringWriter.toString();
+    }
+
     public Map<String, JsonNode> getDataClassification() {
+        jcLog("JCDEBUG2: CallbackResponse.getDataClassification: CALL STACK = " + getCallStackString());
         return dataClassification;
     }
 
     public void setDataClassification(Map<String, JsonNode> dataClassification) {
+        jcLog("JCDEBUG2: CallbackResponse.getDataClassification: CALL STACK = " + getCallStackString());
         this.dataClassification = dataClassification;
     }
 
