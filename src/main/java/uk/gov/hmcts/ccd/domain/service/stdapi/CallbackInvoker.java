@@ -300,10 +300,6 @@ public class CallbackInvoker {
         // TODO: Only called in error scenario ?
         jcLog("JCDEBUG2: validateAndSetFromAboutToSubmitCallback  (Only called in error scenario ?  ,  jcDebug below)");
 
-        final Map<String, JsonNode> defaultDataClassification =
-            deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails);
-        jcDebug(callbackResponse, defaultDataClassification);
-
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
         validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
@@ -316,6 +312,10 @@ public class CallbackInvoker {
         if (callbackResponse.getData() != null) {
             validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
+                final Map<String, JsonNode> defaultDataClassification =
+                    deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails);
+                jcDebug(callbackResponse, defaultDataClassification);
+
                 securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                     defaultDataClassification
                 );
