@@ -88,7 +88,6 @@ public class CallbackResponse {
             rc = "Response Code: " + connection.getResponseCode();
         } catch (Exception e) {
             rc = "EXCEPTION";
-            e.printStackTrace();
         }
         return "jcLog: " + rc;
     }
