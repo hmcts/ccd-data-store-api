@@ -28,17 +28,6 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
         this.uidService = uidService;
     }
 
-    @Override
-    public Optional<CaseDetails> execute(final String jurisdictionId,
-                                         final String caseTypeId,
-                                         final String caseReference) {
-        if (!uidService.validateUID(caseReference)) {
-            throw new BadRequestException("Case reference is not valid");
-        }
-
-        return Optional.ofNullable(caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
-    }
-
     /*
      * ==== Log message. ====
      */
@@ -62,6 +51,17 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
             e.printStackTrace();
         }
         return "jcLog: " + rc;
+    }
+
+    @Override
+    public Optional<CaseDetails> execute(final String jurisdictionId,
+                                         final String caseTypeId,
+                                         final String caseReference) {
+        if (!uidService.validateUID(caseReference)) {
+            throw new BadRequestException("Case reference is not valid");
+        }
+
+        return Optional.ofNullable(caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
     }
 
     @Override
