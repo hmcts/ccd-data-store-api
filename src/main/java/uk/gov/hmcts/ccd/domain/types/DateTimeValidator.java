@@ -24,7 +24,7 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 public class DateTimeValidator implements BaseTypeValidator {
     static final String TYPE_ID = "DateTime";
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
     public BaseType getType() {
         return BaseType.get(TYPE_ID);
