@@ -9,6 +9,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Optional;
 
 @Service
@@ -36,12 +39,38 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
         return Optional.ofNullable(caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
     }
 
+    /*
+     * ==== Log message. ====
+     */
+    private String jcLog(final String message) {
+        String rc;
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+            e.printStackTrace();
+        }
+        return "jcLog: " + rc;
+    }
+
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
 
+        jcLog("JCDEBUG2: DefaultGetCaseOperation.execute() --> caseDetailsRepository.findByReference()");
         return Optional.ofNullable(caseDetailsRepository.findByReference(Long.valueOf(caseReference)));
     }
 }

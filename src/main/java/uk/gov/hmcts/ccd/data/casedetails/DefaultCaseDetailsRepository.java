@@ -26,6 +26,9 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
@@ -222,9 +225,35 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return qb.getSingleResult().map(this.caseDetailsMapper::entityToModel);
     }
 
+    /*
+     * ==== Log message. ====
+     */
+    private String jcLog(final String message) {
+        String rc;
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+            e.printStackTrace();
+        }
+        return "jcLog: " + rc;
+    }
+
     private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id,
                                                              String reference,
                                                              CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
+        jcLog("JCDEBUG2: DefaultCaseDetailsRepository.getCaseDetailsEntity()  --  IS THIS CALLED IN SCEANARIO ?");
         if (null != reference) {
             qb.whereReference(reference);
         } else {

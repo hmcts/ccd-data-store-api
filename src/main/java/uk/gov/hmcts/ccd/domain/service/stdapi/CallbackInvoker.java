@@ -94,8 +94,25 @@ public class CallbackInvoker {
 
     /**
      * NOTES:-
-     * callbackResponse.getDataClassification()  --  obtained from callbackService.sendSingleRequest() OR send()
-     * defaultDataClassification                 --  obtained from deduceDefaultClassificationForExistingFields()
+     *
+     * Fails in Java method validateAndSetFromAboutToSubmitCallback() because objects below are different sizes :-
+     * 1. callbackResponse.getDataClassification()
+     * 2. defaultDataClassification
+     *
+     * See also Java method jcDebug().
+     *
+     * defaultDataClassification is obtained from Java method deduceDefaultClassificationForExistingFields()
+     * ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+     * Above in turn calls Java method caseDataService.getDefaultSecurityClassifications(caseTypeDefinition,
+     *                                                                                   caseDetails.getData(),
+     *                                                                                   EMPTY_DATA_CLASSIFICATION)
+     *
+     * callbackResponse.getDataClassification() is obtained from callback to Private Law RestrictedCaseAccessController
+     * ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾                                      Java method markAsRestricted11() ??
+     * I believe above in turn calls one of the following :-
+     * QueryEndpoint.java:       @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
+     * CaseDetailsEndpoint.java:     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")
+     * CaseDetailsEndpoint.java:     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")
      */
     public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEventDefinition caseEventDefinition,
                                                                      final CaseDetails caseDetailsBefore,

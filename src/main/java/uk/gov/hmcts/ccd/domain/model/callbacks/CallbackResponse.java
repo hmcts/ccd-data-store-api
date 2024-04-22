@@ -108,7 +108,7 @@ public class CallbackResponse {
     }
 
     public void setDataClassification(Map<String, JsonNode> dataClassification) {
-        jcLog("JCDEBUG2: CallbackResponse.getDataClassification: CALL STACK = " + getCallStackString());
+        jcLog("JCDEBUG2: CallbackResponse.setDataClassification: CALL STACK = " + getCallStackString());
         this.dataClassification = dataClassification;
     }
 

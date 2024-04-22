@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -131,11 +132,18 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId) {
 
+        jcLog("JCDEBUG2: CaseDetailsEndpoint.findCaseDetailsForCaseworker --> getCaseOperation.execute()");
         final Instant start = Instant.now();
         final CaseDetails caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
             .orElseThrow(() -> new CaseNotFoundException(jurisdictionId, caseTypeId, caseId));
         final Duration duration = Duration.between(start, Instant.now());
         appInsights.trackRequest("findCaseDetailsForCaseworker", duration.toMillis(), true);
+        if (caseDetails.getDataClassification() != null) {
+            JsonNode debug = JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification());
+            jcLog("JCDEBUG2: caseDetails.getDataClassification() = " + debug.size());
+        } else {
+            jcLog("JCDEBUG2: caseDetails.getDataClassification() = NULL");
+        }
         return caseDetails;
     }
 
@@ -158,8 +166,16 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId) {
 
-        return getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
+        jcLog("JCDEBUG2: CaseDetailsEndpoint.findCaseDetailsForCitizen --> getCaseOperation.execute()");
+        final CaseDetails caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
             .orElseThrow(() -> new CaseNotFoundException(caseId));
+        if (caseDetails.getDataClassification() != null) {
+            JsonNode debug = JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification());
+            jcLog("JCDEBUG2: caseDetails.getDataClassification() = " + debug.size());
+        } else {
+            jcLog("JCDEBUG2: caseDetails.getDataClassification() = NULL");
+        }
+        return caseDetails;
     }
 
     @GetMapping(

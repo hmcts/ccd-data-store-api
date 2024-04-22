@@ -45,6 +45,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
 
 import javax.inject.Inject;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -228,6 +231,31 @@ public class QueryEndpoint {
         return workbasketInputs;
     }
 
+    /*
+     * ==== Log message. ====
+     */
+    private String jcLog(final String message) {
+        String rc;
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+            e.printStackTrace();
+        }
+        return "jcLog: " + rc;
+    }
+
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch a case for display")
@@ -239,6 +267,7 @@ public class QueryEndpoint {
     public CaseView findCase(@PathVariable("jid") final String jurisdictionId,
                              @PathVariable("ctid") final String caseTypeId,
                              @PathVariable("cid") final String cid) {
+        jcLog("JCDEBUG2: QueryEndpoint.findCase()");
         Instant start = Instant.now();
         CaseView caseView = getCaseViewOperation.execute(cid);
         final Duration between = Duration.between(start, Instant.now());
