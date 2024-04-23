@@ -385,6 +385,9 @@ public class CaseDetailsEndpoint {
         return "jcLog: " + rc;
     }
 
+    /*
+     * THIS IS THE ENTRY POINT , LOOKING AT CALL STACK IN SecurityValidationService.validateObject()
+     */
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
@@ -410,7 +413,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
 
-        jcLog("JCDEBUG2: createCaseEventForCaseWorker");
+        jcLog("JCDEBUG2: ---------- createCaseEventForCaseWorker  [ENTRY POINT] ----------");
 
         return createEventOperation.createCaseEvent(caseId,
                                                     content);

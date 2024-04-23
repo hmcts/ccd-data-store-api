@@ -109,10 +109,17 @@ public class CallbackInvoker {
      * .
      * callbackResponse.getDataClassification() is obtained from callback to Private Law RestrictedCaseAccessController
      * ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾                                      Java method markAsRestricted11() ??
-     * I believe above in turn calls ONE of the following Java classes :-
+     * I believe above in turn calls ONE of the following Java classes ???
      * QueryEndpoint:    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
      * CaseDetailsEndpoint:  @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")
      * CaseDetailsEndpoint:  @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")
+     * .
+     * QUESTION :-
+     * "callbackDataClassificationDebug.size" should be shown AFTER the following three log points :-
+     * @1. "JCDEBUG2: DefaultGetCaseOperation.execute() --> caseDetailsRepository.findByReference(): ...."
+     * @2. "JCDEBUG2: invokeAboutToSubmitCallback -> send  ,  *URL* = ...."
+     * @3. "JCDEBUG2: validateAndSetFromAboutToSubmitCallback
+     *     Do these show the same size ?
      */
     public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEventDefinition caseEventDefinition,
                                                                      final CaseDetails caseDetailsBefore,
@@ -120,7 +127,7 @@ public class CallbackInvoker {
                                                                      final CaseTypeDefinition caseTypeDefinition,
                                                                      final Boolean ignoreWarning) {
         // TODO: Called four times ?
-        jcLog("JCDEBUG2: invokeAboutToSubmitCallback  (called four times ?  ,  jcDebug below)");
+        jcLog("JCDEBUG2: invokeAboutToSubmitCallback  [LEVEL 4]  (called four times ?  ,  SIZES BELOW)");
 
         final Optional<CallbackResponse> callbackResponse;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLAboutToSubmitEvent())) {
@@ -134,11 +141,13 @@ public class CallbackInvoker {
             callbackResponse = callbackService.send(
                 caseEventDefinition.getCallBackURLAboutToSubmitEvent(), ABOUT_TO_SUBMIT,
                 caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
+            // ABOVE CALLS INTO DefaultGetCaseOperation.execute()
         }
 
         final Map<String, JsonNode> defaultDataClassification =
             deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails);
-        jcDebug(callbackResponse, defaultDataClassification);
+        // SHOW SIZES
+        jcDebug("@2", callbackResponse, defaultDataClassification);
 
         if (callbackResponse.isPresent()) {
             // TODO: Only called in error scenario ?
@@ -278,33 +287,33 @@ public class CallbackInvoker {
      * Logs:- callbackResponse.getDataClassification()  --  obtained from callbackService.sendSingleRequest() OR send()
      *        defaultDataClassification                 --  obtained from deduceDefaultClassificationForExistingFields()
      */
-    private void jcDebug(final CallbackResponse callbackResponse,
+    private void jcDebug(final String message, final CallbackResponse callbackResponse,
                          final Map<String, JsonNode> defaultDataClassification) {
         JsonNode callbackDataClassificationDebug =
             JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification());
-        jcLog("JCDEBUG2:      callbackDataClassificationDebug.size = "
+        jcLog("JCDEBUG2:      " + message + " callbackDataClassificationDebug.size = "
             + (callbackDataClassificationDebug == null ? "NULL" : callbackDataClassificationDebug.size()));
 
         JsonNode defaultDataClassificationDebug  =
             JacksonUtils.convertValueJsonNode(defaultDataClassification);
-        jcLog("JCDEBUG2:      defaultDataClassificationDebug.size = "
+        jcLog("JCDEBUG2:      " + message + " defaultDataClassificationDebug.size = "
             + (defaultDataClassificationDebug == null ? "NULL" : defaultDataClassificationDebug.size()));
     }
 
-    private void jcDebug(final Optional<CallbackResponse> callbackResponse,
+    private void jcDebug(final String message, final Optional<CallbackResponse> callbackResponse,
                          final Map<String, JsonNode> defaultDataClassification) {
         try {
             JsonNode callbackDataClassificationDebug =
                 JacksonUtils.convertValueJsonNode(callbackResponse.get().getDataClassification());
-            jcLog("JCDEBUG2:      callbackDataClassificationDebug.size = "
+            jcLog("JCDEBUG2:      " + message + " callbackDataClassificationDebug.size = "
                 + (callbackDataClassificationDebug == null ? "NULL" : callbackDataClassificationDebug.size()));
         } catch (NoSuchElementException e) {
-            jcLog("JCDEBUG2:      callbackDataClassificationDebug.size = NoSuchElementException");
+            jcLog("JCDEBUG2:      " + message + " callbackDataClassificationDebug.size = NoSuchElementException");
         }
 
         JsonNode defaultDataClassificationDebug  =
             JacksonUtils.convertValueJsonNode(defaultDataClassification);
-        jcLog("JCDEBUG2:      defaultDataClassificationDebug.size = "
+        jcLog("JCDEBUG2:      " + message + " defaultDataClassificationDebug.size = "
             + (defaultDataClassificationDebug == null ? "NULL" : defaultDataClassificationDebug.size()));
     }
 
@@ -315,7 +324,7 @@ public class CallbackInvoker {
                                                                                   final CallbackResponse
                                                                                       callbackResponse) {
         // TODO: Only called in error scenario ?
-        jcLog("JCDEBUG2: validateAndSetFromAboutToSubmitCallback  (Only called in error scenario ?  ,  jcDebug below)");
+        jcLog("JCDEBUG2: validateAndSetFromAboutToSubmitCallback  (Only called in error scenario ?  ,  SIZES BELOW)");
 
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
@@ -331,7 +340,8 @@ public class CallbackInvoker {
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
                 final Map<String, JsonNode> defaultDataClassification =
                     deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails);
-                jcDebug(callbackResponse, defaultDataClassification);
+                // SHOW SIZES
+                jcDebug("@3", callbackResponse, defaultDataClassification);
 
                 securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                     defaultDataClassification

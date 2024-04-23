@@ -74,7 +74,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     @Override
     public CaseDetails createCaseEvent(final String caseReference,
                                        final CaseDataContent content) {
-        jcLog("JCDEBUG2: createCaseEvent:77");
+        jcLog("JCDEBUG2: createCaseEvent:77  [LEVEL 2]");
 
         eventValidator.validate(content.getEvent());
 

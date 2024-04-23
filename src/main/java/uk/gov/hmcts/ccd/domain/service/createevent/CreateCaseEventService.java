@@ -183,7 +183,7 @@ public class CreateCaseEventService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CreateCaseEventResult createCaseEvent(final String caseReference, final CaseDataContent content) {
 
-        jcLog("JCDEBUG2: createCaseEvent:186");
+        jcLog("JCDEBUG2: createCaseEvent:186  [LEVEL 3]");
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
@@ -221,6 +221,7 @@ public class CreateCaseEventService {
 
         final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
 
+        // Call from [LEVEL 3] to [LEVEL 4]
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
             caseEventDefinition,
             caseDetailsInDatabase,
