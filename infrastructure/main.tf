@@ -149,6 +149,14 @@ module "postgresql_v15" {
     {
       name  = "azure.extensions"
       value = "plpgsql,pg_stat_statements,pg_buffercache,hypopg"
+    },
+    {
+      name  = "logfiles.download_enable"
+      value = "ON"
+    },
+    {
+      name  = "logfiles.retention_days"
+      value = "7"
     }
   ]
   pgsql_version    = "15"
