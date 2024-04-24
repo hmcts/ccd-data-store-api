@@ -2,10 +2,10 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  devmemoryRequests: 2048Mi
-  devcpuRequests: 2000m
-  devmemoryLimits: 4096Mi
-  devcpuLimits: 4000m
+  devmemoryRequests: 4096Mi
+  devcpuRequests: 4000m
+  devmemoryLimits: 8192Mi
+  devcpuLimits: 8000m
   keyVaults:
     ccd:
       secrets:
