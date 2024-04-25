@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -32,6 +33,7 @@ import static java.lang.String.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -56,6 +58,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final Set<String> USER_ROLES = newHashSet(ROLE_IN_USER_ROLES, ROLE_IN_USER_ROLES_2);
 
     private static final Set<AccessProfile> ACCESS_PROFILES = createAccessProfiles(USER_ROLES);
+    private static final List<AccessControlList> ACCESS_CONTROL_LISTS = createAccessControlList(USER_ROLES);
     private static final String ROLE_NOT_IN_USER_ROLES = "caseworker-family-law";
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
     private static final CaseEventDefinition CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
@@ -67,29 +70,15 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final CaseViewEvent CASE_VIEW_EVENT = aCaseViewEvent().withId(EVENT_ID_STRING).build();
     private final List<String> caseRoles = Collections.emptyList();
 
-    private static final CaseViewField FIELD_1 = aViewField().withId("FIELD_1").build();
-    private static final CaseViewField FIELD_2 = aViewField().withId("FIELD_2").build();
-    private static final CaseViewField FIELD_3 = aViewField().withId("FIELD_3").build();
+    private static CaseViewField FIELD_1;
+    private static CaseViewField FIELD_2;
+    private static CaseViewField FIELD_3;
 
-    private static final CaseViewTab CASE_VIEW_TAB_WITH_ROLE_ALLOWED = newCaseViewTab().withId("cvt3")
-        .addCaseViewField(FIELD_1)
-        .withRole(ROLE_IN_USER_ROLES_2)
-        .build();
-    private static final CaseViewTab CASE_VIEW_TAB_WITH_ROLE_ALLOWED2 = newCaseViewTab().withId("cvt3")
-        .addCaseViewField(FIELD_2)
-        .withRole(ROLE_IN_USER_ROLES_2)
-        .build();
-    private static final CaseViewTab CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED = newCaseViewTab().withId("cvt4")
-        .addCaseViewField(FIELD_3)
-        .withRole(ROLE_NOT_IN_USER_ROLES)
-        .build();
+    private static CaseViewTab CASE_VIEW_TAB_WITH_ROLE_ALLOWED;
+    private static CaseViewTab CASE_VIEW_TAB_WITH_ROLE_ALLOWED2;
+    private static CaseViewTab CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED;
 
-    private static final CaseHistoryView TEST_CASE_HISTORY_VIEW = aCaseHistoryView()
-        .addCaseHistoryViewTab(CASE_VIEW_TAB_WITH_ROLE_ALLOWED)
-        .addCaseHistoryViewTab(CASE_VIEW_TAB_WITH_ROLE_ALLOWED2)
-        .addCaseHistoryViewTab(CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED)
-        .withEvent(CASE_VIEW_EVENT)
-        .build();
+    private static CaseHistoryView TEST_CASE_HISTORY_VIEW;
 
     @Mock
     private uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseHistoryViewOperation getCaseHistoryViewOperation;
@@ -110,8 +99,41 @@ class AuthorisedGetCaseHistoryViewOperationTest {
             authorisedGetCaseHistoryViewOperation;
 
     @BeforeEach
+    void resetStaticFields() {
+        FIELD_1 = aViewField().withId("FIELD_1").build();
+        FIELD_2 = aViewField().withId("FIELD_2").build();
+        FIELD_3 = aViewField().withId("FIELD_3").build();
+
+        CASE_VIEW_TAB_WITH_ROLE_ALLOWED = newCaseViewTab().withId("cvt3")
+            .addCaseViewField(FIELD_1)
+            .withRole(ROLE_IN_USER_ROLES_2)
+            .build();
+
+        CASE_VIEW_TAB_WITH_ROLE_ALLOWED2 = newCaseViewTab().withId("cvt3")
+            .addCaseViewField(FIELD_2)
+            .withRole(ROLE_IN_USER_ROLES_2)
+            .build();
+
+        CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED = newCaseViewTab().withId("cvt4")
+            .addCaseViewField(FIELD_3)
+            .withRole(ROLE_NOT_IN_USER_ROLES)
+            .build();
+
+        TEST_CASE_HISTORY_VIEW = aCaseHistoryView()
+            .addCaseHistoryViewTab(CASE_VIEW_TAB_WITH_ROLE_ALLOWED)
+            .addCaseHistoryViewTab(CASE_VIEW_TAB_WITH_ROLE_ALLOWED2)
+            .addCaseHistoryViewTab(CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED)
+            .withEvent(CASE_VIEW_EVENT)
+            .build();
+    }
+
+    @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+
+        FIELD_1.setAccessControlLists(ACCESS_CONTROL_LISTS);
+        FIELD_2.setAccessControlLists(ACCESS_CONTROL_LISTS);
+        FIELD_3.setAccessControlLists(ACCESS_CONTROL_LISTS);
 
         doReturn(TEST_CASE_TYPE).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(ACCESS_PROFILES).when(caseDataAccessControl)
@@ -136,6 +158,16 @@ class AuthorisedGetCaseHistoryViewOperationTest {
             .collect(Collectors.toSet());
     }
 
+    private static List<AccessControlList> createAccessControlList(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> {
+                AccessControlList controlList = new AccessControlList();
+                controlList.setAccessProfile(userRole);
+                controlList.setRead(true);
+                return controlList;
+            })
+            .toList();
+    }
 
     @Test
     @DisplayName("should return case history view")
@@ -155,10 +187,31 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     }
 
     @Test
-    @DisplayName("should remove tabs based on Tab Role)")
+    @DisplayName("should remove all tabs based on Tab Role)")
+    void shouldRemoveAllTabsNotAllowedForUser() {
+        doReturn(true).when(accessControlService)
+            .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES, CAN_READ);
+
+        final CaseHistoryView actualCaseView = authorisedGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
+
+        assertAll(
+            () -> verify(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID),
+            () -> assertThat(actualCaseView.getTabs().length, is(0))
+        );
+    }
+
+    @Test
+    @DisplayName("should remove not allowed tab based on Tab Role)")
     void shouldRemoveTabsNotAllowedForUser() {
         doReturn(true).when(accessControlService)
             .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES, CAN_READ);
+
+        doReturn(true).when(accessControlService)
+            .canAccessCaseViewFieldWithCriteria(FIELD_1, ACCESS_PROFILES, CAN_READ);
+        doReturn(true).when(accessControlService)
+            .canAccessCaseViewFieldWithCriteria(FIELD_2, ACCESS_PROFILES, CAN_READ);
+        doReturn(true).when(accessControlService)
+            .canAccessCaseViewFieldWithCriteria(FIELD_3, ACCESS_PROFILES, CAN_READ);
 
         final CaseHistoryView actualCaseView = authorisedGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
 
@@ -167,6 +220,28 @@ class AuthorisedGetCaseHistoryViewOperationTest {
             () -> assertThat(actualCaseView.getTabs().length, is(2)),
             () -> assertNotEquals(actualCaseView.getTabs()[0], CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED),
             () -> assertNotEquals(actualCaseView.getTabs()[1], CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED)
+        );
+    }
+
+    @Test
+    @DisplayName("should remove allowed tab based on not allowed fields)")
+    void shouldRemoveTabsNotAllowedFields() {
+        doReturn(true).when(accessControlService)
+            .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES, CAN_READ);
+
+        doReturn(true).when(accessControlService)
+            .canAccessCaseViewFieldWithCriteria(FIELD_1, ACCESS_PROFILES, CAN_READ);
+        doReturn(false).when(accessControlService)
+            .canAccessCaseViewFieldWithCriteria(FIELD_2, ACCESS_PROFILES, CAN_READ);
+        doReturn(true).when(accessControlService)
+            .canAccessCaseViewFieldWithCriteria(FIELD_3, ACCESS_PROFILES, CAN_READ);
+
+        final CaseHistoryView actualCaseView = authorisedGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
+
+        assertAll(
+            () -> verify(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID),
+            () -> assertThat(actualCaseView.getTabs().length, is(1)),
+            () -> assertEquals(actualCaseView.getTabs()[0], CASE_VIEW_TAB_WITH_ROLE_ALLOWED)
         );
     }
 
