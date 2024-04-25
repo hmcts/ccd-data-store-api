@@ -129,3 +129,66 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     Then      a positive response is received
     And       the response has all other details as expected
     And       the response [contains updated values for case_data and data_classification]
+
+   #=======================================
+   # Submit Event Creation: v2_external#/case-controller/createCaseUsingPOST
+   #=======================================
+
+  @S-1023.11 #AC-11
+  Scenario: Invoke v2_external#/case-controller/createCaseUsingPOST and caseAccessGroupId created
+    Given     a user with [an active profile in CCD]
+    When      a request is prepared with appropriate values
+    And       the request [contains correctly configured values]
+    And       the request [contains some OrganisationPolicy fields with all correct values]
+    And       the request [is of caseType where case_data has caseAccessGroupType of CCD:all-cases-access]
+    And       it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
+    Then      a positive response is received
+    And       the response has all other details as expected
+    And       the response [contains updated values for data and data_classification]
+
+  @S-1023.12 #AC-12
+  Scenario: Invoke v2_external#/case-controller/createCaseUsingPOST and caseAccessGroupId not created when caseGroupType != CCD:all-cases-access
+    Given     a user with [an active profile in CCD]
+    When      a request is prepared with appropriate values
+    And       the request [contains correctly configured values]
+    And       the request [contains some OrganisationPolicy fields with all correct values]
+    And       the request [is of caseType where caseAccessGroupType is not CCD:all-cases-access]
+    And       it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
+    Then      a positive response is received
+    And       the response has all other details as expected
+    And       the response [contains updated values for data and data_classification]
+
+  @S-1023.13 #AC-13
+  Scenario: CaseAccessGroups field contains Invalid caseAccessGroupType value and Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST
+    Given     a user with [an active profile in CCD]
+    When      a request is prepared with appropriate values
+    And       the request [contains correctly configured values]
+    And       the request [contains some OrganisationPolicy fields with all correct values]
+    And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access],
+    And       the request [caseData Organisation.OrganisationID value is empty value],
+    And       it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
+    Then      a positive response is received
+    And       the response has all other details as expected
+    And       the response [contains updated values for data and data_classification]
+
+  @S-1023.14 #AC-14
+  Scenario: CaseAccessGroups field contains valid caseAccessGroupType value but case data invalid and Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST
+    Given     a user with [an active profile in CCD]
+    When      a request is prepared with appropriate values
+    And       the request [contains correctly configured values]
+    And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access and -OrganisationPolicyField- CaseAssignedRoleField  field exists in caseData and case data has Organisation.OrganisationID value not set to empty value but accessType does not have GroupRoleName]
+    And       it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
+    Then      a positive response is received
+    And       the response has all other details as expected
+    And       the response [contains updated values for data and data_classification]
+
+  @S-1023.15 #Testing Blank value
+  Scenario: Invoke v2_external#/case-controller/createCaseUsingPOST and caseAccessGroups field contains blank value
+    Given     a user with [an active profile in CCD]
+    When      a request is prepared with appropriate values
+    And       the request [contains some OrganisationPolicy fields with all correct values]
+    And       it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
+    Then      a positive response is received
+    And       the response has all other details as expected
+    And       the response [contains updated values for data and data_classification]
+
