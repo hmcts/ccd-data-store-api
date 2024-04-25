@@ -109,10 +109,7 @@ public class CallbackInvoker {
      * .
      * callbackResponse.getDataClassification() is obtained from callback to Private Law RestrictedCaseAccessController
      * ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾                                      Java method markAsRestricted11() ??
-     * I believe above in turn calls ONE of the following Java classes ???
-     * QueryEndpoint:    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
-     * CaseDetailsEndpoint:  @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")
-     * CaseDetailsEndpoint:  @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")
+     * After above callback , there is a call to Java method DefaultGetCaseOperation.execute()
      * .
      * QUESTION :-
      * "callbackDataClassificationDebug.size" should be shown AFTER the following three log points :-

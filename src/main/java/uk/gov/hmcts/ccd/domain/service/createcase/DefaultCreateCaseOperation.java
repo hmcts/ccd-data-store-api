@@ -152,6 +152,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition,
             globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseDataContent.getData())));
 
+        // NEW DATA CLASSIFICATION CREATED WHEN NEW CASE CREATED.
         newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(
             caseTypeDefinition,
             newCaseDetails.getData(),

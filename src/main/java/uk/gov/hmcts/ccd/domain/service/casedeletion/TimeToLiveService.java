@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -15,10 +16,16 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -53,10 +60,57 @@ public class TimeToLiveService {
             .stream().anyMatch(caseFieldDefinition -> TTL_CASE_FIELD_ID.equals(caseFieldDefinition.getId()));
     }
 
+    /*
+     * ==== Log message. ====
+     */
+    private String jcLog(final String message) {
+        String rc;
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+        }
+        return "jcLog: " + rc;
+    }
+
+    /*
+     * ==== Get call start as string. ====
+     */
+    private String getCallStackString() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        new Throwable().printStackTrace(printWriter);
+        return stringWriter.toString();
+    }
+
+    private void jcDebug(String message, Map<String, JsonNode> outputDataClassification) {
+        try {
+            JsonNode outputDataClassificationDebug =
+                JacksonUtils.convertValueJsonNode(outputDataClassification);
+            jcLog("JCDEBUG2:      " + message + " outputDataClassificationDebug.size = "
+                + (outputDataClassificationDebug == null ? "NULL" : outputDataClassificationDebug.size()));
+        } catch (NoSuchElementException e) {
+            jcLog("JCDEBUG2:      " + message + " outputDataClassificationDebug.size = NoSuchElementException");
+        }
+    }
+
+    // May be called ?
     public Map<String, JsonNode> updateCaseDataClassificationWithTTL(Map<String, JsonNode> data,
                                                                      Map<String, JsonNode> dataClassification,
                                                                      CaseEventDefinition caseEventDefinition,
                                                                      CaseTypeDefinition caseTypeDefinition) {
+        jcLog("JCDEBUG2: TimeToLiveService.updateCaseDataClassificationWithTTL: CALL STACK = " + getCallStackString());
         Map<String, JsonNode> outputDataClassification = dataClassification;
         Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
 
@@ -74,7 +128,7 @@ public class TimeToLiveService {
             outputDataClassification = cloneOrNewJsonMap(dataClassification);
             outputDataClassification.put(TTL_CASE_FIELD_ID, justTtlDataClassification.get(TTL_CASE_FIELD_ID));
         }
-
+        jcDebug("TimeToLiveService.updateCaseDataClassificationWithTTL", outputDataClassification);
         return outputDataClassification;
     }
 

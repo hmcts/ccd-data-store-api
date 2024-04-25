@@ -1,9 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
@@ -31,16 +37,65 @@ public class CaseDataService {
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
 
+    /*
+     * ==== Log message. ====
+     */
+    private String jcLog(final String message) {
+        String rc;
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+        }
+        return "jcLog: " + rc;
+    }
+
+    /*
+     * ==== Get call start as string. ====
+     */
+    private String getCallStackString() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        new Throwable().printStackTrace(printWriter);
+        return stringWriter.toString();
+    }
+
+    private void jcDebug(String message, Map<String, JsonNode> outputDataClassification) {
+        try {
+            JsonNode outputDataClassificationDebug =
+                JacksonUtils.convertValueJsonNode(outputDataClassification);
+            jcLog("JCDEBUG2:      " + message + " outputDataClassificationDebug.size = "
+                + (outputDataClassificationDebug == null ? "NULL" : outputDataClassificationDebug.size()));
+        } catch (NoSuchElementException e) {
+            jcLog("JCDEBUG2:      " + message + " outputDataClassificationDebug.size = NoSuchElementException");
+        }
+    }
+
+    // Suspect called multiple times ?
     public Map<String, JsonNode> getDefaultSecurityClassifications(final CaseTypeDefinition caseType,
                                                                    final Map<String, JsonNode> caseData,
                                                                    final Map<String, JsonNode>
                                                                        currentDataClassification) {
+        jcLog("JCDEBUG2: CaseDataService.getDefaultSecurityClassifications: CALL STACK = " + getCallStackString());
         final JsonNode clonedDataClassification = cloneAndConvertDataMap(caseData);
         deduceDefaultClassifications(
             clonedDataClassification,
             JacksonUtils.convertValueJsonNode(currentDataClassification), caseType.getCaseFieldDefinitions(),
             EMPTY_STRING);
-        return JacksonUtils.convertValue(clonedDataClassification);
+        Map<String, JsonNode> outputDataClassification = JacksonUtils.convertValue(clonedDataClassification);
+        jcDebug("CaseDataService.getDefaultSecurityClassifications", outputDataClassification);
+        return outputDataClassification;
     }
 
     private void deduceDefaultClassifications(final JsonNode dataNode,
