@@ -11,6 +11,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +29,20 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
         this.roleAttributeMatchers = roleAttributeMatchers;
     }
 
+    /*
+     * ==== Get call start as string. ====
+     */
+    private String getCallStackString() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        new Throwable().printStackTrace(printWriter);
+        return stringWriter.toString().replaceAll("[\n\r]", "_");
+    }
+
     @Override
     public FilteredRoleAssignments filter(RoleAssignments roleAssignments,
                                           CaseDetails caseDetails) {
+        log.debug("JCDEBUG: RoleAssignmentsFilteringServiceImpl.filter: CALL STACK = " + getCallStackString());
         log.debug("Filter role assignments for case {}", caseDetails.getReference());
 
         return filterMatchingRoleAssignments(roleAssignments,

@@ -19,6 +19,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -139,8 +141,21 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         }
     }
 
+    /*
+     * ==== Get call start as string. ====
+     */
+    private String getCallStackString() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        new Throwable().printStackTrace(printWriter);
+        return stringWriter.toString().replaceAll("[\n\r]", "_");
+    }
+
     private RoleAssignmentResponse getRoleAssignmentResponse(String userId, HttpEntity<Object> requestEntity)
         throws URISyntaxException {
+
+        log.debug("JCDEBUG: DefaultRoleAssignmentRepository.getRoleAssignmentResponse: CALL STACK = "
+            + getCallStackString());
 
         ResponseEntity<RoleAssignmentResponse> exchange = exchangeGet(userId, requestEntity);
         log.debug("GET RoleAssignments for user={} returned response status={}", userId, exchange.getStatusCode());
