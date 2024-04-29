@@ -180,8 +180,10 @@ public class CallbackService {
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
-                .filter(context -> StringUtils.hasLength(context) && null != request.getHeader(context))
-                .forEach(context -> httpHeaders.add(context, request.getHeader(context)));
+                .filter(context -> StringUtils.hasLength(context)
+                    && (null != request.getAttribute(context) || null != request.getHeader(context)))
+                .forEach(context -> httpHeaders.add(context, null != request.getAttribute(context)
+                    ? (String) request.getAttribute(context) : request.getHeader(context)));
         }
     }
 
