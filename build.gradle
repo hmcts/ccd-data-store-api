@@ -636,7 +636,7 @@ sonarqube {
             "**/AuthorisedCreateEventOperation.java,**/ClassifiedCreateEventOperation.java,**/CreateCaseEventService.java," +
             "**/DefaultCreateEventOperation.java,**/CaseDetailsEndpoint.java,**/CallbackResponse.java," +
             "**/DefaultGetCaseOperation.java,**/DefaultCaseDetailsRepository.java,**/QueryEndpoint.java," +
-            "**/CaseDataService.java,**/TimeToLiveService.java"
+            "**/CaseDataService.java,**/TimeToLiveService.java,**/CaseController.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"

@@ -121,4 +121,8 @@ public class CaseResource extends RepresentationModel<RepresentationModel<?>> {
         this.deleteDraftResponseStatusCode = caseDetails.getDeleteDraftResponseStatusCode();
         this.deleteDraftResponseStatus = caseDetails.getDeleteDraftResponseStatus();
     }
+
+    public Map<String, JsonNode> getDataClassification() {
+        return dataClassification;
+    }
 }

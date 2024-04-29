@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -49,8 +51,15 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 import uk.gov.hmcts.ccd.validator.annotation.ValidCaseTypeId;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.ResponseEntity.status;
@@ -97,6 +106,51 @@ public class CaseController {
         this.getLinkedCasesResponseCreator = getLinkedCasesResponseCreator;
     }
 
+    /*
+     * ==== Log message. ====
+     */
+    private String jcLog(final String message) {
+        String rc;
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+        }
+        return "jcLog: " + rc;
+    }
+
+    /*
+     * ==== Get call start as string. ====
+     */
+    private String getCallStackString() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        new Throwable().printStackTrace(printWriter);
+        return stringWriter.toString();
+    }
+
+    private void jcDebug(String message, Map<String, JsonNode> outputDataClassification) {
+        try {
+            JsonNode outputDataClassificationDebug =
+                JacksonUtils.convertValueJsonNode(outputDataClassification);
+            jcLog("JCDEBUG2:      " + message + " outputDataClassificationDebug.size = "
+                + (outputDataClassificationDebug == null ? "NULL" : outputDataClassificationDebug.size()));
+        } catch (NoSuchElementException e) {
+            jcLog("JCDEBUG2:      " + message + " outputDataClassificationDebug.size = NoSuchElementException");
+        }
+    }
+
     @GetMapping(
         path = "/cases/{caseId}",
         headers = {
@@ -128,14 +182,19 @@ public class CaseController {
     @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
+        jcLog("JCDEBUG2: CaseController.getCase: CALL STACK = " + getCallStackString());
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
 
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
             .orElseThrow(() -> new CaseNotFoundException(caseId));
+        final CaseResource caseResource = new CaseResource(caseDetails);
 
-        return ResponseEntity.ok(new CaseResource(caseDetails));
+        jcDebug("CaseController.getCase: caseDetails", caseDetails.getDataClassification());
+        jcDebug("CaseController.getCase: caseResource", caseResource.getDataClassification());
+
+        return ResponseEntity.ok(caseResource);
     }
 
     @ResponseStatus(code = HttpStatus.CREATED)
