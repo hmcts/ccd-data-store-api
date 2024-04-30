@@ -271,6 +271,7 @@ class CallbackServiceTest {
         assertEquals(customHeaderValues.get(1), httpHeaders.get(customHeaders.get(1)).get(0));
         assertFalse(httpHeaders.containsKey(customHeaders.get(2)));
     }
+
     private void initSecurityContext() {
         doReturn(principal).when(authentication).getPrincipal();
         doReturn(authentication).when(securityContext).getAuthentication();

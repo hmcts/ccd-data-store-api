@@ -140,7 +140,7 @@ public class CallbackService {
             httpHeaders.add("Content-Type", "application/json");
             addPassThroughHeaders(httpHeaders);
             if (null != securityHeaders) {
-                securityHeaders.forEach((key, values) -> httpHeaders.put(key, values));
+                securityHeaders.forEach(httpHeaders::put);
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
             if (logCallbackDetails(url)) {
@@ -150,6 +150,7 @@ public class CallbackService {
             if (logCallbackDetails(url)) {
                 LOG.info("Callback {} response received: {}", url, responseEntity);
             }
+            storePassThroughHeaders(responseEntity.getHeaders(), request);
             httpStatus = responseEntity.getStatusCodeValue();
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
@@ -187,8 +188,20 @@ public class CallbackService {
         }
     }
 
+    protected void storePassThroughHeaders(final HttpHeaders httpHeaders, HttpServletRequest request) {
+        if (null != request && null != applicationParams
+            && null != applicationParams.getCallbackPassthruHeaderContexts()) {
+            applicationParams.getCallbackPassthruHeaderContexts().stream()
+                .filter(context -> StringUtils.hasLength(context) && null != httpHeaders.get(context))
+                .forEach(context -> {
+                    LOG.debug("Setting request attribute: <{}> to value: <{}>", context, httpHeaders.get(context));
+                    request.setAttribute(context, httpHeaders.get(context));
+                });
+        }
+    }
+
     private boolean logCallbackDetails(final String url) {
-        return (applicationParams.getCcdCallbackLogControl().size() > 0
+        return (!applicationParams.getCcdCallbackLogControl().isEmpty()
             && (WILDCARD.equals(applicationParams.getCcdCallbackLogControl().get(0))
             || applicationParams.getCcdCallbackLogControl().stream()
             .filter(Objects::nonNull).filter(Predicate.not(String::isEmpty)).anyMatch(url::contains)));
