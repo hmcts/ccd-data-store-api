@@ -199,6 +199,8 @@ public class CaseController {
             .orElseThrow(() -> new CaseNotFoundException(caseId));
         final CaseResource caseResource = new CaseResource(caseDetails);
 
+        jcLog("CaseController.getCase: getCaseOperation.getClass().getName()"
+            + this.getCaseOperation.getClass().getName());
         jcDebug("CaseController.getCase: caseDetails", caseDetails.getDataClassification());
         jcDebug("CaseController.getCase: caseResource", caseResource.getDataClassification());
 

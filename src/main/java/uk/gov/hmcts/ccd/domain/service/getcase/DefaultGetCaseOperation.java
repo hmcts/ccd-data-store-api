@@ -12,6 +12,8 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.NoSuchElementException;
@@ -68,6 +70,16 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
     }
 
     /*
+     * ==== Get call start as string. ====
+     */
+    private String getCallStackString() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        new Throwable().printStackTrace(printWriter);
+        return stringWriter.toString();
+    }
+
+    /*
      * CaseController.getCase underlying call stack :-
      * CreatorGetCaseOperation
      * RestrictedGetCaseOperation
@@ -79,6 +91,7 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
     public Optional<CaseDetails> execute(final String jurisdictionId,
                                          final String caseTypeId,
                                          final String caseReference) {
+        jcLog("JCDEBUG2: DefaultGetCaseOperation.execute: CALL STACK = " + getCallStackString());
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
@@ -87,7 +100,6 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
             + jurisdictionId + " , " + caseTypeId + " , " + caseReference);
         Optional<CaseDetails> caseDetails =
             Optional.ofNullable(caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
-        // AT THIS POINT , DATA CLASSIFICATION IS SAME LENGTH AS "DEFAULT DATA CLASSIFICATION"
         jcDebug("@1 DefaultGetCaseOperation.execute()", caseDetails);
         return caseDetails;
     }
@@ -97,6 +109,7 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
      */
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
+        jcLog("JCDEBUG2: DefaultGetCaseOperation.execute: CALL STACK = " + getCallStackString());
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
@@ -105,7 +118,8 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
             + caseReference);
         Optional<CaseDetails> caseDetails =
             Optional.ofNullable(caseDetailsRepository.findByReference(Long.valueOf(caseReference)));
-        jcDebug("@1", caseDetails);
+        // AT THIS POINT , DATA CLASSIFICATION IS SAME LENGTH AS "DEFAULT DATA CLASSIFICATION"
+        jcDebug("@1 DefaultGetCaseOperation.execute()", caseDetails);
         return caseDetails;
     }
 }
