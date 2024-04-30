@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -12,6 +13,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
@@ -34,7 +41,52 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
         this.getCaseOperation = getCaseOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
-        this.caseDataAccessControl =  caseDataAccessControl;
+        this.caseDataAccessControl = caseDataAccessControl;
+    }
+
+    /*
+     * ==== Log message. ====
+     */
+    private String jcLog(final String message) {
+        String rc;
+        try {
+            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+        }
+        return "jcLog: " + rc;
+    }
+
+    /*
+     * ==== Get call start as string. ====
+     */
+    private String getCallStackString() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        new Throwable().printStackTrace(printWriter);
+        return stringWriter.toString();
+    }
+
+    private void jcDebug(String message, final Optional<CaseDetails> caseDetails) {
+        try {
+            JsonNode callbackDataClassificationDebug =
+                JacksonUtils.convertValueJsonNode(caseDetails.get().getDataClassification());
+            jcLog("JCDEBUG2:      " + message + " callbackDataClassificationDebug.size = "
+                + (callbackDataClassificationDebug == null ? "NULL" : callbackDataClassificationDebug.size()));
+        } catch (NoSuchElementException e) {
+            jcLog("JCDEBUG2:      " + message + " callbackDataClassificationDebug.size = NoSuchElementException");
+        }
     }
 
     @Override
@@ -43,13 +95,24 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
         return this.execute(caseReference);
     }
 
+    /*
+     * CaseController.getCase underlying call stack :-
+     * CreatorGetCaseOperation
+     * RestrictedGetCaseOperation
+     * AuthorisedGetCaseOperation  (and possibly DefaultGetCaseOperation)
+     * ClassifiedGetCaseOperation
+     * DefaultGetCaseOperation
+     */
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
-        return getCaseOperation.execute(caseReference)
-            .flatMap(caseDetails ->
-                verifyReadAccess(getCaseType(caseDetails.getCaseTypeId()),
-                    getAccessProfiles(caseReference),
-                    caseDetails));
+        Optional<CaseDetails> caseDetails1 = this.getCaseOperation.execute(caseReference);
+        jcDebug("AuthorisedGetCaseOperation.execute caseDetails1", caseDetails1);
+        Optional<CaseDetails> caseDetails2 = caseDetails1.flatMap(caseDetails ->
+            verifyReadAccess(getCaseType(caseDetails.getCaseTypeId()),
+                getAccessProfiles(caseReference),
+                caseDetails));
+        jcDebug("AuthorisedGetCaseOperation.execute caseDetails2", caseDetails2);
+        return caseDetails2;
     }
 
     private CaseTypeDefinition getCaseType(String caseTypeId) {

@@ -187,6 +187,14 @@ public class CaseController {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
 
+        /*
+         * CaseController.getCase underlying call stack :-
+         * CreatorGetCaseOperation
+         * RestrictedGetCaseOperation
+         * AuthorisedGetCaseOperation  (and possibly DefaultGetCaseOperation)
+         * ClassifiedGetCaseOperation
+         * DefaultGetCaseOperation
+         */
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
             .orElseThrow(() -> new CaseNotFoundException(caseId));
         final CaseResource caseResource = new CaseResource(caseDetails);

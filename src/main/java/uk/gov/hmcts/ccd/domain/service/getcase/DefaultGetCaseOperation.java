@@ -67,6 +67,14 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
         }
     }
 
+    /*
+     * CaseController.getCase underlying call stack :-
+     * CreatorGetCaseOperation
+     * RestrictedGetCaseOperation
+     * AuthorisedGetCaseOperation  (and possibly DefaultGetCaseOperation)
+     * ClassifiedGetCaseOperation
+     * DefaultGetCaseOperation
+     */
     @Override
     public Optional<CaseDetails> execute(final String jurisdictionId,
                                          final String caseTypeId,
@@ -79,7 +87,8 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
             + jurisdictionId + " , " + caseTypeId + " , " + caseReference);
         Optional<CaseDetails> caseDetails =
             Optional.ofNullable(caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
-        jcDebug("@1", caseDetails);
+        // AT THIS POINT , DATA CLASSIFICATION IS SAME LENGTH AS "DEFAULT DATA CLASSIFICATION"
+        jcDebug("@1 DefaultGetCaseOperation.execute()", caseDetails);
         return caseDetails;
     }
 
