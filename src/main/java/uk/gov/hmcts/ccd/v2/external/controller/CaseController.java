@@ -201,8 +201,8 @@ public class CaseController {
 
         jcLog("CaseController.getCase: getCaseOperation.getClass().getName()"
             + this.getCaseOperation.getClass().getName());
-        jcDebug("CaseController.getCase: caseDetails", caseDetails.getDataClassification());
-        jcDebug("CaseController.getCase: caseResource", caseResource.getDataClassification());
+        jcDebug("CaseController.getCase: caseDetails", caseDetails.getDataClassification());  //size = 287
+        jcDebug("CaseController.getCase: caseResource", caseResource.getDataClassification());  //size = 287
 
         return ResponseEntity.ok(caseResource);
     }

@@ -98,9 +98,9 @@ public class CreatorGetCaseOperation implements GetCaseOperation {
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
         Optional<CaseDetails> caseDetails1 = this.getCaseOperation.execute(caseReference);
-        jcDebug("CreatorGetCaseOperation.execute caseDetails1", caseDetails1);
+        jcDebug("CreatorGetCaseOperation.execute caseDetails1", caseDetails1);  // size = 287 (and 279)
         Optional<CaseDetails> caseDetails2 = caseDetails1.flatMap(this::checkVisibility);
-        jcDebug("CreatorGetCaseOperation.execute caseDetails2", caseDetails2);
+        jcDebug("CreatorGetCaseOperation.execute caseDetails2", caseDetails2);  // size = 287 (and 279)
         return caseDetails2;
     }
 

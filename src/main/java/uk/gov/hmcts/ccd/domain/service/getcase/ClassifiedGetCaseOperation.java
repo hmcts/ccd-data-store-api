@@ -91,9 +91,9 @@ public class ClassifiedGetCaseOperation implements GetCaseOperation {
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
         Optional<CaseDetails> caseDetails1 = this.getCaseOperation.execute(caseReference);
-        jcDebug("ClassifiedGetCaseOperation.execute caseDetails1", caseDetails1);
+        jcDebug("ClassifiedGetCaseOperation.execute caseDetails1", caseDetails1);  // size = 288
         Optional<CaseDetails> caseDetails2 = caseDetails1.flatMap(classificationService::applyClassification);
-        jcDebug("ClassifiedGetCaseOperation.execute caseDetails2", caseDetails2);
+        jcDebug("ClassifiedGetCaseOperation.execute caseDetails2", caseDetails2);  // size = 288
         return caseDetails2;
     }
 }

@@ -18,6 +18,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -106,12 +107,12 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
         Optional<CaseDetails> caseDetails1 = this.getCaseOperation.execute(caseReference);
-        jcDebug("AuthorisedGetCaseOperation.execute caseDetails1", caseDetails1);
+        jcDebug("AuthorisedGetCaseOperation.execute caseDetails1", caseDetails1);  // size = 288
         Optional<CaseDetails> caseDetails2 = caseDetails1.flatMap(caseDetails ->
             verifyReadAccess(getCaseType(caseDetails.getCaseTypeId()),
                 getAccessProfiles(caseReference),
                 caseDetails));
-        jcDebug("AuthorisedGetCaseOperation.execute caseDetails2", caseDetails2);
+        jcDebug("AuthorisedGetCaseOperation.execute caseDetails2", caseDetails2);  // size = 287 (and 279)
         return caseDetails2;
     }
 
@@ -155,4 +156,20 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
         return Optional.of(caseDetails);
     }
 
+    /*
+     * PART OF FIX.
+     * See RestrictedGetCaseOperation for example of auto-wiring AuthorisedGetCaseOperation.
+     */
+    public Map<String, JsonNode> getFilteredDataClassification(String caseReference,
+                                                               CaseTypeDefinition caseType,
+                                                               Map<String, JsonNode> fullDataClassification) {
+        Set<AccessProfile> accessProfiles = getAccessProfiles(caseReference);
+        return JacksonUtils.convertValue(
+            accessControlService.filterCaseFieldsByAccess(
+                JacksonUtils.convertValueJsonNode(fullDataClassification),
+                caseType.getCaseFieldDefinitions(),
+                accessProfiles,
+                CAN_READ,
+                true));
+    }
 }

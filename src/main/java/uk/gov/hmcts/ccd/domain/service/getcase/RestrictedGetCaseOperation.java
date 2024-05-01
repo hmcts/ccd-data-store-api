@@ -123,6 +123,7 @@ public class RestrictedGetCaseOperation implements GetCaseOperation {
                 });
         }
 
+        // size = 287 (and 279)
         jcDebug("RestrictedGetCaseOperation.execute authorisedCaseDetails", authorisedCaseDetails);
         return authorisedCaseDetails;
     }

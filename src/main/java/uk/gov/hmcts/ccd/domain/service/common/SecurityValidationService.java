@@ -3,11 +3,17 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.getcase.AuthorisedGetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.io.OutputStream;
@@ -32,6 +38,19 @@ public class SecurityValidationService {
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data "
         + "validation error (c)";
 
+    // PART OF FIX -- Will be autowired in constructor.
+    private final AuthorisedGetCaseOperation authorisedGetCaseOperation;
+    private final CaseDefinitionRepository caseDefinitionRepository;
+
+    // PART OF FIX -- Constructor autowires authorisedGetCaseOperation , which provides  getFilteredDataClassification()
+    @Autowired
+    public SecurityValidationService(
+        final AuthorisedGetCaseOperation authorisedGetCaseOperation,
+        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
+        this.authorisedGetCaseOperation = authorisedGetCaseOperation;
+        this.caseDefinitionRepository = caseDefinitionRepository;
+    }
+
     public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse,
                                                      CaseDetails caseDetails,
                                                      Map<String, JsonNode> defaultDataClassification) {
@@ -39,8 +58,15 @@ public class SecurityValidationService {
         if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
 
+            // BELOW: PART OF FIX
+            CaseTypeDefinition caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+            Map<String, JsonNode> filteredDataClassification = authorisedGetCaseOperation.getFilteredDataClassification(
+                caseDetails.getReferenceAsString(), caseType, defaultDataClassification
+            );
             validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
-                JacksonUtils.convertValueJsonNode(defaultDataClassification));
+                JacksonUtils.convertValueJsonNode(defaultDataClassification),
+                JacksonUtils.convertValueJsonNode(filteredDataClassification));
+            // ABOVE: PART OF FIX
 
             caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
         } else {
@@ -93,10 +119,13 @@ public class SecurityValidationService {
     /*
      * callbackDataClassification = JacksonUtils.convertValueJsonNode( callbackResponse.getDataClassification() )
      * defaultDataClassification  = JacksonUtils.convertValueJsonNode( defaultDataClassification )
+     * .
+     * HOPEFUL FIX IS TO APPLY FILTER TO defaultDataClassification.
      */
-    private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
+    private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification,
+                                JsonNode filteredDataClassification) {
 
-        if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
+        if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification, filteredDataClassification)) {
             jcLog("JCDEBUG2: validateObject: SIZES DIFFER");
             if (callbackDataClassification != null) {
                 jcLog("JCDEBUG2: validateObject: callbackDataClassification.size = "
@@ -135,9 +164,11 @@ public class SecurityValidationService {
                     JsonNode defaultClassificationValue = defaultClassificationItem.get(VALUE);
                     JsonNode callbackClassificationItem = callbackClassificationValue.get(VALUE);
                     if (callbackClassificationItem.isObject()) {
-                        validateObject(callbackClassificationItem, defaultClassificationValue);
+                        validateObject(callbackClassificationItem, defaultClassificationValue,
+                            filteredDataClassification);
                     } else {
-                        validateCollection(callbackClassificationItem, defaultClassificationValue);
+                        validateCollection(callbackClassificationItem, defaultClassificationValue,
+                            filteredDataClassification);
                     }
                 } else {
                     LOG.warn("callbackClassification={} is complex object with classification but no value",
@@ -159,13 +190,25 @@ public class SecurityValidationService {
         }
     }
 
-    private boolean isNotNullAndSizeEqual(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
-        return defaultDataClassification != null && callbackDataClassification != null
+    /*
+     * PART OF FIX ?
+     */
+    private boolean isNotNullAndSizeEqual(JsonNode callbackDataClassification, JsonNode defaultDataClassification,
+                                          JsonNode filteredDataClassification) {
+        boolean valid = defaultDataClassification != null && callbackDataClassification != null
             && defaultDataClassification.size() == callbackDataClassification.size();
+        jcLog("JCDEBUG2: SecurityValidationService.isNotNullAndSizeEqual: valid1 = " + valid);
+        if (!valid) {
+            valid = filteredDataClassification != null && callbackDataClassification != null
+                && filteredDataClassification.size() == callbackDataClassification.size();
+            jcLog("JCDEBUG2: SecurityValidationService.isNotNullAndSizeEqual: valid2 = " + valid);
+        }
+        return valid;
     }
 
 
-    private void validateCollection(JsonNode callbackClassificationItem, JsonNode defaultClassificationItem) {
+    private void validateCollection(JsonNode callbackClassificationItem, JsonNode defaultClassificationItem,
+                                    JsonNode filteredDataClassification) {
         for (JsonNode callbackItem : callbackClassificationItem) {
             JsonNode defaultItem = getDataClassificationForData(callbackItem, defaultClassificationItem.iterator());
             if (defaultItem.isNull()) {
@@ -174,7 +217,7 @@ public class SecurityValidationService {
             }
             JsonNode callbackItemValue = callbackItem.get(VALUE);
             JsonNode defaultItemValue = defaultItem.get(VALUE);
-            validateObject(callbackItemValue, defaultItemValue);
+            validateObject(callbackItemValue, defaultItemValue, filteredDataClassification);
         }
     }
 
