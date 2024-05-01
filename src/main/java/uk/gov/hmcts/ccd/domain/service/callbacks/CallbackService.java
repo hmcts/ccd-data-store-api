@@ -140,7 +140,7 @@ public class CallbackService {
             httpHeaders.add("Content-Type", "application/json");
             addPassThroughHeaders(httpHeaders);
             if (null != securityHeaders) {
-                securityHeaders.forEach(httpHeaders::put);
+                httpHeaders.putAll(securityHeaders);
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
             if (logCallbackDetails(url)) {
@@ -183,8 +183,7 @@ public class CallbackService {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
                 .filter(context -> StringUtils.hasLength(context)
                     && (null != request.getAttribute(context) || null != request.getHeader(context)))
-                .forEach(context -> httpHeaders.add(context, null != request.getAttribute(context)
-                    ? (String) request.getAttribute(context) : request.getHeader(context)));
+                .forEach(context -> httpHeaders.add(context, getPassThruContextValue(context)));
         }
     }
 
@@ -194,10 +193,24 @@ public class CallbackService {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
                 .filter(context -> StringUtils.hasLength(context) && null != httpHeaders.get(context))
                 .forEach(context -> {
-                    LOG.debug("Setting request attribute: <{}> to value: <{}>", context, httpHeaders.get(context));
+                    LOG.debug("Setting request ATTRIBUTE context <{}> to value: <{}>",
+                        context, httpHeaders.get(context));
                     request.setAttribute(context, httpHeaders.get(context));
                 });
         }
+    }
+
+    private String getPassThruContextValue(String context) {
+        if (null != request.getAttribute(context)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Use request ATTRIBUTE context <{}>: value <{}>", context, request.getAttribute(context));
+            }
+            return (String) request.getAttribute(context);
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Use request HEADER context <{}>: value <{}>", context, request.getHeader(context));
+        }
+        return request.getHeader(context);
     }
 
     private boolean logCallbackDetails(final String url) {

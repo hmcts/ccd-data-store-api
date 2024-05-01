@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.stdapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocume
 
 @Service
 public class CallbackInvoker {
+    private static final Logger LOG = LoggerFactory.getLogger(CallbackInvoker.class);
 
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
 
@@ -89,6 +92,7 @@ public class CallbackInvoker {
                                                                      final CaseDetails caseDetails,
                                                                      final CaseTypeDefinition caseTypeDefinition,
                                                                      final Boolean ignoreWarning) {
+        LOG.debug("invokeAboutToSubmitCallback");
         final Optional<CallbackResponse> callbackResponse;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLAboutToSubmitEvent())) {
             callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
@@ -99,20 +103,18 @@ public class CallbackInvoker {
                 caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         }
 
-        if (callbackResponse.isPresent()) {
-            return validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
+        return callbackResponse.map(response -> validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
                 caseDetails,
                 ignoreWarning,
-                callbackResponse.get());
-        }
+                response)).orElseGet(AboutToSubmitCallbackResponse::new);
 
-        return new AboutToSubmitCallbackResponse();
     }
 
     public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEventDefinition
                                                                                    caseEventDefinition,
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
+        LOG.debug("invokeSubmittedCallback");
         ResponseEntity<AfterSubmitCallbackResponse> afterSubmitCallbackResponseEntity;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLSubmittedEvent())) {
             afterSubmitCallbackResponseEntity =
@@ -133,6 +135,7 @@ public class CallbackInvoker {
 
     public ResponseEntity<GetCaseCallbackResponse> invokeGetCaseCallback(final CaseTypeDefinition caseTypeDefinition,
                                                                          final CaseDetails caseDetails) {
+        LOG.debug("invokeGetCaseCallback");
         String url = caseTypeDefinition.getCallbackGetCaseUrl();
         List<Integer> retries = caseTypeDefinition.getRetriesGetCaseUrl();
 
@@ -165,6 +168,7 @@ public class CallbackInvoker {
                                               final CaseDetails caseDetails,
                                               final Boolean ignoreWarning) {
 
+        LOG.debug("invokeMidEventCallback");
         Optional<CallbackResponse> callbackResponseOptional;
         if (isRetriesDisabled(wizardPage.getRetriesTimeoutMidEvent())) {
             callbackResponseOptional = callbackService.sendSingleRequest(wizardPage.getCallBackURLMidEvent(),
@@ -239,16 +243,14 @@ public class CallbackInvoker {
 
     private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
         return (callbackResponse.getSecurityClassification() != null
-            && callbackResponse.getDataClassification() != null) ? true : false;
+            && callbackResponse.getDataClassification() != null);
     }
 
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseTypeDefinition caseTypeDefinition,
                                                                                CaseDetails caseDetails) {
-        Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
-            caseTypeDefinition,
-            caseDetails.getData(),
-            EMPTY_DATA_CLASSIFICATION);
-        return defaultSecurityClassifications;
+        return caseDataService.getDefaultSecurityClassifications(caseTypeDefinition,
+                                                                caseDetails.getData(),
+                                                                EMPTY_DATA_CLASSIFICATION);
     }
 
     private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,
