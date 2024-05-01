@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
+import uk.gov.hmcts.ccd.endpoint.std.TestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -207,33 +208,42 @@ public class CallbackInvoker {
         }
     }
 
+
+
     private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition
                                                                                       caseTypeDefinition,
                                                                                   final CaseDetails caseDetails,
                                                                                   final Boolean ignoreWarning,
                                                                                   final CallbackResponse
                                                                                       callbackResponse) {
+        TestController.jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback ->");
+        try {
+            final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
-        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
-
-        validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
-        callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
-        callbackResponse.updateCallbackStateBasedOnPriority();
-        aboutToSubmitCallbackResponse.setState(Optional.ofNullable(callbackResponse.getState()));
-        if (callbackResponse.getState() != null) {
-            caseDetails.setState(callbackResponse.getState());
-        }
-        if (callbackResponse.getData() != null) {
-            validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
-            if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
-                securityValidationService.setClassificationFromCallbackIfValid(
-                    callbackResponse,
-                    caseDetails,
-                    deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails)
-                );
+            validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
+            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
+            callbackResponse.updateCallbackStateBasedOnPriority();
+            aboutToSubmitCallbackResponse.setState(Optional.ofNullable(callbackResponse.getState()));
+            if (callbackResponse.getState() != null) {
+                caseDetails.setState(callbackResponse.getState());
             }
+            if (callbackResponse.getData() != null) {
+                validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
+                if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
+                    securityValidationService.setClassificationFromCallbackIfValid(
+                        callbackResponse,
+                        caseDetails,
+                        deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails)
+                    );
+                }
+            }
+            TestController.jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback: OK");
+            return aboutToSubmitCallbackResponse;
+        } catch (Exception e) {
+            TestController.jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback: EXCEPTION: "
+                + e.getMessage());
+            throw e;
         }
-        return aboutToSubmitCallbackResponse;
     }
 
 

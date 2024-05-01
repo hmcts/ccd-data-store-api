@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -92,4 +94,16 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
         return Optional.of(caseDetails);
     }
 
+    public Map<String, JsonNode> getFilteredDataClassification(String caseReference,
+                                                               CaseTypeDefinition caseType,
+                                                               Map<String, JsonNode> fullDataClassification) {
+        Set<AccessProfile> accessProfiles = getAccessProfiles(caseReference);
+        return JacksonUtils.convertValue(
+            accessControlService.filterCaseFieldsByAccess(
+                JacksonUtils.convertValueJsonNode(fullDataClassification),
+                caseType.getCaseFieldDefinitions(),
+                accessProfiles,
+                CAN_READ,
+                true));
+    }
 }

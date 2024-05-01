@@ -7,9 +7,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.getcase.AuthorisedGetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Map;
@@ -31,11 +34,16 @@ class SecurityValidationServiceTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private SecurityValidationService securityValidationService;
 
+    @Mock
+    private AuthorisedGetCaseOperation authorisedGetCaseOperation;
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        securityValidationService = new SecurityValidationService();
+        securityValidationService = new SecurityValidationService(authorisedGetCaseOperation, caseDefinitionRepository);
     }
 
     @Nested
