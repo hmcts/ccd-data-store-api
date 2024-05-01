@@ -28,6 +28,11 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackRe
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassificationBuilder.aClassificationBuilder;
 
+/*
+ * PART OF FIX :-
+ * Add mocked class variables authorisedGetCaseOperation and caseDefinitionRepository.
+ * Update method setUp().
+ */
 class SecurityValidationServiceTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);

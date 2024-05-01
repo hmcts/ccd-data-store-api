@@ -29,6 +29,15 @@ import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getSecurityClassification;
 
+/*
+ * PART OF FIX :-
+ * Add class variables authorisedGetCaseOperation and caseDefinitionRepository.
+ * Add constructor.
+ * Update method setClassificationFromCallbackIfValid() , to pass filteredDataClassification to validateObject().
+ * Update method validateObject() , to pass filteredDataClassification to isNotNullAndSizeEqual().
+ * Update all calls to validateObject() , to include parameter filteredDataClassification.
+ * Update method isNotNullAndSizeEqual().
+ */
 @Service
 public class SecurityValidationService {
 

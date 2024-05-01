@@ -25,6 +25,10 @@ import java.util.Set;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
+/*
+ * PART OF FIX :-
+ * Add public method getFilteredDataClassification().
+ */
 @Service
 @Qualifier("authorised")
 public class AuthorisedGetCaseOperation implements GetCaseOperation {
