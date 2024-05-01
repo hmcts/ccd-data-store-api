@@ -19,7 +19,7 @@ public class TestController {
     /*
      * Method to POST and log messages.
      *
-     * Tested using curl command below :-
+     * Tested originally using curl command below :-
      * curl -X POST https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug -d "TESTING WORKS"
      */
     @PostMapping("/jcdebug")
@@ -40,9 +40,8 @@ public class TestController {
         String rc;
 
         try {
-            // TODO: Update 2356 to "new" pull request number
             // TODO: Update Private Law project to use "new" data store API image
-            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            final String url = "https://ccd-data-store-api-pr-2412.preview.platform.hmcts.net/jcdebug";
             final String message = "TESTING POST";
 
             URL apiUrl = new URL(url);
@@ -72,9 +71,8 @@ public class TestController {
     public static String jcLog(final String message) {
         String rc;
         try {
-            // TODO: Update 2356 to "new" pull request number
             // TODO: Update Private Law project to use "new" data store API image
-            final String url = "https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug";
+            final String url = "https://ccd-data-store-api-pr-2412.preview.platform.hmcts.net/jcdebug";
             URL apiUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
             connection.setRequestMethod("POST");
