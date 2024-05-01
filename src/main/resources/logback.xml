@@ -8,36 +8,36 @@
   </appender>
 
   <!-- Hibernate after 5.4.5 -->
-  <logger name="org.hibernate.SQL" level="trace" additivity="false">
+  <logger name="org.hibernate.SQL" level="info" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="org.hibernate.type.descriptor.sql" level="trace" additivity="false">
+  <logger name="org.hibernate.type.descriptor.sql" level="info" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="org.hibernate.stat" level="trace" additivity="false">
+  <logger name="org.hibernate.stat" level="info" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
   <logger name="org.hibernate.SQL_SLOW" level="info" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="org.hibernate.cache" level="debug" additivity="false">
+  <logger name="org.hibernate.cache" level="info" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
 
   <!-- Hibernate after 6 -->
-  <logger name="org.hibernate.SQL" level="debug" additivity="false">
+  <logger name="org.hibernate.SQL" level="info" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="org.hibernate.orm.jdbc.bind" level="trace" additivity="false">
+  <logger name="org.hibernate.orm.jdbc.bind" level="info" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="org.hibernate.stat" level="debug" additivity="false">
+  <logger name="org.hibernate.stat" level="info" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
   <logger name="org.hibernate.SQL_SLOW" level="info" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="org.hibernate.cache" level="debug" additivity="false">
+  <logger name="org.hibernate.cache" level="info" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
 
