@@ -47,8 +47,7 @@
 
   <!-- LOG "uk.gov.hmcts.ccd.domain.service.callbacks" at INFO level -->
   <logger name="uk.gov.hmcts.ccd.domain.service.callbacks" level="debug" additivity="false">
-      <appender-ref ref="RollingFile" />
-      <appender-ref ref="Console" />
+      <appender-ref ref="STDOUT"/>
   </logger>
 
 </configuration>
