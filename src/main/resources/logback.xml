@@ -1,0 +1,54 @@
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>
+        %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+      </Pattern>
+    </encoder>
+  </appender>
+
+  <!-- Hibernate after 5.4.5 -->
+  <logger name="org.hibernate.SQL" level="trace" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="org.hibernate.type.descriptor.sql" level="trace" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="org.hibernate.stat" level="trace" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="org.hibernate.SQL_SLOW" level="info" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="org.hibernate.cache" level="debug" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+
+  <!-- Hibernate after 6 -->
+  <logger name="org.hibernate.SQL" level="debug" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="org.hibernate.orm.jdbc.bind" level="trace" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="org.hibernate.stat" level="debug" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="org.hibernate.SQL_SLOW" level="info" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="org.hibernate.cache" level="debug" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+
+  <root level="info">
+    <appender-ref ref="STDOUT"/>
+  </root>
+
+  <!-- LOG "uk.gov.hmcts.ccd.domain.service.callbacks" at INFO level -->
+  <logger name="uk.gov.hmcts.ccd.domain.service.callbacks" level="debug" additivity="false">
+      <appender-ref ref="RollingFile" />
+      <appender-ref ref="Console" />
+  </logger>
+
+</configuration>
