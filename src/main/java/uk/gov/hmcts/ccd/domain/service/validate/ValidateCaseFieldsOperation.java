@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 public interface ValidateCaseFieldsOperation {
 
-    Map<String, JsonNode> validateCaseDetails(OperationContext validationContext);
+    Map<String, JsonNode> validateCaseDetails(OperationContext operationContext);
 
     void validateData(final Map<String, JsonNode> data,
                       final CaseTypeDefinition caseTypeDefinition,

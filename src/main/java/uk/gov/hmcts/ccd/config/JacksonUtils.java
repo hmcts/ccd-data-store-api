@@ -202,10 +202,8 @@ public final class JacksonUtils {
     }
 
     public static Map<String, JsonNode> convertValueInDataField(Object from) {
-        Map<String, JsonNode> map = MAPPER.convertValue(from, new TypeReference<HashMap<String, JsonNode>>() {});
-
         Map<String, JsonNode> dataNode = new HashMap<>();
-        dataNode.put(DATA, MAPPER.valueToTree(map));
+        dataNode.put(DATA, MAPPER.valueToTree(convertValue(from)));
         return dataNode;
     }
 }

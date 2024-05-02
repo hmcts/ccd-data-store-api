@@ -13,7 +13,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
-import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Map;
@@ -32,20 +31,17 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAccessService caseAccessService;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
-    private final MidEventCallback midEventCallback;
 
     public AuthorisedValidateCaseFieldsOperation(AccessControlService accessControlService,
                                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                                  CaseDefinitionRepository caseDefinitionRepository,
                                                  CaseAccessService caseAccessService,
-                                                 @Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER)
-                                                 ValidateCaseFieldsOperation validateCaseFieldsOperation,
-                                                 MidEventCallback midEventCallback) {
+                                                 @Qualifier(ClassifiedValidateCaseFieldsOperation.QUALIFIER)
+                                                 ValidateCaseFieldsOperation validateCaseFieldsOperation) {
         this.accessControlService = accessControlService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseAccessService = caseAccessService;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
-        this.midEventCallback = midEventCallback;
     }
 
     @Override
@@ -54,13 +50,6 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
 
         CaseDataContent content = operationContext.content();
         String caseTypeId = operationContext.caseTypeId();
-        String pageId = operationContext.pageId();
-
-        final JsonNode data = midEventCallback.invoke(caseTypeId,
-            content,
-            pageId);
-
-        content.setData(JacksonUtils.convertValue(data));
 
         String caseReference = content.getCaseReference();
         Set<AccessProfile> accessProfiles = StringUtils.isNotEmpty(caseReference)
@@ -81,6 +70,11 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
     private void verifyReadAccess(final String caseTypeId, CaseDataContent content, Set<AccessProfile> accessProfiles) {
         final CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(caseTypeId);
 
+        if (content.getData() == null) {
+            content.setData(newHashMap());
+            return;
+        }
+
         if (!accessControlService.canAccessCaseTypeWithCriteria(
             caseTypeDefinition,
             accessProfiles,
@@ -91,7 +85,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
 
         content.setData(JacksonUtils.convertValueInDataField(
             accessControlService.filterCaseFieldsByAccess(
-                JacksonUtils.convertValueJsonNode(content.getData().get(JacksonUtils.DATA)),
+                JacksonUtils.convertValueJsonNode(content.getData()),
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 accessProfiles,
                 CAN_READ,

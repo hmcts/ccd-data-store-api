@@ -19,7 +19,9 @@
     "is configured to trigger a mid event callback that changes the TTL.OverrideTTL value (null -> missing)",
     "is configured to trigger a mid event callback that changes the TTL.Suspended value (Yes -> YES)",
 
-    "does not contain the TTL as citizen user has no access"
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
+    "does not contain the TTL.OverrideTTL as removed by callback (null -> missing)",
+    "contains the adjusted TTL.Suspended from the callback (Yes -> YES)"
   ],
 
   "users": {

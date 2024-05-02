@@ -18,7 +18,9 @@
     "has a TTLIncrement of 20 days configured",
     "is configured to trigger a mid event callback that changes the TTL.Suspended value (null -> missing)",
 
-    "does not contain the TTL as citizen user has no access"
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
+    "contains the TTL.OverrideTTL from the previouse data",
+    "does not contain the TTL.Suspended as removed by callback (null -> missing)"
   ],
 
   "users": {

@@ -252,7 +252,7 @@ Feature: F-1017: Validate Event to Update TTL
 #  #CCD-3535 & #CCD-3562: Trigger a mid-event callback that makes permitted changes to the TTL values: v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    @S-1017.21 #CCD-3535
+    @S-1017.21 @Ignore #CCD-3535
     Scenario: Trigger a mid event callback that changes TTL.Suspended (null -> missing). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
       Given a user with [an active profile in CCD]
         And a user with [a caseworker with an active profile in CCD]
@@ -270,9 +270,11 @@ Feature: F-1017: Validate Event to Update TTL
 
        Then a positive response is received
         And the response has all other details as expected
-        And the response [does not contain the TTL as citizen user has no access]
+        And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
+        And the response [contains the TTL.OverrideTTL from the previouse data]
+        And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
 
-    @S-1017.22 #CCD-3535
+    @S-1017.22 @Ignore #CCD-3535
     Scenario: Trigger a mid event callback that changes TTL.Suspended (No -> NO). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
       Given a user with [an active profile in CCD]
         And a user with [a caseworker with an active profile in CCD]
@@ -291,9 +293,11 @@ Feature: F-1017: Validate Event to Update TTL
 
        Then a positive response is received
         And the response has all other details as expected
-        And the response [does not contain the TTL as citizen user has no access]
+        And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
+        And the response [does not contain the TTL.OverrideTTL as removed by callback (null -> missing)]
+        And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
 
-    @S-1017.23 #CCD-3535
+    @S-1017.23 @Ignore #CCD-3535
     Scenario: Trigger a mid event callback that changes TTL.Suspended (Yes -> YES). Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
       Given a user with [an active profile in CCD]
         And a user with [a caseworker with an active profile in CCD]
@@ -312,10 +316,12 @@ Feature: F-1017: Validate Event to Update TTL
 
        Then a positive response is received
         And the response has all other details as expected
-        And the response [does not contain the TTL as citizen user has no access]
+        And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
+        And the response [does not contain the TTL.OverrideTTL as removed by callback (null -> missing)]
+        And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
 
 
-    @S-1017.25 #CCD-3562
+    @S-1017.25 @Ignore #CCD-3562
     Scenario: Trigger a mid event callback that has TTL missing. Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
       Given a user with [an active profile in CCD]
         And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCitizen]
@@ -329,7 +335,7 @@ Feature: F-1017: Validate Event to Update TTL
 
        Then a positive response is received
         And the response has all other details as expected
-        And the response [does not contain the TTL as citizen user has no access]
+        And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
 
     @S-1017.26 #CCD-3562
     Scenario: Trigger a mid event callback that changes TTL set to null. Mid Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1

@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -63,7 +64,7 @@ class CaseDataValidatorControllerTest {
         MockitoAnnotations.initMocks(this);
         when(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, EVENT_DATA)))
             .thenReturn(DATA);
-        when(midEventCallback.invoke(CASE_TYPE_ID, EVENT_DATA, PAGE_ID)).thenReturn(DATA_NODE);
+        when(midEventCallback.invoke(CASE_TYPE_ID, EVENT_DATA, PAGE_ID)).thenReturn(DATA);
     }
 
     @Nested
@@ -78,7 +79,7 @@ class CaseDataValidatorControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(response.getBody().getData(), is(UNWRAPPED_DATA_NODE))
+                () -> assertThat(Objects.requireNonNull(response.getBody()).getData(), is(UNWRAPPED_DATA_NODE))
             );
         }
 
