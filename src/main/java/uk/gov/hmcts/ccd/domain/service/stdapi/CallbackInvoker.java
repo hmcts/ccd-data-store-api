@@ -208,7 +208,9 @@ public class CallbackInvoker {
         }
     }
 
-
+    private static String jcLog(final String message) {
+        return TestController.jcLog(message);
+    }
 
     private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition
                                                                                       caseTypeDefinition,
@@ -216,7 +218,7 @@ public class CallbackInvoker {
                                                                                   final Boolean ignoreWarning,
                                                                                   final CallbackResponse
                                                                                       callbackResponse) {
-        TestController.jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback ->");
+        jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #1 -->");
         try {
             final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
@@ -237,10 +239,10 @@ public class CallbackInvoker {
                     );
                 }
             }
-            TestController.jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback: OK");
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #2 (OK)");
             return aboutToSubmitCallbackResponse;
         } catch (Exception e) {
-            TestController.jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback: EXCEPTION: "
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #3 *EXCEPTION* "
                 + e.getMessage());
             throw e;
         }
