@@ -103,14 +103,21 @@ public class SecurityValidationService {
             JsonNode callbackClassificationValue = callbackClassificationMap.getValue();
             JsonNode defaultClassificationItem = defaultDataClassification.get(callbackClassificationKey);
             JsonNode filteredClassificationItem = filteredDataClassification.get(callbackClassificationKey);
+            JsonNode filteredClassificationValue = null;
+            try {
+                filteredClassificationValue = filteredClassificationItem.get(CLASSIFICATION);
+                jcLog("JCDEBUG3: SecurityValidationService.validateObject #4 filteredClassificationValue.size = "
+                    + filteredClassificationValue.size());
+            } catch (NullPointerException e) {
+                jcLog("JCDEBUG3: SecurityValidationService.validateObject #4 filteredClassificationValue = NULL");
+            }
             if (callbackClassificationValue.has(CLASSIFICATION)) {
                 // FAILING IN isValidClassification()
                 if (!isValidClassification(callbackClassificationValue.get(CLASSIFICATION),
-                    defaultClassificationItem.get(CLASSIFICATION), filteredClassificationItem.get(CLASSIFICATION))) {
+                    defaultClassificationItem.get(CLASSIFICATION), filteredClassificationValue)) {
                     LOG.warn("callbackClassificationItem={} has lower classification than defaultClassificationItem={}",
-                        callbackClassificationValue,
-                        defaultClassificationItem, filteredClassificationItem);
-                    jcLog("JCDEBUG3: SecurityValidationService.validateObject #4 *EXCEPTION*");
+                        callbackClassificationValue, defaultClassificationItem);
+                    jcLog("JCDEBUG3: SecurityValidationService.validateObject #5 *EXCEPTION*");
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
                 if (callbackClassificationValue.has(VALUE)) {
@@ -126,26 +133,26 @@ public class SecurityValidationService {
                 } else {
                     LOG.warn("callbackClassification={} is complex object with classification but no value",
                         callbackDataClassification);
-                    jcLog("JCDEBUG3: SecurityValidationService.validateObject #5 *EXCEPTION*");
+                    jcLog("JCDEBUG3: SecurityValidationService.validateObject #6 *EXCEPTION*");
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
             } else if (callbackClassificationValue.has(VALUE)) {
                 LOG.warn("callbackClassification={} is complex object with value but no classification",
                     callbackDataClassification);
-                jcLog("JCDEBUG3: SecurityValidationService.validateObject #6 *EXCEPTION*");
+                jcLog("JCDEBUG3: SecurityValidationService.validateObject #7 *EXCEPTION*");
                 throw new ValidationException(VALIDATION_ERR_MSG);
             } else {
                 if (!isValidClassification(callbackClassificationValue, defaultClassificationItem,
-                    null)) {
+                    filteredClassificationValue)) {
                     LOG.warn("callbackClassificationItem={} has lower classification than defaultClassificationItem={}",
                         JacksonUtils.convertValueJsonNode(callbackClassificationMap),
                         defaultDataClassification);
-                    jcLog("JCDEBUG3: SecurityValidationService.validateObject #7 *EXCEPTION*");
+                    jcLog("JCDEBUG3: SecurityValidationService.validateObject #8 *EXCEPTION*");
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
             }
         }
-        jcLog("JCDEBUG3: SecurityValidationService.validateObject #8 (OK)");
+        jcLog("JCDEBUG3: SecurityValidationService.validateObject #9 (OK)");
     }
 
     private boolean isNotNullAndSizeEqual(JsonNode callbackDataClassification, JsonNode defaultDataClassification,
