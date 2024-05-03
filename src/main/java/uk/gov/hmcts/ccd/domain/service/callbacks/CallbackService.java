@@ -178,6 +178,21 @@ public class CallbackService {
     }
 
     protected void addPassThroughHeaders(final HttpHeaders httpHeaders) {
+        // Temporary test
+        if (httpHeaders.size() == 0
+            && null != applicationParams.getCallbackPassthruHeaderContexts()
+            && !applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
+            httpHeaders.add(applicationParams.getCallbackPassthruHeaderContexts().get(0),
+                "{\n" +
+                    "    user_task: {\n" +
+                    "        task_data: {\n" +
+                    "            ... task structure as retrieved from task management API ...\n" +
+                    "        },\n" +
+                    "        complete_task: false\n" +
+                    "    }\n" +
+                    "}");
+        }
+
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
@@ -188,6 +203,21 @@ public class CallbackService {
     }
 
     protected void storePassThroughHeaders(final HttpHeaders httpHeaders, HttpServletRequest request) {
+        // Temporary test
+        if (httpHeaders.size() == 0
+            && null != applicationParams.getCallbackPassthruHeaderContexts()
+            && !applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
+            httpHeaders.add(applicationParams.getCallbackPassthruHeaderContexts().get(0),
+                "{\n" +
+                    "    user_task: {\n" +
+                    "        task_data: {\n" +
+                    "            ... new task structure last call ...\n" +
+                    "        },\n" +
+                    "        complete_task: true\n" +
+                    "    }\n" +
+                    "}");
+        }
+
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
