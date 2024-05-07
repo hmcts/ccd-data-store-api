@@ -61,6 +61,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 public class CallbackServiceWireMockTest extends WireMockBaseTest {
     private MockHttpServletRequest request;
     private static final ObjectMapper mapper = new ObjectMapper();
+    public static final String HDR_CLIENT_CONTEXT = "Client-Context";
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_START = CallbackType.ABOUT_TO_START;
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_SUBMIT = CallbackType.ABOUT_TO_SUBMIT;
     public static final CallbackType TEST_CALLBACK_SUBMITTED = CallbackType.SUBMITTED;
@@ -117,7 +118,6 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
     public void passThruCustomHeadersLikeClientContext() throws Exception {
         request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-        final String HDR_CLIENT_CONTEXT = "Client-Context";
 
         final String testUrl1 = "http://localhost:" + wiremockPort + "/test-callback101";
         final String testUrl2 = "http://localhost:" + wiremockPort + "/test-callback102";
