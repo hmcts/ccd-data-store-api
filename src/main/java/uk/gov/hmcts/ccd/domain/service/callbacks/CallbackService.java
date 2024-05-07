@@ -181,19 +181,15 @@ public class CallbackService {
     }
 
     protected void addPassThroughHeaders(final HttpHeaders httpHeaders) {
-        LOG.debug("STARTING addPassThroughHeader...");
-
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
                 .forEach(context -> addPassThruContextValuesToHttpHeaders(httpHeaders, context));
         }
-        LOG.debug("ENDING addPassThroughHeader");
     }
 
     private void storePassThroughHeadersAsRequestAttributes(final HttpHeaders httpHeaders,
                                                               HttpServletRequest request) {
-        LOG.debug("STARTING storePassThroughHeaders...");
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
@@ -204,7 +200,6 @@ public class CallbackService {
                     request.setAttribute(context, httpHeaders.get(context).toString());
                 });
         }
-        LOG.debug("ENDING storePassThroughHeaders");
     }
 
     private void addPassThruContextValuesToHttpHeaders(HttpHeaders httpHeaders, String context) {
