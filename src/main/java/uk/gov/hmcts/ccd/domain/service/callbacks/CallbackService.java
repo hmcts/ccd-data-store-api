@@ -197,7 +197,7 @@ public class CallbackService {
                 .forEach(context -> {
                     LOG.debug("Setting request ATTRIBUTE context <{}> to value: <{}>",
                         context, httpHeaders.get(context));
-                    request.setAttribute(context, httpHeaders.get(context).toString());
+                    request.setAttribute(context, httpHeaders.get(context));
                 });
         }
     }
@@ -216,7 +216,7 @@ public class CallbackService {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Add headers context <{}>: value <{}>", context, request.getAttribute(context));
             }
-            httpHeaders.add(context, (String)request.getAttribute(context));
+            httpHeaders.add(context, request.getAttribute(context).toString());
         } else if (null != request.getHeader(context)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Use request HEADER context <{}>: value <{}>", context, request.getHeader(context));

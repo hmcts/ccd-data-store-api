@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
@@ -18,7 +19,10 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpMethod.POST;
 
 import org.springframework.http.HttpEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -40,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -54,34 +59,36 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
     "ccd.callback.timeouts=1,2,3"
     })
 public class CallbackServiceWireMockTest extends WireMockBaseTest {
+    private MockHttpServletRequest request;
     private static final ObjectMapper mapper = new ObjectMapper();
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_START = CallbackType.ABOUT_TO_START;
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_SUBMIT = CallbackType.ABOUT_TO_SUBMIT;
     public static final CallbackType TEST_CALLBACK_SUBMITTED = CallbackType.SUBMITTED;
-    public static final String responseJson1 = "{\n"
-        + "    user_task: {\n"
-        + "        task_data: {\n"
-        + "            ... task structure as retrieved from task management API ...\n"
-        + "        },\n"
-        + "        complete_task: false\n"
-        + "    }\n"
-        + "}";
-    public static final String responseJson2 = "{\n"
-        + "    user_task: {\n"
-        + "        task_data: {\n"
-        + "            ... task structure updated on 2nd call ...\n"
-        + "        },\n"
-        + "        complete_task: false\n"
-        + "    }\n"
-        + "}";
-    public static final String responseJson3 = "{\n"
-        + "    user_task: {\n"
-        + "        task_data: {\n"
-        + "            ... task structure updated on final call ...\n"
-        + "        },\n"
-        + "        complete_task: true\n"
-        + "    }\n"
-        + "}";
+    public static final JSONObject responseJson1 = new JSONObject("""
+        {
+            user_task: {
+                task_data: task structure as retrieved from task management API,
+                complete_task: false
+            }
+        }
+        """);
+    public static final JSONObject responseJson2 = new JSONObject("""
+        {
+            user_task: {
+                task_data: task structure updated on 2nd call,
+                complete_task: false
+            }
+        }
+        """);
+    public static final JSONObject responseJson3 = new JSONObject("""
+        {
+            user_task: {
+                task_data: task structure updated on final call,
+                complete_task: true
+            }
+        }
+        """);
+
     @Test
     public void happyPathWithNoErrorsOrWarnings() throws Exception {
         final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
@@ -108,6 +115,10 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
     @Test
     public void happyPathWithNoErrorsOrWarningsAndWithClientContext() throws Exception {
+        request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        final String HDR_CLIENT_CONTEXT = "Client-Context";
+
         final String testUrl1 = "http://localhost:" + wiremockPort + "/test-callback101";
         final String testUrl2 = "http://localhost:" + wiremockPort + "/test-callback102";
         final String testUrl3 = "http://localhost:" + wiremockPort + "/test-callback103";
@@ -125,17 +136,17 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback101.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader("Client-Context", responseJson1)));
+                .withHeader(HDR_CLIENT_CONTEXT, responseJson1.toString())));
 
         stubFor(post(urlMatching("/test-callback102.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader("Client-Context", responseJson2)));
+                .withHeader(HDR_CLIENT_CONTEXT, responseJson2.toString())));
 
         stubFor(post(urlMatching("/test-callback103.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader("Client-Context", responseJson3)));
+                .withHeader(HDR_CLIENT_CONTEXT, responseJson3.toString())));
 
         final Optional<CallbackResponse> result1 = callbackService.send(testUrl1, TEST_CALLBACK_ABOUT_TO_START,
             caseEventDefinition, null, caseDetails, false);
@@ -150,7 +161,9 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final CallbackResponse response3 = result3.orElseThrow(() -> new AssertionError("Missing result"));
 
         // Need a good Assertion here ... header is ...
-        assertTrue(response3.getErrors().isEmpty());
+        Object objectContext = request.getAttribute(HDR_CLIENT_CONTEXT);
+        ArrayList<String> contextArray = (ArrayList<String>) objectContext;
+        assertEquals(responseJson3.toString(), contextArray.get(0));
     }
 
     @org.junit.Ignore // TODO investigating socket issues in Azure
