@@ -214,10 +214,14 @@ public class CallbackInvoker {
         return TestController.jcLog(message);
     }
 
-    public static String getStackTraceString(Throwable throwable) {
-        StringWriter sw = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
+    /*
+     * ==== Get call start as string. ====
+     */
+    private String getCallStackString() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        new Throwable().printStackTrace(printWriter);
+        return stringWriter.toString();
     }
 
     private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition
@@ -226,7 +230,7 @@ public class CallbackInvoker {
                                                                                   final Boolean ignoreWarning,
                                                                                   final CallbackResponse
                                                                                       callbackResponse) {
-        jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #1 -->");
+        jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #1 -->  (7th May)");
         try {
             final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
@@ -259,8 +263,8 @@ public class CallbackInvoker {
         } catch (Exception e) {
             jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #10 *EXCEPTION* "
                 + e.getMessage());
-            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #10 *CALL STACK* "
-                + getStackTraceString(e));
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #10 *CALL STACK* = "
+                + getCallStackString());
             throw e;
         }
     }
