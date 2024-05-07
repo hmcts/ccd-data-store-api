@@ -1,10 +1,10 @@
 {
   "_guid_": "S-1023.1",
-  "_extends_": "SubmitEvent_v1Ext_Caseworker__Base",
+  "_extends_": "F-1023_Test_Data_Base",
   "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroupId created",
 
   "prerequisites" : [ {
-      "Token_Creation": "S-1023_GetUpdateTokenCaseworker"
+      "Token_Creation": "S-1023_GetCreateToken"
     }
   ],
   "specs": [
