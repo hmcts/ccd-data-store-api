@@ -21,6 +21,8 @@ import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.std.TestController;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -212,6 +214,12 @@ public class CallbackInvoker {
         return TestController.jcLog(message);
     }
 
+    public static String getStackTraceString(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        throwable.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
+    }
+
     private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition
                                                                                       caseTypeDefinition,
                                                                                   final CaseDetails caseDetails,
@@ -222,16 +230,23 @@ public class CallbackInvoker {
         try {
             final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #2");
             validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #3");
             callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #4");
             callbackResponse.updateCallbackStateBasedOnPriority();
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #5");
             aboutToSubmitCallbackResponse.setState(Optional.ofNullable(callbackResponse.getState()));
             if (callbackResponse.getState() != null) {
+                jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #6");
                 caseDetails.setState(callbackResponse.getState());
             }
             if (callbackResponse.getData() != null) {
+                jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #7");
                 validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
                 if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
+                    jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #8");
                     securityValidationService.setClassificationFromCallbackIfValid(
                         callbackResponse,
                         caseDetails,
@@ -239,11 +254,13 @@ public class CallbackInvoker {
                     );
                 }
             }
-            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #2 (OK)");
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #9 (OK)");
             return aboutToSubmitCallbackResponse;
         } catch (Exception e) {
-            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #3 *EXCEPTION* "
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #10 *EXCEPTION* "
                 + e.getMessage());
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #10 *CALL STACK* "
+                + getStackTraceString(e));
             throw e;
         }
     }
