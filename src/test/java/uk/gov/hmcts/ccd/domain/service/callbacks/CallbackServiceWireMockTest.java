@@ -114,7 +114,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void happyPathWithNoErrorsOrWarningsAndWithClientContext() throws Exception {
+    public void passThruCustomHeadersLikeClientContext() throws Exception {
         request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         final String HDR_CLIENT_CONTEXT = "Client-Context";
