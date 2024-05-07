@@ -82,8 +82,6 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.properties")
-// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
-@SuppressWarnings("checkstyle:OperatorWrap")
 public abstract class AbstractBaseIntegrationTest {
     protected static final ObjectMapper mapper = JacksonUtils.MAPPER;
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
@@ -196,11 +194,11 @@ public abstract class AbstractBaseIntegrationTest {
         List<String> sequences = determineSequences(jdbcTemplate);
 
         String truncateTablesQuery =
-            "START TRANSACTION;\n" +
-                tables.stream()
+            "START TRANSACTION;\n"
+                + tables.stream()
                     .map(record -> String.format("TRUNCATE TABLE %s CASCADE;", record))
-                    .collect(Collectors.joining("\n")) +
-                "\nCOMMIT;";
+                    .collect(Collectors.joining("\n"))
+                + "\nCOMMIT;";
         jdbcTemplate.execute(truncateTablesQuery);
 
         sequences.forEach(sequence -> jdbcTemplate.execute("ALTER SEQUENCE " + sequence + " RESTART WITH 1"));
