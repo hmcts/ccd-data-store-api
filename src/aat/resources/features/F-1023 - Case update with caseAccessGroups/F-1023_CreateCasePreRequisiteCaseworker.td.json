@@ -23,6 +23,7 @@
     },
     "body": {
       "data": {
+        "TextField": "This is the case being created",
         "OrganisationPolicyField": {
           "OrgPolicyCaseAssignedRole": "GroupRole1",
           "OrgPolicyReference": "ref",
