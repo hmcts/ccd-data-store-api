@@ -150,7 +150,10 @@ public class CallbackService {
             if (logCallbackDetails(url)) {
                 LOG.info("Callback {} response received: {}", url, responseEntity);
             }
-            storePassThroughHeaders(responseEntity.getHeaders(), request);
+
+            final HttpHeaders httpHeadersNew = new HttpHeaders();
+            httpHeadersNew.addAll(responseEntity.getHeaders());
+            storePassThroughHeadersAsRequestAttributes(httpHeadersNew, request);
             httpStatus = responseEntity.getStatusCodeValue();
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
@@ -178,46 +181,19 @@ public class CallbackService {
     }
 
     protected void addPassThroughHeaders(final HttpHeaders httpHeaders) {
-        // Temporary test
-        if (httpHeaders.size() == 0
-            && null != applicationParams.getCallbackPassthruHeaderContexts()
-            && !applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
-            httpHeaders.add(applicationParams.getCallbackPassthruHeaderContexts().get(0),
-                "{\n" +
-                    "    user_task: {\n" +
-                    "        task_data: {\n" +
-                    "            ... task structure as retrieved from task management API ...\n" +
-                    "        },\n" +
-                    "        complete_task: false\n" +
-                    "    }\n" +
-                    "}");
-        }
+        LOG.debug("STARTING addPassThroughHeader...");
 
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
-                .filter(context -> StringUtils.hasLength(context)
-                    && (null != request.getAttribute(context) || null != request.getHeader(context)))
-                .forEach(context -> httpHeaders.add(context, getPassThruContextValue(context)));
+                .forEach(context -> addPassThruContextValuesToHttpHeaders(httpHeaders, context));
         }
+        LOG.debug("ENDING addPassThroughHeader");
     }
 
-    protected void storePassThroughHeaders(final HttpHeaders httpHeaders, HttpServletRequest request) {
-        // Temporary test
-        if (httpHeaders.size() == 0
-            && null != applicationParams.getCallbackPassthruHeaderContexts()
-            && !applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
-            httpHeaders.add(applicationParams.getCallbackPassthruHeaderContexts().get(0),
-                "{\n" +
-                    "    user_task: {\n" +
-                    "        task_data: {\n" +
-                    "            ... new task structure last call ...\n" +
-                    "        },\n" +
-                    "        complete_task: true\n" +
-                    "    }\n" +
-                    "}");
-        }
-
+    private void storePassThroughHeadersAsRequestAttributes(final HttpHeaders httpHeaders,
+                                                              HttpServletRequest request) {
+        LOG.debug("STARTING storePassThroughHeaders...");
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
@@ -225,22 +201,33 @@ public class CallbackService {
                 .forEach(context -> {
                     LOG.debug("Setting request ATTRIBUTE context <{}> to value: <{}>",
                         context, httpHeaders.get(context));
-                    request.setAttribute(context, httpHeaders.get(context));
+                    request.setAttribute(context, httpHeaders.get(context).toString());
                 });
         }
+        LOG.debug("ENDING storePassThroughHeaders");
     }
 
-    private String getPassThruContextValue(String context) {
+    private void addPassThruContextValuesToHttpHeaders(HttpHeaders httpHeaders, String context) {
         if (null != request.getAttribute(context)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Use request ATTRIBUTE context <{}>: value <{}>", context, request.getAttribute(context));
             }
-            return (String) request.getAttribute(context);
+            if (httpHeaders.containsKey(context)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Removing headers context <{}>: value <{}>", context, httpHeaders.get(context));
+                }
+                httpHeaders.remove(context);
+            }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Add headers context <{}>: value <{}>", context, request.getAttribute(context));
+            }
+            httpHeaders.add(context, (String)request.getAttribute(context));
+        } else if (null != request.getHeader(context)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Use request HEADER context <{}>: value <{}>", context, request.getHeader(context));
+            }
+            httpHeaders.add(context, request.getHeader(context));
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Use request HEADER context <{}>: value <{}>", context, request.getHeader(context));
-        }
-        return request.getHeader(context);
     }
 
     private boolean logCallbackDetails(final String url) {

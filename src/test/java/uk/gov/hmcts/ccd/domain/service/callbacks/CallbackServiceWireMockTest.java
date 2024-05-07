@@ -55,8 +55,33 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
     })
 public class CallbackServiceWireMockTest extends WireMockBaseTest {
     private static final ObjectMapper mapper = new ObjectMapper();
-    public static final CallbackType TEST_CALLBACK = CallbackType.ABOUT_TO_START;
-
+    public static final CallbackType TEST_CALLBACK_ABOUT_TO_START = CallbackType.ABOUT_TO_START;
+    public static final CallbackType TEST_CALLBACK_ABOUT_TO_SUBMIT = CallbackType.ABOUT_TO_SUBMIT;
+    public static final CallbackType TEST_CALLBACK_SUBMITTED = CallbackType.SUBMITTED;
+    public static final String responseJson1 = "{\n"
+        + "    user_task: {\n"
+        + "        task_data: {\n"
+        + "            ... task structure as retrieved from task management API ...\n"
+        + "        },\n"
+        + "        complete_task: false\n"
+        + "    }\n"
+        + "}";
+    public static final String responseJson2 = "{\n"
+        + "    user_task: {\n"
+        + "        task_data: {\n"
+        + "            ... task structure updated on 2nd call ...\n"
+        + "        },\n"
+        + "        complete_task: false\n"
+        + "    }\n"
+        + "}";
+    public static final String responseJson3 = "{\n"
+        + "    user_task: {\n"
+        + "        task_data: {\n"
+        + "            ... task structure updated on final call ...\n"
+        + "        },\n"
+        + "        complete_task: true\n"
+        + "    }\n"
+        + "}";
     @Test
     public void happyPathWithNoErrorsOrWarnings() throws Exception {
         final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
@@ -74,11 +99,58 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, TEST_CALLBACK, caseEventDefinition,
+        final Optional<CallbackResponse> result = callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition,
             null, caseDetails, false);
         final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
         assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void happyPathWithNoErrorsOrWarningsAndWithClientContext() throws Exception {
+        final String testUrl1 = "http://localhost:" + wiremockPort + "/test-callback101";
+        final String testUrl2 = "http://localhost:" + wiremockPort + "/test-callback102";
+        final String testUrl3 = "http://localhost:" + wiremockPort + "/test-callback103";
+
+        final CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setState("test state");
+        caseDetails.setCaseTypeId("test case type");
+
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId("TEST-EVENT");
+
+        final CallbackResponse callbackResponse = new CallbackResponse();
+        callbackResponse.setData(caseDetails.getData());
+
+        stubFor(post(urlMatching("/test-callback101.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
+                .withStatus(200)
+                .withHeader("Client-Context", responseJson1)));
+
+        stubFor(post(urlMatching("/test-callback102.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
+                .withStatus(200)
+                .withHeader("Client-Context", responseJson2)));
+
+        stubFor(post(urlMatching("/test-callback103.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
+                .withStatus(200)
+                .withHeader("Client-Context", responseJson3)));
+
+        final Optional<CallbackResponse> result1 = callbackService.send(testUrl1, TEST_CALLBACK_ABOUT_TO_START,
+            caseEventDefinition, null, caseDetails, false);
+        final CallbackResponse response1 = result1.orElseThrow(() -> new AssertionError("Missing result"));
+
+        final Optional<CallbackResponse> result2 = callbackService.send(testUrl2, TEST_CALLBACK_ABOUT_TO_SUBMIT,
+            caseEventDefinition, null, caseDetails, false);
+        final CallbackResponse response2 = result2.orElseThrow(() -> new AssertionError("Missing result"));
+
+        final Optional<CallbackResponse> result3 = callbackService.send(testUrl3, TEST_CALLBACK_SUBMITTED,
+            caseEventDefinition, null, caseDetails, false);
+        final CallbackResponse response3 = result3.orElseThrow(() -> new AssertionError("Missing result"));
+
+        // Need a good Assertion here ... header is ...
+        assertTrue(response3.getErrors().isEmpty());
     }
 
     @org.junit.Ignore // TODO investigating socket issues in Azure
@@ -99,7 +171,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(1500)));
 
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, TEST_CALLBACK, caseEventDefinition,
+        final Optional<CallbackResponse> result = callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition,
             null, caseDetails,false);
 
         final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
@@ -124,7 +196,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, TEST_CALLBACK, caseEventDefinition,
+        final Optional<CallbackResponse> result = callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition,
             null, caseDetails,false);
         final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
@@ -138,7 +210,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("TEST-EVENT");
 
-        callbackService.send(testUrl, TEST_CALLBACK, caseEventDefinition, null, caseDetails, false);
+        callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null, caseDetails, false);
     }
 
     @Test(expected = CallbackException.class)
@@ -152,7 +224,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
 
-        callbackService.send(testUrl, TEST_CALLBACK, caseEventDefinition, null, caseDetails, false);
+        callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null, caseDetails, false);
     }
 
     @Test
@@ -168,7 +240,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
         Instant start = Instant.now();
         try {
-            callbackService.send(testUrl, TEST_CALLBACK, caseEventDefinition, null, caseDetails, false);
+            callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null, caseDetails, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -188,7 +260,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(401)));
 
-        callbackService.send(testUrl, TEST_CALLBACK, caseEventDefinition, null, caseDetails, false);
+        callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null, caseDetails, false);
     }
 
     @Test
@@ -240,7 +312,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback-submitted.*")).willReturn(
             okJson(mapper.writeValueAsString(callbackResponse)).withStatus(201)));
 
-        final ResponseEntity<String> result = callbackService.send(testUrl, TEST_CALLBACK, caseEventDefinition,
+        final ResponseEntity<String> result = callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition,
             null, caseDetails, String.class);
 
         assertAll(
@@ -266,7 +338,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
         Instant start = Instant.now();
         try {
-            callbackService.send(testUrl, TEST_CALLBACK, caseEventDefinition, null, caseDetails, String.class);
+            callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null, caseDetails, String.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -293,7 +365,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         caseEventDefinition.setId("TEST-EVENT");
 
         try {
-            underTest.send(testUrl, TEST_CALLBACK, caseEventDefinition, null, caseDetails, String.class);
+            underTest.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null, caseDetails, String.class);
         } catch (CallbackException ex) {
             assertThat(ex.getMessage(), is("Callback to service has been unsuccessful for event "
                 + caseEventDefinition.getName()));
