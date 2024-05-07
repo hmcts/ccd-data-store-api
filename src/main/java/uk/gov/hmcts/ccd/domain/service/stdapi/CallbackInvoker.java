@@ -221,16 +221,28 @@ public class CallbackInvoker {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         new Throwable().printStackTrace(printWriter);
-        return stringWriter.toString();
+        return stringWriter.toString().replaceAll("[\n\r]", "_");
     }
 
+    private String getCallStackString(Throwable throwable) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        throwable.printStackTrace(printWriter);
+        return stringWriter.toString().replaceAll("[\n\r]", "_");
+    }
+
+    /*
+     * 1. CallbackInvoker.validateAndSetFromAboutToSubmitCallback         (gets to #8 but NOT #9)
+     * 2. SecurityValidationService.setClassificationFromCallbackIfValid  (gets to #4 (before validateObject))
+     * 3. SecurityValidationService.validateObject
+     */
     private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition
                                                                                       caseTypeDefinition,
                                                                                   final CaseDetails caseDetails,
                                                                                   final Boolean ignoreWarning,
                                                                                   final CallbackResponse
                                                                                       callbackResponse) {
-        jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #1 -->  (7th May)");
+        jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #1 -->  (8th May)");
         try {
             final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
@@ -265,6 +277,8 @@ public class CallbackInvoker {
                 + e.getMessage());
             jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #10 *CALL STACK* = "
                 + getCallStackString());
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #10 *CALL STACK* = "
+                + getCallStackString(e));
             throw e;
         }
     }
