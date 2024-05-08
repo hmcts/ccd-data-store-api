@@ -160,7 +160,6 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response3 = result3.orElseThrow(() -> new AssertionError("Missing result"));
 
-        // Need a good Assertion here ... header is ...
         Object objectContext = request.getAttribute(HDR_CLIENT_CONTEXT);
         ArrayList<String> contextArray = (ArrayList<String>) objectContext;
         assertEquals(responseJson3.toString(), contextArray.get(0));
