@@ -224,7 +224,7 @@ public class CallbackInvoker {
         return stringWriter.toString().replaceAll("[\n\r]", "_");
     }
 
-    private String getCallStackString(Throwable throwable) {
+    private String getCallStackString(final Throwable throwable) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         throwable.printStackTrace(printWriter);
@@ -242,7 +242,7 @@ public class CallbackInvoker {
                                                                                   final Boolean ignoreWarning,
                                                                                   final CallbackResponse
                                                                                       callbackResponse) {
-        jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #1 -->  (8th May)");
+        jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #1 -->  (8th May 11am)");
         try {
             final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
@@ -276,9 +276,9 @@ public class CallbackInvoker {
             jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #10 *EXCEPTION* "
                 + e.getMessage());
             jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #10 *CALL STACK* = "
-                + getCallStackString());
-            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #10 *CALL STACK* = "
                 + getCallStackString(e));
+            jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #10 *CALL STACK* = "
+                + getCallStackString());
             throw e;
         }
     }
