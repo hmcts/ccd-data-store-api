@@ -92,7 +92,6 @@ public class CallbackInvoker {
                                                                      final CaseDetails caseDetails,
                                                                      final CaseTypeDefinition caseTypeDefinition,
                                                                      final Boolean ignoreWarning) {
-        LOG.debug("invokeAboutToSubmitCallback");
         final Optional<CallbackResponse> callbackResponse;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLAboutToSubmitEvent())) {
             callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
@@ -114,7 +113,6 @@ public class CallbackInvoker {
                                                                                    caseEventDefinition,
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
-        LOG.debug("invokeSubmittedCallback");
         ResponseEntity<AfterSubmitCallbackResponse> afterSubmitCallbackResponseEntity;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLSubmittedEvent())) {
             afterSubmitCallbackResponseEntity =
@@ -135,7 +133,6 @@ public class CallbackInvoker {
 
     public ResponseEntity<GetCaseCallbackResponse> invokeGetCaseCallback(final CaseTypeDefinition caseTypeDefinition,
                                                                          final CaseDetails caseDetails) {
-        LOG.debug("invokeGetCaseCallback");
         String url = caseTypeDefinition.getCallbackGetCaseUrl();
         List<Integer> retries = caseTypeDefinition.getRetriesGetCaseUrl();
 
@@ -168,7 +165,6 @@ public class CallbackInvoker {
                                               final CaseDetails caseDetails,
                                               final Boolean ignoreWarning) {
 
-        LOG.debug("invokeMidEventCallback");
         Optional<CallbackResponse> callbackResponseOptional;
         if (isRetriesDisabled(wizardPage.getRetriesTimeoutMidEvent())) {
             callbackResponseOptional = callbackService.sendSingleRequest(wizardPage.getCallBackURLMidEvent(),
