@@ -232,27 +232,36 @@ public class SecurityValidationService {
     }
 
 
-    private void validateCollection(JsonNode callbackClassificationItem, JsonNode defaultClassificationItem,
-                                    JsonNode filteredDataClassification) {
+    private void validateCollection(final JsonNode callbackClassificationItem, final JsonNode defaultClassificationItem,
+                                    final JsonNode filteredDataClassification) {
         try {
-            for (JsonNode callbackItem : callbackClassificationItem) {
+            jcLog2("JCDEBUG4: validateCollection #1 ---->");
+            jcLog2("JCDEBUG4: validateCollection #2 " + callbackClassificationItem.toString());
+            jcLog2("JCDEBUG4: validateCollection #3 " + defaultClassificationItem.toString());
+            jcLog2("JCDEBUG4: validateCollection #4 " + filteredDataClassification.toString());
+
+            for (final JsonNode callbackItem : callbackClassificationItem) {
                 JsonNode defaultItem = getDataClassificationForData(callbackItem, defaultClassificationItem.iterator());
                 if (defaultItem.isNull()) {
-                    defaultItem = getDataClassificationForData(callbackItem, filteredDataClassification.iterator());
-                }
-                if (defaultItem.isNull()) {
                     LOG.warn("No defaultClassificationItem for callbackItem={}", callbackItem);
+                    jcLog2("JCDEBUG4: validateCollection #5 , *NO* defaultClassificationItem for callbackItem "
+                        + callbackItem);
                     throw new ValidationException(VALIDATION_ERR_MSG);
+                } else {
+                    jcLog2("JCDEBUG4: validateCollection #5 , YES defaultClassificationItem for callbackItem "
+                        + callbackItem);
                 }
                 JsonNode callbackItemValue = callbackItem.get(VALUE);
                 JsonNode defaultItemValue = defaultItem.get(VALUE);
                 validateObject(callbackItemValue, defaultItemValue, filteredDataClassification);
             }
         } catch (Exception e) {
+            jcLog2("JCDEBUG4: validateCollection #6 *EXCEPTION*");
             jcLogCallStack("validateCollection", e);
             throw e;
         }
     }
+
 
     private boolean isValidClassification(JsonNode callbackClassificationValue, JsonNode defaultClassificationValue,
                                           JsonNode filteredClassificationValue) {
