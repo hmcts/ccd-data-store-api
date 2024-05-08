@@ -151,18 +151,17 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final Optional<CallbackResponse> result1 = callbackService.send(testUrl1, TEST_CALLBACK_ABOUT_TO_START,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response1 = result1.orElseThrow(() -> new AssertionError("Missing result"));
+        assertOnRequestAttribute(responseJson1);
 
         final Optional<CallbackResponse> result2 = callbackService.send(testUrl2, TEST_CALLBACK_ABOUT_TO_SUBMIT,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response2 = result2.orElseThrow(() -> new AssertionError("Missing result"));
+        assertOnRequestAttribute(responseJson2);
 
         final Optional<CallbackResponse> result3 = callbackService.send(testUrl3, TEST_CALLBACK_SUBMITTED,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response3 = result3.orElseThrow(() -> new AssertionError("Missing result"));
-
-        Object objectContext = request.getAttribute(HDR_CLIENT_CONTEXT);
-        ArrayList<String> contextArray = (ArrayList<String>) objectContext;
-        assertEquals(responseJson3.toString(), contextArray.get(0));
+        assertOnRequestAttribute(responseJson3);
     }
 
     @org.junit.Ignore // TODO investigating socket issues in Azure
@@ -391,4 +390,11 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             throw ex;
         }
     }
+
+    private void assertOnRequestAttribute(JSONObject jsonObject) {
+        Object objectContext = request.getAttribute(HDR_CLIENT_CONTEXT);
+        ArrayList<String> contextArray = (ArrayList<String>) objectContext;
+        assertEquals(jsonObject.toString(), contextArray.get(0));
+    }
+
 }
