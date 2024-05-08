@@ -15,7 +15,6 @@ public class CustomHeadersConfig implements WebMvcConfigurer {
         this.applicationParams = applicationParams;
     }
 
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(customHeadersInterceptor());
