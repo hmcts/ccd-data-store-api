@@ -60,6 +60,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 public class CallbackTest extends WireMockBaseTest {
 
     private static final String URL_BEFORE_COMMIT = "/before-commit.*";
+    private static final String UPLOAD_TIMESTAMP = "2000-02-29T00:00:00.00Z";
 
     private static JsonNode DATA = null;
     private static final String DATA_JSON_STRING =
@@ -209,7 +210,8 @@ public class CallbackTest extends WireMockBaseTest {
             + "  },\n"
             + "  \"D8Document\":{"
             + "    \"document_url\": \"http://localhost:" + getPort()
-            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
+            + "    \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "  }\n"
             + "}\n";
 
@@ -224,7 +226,8 @@ public class CallbackTest extends WireMockBaseTest {
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
             + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
-            + "    \"document_filename\": \"Seagulls_Square.jpg\""
+            + "    \"document_filename\": \"Seagulls_Square.jpg\",\n"
+            + "    \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "  }\n"
             + "}\n";
 
@@ -240,7 +243,8 @@ public class CallbackTest extends WireMockBaseTest {
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
             + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
-            + "    \"document_filename\": \"Seagulls_Square.jpg\""
+            + "    \"document_filename\": \"Seagulls_Square.jpg\",\n"
+            + "    \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "  }\n"
             + "}\n";
 
@@ -252,7 +256,8 @@ public class CallbackTest extends WireMockBaseTest {
             + "  },\n"
             + "  \"D8Document\":{"
             + "    \"document_url\": \"http://localhost:" + getPort()
-            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"\n"
+            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\",\n"
+            + "    \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "  }\n"
             + "}\n";
 
