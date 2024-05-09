@@ -21,7 +21,6 @@
     }
   },
 
-
   "expectedResponse": {
     "body": {
       "case_details": {

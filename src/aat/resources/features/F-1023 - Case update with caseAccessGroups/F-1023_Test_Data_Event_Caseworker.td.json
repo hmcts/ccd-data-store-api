@@ -1,5 +1,5 @@
 {
-	"_guid_": "F-1023_Test_Data_Event_Base",
+	"_guid_": "F-1023_Test_Data_Event_Caseworker",
   "_extends_": "Event_Creation_Caseworker_Base",
 
   "users": {
