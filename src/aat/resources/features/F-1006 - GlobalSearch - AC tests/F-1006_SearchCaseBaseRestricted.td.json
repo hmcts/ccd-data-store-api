@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1006_SearchCaseBase",
+  "_guid_": "F-1006_SearchCaseBaseRestricted",
   "productName": "CCD Data Store",
   "operationName": "Global Search",
   "method": "POST",
