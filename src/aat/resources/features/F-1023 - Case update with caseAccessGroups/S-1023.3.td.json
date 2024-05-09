@@ -1,7 +1,7 @@
 {
   "_guid_": "S-1023.3",
   "_extends_": "F-1023_Test_Data_Base",
-  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroupId created",
+  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST when OrganisationID is empty",
 
   "prerequisites" : [ {
       "Token_Creation": "S-1023_GetCreateToken"

@@ -21,7 +21,7 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     And       the response has all other details as expected
     And       the response [contains updated values for case_data and data_classification]
 
-  @S-1023.2 #AC-2
+  @S-1023.2 #AC-2 #AC-02 of CCD-5324
   Scenario: Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroupId not created when caseGroupType != CCD:all-cases-access
     Given     a user with [an active profile in CCD]
     When      a request is prepared with appropriate values
@@ -33,8 +33,8 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     And       the response has all other details as expected
     And       the response [contains updated values for case_data and data_classification]
 
-  @S-1023.3 #AC-3
-  Scenario: CaseAccessGroups field contains Invalid caseAccessGroupType value and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
+  @S-1023.3 #AC-3 #AC-03 of CCD-5324
+  Scenario: Invoke saveCaseDetailsForCaseWorkerUsingPOST when OrganisationID is empty
     Given     a user with [an active profile in CCD]
     When      a request is prepared with appropriate values
     And       the request [contains correctly configured values]
@@ -46,7 +46,7 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     And       the response has all other details as expected
     And       the response [contains updated values for case_data and data_classification]
 
-  @S-1023.4 #AC-4
+  @S-1023.4 #AC-4 #AC-10 of CCD-5324
   Scenario: CaseAccessGroups field contains valid caseAccessGroupType value but case data invalid and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
     Given     a user with [an active profile in CCD]
     When      a request is prepared with appropriate values
@@ -230,4 +230,26 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
 
     Then  a positive response is received
     And   the response has all other details as expected
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# v2_external#/case-controller/createEventUsingPOST
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-1023.18 #AC-18 #AC-07 of CCD-5324
+  Scenario:  Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST and caseAccessGroupId
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1023_CreateCasePreRequisiteCaseworker]
+
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created as in F-1023_CreateCasePreRequisiteCaseworker]
+    And the request [contains an event token for the case just created above]
+    And the request [contains some OrganisationPolicy fields with all correct values]
+    And the request [is of caseType where case_data has caseAccessGroupType of CCD:all-cases-access]
+    And the request [specifying the case to be updated, as created in F-1023_CreateCasePreRequisiteCaseworker]
+    And it is submitted to call the [Submit event creation (v2_ext)] operation of [CCD Data Store]
+
+    Then  a positive response is received
+    And   the response has all other details as expected
+
+
 
