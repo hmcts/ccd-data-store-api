@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.StartEventResource;
 
@@ -26,8 +27,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class StartEventControllerIT extends WireMockBaseTest {
 
+    private static final String HDR_CLIENT_CONTEXT = "Client-Context";
+    private static final JSONObject responseJson1 = new JSONObject("""
+        {
+            user_task: {
+                task_data: task structure as retrieved from task management API,
+                complete_task: false
+            }
+        }
+        """);
+    private static final JSONObject responseJson2 = new JSONObject("""
+        {
+            user_task: {
+                task_data: task structure updated on 2nd call,
+                complete_task: false
+            }
+        }
+        """);
+
     @Inject
     private WebApplicationContext wac;
+    @Inject
+    private CustomHeadersFilter customHeadersFilter;
+
     private MockMvc mockMvc;
 
     private final JSONObject jsonObject = new JSONObject("""
@@ -39,8 +61,7 @@ public class StartEventControllerIT extends WireMockBaseTest {
     @Before
     public void setUp() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
@@ -53,12 +74,30 @@ public class StartEventControllerIT extends WireMockBaseTest {
         headers.add("Client-Context", jsonObject.toString());
 
         mockMvc.perform(MockMvcRequestBuilders.get(
-            "/case-types/TestAddressBookCreatorCase/event-triggers/NO_PRE_STATES_EVENT")
+                    "/case-types/TestAddressBookCreatorCase/event-triggers/NO_PRE_STATES_EVENT")
                 .headers(headers)
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().exists("Client-Context"))
-            .andExpect(MockMvcResultMatchers.header().string("Client-Context", jsonObject.toString()));
+            .andExpect(MockMvcResultMatchers.header().exists(HDR_CLIENT_CONTEXT))
+            .andExpect(MockMvcResultMatchers.header().string(HDR_CLIENT_CONTEXT, jsonObject.toString()));
+    }
+
+    @Test
+    public void shouldReturnCustomHeaderFromAttribute() throws Exception {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTHORIZATION, "Bearer user1");
+        headers.add(V2.EXPERIMENTAL_HEADER, "true");
+        headers.add(HDR_CLIENT_CONTEXT, responseJson1.toString());
+
+        mockMvc.perform(MockMvcRequestBuilders.get(
+            "/case-types/TestAddressBookCreatorCase/event-triggers/NO_PRE_STATES_EVENT")
+                .requestAttr(HDR_CLIENT_CONTEXT, responseJson2)
+                .headers(headers)
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header().exists(HDR_CLIENT_CONTEXT))
+            .andExpect(MockMvcResultMatchers.header().string(HDR_CLIENT_CONTEXT, responseJson2.toString()));
     }
 
     @Test
@@ -68,6 +107,7 @@ public class StartEventControllerIT extends WireMockBaseTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
+        headers.add("Client-Context", "{jsonData:false}");
 
         final MvcResult result = mockMvc.perform(get(URL)
             .contentType(JSON_CONTENT_TYPE)

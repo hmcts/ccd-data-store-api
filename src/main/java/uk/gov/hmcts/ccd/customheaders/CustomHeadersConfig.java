@@ -1,13 +1,12 @@
 package uk.gov.hmcts.ccd.customheaders;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
 @Configuration
-public class CustomHeadersConfig implements WebMvcConfigurer {
+public class CustomHeadersConfig {
 
     private ApplicationParams applicationParams;
 
@@ -15,14 +14,11 @@ public class CustomHeadersConfig implements WebMvcConfigurer {
         this.applicationParams = applicationParams;
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(customHeadersInterceptor());
+    @Bean(name = "customHeadersFilterBean")
+    public FilterRegistrationBean<CustomHeadersFilter> customHeadersFilterBean() {
+        FilterRegistrationBean<CustomHeadersFilter> customHeadersFilterBean = new FilterRegistrationBean<>();
+        customHeadersFilterBean.setFilter(new CustomHeadersFilter(applicationParams));
+        customHeadersFilterBean.addUrlPatterns("/api/*");
+        return customHeadersFilterBean;
     }
-
-    @Bean
-    public CustomHeadersInterceptor customHeadersInterceptor() {
-        return new CustomHeadersInterceptor(applicationParams);
-    }
-
 }
