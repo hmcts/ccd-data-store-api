@@ -19,7 +19,6 @@ import java.io.IOException;
 public class CustomHeadersFilter implements Filter {
 
     private static final Logger LOG = LoggerFactory.getLogger(CustomHeadersFilter.class);
-    public static final String HDR_CLIENT_CONTEXT = "Client-Context";
 
     private final ApplicationParams applicationParams;
 

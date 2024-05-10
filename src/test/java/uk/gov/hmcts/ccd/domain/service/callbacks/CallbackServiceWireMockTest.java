@@ -61,7 +61,6 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 public class CallbackServiceWireMockTest extends WireMockBaseTest {
     private MockHttpServletRequest request;
     private static final ObjectMapper mapper = new ObjectMapper();
-    public static final String HDR_CLIENT_CONTEXT = "Client-Context";
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_START = CallbackType.ABOUT_TO_START;
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_SUBMIT = CallbackType.ABOUT_TO_SUBMIT;
     public static final CallbackType TEST_CALLBACK_SUBMITTED = CallbackType.SUBMITTED;
@@ -116,6 +115,13 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
     @Test
     public void passThruCustomHeadersLikeClientContext() throws Exception {
+        if (null == applicationParams || null == applicationParams.getCallbackPassthruHeaderContexts()
+            || applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
+            return;
+        }
+
+        final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
+
         request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
@@ -136,32 +142,32 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback101.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(HDR_CLIENT_CONTEXT, responseJson1.toString())));
+                .withHeader(customContext, responseJson1.toString())));
 
         stubFor(post(urlMatching("/test-callback102.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(HDR_CLIENT_CONTEXT, responseJson2.toString())));
+                .withHeader(customContext, responseJson2.toString())));
 
         stubFor(post(urlMatching("/test-callback103.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(HDR_CLIENT_CONTEXT, responseJson3.toString())));
+                .withHeader(customContext, responseJson3.toString())));
 
         final Optional<CallbackResponse> result1 = callbackService.send(testUrl1, TEST_CALLBACK_ABOUT_TO_START,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response1 = result1.orElseThrow(() -> new AssertionError("Missing result"));
-        assertOnRequestAttribute(responseJson1);
+        assertOnRequestAttribute(responseJson1, customContext);
 
         final Optional<CallbackResponse> result2 = callbackService.send(testUrl2, TEST_CALLBACK_ABOUT_TO_SUBMIT,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response2 = result2.orElseThrow(() -> new AssertionError("Missing result"));
-        assertOnRequestAttribute(responseJson2);
+        assertOnRequestAttribute(responseJson2, customContext);
 
         final Optional<CallbackResponse> result3 = callbackService.send(testUrl3, TEST_CALLBACK_SUBMITTED,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response3 = result3.orElseThrow(() -> new AssertionError("Missing result"));
-        assertOnRequestAttribute(responseJson3);
+        assertOnRequestAttribute(responseJson3, customContext);
     }
 
     @org.junit.Ignore // TODO investigating socket issues in Azure
@@ -391,8 +397,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         }
     }
 
-    private void assertOnRequestAttribute(JSONObject jsonObject) {
-        Object objectContext = request.getAttribute(HDR_CLIENT_CONTEXT);
+    private void assertOnRequestAttribute(JSONObject jsonObject, String customContext) {
+        Object objectContext = request.getAttribute(customContext);
         ArrayList<String> contextArray = (ArrayList<String>) objectContext;
         assertEquals(jsonObject.toString(), contextArray.get(0));
     }

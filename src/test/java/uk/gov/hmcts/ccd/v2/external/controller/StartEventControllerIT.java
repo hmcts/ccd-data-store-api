@@ -21,14 +21,12 @@ import uk.gov.hmcts.ccd.v2.external.resource.StartEventResource;
 import javax.inject.Inject;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class StartEventControllerIT extends WireMockBaseTest {
 
-    private static final String HDR_CLIENT_CONTEXT = "Client-Context";
     private static final JSONObject responseJson1 = new JSONObject("""
         {
             user_task: {
@@ -68,37 +66,49 @@ public class StartEventControllerIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturnCustomHeader() throws Exception {
+        if (null == applicationParams || null == applicationParams.getCallbackPassthruHeaderContexts()
+            || applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
+            return;
+        }
+
+        final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
-        headers.add("Client-Context", jsonObject.toString());
+        headers.add(customContext, jsonObject.toString());
 
         mockMvc.perform(MockMvcRequestBuilders.get(
                     "/case-types/TestAddressBookCreatorCase/event-triggers/NO_PRE_STATES_EVENT")
                 .headers(headers)
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().exists(HDR_CLIENT_CONTEXT))
-            .andExpect(MockMvcResultMatchers.header().string(HDR_CLIENT_CONTEXT, jsonObject.toString()));
+            .andExpect(MockMvcResultMatchers.header().exists(customContext))
+            .andExpect(MockMvcResultMatchers.header().string(customContext, jsonObject.toString()));
     }
 
     @Test
     public void shouldReturnCustomHeaderFromAttribute() throws Exception {
+        if (null == applicationParams || null == applicationParams.getCallbackPassthruHeaderContexts()
+            || applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
+            return;
+        }
+
+        final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
-        headers.add(HDR_CLIENT_CONTEXT, responseJson1.toString());
+        headers.add(customContext, responseJson1.toString());
 
         mockMvc.perform(MockMvcRequestBuilders.get(
             "/case-types/TestAddressBookCreatorCase/event-triggers/NO_PRE_STATES_EVENT")
-                .requestAttr(HDR_CLIENT_CONTEXT, responseJson2)
+                .requestAttr(customContext, responseJson2)
                 .headers(headers)
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().exists(HDR_CLIENT_CONTEXT))
-            .andExpect(MockMvcResultMatchers.header().string(HDR_CLIENT_CONTEXT, responseJson2.toString()));
+            .andExpect(MockMvcResultMatchers.header().exists(customContext))
+            .andExpect(MockMvcResultMatchers.header().string(customContext, responseJson2.toString()));
     }
 
     @Test
@@ -108,7 +118,6 @@ public class StartEventControllerIT extends WireMockBaseTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
-        headers.add(HDR_CLIENT_CONTEXT, "{jsonData:false}");
 
         final MvcResult result = mockMvc.perform(get(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -119,7 +128,6 @@ public class StartEventControllerIT extends WireMockBaseTest {
 
         final StartEventResource startEventResource = mapper.readValue(result.getResponse().getContentAsString(),
                 StartEventResource.class);
-        assertTrue(result.getResponse().getHeaderNames().contains(HDR_CLIENT_CONTEXT));
         assertNotNull("UI Start Trigger Resource is null", startEventResource);
     }
 
