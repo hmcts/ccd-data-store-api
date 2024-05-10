@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.v2.external.resource.StartEventResource;
 import javax.inject.Inject;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -107,7 +108,7 @@ public class StartEventControllerIT extends WireMockBaseTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
-        headers.add("Client-Context", "{jsonData:false}");
+        headers.add(HDR_CLIENT_CONTEXT, "{jsonData:false}");
 
         final MvcResult result = mockMvc.perform(get(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -118,6 +119,7 @@ public class StartEventControllerIT extends WireMockBaseTest {
 
         final StartEventResource startEventResource = mapper.readValue(result.getResponse().getContentAsString(),
                 StartEventResource.class);
+        assertTrue(result.getResponse().getHeaderNames().contains(HDR_CLIENT_CONTEXT));
         assertNotNull("UI Start Trigger Resource is null", startEventResource);
     }
 
