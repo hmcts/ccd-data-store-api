@@ -71,6 +71,7 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
             }
         }
         """);
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
