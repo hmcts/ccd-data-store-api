@@ -27,6 +27,7 @@ import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkDetails;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
 import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
@@ -84,9 +85,12 @@ class CaseControllerTestIT extends WireMockBaseTest {
     private static final String REQUEST_ID = "request-id";
     private static final String REQUEST_ID_VALUE = "1234567898765432";
     private static final String ROLE_PROBATE_SOLICITOR = "caseworker-probate-solicitor";
+    private static String CUSTOM_CONTEXT = "";
 
     @Inject
     private WebApplicationContext wac;
+    @Inject
+    private CustomHeadersFilter customHeadersFilter;
 
     private MockMvc mockMvc;
 
@@ -97,7 +101,10 @@ class CaseControllerTestIT extends WireMockBaseTest {
     public void setUp() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
+        if (!applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
+            CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
+        }
     }
 
     @Test
@@ -259,6 +266,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(CUSTOM_CONTEXT, responseJson1.toString())
             .header(REQUEST_ID, REQUEST_ID_VALUE)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
@@ -273,6 +281,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
+        assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
         assertThat(captor.getValue().getIdamId(), is(UID));
@@ -317,10 +326,12 @@ class CaseControllerTestIT extends WireMockBaseTest {
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
             .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .header(CUSTOM_CONTEXT, responseJson1.toString())
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
 
+        assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
         assertEquals(201, mvcResult.getResponse().getStatus(), mvcResult.getResponse().getContentAsString());
         String content = mvcResult.getResponse().getContentAsString();
         assertNotNull(content, "Content Should not be null");
@@ -376,11 +387,13 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(CUSTOM_CONTEXT, responseJson1.toString())
             .header(REQUEST_ID, REQUEST_ID_VALUE)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
 
+        assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
         assertEquals(201, mvcResult.getResponse().getStatus(), mvcResult.getResponse().getContentAsString());
         String content = mvcResult.getResponse().getContentAsString();
         assertNotNull(content, "Content Should not be null");
@@ -432,10 +445,12 @@ class CaseControllerTestIT extends WireMockBaseTest {
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
             .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .header(CUSTOM_CONTEXT, responseJson1.toString())
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
 
+        assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
         assertEquals(201, mvcResult.getResponse().getStatus(), mvcResult.getResponse().getContentAsString());
         String content = mvcResult.getResponse().getContentAsString();
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
@@ -473,10 +488,12 @@ class CaseControllerTestIT extends WireMockBaseTest {
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
             .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .header(CUSTOM_CONTEXT, responseJson1.toString())
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
 
+        assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
         assertEquals(201, mvcResult.getResponse().getStatus());
         final String content = mvcResult.getResponse().getContentAsString();
         assertNotNull(content, "Content Should not be null");
@@ -524,10 +541,12 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
             .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(CUSTOM_CONTEXT, responseJson1.toString())
             .contentType(jsonContentV3CreateCase)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
 
+        assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
         assertEquals(201, mvcResult.getResponse().getStatus(), mvcResult.getResponse().getContentAsString());
         String content = mvcResult.getResponse().getContentAsString();
 
@@ -555,10 +574,12 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(CUSTOM_CONTEXT, responseJson1.toString())
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
 
+        assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
         assertEquals(201, mvcResult.getResponse().getStatus(), mvcResult.getResponse().getContentAsString());
         String content = mvcResult.getResponse().getContentAsString();
         assertNotNull(content, "Content Should not be null");
@@ -740,11 +761,13 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(CUSTOM_CONTEXT, responseJson1.toString())
             .header(REQUEST_ID, REQUEST_ID_VALUE)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
 
+        assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
         assertEquals(201, mvcResult.getResponse().getStatus(), mvcResult.getResponse().getContentAsString());
         String content = mvcResult.getResponse().getContentAsString();
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
@@ -757,15 +780,17 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         @BeforeEach
         void setup() {
-            String userJson = "{\n"
-                + "          \"sub\": \"Cloud.Strife@test.com\",\n"
-                + "          \"uid\": \"1234\",\n"
-                + "          \"roles\": [\n"
-                + "            \"caseworker\",\n"
-                + "            \"caseworker-test\"\n"
-                + "          ],\n"
-                + "          \"name\": \"Cloud Strife\"\n"
-                + "        }";
+            String userJson = """
+                {
+                    "sub": "Cloud.Strife@test.com",
+                    "uid": "1234",
+                    "roles": [
+                        "caseworker",
+                        "caseworker-test"
+                      ],
+                      "name": "Cloud Strife"
+                }
+                """;
             stubFor(WireMock.get(urlMatching("/o/userinfo"))
                 .willReturn(okJson(userJson).withStatus(200)));
         }
