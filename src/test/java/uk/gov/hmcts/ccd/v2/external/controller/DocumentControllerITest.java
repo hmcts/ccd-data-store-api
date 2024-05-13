@@ -12,9 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.DocumentsResource;
@@ -32,6 +34,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,14 +47,21 @@ public class DocumentControllerITest extends WireMockBaseTest {
     private static final String REQUEST_ID = "request-id";
     private static final String REQUEST_ID_VALUE = "1234567898765432";
 
-    @SpyBean
-    private AuditRepository auditRepository;
-
     @Inject
     private WebApplicationContext wac;
+
+    @Inject
+    private CustomHeadersFilter customHeadersFilter;
+
+    @Inject
+    protected ApplicationParams applicationParams;
+
+    @Inject
+    protected DataSource db;
+
     private MockMvc mockMvc;
     protected static final ObjectMapper mapper = new ObjectMapper();
-    private String caseTypeResponseString = "{\n"
+    private static final String caseTypeResponseString = "{\n"
         + "      \"id\": \"TestAddressBookCase\",\n"
         + "      \"version\": {\n"
         + "        \"number\": 1,\n"
@@ -96,14 +106,16 @@ public class DocumentControllerITest extends WireMockBaseTest {
         + "      ]\n"
         + "    }";
 
-    @Inject
-    protected DataSource db;
+    private static String CUSTOM_CONTEXT = "";
 
     @Before
     public void setUp() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
+        if (!applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
+            CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
+        }
         mapper.registerModule(new Jackson2HalModule());
     }
 
@@ -123,6 +135,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Accept", V2.MediaType.CASE_DOCUMENTS)
                     .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .header(CUSTOM_CONTEXT, responseJson1.toString())
                     .header("experimental", true))
             .andExpect(status().is(200))
             .andReturn();
@@ -132,6 +145,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
         List<Document> documentResources = documentsResource.getDocumentResources();
         Optional<Link> self = documentsResource.getLink("self");
 
+        assertTrue(result.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
         assertAll(
             () -> assertThat(self.get().getHref(),
                 is(String.format("http://localhost:%s/cases/" + CASE_ID + "/documents", super.wiremockPort))),
