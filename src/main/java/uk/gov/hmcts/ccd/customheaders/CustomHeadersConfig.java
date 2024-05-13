@@ -18,7 +18,7 @@ public class CustomHeadersConfig {
     public FilterRegistrationBean<CustomHeadersFilter> customHeadersFilterBean() {
         FilterRegistrationBean<CustomHeadersFilter> customHeadersFilterBean = new FilterRegistrationBean<>();
         customHeadersFilterBean.setFilter(new CustomHeadersFilter(applicationParams));
-        customHeadersFilterBean.addUrlPatterns("/api/*");
+        customHeadersFilterBean.addUrlPatterns("/*");
         return customHeadersFilterBean;
     }
 }

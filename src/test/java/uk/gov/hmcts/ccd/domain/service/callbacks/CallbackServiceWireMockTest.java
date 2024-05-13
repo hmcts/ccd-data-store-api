@@ -115,11 +115,6 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
     @Test
     public void passThruCustomHeadersLikeClientContext() throws Exception {
-        if (null == applicationParams || null == applicationParams.getCallbackPassthruHeaderContexts()
-            || applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
-            return;
-        }
-
         final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
 
         request = new MockHttpServletRequest();
@@ -399,7 +394,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
     private void assertOnRequestAttribute(JSONObject jsonObject, String customContext) {
         Object objectContext = request.getAttribute(customContext);
-        ArrayList<String> contextArray = (ArrayList<String>) objectContext;
+        List<String> contextArray = (List<String>) objectContext;
         assertEquals(jsonObject.toString(), contextArray.get(0));
     }
 

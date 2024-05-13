@@ -151,9 +151,7 @@ public class CallbackService {
                 LOG.info("Callback {} response received: {}", url, responseEntity);
             }
 
-            final HttpHeaders httpHeadersNew = new HttpHeaders();
-            httpHeadersNew.addAll(responseEntity.getHeaders());
-            storePassThroughHeadersAsRequestAttributes(httpHeadersNew, request);
+            storePassThroughHeadersAsRequestAttributes(responseEntity.getHeaders(), request);
             httpStatus = responseEntity.getStatusCodeValue();
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
@@ -204,25 +202,17 @@ public class CallbackService {
 
     private void addPassThruContextValuesToHttpHeaders(HttpHeaders httpHeaders, String context) {
         if (null != request.getAttribute(context)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Use request ATTRIBUTE context <{}>: value <{}>", context, request.getAttribute(context));
-            }
+            LOG.debug("Use request ATTRIBUTE context <{}>: value <{}>", context, request.getAttribute(context));
             if (httpHeaders.containsKey(context)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Removing headers context <{}>: value <{}>", context, httpHeaders.get(context));
-                }
+                LOG.debug("Removing headers context <{}>: value <{}>", context, httpHeaders.get(context));
                 httpHeaders.remove(context);
             }
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Add headers context <{}>: value <{}>", context, request.getAttribute(context));
-            }
+            LOG.debug("Add headers context <{}>: value <{}>", context, request.getAttribute(context));
             httpHeaders.add(context, request.getAttribute(context).toString());
             // tidy up? remove the attribute
             request.removeAttribute(context);
         } else if (null != request.getHeader(context)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Use request HEADER context <{}>: value <{}>", context, request.getHeader(context));
-            }
+            LOG.debug("Use request HEADER context <{}>: value <{}>", context, request.getHeader(context));
             httpHeaders.add(context, request.getHeader(context));
         }
     }

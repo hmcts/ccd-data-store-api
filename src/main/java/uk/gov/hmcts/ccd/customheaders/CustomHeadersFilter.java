@@ -29,6 +29,7 @@ public class CustomHeadersFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
         throws IOException, ServletException {
+        filterChain.doFilter(request, response);
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         if (null != applicationParams
@@ -37,7 +38,6 @@ public class CustomHeadersFilter implements Filter {
                 .filter(StringUtils::hasLength)
                 .forEach(context -> setContextHeader(context, httpRequest, httpResponse));
         }
-        filterChain.doFilter(request, response);
     }
 
     private void setContextHeader(String context, HttpServletRequest request, HttpServletResponse response) {

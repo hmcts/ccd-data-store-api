@@ -66,11 +66,6 @@ public class StartEventControllerIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturnCustomHeader() throws Exception {
-        if (null == applicationParams || null == applicationParams.getCallbackPassthruHeaderContexts()
-            || applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
-            return;
-        }
-
         final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
 
         HttpHeaders headers = new HttpHeaders();
@@ -89,11 +84,6 @@ public class StartEventControllerIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturnCustomHeaderFromAttribute() throws Exception {
-        if (null == applicationParams || null == applicationParams.getCallbackPassthruHeaderContexts()
-            || applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
-            return;
-        }
-
         final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
 
         HttpHeaders headers = new HttpHeaders();
