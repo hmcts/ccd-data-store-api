@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 @Configuration
 public class CustomHeadersConfig {
 
-    private ApplicationParams applicationParams;
+    private final ApplicationParams applicationParams;
 
     public CustomHeadersConfig(ApplicationParams applicationParams) {
         this.applicationParams = applicationParams;
@@ -18,7 +18,7 @@ public class CustomHeadersConfig {
     public FilterRegistrationBean<CustomHeadersFilter> customHeadersFilterBean() {
         FilterRegistrationBean<CustomHeadersFilter> customHeadersFilterBean = new FilterRegistrationBean<>();
         customHeadersFilterBean.setFilter(new CustomHeadersFilter(applicationParams));
-        customHeadersFilterBean.addUrlPatterns("/*");
+        customHeadersFilterBean.addUrlPatterns("/**");
         return customHeadersFilterBean;
     }
 }
