@@ -82,9 +82,7 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
-        if (!applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
-            CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
-        }
+        CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
 
         mapper.registerModule(new Jackson2HalModule());
     }

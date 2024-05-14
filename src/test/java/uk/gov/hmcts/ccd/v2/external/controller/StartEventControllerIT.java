@@ -78,8 +78,7 @@ public class StartEventControllerIT extends WireMockBaseTest {
                 .headers(headers)
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().exists(customContext))
-            .andExpect(MockMvcResultMatchers.header().string(customContext, jsonObject.toString()));
+             .andExpect(MockMvcResultMatchers.header().string(customContext, jsonObject.toString()));
     }
 
     @Test
@@ -97,7 +96,6 @@ public class StartEventControllerIT extends WireMockBaseTest {
                 .headers(headers)
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().exists(customContext))
             .andExpect(MockMvcResultMatchers.header().string(customContext, responseJson2.toString()));
     }
 

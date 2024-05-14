@@ -32,6 +32,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -111,9 +112,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
-        if (!applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
-            CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
-        }
+        CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
         mapper.registerModule(new Jackson2HalModule());
     }
 
@@ -144,6 +143,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
         Optional<Link> self = documentsResource.getLink("self");
 
         assertTrue(result.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
+        assertEquals(responseJson1.toString(), result.getResponse().getHeader(CUSTOM_CONTEXT));
         assertAll(
             () -> assertThat(self.get().getHref(),
                 is(String.format("http://localhost:%s/cases/" + CASE_ID + "/documents", super.wiremockPort))),

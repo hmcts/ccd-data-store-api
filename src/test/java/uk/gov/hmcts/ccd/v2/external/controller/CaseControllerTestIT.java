@@ -102,9 +102,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
-        if (!applicationParams.getCallbackPassthruHeaderContexts().isEmpty()) {
-            CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
-        }
+        CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
     }
 
     @Test
