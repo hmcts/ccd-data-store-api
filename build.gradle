@@ -211,7 +211,7 @@ dependencies {
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.77'
 
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.5.14'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.7.12'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
