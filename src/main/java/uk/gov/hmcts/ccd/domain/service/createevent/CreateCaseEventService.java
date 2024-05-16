@@ -48,6 +48,7 @@ import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.endpoint.std.TestController;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
@@ -155,6 +156,10 @@ public class CreateCaseEventService {
         this.caseDocumentTimestampService = caseDocumentTimestampService;
     }
 
+    private static String jcLog(final String message) {
+        return TestController.jcLog(message);
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CreateCaseEventResult createCaseEvent(final String caseReference, final CaseDataContent content) {
 
@@ -194,6 +199,7 @@ public class CreateCaseEventService {
 
         final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
 
+        jcLog("JCDEBUG3: CreateCaseEventService.createCaseEvent #1");
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
             caseEventDefinition,
             caseDetailsInDatabase,
@@ -201,6 +207,7 @@ public class CreateCaseEventService {
             caseTypeDefinition,
             content.getIgnoreWarning()
         );
+        jcLog("JCDEBUG3: CreateCaseEventService.createCaseEvent #2");
 
         final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
 
@@ -287,6 +294,7 @@ public class CreateCaseEventService {
 
         final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(caseDetails);
 
+        jcLog("JCDEBUG3: CreateCaseEventService.createCaseSystemEvent #1");
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
             caseEventDefinition,
             caseDetailsInDatabase,
@@ -294,6 +302,7 @@ public class CreateCaseEventService {
             caseTypeDefinition,
             false
         );
+        jcLog("JCDEBUG3: CreateCaseEventService.createCaseSystemEvent #2");
 
         final Optional<String> newState = Optional.ofNullable(oldState);
 
