@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -81,6 +82,51 @@ class CallbackServiceTest {
     private CallbackResponse callbackResponse = new CallbackResponse();
     private Logger logger;
     private ListAppender<ILoggingEvent> listAppender;
+    public static final JSONObject responseAttrJson1 = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "00003",
+                    "task_name": "task name 3 from Attribute"
+                },
+                "complete_task": "false"
+            }
+        }
+        """);
+    public static final JSONObject responseAttrJson2 = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "000004",
+                    "task_name": "task name 4 from Attribute"
+                },
+                "complete_task": "false"
+            }
+        }
+        """);
+
+    public static final JSONObject responseHdrJson1 = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "00001",
+                    "task_name": "task name 1 from hdr"
+                },
+                "complete_task": "false"
+            }
+        }
+        """);
+    public static final JSONObject responseHdrJson2 = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "000002",
+                    "task_name": "task name 2 from hdr"
+                },
+                "complete_task": "false"
+            }
+        }
+        """);
 
     @BeforeEach
     void setUp() {
@@ -251,14 +297,14 @@ class CallbackServiceTest {
     @DisplayName("Should add callback passthru headers from request attribute")
     void shouldAddCallbackPassthruHeadersFromRequestAttribute() throws Exception {
         List<String> customHeaders = List.of("Client-Context","Dummy-Context1","DummyContext-2");
-        List<String> customHeaderValues = List.of("{json1:{test:1221}}","{json2:{test:2332}}");
+        List<String> customHeaderValues = List.of(responseAttrJson1.toString(),responseAttrJson2.toString());
 
         when(applicationParams.getCallbackPassthruHeaderContexts()).thenReturn(customHeaders);
         when(request.getAttribute(customHeaders.get(0))).thenReturn(customHeaderValues.get(0));
         when(request.getAttribute(customHeaders.get(1))).thenReturn(customHeaderValues.get(1));
         when(request.getAttribute(customHeaders.get(2))).thenReturn(null);
-        when(request.getHeader(customHeaders.get(0))).thenReturn("s1111");
-        when(request.getHeader(customHeaders.get(1))).thenReturn("s1112");
+        when(request.getHeader(customHeaders.get(0))).thenReturn(responseHdrJson1.toString());
+        when(request.getHeader(customHeaders.get(1))).thenReturn(responseHdrJson2.toString());
         when(request.getHeader(customHeaders.get(2))).thenReturn(null);
 
         HttpHeaders httpHeaders = new HttpHeaders();

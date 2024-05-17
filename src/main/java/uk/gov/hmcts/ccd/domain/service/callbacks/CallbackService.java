@@ -27,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
@@ -207,8 +208,16 @@ public class CallbackService {
                 LOG.debug("Removing headers context <{}>: value <{}>", context, httpHeaders.get(context));
                 httpHeaders.remove(context);
             }
-            LOG.debug("Add headers context <{}>: value <{}>", context, request.getAttribute(context));
-            httpHeaders.add(context, request.getAttribute(context).toString());
+
+            if ("Client-Context".equals(context)) {
+                String mergedClientContext = ClientContextUtil.mergeClientContexts(
+                    request.getHeader(context), request.getAttribute(context).toString());
+                LOG.debug("Add headers context <{}>: value <{}>", context, mergedClientContext);
+                httpHeaders.add(context, mergedClientContext);
+            } else {
+                LOG.debug("Add headers context <{}>: value <{}>", context, request.getAttribute(context));
+                httpHeaders.add(context, request.getAttribute(context).toString());
+            }
             // tidy up? remove the attribute
             request.removeAttribute(context);
         } else if (null != request.getHeader(context)) {

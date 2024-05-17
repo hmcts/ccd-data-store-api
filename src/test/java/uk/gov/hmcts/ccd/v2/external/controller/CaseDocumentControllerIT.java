@@ -65,9 +65,12 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
     private static String CUSTOM_CONTEXT = "";
     public static final JSONObject responseJson1 = new JSONObject("""
         {
-            user_task: {
-                task_data: task structure as retrieved from task management API,
-                complete_task: false
+            "user_task": {
+                "task_data": {
+                    "task_id": "000001",
+                    "task_name": "Task 1 name"
+                },
+                "complete_task": "false"
             }
         }
         """);

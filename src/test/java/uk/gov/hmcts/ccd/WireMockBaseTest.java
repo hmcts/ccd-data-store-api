@@ -70,9 +70,23 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
     public static final int NUMBER_OF_CASES = 23;
     public static final JSONObject responseJson1 = new JSONObject("""
         {
-            user_task: {
-                task_data: task structure as retrieved from task management API,
-                complete_task: false
+            "user_task": {
+                "task_data": {
+                    "task_id": "0001",
+                    "task_name": "Task 1 - description 1"
+                },
+                "complete_task": "false"
+            }
+        }
+        """);
+    public static final JSONObject responseJson2 = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "00002",
+                    "task_name": "Task 2 as modified by callback",
+                },
+                "complete_task": "true"
             }
         }
         """);

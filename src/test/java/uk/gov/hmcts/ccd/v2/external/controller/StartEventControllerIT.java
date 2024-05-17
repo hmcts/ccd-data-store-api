@@ -29,17 +29,23 @@ public class StartEventControllerIT extends WireMockBaseTest {
 
     private static final JSONObject responseJson1 = new JSONObject("""
         {
-            user_task: {
-                task_data: task structure as retrieved from task management API,
-                complete_task: false
+            "user_task": {
+                "task_data": {
+                    "task_id": "000001",
+                    "task_name": "Task 1 name"
+                },
+                "complete_task": "false"
             }
         }
         """);
     private static final JSONObject responseJson2 = new JSONObject("""
         {
-            user_task: {
-                task_data: task structure updated on 2nd call,
-                complete_task: false
+            "user_task": {
+                "task_data": {
+                    "task_id": "000002",
+                    "task_name": "Task 2 name"
+                },
+                "complete_task": "false"
             }
         }
         """);

@@ -66,25 +66,34 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
     public static final CallbackType TEST_CALLBACK_SUBMITTED = CallbackType.SUBMITTED;
     public static final JSONObject responseJson1 = new JSONObject("""
         {
-            user_task: {
-                task_data: task structure as retrieved from task management API,
-                complete_task: false
+            "user_task": {
+                "task_data": {
+                    "task_id": "00001",
+                    "task_name": "task name 1"
+                },
+                "complete_task": "false"
             }
         }
         """);
     public static final JSONObject responseJson2 = new JSONObject("""
         {
-            user_task: {
-                task_data: task structure updated on 2nd call,
-                complete_task: false
+            "user_task": {
+                "task_data": {
+                    "task_id": "000002",
+                    "task_name": "task name 2"
+                },
+                "complete_task": "false"
             }
         }
         """);
     public static final JSONObject responseJson3 = new JSONObject("""
         {
-            user_task: {
-                task_data: task structure updated on final call,
-                complete_task: true
+            "user_task": {
+                "task_data": {
+                    "task_id": "000003",
+                    "task_name": "task name 3"
+                },
+                "complete_task": "true"
             }
         }
         """);
