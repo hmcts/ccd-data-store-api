@@ -82,6 +82,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
                     "task_id": "000002",
                     "task_name": "task name 2"
                 },
+                "new_field": "check1",
                 "complete_task": "false"
             }
         }

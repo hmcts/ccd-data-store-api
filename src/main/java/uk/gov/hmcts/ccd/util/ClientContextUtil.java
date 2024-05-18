@@ -20,11 +20,15 @@ public class ClientContextUtil {
             nodeA = (ObjectNode) objectMapper.readTree(jsonA);
         } catch (IOException e) {
             LOG.error("Problem deserialising jsonA: {}", jsonA, e);
+        } catch (Exception e) {
+            LOG.error("Problem with jsonA: {}", jsonA, e);
         }
         try {
             nodeB = (ObjectNode) objectMapper.readTree(jsonB);
         } catch (IOException e) {
             LOG.error("Problem deserialising jsonB: {}", jsonB, e);
+        } catch (Exception e) {
+            LOG.error("Problem with jsonB: {}", jsonB, e);
         }
 
         if (null == nodeA && null == nodeB) {

@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -10,10 +8,10 @@ import org.slf4j.Logger;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-public class ClientContextUtilTest {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+class ClientContextUtilTest {
     private Logger mockLogger;
 
     @BeforeEach
