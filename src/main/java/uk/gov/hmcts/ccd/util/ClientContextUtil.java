@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.util;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
@@ -9,42 +8,47 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 public class ClientContextUtil {
-    public static Logger LOG = LoggerFactory.getLogger(ClientContextUtil.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(ClientContextUtil.class);
+
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static String mergeClientContexts(String jsonA, String jsonB) {
-        ObjectNode nodeA = null;
-        ObjectNode nodeB = null;
+    private ClientContextUtil() {}
+
+    public static String mergeClientContexts(String originalJson, String toBeMergedJson) {
+        ObjectNode originalJsonNode = null;
+        ObjectNode toBeMergedJsonNode = null;
 
         try {
-            nodeA = (ObjectNode) objectMapper.readTree(jsonA);
+            originalJsonNode = (ObjectNode) objectMapper.readTree(originalJson);
         } catch (IOException e) {
-            LOG.error("Problem deserialising jsonA: {}", jsonA, e);
+            LOG.error("Problem deserialising original JSON: {}", originalJson, e);
         } catch (Exception e) {
-            LOG.error("Problem with jsonA: {}", jsonA, e);
+            LOG.error("Problem with original JSON: {}", originalJson, e);
         }
         try {
-            nodeB = (ObjectNode) objectMapper.readTree(jsonB);
+            toBeMergedJsonNode = (ObjectNode) objectMapper.readTree(toBeMergedJson);
         } catch (IOException e) {
-            LOG.error("Problem deserialising jsonB: {}", jsonB, e);
+            LOG.error("Problem deserialising to-Be-Merged JSON: {}", toBeMergedJson, e);
         } catch (Exception e) {
-            LOG.error("Problem with jsonB: {}", jsonB, e);
+            LOG.error("Problem with to-Be-Merged JSON: {}", toBeMergedJson, e);
         }
 
-        if (null == nodeA && null == nodeB) {
-            return jsonA;
-        } else if (null == nodeB) {
-            return jsonA;
-        } else if (null == nodeA) {
-            return jsonB;
+        if (null == originalJsonNode && null == toBeMergedJsonNode) {
+            return originalJson;
+        } else if (null == toBeMergedJsonNode) {
+            return originalJson;
+        } else if (null == originalJsonNode) {
+            return toBeMergedJson;
         }
 
-        mergeObjectNodes(nodeA, nodeB);
-        return nodeA.toString();
-    }
+        mergeObjectNodes(originalJsonNode, toBeMergedJsonNode);
+        return originalJsonNode.toString();    }
 
-    private static void mergeObjectNodes(ObjectNode targetNode, ObjectNode sourceNode) {
-        sourceNode.fields().forEachRemaining(entry -> targetNode.set(entry.getKey(), entry.getValue()));
+    private static void mergeObjectNodes(ObjectNode originalJsonNode, ObjectNode toBeMergedJsonNode) {
+        toBeMergedJsonNode.fields().forEachRemaining(entry ->
+            originalJsonNode.set(entry.getKey(), entry.getValue())
+        );
     }
 
 }

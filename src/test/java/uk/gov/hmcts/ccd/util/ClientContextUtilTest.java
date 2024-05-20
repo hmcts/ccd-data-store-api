@@ -1,68 +1,50 @@
 package uk.gov.hmcts.ccd.util;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class ClientContextUtilTest {
-    private Logger mockLogger;
-
-    @BeforeEach
-    public void setUp() {
-        mockLogger = mock(Logger.class);
-        ClientContextUtil.LOG = mockLogger;
-    }
 
     @Test
-    void testMergeClientContextsBothValid() throws IOException {
-        String jsonA = "{\"key1\": \"value1\", \"key2\": \"value2\"}";
-        String jsonB = "{\"key2\": \"newValue2\", \"key3\": \"value3\"}";
+    void testMergeClientContextsBothValid() {
+        String originalJson = "{\"key1\": \"value1\", \"key2\": \"value2\"}";
+        String toBeMergedJson = "{\"key2\": \"newValue2\", \"key3\": \"value3\"}";
         String expectedMergedJson = "{\"key1\":\"value1\",\"key2\":\"newValue2\",\"key3\":\"value3\"}";
 
-        String result = ClientContextUtil.mergeClientContexts(jsonA, jsonB);
+        String result = ClientContextUtil.mergeClientContexts(originalJson, toBeMergedJson);
 
         assertEquals(expectedMergedJson, result);
     }
 
     @Test
-    void testMergeClientContextsInvalidJsonA() {
-        String invalidJsonA = "invalid json";
-        String jsonB = "{\"key2\":\"newValue2\",\"key3\":\"value3\"}";
+    void testMergeClientContextsWithInvalidJsonA() {
+        String invalidOriginalJson = "invalid JSON";
+        String toBeMergedJson = "{\"key2\":\"newValue2\",\"key3\":\"value3\"}";
         String expectedMergedJson = "{\"key2\":\"newValue2\",\"key3\":\"value3\"}";
 
-        String result = ClientContextUtil.mergeClientContexts(invalidJsonA, jsonB);
+        String result = ClientContextUtil.mergeClientContexts(invalidOriginalJson, toBeMergedJson);
 
         assertEquals(expectedMergedJson, result);
-        verify(mockLogger).error(Mockito.anyString(), Mockito.eq(invalidJsonA), Mockito.any(IOException.class));
     }
 
     @Test
-    void testMergeClientContextsInvalidJsonB() {
-        String jsonA = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
-        String invalidJsonB = "invalid json";
+    void testMergeClientContextsWithInvalidToBeMergedJson() {
+        String originalJson = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
+        String invalidToBeMergedJson = "invalid To Be Merged JSON";
 
-        String result = ClientContextUtil.mergeClientContexts(jsonA, invalidJsonB);
+        String result = ClientContextUtil.mergeClientContexts(originalJson, invalidToBeMergedJson);
 
-        assertEquals(jsonA, result);
-        verify(mockLogger).error(Mockito.anyString(), Mockito.eq(invalidJsonB), Mockito.any(IOException.class));
+        assertEquals(originalJson, result);
     }
 
     @Test
-    void testMergeClientContextsBothInvalid() {
-        String invalidJsonA = "invalid json A";
-        String invalidJsonB = "invalid json B";
+    void testMergeClientContextsWithBothInvalid() {
+        String invalidOriginalJson = "invalid original JSON";
+        String invalidToBeMergedJson = "invalid to-Be-Merged JSON";
 
-        String result = ClientContextUtil.mergeClientContexts(invalidJsonA, invalidJsonB);
+        String result = ClientContextUtil.mergeClientContexts(invalidOriginalJson, invalidToBeMergedJson);
 
-        assertEquals(invalidJsonA, result);
-        verify(mockLogger).error(Mockito.anyString(), Mockito.eq(invalidJsonA), Mockito.any(IOException.class));
-        verify(mockLogger).error(Mockito.anyString(), Mockito.eq(invalidJsonB), Mockito.any(IOException.class));
+        assertEquals(invalidOriginalJson, result);
     }
 }
