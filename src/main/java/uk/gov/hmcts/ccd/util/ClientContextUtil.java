@@ -44,11 +44,7 @@ public class ClientContextUtil {
     }
 
     private static void mergeObjectNodes(ObjectNode targetNode, ObjectNode sourceNode) {
-        sourceNode.fields().forEachRemaining(entry -> {
-            String fieldName = entry.getKey();
-            JsonNode value = entry.getValue();
-            targetNode.set(fieldName, value);
-        });
+        sourceNode.fields().forEachRemaining(entry -> targetNode.set(entry.getKey(), entry.getValue()));
     }
 
 }
