@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +40,16 @@ public class SecurityValidationService {
 
     private final AuthorisedGetCaseOperation authorisedGetCaseOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public SecurityValidationService(
         final AuthorisedGetCaseOperation authorisedGetCaseOperation,
-        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
+        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+        final ObjectMapper objectMapper) {
         this.authorisedGetCaseOperation = authorisedGetCaseOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.objectMapper = objectMapper;
     }
 
     private static String jcLog2(final String message) {
@@ -82,7 +87,7 @@ public class SecurityValidationService {
                                                      CaseDetails caseDetails,
                                                      Map<String, JsonNode> defaultDataClassification) {
         try {
-            jcLog2("JCDEBUG3: SecurityValidationService.setClassificationFromCallbackIfValid #1 -->  (18th May)");
+            jcLog2("JCDEBUG3: SecurityValidationService.setClassificationFromCallbackIfValid #1 -->  (20th May)");
             if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
                 jcLog2("JCDEBUG3: SecurityValidationService.setClassificationFromCallbackIfValid #2");
                 caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
@@ -129,7 +134,7 @@ public class SecurityValidationService {
     private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification,
                                 JsonNode filteredDataClassification) {
         try {
-            jcLog2("JCDEBUG3: SecurityValidationService.validateObject #1 -->  (18th May)");
+            jcLog2("JCDEBUG3: SecurityValidationService.validateObject #1 -->  (20th May)");
             if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification,
                 filteredDataClassification)) {
                 LOG.warn("callbackClassification={} and defaultClassification={} sizes differ",
@@ -217,13 +222,27 @@ public class SecurityValidationService {
     private boolean isNotNullAndSizeEqual(JsonNode callbackDataClassification, JsonNode defaultDataClassification,
                                           JsonNode filteredDataClassification) {
         try {
+            try {
+                jcLog2("JCDEBUG3: SecurityValidationService.isNotNullAndSizeEqual: callbackDataClassification: "
+                    + callbackDataClassification.size() + " " + callbackDataClassification.hashCode() + " "
+                    + objectMapper.writeValueAsString(callbackDataClassification).hashCode());
+                jcLog2("JCDEBUG3: SecurityValidationService.isNotNullAndSizeEqual: defaultDataClassification: "
+                    + defaultDataClassification.size() + " " + defaultDataClassification.hashCode() + " "
+                    + objectMapper.writeValueAsString(defaultDataClassification).hashCode());
+                jcLog2("JCDEBUG3: SecurityValidationService.isNotNullAndSizeEqual: filteredDataClassification: "
+                    + filteredDataClassification.size() + " " + filteredDataClassification.hashCode() + " "
+                    + objectMapper.writeValueAsString(filteredDataClassification).hashCode());
+            } catch (JsonProcessingException e) {
+                jcLog2("JCDEBUG3: SecurityValidationService.isNotNullAndSizeEqual: (JsonProcessingException)");
+            }
+
             boolean valid = defaultDataClassification != null && callbackDataClassification != null
                 && defaultDataClassification.size() == callbackDataClassification.size();
-            ////jcLog("JCDEBUG3: SecurityValidationService.isNotNullAndSizeEqual: valid1 = " + valid);
+            jcLog2("JCDEBUG3: SecurityValidationService.isNotNullAndSizeEqual: valid1 = " + valid);
             if (!valid) {
                 valid = filteredDataClassification != null && callbackDataClassification != null
                     && filteredDataClassification.size() == callbackDataClassification.size();
-                ////jcLog("JCDEBUG3: SecurityValidationService.isNotNullAndSizeEqual: valid2 = " + valid);
+                jcLog2("JCDEBUG3: SecurityValidationService.isNotNullAndSizeEqual: valid2 = " + valid);
             }
             return valid;
         } catch (Exception e) {
