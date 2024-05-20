@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,11 +40,14 @@ class SecurityValidationServiceTest {
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        securityValidationService = new SecurityValidationService(authorisedGetCaseOperation, caseDefinitionRepository);
+        securityValidationService = new SecurityValidationService(authorisedGetCaseOperation, caseDefinitionRepository,
+            objectMapper);
     }
 
     @Nested
