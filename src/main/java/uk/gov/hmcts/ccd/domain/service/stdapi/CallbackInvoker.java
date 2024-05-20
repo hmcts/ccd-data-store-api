@@ -259,15 +259,18 @@ public class CallbackInvoker {
                 caseDetails.setState(callbackResponse.getState());
             }
             if (callbackResponse.getData() != null) {
-                jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #7");
+                jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #7.1");
                 validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
+                jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #7.2");
                 if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
-                    jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #8");
+                    jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #8.1 (yes)");
                     securityValidationService.setClassificationFromCallbackIfValid(
                         callbackResponse,
                         caseDetails,
                         deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails)
                     );
+                } else {
+                    jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #8.2 (*NO*)");
                 }
             }
             jcLog("JCDEBUG3: CallbackInvoker.validateAndSetFromAboutToSubmitCallback #9 (OK)");
