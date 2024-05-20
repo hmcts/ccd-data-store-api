@@ -44,6 +44,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
     private static final String WILDCARD = "*";
+    private static final String CLIENT_CONTEXT = "Client-Context";
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
@@ -209,7 +210,7 @@ public class CallbackService {
                 httpHeaders.remove(context);
             }
 
-            if ("Client-Context".equals(context)) {
+            if (CLIENT_CONTEXT.equals(context)) {
                 String mergedClientContext = ClientContextUtil.mergeClientContexts(
                     request.getHeader(context), request.getAttribute(context).toString());
                 LOG.debug("Add headers context <{}>: value <{}>", context, mergedClientContext);
