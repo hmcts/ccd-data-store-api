@@ -218,7 +218,6 @@ public class CallbackService {
                 LOG.debug("Add headers context <{}>: value <{}>", context, request.getAttribute(context));
                 httpHeaders.add(context, request.getAttribute(context).toString());
             }
-            // tidy up? remove the attribute
             request.removeAttribute(context);
         } else if (null != request.getHeader(context)) {
             LOG.debug("Use request HEADER context <{}>: value <{}>", context, request.getHeader(context));
