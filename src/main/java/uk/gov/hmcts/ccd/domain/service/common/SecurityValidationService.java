@@ -234,6 +234,8 @@ public class SecurityValidationService {
                     + objectMapper.writeValueAsString(filteredDataClassification).hashCode());
             } catch (JsonProcessingException e) {
                 jcLog2("JCDEBUG3: SecurityValidationService.isNotNullAndSizeEqual: (JsonProcessingException)");
+            } catch (NullPointerException e) {
+                jcLog2("JCDEBUG3: SecurityValidationService.isNotNullAndSizeEqual: (NullPointerException)");
             }
 
             boolean valid = defaultDataClassification != null && callbackDataClassification != null
