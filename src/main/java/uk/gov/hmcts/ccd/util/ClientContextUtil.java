@@ -40,13 +40,7 @@ public class ClientContextUtil {
         }
 
         mergeObjectNodes(nodeA, nodeB);
-        String mergedJson = "";
-        try {
-            mergedJson = objectMapper.writeValueAsString(nodeA);
-        } catch (IOException e) {
-            LOG.error("Problem deserialising mergedJson: {}", mergedJson, e);
-        }
-        return mergedJson;
+        return nodeA.toString();
     }
 
     private static void mergeObjectNodes(ObjectNode targetNode, ObjectNode sourceNode) {
