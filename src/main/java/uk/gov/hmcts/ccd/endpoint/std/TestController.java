@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
-// TODO: Update Private Law data-store image from PR-2412 to PR-2410
+// TODO: **** Update Private Law data-store image from PR-2412 to PR-2410 ****
 
 @RestController
 public class TestController {
@@ -48,7 +48,7 @@ public class TestController {
     public static String jcLog(final String message) {
         String rc = "";
         try {
-            final String url = "https://ccd-data-store-api-pr-2412.preview.platform.hmcts.net/jcdebug";
+            final String url = "https://ccd-data-store-api-pr-2410.preview.platform.hmcts.net/jcdebug";
             URL apiUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
             connection.setRequestMethod("POST");
