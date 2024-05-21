@@ -2160,13 +2160,11 @@ public class AccessControlServiceTest {
             assertAll(() -> assertTrue(jsonNode.get("People").get(0).get(VALUE).get("BirthInfo").isEmpty()),
                 () -> assertThat(jsonNode.get("People").get(0).get(VALUE).get("FirstName").textValue(), is("Fatih")),
                 () -> assertThat(jsonNode.get("People").get(1).get(VALUE).get("FirstName").textValue(), is("Andrew")));
-
-            /*
+            
             List<ILoggingEvent> logsList = listAppender.list;
             assertEquals("Can not find field with caseFieldId=BirthInfo, "
                     + "accessControlList=[ACL{accessProfile='caseworker-probate-loa1', crud=R}]",
                 logsList.get(0).getFormattedMessage());
-             */
 
             logger.detachAndStopAllAppenders();
         }

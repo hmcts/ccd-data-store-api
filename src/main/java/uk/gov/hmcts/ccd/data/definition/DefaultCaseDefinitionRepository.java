@@ -17,8 +17,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -171,19 +169,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         return getLatestVersionFromDefinitionStore(caseTypeId);
     }
 
-    /*
-     * ==== Get call start as string. ====
-     */
-    private String getCallStackString() {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-        new Throwable().printStackTrace(printWriter);
-        return stringWriter.toString().replaceAll("[\n\r]", "_");
-    }
-
     public CaseTypeDefinitionVersion getLatestVersionFromDefinitionStore(String caseTypeId) {
-        LOG.debug("JCDEBUG: DefaultCaseDefinitionRepository.getLatestVersionFromDefinitionStore: CALL STACK = "
-            + getCallStackString());
         try {
             CaseTypeDefinitionVersion version = definitionStoreClient
                 .invokeGetRequest(applicationParams.caseTypeLatestVersionUrl(caseTypeId),

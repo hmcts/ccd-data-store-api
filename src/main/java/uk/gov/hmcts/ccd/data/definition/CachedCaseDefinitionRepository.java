@@ -13,8 +13,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -80,20 +78,8 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
         }
     }
 
-    /*
-     * ==== Get call start as string. ====
-     */
-    private String getCallStackString() {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-        new Throwable().printStackTrace(printWriter);
-        return stringWriter.toString().replaceAll("[\n\r]", "_");
-    }
-
     private CaseTypeDefinition getClonedCaseType(int version, String caseTypeId) {
-        log.debug("JCDEBUG: CachedCaseDefinitionRepository.getClonedCaseType: CALL STACK = " + getCallStackString());
         var clonedCaseType = caseDefinitionRepository.getCaseType(version, caseTypeId).createCopy();
-        log.debug("Cloned case type: {}", clonedCaseType);
         return clonedCaseType;
     }
 
