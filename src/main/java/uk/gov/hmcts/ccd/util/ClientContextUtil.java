@@ -13,7 +13,9 @@ public class ClientContextUtil {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private ClientContextUtil() {}
+    private ClientContextUtil() {
+
+    }
 
     public static String mergeClientContexts(String originalJson, String toBeMergedJson) {
         ObjectNode originalJsonNode = null;
@@ -43,7 +45,8 @@ public class ClientContextUtil {
         }
 
         mergeObjectNodes(originalJsonNode, toBeMergedJsonNode);
-        return originalJsonNode.toString();    }
+        return originalJsonNode.toString();
+    }
 
     private static void mergeObjectNodes(ObjectNode originalJsonNode, ObjectNode toBeMergedJsonNode) {
         toBeMergedJsonNode.fields().forEachRemaining(entry ->
