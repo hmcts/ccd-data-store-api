@@ -294,38 +294,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
         assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
     }
 
-//    @ Test
-//    void shouldReturnCustomHeaderWithAlteredValueFromCallback() throws Exception {
-//        final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
-//        //final String URL = "/case-types/" + CASE_TYPE + "/cases";
-//        final String URL = "/case-type/TestAddressBookCaseCaseLinks
-//
-//        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-//        final Event triggeringEvent = anEvent().build();
-//        final String description = "A very long comment.......";
-//        final String summary = "Short comment";
-//
-//        triggeringEvent.setEventId(TEST_EVENT_ID);
-//        triggeringEvent.setDescription(description);
-//        triggeringEvent.setSummary(summary);
-//        caseDetailsToSave.setEvent(triggeringEvent);
-//        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
-//        caseDetailsToSave.setToken(token);
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add(AUTHORIZATION, "Bearer user1");
-//        headers.add(V2.EXPERIMENTAL_HEADER, "true");
-//        headers.add(customContext, responseJson1.toString());
-//
-//        final MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(URL).headers(headers)
-//            .contentType(JSON_CONTENT_TYPE)
-//            .content(mapper.writeValueAsString(caseDetailsToSave))
-//        ).andReturn();
-//
-//        assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
-//        assertEquals(responseJson2.toString(), mvcResult.getResponse().getHeader(CUSTOM_CONTEXT));
-//    }
-
     @Test
     void shouldReturnCustomHeaderWithAlteredValueFromCallback() throws Exception {
         final String callbackEventId = "TEST_SUBMIT_CALLBACK_EVENT";
