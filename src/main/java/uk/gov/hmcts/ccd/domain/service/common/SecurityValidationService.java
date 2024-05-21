@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -17,6 +19,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.caseHasClassificationEqualOrLowerThan;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getSecurityClassification;
+import static uk.gov.hmcts.ccd.endpoint.std.TestController.jcLog;
 
 @Service
 public class SecurityValidationService {
@@ -27,6 +30,23 @@ public class SecurityValidationService {
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data "
         + "validation error (c)";
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private void jcLogJsonNodeValue(final String message, final JsonNode value) {
+        try {
+            jcLog(message + " " + value.size() + " " + value.hashCode() + " "
+                + objectMapper.writeValueAsString(value).hashCode());
+        } catch (Exception e) {
+            jcLog(message + " EXCEPTION: " + e.getMessage());
+        }
+    }
+
+    /*
+     * 1. CallbackInvoker.validateAndSetFromAboutToSubmitCallback
+     * 2. SecurityValidationService.setClassificationFromCallbackIfValid
+     * 3. SecurityValidationService.validateObject
+     */
     public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse,
                                                      CaseDetails caseDetails,
                                                      Map<String, JsonNode> defaultDataClassification) {
@@ -34,8 +54,18 @@ public class SecurityValidationService {
         if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
 
-            validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
-                JacksonUtils.convertValueJsonNode(defaultDataClassification));
+            // BELOW: JC debugging
+            final JsonNode callbackDataClassification_Value =
+                JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification());
+            final JsonNode defaultDataClassification_Value =
+                JacksonUtils.convertValueJsonNode(defaultDataClassification);
+            jcLogJsonNodeValue("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): "
+                + "callbackDataClassification_Value", callbackDataClassification_Value);
+            jcLogJsonNodeValue("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): "
+                + "defaultDataClassification_Value", defaultDataClassification_Value);
+            // ABOVE: JC debugging
+
+            validateObject(callbackDataClassification_Value, defaultDataClassification_Value);
 
             caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
         } else {
