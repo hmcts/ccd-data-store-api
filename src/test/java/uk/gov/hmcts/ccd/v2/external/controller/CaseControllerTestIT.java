@@ -319,15 +319,14 @@ class CaseControllerTestIT extends WireMockBaseTest {
         stubFor(WireMock.get(urlMatching("/api/data/case-type/" + CASE_TYPE))
             .willReturn(okJson(jsonString).withStatus(200)));
 
-        final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
         stubFor(WireMock.post(urlMatching("/callback/document"))
-            .willReturn(okJson(jsonString).withStatus(200).withHeader(customContext, responseJson2.toString())));
+            .willReturn(okJson(jsonString).withStatus(200).withHeader(CUSTOM_CONTEXT, responseJson2.toString())));
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");
         headers.add(REQUEST_ID, REQUEST_ID_VALUE);
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
-        headers.add(customContext, responseJson1.toString());
+        headers.add(CUSTOM_CONTEXT, responseJson1.toString());
 
         final MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(URL).headers(headers)
             .contentType(JSON_CONTENT_TYPE)
@@ -335,8 +334,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(201, mvcResult.getResponse().getStatus());
-        assertTrue(mvcResult.getResponse().getHeaderNames().contains(customContext));
-        assertTrue(mvcResult.getResponse().getHeader(customContext).contains(responseJson2.toString()));
+        assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
+        assertTrue(mvcResult.getResponse().getHeader(CUSTOM_CONTEXT).contains(responseJson2.toString()));
     }
 
     @Test
