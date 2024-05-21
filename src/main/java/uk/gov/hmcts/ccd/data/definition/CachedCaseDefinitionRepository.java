@@ -80,6 +80,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     private CaseTypeDefinition getClonedCaseType(int version, String caseTypeId) {
         var clonedCaseType = caseDefinitionRepository.getCaseType(version, caseTypeId).createCopy();
+        log.debug("Cloned case type: {}", clonedCaseType);
         return clonedCaseType;
     }
 
