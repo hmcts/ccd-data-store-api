@@ -141,7 +141,11 @@ public class SecurityValidationService {
                 + "callbackDataClassification_Value", callbackDataClassification_Value);
             jcLogJsonNodeValue("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): "
                 + "defaultDataClassification_Value", defaultDataClassification_Value);
-            jcTestHarness(callbackDataClassification_Value, caseDetails.getReferenceAsString());
+            try {
+                jcTestHarness(callbackDataClassification_Value, caseDetails.getReferenceAsString());
+            } catch (Exception e) {
+                jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): *FAIL*" + e.getMessage());
+            }
             // ABOVE: JC debugging
 
             validateObject(callbackDataClassification_Value, defaultDataClassification_Value);
