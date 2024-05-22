@@ -10,6 +10,11 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.getcase.DefaultGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.ClassifiedGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.AuthorisedGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.RestrictedGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Iterator;
@@ -33,6 +38,21 @@ public class SecurityValidationService {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private DefaultGetCaseOperation defaultGetCaseOperation;
+
+    @Autowired
+    private ClassifiedGetCaseOperation classifiedGetCaseOperation;
+
+    @Autowired
+    private AuthorisedGetCaseOperation authorisedGetCaseOperation;
+
+    @Autowired
+    private RestrictedGetCaseOperation restrictedGetCaseOperation;
+
+    @Autowired
+    private CreatorGetCaseOperation creatorGetCaseOperation;
+
     private void jcLogJsonNodeValue(final String message, final JsonNode value) {
         try {
             jcLog(message + " " + value.size() + " " + value.hashCode() + " "
@@ -42,10 +62,68 @@ public class SecurityValidationService {
         }
     }
 
+    private void jcTestHarness(final JsonNode callbackDataClassificationValue, final String caseReference) {
+        CaseDetails defaultCaseDetails = defaultGetCaseOperation.execute(caseReference).get();
+        CaseDetails classifiedCaseDetails = classifiedGetCaseOperation.execute(caseReference).get();
+        CaseDetails authorisedCaseDetails = authorisedGetCaseOperation.execute(caseReference).get();
+        CaseDetails restrictedCaseDetails = restrictedGetCaseOperation.execute(caseReference).get();
+        CaseDetails creatorCaseDetails = creatorGetCaseOperation.execute(caseReference).get();
+        final JsonNode defaultDataClassification_Value =
+            JacksonUtils.convertValueJsonNode(defaultCaseDetails.getDataClassification());
+        final JsonNode classifiedDataClassification_Value =
+            JacksonUtils.convertValueJsonNode(classifiedCaseDetails.getDataClassification());
+        final JsonNode authorisedDataClassification_Value =
+            JacksonUtils.convertValueJsonNode(authorisedCaseDetails.getDataClassification());
+        final JsonNode restrictedDataClassification_Value =
+            JacksonUtils.convertValueJsonNode(restrictedCaseDetails.getDataClassification());
+        final JsonNode creatorDataClassification_Value =
+            JacksonUtils.convertValueJsonNode(creatorCaseDetails.getDataClassification());
+
+        try {
+            validateObject(callbackDataClassificationValue, defaultDataClassification_Value);
+            jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): OK");
+        } catch (Exception e) {
+            jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): ERROR: " + e.getMessage());
+        }
+
+        try {
+            validateObject(callbackDataClassificationValue, classifiedDataClassification_Value);
+            jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): OK");
+        } catch (Exception e) {
+            jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): ERROR: " + e.getMessage());
+        }
+
+        try {
+            validateObject(callbackDataClassificationValue, authorisedDataClassification_Value);
+            jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): OK");
+        } catch (Exception e) {
+            jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): ERROR: " + e.getMessage());
+        }
+
+        try {
+            validateObject(callbackDataClassificationValue, restrictedDataClassification_Value);
+            jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): OK");
+        } catch (Exception e) {
+            jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): ERROR: " + e.getMessage());
+        }
+
+        try {
+            validateObject(callbackDataClassificationValue, creatorDataClassification_Value);
+            jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): OK");
+        } catch (Exception e) {
+            jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): ERROR: " + e.getMessage());
+        }
+    }
+
     /*
      * 1. CallbackInvoker.validateAndSetFromAboutToSubmitCallback
      * 2. SecurityValidationService.setClassificationFromCallbackIfValid
      * 3. SecurityValidationService.validateObject
+     *
+     * Debugging :-
+     * "JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid()"
+     * "JCDEBUG2: DefaultGetCaseOperation.execute()"
+     * "JCDEBUG2: SecurityValidationService.jcTestHarness()"
      */
     public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse,
                                                      CaseDetails caseDetails,
@@ -63,6 +141,7 @@ public class SecurityValidationService {
                 + "callbackDataClassification_Value", callbackDataClassification_Value);
             jcLogJsonNodeValue("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): "
                 + "defaultDataClassification_Value", defaultDataClassification_Value);
+            jcTestHarness(callbackDataClassification_Value, caseDetails.getReferenceAsString());
             // ABOVE: JC debugging
 
             validateObject(callbackDataClassification_Value, defaultDataClassification_Value);
@@ -80,7 +159,7 @@ public class SecurityValidationService {
         }
     }
 
-    private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
+    private void validateObject(final JsonNode callbackDataClassification, final JsonNode defaultDataClassification) {
 
         if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
             LOG.warn("callbackClassification={} and defaultClassification={} sizes differ", callbackDataClassification,
