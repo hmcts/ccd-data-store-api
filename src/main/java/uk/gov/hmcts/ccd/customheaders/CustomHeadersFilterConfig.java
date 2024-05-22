@@ -19,7 +19,7 @@ public class CustomHeadersFilterConfig {
         FilterRegistrationBean<CustomHeadersFilter> customHeadersFilter = new FilterRegistrationBean<>();
         customHeadersFilter.setFilter(new CustomHeadersFilter(applicationParams));
         customHeadersFilter.addUrlPatterns("/**");
-        customHeadersFilter.setOrder(1);
+        customHeadersFilter.setOrder(0);
         return customHeadersFilter;
     }
 

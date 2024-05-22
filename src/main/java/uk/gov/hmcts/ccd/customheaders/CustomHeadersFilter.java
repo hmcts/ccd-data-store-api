@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.customheaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
 import javax.servlet.Filter;
@@ -30,14 +31,19 @@ public class CustomHeadersFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        filterChain.doFilter(request, response);
+        // Wrap the response to cache the content
+        ContentCachingResponseWrapper wrappedResponse = new ContentCachingResponseWrapper(httpResponse);
+
+        filterChain.doFilter(request, wrappedResponse);
 
         if (null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
                 .filter(StringUtils::hasLength)
-                .forEach(context -> setContextHeader(context, httpRequest, httpResponse));
+                .forEach(context -> setContextHeader(context, httpRequest, wrappedResponse));
         }
+
+        wrappedResponse.copyBodyToResponse();
     }
 
     private void setContextHeader(String context, HttpServletRequest request, HttpServletResponse response) {
