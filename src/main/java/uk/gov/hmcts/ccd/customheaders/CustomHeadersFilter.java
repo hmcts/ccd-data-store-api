@@ -31,7 +31,6 @@ public class CustomHeadersFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        // Wrap the response to cache the content
         ContentCachingResponseWrapper wrappedResponse = new ContentCachingResponseWrapper(httpResponse);
 
         filterChain.doFilter(request, wrappedResponse);
