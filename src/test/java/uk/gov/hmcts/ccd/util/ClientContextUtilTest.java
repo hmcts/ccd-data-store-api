@@ -12,20 +12,22 @@ class ClientContextUtilTest {
         String toBeMergedJson = "{\"key2\": \"newValue2\", \"key3\": \"value3\"}";
         String expectedMergedJson = "{\"key1\":\"value1\",\"key2\":\"newValue2\",\"key3\":\"value3\"}";
 
-        String result = ClientContextUtil.mergeClientContexts(originalJson, toBeMergedJson);
+        String result = ClientContextUtil.mergeClientContexts(ClientContextUtil.encodeToBase64(originalJson),
+            ClientContextUtil.encodeToBase64(toBeMergedJson));
 
-        assertEquals(expectedMergedJson, result);
+        assertEquals(ClientContextUtil.encodeToBase64(expectedMergedJson), result);
     }
 
     @Test
     void testMergeClientContextsWithInvalidJsonA() {
-        String invalidOriginalJson = "invalid JSON";
+        String invalidOriginalJson = "{\"test\":invalid JSON}";
         String toBeMergedJson = "{\"key2\":\"newValue2\",\"key3\":\"value3\"}";
         String expectedMergedJson = "{\"key2\":\"newValue2\",\"key3\":\"value3\"}";
 
-        String result = ClientContextUtil.mergeClientContexts(invalidOriginalJson, toBeMergedJson);
+        String result = ClientContextUtil.mergeClientContexts(ClientContextUtil.encodeToBase64(invalidOriginalJson),
+            ClientContextUtil.encodeToBase64(toBeMergedJson));
 
-        assertEquals(expectedMergedJson, result);
+        assertEquals(ClientContextUtil.encodeToBase64(expectedMergedJson), result);
     }
 
     @Test
@@ -33,9 +35,10 @@ class ClientContextUtilTest {
         String originalJson = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
         String invalidToBeMergedJson = "invalid To Be Merged JSON";
 
-        String result = ClientContextUtil.mergeClientContexts(originalJson, invalidToBeMergedJson);
+        String result = ClientContextUtil.mergeClientContexts(ClientContextUtil.encodeToBase64(originalJson),
+            ClientContextUtil.encodeToBase64(invalidToBeMergedJson));
 
-        assertEquals(originalJson, result);
+        assertEquals(ClientContextUtil.encodeToBase64(originalJson), result);
     }
 
     @Test
@@ -43,8 +46,9 @@ class ClientContextUtilTest {
         String invalidOriginalJson = "invalid original JSON";
         String invalidToBeMergedJson = "invalid to-Be-Merged JSON";
 
-        String result = ClientContextUtil.mergeClientContexts(invalidOriginalJson, invalidToBeMergedJson);
+        String result = ClientContextUtil.mergeClientContexts(ClientContextUtil.encodeToBase64(invalidOriginalJson),
+            ClientContextUtil.encodeToBase64(invalidToBeMergedJson));
 
-        assertEquals(invalidOriginalJson, result);
+        assertEquals(ClientContextUtil.encodeToBase64(invalidOriginalJson), result);
     }
 }

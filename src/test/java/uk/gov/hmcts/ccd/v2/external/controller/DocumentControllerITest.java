@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
+import uk.gov.hmcts.ccd.util.ClientContextUtil;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.DocumentsResource;
 
@@ -132,7 +133,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Accept", V2.MediaType.CASE_DOCUMENTS)
                     .header(REQUEST_ID, REQUEST_ID_VALUE)
-                    .header(CUSTOM_CONTEXT, responseJson1.toString())
+                    .header(CUSTOM_CONTEXT, ClientContextUtil.encodeToBase64(responseJson1.toString()))
                     .header("experimental", true))
             .andExpect(status().is(200))
             .andReturn();
