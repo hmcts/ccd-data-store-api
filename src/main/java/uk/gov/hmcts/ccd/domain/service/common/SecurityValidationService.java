@@ -148,9 +148,26 @@ public class SecurityValidationService {
             }
             // ABOVE: JC debugging
 
-            validateObject(callbackDataClassification_Value, defaultDataClassification_Value);
+            jcLog("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): BEFORE VALIDATE OBJECT");
+            try {
+                validateObject(callbackDataClassification_Value, defaultDataClassification_Value);
+            } catch (Exception e) {
+                final JsonNode defaultDataClassification_Value2;
+                try {
+                    CaseDetails defaultCaseDetails =
+                        defaultGetCaseOperation.execute(caseDetails.getReferenceAsString()).get();
+                    defaultDataClassification_Value2 =
+                        JacksonUtils.convertValueJsonNode(defaultCaseDetails.getDataClassification());
+                } catch (Exception e2) {
+                    throw new ValidationException(VALIDATION_ERR_MSG);
+                }
+                validateObject(callbackDataClassification_Value, defaultDataClassification_Value2);
+            }
+            jcLog("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): AFTER VALIDATE OBJECT");
 
             caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
+
+            jcLog("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): AFTER SET DATA CLASS.");
         } else {
             LOG.warn("CallbackCaseClassification={} has lower classification than caseClassification={} for "
                     + "caseReference={}, jurisdiction={} and caseType={}",
