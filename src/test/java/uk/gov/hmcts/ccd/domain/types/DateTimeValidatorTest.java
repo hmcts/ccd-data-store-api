@@ -306,7 +306,6 @@ class DateTimeValidatorTest {
         assertEquals(FIELD_ID, result.get(0).getFieldId());
     }
 
-
     @Test
     void validRegEx() {
         final String validDateTime = "2001-12-10T00:00:00";
