@@ -69,7 +69,7 @@ class DateTimeValidatorTest {
 
         @Test
         @DisplayName("should validate date time: 2012-04-21T00:00:00.000000000 even with empty caseFieldDefinition")
-        void emptyCaseFieldDefinition () {
+        void emptyCaseFieldDefinition() {
             CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
             caseFieldDefinition.setFieldTypeDefinition(new FieldTypeDefinition());
 
@@ -118,7 +118,7 @@ class DateTimeValidatorTest {
 
         @Test
         @DisplayName("should not validate date time: 3321M1 1AA even with empty caseFieldDefinition")
-        void emptyCaseFieldDefinition () {
+        void emptyCaseFieldDefinition() {
             CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
             caseFieldDefinition.setFieldTypeDefinition(new FieldTypeDefinition());
 
