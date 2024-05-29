@@ -43,16 +43,18 @@ public class SecurityValidationService {
                 validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
                     JacksonUtils.convertValueJsonNode(deducedDataClassification));
             } catch (ValidationException deducedDataClassificationException) {
-                final Map<String, JsonNode> defaultDataClassification;
+                final Optional<CaseDetails> defaultCaseDetails;
                 try {
-                    CaseDetails defaultCaseDetails =
-                        defaultGetCaseOperation.execute(caseDetails.getReferenceAsString()).get();
-                    defaultDataClassification = defaultCaseDetails.getDataClassification();
+                    defaultCaseDetails = defaultGetCaseOperation.execute(caseDetails.getReferenceAsString());
                 } catch (Exception defaultDataClassificationException) {
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
-                validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
-                    JacksonUtils.convertValueJsonNode(defaultDataClassification));
+                if (defaultCaseDetails.isEmpty()) {
+                    throw new ValidationException(VALIDATION_ERR_MSG);
+                } else {
+                    validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
+                        JacksonUtils.convertValueJsonNode(defaultCaseDetails.get().getDataClassification()));
+                }
             }
 
             caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
