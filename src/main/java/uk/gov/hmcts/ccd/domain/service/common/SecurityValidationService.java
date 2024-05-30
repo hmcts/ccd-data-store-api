@@ -29,8 +29,12 @@ public class SecurityValidationService {
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data "
         + "validation error (c)";
 
-    @Autowired
     private DefaultGetCaseOperation defaultGetCaseOperation;
+
+    @Autowired
+    public SecurityValidationService(final DefaultGetCaseOperation defaultGetCaseOperation) {
+        this.defaultGetCaseOperation = defaultGetCaseOperation;
+    }
 
     public void setClassificationFromCallbackIfValid(final CallbackResponse callbackResponse,
                                                      final CaseDetails caseDetails,

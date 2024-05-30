@@ -7,12 +7,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.getcase.DefaultGetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.is;
@@ -25,17 +29,24 @@ import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassificationBuilder.aClassificationBuilder;
+import static org.mockito.Mockito.when;
 
 class SecurityValidationServiceTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private SecurityValidationService securityValidationService;
 
+    @Mock
+    private DefaultGetCaseOperation defaultGetCaseOperation;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        securityValidationService = new SecurityValidationService();
+        securityValidationService = new SecurityValidationService(defaultGetCaseOperation);
+
+        CaseDetails mockCaseDetails = new CaseDetails();
+        when(defaultGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(mockCaseDetails));
     }
 
     @Nested
