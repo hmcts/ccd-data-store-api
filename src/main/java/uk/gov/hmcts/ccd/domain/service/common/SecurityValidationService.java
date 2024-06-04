@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -29,9 +28,8 @@ public class SecurityValidationService {
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data "
         + "validation error (c)";
 
-    private DefaultGetCaseOperation defaultGetCaseOperation;
+    private final DefaultGetCaseOperation defaultGetCaseOperation;
 
-    @Autowired
     public SecurityValidationService(final DefaultGetCaseOperation defaultGetCaseOperation) {
         this.defaultGetCaseOperation = defaultGetCaseOperation;
     }
