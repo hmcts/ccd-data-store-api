@@ -66,12 +66,23 @@ class DateTimeValidatorTest {
     @Nested
     @DisplayName("when valid datetime")
     class WhenValidDateTime {
+
+        @Test
+        @DisplayName("should validate date time: 2012-04-21T00:00:00.000000000 even with empty caseFieldDefinition")
+        void emptyCaseFieldDefinition() {
+            CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+            caseFieldDefinition.setFieldTypeDefinition(new FieldTypeDefinition());
+
+            assertEquals(0, validator.validate(FIELD_ID, NODE_FACTORY.textNode("2012-04-21T00:00:00.000000000"),
+                caseFieldDefinition).size());
+        }
+
         @Test
         @DisplayName("should validate date time: 2012-04-21T00:00:00.000")
         void shouldValidateDateTimeWithoutTimeZone() {
             final List<ValidationResult> results = validator.validate(FIELD_ID,
-                                                                      NODE_FACTORY.textNode("2012-04-21T00:00:00.000"),
-                    caseFieldDefinition);
+                                                                NODE_FACTORY.textNode("2012-04-21T00:00:00.000"),
+                                                                caseFieldDefinition);
             assertThat(results, hasSize(0));
         }
 
@@ -104,6 +115,18 @@ class DateTimeValidatorTest {
     @Nested
     @DisplayName("when invalid datetime")
     class WhenInvalidDateTime {
+
+        @Test
+        @DisplayName("should not validate date time: 3321M1 1AA even with empty caseFieldDefinition")
+        void emptyCaseFieldDefinition() {
+            CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+            caseFieldDefinition.setFieldTypeDefinition(new FieldTypeDefinition());
+
+            assertEquals(1, validator.validate(FIELD_ID, NODE_FACTORY.textNode("3321M1 1AA"),
+                caseFieldDefinition).size());
+        }
+
+
         @Test
         @DisplayName("should not validate date time: 3321M1 1AA")
         void shouldNotValidateNotDateTime() {
@@ -282,7 +305,6 @@ class DateTimeValidatorTest {
         assertEquals("2001-12-10T00:00:00 Date Time Type Regex Failed:InvalidRegEx", result.get(0).getErrorMessage());
         assertEquals(FIELD_ID, result.get(0).getFieldId());
     }
-
 
     @Test
     void validRegEx() {
