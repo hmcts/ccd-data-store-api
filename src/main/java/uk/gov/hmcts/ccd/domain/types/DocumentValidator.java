@@ -8,6 +8,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -104,7 +105,7 @@ public class DocumentValidator implements BaseTypeValidator {
 
         if (dataValue.has(UPLOAD_TIMESTAMP)) {
             final JsonNode uploadTimeStamp = dataValue.get(UPLOAD_TIMESTAMP);
-            validationResults = validateUploadTimeStamp(dataFieldId,uploadTimeStamp,caseFieldDefinition);
+            validationResults = validateUploadTimeStamp(dataFieldId, uploadTimeStamp);
             if (!validationResults.isEmpty()) {
                 return validationResults;
             }
@@ -154,16 +155,18 @@ public class DocumentValidator implements BaseTypeValidator {
     }
 
     private List<ValidationResult> validateUploadTimeStamp(final String dataFieldId,
-                                                           final JsonNode uploadTimeStamp,
-                                                           final CaseFieldDefinition caseFieldDefinition) {
+                                                           final JsonNode uploadTimeStamp) {
 
         if (isNullOrEmpty(uploadTimeStamp)) {
             LOG.debug("{}{}",UPLOAD_TIMESTAMP,NOT_TEXT_OR_NULL);
             return Collections.emptyList();
         }
 
+        CaseFieldDefinition emptyCaseFieldDefinition = new CaseFieldDefinition();
+        emptyCaseFieldDefinition.setFieldTypeDefinition(new FieldTypeDefinition());
+
         List<ValidationResult> validationResults =
-            dateTimeValidator.validate(dataFieldId, uploadTimeStamp, caseFieldDefinition);
+            dateTimeValidator.validate(dataFieldId, uploadTimeStamp, emptyCaseFieldDefinition);
         if (!validationResults.isEmpty()) {
             return validationResult(UPLOAD_TIMESTAMP,validationResults);
         }
