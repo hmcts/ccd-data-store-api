@@ -1241,6 +1241,63 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    public void shouldReturnBadRequestWhenTokenIsNull() throws Exception {
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setToken(null);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().isBadRequest())
+            .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue("The response should contain 'Missing start trigger token'",
+            content.contains("Missing start trigger token"));
+    }
+
+    @Test
+    public void shouldReturnBadRequestWhenTokenIsEmpty() throws Exception {
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setToken("");
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().isBadRequest())
+            .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue("The response should contain 'Missing start trigger token'",
+            content.contains("Missing start trigger token"));
+    }
+
+    @Test
+    public void shouldReturnForbiddenWhenTokenIsInvalid() throws Exception {
+        final String invalidToken = "eyJhbGciOiJIUzI1NiJ9.e0.KUFDva2DpGi-zmDrHrcMOPMC1DlaKodGHKHIsib3gTA";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setToken(invalidToken);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().isForbidden())
+            .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue("The response should contain 'Token is not valid'", content.contains("Token is not valid"));
+    }
+
+    @Test
     public void shouldReturn201WhenPostCreateCaseWithNoDataForCitizen() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
