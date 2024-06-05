@@ -173,7 +173,8 @@ class SecurityValidationServiceTest {
         }
 
         @Test
-        @DisplayName("should fail if neither deduced nor default data classification matches callbackResponse data classification")
+        @DisplayName
+            ("should fail if neither deduced nor default dataClassification match callbackResponse dataClassification")
         void shouldFailIfNeitherDeducedNorDefaultDataClassificationMatchesCallbackResponseDataClassification() {
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
@@ -248,7 +249,8 @@ class SecurityValidationServiceTest {
         }
 
         @Test
-        @DisplayName("should fail if neither deduced nor default data classification matches callbackResponse data classification")
+        @DisplayName
+            ("should fail if neither deduced nor default dataClassification match callbackResponse dataClassification")
         void shouldFailIfNeitherDeducedNorDefaultDataClassificationMatchesCallbackResponseDataClassification2() {
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
