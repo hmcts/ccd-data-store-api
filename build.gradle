@@ -707,7 +707,7 @@ jacocoTestReport {
     }
 
     doLast {
-        def report = file("${jacoco.reportsDir}/test/jacocoTestReport.xml")
+        def report = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
         logger.lifecycle("Checking coverage results: ${report}")
 
         def parser = new XmlParser()
