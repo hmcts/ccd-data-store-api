@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.getcase.DefaultGetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.endpoint.std.TestController;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -42,23 +43,33 @@ public class SecurityValidationService {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
 
             try {
+                TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #1");
                 validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
                     JacksonUtils.convertValueJsonNode(deducedDataClassification));
+                TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #2  [deduced OK]");
             } catch (ValidationException deducedDataClassificationException) {
+                TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #3  [deduced FAILED]");
                 final Optional<CaseDetails> defaultCaseDetails;
                 try {
+                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #4  [before get default]");
                     defaultCaseDetails = defaultGetCaseOperation.execute(caseDetails.getReferenceAsString());
+                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #5  [after get default]");
                 } catch (Exception defaultDataClassificationException) {
+                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #6  [get default FAIL");
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
                 if (defaultCaseDetails.isEmpty()) {
+                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #7  [get default EMPTY]");
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 } else {
+                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #8  [before validate default]");
                     validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
                         JacksonUtils.convertValueJsonNode(defaultCaseDetails.get().getDataClassification()));
+                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #9  [validate default OK]");
                 }
             }
 
+            TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #10");
             caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
         } else {
             LOG.warn("CallbackCaseClassification={} has lower classification than caseClassification={} for "
