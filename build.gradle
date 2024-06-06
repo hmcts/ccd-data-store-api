@@ -192,6 +192,12 @@ dependencies {
         }
     }
 
+    implementation('commons-io:commons-io') {
+        version {
+            strictly '2.16.1'
+        }
+    }
+
 
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.9'
@@ -262,7 +268,7 @@ dependencies {
     implementation "org.glassfish:jakarta.el:4.0.1"
 
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
-    implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
 
     // use the latest org.springframework.security
     implementation group: 'org.springframework.security', name: 'spring-security-core'
