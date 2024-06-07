@@ -10,7 +10,7 @@ Feature: F-1002: Submit Event for an Existing Case
     And another successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation],
     And another successful call [by same user to create a case of this case type] as in [F-1002-Case_Creation_Data],
     And another successful call [to upload a document with mandatory metadata] as in [Default_Document_Upload_Data],
-    And another successful call [to get an update event token for the case just created]  as in [S-1011-Update_Event_Token_Creation],
+    And another successful call [to get an update event token for the case just created] as in [S-1011-Update_Event_Token_Creation],
     When a request is prepared with appropriate values,
     And the request [contains an Event Id received from upstream],
     And the request [contains a Case Id and Document Id created above],
