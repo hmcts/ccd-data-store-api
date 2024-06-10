@@ -1,0 +1,86 @@
+{
+  "_guid_": "S-140.9_CreateCase_NoCategories",
+  "productName": "CCD Data Store",
+  "operationName": "external create case",
+  "method": "POST",
+  "uri": "/case-types/{ctid}/cases",
+  "specs": [
+    "to create a full case"
+  ],
+  "prerequisites": [
+    {
+      "Token_Creation": "S-140.9_CreateCase_Token_Creation"
+    }
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker2Solicitor2"
+    }
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "ctid": "BEFTA_CASETYPE_2_1"
+    },
+    "headers": {
+      "experimental": true
+    },
+    "body": {
+      "data": {
+        "DocumentField1": {
+          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}"
+        }
+      },
+      "event": {
+        "id": "CREATE"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": false
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Length": "[[ANY_NULLABLE]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_JURISDICTION_2",
+      "case_type": "BEFTA_CASETYPE_2_1",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "TODO",
+      "security_classification": "PUBLIC",
+      "data": {
+        "DocumentField1": {
+          "document_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_binary_url": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][binary][href]}",
+          "document_filename": "${[scenarioContext][siblingContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "upload_timestamp": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "data_classification": {
+        "DocumentField1": "PUBLIC"
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

@@ -5,7 +5,7 @@
   "title": "TTL.Suspended changed to \"No\", SystemTTL and OverrideTTL greater than Guard value using '/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events'",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1016_GetUpdateSuspendedCaseTokenCaseworker"
+    "Token_Creation": "S-1016.7_GetUpdateSuspendedCaseTokenCaseworker"
   }
   ],
 

@@ -1,21 +1,20 @@
 {
-  "_guid_": "S-131.5_CreateCase_Token_Creation",
+  "_guid_": "S-141.12_CreateCase_Token_Creation",
 
   "productName": "CCD Data Store",
-  "operationName": "Start event creation as a Case worker",
+  "operationName": "Start event creation as Case worker",
 
   "method": "GET",
-  "uri": "/case-types/FT_CRUD_3/event-triggers/{etid}",
+  "uri": "/case-types/{ctid}/event-triggers/{etid}",
 
   "specs": [
     "to create a token for case creation",
-    "to create a token for event creation"
+    "As a prerequisite"
   ],
 
   "users": {
     "invokingUser": {
-      "username": "master.caseworker@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+      "_extends_": "BeftaMasterCaseworker"
     }
   },
 
@@ -25,7 +24,8 @@
       "Experimental" : "true"
     },
     "pathVariables": {
-      "etid": "createCase"
+      "etid": "CREATE",
+      "ctid": "FT_CaseFileView_2"
     }
   },
 
@@ -47,7 +47,7 @@
         "jurisdiction" : "BEFTA_MASTER",
         "state" : null,
         "version" : null,
-        "case_type_id" : "[[ANYTHING_PRESENT]]",
+        "case_type_id" : "FT_CaseFileView_2",
         "created_date" : null,
         "last_modified" : null,
         "last_state_modified_date" : null,
@@ -61,9 +61,7 @@
         "delete_draft_response_status_code" : null,
         "delete_draft_response_status" : null
       },
-      "event_id" : "createCase"
+      "event_id" : "CREATE"
     }
   }
 }
-
-
