@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -31,6 +32,7 @@ public class SecurityValidationService {
 
     private final DefaultGetCaseOperation defaultGetCaseOperation;
 
+    @Autowired
     public SecurityValidationService(final DefaultGetCaseOperation defaultGetCaseOperation) {
         this.defaultGetCaseOperation = defaultGetCaseOperation;
     }
@@ -63,13 +65,21 @@ public class SecurityValidationService {
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 } else {
                     TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #8  [before validate default]");
-                    validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
-                        JacksonUtils.convertValueJsonNode(defaultCaseDetails.get().getDataClassification()));
-                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #9  [validate default OK]");
+                    try {
+                        validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
+                            JacksonUtils.convertValueJsonNode(defaultCaseDetails.get().getDataClassification()));
+                    } catch (Exception e) {
+                        TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #9  [EXCEPTION]");
+                        TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #9  " + e.getMessage());
+                        TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #9  "
+                            + e.getStackTrace().toString());
+                        throw e;
+                    }
+                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #10  [validate default OK]");
                 }
             }
 
-            TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #10");
+            TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #11");
             caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
         } else {
             LOG.warn("CallbackCaseClassification={} has lower classification than caseClassification={} for "
