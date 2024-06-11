@@ -125,9 +125,9 @@ public class SecurityValidationService {
      * "JCDEBUG2: DefaultGetCaseOperation.execute()"
      * "JCDEBUG2: SecurityValidationService.jcTestHarness()"
      */
-    public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse,
-                                                     CaseDetails caseDetails,
-                                                     Map<String, JsonNode> defaultDataClassification) {
+    public void setClassificationFromCallbackIfValid(final CallbackResponse callbackResponse,
+                                                     final CaseDetails caseDetails,
+                                                     final Map<String, JsonNode> defaultDataClassification) {
 
         if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
