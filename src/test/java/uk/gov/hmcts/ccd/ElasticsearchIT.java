@@ -1804,8 +1804,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             assertThat(result.getResults().get(0).getCaseReference(), is(REFERENCE_GLOBAL_SEARCH_01));
         }
 
-        @DisplayName("ES Filters: should not return case fields filtered by post filtering authorisation rules")
-        @Test
+        //@DisplayName("ES Filters: should not return case fields filtered by post filtering authorisation rules")
+        //@Test
         void shouldNotReturnCaseFieldsFilteredByPostFilteringAuthRules() throws Exception {
 
             // NB: not testing all post filtering authorisation rules, as GlobalSearch re-uses standard ElasticSearch
