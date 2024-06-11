@@ -52,21 +52,13 @@ public class SecurityValidationService {
     @Autowired
     private CreatorGetCaseOperation creatorGetCaseOperation;
 
-    private void jcLogJsonNodeValue(final String message, final JsonNode value) {
-        try {
-            //jcLog(message + " " + value.size() + " " + value.hashCode() + " "
-            // + objectMapper.writeValueAsString(value).hashCode());
-        } catch (Exception e) {
-            //jcLog(message + " EXCEPTION: " + e.getMessage());
-        }
-    }
-
     private void jcTestHarness(final JsonNode callbackDataClassificationValue, final String caseReference) {
         CaseDetails defaultCaseDetails = defaultGetCaseOperation.execute(caseReference).get();
         CaseDetails classifiedCaseDetails = classifiedGetCaseOperation.execute(caseReference).get();
         CaseDetails authorisedCaseDetails = authorisedGetCaseOperation.execute(caseReference).get();
         CaseDetails restrictedCaseDetails = restrictedGetCaseOperation.execute(caseReference).get();
         CaseDetails creatorCaseDetails = creatorGetCaseOperation.execute(caseReference).get();
+        /*
         final JsonNode defaultDataClassification_Value =
             JacksonUtils.convertValueJsonNode(defaultCaseDetails.getDataClassification());
         final JsonNode classifiedDataClassification_Value =
@@ -112,6 +104,7 @@ public class SecurityValidationService {
         } catch (Exception e) {
             //jcLog("JCDEBUG2: SecurityValidationService.jcTestHarness(): ERROR: " + e.getMessage());
         }
+        */
     }
 
     /*
@@ -136,10 +129,6 @@ public class SecurityValidationService {
                 JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification());
             final JsonNode defaultDataClassification_Value =
                 JacksonUtils.convertValueJsonNode(defaultDataClassification);
-            jcLogJsonNodeValue("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): "
-                + "callbackDataClassification_Value", callbackDataClassification_Value);
-            jcLogJsonNodeValue("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): "
-                + "defaultDataClassification_Value", defaultDataClassification_Value);
             try {
                 jcTestHarness(callbackDataClassification_Value, caseDetails.getReferenceAsString());
             } catch (Exception e) {
