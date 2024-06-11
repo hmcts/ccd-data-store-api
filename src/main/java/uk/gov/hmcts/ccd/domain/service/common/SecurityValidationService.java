@@ -55,7 +55,7 @@ public class SecurityValidationService {
     private void jcLogJsonNodeValue(final String message, final JsonNode value) {
         try {
             //jcLog(message + " " + value.size() + " " + value.hashCode() + " "
-                + objectMapper.writeValueAsString(value).hashCode());
+            // + objectMapper.writeValueAsString(value).hashCode());
         } catch (Exception e) {
             //jcLog(message + " EXCEPTION: " + e.getMessage());
         }
@@ -147,7 +147,8 @@ public class SecurityValidationService {
             }
             // ABOVE: JC debugging
 
-            //jcLog("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): BEFORE VALIDATE OBJECT");
+            //jcLog("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): BEFORE VALIDATE
+            // OBJECT");
             try {
                 validateObject(callbackDataClassification_Value, defaultDataClassification_Value);
             } catch (Exception e) {
@@ -162,11 +163,13 @@ public class SecurityValidationService {
                 }
                 validateObject(callbackDataClassification_Value, defaultDataClassification_Value2);
             }
-            //jcLog("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): AFTER VALIDATE OBJECT");
+            //jcLog("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): AFTER VALIDATE
+            // OBJECT");
 
             caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
 
-            //jcLog("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): AFTER SET DATA CLASS.");
+            //jcLog("JCDEBUG2: SecurityValidationService.setClassificationFromCallbackIfValid(): AFTER SET DATA
+            // CLASS.");
         } else {
             LOG.warn("CallbackCaseClassification={} has lower classification than caseClassification={} for "
                     + "caseReference={}, jurisdiction={} and caseType={}",
