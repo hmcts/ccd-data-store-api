@@ -32,7 +32,7 @@ def versions = [
         pact_version    : '4.1.7',
 ]
 
-ext['spring-security.version'] = '5.7.11'
+ext['spring-security.version'] = '5.7.10'
 ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.16.0'
 
@@ -631,10 +631,8 @@ jsonSchema2Pojo {
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java," +
-            "**/AppInsightsConfiguration.java,**/TestingSupportController.java," +
-            "**/TestController.java,**/DefaultRoleAssignmentRepository.java,**/DefaultCaseDefinitionRepository.java," +
-            "**/RoleAssignmentsFilteringServiceImpl.java,**/CachedCaseDefinitionRepository.java," +
-                "**/SecurityValidationService.java,**/DefaultGetCaseOperation.java,**/CallbackInvoker.java"
+            "**/AppInsightsConfiguration.java," +
+            "**/TestingSupportController.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"

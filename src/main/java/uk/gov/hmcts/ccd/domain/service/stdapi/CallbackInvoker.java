@@ -17,7 +17,6 @@ import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
-import uk.gov.hmcts.ccd.domain.service.getcase.DefaultGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
@@ -47,9 +46,6 @@ public class CallbackInvoker {
     private final SecurityValidationService securityValidationService;
     private final GlobalSearchProcessorService globalSearchProcessorService;
     private final TimeToLiveService timeToLiveService;
-
-    @Autowired
-    private DefaultGetCaseOperation defaultGetCaseOperation;
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
@@ -253,11 +249,6 @@ public class CallbackInvoker {
             caseDetails.getData(),
             EMPTY_DATA_CLASSIFICATION);
         return defaultSecurityClassifications;
-
-        /*  (21 tests fail with BELOW)
-        CaseDetails defaultCaseDetails = defaultGetCaseOperation.execute(caseDetails.getReferenceAsString()).get();
-        return defaultCaseDetails.getDataClassification();
-        (21 tests fail with ABOVE)  */
     }
 
     private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,
