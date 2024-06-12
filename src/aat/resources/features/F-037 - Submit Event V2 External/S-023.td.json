@@ -9,11 +9,13 @@
 		"contains a HTTP 403 Forbidden"
 	],
 
-	"request": {
-		"headers": {
-			"ServiceAuthorization": "eyJhbGciOiJIUzI1NiJ9"
-		}
-	},
+  "user": {
+    "_extends_": "BeftaCaseworker1"
+  },
+
+  "request": {
+    "_extends_": "Common_Request"
+  },
 
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",

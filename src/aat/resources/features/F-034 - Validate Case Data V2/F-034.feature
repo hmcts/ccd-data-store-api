@@ -21,7 +21,7 @@ Scenario: must return 200 when the case type and event exists
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-308 @Ignore #This scenario is return 403 instead of 401. Jira: RDM-6628
+@S-308 #This scenario is return 403 instead of 401. Jira: RDM-6628
 Scenario: must return 401 when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
@@ -35,7 +35,7 @@ Scenario: must return 401 when request does not provide valid authentication cre
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-309 @Ignore # re-write as part of RDM-6847
+@S-309 # re-write as part of RDM-6847
 Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
 
     Given a user with [an active profile in CCD],
@@ -63,7 +63,7 @@ Scenario: must return 404 when case type does not exist
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-311 @Ignore #This scenario is return 500 instead of 404. Jira: RDM-7084
+@S-311 #This scenario is return 500 instead of 404. Jira: RDM-7084
 
 Scenario: must return 404 when event not provided
 
@@ -78,7 +78,7 @@ Scenario: must return 404 when event not provided
       And the response ha s all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-312 @Ignore #This scenario is invalid. Jira: RDM-6410
+@S-312 #This scenario is invalid. Jira: RDM-6410
 Scenario: must return 422 when event trigger does not exist
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -10,10 +10,17 @@
 	],
 
 	"request": {
-		"pathVariables": {
-			"ctid": "AAT"
-		}
-	},
+    "pathVariables": {
+      "ctid": "AAT"
+    },
+    "body": {
+      "event": {
+        "id": "UPDATE00000",
+        "summary": "",
+        "description": ""
+      }
+    }
+  },
 
 	"expectedResponse": {
 		"_extends_": "Common_404_Response",
