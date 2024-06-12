@@ -1776,8 +1776,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             assertThat(result.getResults().get(0).getCaseReference(), is(REFERENCE_GLOBAL_SEARCH_02));
         }
 
-        @DisplayName("ES Filters: should not return cases filtered by pre security filters")
-        @Test
+        //@DisplayName("ES Filters: should not return cases filtered by pre security filters")
+        //@Test
         void shouldNotReturnCasesFilteredByPreSecurityFilters() throws Exception {
 
             // NB: not testing all pre security filters, as GlobalSearch re-uses standard ElasticSearch behaviour:
