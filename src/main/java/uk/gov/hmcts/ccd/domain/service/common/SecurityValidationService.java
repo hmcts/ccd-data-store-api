@@ -90,11 +90,11 @@ public class SecurityValidationService {
                 final JsonNode defaultDataClassification_Value2;
                 try {
                     jcLog("setClassificationFromCallbackIfValid #7");
-                    CaseDetails defaultCaseDetails =
-                        defaultGetCaseOperation.execute(caseDetails.getReferenceAsString()).get();
+                    Optional<CaseDetails> defaultCaseDetails =
+                        defaultGetCaseOperation.execute(caseDetails.getReferenceAsString());
                     jcLog("setClassificationFromCallbackIfValid #8");
                     defaultDataClassification_Value2 =
-                        JacksonUtils.convertValueJsonNode(defaultCaseDetails.getDataClassification());
+                        JacksonUtils.convertValueJsonNode(defaultCaseDetails.get().getDataClassification());
                 } catch (Exception e2) {
                     jcLog("setClassificationFromCallbackIfValid #9");
                     throw new ValidationException(VALIDATION_ERR_MSG);
