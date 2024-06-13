@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -35,20 +36,24 @@ public class SecurityValidationService {
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data "
         + "validation error (c)";
 
-    @Autowired
     private DefaultGetCaseOperation defaultGetCaseOperation;
-
-    @Autowired
     private ClassifiedGetCaseOperation classifiedGetCaseOperation;
-
-    @Autowired
     private AuthorisedGetCaseOperation authorisedGetCaseOperation;
-
-    @Autowired
     private RestrictedGetCaseOperation restrictedGetCaseOperation;
+    private CreatorGetCaseOperation creatorGetCaseOperation;
 
     @Autowired
-    private CreatorGetCaseOperation creatorGetCaseOperation;
+    public SecurityValidationService(@Qualifier("default") DefaultGetCaseOperation defaultGetCaseOperation,
+                                     @Qualifier("classified") ClassifiedGetCaseOperation classifiedGetCaseOperation,
+                                     @Qualifier("authorised") AuthorisedGetCaseOperation authorisedGetCaseOperation,
+                                     @Qualifier("restricted") RestrictedGetCaseOperation restrictedGetCaseOperation,
+                                     @Qualifier("creator") CreatorGetCaseOperation creatorGetCaseOperation) {
+        this.defaultGetCaseOperation = defaultGetCaseOperation;
+        this.classifiedGetCaseOperation = classifiedGetCaseOperation;
+        this.authorisedGetCaseOperation = authorisedGetCaseOperation;
+        this.restrictedGetCaseOperation = restrictedGetCaseOperation;
+        this.creatorGetCaseOperation = creatorGetCaseOperation;
+    }
 
     /*
      * ==== JC Test Harness. ====
