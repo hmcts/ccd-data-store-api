@@ -44,42 +44,44 @@ public class SecurityValidationService {
         if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
 
+            // PR-2426  (13th June)
             try {
-                TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #1");
+                TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #1");
                 validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
                     JacksonUtils.convertValueJsonNode(deducedDataClassification));
-                TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #2  [deduced OK]");
+                TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #2  [deduced OK]");
             } catch (ValidationException deducedDataClassificationException) {
-                TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #3  [deduced FAILED]");
+                TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #3  [deduced FAILED]");
                 final Optional<CaseDetails> defaultCaseDetails;
                 try {
-                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #4  [before get default]");
+                    TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #4  [before get default]");
                     defaultCaseDetails = defaultGetCaseOperation.execute(caseDetails.getReferenceAsString());
-                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #5  [after get default]");
+                    TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #5  [after get default]");
                 } catch (Exception defaultDataClassificationException) {
-                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #6  [get default FAIL");
+                    TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #6  [get default FAIL");
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
                 if (defaultCaseDetails.isEmpty()) {
-                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #7  [get default EMPTY]");
+                    TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #7  [get default EMPTY]");
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 } else {
-                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #8  [before validate default]");
+                    TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #8  [before validate default]");
                     try {
                         validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
                             JacksonUtils.convertValueJsonNode(defaultCaseDetails.get().getDataClassification()));
                     } catch (Exception e) {
-                        TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #9  [EXCEPTION]");
-                        TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #9  " + e.getMessage());
-                        TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #9  "
+                        TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #9  [EXCEPTION]");
+                        TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #9  " + e.getMessage());
+                        TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #9  "
                             + e.getStackTrace().toString());
                         throw e;
                     }
-                    TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #10  [validate default OK]");
+                    TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #10  [validate default OK]");
                 }
             }
+            // PR-2426  (13th June)
 
-            TestController.jcLog("JCDEBUG: setClassificationFromCallbackIfValid #11");
+            TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #11");
             caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
         } else {
             LOG.warn("CallbackCaseClassification={} has lower classification than caseClassification={} for "
