@@ -1,0 +1,86 @@
+{
+  "title": "Scenario 2.1 - CHALLENGED Access Process (region and location filter on STANDARD RoleToAccessProfile for case-type)",
+  "_guid_": "S-1006.AP.2",
+  "_extends_": "GlobalSearch__Base",
+
+  "specs": [
+    "a caseworker with RA1: BASIC role assignment and RA2: STANDARD role assignment with region attribute with value 123 and location attribute with value 1",
+    "search for case type with STANDARD RoleToAccessProfile and case has unmatched region for user",
+    "search for case type with STANDARD RoleToAccessProfile and case has unmatched location for user",
+    "search for case type with STANDARD RoleToAccessProfile and case has matching region and location for user",
+    "contains two cases with Access Process value CHALLENGED when unmatched region/location",
+    "contains case with Access Process value NONE when matching region and location"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker_RegionalStaff"
+    }
+  },
+
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "CCDCaseTypeIds": [
+          "FT_GlobalSearch_AC_2"
+        ],
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Region_3][testData][actualResponse][body][id]}",
+          "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Location_2][testData][actualResponse][body][id]}",
+          "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Region_123__Location_1][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 3,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "caseReference"
+        },
+        {
+          "_extends_": "F-1006_ExpectedCaseSearchResult",
+
+          "caseReference" : "${}${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Region_3][testData][actualResponse][body][id]}",
+
+          "regionId" : "3",
+          "processForAccess" : "CHALLENGED",
+
+          "CCDCaseTypeId" : "FT_GlobalSearch_AC_2",
+          "CCDCaseTypeName" : "FT_GlobalSearch_AC_2"
+        },
+        {
+          "_extends_": "F-1006_ExpectedCaseSearchResult",
+
+          "caseReference" : "${}${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Location_2][testData][actualResponse][body][id]}",
+
+          "baseLocationId" : "2",
+          "regionId" : "123",
+          "processForAccess" : "CHALLENGED",
+
+          "CCDCaseTypeId" : "FT_GlobalSearch_AC_2",
+          "CCDCaseTypeName" : "FT_GlobalSearch_AC_2"
+        },
+        {
+          "_extends_": "F-1006_ExpectedCaseSearchResult",
+
+          "caseReference" : "${}${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Region_123__Location_1][testData][actualResponse][body][id]}",
+
+          "regionId" : "123",
+          "processForAccess" : "NONE",
+
+          "CCDCaseTypeId" : "FT_GlobalSearch_AC_2",
+          "CCDCaseTypeName" : "FT_GlobalSearch_AC_2"
+        }
+      ]
+    }
+  }
+}
