@@ -7,12 +7,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.getcase.DefaultGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.ClassifiedGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.AuthorisedGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.RestrictedGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.is;
@@ -20,6 +28,7 @@ import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
@@ -31,11 +40,30 @@ class SecurityValidationServiceTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private SecurityValidationService securityValidationService;
 
+    @Mock
+    private DefaultGetCaseOperation defaultGetCaseOperation;
+
+    @Mock
+    private ClassifiedGetCaseOperation classifiedGetCaseOperation;
+
+    @Mock
+    private AuthorisedGetCaseOperation authorisedGetCaseOperation;
+
+    @Mock
+    private RestrictedGetCaseOperation restrictedGetCaseOperation;
+
+    @Mock
+    private CreatorGetCaseOperation creatorGetCaseOperation;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        securityValidationService = new SecurityValidationService();
+        securityValidationService = new SecurityValidationService(defaultGetCaseOperation, classifiedGetCaseOperation,
+            authorisedGetCaseOperation, restrictedGetCaseOperation, creatorGetCaseOperation);
+
+        CaseDetails mockCaseDetails = new CaseDetails();
+        when(defaultGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(mockCaseDetails));
     }
 
     @Nested
