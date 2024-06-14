@@ -16,6 +16,9 @@ public class TestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
 
+    // Enable flags by default.
+    private static int[] flags = new int[] {1,1,1,1,1};
+
     /*
      * Method to POST and log messages.
      *
@@ -38,6 +41,47 @@ public class TestController {
     @GetMapping("/jcdebugtest")
     public String jcdebugtest() {
         return jcLog("TEST MESSAGE");
+    }
+
+    @GetMapping("/setflag0")
+    public String setflag0() {
+        return setFlag(0);
+    }
+
+    @GetMapping("/setflag1")
+    public String setflag1() {
+        return setFlag(1);
+    }
+
+    @GetMapping("/setflag2")
+    public String setflag2() {
+        return setFlag(2);
+    }
+
+    @GetMapping("/setflag3")
+    public String setflag3() {
+        return setFlag(3);
+    }
+
+    @GetMapping("/setflag4")
+    public String setflag4() {
+        return setFlag(4);
+    }
+
+    public static int[] getFlags() {
+        return flags;
+    }
+
+    /*
+     * Set Static Flag.
+     */
+    private String setFlag(final int index) {
+        if (flags[index] == 0) {
+            flags[index] = 1;
+        } else {
+            flags[index] = 0;
+        }
+        return "flags[" + index + "] = " + flags[index];
     }
 
     /*

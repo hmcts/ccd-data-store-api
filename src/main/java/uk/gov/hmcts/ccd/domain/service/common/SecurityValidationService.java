@@ -60,11 +60,42 @@ public class SecurityValidationService {
      */
     private void jcTestHarness(final String caseReference) {
         try {
-            CaseDetails defaultCaseDetails = defaultGetCaseOperation.execute(caseReference).get();
-            CaseDetails classifiedCaseDetails = classifiedGetCaseOperation.execute(caseReference).get();
-            CaseDetails authorisedCaseDetails = authorisedGetCaseOperation.execute(caseReference).get();
-            CaseDetails restrictedCaseDetails = restrictedGetCaseOperation.execute(caseReference).get();
-            CaseDetails creatorCaseDetails = creatorGetCaseOperation.execute(caseReference).get();
+            int[] flags = TestController.getFlags();
+            if (flags[0] == 1) {
+                TestController.jcLog("jcTestHarness: defaultCaseDetails: YES");
+                CaseDetails defaultCaseDetails = defaultGetCaseOperation.execute(caseReference).get();
+            } else {
+                TestController.jcLog("jcTestHarness: defaultCaseDetails: NO");
+            }
+
+            if (flags[1] == 1) {
+                TestController.jcLog("jcTestHarness: classifiedCaseDetails: YES");
+                CaseDetails classifiedCaseDetails = classifiedGetCaseOperation.execute(caseReference).get();
+            } else {
+                TestController.jcLog("jcTestHarness: classifiedCaseDetails: NO");
+            }
+
+            if (flags[2] == 1) {
+                TestController.jcLog("jcTestHarness: authorisedCaseDetails: YES");
+                CaseDetails authorisedCaseDetails = authorisedGetCaseOperation.execute(caseReference).get();
+            } else {
+                TestController.jcLog("jcTestHarness: authorisedCaseDetails: NO");
+            }
+
+            if (flags[3] == 1) {
+                TestController.jcLog("jcTestHarness: restrictedCaseDetails: YES");
+                CaseDetails restrictedCaseDetails = restrictedGetCaseOperation.execute(caseReference).get();
+            } else {
+                TestController.jcLog("jcTestHarness: restrictedCaseDetails: NO");
+            }
+
+            if (flags[4] == 1) {
+                TestController.jcLog("jcTestHarness: creatorCaseDetails: YES");
+                CaseDetails creatorCaseDetails = creatorGetCaseOperation.execute(caseReference).get();
+            } else {
+                TestController.jcLog("jcTestHarness: creatorCaseDetails: NO");
+            }
+
         } catch (Exception e) {
             // Empty
         }

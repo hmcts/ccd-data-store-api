@@ -61,7 +61,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/webjars/**",
         "/testing-support/cleanup-case-type/**",
         "/jcdebug",
-        "/jcdebugtest"
+        "/jcdebugtest",
+        "/setflag0",
+        "/setflag1",
+        "/setflag2",
+        "/setflag3",
+        "/setflag4"
     };
 
     @Inject
