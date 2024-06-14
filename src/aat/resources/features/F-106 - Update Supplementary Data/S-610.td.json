@@ -1,0 +1,54 @@
+{
+  "title": "Must NOT be able to see updated supplementary data of a case from different jurisdiction",
+  "_guid_": "S-610",
+  "_extends_": "F-106_Test_Data_Base",
+  "specs": [
+    "is configured to search for the previously created case by the updated supplementary data value",
+    "a valid profile with different Jurisdiction",
+    "does NOT contain the previously created case"
+  ],
+  "user" : {
+    "_extends_": "BeftaCaseworker3"
+  },
+  "request": {
+    "queryParams": {
+      "usecase": "workbasket"
+    },
+    "body": {
+      "query": {
+        "bool": {
+          "filter": [
+            {
+              "bool": {
+                "should": [
+                  {
+                    "range": {
+                      "supplementary_data.orgs_assigned_users.OrgZ": {
+                        "gte": 2500
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "from": 0,
+      "size": 6,
+      "_source": true,
+      "sort": {
+        "created_date": {
+          "order": "desc"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "body" : {
+      "total" : 0,
+      "cases" : [ ],
+      "case_types_results" : [ ]
+    }
+  }
+}
