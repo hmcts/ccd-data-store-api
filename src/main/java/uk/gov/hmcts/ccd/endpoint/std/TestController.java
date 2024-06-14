@@ -11,12 +11,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
+/*
+ * Debugging and logging mechanisms.
+ */
 @RestController
 public class TestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
 
-    // Enable flags by default.
+    /*
+     * Enable flags (to 1) by default.
+     *
+     * Curl commands to change flags :-
+     * curl -w '\n' https://ccd-data-store-api-pr-2410.preview.platform.hmcts.net/setflag0
+     * curl -w '\n' https://ccd-data-store-api-pr-2410.preview.platform.hmcts.net/setflag1
+     * curl -w '\n' https://ccd-data-store-api-pr-2410.preview.platform.hmcts.net/setflag2
+     * curl -w '\n' https://ccd-data-store-api-pr-2410.preview.platform.hmcts.net/setflag3
+     * curl -w '\n' https://ccd-data-store-api-pr-2410.preview.platform.hmcts.net/setflag4
+     */
     private static int[] flags = new int[] {1,1,1,1,1};
 
     /*
@@ -36,11 +48,36 @@ public class TestController {
 
     /*
      * Method to TEST message logging.
-     * Copy to SecurityValidationService , CallbackInvoker , (and CallbackService).
      */
     @GetMapping("/jcdebugtest")
     public String jcdebugtest() {
         return jcLog("TEST MESSAGE");
+    }
+
+    /*
+     * ==== Log message. ====
+     */
+    public static String jcLog(final String message) {
+        String rc = "";
+        try {
+            final String url = "https://ccd-data-store-api-pr-2410.preview.platform.hmcts.net/jcdebug";
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "text/plain");
+
+            // Write the string payload to the HTTP request body
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(message.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            rc = "Response Code: " + connection.getResponseCode();
+        } catch (Exception e) {
+            rc = "EXCEPTION";
+            e.printStackTrace();
+        }
+        return "jcLog: " + rc;
     }
 
     @GetMapping("/setflag0")
@@ -82,31 +119,5 @@ public class TestController {
             flags[index] = 0;
         }
         return "flags[" + index + "] = " + flags[index];
-    }
-
-    /*
-     * ==== Log message. ====
-     */
-    public static String jcLog(final String message) {
-        String rc = "";
-        try {
-            final String url = "https://ccd-data-store-api-pr-2410.preview.platform.hmcts.net/jcdebug";
-            URL apiUrl = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            connection.setRequestProperty("Content-Type", "text/plain");
-
-            // Write the string payload to the HTTP request body
-            OutputStream outputStream = connection.getOutputStream();
-            outputStream.write(message.getBytes());
-            outputStream.flush();
-            outputStream.close();
-            rc = "Response Code: " + connection.getResponseCode();
-        } catch (Exception e) {
-            rc = "EXCEPTION";
-            e.printStackTrace();
-        }
-        return "jcLog: " + rc;
     }
 }
