@@ -127,7 +127,7 @@ public class SecurityValidationService {
             jcLog("PR-2410: setClassificationFromCallbackIfValid #1");
 
             // BELOW: JC debugging
-            // jcTestHarness(caseDetails.getReferenceAsString());
+            jcTestHarness(caseDetails.getReferenceAsString());
             try {
                 copyOfValidationFromPr2426(callbackResponse, caseDetails, deducedDataClassification);
             } catch (Exception e) {
