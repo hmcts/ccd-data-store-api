@@ -182,6 +182,9 @@ public class ApplicationParams {
     @Value("${enable-case-users-db-sync}")
     private boolean enableCaseUsersDbSync;
 
+    @Value("#{'${ccd.upload-timestamp-featured-case-types}'.split(',')}")
+    private List<String> uploadTimestampFeaturedCaseTypes;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
@@ -226,6 +229,9 @@ public class ApplicationParams {
 
     @Value("${search.internal.case-access-metadata.enabled}")
     private boolean internalSearchCaseAccessMetadataEnabled;
+
+    @Value("${enable-case-group-access-filtering}")
+    private boolean enableCaseGroupAccessFiltering;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -615,5 +621,13 @@ public class ApplicationParams {
 
     public boolean getInternalSearchCaseAccessMetadataEnabled() {
         return internalSearchCaseAccessMetadataEnabled;
+    }
+
+    public boolean getCaseGroupAccessFilteringEnabled() {
+        return enableCaseGroupAccessFiltering;
+    }
+
+    public List<String> getUploadTimestampFeaturedCaseTypes() {
+        return uploadTimestampFeaturedCaseTypes;
     }
 }
