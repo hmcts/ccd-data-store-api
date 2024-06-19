@@ -1,18 +1,17 @@
 {
-  "_guid_": "S-1023.3",
-  "_extends_": "F-1023_Test_Data_Base",
-  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST when OrganisationID is empty",
+  "_guid_": "S-1023.9",
+  "_extends_": "F-1023_Test_Data_Citizen_Base",
+  "title": "Invoke saveCaseDetailsForCitizenUsingPOST and caseAccessGroupId created",
 
   "prerequisites" : [ {
-      "Token_Creation": "S-1023_GetCreateToken"
+      "Token_Creation": "S-1023_GetCitizenCreateToken"
     }
   ],
   "specs": [
     "an active profile in CCD",
     "contains some OrganisationPolicy fields with all correct values",
-    "is of caseType where caseAccessGroupType = CCD:all-cases-access",
-    "caseData Organisation.OrganisationID value is empty value",
-    "Submit case creation as Case worker",
+    "is of caseType where caseAccessGroupType = CCD:all-cases-access and -OrganisationPolicyField- CaseAssignedRoleField  field exists in caseData and case data has Organisation.OrganisationID value not set to empty value but accessType does not have GroupRoleName",
+    "Submit case creation as Citizen",
     "contains correctly configured values",
     "contains updated values for case_data and data_classification"
 
@@ -21,10 +20,10 @@
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyCaseAssignedRole": "GroupRole2",
           "OrgPolicyReference": "ref",
           "Organisation": {
-            "OrganisationID": "",
+            "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
           }
         },
@@ -41,7 +40,18 @@
       "event": {
         "id": "createCase"
       },
-      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "event_data": {
+        "CaseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupId": "test",
+              "caseAccessGroupType": "CCD:all-cases-access"
+            },
+            "id": null
+          }
+        ]
+      }
     }
   },
   "expectedResponse": {
@@ -60,12 +70,12 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "GroupRole1",
-          "OrgPolicyReference": "ref",
-          "Organisation": {
-            "OrganisationID": "",
-            "OrganisationName": "orgName1"
+        "OrganisationPolicyField" : {
+          "OrgPolicyCaseAssignedRole" : "GroupRole2",
+          "OrgPolicyReference" : "ref",
+          "Organisation" : {
+            "OrganisationID" : "orgID1",
+            "OrganisationName" : "orgName1"
           }
         }
       },

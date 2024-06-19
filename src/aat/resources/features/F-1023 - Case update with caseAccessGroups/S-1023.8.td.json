@@ -1,10 +1,10 @@
 {
-  "_guid_": "S-1023.3",
-  "_extends_": "F-1023_Test_Data_Base",
-  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST when OrganisationID is empty",
+  "_guid_": "S-1023.8",
+  "_extends_": "F-1023_Test_Data_Citizen_Base",
+  "title": "Invoke saveCaseDetailsForCitizenUsingPOST and caseAccessGroupId created",
 
   "prerequisites" : [ {
-      "Token_Creation": "S-1023_GetCreateToken"
+      "Token_Creation": "S-1023_GetCitizenCreateToken"
     }
   ],
   "specs": [
@@ -12,7 +12,7 @@
     "contains some OrganisationPolicy fields with all correct values",
     "is of caseType where caseAccessGroupType = CCD:all-cases-access",
     "caseData Organisation.OrganisationID value is empty value",
-    "Submit case creation as Case worker",
+    "Submit case creation as Citizen",
     "contains correctly configured values",
     "contains updated values for case_data and data_classification"
 

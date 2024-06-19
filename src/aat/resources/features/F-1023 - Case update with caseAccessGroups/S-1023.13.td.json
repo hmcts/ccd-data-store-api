@@ -1,7 +1,7 @@
 {
-  "_guid_": "S-1023.3",
-  "_extends_": "F-1023_Test_Data_Base",
-  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST when OrganisationID is empty",
+  "_guid_": "S-1023.13",
+  "_extends_": "F-1023_Test_Data_Base_V2",
+  "title": "Invoke v2_external#/case-controller/createCaseUsingPOST and caseAccessGroupId created",
 
   "prerequisites" : [ {
       "Token_Creation": "S-1023_GetCreateToken"
@@ -12,9 +12,9 @@
     "contains some OrganisationPolicy fields with all correct values",
     "is of caseType where caseAccessGroupType = CCD:all-cases-access",
     "caseData Organisation.OrganisationID value is empty value",
-    "Submit case creation as Case worker",
+    "Submit case creation as Case worker (V2)",
     "contains correctly configured values",
-    "contains updated values for case_data and data_classification"
+    "contains updated values for data and data_classification"
 
   ],
   "request": {
@@ -52,14 +52,14 @@
       "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
+      "_links" : "[[ANYTHING_PRESENT]]",
       "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_MASTER",
-      "case_type_id": "FT_CaseAccessGroups",
-      "created_date": "[[ANYTHING_PRESENT]]",
-      "last_modified": "[[ANYTHING_PRESENT]]",
-      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
-      "case_data": {
+      "data": {
         "OrganisationPolicyField": {
           "OrgPolicyCaseAssignedRole": "GroupRole1",
           "OrgPolicyReference": "ref",
@@ -71,7 +71,6 @@
       },
       "data_classification" : {}
     },
-    "supplementary_data" : null,
     "after_submit_callback_response": null,
     "callback_response_status_code": null,
     "callback_response_status": null,
