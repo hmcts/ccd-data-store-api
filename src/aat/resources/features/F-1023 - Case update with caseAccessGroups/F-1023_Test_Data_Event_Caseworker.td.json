@@ -1,0 +1,39 @@
+{
+	"_guid_": "F-1023_Test_Data_Event_Caseworker",
+  "_extends_": "Event_Creation_Caseworker_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers"
+    },
+    "body" : {
+      "id" : "OVERRIDE",
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type_id" : "FT_CaseAccessGroups",
+      "state" : "CaseUpdated",
+      "version" : 1,
+      "created_date" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "last_modified" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "last_state_modified_date" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "security_classification" : "PUBLIC",
+      "supplementary_data" : null,
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null,
+
+      "case_data" : {
+      },
+      "data_classification": {
+      }
+    }
+  }
+}
