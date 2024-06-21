@@ -80,6 +80,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
+    public CaseTypeDefinition getScopedCachedCaseType(String caseTypeId) {
+        return this.getCaseType(caseTypeId);
+    }
+
+    @Override
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
