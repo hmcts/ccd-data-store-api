@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-1023_GetEventTokenBase",
+  "_extends_": "StartEvent_v2Ext__PositiveResponse_Base",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "OVERRIDE",
+      "etid": "updateCase"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "id": "[[ANYTHING_PRESENT]]",
+        "version": "[[ANY_INTEGER_NOT_NULLABLE]]",
+
+        "jurisdiction": "BEFTA_MASTER",
+        "case_type_id": "[[ANYTHING_PRESENT]]",
+
+        "case_data": "[[ANYTHING_PRESENT]]",
+        "data_classification": "[[ANYTHING_PRESENT]]"
+      },
+
+      "event_id": "updateCase"
+    }
+  }
+}
