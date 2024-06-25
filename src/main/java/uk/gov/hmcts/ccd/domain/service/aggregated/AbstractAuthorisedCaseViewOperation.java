@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.AbstractCaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -78,6 +79,18 @@ public abstract class AbstractAuthorisedCaseViewOperation {
     private boolean tabAllowed(final CaseViewTab caseViewTab, final Set<AccessProfile> accessProfiles) {
         Set<String> accessProfileNames = AccessControlService.extractAccessProfileNames(accessProfiles);
         return StringUtils.isEmpty(caseViewTab.getRole()) || accessProfileNames.contains(caseViewTab.getRole());
+    }
+
+    protected void filterCaseTabFieldsByReadAccess(AbstractCaseView caseHistoryView,
+                                                   Set<AccessProfile> accessProfiles) {
+        caseHistoryView.setTabs(Arrays.stream(caseHistoryView.getTabs()).map(
+            caseViewTab -> {
+                caseViewTab.setFields(Arrays.stream(caseViewTab.getFields())
+                    .filter(caseViewField -> getAccessControlService()
+                        .canAccessCaseViewFieldWithCriteria(caseViewField, accessProfiles, CAN_READ))
+                    .toArray(CaseViewField[]::new));
+                return caseViewTab;
+            }).toArray(CaseViewTab[]::new));
     }
 
     AccessControlService getAccessControlService() {
