@@ -144,7 +144,8 @@ public class DocumentControllerITest extends WireMockBaseTest {
         Optional<Link> self = documentsResource.getLink("self");
 
         assertTrue(result.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
-        assertEquals(responseJson1.toString(), result.getResponse().getHeader(CUSTOM_CONTEXT));
+        assertEquals(responseJson1.toString(),
+            ClientContextUtil.decodeFromBase64(result.getResponse().getHeader(CUSTOM_CONTEXT)));
         assertAll(
             () -> assertThat(self.get().getHref(),
                 is(String.format("http://localhost:%s/cases/" + CASE_ID + "/documents", super.wiremockPort))),
