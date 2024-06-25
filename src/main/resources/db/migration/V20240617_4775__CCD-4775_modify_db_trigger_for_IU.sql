@@ -12,7 +12,9 @@ CREATE OR REPLACE FUNCTION public.insert_update_logstash_queue () RETURNS TRIGGE
     LANGUAGE plpgsql
     AS $$
     BEGIN
-        INSERT INTO public.case_data_logstash_queue ("case_data_id") VALUES (NEW.id);
+        IF NOT EXISTS ( SELECT 1 FROM case_data cd, case_data_logstash_queue cdlq WHERE cdlq.case_data_id = cd.id) THEN
+            INSERT INTO public.case_data_logstash_queue ("case_data_id") VALUES (NEW.id);
+        END IF;
         RETURN NEW;
     END;
     $$;
