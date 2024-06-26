@@ -22,61 +22,22 @@ public class ClientContextUtil {
     }
 
     public static String mergeClientContexts(String originalJsonEncoded, String toBeMergedJsonEncoded) {
-        ObjectNode originalJsonNode = null;
-        ObjectNode toBeMergedJsonNode = null;
-        String originalJson = null;
-        String toBeMergedJson = null;
+        String originalJson = decodeAndRemoveBrackets(originalJsonEncoded);
+        String toBeMergedJson = decodeAndRemoveBrackets(toBeMergedJsonEncoded);
 
-        if (isBase64(originalJsonEncoded)) {
-            try {
-                originalJson = decodeFromBase64(originalJsonEncoded);
-            } catch (Exception e) {
-                LOG.error("Problem decoding original encoded JSON: {}", originalJsonEncoded, e);
-            }
-        } else {
-            originalJson = originalJsonEncoded;
-        }
-        if (isBase64(toBeMergedJsonEncoded)) {
-            try {
-                toBeMergedJson = decodeFromBase64(toBeMergedJsonEncoded);
-            } catch (Exception e) {
-                LOG.error("Problem decoding toBeMerged encoded JSON: {}", toBeMergedJsonEncoded, e);
-            }
-        } else {
-            toBeMergedJson = toBeMergedJsonEncoded;
-        }
+        ObjectNode originalJsonNode = convertToObjectNode(originalJson);
+        ObjectNode toBeMergedJsonNode = convertToObjectNode(toBeMergedJson);
 
-        try {
-            originalJsonNode = (ObjectNode) objectMapper.readTree(originalJson);
-        } catch (IOException e) {
-            LOG.error("Problem deserialising original JSON: {}", originalJson, e);
-        } catch (Exception e) {
-            LOG.error("Problem with original JSON: {}", originalJson, e);
-        }
-        try {
-            toBeMergedJsonNode = (ObjectNode) objectMapper.readTree(toBeMergedJson);
-        } catch (IOException e) {
-            LOG.error("Problem deserialising to-Be-Merged JSON: {}", toBeMergedJson, e);
-        } catch (Exception e) {
-            LOG.error("Problem with to-Be-Merged JSON: {}", toBeMergedJson, e);
-        }
-
-        if (null == originalJsonNode && null == toBeMergedJsonNode) {
+        if (originalJsonNode == null && toBeMergedJsonNode == null) {
             return originalJsonEncoded;
-        } else if (null == toBeMergedJsonNode) {
+        } else if (toBeMergedJsonNode == null) {
             return originalJsonEncoded;
-        } else if (null == originalJsonNode) {
+        } else if (originalJsonNode == null) {
             return toBeMergedJsonEncoded;
         }
 
         mergeObjectNodes(originalJsonNode, toBeMergedJsonNode);
         return encodeToBase64(originalJsonNode.toString());
-    }
-
-    private static void mergeObjectNodes(ObjectNode originalJsonNode, ObjectNode toBeMergedJsonNode) {
-        toBeMergedJsonNode.fields().forEachRemaining(entry ->
-            originalJsonNode.set(entry.getKey(), entry.getValue())
-        );
     }
 
     public static String decodeFromBase64(String encodedString) {
@@ -93,4 +54,43 @@ public class ClientContextUtil {
         }
         return BASE64_PATTERN.matcher(input).matches();
     }
+
+    public static String removeEnclosingSquareBrackets(String input) {
+        if (input.startsWith("[") && input.endsWith("]")) {
+            return input.substring(1, input.length() - 1);
+        }
+        return input;
+    }
+
+    private static String decodeAndRemoveBrackets(String encodedJson) {
+        if (encodedJson == null) {
+            return null;
+        }
+
+        String json = removeEnclosingSquareBrackets(encodedJson);
+        return isBase64(json) ? decodeFromBase64(json) : json;
+    }
+
+    private static ObjectNode convertToObjectNode(String json) {
+        if (json == null) {
+            return null;
+        }
+
+        try {
+            return (ObjectNode) objectMapper.readTree(json);
+        } catch (IOException e) {
+            LOG.error("Problem deserialising JSON: {}", json, e);
+        } catch (Exception e) {
+            LOG.error("Problem with JSON: {}", json, e);
+        }
+
+        return null;
+    }
+
+    private static void mergeObjectNodes(ObjectNode originalJsonNode, ObjectNode toBeMergedJsonNode) {
+        toBeMergedJsonNode.fields().forEachRemaining(entry ->
+            originalJsonNode.set(entry.getKey(), entry.getValue())
+        );
+    }
+
 }

@@ -6,6 +6,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
+import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -62,17 +63,10 @@ public class CustomHeadersFilter implements Filter {
         // if the header exists then add it to the response
         if (headerValue != null) {
             if (context.equals(CallbackService.CLIENT_CONTEXT)) {
-                headerValue = removeEnclosingSquareBrackets(headerValue);
+                headerValue = ClientContextUtil.removeEnclosingSquareBrackets(headerValue);
             }
 
             response.setHeader(context, headerValue);
         }
-    }
-
-    public String removeEnclosingSquareBrackets(String input) {
-        if (input.startsWith("[") && input.endsWith("]")) {
-            return input.substring(1, input.length() - 1);
-        }
-        return input;
     }
 }
