@@ -7,6 +7,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ClientContextUtilTest {
 
     @Test
+    void testMergeClientContextsBothValidAndEnclosedInBrackets() {
+        String originalJson = "{\"key1\": \"value1\", \"key2\": \"value2\"}";
+        String toBeMergedJson = "{\"key2\": \"newValue2\", \"key3\": \"value3\"}";
+        String expectedMergedJson = "{\"key1\":\"value1\",\"key2\":\"newValue2\",\"key3\":\"value3\"}";
+
+        String originalJsonBracketEncoded = "[" + ClientContextUtil.encodeToBase64(originalJson) + "]";
+        String toBeMergedJsonBracketEncoded = "[" + ClientContextUtil.encodeToBase64(toBeMergedJson) + "]";
+
+        String result = ClientContextUtil.mergeClientContexts(originalJsonBracketEncoded, toBeMergedJsonBracketEncoded);
+
+        assertEquals(ClientContextUtil.encodeToBase64(expectedMergedJson), result);
+    }
+
+    @Test
     void testMergeClientContextsBothValid() {
         String originalJson = "{\"key1\": \"value1\", \"key2\": \"value2\"}";
         String toBeMergedJson = "{\"key2\": \"newValue2\", \"key3\": \"value3\"}";
