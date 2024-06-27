@@ -31,7 +31,6 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
-import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
@@ -313,7 +312,7 @@ class CallbackServiceTest {
 
         assertEquals(2, httpHeaders.size());
         assertTrue(httpHeaders.containsKey(customHeaders.get(0)));
-        assertEquals(ClientContextUtil.encodeToBase64(customHeaderValues.get(0)),
+        assertEquals(customHeaderValues.get(0),
             httpHeaders.get(customHeaders.get(0)).get(0));
         assertTrue(httpHeaders.containsKey(customHeaders.get(1)));
         assertEquals(customHeaderValues.get(1), httpHeaders.get(customHeaders.get(1)).get(0));

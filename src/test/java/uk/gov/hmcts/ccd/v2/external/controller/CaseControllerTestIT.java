@@ -37,6 +37,7 @@ import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.util.ClientContextUtil;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
@@ -335,7 +336,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         assertEquals(201, mvcResult.getResponse().getStatus());
         assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
-        assertTrue(mvcResult.getResponse().getHeader(CUSTOM_CONTEXT).contains(responseJson2.toString()));
+        assertTrue(mvcResult.getResponse().getHeader(CUSTOM_CONTEXT).contains(
+            ClientContextUtil.encodeToBase64(responseJson2.toString())));
     }
 
     @Test

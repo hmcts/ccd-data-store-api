@@ -190,8 +190,33 @@ public class CallbackService {
         }
     }
 
+    private void addPassThruContextValuesToHttpHeaders(HttpHeaders httpHeaders, String context) {
+        LOG.info("addPassThruContextValuesToHttpHeaders called for context <{}> !", context);
+        if (null != request.getAttribute(context)) {
+            LOG.info("Use request ATTRIBUTE context <{}>: value <{}>", context, request.getAttribute(context));
+            if (httpHeaders.containsKey(context)) {
+                LOG.info("Removing headers context <{}>: value <{}>", context, httpHeaders.get(context));
+                httpHeaders.remove(context);
+            }
+
+            //  if (CLIENT_CONTEXT.equalsIgnoreCase(context)) {
+            //    String mergedClientContext = ClientContextUtil.mergeClientContexts(
+            //          request.getHeader(context), request.getAttribute(context).toString());
+            //    LOG.info("Add headers mergedClientContext <{}>: value <{}>", context, mergedClientContext);
+            //    httpHeaders.add(context, mergedClientContext);
+            //  } else {
+            LOG.info("Add headers context <{}>: value <{}>", context, request.getAttribute(context));
+            httpHeaders.add(context, request.getAttribute(context).toString());
+            //  }
+            request.removeAttribute(context);
+        } else if (null != request.getHeader(context)) {
+            LOG.info("Use request HEADER context <{}>: value <{}>", context, request.getHeader(context));
+            httpHeaders.add(context, request.getHeader(context));
+        }
+    }
+
     private void storePassThroughHeadersAsRequestAttributes(final HttpHeaders httpHeaders,
-                                                              HttpServletRequest request) {
+                                                            HttpServletRequest request) {
         LOG.info("storePassThroughHeadersAsRequestAttributes called!");
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
@@ -200,35 +225,18 @@ public class CallbackService {
                 .forEach(context -> {
                     String headerValue = ClientContextUtil.removeEnclosingSquareBrackets(
                         httpHeaders.get(context).get(0));
-                    LOG.info("Setting request ATTRIBUTE context <{}> to value: <{}>",
-                        context, headerValue);
+
+                    if (CLIENT_CONTEXT.equalsIgnoreCase(context)) {
+                        headerValue = ClientContextUtil.mergeClientContexts(
+                            request.getHeader(context), httpHeaders.get(context).get(0));
+                        LOG.info("Set attribute to  mergedClientContext <{}>: value <{}>", context,headerValue);
+                    } else {
+                        LOG.info("Set attribute to context <{}>: value <{}>", context, headerValue);
+                    }
+
+
                     request.setAttribute(context, headerValue);
                 });
-        }
-    }
-
-    private void addPassThruContextValuesToHttpHeaders(HttpHeaders httpHeaders, String context) {
-        LOG.info("addPassThruContextValuesToHttpHeaders called!");
-        if (null != request.getAttribute(context)) {
-            LOG.info("Use request ATTRIBUTE context <{}>: value <{}>", context, request.getAttribute(context));
-            if (httpHeaders.containsKey(context)) {
-                LOG.info("Removing headers context <{}>: value <{}>", context, httpHeaders.get(context));
-                httpHeaders.remove(context);
-            }
-
-            if (CLIENT_CONTEXT.equalsIgnoreCase(context)) {
-                String mergedClientContext = ClientContextUtil.mergeClientContexts(
-                    request.getHeader(context), request.getAttribute(context).toString());
-                LOG.info("Add headers context <{}>: value <{}>", context, mergedClientContext);
-                httpHeaders.add(context, mergedClientContext);
-            } else {
-                LOG.info("Add headers context <{}>: value <{}>", context, request.getAttribute(context));
-                httpHeaders.add(context, request.getAttribute(context).toString());
-            }
-            request.removeAttribute(context);
-        } else if (null != request.getHeader(context)) {
-            LOG.info("Use request HEADER context <{}>: value <{}>", context, request.getHeader(context));
-            httpHeaders.add(context, request.getHeader(context));
         }
     }
 
