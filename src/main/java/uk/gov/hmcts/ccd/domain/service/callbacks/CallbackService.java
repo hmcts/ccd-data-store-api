@@ -195,7 +195,8 @@ public class CallbackService {
         if (null != request.getAttribute(context)) {
             LOG.info("Use request ATTRIBUTE context <{}>: value <{}>", context, request.getAttribute(context));
             if (httpHeaders.containsKey(context)) {
-                LOG.info("Removing headers context <{}>: value <{}>", context, httpHeaders.get(context));
+                LOG.info("Removing headers context <{}>: value <{}>", context,
+                    ClientContextUtil.decodeFromBase64(httpHeaders.get(context).get(0)));
                 httpHeaders.remove(context);
             }
 
@@ -205,12 +206,14 @@ public class CallbackService {
             //    LOG.info("Add headers mergedClientContext <{}>: value <{}>", context, mergedClientContext);
             //    httpHeaders.add(context, mergedClientContext);
             //  } else {
-            LOG.info("Add headers context <{}>: value <{}>", context, request.getAttribute(context));
+            LOG.info("Add headers context <{}>: value <{}>", context,
+                ClientContextUtil.decodeFromBase64((String)request.getAttribute(context)));
             httpHeaders.add(context, request.getAttribute(context).toString());
             //  }
             request.removeAttribute(context);
         } else if (null != request.getHeader(context)) {
-            LOG.info("Use request HEADER context <{}>: value <{}>", context, request.getHeader(context));
+            LOG.info("Use request HEADER context <{}>: value <{}>", context,
+                ClientContextUtil.decodeFromBase64(request.getHeader(context)));
             httpHeaders.add(context, request.getHeader(context));
         }
     }
@@ -228,10 +231,12 @@ public class CallbackService {
 
                     if (CLIENT_CONTEXT.equalsIgnoreCase(context)) {
                         headerValue = ClientContextUtil.mergeClientContexts(
-                            request.getHeader(context), httpHeaders.get(context).get(0));
-                        LOG.info("Set attribute to  mergedClientContext <{}>: value <{}>", context,headerValue);
+                            request.getHeader(context), headerValue);
+                        LOG.info("Set attribute to  mergedClientContext <{}>: value <{}>", context,
+                            ClientContextUtil.decodeFromBase64(headerValue));
                     } else {
-                        LOG.info("Set attribute to context <{}>: value <{}>", context, headerValue);
+                        LOG.info("Set attribute to context <{}>: value <{}>", context,
+                            ClientContextUtil.decodeFromBase64(headerValue));
                     }
 
 
