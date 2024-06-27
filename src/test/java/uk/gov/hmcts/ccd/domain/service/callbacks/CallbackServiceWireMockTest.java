@@ -404,8 +404,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
     private void assertOnRequestAttribute(JSONObject jsonObject, String customContext) {
         Object objectContext = request.getAttribute(customContext);
-        List<String> contextArray = (List<String>) objectContext;
-        assertEquals(jsonObject.toString(), contextArray.get(0));
+        String contextValue = (String) objectContext;
+        assertEquals(jsonObject.toString(), contextValue);
     }
 
 }
