@@ -218,7 +218,7 @@ class CallbackServiceTest {
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("Invoking callback {} of type {} with request: {}", logsList.get(0)
+        assertEquals("Invoking callback {} of type {} with request: {}", logsList.get(2)
             .getMessage());
     }
 
@@ -232,7 +232,7 @@ class CallbackServiceTest {
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("Callback {} response received: {}", logsList.get(1)
+        assertEquals("Callback {} response received: {}", logsList.get(3)
             .getMessage());
     }
 
@@ -244,9 +244,9 @@ class CallbackServiceTest {
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("Invoking callback {} of type {} with request: {}", logsList.get(0)
+        assertEquals("Invoking callback {} of type {} with request: {}", logsList.get(2)
             .getMessage());
-        assertEquals("Callback {} response received: {}", logsList.get(1)
+        assertEquals("Callback {} response received: {}", logsList.get(3)
             .getMessage());
     }
 
@@ -258,7 +258,7 @@ class CallbackServiceTest {
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals(0,logsList.size());
+        assertEquals(3,logsList.size());
     }
 
     @Test
@@ -269,7 +269,7 @@ class CallbackServiceTest {
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals(0,logsList.size());
+        assertEquals(3,logsList.size());
     }
 
     @Test
