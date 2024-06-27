@@ -210,7 +210,7 @@ public class CallbackService {
                 httpHeaders.remove(context);
             }
 
-            if (CLIENT_CONTEXT.equals(context)) {
+            if (CLIENT_CONTEXT.equalsIgnoreCase(context)) {
                 String mergedClientContext = ClientContextUtil.mergeClientContexts(
                     request.getHeader(context), request.getAttribute(context).toString());
                 LOG.debug("Add headers context <{}>: value <{}>", context, mergedClientContext);

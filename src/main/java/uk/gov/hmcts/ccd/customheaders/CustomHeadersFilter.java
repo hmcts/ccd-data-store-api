@@ -62,7 +62,7 @@ public class CustomHeadersFilter implements Filter {
 
         // if the header exists then add it to the response
         if (headerValue != null) {
-            if (context.equals(CallbackService.CLIENT_CONTEXT)) {
+            if (context.equalsIgnoreCase(CallbackService.CLIENT_CONTEXT)) {
                 headerValue = ClientContextUtil.removeEnclosingSquareBrackets(headerValue);
             }
 
