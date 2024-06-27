@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
@@ -46,16 +48,19 @@ public class CallbackService {
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final AppInsights appinsights;
+    private final HttpServletRequest request;
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
                            @Qualifier("restTemplate") final RestTemplate restTemplate,
                            final ApplicationParams applicationParams,
-                           AppInsights appinsights) {
+                           AppInsights appinsights,
+                           HttpServletRequest request) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
         this.applicationParams = applicationParams;
         this.appinsights = appinsights;
+        this.request = request;
     }
 
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
@@ -122,7 +127,6 @@ public class CallbackService {
     private <T> Optional<ResponseEntity<T>> sendRequest(final String url,
                                                         final CallbackType callbackType,
                                                         final Class<T> clazz,
-
                                                         final CallbackRequest callbackRequest) {
 
         HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
@@ -134,6 +138,7 @@ public class CallbackService {
         try {
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
+            addPassThroughHeaders(httpHeaders);
             if (null != securityHeaders) {
                 securityHeaders.forEach((key, values) -> httpHeaders.put(key, values));
             }
@@ -168,6 +173,17 @@ public class CallbackService {
             throw new ApiException("Unable to proceed because there are one or more callback Errors or Warnings")
                 .withErrors(callbackResponse.getErrors())
                 .withWarnings(callbackResponse.getWarnings());
+        }
+    }
+
+    protected void addPassThroughHeaders(final HttpHeaders httpHeaders) {
+        if (null != request && null != applicationParams
+            && null != applicationParams.getCallbackPassthruHeaderContexts()) {
+            applicationParams.getCallbackPassthruHeaderContexts().stream()
+                .filter(context -> StringUtils.hasLength(context)
+                    && (null != request.getAttribute(context) || null != request.getHeader(context)))
+                .forEach(context -> httpHeaders.add(context, null != request.getAttribute(context)
+                    ? (String) request.getAttribute(context) : request.getHeader(context)));
         }
     }
 
