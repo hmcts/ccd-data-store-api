@@ -198,9 +198,11 @@ public class CallbackService {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
                 .filter(context -> StringUtils.hasLength(context) && null != httpHeaders.get(context))
                 .forEach(context -> {
+                    String headerValue = ClientContextUtil.removeEnclosingSquareBrackets(
+                        httpHeaders.get(context).get(0));
                     LOG.info("Setting request ATTRIBUTE context <{}> to value: <{}>",
-                        context, httpHeaders.get(context));
-                    request.setAttribute(context, httpHeaders.get(context));
+                        context, headerValue);
+                    request.setAttribute(context, headerValue);
                 });
         }
     }
