@@ -231,7 +231,7 @@ public class CallbackService {
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
-                .filter(context -> StringUtils.hasLength(context))
+                .filter(context -> StringUtils.hasLength(context) && null != httpHeaders.get(context))
                 .forEach(context -> {
                     String headerValue = ClientContextUtil.removeEnclosingSquareBrackets(
                         httpHeaders.get(context).get(0));
