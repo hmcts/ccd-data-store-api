@@ -48,7 +48,12 @@ public class ClientContextUtil {
     }
 
     public static String decodeFromBase64(String encodedString) {
-        return new String(Base64.getDecoder().decode(encodedString));
+        String unenclosedString = removeEnclosingSquareBrackets(encodedString);
+        if (isBase64(unenclosedString)) {
+            return new String(Base64.getDecoder().decode(unenclosedString));
+        } else {
+            return encodedString;
+        }
     }
 
     public static String encodeToBase64(String decodedString) {

@@ -193,10 +193,13 @@ public class CallbackService {
     private void addPassThruContextValuesToHttpHeaders(HttpHeaders httpHeaders, String context) {
         LOG.info("addPassThruContextValuesToHttpHeaders called for context <{}> !", context);
         if (null != request.getAttribute(context)) {
-            LOG.info("Use request ATTRIBUTE context <{}>: value <{}>", context, request.getAttribute(context));
+            LOG.info("Use request ATTRIBUTE context <{}>: value <{}>", context,
+                ClientContextUtil.decodeFromBase64((String)request.getAttribute(context)));
             if (httpHeaders.containsKey(context)) {
-                LOG.info("Removing headers context <{}>: value <{}>", context,
-                    ClientContextUtil.decodeFromBase64(httpHeaders.get(context).get(0)));
+                if (null != httpHeaders.get(context) && !httpHeaders.get(context).isEmpty()) {
+                    LOG.info("Removing headers context <{}>: value <{}>", context,
+                        ClientContextUtil.decodeFromBase64(httpHeaders.get(context).get(0)));
+                }
                 httpHeaders.remove(context);
             }
 
