@@ -19,6 +19,8 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpMethod.POST;
 import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService.CLIENT_CONTEXT;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.HttpEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.client.RestClientException;
@@ -87,6 +89,28 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             "complete_task": "false"
         }
         """);
+    public static final JSONObject responseJson1Merged = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "00001",
+                    "task_name": "task name 1"
+                }
+            },
+            "complete_task": "false"
+        }
+        """);
+    public static final JSONObject requestJson2 = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "00002",
+                    "task_name": "Step 2"
+                }
+            },
+            "complete_task": "false"
+        }
+        """);
     public static final JSONObject responseJson2 = new JSONObject("""
         {
             "user_task": {
@@ -99,15 +123,53 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             "complete_task": "false"
         }
         """);
+    public static final JSONObject responseJson2Merged = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "000002",
+                    "task_name": "task name 2"
+                }
+            },
+            "new_field": "check1",
+            "complete_task": "false"
+        }
+        """);
+    public static final JSONObject requestJson3 = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "00003",
+                    "task_name": "Step 3 started"
+                }
+            },
+            "new_field": "check1",
+            "new_field2": "check2",
+            "complete_task": "false"
+        }
+        """);
     public static final JSONObject responseJson3 = new JSONObject("""
         {
             "user_task": {
                 "task_data": {
                     "task_id": "000003",
-                    "task_name": "task name 3"
+                    "task_name": "task name 3 completed"
                 }
             },
-            "new_field2": "check2",
+            "new_field2": "check2ed",
+            "complete_task": "true"
+        }
+        """);
+    public static final JSONObject responseJson3Merged = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "000003",
+                    "task_name": "task name 3 completed"
+                }
+            },
+            "new_field": "check1",
+            "new_field2": "check2ed",
             "complete_task": "true"
         }
         """);
@@ -138,10 +200,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
     @Test
     public void passThruCustomHeadersLikeClientContext() throws Exception {
-        final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
 
         request = new MockHttpServletRequest();
-        request.setAttribute(CLIENT_CONTEXT, ClientContextUtil.encodeToBase64(requestJson1.toString()));
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
         final String testUrl1 = "http://localhost:" + wiremockPort + "/test-callback101";
@@ -158,35 +218,37 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(caseDetails.getData());
 
+        String clientContextValue1 = ClientContextUtil.encodeToBase64(requestJson1.toString());
         stubFor(post(urlMatching("/test-callback101.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(customContext, ClientContextUtil.encodeToBase64(responseJson1.toString()))));
+                .withHeader(CLIENT_CONTEXT, ClientContextUtil.encodeToBase64(responseJson1.toString()))));
 
+        String clientContextValue2 = ClientContextUtil.encodeToBase64(requestJson2.toString());
         stubFor(post(urlMatching("/test-callback102.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(customContext, ClientContextUtil.encodeToBase64(responseJson2.toString()))));
+                .withHeader(CLIENT_CONTEXT, ClientContextUtil.encodeToBase64(responseJson2.toString()))));
 
         stubFor(post(urlMatching("/test-callback103.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(customContext, ClientContextUtil.encodeToBase64((responseJson3.toString())))));
+                .withHeader(CLIENT_CONTEXT, ClientContextUtil.encodeToBase64((responseJson3.toString())))));
 
         final Optional<CallbackResponse> result1 = callbackService.send(testUrl1, TEST_CALLBACK_ABOUT_TO_START,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response1 = result1.orElseThrow(() -> new AssertionError("Missing result"));
-        assertOnRequestAttribute(responseJson1, customContext);
+        assertOnRequestAttribute(responseJson1Merged, CLIENT_CONTEXT);
 
         final Optional<CallbackResponse> result2 = callbackService.send(testUrl2, TEST_CALLBACK_ABOUT_TO_SUBMIT,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response2 = result2.orElseThrow(() -> new AssertionError("Missing result"));
-        assertOnRequestAttribute(responseJson2, customContext);
+        assertOnRequestAttribute(responseJson2Merged, CLIENT_CONTEXT);
 
         final Optional<CallbackResponse> result3 = callbackService.send(testUrl3, TEST_CALLBACK_SUBMITTED,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response3 = result3.orElseThrow(() -> new AssertionError("Missing result"));
-        assertOnRequestAttribute(responseJson3, customContext);
+        assertOnRequestAttribute(responseJson3Merged, CLIENT_CONTEXT);
     }
 
     @org.junit.Ignore // TODO investigating socket issues in Azure
@@ -419,7 +481,20 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
     private void assertOnRequestAttribute(JSONObject jsonObject, String customContext) {
         Object objectContext = request.getAttribute(customContext);
         String contextValue = (String) objectContext;
-        assertEquals(jsonObject.toString(), ClientContextUtil.decodeFromBase64(contextValue));
+        JsonNode jsonNode1 = null;
+        JsonNode jsonNode2 = null;
+
+        try {
+            jsonNode1 = mapper.readTree(jsonObject.toString());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            jsonNode2 = mapper.readTree(ClientContextUtil.decodeFromBase64(contextValue));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(jsonNode1, jsonNode2);
     }
 
 }
