@@ -7,13 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -26,14 +24,12 @@ import static java.lang.String.format;
 @Slf4j
 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
 @RequestScope
-// TODO: Make this repository return copies of the maps https://tools.hmcts.net/jira/browse/RDM-1459
 public class CachedCaseDefinitionRepository implements CaseDefinitionRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedCaseDefinitionRepository.class);
 
     public static final String QUALIFIER = "cached";
     private static final String CASE_TYPE_KEY_FORMAT = "%s___%d";
-    private final ApplicationParams applicationParams;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final Map<String, List<CaseTypeDefinition>> caseTypesForJurisdictions = newHashMap();
     private final Map<String, CaseTypeDefinitionVersion> versions = newHashMap();
@@ -44,10 +40,8 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     @Autowired
     public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
-                                                  CaseDefinitionRepository caseDefinitionRepository,
-                                          ApplicationParams applicationParams) {
+                                                  CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDefinitionRepository = caseDefinitionRepository;
-        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -79,13 +73,15 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     /**
-     * Retrieves a cached case type definition for the specified case type ID using a two-level caching mechanism and returns a cloned copy.
-     * The first level of caching is an in-memory cache that checks if the case type definition is already available before
-     * attempting to retrieve it from an external source (case definition repository). If the definition is not cached, it
-     * fetches the definition from the repository, stores it in the in-memory cache, and returns a cloned copy.
-     * The second level of caching is a scope-specific cache implemented using a HashMap, defined as a Spring component with
-     * RequestScope. This ensures that within the same request, the method can return the same object without cloning,
-     * improving performance by avoiding redundant cloning operations.
+     * Retrieves a cached case type definition for the specified case type ID using a two-level caching mechanism and
+     * returns a cloned copy.
+     * The first level of caching is an in-memory cache that checks if the case type definition is already available
+     * before attempting to retrieve it from an external source (case definition repository). If the definition is not
+     * cached, it fetches the definition from the repository, stores it in the in-memory cache, and returns a cloned
+     * copy.
+     * The second level of caching is a scope-specific cache implemented using a HashMap, defined as a Spring component
+     * with RequestScope. This ensures that within the same request, the method can return the same object without
+     * cloning, improving performance by avoiding redundant cloning operations.
      * Use this method when the returned object is circulated in a read-only transaction to enhance performance.
      *
      * @param caseTypeId The ID of the case type to retrieve.
