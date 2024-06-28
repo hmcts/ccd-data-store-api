@@ -155,7 +155,7 @@ public class CallbackService {
                 LOG.info("Callback {} response received: {}", url, responseEntity);
             }
 
-            storePassThroughHeadersAsRequestAttributes(responseEntity, request);
+            storePassThroughHeadersAsRequestAttributes(responseEntity, requestEntity, request);
             responseEntity = replaceResponseEntityWithUpdatedHeaders(responseEntity, CLIENT_CONTEXT);
             httpStatus = responseEntity.getStatusCodeValue();
             return Optional.of(responseEntity);
@@ -225,6 +225,7 @@ public class CallbackService {
     }
 
     private void storePassThroughHeadersAsRequestAttributes(ResponseEntity responseEntity,
+                                                            HttpEntity requestEntity,
                                                             HttpServletRequest request) {
         LOG.info("storePassThroughHeadersAsRequestAttributes called!");
         HttpHeaders httpHeaders = responseEntity.getHeaders();
@@ -238,7 +239,7 @@ public class CallbackService {
 
                     if (CLIENT_CONTEXT.equalsIgnoreCase(context)) {
                         headerValue = ClientContextUtil.mergeClientContexts(
-                            request.getHeader(context), headerValue);
+                            requestEntity.getHeaders().getFirst(context), headerValue);
                         LOG.info("Set attribute to  mergedClientContext <{}>: value <{}>", context,
                             ClientContextUtil.decodeFromBase64(headerValue));
                     } else {
