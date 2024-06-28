@@ -58,7 +58,7 @@ class CachedCaseDefinitionRepositoryTest {
         openMocks = MockitoAnnotations.openMocks(this);
 
         doReturn(List.of("GrantOfRepresentation")).when(appParams).getRequestScopeCachedCaseTypes();
-        cachedCaseDefinitionRepository = new CachedCaseDefinitionRepository(caseDefinitionRepository, appParams);
+        cachedCaseDefinitionRepository = new CachedCaseDefinitionRepository(caseDefinitionRepository);
     }
 
     @Nested
@@ -374,7 +374,8 @@ class CachedCaseDefinitionRepositoryTest {
         doReturn(caseTypeDefinitionVersion).when(caseDefinitionRepository).getLatestVersion(CASE_TYPE_ID);
         doReturn(expectedCaseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_VERSION, CASE_TYPE_ID);
 
-        CaseTypeDefinition initialReturnOfCaseType = cachedCaseDefinitionRepository.getScopedCachedCaseType(CASE_TYPE_ID);
+        CaseTypeDefinition initialReturnOfCaseType =
+            cachedCaseDefinitionRepository.getScopedCachedCaseType(CASE_TYPE_ID);
 
         assertAll(
             () -> assertNotEquals(expectedCaseType, initialReturnOfCaseType),
@@ -385,7 +386,8 @@ class CachedCaseDefinitionRepositoryTest {
 
         reset(caseDefinitionRepository);
 
-        CaseTypeDefinition secondReturnOfCaseType = cachedCaseDefinitionRepository.getScopedCachedCaseType(CASE_TYPE_ID);
+        CaseTypeDefinition secondReturnOfCaseType =
+            cachedCaseDefinitionRepository.getScopedCachedCaseType(CASE_TYPE_ID);
 
         assertAll(
             () -> assertEquals(initialReturnOfCaseType, secondReturnOfCaseType),

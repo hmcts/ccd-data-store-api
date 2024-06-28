@@ -42,13 +42,15 @@ public interface CaseDefinitionRepository {
     List<String> getAllCaseTypesIDs();
 
     /**
-     * Retrieves a cached case type definition for the specified case type ID using a two-level caching mechanism and returns a cloned copy.
-     * The first level of caching is an in-memory cache that checks if the case type definition is already available before
-     * attempting to retrieve it from an external source (case definition repository). If the definition is not cached, it
-     * fetches the definition from the repository, stores it in the in-memory cache, and returns a cloned copy.
-     * The second level of caching is a scope-specific cache implemented using a HashMap, defined as a Spring component with
-     * RequestScope. This ensures that within the same request, the method can return the same object without cloning,
-     * improving performance by avoiding redundant cloning operations.
+     * Retrieves a cached case type definition for the specified case type ID using a two-level caching mechanism and
+     * returns a cloned copy.
+     * The first level of caching is an in-memory cache that checks if the case type definition is already available
+     * before attempting to retrieve it from an external source (case definition repository). If the definition is not
+     * cached, it fetches the definition from the repository, stores it in the in-memory cache, and returns a cloned
+     * copy.
+     * The second level of caching is a scope-specific cache implemented using a HashMap, defined as a Spring component
+     * with RequestScope. This ensures that within the same request, the method can return the same object without
+     * cloning, improving performance by avoiding redundant cloning operations.
      * Use this method when the returned object is circulated in a read-only transaction to enhance performance.
      *
      * @param caseTypeId The ID of the case type to retrieve.
