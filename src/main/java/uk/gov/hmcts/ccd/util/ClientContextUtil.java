@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -72,6 +73,18 @@ public class ClientContextUtil {
             return input.substring(1, input.length() - 1);
         }
         return input;
+    }
+
+    public static HttpHeaders replaceHeader(HttpHeaders headers, String headerName, String headerValue) {
+        HttpHeaders newHeaders = new HttpHeaders();
+        headers.forEach((key, value) -> {
+            if (key.equalsIgnoreCase(headerName)) {
+                newHeaders.add(key, headerValue);
+            } else {
+                newHeaders.addAll(key, value);
+            }
+        });
+        return newHeaders;
     }
 
     private static String decodeAndRemoveBrackets(String encodedJson) {

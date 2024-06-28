@@ -155,7 +155,8 @@ public class CallbackService {
                 LOG.info("Callback {} response received: {}", url, responseEntity);
             }
 
-            storePassThroughHeadersAsRequestAttributes(responseEntity.getHeaders(), request);
+            storePassThroughHeadersAsRequestAttributes(responseEntity, request);
+            responseEntity = replaceResponseEntityWithUpdatedHeaders(responseEntity, CLIENT_CONTEXT);
             httpStatus = responseEntity.getStatusCodeValue();
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
@@ -223,13 +224,14 @@ public class CallbackService {
         }
     }
 
-    private void storePassThroughHeadersAsRequestAttributes(final HttpHeaders httpHeaders,
+    private void storePassThroughHeadersAsRequestAttributes(ResponseEntity responseEntity,
                                                             HttpServletRequest request) {
         LOG.info("storePassThroughHeadersAsRequestAttributes called!");
+        HttpHeaders httpHeaders = responseEntity.getHeaders();
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
-                .filter(context -> StringUtils.hasLength(context) && null != httpHeaders.get(context))
+                .filter(context -> StringUtils.hasLength(context))
                 .forEach(context -> {
                     String headerValue = ClientContextUtil.removeEnclosingSquareBrackets(
                         httpHeaders.get(context).get(0));
@@ -249,6 +251,19 @@ public class CallbackService {
                 });
         }
     }
+
+    private ResponseEntity replaceResponseEntityWithUpdatedHeaders(final ResponseEntity responseEntity,
+                                                                   final String headerName) {
+        HttpHeaders headers = responseEntity.getHeaders();
+        if (headers != null && headers.get(headerName) != null) {
+            HttpHeaders newHeaders = ClientContextUtil.replaceHeader(headers, CLIENT_CONTEXT,
+                request.getAttribute(CLIENT_CONTEXT).toString());
+            return new ResponseEntity<>(responseEntity.getBody(), newHeaders, responseEntity.getStatusCode());
+        } else {
+            return responseEntity;
+        }
+    }
+
 
     private boolean logCallbackDetails(final String url) {
         return (!applicationParams.getCcdCallbackLogControl().isEmpty()

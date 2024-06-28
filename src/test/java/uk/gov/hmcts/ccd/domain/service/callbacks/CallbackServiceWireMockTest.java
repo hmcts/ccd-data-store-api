@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpMethod.POST;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService.CLIENT_CONTEXT;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -53,6 +54,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
 @TestPropertySource(properties =
     {
@@ -64,15 +66,25 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_START = CallbackType.ABOUT_TO_START;
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_SUBMIT = CallbackType.ABOUT_TO_SUBMIT;
     public static final CallbackType TEST_CALLBACK_SUBMITTED = CallbackType.SUBMITTED;
+    public static final JSONObject requestJson1 = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "00000",
+                    "task_name": "Initialise"
+                }
+            }
+        }
+        """);
     public static final JSONObject responseJson1 = new JSONObject("""
         {
             "user_task": {
                 "task_data": {
                     "task_id": "00001",
                     "task_name": "task name 1"
-                },
-                "complete_task": "false"
-            }
+                }
+            },
+            "complete_task": "false"
         }
         """);
     public static final JSONObject responseJson2 = new JSONObject("""
@@ -81,10 +93,10 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
                 "task_data": {
                     "task_id": "000002",
                     "task_name": "task name 2"
-                },
-                "new_field": "check1",
-                "complete_task": "false"
-            }
+                }
+            },
+            "new_field": "check1",
+            "complete_task": "false"
         }
         """);
     public static final JSONObject responseJson3 = new JSONObject("""
@@ -93,9 +105,10 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
                 "task_data": {
                     "task_id": "000003",
                     "task_name": "task name 3"
-                },
-                "complete_task": "true"
-            }
+                }
+            },
+            "new_field2": "check2",
+            "complete_task": "true"
         }
         """);
 
@@ -128,6 +141,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
 
         request = new MockHttpServletRequest();
+        request.setAttribute(CLIENT_CONTEXT, ClientContextUtil.encodeToBase64(requestJson1.toString()));
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
         final String testUrl1 = "http://localhost:" + wiremockPort + "/test-callback101";
@@ -147,17 +161,17 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback101.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(customContext, responseJson1.toString())));
+                .withHeader(customContext, ClientContextUtil.encodeToBase64(responseJson1.toString()))));
 
         stubFor(post(urlMatching("/test-callback102.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(customContext, responseJson2.toString())));
+                .withHeader(customContext, ClientContextUtil.encodeToBase64(responseJson2.toString()))));
 
         stubFor(post(urlMatching("/test-callback103.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(customContext, responseJson3.toString())));
+                .withHeader(customContext, ClientContextUtil.encodeToBase64((responseJson3.toString())))));
 
         final Optional<CallbackResponse> result1 = callbackService.send(testUrl1, TEST_CALLBACK_ABOUT_TO_START,
             caseEventDefinition, null, caseDetails, false);
@@ -405,7 +419,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
     private void assertOnRequestAttribute(JSONObject jsonObject, String customContext) {
         Object objectContext = request.getAttribute(customContext);
         String contextValue = (String) objectContext;
-        assertEquals(jsonObject.toString(), contextValue);
+        assertEquals(jsonObject.toString(), ClientContextUtil.decodeFromBase64(contextValue));
     }
 
 }
