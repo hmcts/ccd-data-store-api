@@ -32,6 +32,7 @@ import uk.gov.hmcts.ccd.util.ClientContextUtil;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -196,9 +197,10 @@ public class CallbackService {
             LOG.info("Use request ATTRIBUTE context <{}>: value <{}>", context,
                 ClientContextUtil.decodeFromBase64((String)request.getAttribute(context)));
             if (httpHeaders.containsKey(context)) {
-                if (null != httpHeaders.get(context) && !httpHeaders.get(context).isEmpty()) {
+                List<String> headerValues = httpHeaders.get(context);
+                if (headerValues != null && !headerValues.isEmpty()) {
                     LOG.info("Removing headers context <{}>: value <{}>", context,
-                        ClientContextUtil.decodeFromBase64(httpHeaders.get(context).get(0)));
+                        ClientContextUtil.decodeFromBase64(headerValues.get(0)));
                 }
                 httpHeaders.remove(context);
             }
