@@ -23,7 +23,7 @@ class CaseAccessGroupsMatcherTest extends BaseFilter {
 
     private CaseAccessGroupsMatcher classUnderTest;
     private final String simpleGAjsonRequest = "{\n"
-        + "  \"caseAccessGroups\": [\n"
+        + "  \"CaseAccessGroups\": [\n"
         + "    {\n"
         + "      \"id\": \"id1\",\n"
         + "      \"value\": {\n"
