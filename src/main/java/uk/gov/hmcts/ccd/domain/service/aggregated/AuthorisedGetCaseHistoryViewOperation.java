@@ -41,6 +41,7 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
         Set<AccessProfile> accessProfiles = getAccessProfiles(caseDetails.getReferenceAsString());
         verifyCaseTypeReadAccess(caseTypeDefinition, accessProfiles);
         CaseHistoryView caseHistoryView = getCaseHistoryViewOperation.execute(caseReference, eventId);
+        filterCaseTabFieldsByReadAccess(caseHistoryView, accessProfiles);
         filterAllowedTabsWithFields(caseHistoryView, accessProfiles);
         return caseHistoryView;
     }
