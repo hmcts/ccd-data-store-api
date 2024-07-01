@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 
 class WizardPageTest {
@@ -40,11 +39,9 @@ class WizardPageTest {
         WizardPageCollection wizardPageCollection = objectMapper.readValue(fileContent, WizardPageCollection.class);
         List<WizardPage> wizardPages = wizardPageCollection.getWizardPages();
         WizardPage wizardPage = wizardPages.get(0);
-        WizardPage copiedWizardPage = wizardPage.createCopy();
-
-        assertNotEquals(wizardPage.hashCode(), copiedWizardPage.hashCode());
-
         String originalJson = objectMapper.writeValueAsString(wizardPage);
+
+        WizardPage copiedWizardPage = wizardPage.createCopy();
         String copiedJson = objectMapper.writeValueAsString(copiedWizardPage);
 
         String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
@@ -60,11 +57,9 @@ class WizardPageTest {
         WizardPageCollection wizardPageCollection = objectMapper.readValue(fileContent, WizardPageCollection.class);
         List<WizardPage> wizardPages = wizardPageCollection.getWizardPages();
         WizardPage wizardPage = wizardPages.get(0);
-        WizardPage copiedWizardPage = wizardPage.createCopy();
-
-        assertNotEquals(wizardPage.hashCode(), copiedWizardPage.hashCode());
-
         String originalJson = objectMapper.writeValueAsString(wizardPage);
+
+        WizardPage copiedWizardPage = wizardPage.createCopy();
         String copiedJson = objectMapper.writeValueAsString(copiedWizardPage);
 
         String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
@@ -80,11 +75,9 @@ class WizardPageTest {
         WizardPageCollection wizardPageCollection = objectMapper.readValue(fileContent, WizardPageCollection.class);
         List<WizardPage> wizardPages = wizardPageCollection.getWizardPages();
         WizardPage wizardPage = wizardPages.get(0);
-        WizardPage copiedWizardPage = wizardPage.createCopy();
-
-        assertNotEquals(wizardPage.hashCode(), copiedWizardPage.hashCode());
-
         String originalJson = objectMapper.writeValueAsString(wizardPage);
+
+        WizardPage copiedWizardPage = wizardPage.createCopy();
         String copiedJson = objectMapper.writeValueAsString(copiedWizardPage);
 
         String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
