@@ -59,7 +59,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/swagger-resources/**",
         "/swagger-ui/**",
         "/webjars/**",
-        "/testing-support/cleanup-case-type/**"
+        "/testing-support/cleanup-case-type/**",
+        "/jcdebug",
+        "/jcdebugtest",
+        "/setflag0",
+        "/setflag1",
+        "/setflag2",
+        "/setflag3",
+        "/setflag4"
     };
 
     @Inject
