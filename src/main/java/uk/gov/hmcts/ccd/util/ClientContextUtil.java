@@ -24,27 +24,20 @@ public class ClientContextUtil {
 
     public static String mergeClientContexts(String originalJsonEncoded, String toBeMergedJsonEncoded) {
         String originalJson = decodeAndRemoveBrackets(originalJsonEncoded);
-        LOG.info("originalJson: {}", originalJson);
-
         String toBeMergedJson = decodeAndRemoveBrackets(toBeMergedJsonEncoded);
-        LOG.info("toBeMergedJson: {}", toBeMergedJson);
 
         ObjectNode originalJsonNode = convertToObjectNode(originalJson);
         ObjectNode toBeMergedJsonNode = convertToObjectNode(toBeMergedJson);
 
         if (originalJsonNode == null && toBeMergedJsonNode == null) {
-            LOG.info("originalJsonNode == null && toBeMergedJsonNode == null - returning originalJson");
             return originalJsonEncoded;
         } else if (toBeMergedJsonNode == null) {
-            LOG.info("toBeMergedJsonNode == null - returning originalJson");
             return originalJsonEncoded;
         } else if (originalJsonNode == null) {
-            LOG.info("originalJsonNode == null - returning toBeMergedJson");
             return toBeMergedJsonEncoded;
         }
 
         mergeObjectNodes(originalJsonNode, toBeMergedJsonNode);
-        LOG.info("merged into originalJson now: {}",originalJsonNode);
         return encodeToBase64(originalJsonNode.toString());
     }
 

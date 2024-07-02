@@ -32,7 +32,6 @@ import uk.gov.hmcts.ccd.util.ClientContextUtil;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -98,7 +97,6 @@ public class CallbackService {
         if (url == null || url.isEmpty()) {
             return Optional.empty();
         }
-        LOG.info("callback URL is {}", url);
         final CallbackRequest callbackRequest =
             new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId(), ignoreWarning);
         final Optional<ResponseEntity<CallbackResponse>> responseEntity =
@@ -184,7 +182,6 @@ public class CallbackService {
     }
 
     protected void addPassThroughHeaders(final HttpHeaders httpHeaders) {
-        LOG.info("addPassThroughHeaders called!");
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
@@ -193,33 +190,14 @@ public class CallbackService {
     }
 
     private void addPassThruContextValuesToHttpHeaders(HttpHeaders httpHeaders, String context) {
-        LOG.info("addPassThruContextValuesToHttpHeaders called for context <{}> !", context);
         if (null != request.getAttribute(context)) {
-            LOG.info("Use request ATTRIBUTE context <{}>: value <{}>", context,
-                ClientContextUtil.decodeFromBase64((String)request.getAttribute(context)));
             if (httpHeaders.containsKey(context)) {
-                List<String> headerValues = httpHeaders.get(context);
-                if (headerValues != null && !headerValues.isEmpty()) {
-                    LOG.info("Removing headers context <{}>: value <{}>", context,
-                        ClientContextUtil.decodeFromBase64(headerValues.get(0)));
-                }
                 httpHeaders.remove(context);
             }
 
-            //  if (CLIENT_CONTEXT.equalsIgnoreCase(context)) {
-            //    String mergedClientContext = ClientContextUtil.mergeClientContexts(
-            //          request.getHeader(context), request.getAttribute(context).toString());
-            //    LOG.info("Add headers mergedClientContext <{}>: value <{}>", context, mergedClientContext);
-            //    httpHeaders.add(context, mergedClientContext);
-            //  } else {
-            LOG.info("Add headers context <{}>: value <{}>", context,
-                ClientContextUtil.decodeFromBase64((String)request.getAttribute(context)));
             httpHeaders.add(context, request.getAttribute(context).toString());
-            //  }
             request.removeAttribute(context);
         } else if (null != request.getHeader(context)) {
-            LOG.info("Use request HEADER context <{}>: value <{}>", context,
-                ClientContextUtil.decodeFromBase64(request.getHeader(context)));
             httpHeaders.add(context, request.getHeader(context));
         }
     }
@@ -227,7 +205,6 @@ public class CallbackService {
     private void storePassThroughHeadersAsRequestAttributes(ResponseEntity responseEntity,
                                                             HttpEntity requestEntity,
                                                             HttpServletRequest request) {
-        LOG.info("storePassThroughHeadersAsRequestAttributes called!");
         HttpHeaders httpHeaders = responseEntity.getHeaders();
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
@@ -240,13 +217,7 @@ public class CallbackService {
                     if (CLIENT_CONTEXT.equalsIgnoreCase(context)) {
                         headerValue = ClientContextUtil.mergeClientContexts(
                             requestEntity.getHeaders().getFirst(context), headerValue);
-                        LOG.info("Set attribute to  mergedClientContext <{}>: value <{}>", context,
-                            ClientContextUtil.decodeFromBase64(headerValue));
-                    } else {
-                        LOG.info("Set attribute to context <{}>: value <{}>", context,
-                            ClientContextUtil.decodeFromBase64(headerValue));
                     }
-
 
                     request.setAttribute(context, headerValue);
                 });
@@ -264,7 +235,6 @@ public class CallbackService {
             return responseEntity;
         }
     }
-
 
     private boolean logCallbackDetails(final String url) {
         return (!applicationParams.getCcdCallbackLogControl().isEmpty()
