@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.util.PathFromUrlUtil;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -42,7 +43,7 @@ class JurisdictionViewResourceTest {
         final JurisdictionViewResource resource = new JurisdictionViewResource(this.displayProperties, ACCESS);
         Optional<Link> link = resource.getLink("self");
 
-        assertThat(link.get().getHref(), equalTo(LINK_SELF));
+        assertThat(PathFromUrlUtil.getActualPath(link.get().getHref()), equalTo(LINK_SELF));
     }
 
 }

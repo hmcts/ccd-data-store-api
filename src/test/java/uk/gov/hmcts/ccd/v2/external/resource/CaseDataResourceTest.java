@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.util.PathFromUrlUtil;
 
 import java.util.Map;
 import java.util.Optional;
@@ -52,7 +53,7 @@ class CaseDataResourceTest {
         final CaseDataResource caseDataResource = new CaseDataResource(CASE_DATA_CONTENT, CASE_TYPE_ID, PAGE_ID);
 
         Optional<Link> self = caseDataResource.getLink("self");
-        assertThat(self.get().getHref(), equalTo(linkSelfForCaseData));
+        assertThat(PathFromUrlUtil.getActualPath(self.get().getHref()), equalTo(linkSelfForCaseData));
     }
 
 }
