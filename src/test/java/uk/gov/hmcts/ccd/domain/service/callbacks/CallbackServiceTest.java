@@ -31,6 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
@@ -217,7 +218,7 @@ class CallbackServiceTest {
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("Invoking callback {} of type {} with request: {}", logsList.get(2)
+        assertEquals("Invoking callback {} of type {} with request: {}", logsList.get(0)
             .getMessage());
     }
 
@@ -231,7 +232,7 @@ class CallbackServiceTest {
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("Callback {} response received: {}", logsList.get(3)
+        assertEquals("Callback {} response received: {}", logsList.get(1)
             .getMessage());
     }
 
@@ -243,9 +244,9 @@ class CallbackServiceTest {
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("Invoking callback {} of type {} with request: {}", logsList.get(2)
+        assertEquals("Invoking callback {} of type {} with request: {}", logsList.get(0)
             .getMessage());
-        assertEquals("Callback {} response received: {}", logsList.get(3)
+        assertEquals("Callback {} response received: {}", logsList.get(1)
             .getMessage());
     }
 
@@ -257,7 +258,7 @@ class CallbackServiceTest {
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals(3,logsList.size());
+        assertEquals(0,logsList.size());
     }
 
     @Test
@@ -268,7 +269,7 @@ class CallbackServiceTest {
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals(3,logsList.size());
+        assertEquals(0,logsList.size());
     }
 
     @Test
@@ -297,14 +298,17 @@ class CallbackServiceTest {
     @DisplayName("Should add callback passthru headers from request attribute")
     void shouldAddCallbackPassthruHeadersFromRequestAttribute() throws Exception {
         List<String> customHeaders = List.of("Client-Context","Dummy-Context1","DummyContext-2");
-        List<String> customHeaderValues = List.of(responseAttrJson1.toString(),responseAttrJson2.toString());
+        List<String> customHeaderValues = List.of(ClientContextUtil.encodeToBase64(responseAttrJson1.toString()),
+            ClientContextUtil.encodeToBase64(responseAttrJson2.toString()));
 
         when(applicationParams.getCallbackPassthruHeaderContexts()).thenReturn(customHeaders);
         when(request.getAttribute(customHeaders.get(0))).thenReturn(customHeaderValues.get(0));
         when(request.getAttribute(customHeaders.get(1))).thenReturn(customHeaderValues.get(1));
         when(request.getAttribute(customHeaders.get(2))).thenReturn(null);
-        when(request.getHeader(customHeaders.get(0))).thenReturn(responseHdrJson1.toString());
-        when(request.getHeader(customHeaders.get(1))).thenReturn(responseHdrJson2.toString());
+        when(request.getHeader(customHeaders.get(0)))
+            .thenReturn(ClientContextUtil.encodeToBase64(responseHdrJson1.toString()));
+        when(request.getHeader(customHeaders.get(1)))
+            .thenReturn(ClientContextUtil.encodeToBase64(responseHdrJson2.toString()));
         when(request.getHeader(customHeaders.get(2))).thenReturn(null);
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -312,8 +316,7 @@ class CallbackServiceTest {
 
         assertEquals(2, httpHeaders.size());
         assertTrue(httpHeaders.containsKey(customHeaders.get(0)));
-        assertEquals(customHeaderValues.get(0),
-            httpHeaders.get(customHeaders.get(0)).get(0));
+        assertEquals(customHeaderValues.get(0), httpHeaders.get(customHeaders.get(0)).get(0));
         assertTrue(httpHeaders.containsKey(customHeaders.get(1)));
         assertEquals(customHeaderValues.get(1), httpHeaders.get(customHeaders.get(1)).get(0));
         assertFalse(httpHeaders.containsKey(customHeaders.get(2)));
