@@ -130,7 +130,8 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         FilteredRoleAssignments filteredRoleAssignments =
             roleAssignmentsFilteringService.filter(roleAssignments, caseDetails);
 
-        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+        CaseTypeDefinition caseTypeDefinition =
+            caseDefinitionRepository.getScopedCachedCaseType(caseDetails.getCaseTypeId());
 
         List<AccessProfile> filteredAccessProfiles = filteredAccessProfiles(
             filteredRoleAssignments.getFilteredMatchingRoleAssignments(), caseTypeDefinition, false);
