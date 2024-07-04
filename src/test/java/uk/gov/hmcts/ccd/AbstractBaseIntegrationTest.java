@@ -161,7 +161,7 @@ public abstract class AbstractBaseIntegrationTest {
     @Before
     @BeforeEach
     public void initMock() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(roleAssignmentRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
@@ -226,7 +226,8 @@ public abstract class AbstractBaseIntegrationTest {
                         + "COMMIT;\n"
                         + recreateTableFKConstraintString
                         + "\nCOMMIT;\n "
-                        + "ALTER TABLE %s ENABLE TRIGGER ALL;\n",
+                        + "ALTER TABLE %s ENABLE TRIGGER ALL;\n"
+                        + "END TRANSACTION;\n",
                     tableName, tableName, tableName);
 
             LOG.info("Executing :" + truncateTablesQuery + "\n");

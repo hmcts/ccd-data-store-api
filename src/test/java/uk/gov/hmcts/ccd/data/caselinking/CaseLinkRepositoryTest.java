@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.caselinking;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
 import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.STANDARD_LINK;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class CaseLinkRepositoryTest extends WireMockBaseTest {
 
     private static final String TEST_ADDRESS_BOOK_CASE = "TestAddressBookCase";
@@ -42,6 +44,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
         caseLinkIdToReferenceMap.put(CASE_04_ID, parseLong(CASE_04_REFERENCE));
         caseLinkIdToReferenceMap.put(CASE_13_ID, parseLong(CASE_13_REFERENCE));
         caseLinkIdToReferenceMap.put(CASE_14_ID, parseLong(CASE_14_REFERENCE));
+
     }
 
     @Test
@@ -65,6 +68,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
+    //@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testSaveCaseLinkEntityWithStandardLinkTrue() {
 
@@ -114,6 +118,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
+    //@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testSaveFailsIfCaseIdDoesNotExist() {
 
@@ -125,6 +130,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
+    //@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testSaveFailsIfLinkedCaseIdDoesNotExist() {
 
