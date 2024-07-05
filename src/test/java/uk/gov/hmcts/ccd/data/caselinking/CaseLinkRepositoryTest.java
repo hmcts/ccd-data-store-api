@@ -1,10 +1,8 @@
 package uk.gov.hmcts.ccd.data.caselinking;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 
