@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
@@ -86,23 +85,6 @@ public abstract class AbstractBaseIntegrationTest {
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(AbstractBaseIntegrationTest.class);
-
-    protected static final String dropTableFKConstraint =
-        "SELECT 'ALTER TABLE \"'||nspname||'\".\"'||relname||'\" DROP CONSTRAINT \"'||conname||'\" %s;'" +
-        "FROM pg_constraint " +
-        "INNER JOIN pg_class ON conrelid=pg_class.oid " +
-        "INNER JOIN pg_namespace ON pg_namespace.oid=pg_class.relnamespace " +
-        "WHERE relname = '%s'" +
-        "ORDER BY CASE WHEN contype='f' THEN 0 ELSE 1 END,contype,nspname,relname,conname;";
-
-    protected static final String recreateTableFKConstraint =
-        "SELECT 'ALTER TABLE \"'||nspname||'\".\"'||relname||'\" ADD CONSTRAINT \"'||conname||'\" '|| " +
-        "pg_get_constraintdef(pg_constraint.oid)||';' " +
-        "FROM pg_constraint " +
-        "INNER JOIN pg_class ON conrelid=pg_class.oid " +
-        "INNER JOIN pg_namespace ON pg_namespace.oid=pg_class.relnamespace " +
-        "WHERE relname = '%s'" +
-        "ORDER BY CASE WHEN contype='f' THEN 0 ELSE 1 END DESC,contype DESC,nspname DESC,relname DESC,conname DESC;";
 
     protected static final MediaType JSON_CONTENT_TYPE = new MediaType(
         MediaType.APPLICATION_JSON.getType(),
@@ -205,64 +187,18 @@ public abstract class AbstractBaseIntegrationTest {
         List<String> tables = determineTables(jdbcTemplate);
         List<String> sequences = determineSequences(jdbcTemplate);
 
-        String dropTableFKConstraintString = null;
-        String recreateTableFKConstraintString = null;
-        String casecadeString = "";
-
-        for (String tableName : tables) {
-            casecadeString = "";
-            if (!tableName.equals("case_users")) {
-                casecadeString = "CASCADE";
-            }
-            dropTableFKConstraintString = getFKConstraintToDrop(casecadeString, tableName);
-            recreateTableFKConstraintString = getFKConstraintToRecreate(tableName);
-            String truncateTablesQuery =
-                String.format(
-                    "START TRANSACTION;\n" +
-                        dropTableFKConstraintString
-                        + "\nCOMMIT;\n"
-                        + "TRUNCATE TABLE %s CASCADE;\n"
-                        + "ALTER TABLE %s DISABLE TRIGGER ALL;\n"
-                        + "COMMIT;\n"
-                        + recreateTableFKConstraintString
-                        + "\nCOMMIT;\n "
-                        + "ALTER TABLE %s ENABLE TRIGGER ALL;\n"
-                        + "END TRANSACTION;\n",
-                    tableName, tableName, tableName);
-
-            LOG.info("Executing :" + truncateTablesQuery + "\n");
-
-            jdbcTemplate.execute(truncateTablesQuery);
-        }
+        String truncateTablesQuery =
+            "START TRANSACTION;\n" +
+                tables.stream()
+                    .map(record -> String.format("TRUNCATE TABLE %s CASCADE;", record))
+                    .collect(Collectors.joining("\n")) +
+                "\nCOMMIT;";
+        jdbcTemplate.execute(truncateTablesQuery);
 
         sequences.forEach(sequence -> jdbcTemplate.execute("ALTER SEQUENCE " + sequence + " RESTART WITH 1"));
 
         cacheManager.getCacheNames().forEach(
             cacheName -> Objects.requireNonNull(cacheManager.getCache(cacheName)).clear());
-    }
-
-    private  String getFKConstraintToDrop(String tableName, String cascade) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-
-        String formatedString = String.format(dropTableFKConstraint, tableName, cascade);
-
-        List result = jdbcTemplate.queryForList(formatedString, String.class);
-        String commaseparatedlist = result.toString().replace("[", "")
-            .replace("]", "")
-            .replace(";,", ";");
-        return commaseparatedlist;
-
-    }
-
-    private String getFKConstraintToRecreate(String tableName) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-        String formatedString = String.format(recreateTableFKConstraint, tableName);
-        List result = jdbcTemplate.queryForList(formatedString, String.class);
-        String commaseparatedlist = result.toString().replace("[", "")
-            .replace("]", "")
-            .replace(";,", ";");
-        return commaseparatedlist;
-
     }
 
     private List<String> determineTables(JdbcTemplate jdbcTemplate) {
