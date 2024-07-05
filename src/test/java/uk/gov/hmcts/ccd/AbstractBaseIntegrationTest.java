@@ -84,8 +84,6 @@ public abstract class AbstractBaseIntegrationTest {
     protected static final ObjectMapper mapper = JacksonUtils.MAPPER;
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(AbstractBaseIntegrationTest.class);
-
     protected static final MediaType JSON_CONTENT_TYPE = new MediaType(
         MediaType.APPLICATION_JSON.getType(),
         MediaType.APPLICATION_JSON.getSubtype(),
