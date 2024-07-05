@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
 import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.STANDARD_LINK;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class CaseLinkRepositoryTest extends WireMockBaseTest {
 
     private static final String TEST_ADDRESS_BOOK_CASE = "TestAddressBookCase";
@@ -69,7 +68,6 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    //@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testSaveCaseLinkEntityWithStandardLinkTrue() {
 
@@ -118,7 +116,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
         assertTrue(caseLinkRepository.findById(caseLinkEntity.getCaseLinkPrimaryKey()).isPresent());
     }
 
-    @Ignore //@Test
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testSaveFailsIfCaseIdDoesNotExist() {
 
@@ -129,7 +127,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
     }
 
-    @Ignore //@Test
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void testSaveFailsIfLinkedCaseIdDoesNotExist() {
 
