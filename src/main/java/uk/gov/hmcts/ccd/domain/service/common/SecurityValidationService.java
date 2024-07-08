@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.getcase.DefaultGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.AuthorisedGetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.endpoint.std.TestController;
 
@@ -31,11 +31,12 @@ public class SecurityValidationService {
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data "
         + "validation error (c)";
 
-    private final DefaultGetCaseOperation defaultGetCaseOperation;
+    private final AuthorisedGetCaseOperation authorisedGetCaseOperation;
 
     @Autowired
-    public SecurityValidationService(@Qualifier("default") final DefaultGetCaseOperation defaultGetCaseOperation) {
-        this.defaultGetCaseOperation = defaultGetCaseOperation;
+    public SecurityValidationService(
+        @Qualifier("authorised") final AuthorisedGetCaseOperation authorisedGetCaseOperation) {
+        this.authorisedGetCaseOperation = authorisedGetCaseOperation;
     }
 
     public void setClassificationFromCallbackIfValid(final CallbackResponse callbackResponse,
@@ -53,23 +54,23 @@ public class SecurityValidationService {
                 TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #2  [deduced OK]");
             } catch (ValidationException deducedDataClassificationException) {
                 TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #3  [deduced FAILED]");
-                final Optional<CaseDetails> defaultCaseDetails;
+                final Optional<CaseDetails> authorisedCaseDetails;
                 try {
                     TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #4  [before get default]");
-                    defaultCaseDetails = defaultGetCaseOperation.execute(caseDetails.getReferenceAsString());
+                    authorisedCaseDetails = authorisedGetCaseOperation.execute(caseDetails.getReferenceAsString());
                     TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #5  [after get default]");
-                } catch (Exception defaultDataClassificationException) {
+                } catch (Exception authorisedDataClassificationException) {
                     TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #6  [get default FAIL");
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
-                if (defaultCaseDetails.isEmpty()) {
+                if (authorisedCaseDetails.isEmpty()) {
                     TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #7  [get default EMPTY]");
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 } else {
                     TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #8  [before validate default]");
                     try {
                         validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
-                            JacksonUtils.convertValueJsonNode(defaultCaseDetails.get().getDataClassification()));
+                            JacksonUtils.convertValueJsonNode(authorisedCaseDetails.get().getDataClassification()));
                     } catch (Exception e) {
                         TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #9  [EXCEPTION]");
                         TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #9  " + e.getMessage());

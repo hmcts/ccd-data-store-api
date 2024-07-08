@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.getcase.AuthorisedGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.DefaultGetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -37,13 +38,13 @@ class SecurityValidationServiceTest {
     private SecurityValidationService securityValidationService;
 
     @Mock
-    private DefaultGetCaseOperation defaultGetCaseOperation;
+    private AuthorisedGetCaseOperation authorisedGetCaseOperation;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        securityValidationService = new SecurityValidationService(defaultGetCaseOperation);
+        securityValidationService = new SecurityValidationService(authorisedGetCaseOperation);
     }
 
     @Nested
@@ -201,7 +202,7 @@ class SecurityValidationServiceTest {
                         .withData("field1", getTextNode("PRIVATE"))
                         .buildAsMap())
                 .build();
-            when(defaultGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(defaultCaseDetails));
+            when(authorisedGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(defaultCaseDetails));
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
@@ -235,7 +236,7 @@ class SecurityValidationServiceTest {
                         .withData("field2", getTextNode("PRIVATE"))
                         .buildAsMap())
                 .build();
-            when(defaultGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(defaultCaseDetails));
+            when(authorisedGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(defaultCaseDetails));
 
             securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                 caseDetails.getDataClassification());
@@ -279,7 +280,7 @@ class SecurityValidationServiceTest {
                         .withData("field3", getTextNode("PRIVATE"))
                         .buildAsMap())
                 .build();
-            when(defaultGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(defaultCaseDetails));
+            when(authorisedGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(defaultCaseDetails));
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
