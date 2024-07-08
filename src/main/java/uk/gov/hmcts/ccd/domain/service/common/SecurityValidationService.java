@@ -118,7 +118,7 @@ public class SecurityValidationService {
             final Optional<CaseDetails> defaultCaseDetails;
             try {
                 TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #4  [before get default]");
-                defaultCaseDetails = defaultGetCaseOperation.execute(caseDetails.getReferenceAsString());
+                defaultCaseDetails = classifiedGetCaseOperation.execute(caseDetails.getReferenceAsString());
                 TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #5  [after get default]");
             } catch (Exception defaultDataClassificationException) {
                 TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #6  [get default FAIL");
@@ -155,10 +155,10 @@ public class SecurityValidationService {
         if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
 
-            jcLog("PR-2410: setClassificationFromCallbackIfValid #1");
+            jcLog("PR-2410: setClassificationFromCallbackIfValid #1  [DATE: 8th July]");
 
             // BELOW: JC debugging
-            jcTestHarness(caseDetails.getReferenceAsString());
+            // jcTestHarness(caseDetails.getReferenceAsString());
             try {
                 copyOfValidationFromPr2426(callbackResponse, caseDetails, deducedDataClassification);
             } catch (Exception e) {
@@ -183,7 +183,7 @@ public class SecurityValidationService {
                 try {
                     jcLog("PR-2410: setClassificationFromCallbackIfValid #7");
                     Optional<CaseDetails> defaultCaseDetails =
-                        defaultGetCaseOperation.execute(caseDetails.getReferenceAsString());
+                        classifiedGetCaseOperation.execute(caseDetails.getReferenceAsString());
                     jcLog("PR-2410: setClassificationFromCallbackIfValid #8");
                     defaultDataClassification_Value =
                         JacksonUtils.convertValueJsonNode(defaultCaseDetails.get().getDataClassification());
