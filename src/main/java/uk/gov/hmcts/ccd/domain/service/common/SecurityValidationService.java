@@ -155,7 +155,7 @@ public class SecurityValidationService {
         if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
 
-            jcLog("PR-2410: setClassificationFromCallbackIfValid #1  [DATE: 8th July]");
+            jcLog("PR-2410: setClassificationFromCallbackIfValid #1  [DATE: 8th July , authorisedGetCaseOperation]");
 
             // BELOW: JC debugging
             // jcTestHarness(caseDetails.getReferenceAsString());
