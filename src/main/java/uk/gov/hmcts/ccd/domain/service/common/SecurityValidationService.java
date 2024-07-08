@@ -118,7 +118,7 @@ public class SecurityValidationService {
             final Optional<CaseDetails> defaultCaseDetails;
             try {
                 TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #4  [before get default]");
-                defaultCaseDetails = classifiedGetCaseOperation.execute(caseDetails.getReferenceAsString());
+                defaultCaseDetails = authorisedGetCaseOperation.execute(caseDetails.getReferenceAsString());
                 TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #5  [after get default]");
             } catch (Exception defaultDataClassificationException) {
                 TestController.jcLog("PR-2426: setClassificationFromCallbackIfValid #6  [get default FAIL");
@@ -183,7 +183,7 @@ public class SecurityValidationService {
                 try {
                     jcLog("PR-2410: setClassificationFromCallbackIfValid #7");
                     Optional<CaseDetails> defaultCaseDetails =
-                        classifiedGetCaseOperation.execute(caseDetails.getReferenceAsString());
+                        authorisedGetCaseOperation.execute(caseDetails.getReferenceAsString());
                     jcLog("PR-2410: setClassificationFromCallbackIfValid #8");
                     defaultDataClassification_Value =
                         JacksonUtils.convertValueJsonNode(defaultCaseDetails.get().getDataClassification());
