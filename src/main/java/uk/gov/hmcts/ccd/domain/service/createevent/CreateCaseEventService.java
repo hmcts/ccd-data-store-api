@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -69,7 +71,6 @@ public class CreateCaseEventService {
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseDetailsRepository defaultCaseDetailsRepository;
-
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final EventTriggerService eventTriggerService;
@@ -94,6 +95,8 @@ public class CreateCaseEventService {
     private final TimeToLiveService timeToLiveService;
     private final CaseLinkService caseLinkService;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
+    private final ApplicationParams applicationParams;
+    private final CaseAccessGroupUtils caseAccessGroupUtils;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -125,7 +128,10 @@ public class CreateCaseEventService {
                                   final CaseDetailsJsonParser jsonPathParser,
                                   final TimeToLiveService timeToLiveService,
                                   final CaseLinkService caseLinkService,
+                                  final ApplicationParams applicationParams,
+                                  final CaseAccessGroupUtils caseAccessGroupUtils,
                                   final CaseDocumentTimestampService caseDocumentTimestampService) {
+
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -152,7 +158,10 @@ public class CreateCaseEventService {
         this.timeToLiveService = timeToLiveService;
         this.caseLinkService = caseLinkService;
         this.defaultCaseDetailsRepository = defaultCaseDetailsRepository;
+        this.applicationParams = applicationParams;
+        this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
+
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -222,6 +231,11 @@ public class CreateCaseEventService {
         final CaseDetails caseDetailsAfterCallbackWithoutHashes = caseDocumentService.stripDocumentHashes(
             caseDetailsAfterCallback
         );
+
+        if (this.applicationParams.getCaseGroupAccessFilteringEnabled()) {
+            caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetailsAfterCallbackWithoutHashes,
+                caseTypeDefinition);
+        }
 
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
