@@ -1,6 +1,4 @@
 {
   "_guid_": "GroupAccessCaseworkerAutotest",
-
-  "username": "befta.caseworker.1@gmail.com",
-  "password": "Pa55word11"
+  "_extends_": "BeftaCaseworker1"
 }
