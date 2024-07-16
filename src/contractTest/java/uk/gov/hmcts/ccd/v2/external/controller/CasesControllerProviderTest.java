@@ -24,7 +24,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -32,12 +34,17 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.Map;
+import java.util.Arrays;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @Provider("ccdDataStoreAPI_Cases")
