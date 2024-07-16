@@ -222,7 +222,7 @@ class GetLinkedCasesResponseCreatorTest {
         + "        \"CaseReference\" : \"4444333322221111\",\n"
         + "        \"CaseType\" : \"MyBaseType\",\n"
         + "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\"\n"
-/*        + "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\",\n"
+        /*+ "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\",\n"
         + "        \"ReasonForLink\" : [ {\n"
         + "          \"id\" : \"b38a2996-3ddb-42fa-85d5-c8b07387e1ae\",\n"
         + "          \"value\" : {\n"
@@ -238,7 +238,7 @@ class GetLinkedCasesResponseCreatorTest {
         + "        \"CaseReference\" : \"" + CASE_REFERENCE + "\",\n"
         + "        \"CaseType\" : \"MyBaseType\",\n"
         + "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\"\n"
-/*        + "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\",\n"
+        /*+ "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\",\n"
         + "        \"ReasonForLink\" : [ {\n"
         + "          \"id\" : \"02d7b1a5-d5b7-4abd-8991-59ab8c1b4136\",\n"
         + "          \"value\" : {\n"
@@ -364,7 +364,8 @@ class GetLinkedCasesResponseCreatorTest {
 
     @Test
     void testCreateCaseLinkInfoListNoLinkReasonCaseLinkFieldsPresent() throws JsonProcessingException {
-        final String caseDetails = String.format(CASE_DETAILS_TEMPLATE_NO_LINK_REASON_CASE_LINK_FIELDS, "1500638105106660",
+        final String caseDetails =
+            String.format(CASE_DETAILS_TEMPLATE_NO_LINK_REASON_CASE_LINK_FIELDS, "1500638105106660",
             "jurisdiction", "state", "caseTypeId", "caseNameHmctsInternal");
 
         CaseLinkRetrievalResults caseLinkRetrievalResults = CaseLinkRetrievalResults.builder()
