@@ -377,7 +377,9 @@ class GetLinkedCasesResponseCreatorTest {
 
         final List<CaseLinkInfo> caseLinks = response.getLinkedCases();
 
+        assertFalse(response.getLinkedCases().isEmpty());
         assertEquals(caseLinks.size(), 1);
+        assertEquals(caseLinks.get(0).getLinkDetails().size(), 3);
         assertFalse(response.isHasMoreRecords());
     }
 
