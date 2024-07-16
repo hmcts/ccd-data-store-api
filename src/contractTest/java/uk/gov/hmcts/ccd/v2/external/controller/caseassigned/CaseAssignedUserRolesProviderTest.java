@@ -11,6 +11,8 @@ import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -43,6 +45,8 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("CASE_ASSIGNED")
 public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CaseAssignedUserRolesProviderTest.class);
+
     @Autowired
     ApplicationParams applicationParams;
 
@@ -54,6 +58,13 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
 
     @Autowired
     CaseAccessOperation caseAccessOperation;
+
+    private void jclog(String message) {
+        LOG.debug("JCDEBUG: debug: CaseAssignedUserRolesProviderTest: " + message);
+        LOG.info("JCDEBUG: info: CaseAssignedUserRolesProviderTest: " + message);
+        LOG.warn("JCDEBUG: warn: CaseAssignedUserRolesProviderTest: " + message);
+        LOG.error("JCDEBUG: error: CaseAssignedUserRolesProviderTest: " + message);
+    }
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
@@ -76,6 +87,7 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
 
     @State("A User Role exists for a Case")
     public void setUpUserRoleExists() {
+        jclog("A User Role exists for a Case");
         when(securityUtils.getServiceNameFromS2SToken(anyString())).thenReturn("serviceName");
         when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(List.of("serviceName"));
 
