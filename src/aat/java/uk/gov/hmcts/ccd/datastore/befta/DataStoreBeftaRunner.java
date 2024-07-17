@@ -11,7 +11,8 @@ import uk.gov.hmcts.befta.BeftaMain;
 @RunWith(Cucumber.class)
 @CucumberOptions(plugin = "json:target/cucumber.json",
     glue = {"uk.gov.hmcts.befta.player"},
-    features = { "classpath:features" }, tags = { "(not @Ignore) or (not @elasticsearch)" })
+    features = { "classpath:features" }, 
+    tags = "(not @Ignore) or (not @elasticsearch)")
 public class DataStoreBeftaRunner {
 
     private DataStoreBeftaRunner() {
