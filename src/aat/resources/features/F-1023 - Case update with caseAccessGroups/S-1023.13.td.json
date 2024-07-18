@@ -1,0 +1,80 @@
+{
+  "_guid_": "S-1023.13",
+  "_extends_": "F-1023_Test_Data_Base_V2",
+  "title": "Invoke v2_external#/case-controller/createCaseUsingPOST and caseAccessGroupId created",
+
+  "prerequisites" : [ {
+      "Token_Creation": "S-1023_GetCreateToken"
+    }
+  ],
+  "specs": [
+    "an active profile in CCD",
+    "contains some OrganisationPolicy fields with all correct values",
+    "is of caseType where caseAccessGroupType = CCD:all-cases-access",
+    "caseData Organisation.OrganisationID value is empty value",
+    "Submit case creation as Case worker (V2)",
+    "contains correctly configured values",
+    "contains updated values for data and data_classification"
+
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "OrganisationPolicyField": {
+          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "",
+            "OrganisationName": "orgName1"
+          }
+        },
+        "CaseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupId": "test",
+              "caseAccessGroupType": "CCD:all-cases-access"
+            },
+            "id": null
+          }
+        ]
+      },
+      "event": {
+        "id": "createCase"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "_links" : "[[ANYTHING_PRESENT]]",
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "data": {
+        "OrganisationPolicyField": {
+          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "",
+            "OrganisationName": "orgName1"
+          }
+        }
+      },
+      "data_classification" : {}
+    },
+    "after_submit_callback_response": null,
+    "callback_response_status_code": null,
+    "callback_response_status": null,
+    "delete_draft_response_status_code": null,
+    "delete_draft_response_status": null
+  }
+}
