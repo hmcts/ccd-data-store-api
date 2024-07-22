@@ -31,8 +31,8 @@ java:
     USER_PROFILE_HOST: http://ccd-user-profile-api-pr-399-java/
     ELASTIC_SEARCH_ENABLED: true # enable whenever ES required on a particular PR
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
-    ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
-    ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
+    ELASTIC_SEARCH_HOSTS: "elastic-ccd-poc.es.uksouth.azure.elastic-cloud.com:9200"
+    ELASTIC_SEARCH_DATA_NODES_HOSTS: "https://elastic-ccd-poc.es.uksouth.azure.elastic-cloud.com:9200"
     TESTING_SUPPORT_ENABLED: true
     MIGRATIONS_ENDPOINT_ENABLED: true
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
