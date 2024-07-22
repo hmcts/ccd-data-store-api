@@ -42,7 +42,7 @@ java:
     enabled: true
 
 elastic:
-  enabled: true # enable whenever required on a particular PR
+  enabled: false # enable whenever required on a particular PR
 
 elasticsearch:
   nameOverride: ${SERVICE_NAME}-es
@@ -93,7 +93,7 @@ logstash:
     logstash.yml: |
       http.host: 0.0.0.0
       xpack.monitoring.enabled: false
-      xpack.monitoring.elasticsearch.hosts: ["http://{{ .Release.Name }}-es-master:9200"]
+      xpack.monitoring.elasticsearch.hosts: ["https://elastic-ccd-poc.es.uksouth.azure.elastic-cloud.com:9200"]
       queue.type: persisted
       dead_letter_queue.enable: true
     pipelines.yml: |
@@ -218,7 +218,7 @@ logstash:
     03_output.conf: |
       output {
           elasticsearch {
-              hosts => ["http://{{ .Release.Name }}-es-master:9200"]
+              hosts => ["https://elastic-ccd-poc.es.uksouth.azure.elastic-cloud.com:9200"]
               sniffing => false
               index => "%{[index_id]}"
               document_type => "_doc"
