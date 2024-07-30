@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.7.12'
+        springBootVersion = '2.7.18'
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -217,7 +217,8 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-actuator')
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation('org.springframework.boot:spring-boot-starter-hateoas')
+    implementation('org.springframework.hateoas:spring-hateoas:1.5.5')
+
     implementation group: 'org.springframework.plugin', name: 'spring-plugin-core'
     implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
         exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
@@ -241,7 +242,7 @@ dependencies {
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.77'
 
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.7.12'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.7.18'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
@@ -354,7 +355,7 @@ dependencies {
     contractTestImplementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.6.1'
     contractTestImplementation group: 'javax.inject', name: 'javax.inject', version: '1'
     contractTestImplementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
-    contractTestImplementation('org.springframework.boot:spring-boot-starter-hateoas')
+    contractTestImplementation('org.springframework.hateoas:spring-hateoas:1.5.5')
     contractTestImplementation(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
