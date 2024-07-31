@@ -25,6 +25,7 @@ plugins {
     id "org.jsonschema2pojo" version "1.2.1"
 }
 
+
 apply from: './gradle/suppress.gradle'
 
 def versions = [
