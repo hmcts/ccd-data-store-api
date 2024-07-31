@@ -42,7 +42,7 @@ java:
     enabled: true
 
 elastic:
-  enabled: false # enable whenever required on a particular PR
+  enabled: false # enable whenever required on a particular PR - disable for POC
 
 elasticsearch:
   nameOverride: ${SERVICE_NAME}-es
