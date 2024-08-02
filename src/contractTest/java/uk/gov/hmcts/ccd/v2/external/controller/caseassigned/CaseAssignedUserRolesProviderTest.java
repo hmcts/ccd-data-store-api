@@ -59,23 +59,23 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
     @Autowired
     CaseAccessOperation caseAccessOperation;
 
-    private void jclog(String message) {
-        LOG.debug("JCDEBUG: debug: CaseAssignedUserRolesProviderTest: " + message);
-        LOG.info("JCDEBUG: info: CaseAssignedUserRolesProviderTest: " + message);
-        LOG.warn("JCDEBUG: warn: CaseAssignedUserRolesProviderTest: " + message);
-        LOG.error("JCDEBUG: error: CaseAssignedUserRolesProviderTest: " + message);
+    private void jcLog(String message) {
+        LOG.info("JCDEBUG: CaseAssignedUserRolesProviderTest: " + message);
     }
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
+        jcLog("pactVerificationTestTemplate() ->");
         if (context != null) {
             context.verifyInteraction();
         }
+        jcLog("pactVerificationTestTemplate() <-");
     }
 
     @BeforeEach
     void before(PactVerificationContext context) {
+        jcLog("build() ->");
         //System.getProperties().setProperty("pact.verifier.publishResults", "true");
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         testTarget.setControllers(
@@ -83,11 +83,12 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
         if (context != null) {
             context.setTarget(testTarget);
         }
+        jcLog("build() <-");
     }
 
     @State("A User Role exists for a Case")
     public void setUpUserRoleExists() {
-        jclog("A User Role exists for a Case");
+        jcLog("A User Role exists for a Case");
         when(securityUtils.getServiceNameFromS2SToken(anyString())).thenReturn("serviceName");
         when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(List.of("serviceName"));
 
