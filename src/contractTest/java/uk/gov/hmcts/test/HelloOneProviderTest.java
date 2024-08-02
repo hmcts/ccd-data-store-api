@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 // Based on GetActorByIdRoleAssignmentProviderTest.java  ,  @Provider("am_roleAssignment_getAssignment")
 
 @ExtendWith(SpringExtension.class)
-@Provider("am_roleAssignment_HelloOneProviderTest")
+@Provider("ccdDataStoreAPI_HelloOneProviderTest")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:9292}", consumerVersionSelectors = {
         @VersionSelector(tag = "master")})
