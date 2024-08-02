@@ -1,4 +1,4 @@
-package uk.gov.hmcts.test;
+package uk.gov.hmcts.ccd.v2.external.controller;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
@@ -19,18 +19,18 @@ import org.slf4j.LoggerFactory;
 // Based on GetActorByIdRoleAssignmentProviderTest.java  ,  @Provider("am_roleAssignment_getAssignment")
 
 @ExtendWith(SpringExtension.class)
-@Provider("am_roleAssignment_HelloOneProviderTest")
+@Provider("am_roleAssignment_HelloTwoProviderTest")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:9292}", consumerVersionSelectors = {
         @VersionSelector(tag = "master")})
 @TestPropertySource(locations = "/application.properties")
 @IgnoreNoPactsToVerify
-public class HelloOneProviderTest {
+public class HelloTwoProviderTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HelloOneProviderTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HelloTwoProviderTest.class);
 
     private void jcLog(String message) {
-        LOG.info("JCDEBUG: HelloOneProviderTest: " + message);
+        LOG.info("JCDEBUG: HelloTwoProviderTest: " + message);
     }
 
     @TestTemplate
@@ -54,8 +54,8 @@ public class HelloOneProviderTest {
         jcLog("before() <-");
     }
 
-    @State({"helloOneTest"})
-    public void helloOneTest() throws Exception {
-        jcLog("helloOneTest");
+    @State({"helloTwoTest"})
+    public void helloTwoTest() throws Exception {
+        jcLog("helloTwoTest");
     }
 }
