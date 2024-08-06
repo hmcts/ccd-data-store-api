@@ -29,10 +29,10 @@ import java.util.Map;
 @Provider("ccdDataStoreAPI_WorkAllocation")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+    port = "${PACT_BROKER_PORT:9292}", consumerVersionSelectors = {
         @VersionSelector(tag = "master")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
-    "server.port=8123", "spring.application.name=PACT_TEST",
+    "server.port=8124", "spring.application.name=PACT_TEST",
     "ccd.document.url.pattern=${CCD_DOCUMENT_URL_PATTERN:https?://(((?:api-gateway.preprod.dm.reform.hmcts.net|"
         + "(dm-store-aat.service.core-compute-aat|dm-store-(pr-[0-9]+|preview).service.core-compute-preview)."
         + "internal(?::d+)?)/documents/[A-Za-z0-9-]+(?:/binary)?)|((em-hrs-api-aat.service.core-compute-aat|"
@@ -60,7 +60,13 @@ public class WorkAllocationProviderTest extends WireMockBaseTest {
     ContractTestCreateCaseOperation contractTestCreateCaseOperation;
 
     @Autowired
+    ContractTestGetCaseOperation getCaseOperation;
+
+    @Autowired
     ContractTestStartEventOperation startEventOperation;
+
+    @Autowired
+    ContractTestCreateEventOperation createEventOperation;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -90,9 +96,11 @@ public class WorkAllocationProviderTest extends WireMockBaseTest {
         jcLog("before() <-");
     }
 
-    @State({"helloWorldTest"})
-    public void helloTwoTest() throws Exception {
-        jcLog("helloWorldTest");
+    @State({"A case exists"})
+    public void toGetACase(Map<String, Object> dataMap) {
+        jcLog("A Get Case is requested");
+        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
     @State({"A Start Event for a Caseworker is  requested"})
@@ -107,6 +115,33 @@ public class WorkAllocationProviderTest extends WireMockBaseTest {
     public void toStartForACaseworker(Map<String, Object> dataMap) {
         jcLog("A Start for a Caseworker is requested");
         setUpSecurityContextForEvent(dataMap);
+    }
+
+    @State({"A Submit Event for a Caseworker is requested"})
+    public void toSubmitEventForACaseworker(Map<String, Object> dataMap) {
+        jcLog("A Submit Event for a Caseworker is requested");
+        CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
+        createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+    }
+
+    @State({"A Submit for a Caseworker is requested"})
+    public void toSubmitForACaseworker(Map<String, Object> dataMap) {
+        jcLog("A Submit for a Caseworker is requested");
+        setUpSecurityContextForEvent(dataMap);
+    }
+
+    private CaseDetails setUpCaseDetailsFromStateMap(Map<String, Object> dataMap) {
+        Map<String, Object> contentDataMap = (Map<String, Object>) dataMap.get(CASE_DATA_CONTENT);
+        String caseworkerUsername = (String) dataMap.get(CASEWORKER_USERNAME);
+        String caseworkerPassword = (String) dataMap.get(CASEWORKER_PASSWORD);
+        String caseType = (String) dataMap.get(CASE_TYPE);
+        CaseDataContent caseDataContent = objectMapper.convertValue(contentDataMap, CaseDataContent.class);
+
+        securityUtils.setSecurityContextUserAsCaseworkerByCaseType(caseType, caseworkerUsername,
+            caseworkerPassword);
+        securityUtils.setSecurityContextUserAsCaseworkerByEvent(caseDataContent.getEventId(), caseworkerUsername,
+            caseworkerPassword);
+        return contractTestCreateCaseOperation.createCaseDetails(caseType, caseDataContent, true);
     }
 
     private CaseDetails setUpCaseDetailsFromStateMapForEvent(Map<String, Object> dataMap) {
