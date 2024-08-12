@@ -9,7 +9,7 @@ properties(
         ],
         pipelineTriggers([[$class: 'GitHubPushTrigger']])
     ]
-)
+) 
 
 @Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION")
 
