@@ -9,6 +9,7 @@ import lombok.extern.jackson.Jacksonized;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+
 @Value
 @Builder
 @Jacksonized
