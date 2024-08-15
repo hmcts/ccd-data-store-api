@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.casefileview;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Value;
 
 import java.util.List;
 
 @Value
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Category {
     String categoryId;
     String categoryName;
