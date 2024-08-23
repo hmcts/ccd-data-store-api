@@ -30,7 +30,7 @@ java:
     DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-1492-java/
     USER_PROFILE_HOST: http://ccd-user-profile-api-pr-399-java/
     ELASTIC_SEARCH_ENABLED: true # enable whenever ES required on a particular PR
-    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
     ELASTIC_SEARCH_HOSTS: "elastic-ccd-poc.es.privatelink.uksouth.azure.elastic-cloud.com:443"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "https://elastic-ccd-poc.es.privatelink.uksouth.azure.elastic-cloud.com:443"
     TESTING_SUPPORT_ENABLED: true
