@@ -32,7 +32,7 @@ java:
     ELASTIC_SEARCH_ENABLED: true # enable whenever ES required on a particular PR
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
     ELASTIC_SEARCH_HOSTS: "elastic-ccd-poc.es.privatelink.uksouth.azure.elastic-cloud.com:443"
-    ELASTIC_SEARCH_DATA_NODES_HOSTS: "https://elastic-ccd-poc.es.privatelink.uksouth.azure.elastic-cloud.com"
+    ELASTIC_SEARCH_DATA_NODES_HOSTS: "https://elastic-ccd-poc.es.privatelink.uksouth.azure.elastic-cloud.com:443"
     TESTING_SUPPORT_ENABLED: true
     MIGRATIONS_ENDPOINT_ENABLED: true
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
@@ -93,7 +93,7 @@ logstash:
     logstash.yml: |
       http.host: 0.0.0.0
       xpack.monitoring.enabled: false
-      xpack.monitoring.elasticsearch.hosts: ["https://elastic-ccd-poc.es.privatelink.uksouth.azure.elastic-cloud.com"]
+      xpack.monitoring.elasticsearch.hosts: ["https://elastic-ccd-poc.es.privatelink.uksouth.azure.elastic-cloud.com:443"]
       queue.type: persisted
       dead_letter_queue.enable: true
     pipelines.yml: |
@@ -218,7 +218,7 @@ logstash:
     03_output.conf: |
       output {
           elasticsearch {
-              hosts => ["https://elastic-ccd-poc.es.privatelink.uksouth.azure.elastic-cloud.com"]
+              hosts => ["https://elastic-ccd-poc.es.privatelink.uksouth.azure.elastic-cloud.com:443"]
               sniffing => false
               index => "%{[index_id]}"
               document_type => "_doc"
