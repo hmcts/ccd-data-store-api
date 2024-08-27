@@ -70,6 +70,10 @@ public class TestingSupportController {
 
         executeSql(
             session,
+            "DELETE FROM case_link WHERE case_type_id IN (:caseTypeReferences)",
+            caseTypesWithChangeIds);
+        executeSql(
+            session,
             "DELETE FROM case_event WHERE case_type_id IN (:caseTypeReferences)",
             caseTypesWithChangeIds);
         executeSql(
