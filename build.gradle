@@ -331,7 +331,7 @@ dependencies {
     implementation(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
-    implementation(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2') {
+    implementation(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.23') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     implementation 'org.jooq:jool-java-8:0.9.14'
@@ -364,7 +364,7 @@ dependencies {
     }
     contractTestImplementation("org.springframework.boot:spring-boot-starter-data-jpa")
     contractTestImplementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
-    contractTestImplementation(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2') {
+    contractTestImplementation(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.23') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     contractTestImplementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
