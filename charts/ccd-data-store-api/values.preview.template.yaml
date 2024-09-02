@@ -91,6 +91,7 @@ logstash:
       mountPath: /usr/share/logstash/ccd
   logstashConfig:
     logstash.yml: |
+      log.level: trace
       http.host: 0.0.0.0
       xpack.monitoring.enabled: false
       xpack.monitoring.elasticsearch.hosts: ["https://elastic-poc-ccd.es.privatelink.uksouth.azure.elastic-cloud.com:443"]
