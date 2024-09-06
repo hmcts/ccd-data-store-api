@@ -18,6 +18,7 @@ def product = "ccd"
 def component = "data-store-api"
 def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
 
+
 // Variables to switch pipeline logic and wiring per type of build
 
 def definitionStoreDevelopPr = "PR-575"  // This doesn't change frequently, but when it does, only change this value.
