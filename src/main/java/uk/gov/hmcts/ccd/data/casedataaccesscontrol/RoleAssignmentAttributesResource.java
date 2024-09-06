@@ -39,4 +39,6 @@ public class RoleAssignmentAttributesResource implements Serializable {
     Optional<String> region;
     Optional<String> location;
     Optional<String> contractType;
+    transient Optional<String> caseAccessGroupId;
+
 }

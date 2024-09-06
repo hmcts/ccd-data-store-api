@@ -3,18 +3,12 @@ package uk.gov.hmcts.ccd.data.definition;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -23,13 +17,13 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -47,17 +41,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     private static final int RESOURCE_NOT_FOUND = 404;
 
     private final ApplicationParams applicationParams;
-    private final SecurityUtils securityUtils;
-    @Qualifier("restTemplate")
-    @Autowired
-    private final RestTemplate restTemplate;
+    private final DefinitionStoreClient definitionStoreClient;
 
-    @Inject
-    public DefaultCaseDefinitionRepository(final ApplicationParams applicationParams, final SecurityUtils securityUtils,
-            final RestTemplate restTemplate) {
+    public DefaultCaseDefinitionRepository(final ApplicationParams applicationParams,
+                                           final DefinitionStoreClient definitionStoreClient) {
         this.applicationParams = applicationParams;
-        this.securityUtils = securityUtils;
-        this.restTemplate = restTemplate;
+        this.definitionStoreClient = definitionStoreClient;
     }
 
     /**
@@ -68,9 +57,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {
-            final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            return Arrays.asList(restTemplate.exchange(applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId),
-                    HttpMethod.GET, requestEntity, CaseTypeDefinition[].class).getBody());
+            return Arrays.asList(Objects.requireNonNull(definitionStoreClient.invokeGetRequest(
+                applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId),
+                CaseTypeDefinition[].class).getBody()));
         } catch (Exception e) {
             LOG.warn("Error while retrieving base type", e);
             if (e instanceof HttpClientErrorException
@@ -94,11 +83,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
-            final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            final CaseTypeDefinition caseTypeDefinition = restTemplate
-                    .exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity,
-                            CaseTypeDefinition.class)
-                    .getBody();
+            final CaseTypeDefinition caseTypeDefinition = definitionStoreClient
+                .invokeGetRequest(applicationParams.caseTypeDefURL(caseTypeId),
+                CaseTypeDefinition.class).getBody();
             if (caseTypeDefinition != null) {
                 caseTypeDefinition.getCaseFieldDefinitions().stream()
                         .forEach(CaseFieldDefinition::propagateACLsToNestedFields);
@@ -121,18 +108,18 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<FieldTypeDefinition> getBaseTypes() {
         try {
-            final HttpEntity requestEntity = new HttpEntity<CaseTypeDefinition>(securityUtils.authorizationHeaders());
-            return Arrays.asList(restTemplate.exchange(applicationParams.baseTypesURL(), HttpMethod.GET, requestEntity,
-                    FieldTypeDefinition[].class).getBody());
+            return Arrays.asList(Objects.requireNonNull(definitionStoreClient
+                .invokeGetRequest(applicationParams.baseTypesURL(),
+                FieldTypeDefinition[].class).getBody()));
         } catch (Exception e) {
             LOG.warn("Error while retrieving base types", e);
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(
-                        "Problem getting base types definition from definition store because of " + e.getMessage());
+                    "Problem getting base types definition from definition store because of " + e.getMessage());
             } else {
                 throw new ServiceException(
-                        "Problem getting base types definition from definition store because of " + e.getMessage(), e);
+                    "Problem getting base types definition from definition store because of " + e.getMessage(), e);
             }
         }
     }
@@ -141,20 +128,19 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Cacheable("userRolesCache")
     public UserRole getUserRoleClassifications(String userRole) {
         try {
-            final HttpEntity requestEntity = new HttpEntity<CaseTypeDefinition>(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("userRole", encodeBase64(userRole));
-            return restTemplate.exchange(applicationParams.userRoleClassification(), HttpMethod.GET, requestEntity,
-                    UserRole.class, queryParams).getBody();
+            return definitionStoreClient.invokeGetRequest(applicationParams.userRoleClassification(),
+                UserRole.class, queryParams).getBody();
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 LOG.debug("No classification found for user role {} because of ", userRole, e);
                 return null;
             } else {
                 LOG.warn("Error while retrieving classification for user role {} because of ", userRole, e);
                 throw new ServiceException("Error while retrieving classification for user role " + userRole
-                        + " because of " + e.getMessage(), e);
+                    + " because of " + e.getMessage(), e);
             }
         }
     }
@@ -165,11 +151,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (userRoles.isEmpty()) {
                 return Collections.emptyList();
             }
-            final HttpEntity requestEntity = new HttpEntity<CaseTypeDefinition>(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("roles", StringUtils.join(userRoles, ","));
-            return Arrays.asList(restTemplate.exchange(applicationParams.userRolesClassificationsURL(), HttpMethod.GET,
-                    requestEntity, UserRole[].class, queryParams).getBody());
+            return Arrays.asList(Objects.requireNonNull(definitionStoreClient
+                .invokeGetRequest(applicationParams.userRolesClassificationsURL(),
+                UserRole[].class, queryParams).getBody()));
         } catch (Exception e) {
             LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
             throw new ServiceException("Error while retrieving classification for user roles " + userRoles
@@ -185,10 +171,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     public CaseTypeDefinitionVersion getLatestVersionFromDefinitionStore(String caseTypeId) {
         try {
-            final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            CaseTypeDefinitionVersion version = restTemplate
-                    .exchange(applicationParams.caseTypeLatestVersionUrl(caseTypeId), HttpMethod.GET, requestEntity,
-                            CaseTypeDefinitionVersion.class)
+            CaseTypeDefinitionVersion version = definitionStoreClient
+                .invokeGetRequest(applicationParams.caseTypeLatestVersionUrl(caseTypeId),
+                CaseTypeDefinitionVersion.class)
                     .getBody();
             LOG.debug("retrieved latest version for case type: {}: {}", caseTypeId, version);
             return version;
@@ -208,16 +193,20 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Cacheable(value = "jurisdictionCache")
     @Override
     public JurisdictionDefinition getJurisdiction(String jurisdictionId) {
-        return getJurisdictionFromDefinitionStore(jurisdictionId);
+        return retrieveJurisdictions(Optional.of(Collections.singletonList(jurisdictionId)))
+            .stream()
+            .findFirst()
+            .orElse(null);
     }
 
-    public JurisdictionDefinition getJurisdictionFromDefinitionStore(String jurisdictionId) {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
-                Optional.of(Arrays.asList(jurisdictionId)));
-        if (jurisdictionDefinitions.isEmpty()) {
-            return null;
-        }
-        return jurisdictionDefinitions.get(0);
+    @Cacheable(value = "allJurisdictionsCache")
+    @Override
+    public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore() {
+        return retrieveJurisdictions(Optional.of(Collections.emptyList()));
+    }
+
+    public List<JurisdictionDefinition> retrieveJurisdictions(Optional<List<String>> jurisdictionIds) {
+        return getJurisdictionsFromDefinitionStore(jurisdictionIds);
     }
 
     @Override
@@ -229,14 +218,13 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.warn("Definitions not found for requested jurisdictions {}", jurisdictionIds);
             return Collections.emptyList();
         }
-        List<String> caseTypes = getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
-        return caseTypes;
+        return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
     }
 
     @Override
     public List<String> getAllCaseTypesIDs() {
         List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
-                Optional.ofNullable(null));
+                Optional.empty());
         return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
     }
 
@@ -246,31 +234,19 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value = "allJurisdictionsCache")
-    @Override
-    public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore() {
-        return getJurisdictionsFromDefinitionStore(Optional.of(Collections.emptyList()));
-    }
-
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
-            if (jurisdictionIds.isPresent()) {
-                builder.queryParam("ids", String.join(",", jurisdictionIds.get()));
-            }
+            jurisdictionIds.ifPresent(ids -> builder.queryParam("ids", String.join(",", ids)));
+
             LOG.debug("Retrieving jurisdiction object(s) from definition store for Jurisdiction IDs: {}.",
                 jurisdictionIds.orElse(Collections.emptyList()));
-            HttpEntity<List<JurisdictionDefinition>> requestEntity = new HttpEntity<>(
-                securityUtils.authorizationHeaders());
 
-            List<JurisdictionDefinition> jurisdictionDefinitionList = restTemplate
-                .exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity,
-                    new ParameterizedTypeReference<List<JurisdictionDefinition>>() {
-                    })
-                .getBody();
-            if (jurisdictionDefinitionList == null) {
-                jurisdictionDefinitionList = Collections.emptyList();
-            }
+            List<JurisdictionDefinition> jurisdictionDefinitionList = Optional.ofNullable(
+                    definitionStoreClient.invokeGetRequest(builder.build().encode().toUriString(),
+                        JurisdictionDefinition[].class).getBody())
+                .map(Arrays::asList)
+                .orElse(Collections.emptyList());
             LOG.debug("Retrieved jurisdiction object(s) from definition store: {}.", jurisdictionDefinitionList);
             return jurisdictionDefinitionList;
         } catch (Exception e) {

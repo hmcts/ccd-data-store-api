@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +22,13 @@ import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 
 public class SearchResultDefinitionTest {
 
@@ -23,9 +38,114 @@ public class SearchResultDefinitionTest {
     private SearchResultField srf3;
     private SearchResultField srf4;
 
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     public void setUp() {
         searchResultDefinition = new SearchResultDefinition();
+
+        objectMapper = new ObjectMapper()
+            .registerModule(new Jdk8Module())
+            .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
+            .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
+    }
+
+    @Test
+    public void workBasket_1CompareActualAndClone() throws JsonProcessingException {
+        String fileContent = fromFileAsString("tests/Data-workbasket-1.json");
+
+        SearchResultDefinition searchResultDefinition = objectMapper
+            .readValue(fileContent, SearchResultDefinition.class);
+        SearchResultDefinition copiedSearchResultDefinition = searchResultDefinition.createCopy();
+
+        assertNotEquals(searchResultDefinition.hashCode(), copiedSearchResultDefinition.hashCode());
+
+        String originalJson = objectMapper.writeValueAsString(searchResultDefinition);
+        String copiedJson = objectMapper.writeValueAsString(copiedSearchResultDefinition);
+
+        String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
+        String copiedJsonHash256 = DigestUtils.sha256Hex(copiedJson);
+
+        assertEquals(originalJsonHash256, copiedJsonHash256);
+    }
+
+    @Test
+    public void workBasket_2CompareActualAndClone() throws JsonProcessingException {
+        String fileContent = fromFileAsString("tests/Data-workbasket-2.json");
+
+        SearchResultDefinition searchResultDefinition = objectMapper
+            .readValue(fileContent, SearchResultDefinition.class);
+        SearchResultDefinition copiedSearchResultDefinition = searchResultDefinition.createCopy();
+
+        assertNotEquals(searchResultDefinition.hashCode(), copiedSearchResultDefinition.hashCode());
+
+        String originalJson = objectMapper.writeValueAsString(searchResultDefinition);
+        String copiedJson = objectMapper.writeValueAsString(copiedSearchResultDefinition);
+
+        String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
+        String copiedJsonHash256 = DigestUtils.sha256Hex(copiedJson);
+
+        assertEquals(originalJsonHash256, copiedJsonHash256);
+    }
+
+    @Test
+    public void workBasketEmptyAndNullFieldInListCompareActualAndClone() throws JsonProcessingException {
+        String fileContent = fromFileAsString("tests/Data-workbasket-3.json");
+
+        SearchResultDefinition searchResultDefinition = objectMapper
+            .readValue(fileContent, SearchResultDefinition.class);
+        var fieldEmpty = searchResultDefinition.getFields()[0];
+        var fieldNull = searchResultDefinition.getFields()[1];
+
+        assertNotNull(fieldEmpty);
+        assertNull(fieldNull);
+
+        SearchResultDefinition copiedSearchResultDefinition = searchResultDefinition.createCopy();
+        var clonedFieldEmpty = copiedSearchResultDefinition.getFields()[0];
+        var clonedFieldNull = copiedSearchResultDefinition.getFields()[1];
+
+        assertNotNull(clonedFieldEmpty);
+        assertNull(clonedFieldNull);
+
+        assertNotEquals(fieldEmpty.hashCode(), clonedFieldEmpty.hashCode());
+        assertNotEquals(searchResultDefinition.hashCode(), copiedSearchResultDefinition.hashCode());
+    }
+
+    @Test
+    public void workBasketEmptyFieldsListInListCompareActualAndClone() throws JsonProcessingException {
+        String fileContent = fromFileAsString("tests/Data-workbasket-4.json");
+
+        SearchResultDefinition searchResultDefinition = objectMapper
+            .readValue(fileContent, SearchResultDefinition.class);
+        assertEquals(0, searchResultDefinition.getFields().length);
+
+        SearchResultDefinition copiedSearchResultDefinition = searchResultDefinition.createCopy();
+        assertEquals(0, copiedSearchResultDefinition.getFields().length);
+
+        copiedSearchResultDefinition.setFields(new SearchResultField[]{new SearchResultField()});
+        assertEquals(0, searchResultDefinition.getFields().length);
+        assertEquals(1, copiedSearchResultDefinition.getFields().length);
+
+        assertNotEquals(searchResultDefinition.hashCode(), copiedSearchResultDefinition.hashCode());
+    }
+
+    @Test
+    public void workBasketNullFieldsListInListCompareActualAndClone() {
+        SearchResultDefinition searchResultDefinition = new SearchResultDefinition();
+        searchResultDefinition.setFields(null);
+
+        assertNull(searchResultDefinition.getFields());
+
+        SearchResultDefinition copiedSearchResultDefinition = searchResultDefinition.createCopy();
+        assertNull(copiedSearchResultDefinition.getFields());
+
+        copiedSearchResultDefinition.setFields(new SearchResultField[]{new SearchResultField()});
+        assertNull(searchResultDefinition.getFields());
+        assertEquals(1, copiedSearchResultDefinition.getFields().length);
+
+        assertNotEquals(searchResultDefinition.hashCode(), copiedSearchResultDefinition.hashCode());
     }
 
     @Nested

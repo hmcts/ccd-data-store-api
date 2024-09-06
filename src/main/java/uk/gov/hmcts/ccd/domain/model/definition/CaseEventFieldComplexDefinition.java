@@ -1,12 +1,14 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 import java.io.Serializable;
 
 @Builder
-public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPModel {
+public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPModel,
+        Copyable<CaseEventFieldComplexDefinition> {
 
     private String reference;
 
@@ -112,4 +114,17 @@ public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPM
         this.publishAs = publishAs;
     }
 
+    @JsonIgnore
+    @Override
+    public CaseEventFieldComplexDefinition createCopy() {
+        return CaseEventFieldComplexDefinition.builder()
+            .reference(this.reference)
+            .order(this.order)
+            .displayContextParameter(this.displayContextParameter)
+            .defaultValue(this.defaultValue)
+            .retainHiddenValue(this.retainHiddenValue)
+            .publish(this.publish)
+            .publishAs(this.publishAs)
+            .build();
+    }
 }

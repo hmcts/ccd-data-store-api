@@ -24,14 +24,18 @@ import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.ApplicationParams;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,6 +82,9 @@ class SubmitCaseTransactionTest {
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
 
+    private static final String ON_BEHALF_OF_ID = "24";
+    private static final String ON_BEHALF_OF_FNAME = "Pierre OnBehalf";
+    private static final String ON_BEHALF_OF_LNAME = "Martin OnBehalf";
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -106,7 +113,13 @@ class SubmitCaseTransactionTest {
     private CaseDocumentService caseDocumentService;
 
     @Mock
+    private CaseDocumentTimestampService caseDocumentTimestampService;
+
+    @Mock
     private MessageService messageService;
+
+    @Mock
+    private CaseDataService caseDataService;
 
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
@@ -115,10 +128,19 @@ class SubmitCaseTransactionTest {
     private IdamUser idamUser;
     private CaseEventDefinition caseEventDefinition;
     private CaseStateDefinition state;
+    @Mock
+    private ApplicationParams applicationParams;
+    private CaseAccessGroupUtils caseAccessGroupUtils;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.initMocks(this);
+
+        event = buildEvent();
+        caseTypeDefinition = buildCaseType();
+        objectMapper = new ObjectMapper();
+        caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
 
         submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
             caseAuditEventRepository,
@@ -128,11 +150,13 @@ class SubmitCaseTransactionTest {
             securityClassificationService,
             caseDataAccessControl,
             messageService,
-            caseDocumentService
+            caseDocumentService,
+            applicationParams,
+            caseAccessGroupUtils,
+            caseDocumentTimestampService
+
         );
 
-        event = buildEvent();
-        caseTypeDefinition = buildCaseType();
         idamUser = buildIdamUser();
         caseEventDefinition = buildEventTrigger();
         state = buildState();
@@ -181,7 +205,8 @@ class SubmitCaseTransactionTest {
                                                                                idamUser,
                                                                                caseEventDefinition,
                                                                                this.caseDetails,
-                                                                               IGNORE_WARNING);
+                                                                               IGNORE_WARNING,
+                                                                               null);
 
         final InOrder order = inOrder(caseDetails, caseDetails, caseDetailsRepository);
 
@@ -205,7 +230,8 @@ class SubmitCaseTransactionTest {
                                          idamUser,
                                          caseEventDefinition,
                                          this.caseDetails,
-                                         IGNORE_WARNING);
+                                         IGNORE_WARNING,
+                                         null);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -240,7 +266,8 @@ class SubmitCaseTransactionTest {
             idamUser,
             caseEventDefinition,
             inputCaseDetails,
-            IGNORE_WARNING);
+            IGNORE_WARNING,
+            null);
 
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
@@ -257,14 +284,14 @@ class SubmitCaseTransactionTest {
             idamUser,
             caseEventDefinition,
             this.caseDetails,
-            IGNORE_WARNING);
+            IGNORE_WARNING,
+            null);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
             () -> assertAuditEventWithSignificantDocument(auditEventCaptor.getValue())
         );
     }
-
 
     @Test
     @DisplayName("should invoke callback")
@@ -274,10 +301,51 @@ class SubmitCaseTransactionTest {
             idamUser,
             caseEventDefinition,
             this.caseDetails,
-            IGNORE_WARNING);
+            IGNORE_WARNING,
+            null);
 
         verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null, caseDetails, caseTypeDefinition,
             IGNORE_WARNING);
+    }
+
+    @Test
+    @DisplayName("should persist event when onBehalfOfUser is Passed")
+    void shouldPersistEventWhenOnBehalfOfUserPassed() {
+        final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+        final ArgumentCaptor<MessageContext> messageCandidateCaptor = ArgumentCaptor.forClass(MessageContext.class);
+
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            buildOnBehalfOfUser());
+
+        assertAll(
+            () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
+            () -> assertAuditEventProxyByUser(auditEventCaptor.getValue()),
+            () -> verify(messageService).handleMessage(messageCandidateCaptor.capture())
+        );
+    }
+
+    private void assertAuditEventProxyByUser(final AuditEvent auditEvent) {
+        assertAll("Audit event",
+            () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
+            () -> assertThat(auditEvent.getProxiedBy(), is(IDAM_ID)),
+            () -> assertThat(auditEvent.getProxiedByFirstName(), is(IDAM_FNAME)),
+            () -> assertThat(auditEvent.getProxiedByLastName(), is(IDAM_LNAME)),
+            () -> assertThat(auditEvent.getUserId(), is(ON_BEHALF_OF_ID)),
+            () -> assertThat(auditEvent.getUserLastName(), is(ON_BEHALF_OF_LNAME)),
+            () -> assertThat(auditEvent.getUserFirstName(), is(ON_BEHALF_OF_FNAME)),
+            () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
+            () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
+            () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
+            () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
+            () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
+            () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
+            () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
     }
 
     private void assertAuditEvent(final AuditEvent auditEvent) {
@@ -347,13 +415,20 @@ class SubmitCaseTransactionTest {
         return event;
     }
 
-
     private IdamUser buildIdamUser() {
         final IdamUser idamUser = new IdamUser();
         idamUser.setId(IDAM_ID);
         idamUser.setForename(IDAM_FNAME);
         idamUser.setSurname(IDAM_LNAME);
         idamUser.setEmail(IDAM_EMAIL);
+        return idamUser;
+    }
+
+    private IdamUser buildOnBehalfOfUser() {
+        final IdamUser idamUser = new IdamUser();
+        idamUser.setId(ON_BEHALF_OF_ID);
+        idamUser.setForename(ON_BEHALF_OF_FNAME);
+        idamUser.setSurname(ON_BEHALF_OF_LNAME);
         return idamUser;
     }
 

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchRoleAssignment
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.CASE_ACCESS_CATEGORY;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_COL;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.CASE_ACCESS_GROUP_ID_FIELD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.LOCATION;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIELD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REGION;
@@ -29,8 +31,9 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
     protected static final String KEYWORD = ".keyword";
 
     protected GrantTypeESQueryBuilder(AccessControlService accessControlService,
-                                      CaseDataAccessControl caseDataAccessControl) {
-        super(accessControlService, caseDataAccessControl);
+                                      CaseDataAccessControl caseDataAccessControl,
+                                      ApplicationParams applicationParams) {
+        super(accessControlService, caseDataAccessControl, applicationParams);
     }
 
     public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments,
@@ -47,6 +50,10 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
                     return;
                 }
 
+                if (getApplicationParams().getCaseGroupAccessFilteringEnabled()) {
+                    addTermQueryForOptionalAttribute(representative.getCaseAccessGroupId(), innerQuery,
+                        CASE_ACCESS_GROUP_ID_FIELD_COL);
+                }
                 addTermQueryForOptionalAttribute(representative.getJurisdiction(), innerQuery, JURISDICTION_FIELD_COL);
                 addTermQueryForOptionalAttribute(representative.getRegion(), innerQuery, REGION);
                 addTermQueryForOptionalAttribute(representative.getLocation(), innerQuery, LOCATION);
