@@ -38,7 +38,6 @@ import static org.mockito.Mockito.when;
     url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
     consumerVersionSelectors = {@VersionSelector(tag = "master")})
 @IgnoreNoPactsToVerify
-// @PactFolder("target/pacts/reform/wataskmanagement/SubmitProviderTest")
 @ExtendWith(SpringExtension.class)
 public class SubmitProviderTest {
 
