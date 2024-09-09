@@ -39,7 +39,8 @@ public class SubmitRestController {
                 @Content(mediaType = "application/json")
             })
     })
-    @PostMapping(path = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases", produces = APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+        produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<CaseDetails> saveCaseDetailsForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,

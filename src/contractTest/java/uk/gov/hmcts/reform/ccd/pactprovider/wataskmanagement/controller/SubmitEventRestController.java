@@ -38,7 +38,8 @@ public class SubmitEventRestController {
                 @Content(mediaType = "application/json")
             })
     })
-    @PostMapping(path = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events", produces = APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+        produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<CaseDetails> createCaseEventForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,

@@ -59,7 +59,8 @@ public class StartProviderTest {
     // Mock the interaction.
     @State("A Start for a Caseworker is requested")
     public void start() {
-        when(startEventOperation.triggerStartForCaseType(anyString(), anyString(), anyBoolean())).thenReturn(mockStartEventResult());
+        when(startEventOperation.triggerStartForCaseType(anyString(), anyString(), anyBoolean()))
+            .thenReturn(mockStartEventResult());
     }
 
     private StartEventResult mockStartEventResult() {
@@ -76,9 +77,10 @@ public class StartProviderTest {
         caseDetails.setCaseTypeId("Asylum");
         caseDetails.setJurisdiction("IA");
         caseDetails.setData(new HashMap<String, JsonNode>() {{
-            put("appealOutOfCountry", new TextNode("No"));
-            put("isOutOfCountryEnabled", new TextNode("No"));
-        }});
+                put("appealOutOfCountry", new TextNode("No"));
+                put("isOutOfCountryEnabled", new TextNode("No"));
+            }
+        });
         return caseDetails;
     }
 }

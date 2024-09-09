@@ -36,7 +36,8 @@ public class StartRestController {
                 @Content(mediaType = "application/json")
             })
     })
-    @GetMapping(path = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+        produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<StartEventResult> startCaseForCaseworker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -49,7 +50,8 @@ public class StartRestController {
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false, defaultValue = "false") final Boolean ignoreWarning) {
 
-        StartEventResult startEventResult = startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
+        StartEventResult startEventResult = startEventOperation.triggerStartForCaseType(caseTypeId, eventId,
+            ignoreWarning);
         return ResponseEntity.ok(startEventResult);
     }
 }

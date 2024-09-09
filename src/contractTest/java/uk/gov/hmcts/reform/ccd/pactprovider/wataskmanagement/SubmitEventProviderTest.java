@@ -66,7 +66,8 @@ public class SubmitEventProviderTest {
     // Mock the interaction.
     @State("A Submit Event for a Caseworker is requested")
     public void submitEvent() throws JsonProcessingException {
-        when(createEventOperation.createCaseEvent(anyString(), any(CaseDataContent.class))).thenReturn(mockCaseDetails());
+        when(createEventOperation.createCaseEvent(anyString(), any(CaseDataContent.class)))
+            .thenReturn(mockCaseDetails());
     }
 
     private CaseDetails mockCaseDetails() throws JsonProcessingException {
@@ -78,27 +79,38 @@ public class SubmitEventProviderTest {
         caseDetails.setAfterSubmitCallbackResponseEntity(new ResponseEntity<>(HttpStatus.OK));
         caseDetails.setState("appealStarted");
         caseDetails.setData(new HashMap<String, JsonNode>() {{
-            put("appealReferenceNumber", new TextNode("DRAFT"));
-            put("appealType", new TextNode("protection"));
-            put("appellantDateOfBirth", new TextNode("1990-12-07"));
-            put("appellantFamilyName", new TextNode("Smith"));
-            put("appellantGivenNames", new TextNode("Bob"));
-            put("appellantNameForDisplay", new TextNode("Bob Smith"));
-            put("appellantTitle", new TextNode("Mr"));
-            put("applicationOutOfTimeExplanation", new TextNode("test case"));
-            put("caseManagementLocation", objectMapper.readTree("{\"baseLocation\":\"765324\",\"region\":\"1\"}"));
-            put("currentCaseStateVisibleToLegalRepresentative", new TextNode("appealStarted"));
-            put("homeOfficeDecisionDate", new TextNode("2019-08-01"));
-            put("homeOfficeReferenceNumber", new TextNode("000123456"));
-            put("legalRepCompanyAddress", objectMapper.readTree("{\"AddressLine1\":\"\",\"AddressLine2\":\"\",\"AddressLine3\":\"\",\"Country\":\"\",\"PostCode\":\"\",\"PostTown\":\"\"}"));
-            put("legalRepCompanyName", new TextNode(""));
-            put("staffLocation", new TextNode("Taylor House"));
-            put("submissionOutOfTime", new TextNode("Yes"));
-            put("subscriptions", objectMapper.readTree("[{\"id\":\"1\",\"value\":{\"email\":\"test@example.com\",\"mobileNumber\":\"0111111111\",\"subscriber\":\"appellant\",\"wantsEmail\":\"Yes\",\"wantsSms\":\"Yes\"}}]"));
-            put("uploadAddendumEvidenceLegalRepActionAvailable", new TextNode("No"));
-            put("uploadAdditionalEvidenceActionAvailable", new TextNode("No"));
-            put("uploadTheNoticeOfDecisionDocs", objectMapper.readTree("[{\"id\":\"1\",\"value\":{\"description\":\"some notice of decision description\",\"document\":{\"document_binary_url\":\"http://dm-store-aat.service.core-compute-aat.internal/documents/7f63ca9b-c361-49ab-aa8c-8fbdb6bc2936\",\"document_filename\":\"some-notice-of-decision-letter.pdf\",\"document_url\":\"http://dm-store-aat.service.core-compute-aat.internal/documents/7f63ca9b-c361-49ab-aa8c-8fbdb6bc2936\"}}}]"));
-        }});
+                put("appealReferenceNumber", new TextNode("DRAFT"));
+                put("appealType", new TextNode("protection"));
+                put("appellantDateOfBirth", new TextNode("1990-12-07"));
+                put("appellantFamilyName", new TextNode("Smith"));
+                put("appellantGivenNames", new TextNode("Bob"));
+                put("appellantNameForDisplay", new TextNode("Bob Smith"));
+                put("appellantTitle", new TextNode("Mr"));
+                put("applicationOutOfTimeExplanation", new TextNode("test case"));
+                put("caseManagementLocation", objectMapper.readTree("{\"baseLocation\":\"765324\",\"region\":"
+                    + "\"1\"}"));
+                put("currentCaseStateVisibleToLegalRepresentative", new TextNode("appealStarted"));
+                put("homeOfficeDecisionDate", new TextNode("2019-08-01"));
+                put("homeOfficeReferenceNumber", new TextNode("000123456"));
+                put("legalRepCompanyAddress", objectMapper.readTree("{\"AddressLine1\":\"\",\"AddressLine2\":"
+                    + "\"\",\"AddressLine3\":\"\",\"Country\":\"\",\"PostCode\":\"\",\"PostTown\":\"\"}"));
+                put("legalRepCompanyName", new TextNode(""));
+                put("staffLocation", new TextNode("Taylor House"));
+                put("submissionOutOfTime", new TextNode("Yes"));
+                put("subscriptions", objectMapper.readTree("[{\"id\":\"1\",\"value\":{\"email\":"
+                    + "\"test@example.com\",\"mobileNumber\":\"0111111111\",\"subscriber\":\"appellant\","
+                    + "\"wantsEmail\":\"Yes\",\"wantsSms\":\"Yes\"}}]"));
+                put("uploadAddendumEvidenceLegalRepActionAvailable", new TextNode("No"));
+                put("uploadAdditionalEvidenceActionAvailable", new TextNode("No"));
+                put("uploadTheNoticeOfDecisionDocs", objectMapper.readTree("[{\"id\":\"1\",\"value\":"
+                    + "{\"description\":\"some notice of decision description\",\"document\":{\"document_binary_url\":"
+                    + "\"http://dm-store-aat.service.core-compute-aat.internal/documents/"
+                    + "7f63ca9b-c361-49ab-aa8c-8fbdb6bc2936\",\"document_filename\":"
+                    + "\"some-notice-of-decision-letter.pdf\",\"document_url\":"
+                    + "\"http://dm-store-aat.service.core-compute-aat.internal/documents/"
+                    + "7f63ca9b-c361-49ab-aa8c-8fbdb6bc2936\"}}}]"));
+            }
+        });
         return caseDetails;
     }
 }
