@@ -19,6 +19,7 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.util.PathFromUrlUtil;
 
 class SearchInputsViewResourceTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
@@ -47,7 +48,7 @@ class SearchInputsViewResourceTest {
         final SearchInputsViewResource resource = new SearchInputsViewResource(searchInputs, CASE_TYPE_ID);
 
         Optional<Link> self = resource.getLink("self");
-        assertThat(self.get().getHref(), equalTo(LINK_SELF));
+        assertThat(PathFromUrlUtil.getActualPath(self.get().getHref()), equalTo(LINK_SELF));
     }
 
 }
