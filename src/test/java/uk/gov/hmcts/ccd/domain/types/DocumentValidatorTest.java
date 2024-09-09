@@ -469,7 +469,6 @@ public class DocumentValidatorTest implements IVallidatorTest {
         assertThat(validDocumentUrlResult, empty());
     }
 
-
     private ObjectNode createDoc(String documentUrl) {
         data = MAPPER.createObjectNode();
         data.set(DOCUMENT_URL, new TextNode(documentUrl));
@@ -503,4 +502,5 @@ public class DocumentValidatorTest implements IVallidatorTest {
         doReturn(categories)
             .when(caseTypeDefinition).getCategories();
     }
+
 }
