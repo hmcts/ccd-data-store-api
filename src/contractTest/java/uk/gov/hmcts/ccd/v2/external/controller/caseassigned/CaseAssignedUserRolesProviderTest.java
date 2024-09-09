@@ -11,8 +11,6 @@ import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -45,8 +43,6 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("CASE_ASSIGNED")
 public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CaseAssignedUserRolesProviderTest.class);
-
     @Autowired
     ApplicationParams applicationParams;
 
@@ -59,23 +55,16 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
     @Autowired
     CaseAccessOperation caseAccessOperation;
 
-    private void jcLog(String message) {
-        LOG.info("JCDEBUG: CaseAssignedUserRolesProviderTest: " + message);
-    }
-
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
-        jcLog("pactVerificationTestTemplate() ->");
         if (context != null) {
             context.verifyInteraction();
         }
-        jcLog("pactVerificationTestTemplate() <-");
     }
 
     @BeforeEach
     void before(PactVerificationContext context) {
-        jcLog("build() ->");
         //System.getProperties().setProperty("pact.verifier.publishResults", "true");
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         testTarget.setControllers(
@@ -83,12 +72,10 @@ public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
         if (context != null) {
             context.setTarget(testTarget);
         }
-        jcLog("build() <-");
     }
 
     @State("A User Role exists for a Case")
     public void setUpUserRoleExists() {
-        jcLog("A User Role exists for a Case");
         when(securityUtils.getServiceNameFromS2SToken(anyString())).thenReturn("serviceName");
         when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(List.of("serviceName"));
 

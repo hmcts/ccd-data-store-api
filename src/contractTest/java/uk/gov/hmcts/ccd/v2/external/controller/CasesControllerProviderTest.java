@@ -13,8 +13,6 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,9 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -34,17 +30,12 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.Map;
-import java.util.Arrays;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @Provider("ccdDataStoreAPI_Cases")
@@ -65,8 +56,6 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("SECURITY_MOCK")
 @IgnoreNoPactsToVerify
 public class CasesControllerProviderTest extends WireMockBaseTest {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CasesControllerProviderTest.class);
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
     private static final String CASEWORKER_PASSWORD = "caseworkerPassword";
@@ -131,160 +120,132 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     @MockBean
     MessageService messageService;
 
-    private void jcLog(String message) {
-        LOG.info("JCDEBUG: CasesControllerProviderTest: " + message);
-    }
-
     @TestTemplate
     @ExtendWith(PactVerificationSpringProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
-        jcLog("pactVerificationTestTemplate() ->");
         if (context != null) {
             context.verifyInteraction();
         }
-        jcLog("pactVerificationTestTemplate() <-");
     }
 
     @BeforeEach
     void before(PactVerificationContext context) {
-        jcLog("build() ->");
         if (context != null) {
             context.setTarget(new HttpTestTarget("localhost", 8123, "/"));
         }
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
         //System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
-        when(userAuthorisation.getUserId()).thenReturn("userId");
-        jcLog("build() <-");
+        // when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
+        // when(userAuthorisation.getUserId()).thenReturn("userId");
     }
 
     @State("adoption-web makes request to get cases")
     public void adoptionWebToGetCases(Map<String, Object> dataMap) {
-        jcLog("adoption-web makes request to get cases");
     }
 
     @State("adoption-web makes request to send case event")
     public void adoptionWebToSendCaseEvent(Map<String, Object> dataMap) {
-        jcLog("adoption-web makes request to send case event");
     }
 
     @State("adoption-web makes request to get citizen-create-application event token")
     public void adoptionWebToGetCitizenCreateEventToken(Map<String, Object> dataMap) {
-        jcLog("adoption-web makes request to get citizen-create-application event token");
     }
 
     @State("adoption-web makes request to get case by id")
     public void adoptionWebToGetCaseById(Map<String, Object> dataMap) {
-        jcLog("adoption-web makes request to get case by id");
     }
 
     @State("adoption-web makes request to create case")
     public void adoptionWebToCreateCase(Map<String, Object> dataMap) {
-        jcLog("adoption-web makes request to create case");
     }
 
     @State("adoption-web makes request to get case-users roles")
     public void adoptionWebToGetCaseUsersRoles(Map<String, Object> dataMap) {
-        jcLog("adoption-web makes request to get case-users roles");
     }
 
     @State("adoption-web makes request to get citizen-update-application event token")
     public void adoptionWebToGetCitizenUpdateEventToken(Map<String, Object> dataMap) {
-        jcLog("adoption-web makes request to get citizen-update-application event token");
     }
 
     @State({"A Get Case is requested"})
     public void toGetACase(Map<String, Object> dataMap) {
-        jcLog("A Get Case is requested");
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        //CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        //getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
 
     }
 
     @State({"A Read for a Citizen is requested"})
     public void toReadForACitizen(Map<String, Object> dataMap) {
-        jcLog("A Read for a Citizen is requested");
-        toGetACase(dataMap);
+        //toGetACase(dataMap);
 
     }
 
     @State({"A Read for a Caseworker is requested"})
     public void toReadForCaseworker(Map<String, Object> dataMap) {
-        jcLog("A Read for a Caseworker is requested");
-        toGetACase(dataMap);
+        // toGetACase(dataMap);
     }
 
     @State({"A Search for cases is requested"})
     public void toSearchCasesForACitizen(Map<String, Object> dataMap) {
-        jcLog("A Search for cases is requested");
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class), any()))
-            .thenReturn(new CaseSearchResult(1L, Arrays.asList(caseDetails), null));
+        //CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        //when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class), any()))
+        //    .thenReturn(new CaseSearchResult(1L, Arrays.asList(caseDetails), null));
     }
 
     @State({"A Search cases for a Citizen is requested"})
     public void toSearchForACitizen(Map<String, Object> dataMap) {
-        jcLog("A Search cases for a Citizen is requested");
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        when(authorisedSearchOperation.execute(any(MetaData.class), any(Map.class)))
-            .thenReturn(Arrays.asList(caseDetails));
+        //CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        //when(authorisedSearchOperation.execute(any(MetaData.class), any(Map.class)))
+        //    .thenReturn(Arrays.asList(caseDetails));
 
     }
 
     @State({"A Start Event for a Caseworker is  requested"})
     public void toStartEventForACaseworker(Map<String, Object> dataMap) {
-        jcLog("A Start Event for a Caseworker is  requested");
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
-        startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
-            caseDetails.getReferenceAsString());
+        //CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
+        //startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
+        //    caseDetails.getReferenceAsString());
 
     }
 
     @State({"A Start Event for a Citizen is requested"})
     public void toStartEventForACitizen(Map<String, Object> dataMap) {
-        jcLog("A Start Event for a Citizen is requested");
-        toStartEventForACaseworker(dataMap);
+        //toStartEventForACaseworker(dataMap);
 
     }
 
     @State({"A Start for a Caseworker is requested"})
     public void toStartForACaseworker(Map<String, Object> dataMap) {
-        jcLog("A Start for a Caseworker is requested");
-        setUpSecurityContextForEvent(dataMap);
+        //setUpSecurityContextForEvent(dataMap);
 
     }
 
     @State({"A Start for a Citizen is requested"})
     public void toStartForACitizen(Map<String, Object> dataMap) {
-        jcLog("A Start for a Citizen is requested");
-        setUpSecurityContextForEvent(dataMap);
+        //setUpSecurityContextForEvent(dataMap);
 
     }
 
     @State({"A Submit Event for a Caseworker is requested"})
     public void toSubmitEventForACaseworker(Map<String, Object> dataMap) {
-        jcLog("A Submit Event for a Caseworker is requested");
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
-        createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        //CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
+        //createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
     @State({"A Submit Event for a Citizen is requested"})
     public void toSubmitEventForACitizen(Map<String, Object> dataMap) {
-        jcLog("A Submit Event for a Citizen is requested");
-        toSubmitEventForACaseworker(dataMap);
+        // toSubmitEventForACaseworker(dataMap);
     }
 
     @State({"A Submit for a Caseworker is requested"})
     public void toSubmitForACaseworker(Map<String, Object> dataMap) {
-        jcLog("A Submit for a Caseworker is requested");
-        setUpSecurityContextForEvent(dataMap);
+        //setUpSecurityContextForEvent(dataMap);
 
     }
 
     @State({"A Submit for a Citizen is requested"})
     public void toSubmitForACitizen(Map<String, Object> dataMap) {
-        jcLog("A Submit for a Citizen is requested");
-        setUpSecurityContextForEvent(dataMap);
+        //setUpSecurityContextForEvent(dataMap);
 
     }
 
