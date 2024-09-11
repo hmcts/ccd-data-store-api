@@ -160,6 +160,10 @@ withPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     }
 
+    before('smoketest:aat') {
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-staging.aat.platform.hmcts.net"
+    }
+
     afterAlways('smoketest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     }
