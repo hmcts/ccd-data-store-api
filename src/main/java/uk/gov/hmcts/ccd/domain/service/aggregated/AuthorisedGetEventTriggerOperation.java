@@ -174,6 +174,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             accessProfiles, CAN_CREATE)) {
             ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
             resourceNotFoundException.withDetails("No Create Access");
+            throw resourceNotFoundException;
         }
         if (!accessControlService.canAccessCaseEventWithCriteria(eventId,
                                                                  caseTypeDefinition.getEvents(),
