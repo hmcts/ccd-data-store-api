@@ -28,12 +28,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_STATE_FOUND;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
 @Service
 @Qualifier(AuthorisedGetEventTriggerOperation.QUALIFIER)
@@ -166,16 +161,20 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                                        Set<AccessProfile> accessProfiles) {
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
             accessProfiles, CAN_READ)) {
-            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+            ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+            resourceNotFoundException.withDetails("No READ Access");
+            throw resourceNotFoundException;
         }
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
             accessProfiles, CAN_CREATE)) {
-            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+            ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+            resourceNotFoundException.withDetails("No Create Access");
         }
         if (!accessControlService.canAccessCaseEventWithCriteria(eventId,
                                                                  caseTypeDefinition.getEvents(),
             accessProfiles, CAN_CREATE)) {
-            throw new ResourceNotFoundException(NO_EVENT_FOUND);
+            ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(NO_EVENT_FOUND);
+            throw new ResourceNotFoundException("No Create Access");
         }
     }
 
@@ -185,12 +184,16 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
             accessProfiles,
                                                                 CAN_READ)) {
-            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+            ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+            resourceNotFoundException.withDetails("No READ Access");
+            throw resourceNotFoundException;
         }
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
             accessProfiles,
                                                                 CAN_UPDATE)) {
-            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+            ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+            resourceNotFoundException.withDetails("No Update Access");
+            throw resourceNotFoundException;
         }
         if (!accessControlService.canAccessCaseEventWithCriteria(eventId,
                                                                  caseTypeDefinition.getEvents(),
