@@ -21,14 +21,14 @@ plugins {
     id 'org.jetbrains.gradle.plugin.idea-ext' version '0.7'
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'uk.gov.hmcts.java' version '0.12.57'
-    id 'au.com.dius.pact' version '4.1.0'
+    id 'au.com.dius.pact' version '4.3.12'
     id "org.jsonschema2pojo" version "1.2.1"
 }
 
 apply from: './gradle/suppress.gradle'
 
 def versions = [
-        pact_version    : '4.1.7',
+        pact_version    : '4.3.4',
 ]
 
 ext['spring-security.version'] = '5.7.11'
@@ -921,7 +921,7 @@ task runProviderPactVerification(type:Test) {
         systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
     }
     systemProperty 'pact.provider.version', project.pactVersion
-    include "uk/gov/hmcts/ccd/v2/external/controller/**"
+    include "uk/gov/hmcts/**"
 }
 
 runProviderPactVerification.finalizedBy pactVerify
