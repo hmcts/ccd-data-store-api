@@ -181,6 +181,217 @@ class GetLinkedCasesResponseCreatorTest {
         + "  \"delete_draft_response_status\": null\n"
         + "}";
 
+    private static final String CASE_DETAILS_TEMPLATE_NO_LINK_REASON_CASE_LINK_FIELDS = "{\n"
+        + "  \"id\": %s,\n"
+        + "  \"jurisdiction\": \"%s\",\n"
+        + "  \"state\": \"%s\",\n"
+        + "  \"version\": 1,\n"
+        + "  \"case_type_id\": \"%s\",\n"
+        + "  \"created_date\": \"2016-06-22T20:44:52.824\",\n"
+        + "  \"last_modified\": \"2016-06-24T20:44:52.824\",\n"
+        + "  \"last_state_modified_date\": \"2016-06-24T20:44:52.824\",\n"
+        + "  \"security_classification\": \"PUBLIC\",\n"
+        + "  \"case_data\": {\n"
+        + "    \"caseNameHmctsInternal\" : \"%s\",\n"
+        + "    \"caseLinks\" : [ {\n"
+        // many reasons
+        + "      \"id\" : \"8d64133f-cde0-4db7-bdbe-6cb767c63d7d\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"" + CASE_REFERENCE + "\",\n"
+        + "        \"CaseType\" : \"MyBaseType\",\n"
+        + "        \"CreatedDateTime\" : \"2022-04-14T01:46:57.947877\"\n"
+        //+ "        \"CreatedDateTime\" : \"2022-04-14T01:46:57.947877\",\n"
+        //+ "        \"ReasonForLink\" : [ {\n"
+        //+ "          \"id\" : \"57bc2066-545e-4020-8365-5cf4512b3c85\",\n"
+        //+ "          \"value\" : {\n"
+        //+ "            \"Reason\" : \"Reason 1.1\",\n"
+        //+ "            \"OtherDescription\" : \"OtherDescription 1.1\"\n"
+        //+ "          }\n"
+        //+ "        }, {\n"
+        //+ "          \"id\" : \"2f069606-18ca-453a-893f-a32c31443b16\",\n"
+        //+ "          \"value\" : {\n"
+        //+ "            \"Reason\" : \"Reason 1.2\",\n"
+        //+ "            \"OtherDescription\" : \"OtherDescription 1.2\"\n"
+        //+ "         }\n"
+        //+ "        } ]\n"
+        + "      }\n"
+        + "    }, {\n"
+        // to be ignored as wrong case reference
+        + "      \"id\" : \"d0eec7af-4bf0-4a24-9676-1d2d4dc736e6\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"4444333322221111\",\n"
+        + "        \"CaseType\" : \"MyBaseType\",\n"
+        + "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\"\n"
+        /*+ "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\",\n"
+        + "        \"ReasonForLink\" : [ {\n"
+        + "          \"id\" : \"b38a2996-3ddb-42fa-85d5-c8b07387e1ae\",\n"
+        + "          \"value\" : {\n"
+        + "            \"Reason\" : \"Reason and link ignored in test (wrong case reference)\",\n"
+        + "            \"OtherDescription\" : \"OtherDescription\"\n"
+        + "          }\n"
+        + "        } ]\n"*/
+        + "      }\n"
+        + "    }, {\n"
+        // single reason
+        + "      \"id\" : \"ddd50637-1e17-4395-a101-e65b3ed4e634\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"" + CASE_REFERENCE + "\",\n"
+        + "        \"CaseType\" : \"MyBaseType\",\n"
+        + "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\"\n"
+        /*+ "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\",\n"
+        + "        \"ReasonForLink\" : [ {\n"
+        + "          \"id\" : \"02d7b1a5-d5b7-4abd-8991-59ab8c1b4136\",\n"
+        + "          \"value\" : {\n"
+        + "            \"Reason\" : \"Reason 2.1\",\n"
+        + "            \"OtherDescription\" : \"OtherDescription 2.1\"\n"
+        + "          }\n"
+        + "        } ]\n"*/
+        + "      }\n"
+        + "    }, {\n"
+        // minimal case link (i.e. no reasons or date time)
+        + "      \"id\" : \"f113b206-9ebd-4e8e-b1c6-ee0093167e1a\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"" + CASE_REFERENCE + "\"\n"
+        + "      }\n"
+        + "    } ],\n"
+        + "    \"PersonAddress\": {\n"
+        + "      \"Country\": \"England\",\n"
+        + "      \"Postcode\": \"HX08 5TG\",\n"
+        + "      \"AddressLine1\": \"123\",\n"
+        + "      \"AddressLine2\": \"Fake Street\",\n"
+        + "      \"AddressLine3\": \"Hexton\"\n"
+        + "    },\n"
+        + "    \"PersonLastName\": \"Parker\",\n"
+        + "    \"PersonFirstName\": \"Janet\"\n"
+        + "  },\n"
+        + "  \"data_classification\": {\n"
+        + "   \"caseNameHmctsInternal\" : \"PUBLIC\",\n"
+        + "    \"PersonAddress\": {\n"
+        + "      \"value\": {\n"
+        + "        \"Country\": \"PUBLIC\",\n"
+        + "        \"Postcode\": \"PUBLIC\",\n"
+        + "        \"AddressLine1\": \"PUBLIC\",\n"
+        + "        \"AddressLine2\": \"PUBLIC\",\n"
+        + "        \"AddressLine3\": \"PUBLIC\"\n"
+        + "      },\n"
+        + "      \"classification\": \"PUBLIC\"\n"
+        + "    },\n"
+        + "    \"PersonLastName\": \"PUBLIC\",\n"
+        + "    \"PersonFirstName\": \"PUBLIC\"\n"
+        + "  },\n"
+        + "  \"supplementary_data\": null,\n"
+        + "  \"after_submit_callback_response\": null,\n"
+        + "  \"callback_response_status_code\": null,\n"
+        + "  \"callback_response_status\": null,\n"
+        + "  \"delete_draft_response_status_code\": null,\n"
+        + "  \"delete_draft_response_status\": null\n"
+        + "}";
+
+    private static final String CASE_DETAILS_TEMPLATE_EMPTY_LINK_REASON_CASE_LINK_FIELDS = "{\n"
+        + "  \"id\": %s,\n"
+        + "  \"jurisdiction\": \"%s\",\n"
+        + "  \"state\": \"%s\",\n"
+        + "  \"version\": 1,\n"
+        + "  \"case_type_id\": \"%s\",\n"
+        + "  \"created_date\": \"2016-06-22T20:44:52.824\",\n"
+        + "  \"last_modified\": \"2016-06-24T20:44:52.824\",\n"
+        + "  \"last_state_modified_date\": \"2016-06-24T20:44:52.824\",\n"
+        + "  \"security_classification\": \"PUBLIC\",\n"
+        + "  \"case_data\": {\n"
+        + "    \"caseNameHmctsInternal\" : \"%s\",\n"
+        + "    \"caseLinks\" : [ {\n"
+        // many reasons
+        + "      \"id\" : \"8d64133f-cde0-4db7-bdbe-6cb767c63d7d\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"" + CASE_REFERENCE + "\",\n"
+        + "        \"CaseType\" : \"MyBaseType\",\n"
+        + "        \"CreatedDateTime\" : \"2022-04-14T01:46:57.947877\",\n"
+        + "        \"ReasonForLink\" : [ {\n"
+        //+ "          \"id\" : \"57bc2066-545e-4020-8365-5cf4512b3c85\",\n"
+        //+ "          \"value\" : {\n"
+        //+ "            \"Reason\" : \"Reason 1.1\",\n"
+        //+ "            \"OtherDescription\" : \"OtherDescription 1.1\"\n"
+        //+ "          }\n"
+        //+ "        }, {\n"
+        //+ "          \"id\" : \"2f069606-18ca-453a-893f-a32c31443b16\",\n"
+        //+ "          \"value\" : {\n"
+        //+ "            \"Reason\" : \"Reason 1.2\",\n"
+        //+ "            \"OtherDescription\" : \"OtherDescription 1.2\"\n"
+        //+ "         }\n"
+        + "        } ]\n"
+        + "      }\n"
+        + "    }, {\n"
+        // to be ignored as wrong case reference
+        + "      \"id\" : \"d0eec7af-4bf0-4a24-9676-1d2d4dc736e6\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"4444333322221111\",\n"
+        + "        \"CaseType\" : \"MyBaseType\",\n"
+        + "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\"\n"
+        /*+ "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\",\n"
+        + "        \"ReasonForLink\" : [ {\n"
+        + "          \"id\" : \"b38a2996-3ddb-42fa-85d5-c8b07387e1ae\",\n"
+        + "          \"value\" : {\n"
+        + "            \"Reason\" : \"Reason and link ignored in test (wrong case reference)\",\n"
+        + "            \"OtherDescription\" : \"OtherDescription\"\n"
+        + "          }\n"
+        + "        } ]\n"*/
+        + "      }\n"
+        + "    }, {\n"
+        // single reason
+        + "      \"id\" : \"ddd50637-1e17-4395-a101-e65b3ed4e634\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"" + CASE_REFERENCE + "\",\n"
+        + "        \"CaseType\" : \"MyBaseType\",\n"
+        + "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\"\n"
+        /*+ "        \"CreatedDateTime\" : \"2022-03-24T09:08:15.947877\",\n"
+        + "        \"ReasonForLink\" : [ {\n"
+        + "          \"id\" : \"02d7b1a5-d5b7-4abd-8991-59ab8c1b4136\",\n"
+        + "          \"value\" : {\n"
+        + "            \"Reason\" : \"Reason 2.1\",\n"
+        + "            \"OtherDescription\" : \"OtherDescription 2.1\"\n"
+        + "          }\n"
+        + "        } ]\n"*/
+        + "      }\n"
+        + "    }, {\n"
+        // minimal case link (i.e. no reasons or date time)
+        + "      \"id\" : \"f113b206-9ebd-4e8e-b1c6-ee0093167e1a\",\n"
+        + "      \"value\" : {\n"
+        + "        \"CaseReference\" : \"" + CASE_REFERENCE + "\"\n"
+        + "      }\n"
+        + "    } ],\n"
+        + "    \"PersonAddress\": {\n"
+        + "      \"Country\": \"England\",\n"
+        + "      \"Postcode\": \"HX08 5TG\",\n"
+        + "      \"AddressLine1\": \"123\",\n"
+        + "      \"AddressLine2\": \"Fake Street\",\n"
+        + "      \"AddressLine3\": \"Hexton\"\n"
+        + "    },\n"
+        + "    \"PersonLastName\": \"Parker\",\n"
+        + "    \"PersonFirstName\": \"Janet\"\n"
+        + "  },\n"
+        + "  \"data_classification\": {\n"
+        + "   \"caseNameHmctsInternal\" : \"PUBLIC\",\n"
+        + "    \"PersonAddress\": {\n"
+        + "      \"value\": {\n"
+        + "        \"Country\": \"PUBLIC\",\n"
+        + "        \"Postcode\": \"PUBLIC\",\n"
+        + "        \"AddressLine1\": \"PUBLIC\",\n"
+        + "        \"AddressLine2\": \"PUBLIC\",\n"
+        + "        \"AddressLine3\": \"PUBLIC\"\n"
+        + "      },\n"
+        + "      \"classification\": \"PUBLIC\"\n"
+        + "    },\n"
+        + "    \"PersonLastName\": \"PUBLIC\",\n"
+        + "    \"PersonFirstName\": \"PUBLIC\"\n"
+        + "  },\n"
+        + "  \"supplementary_data\": null,\n"
+        + "  \"after_submit_callback_response\": null,\n"
+        + "  \"callback_response_status_code\": null,\n"
+        + "  \"callback_response_status\": null,\n"
+        + "  \"delete_draft_response_status_code\": null,\n"
+        + "  \"delete_draft_response_status\": null\n"
+        + "}";
+
     @BeforeEach
     void setup() {
         caseDetails = new ArrayList<>();
@@ -255,6 +466,51 @@ class GetLinkedCasesResponseCreatorTest {
         assertTrue(caseLinks.get(0).getLinkDetails().isEmpty());
         assertFalse(response.isHasMoreRecords());
     }
+
+    @Test
+    void testCreateCaseLinkInfoListNoLinkReasonCaseLinkFieldsPresent() throws JsonProcessingException {
+        final String caseDetails =
+            String.format(CASE_DETAILS_TEMPLATE_NO_LINK_REASON_CASE_LINK_FIELDS, "1500638105106660",
+            "jurisdiction", "state", "caseTypeId", "caseNameHmctsInternal");
+
+        CaseLinkRetrievalResults caseLinkRetrievalResults = CaseLinkRetrievalResults.builder()
+            .caseDetails(List.of(OBJECT_MAPPER.readValue(caseDetails, CaseDetails.class)))
+            .hasMoreResults(false)
+            .build();
+
+        final GetLinkedCasesResponse response = getLinkedCasesResponseCreator.createResponse(caseLinkRetrievalResults,
+            CASE_REFERENCE);
+
+        final List<CaseLinkInfo> caseLinks = response.getLinkedCases();
+
+        assertFalse(response.getLinkedCases().isEmpty());
+        assertEquals(caseLinks.size(), 1);
+        assertEquals(caseLinks.get(0).getLinkDetails().size(), 3);
+        assertFalse(response.isHasMoreRecords());
+    }
+
+    @Test
+    void testCreateCaseLinkInfoListEmptyLinkReasonCaseLinkFieldsPresent() throws JsonProcessingException {
+        final String caseDetails =
+            String.format(CASE_DETAILS_TEMPLATE_EMPTY_LINK_REASON_CASE_LINK_FIELDS, "1500638105106660",
+                "jurisdiction", "state", "caseTypeId", "caseNameHmctsInternal");
+
+        CaseLinkRetrievalResults caseLinkRetrievalResults = CaseLinkRetrievalResults.builder()
+            .caseDetails(List.of(OBJECT_MAPPER.readValue(caseDetails, CaseDetails.class)))
+            .hasMoreResults(false)
+            .build();
+
+        final GetLinkedCasesResponse response = getLinkedCasesResponseCreator.createResponse(caseLinkRetrievalResults,
+            CASE_REFERENCE);
+
+        final List<CaseLinkInfo> caseLinks = response.getLinkedCases();
+
+        assertFalse(response.getLinkedCases().isEmpty());
+        assertEquals(caseLinks.size(), 1);
+        assertEquals(caseLinks.get(0).getLinkDetails().size(), 3);
+        assertFalse(response.isHasMoreRecords());
+    }
+
 
     @Test
     void testCreateCaseLinkInfoListNoCaseNameHmctsInternalFieldPresent() throws JsonProcessingException {
