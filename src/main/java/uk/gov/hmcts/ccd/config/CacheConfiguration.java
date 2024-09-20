@@ -1,10 +1,13 @@
 package uk.gov.hmcts.ccd.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.binder.cache.CaffeineCacheMetrics;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,6 +81,18 @@ public class CacheConfiguration {
         ));
 
         return cacheManager;
+    }
+
+    @Bean
+    public CacheManager cacheManager(Caffeine<Object, Object> caffeine, MeterRegistry meterRegistry) {
+        CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager() {
+            protected com.github.benmanes.caffeine.cache.Cache<Object, Object> createNativeCaffeineCache(String name) {
+                return CaffeineCacheMetrics.monitor(meterRegistry, super.createNativeCaffeineCache(name), name);
+            }
+
+        };
+        caffeineCacheManager.setCaffeine(caffeine);
+        return caffeineCacheManager;
     }
 
     private CaffeineCache newMapConfigWithMaxIdle(final String cacheName, final Integer maxIdle) {
