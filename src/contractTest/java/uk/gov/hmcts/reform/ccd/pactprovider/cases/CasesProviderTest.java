@@ -118,7 +118,7 @@ public class CasesProviderTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(1L);
         caseDetails.setCaseTypeId("ET_EnglandWales");
-        caseDetails.setJurisdiction("IA");
+        caseDetails.setJurisdiction("EMPLOYMENT");
         caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
         caseDetails.setAfterSubmitCallbackResponseEntity(new ResponseEntity<>(HttpStatus.OK));
         caseDetails.setState("appealStarted");
