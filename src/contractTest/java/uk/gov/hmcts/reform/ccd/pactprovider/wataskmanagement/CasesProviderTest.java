@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 
 // Consolidated Pact Provider Test for "WA TASK MANAGEMENT" , version 1.   [Copied from CCD-5224]
 
-@Provider("ccdDataStoreAPI_WorkAllocation")
+@Provider("ccd_data_store_get_case_by_id")
 @PactBroker(
     url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
     consumerVersionSelectors = {@VersionSelector(tag = "master")})

@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 
 // Consolidated Pact Provider Test for "WA TASK MONITOR" , version 1.   [Copied from CCD-5224]
 
-@Provider("ccdDataStoreAPI_WorkAllocation1")
+@Provider("ccdDataStoreAPI_Cases")
 @PactBroker(
     url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
     consumerVersionSelectors = {@VersionSelector(tag = "master")})
