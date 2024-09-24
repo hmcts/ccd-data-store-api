@@ -921,7 +921,7 @@ task runProviderPactVerification(type:Test) {
         systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
     }
     systemProperty 'pact.provider.version', project.pactVersion
-    include "uk/gov/hmcts/**"
+    include "uk/gov/hmcts/reform/**"
 }
 
 runProviderPactVerification.finalizedBy pactVerify
