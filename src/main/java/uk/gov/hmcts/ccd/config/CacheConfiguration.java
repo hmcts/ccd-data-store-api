@@ -1,9 +1,7 @@
 package uk.gov.hmcts.ccd.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
@@ -29,9 +27,6 @@ public class CacheConfiguration extends CachingConfigurerSupport {
 
     private static final int TTL_ZERO = 0;
     private final ApplicationParams applicationParams;
-
-    @Autowired
-    private MeterRegistry meterRegistry;
 
     // create a Caffeine Cache manager
     private final CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
@@ -87,6 +82,7 @@ public class CacheConfiguration extends CachingConfigurerSupport {
             newMapConfigWithTtl(SERVICES_CACHE, applicationParams.getRefDataCacheTtlInSec())
         ));
 
+        caffeineCacheManager.setCaffeine(Caffeine.newBuilder().recordStats());
         caffeineCacheManager.setCacheNames(cacheManager.getCacheNames());
         return caffeineCacheManager;
     }
