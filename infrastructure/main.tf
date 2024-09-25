@@ -108,6 +108,10 @@ module "postgresql_v15" {
     {
       name  = "log_lock_waits"
       value = "on"
+    },
+    {
+      name  = "pgms_wait_sampling.query_capture_mode"
+      value = "ALL"
     }
   ]
   pgsql_version     = "15"
