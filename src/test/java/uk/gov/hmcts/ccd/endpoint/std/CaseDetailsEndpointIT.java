@@ -47,7 +47,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -64,7 +64,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
@@ -75,6 +74,7 @@ import static org.hamcrest.core.Every.everyItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
@@ -436,8 +436,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
-        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData
-            .entrySet())));
+
+        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));  
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -939,8 +939,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
-        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData
-            .entrySet())));
+        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));  
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -3612,16 +3611,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  }\n" +
                 "}\n"
         );
-        Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
+        Map<Object,Object> expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         JsonNode caseData = mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data");
         JsonNode dataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("data_classification");
-        Map actualData = mapper.readValue(caseData.toString(), Map.class);
-        assertAll(() -> assertThat("Incorrect Response Content",
-            actualData.entrySet(),
-            everyItem(isIn(expectedSanitizedData.entrySet()))),
-            () -> assertThat("Response contains filtered out data", caseData.has("PersonFirstName"),
-                is(false)),
+        Map<Object,Object> actualData = mapper.readValue(caseData.toString(), Map.class);
+        assertAll(() -> 
+            assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet()
+                .containsAll(actualData.entrySet())),
+            () -> assertThat("Response contains filtered out data", 
+                caseData.has("PersonFirstName"), is(false)),
             () -> assertThat(dataClassification.has("PersonFirstName"), CoreMatchers.is(false)),
             () -> assertThat(dataClassification.has("PersonLastName"), CoreMatchers.is(true)),
             () -> assertThat(dataClassification.has("PersonAddress"), CoreMatchers.is(true))

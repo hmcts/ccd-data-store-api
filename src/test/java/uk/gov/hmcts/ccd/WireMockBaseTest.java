@@ -29,9 +29,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import jakarta.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -44,7 +42,7 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 @AutoConfigureWireMock(port = 0)
 public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseContractTest.class);
 
     // data values as per: classpath:sql/insert_cases.sql
     public static final String CASE_01_REFERENCE = "1504259907353529";

@@ -3,7 +3,8 @@ package uk.gov.hmcts.ccd.domain.model.std;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -41,10 +42,10 @@ public class AuditEvent extends Event {
     @JsonProperty("state_name")
     private String stateName;
     @JsonProperty("data")
-    @ApiModelProperty("Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
+    @Schema(description = "Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
     private Map<String, JsonNode> data;
     @JsonProperty("data_classification")
-    @ApiModelProperty("Same structure as `data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
+    @Schema(description = "Same structure as `data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
         + "as field's value.")
     private Map<String, JsonNode> dataClassification;
     @JsonProperty("security_classification")

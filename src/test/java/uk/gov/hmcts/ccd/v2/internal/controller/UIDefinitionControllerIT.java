@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.SearchInputsViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.WorkbasketInputsViewResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;

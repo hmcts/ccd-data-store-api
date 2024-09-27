@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseRoleDefinition;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.springframework.http.HttpMethod.GET;
 

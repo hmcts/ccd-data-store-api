@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

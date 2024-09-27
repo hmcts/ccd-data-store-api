@@ -34,8 +34,8 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.ui.UserProfileEndpoint;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolationException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import java.io.Serializable;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;

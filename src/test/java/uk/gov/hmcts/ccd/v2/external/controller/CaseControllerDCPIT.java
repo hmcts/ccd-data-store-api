@@ -21,7 +21,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.v2.V2;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;

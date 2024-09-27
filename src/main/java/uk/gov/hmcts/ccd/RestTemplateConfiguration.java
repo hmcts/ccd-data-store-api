@@ -1,9 +1,15 @@
 package uk.gov.hmcts.ccd;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.HttpRoute;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.function.Resolver;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +21,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -69,7 +75,6 @@ class RestTemplateConfiguration {
         final RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory requestFactory =
             new HttpComponentsClientHttpRequestFactory(getHttpClient());
-        requestFactory.setReadTimeout(readTimeout);
         LOG.info("readTimeout: {}", readTimeout);
         restTemplate.setRequestFactory(requestFactory);
         return restTemplate;
@@ -81,7 +86,6 @@ class RestTemplateConfiguration {
         final RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory requestFactory =
             new HttpComponentsClientHttpRequestFactory(getHttpClient());
-        requestFactory.setReadTimeout(readTimeout);
         LOG.info("readTimeout: {}", readTimeout);
         restTemplate.setRequestFactory(requestFactory);
 
@@ -136,16 +140,33 @@ class RestTemplateConfiguration {
         LOG.info("connectionTimeout: {}", timeout);
 
         cm.setMaxTotal(maxTotalHttpClient);
-        cm.closeIdleConnections(maxSecondsIdleConnection, TimeUnit.SECONDS);
+        cm.closeIdle(TimeValue.ofSeconds(maxSecondsIdleConnection));
         cm.setDefaultMaxPerRoute(maxClientPerRoute);
-        cm.setValidateAfterInactivity(validateAfterInactivity);
-        final RequestConfig
-            config =
+        Resolver<HttpRoute, ConnectionConfig> connectionConfigResolver = new Resolver<HttpRoute,ConnectionConfig>() {
+            @Override
+            public ConnectionConfig resolve(HttpRoute route) {
+                return ConnectionConfig.custom()
+                        .setConnectTimeout(Timeout.ofSeconds(timeout))
+                        .setSocketTimeout(Timeout.ofSeconds(timeout))
+                        .setValidateAfterInactivity(TimeValue.ofSeconds(validateAfterInactivity))
+                        .build();
+            }
+        };
+        cm.setConnectionConfigResolver(connectionConfigResolver);
+        Resolver<HttpRoute, SocketConfig> socketConfigResolver = new Resolver<HttpRoute,SocketConfig>() {
+            @Override
+            public SocketConfig resolve(HttpRoute route) {
+                return SocketConfig.custom()
+                        .setSoTimeout(Timeout.ofSeconds(readTimeout))
+                        .build();
+            }
+        };
+        cm.setSocketConfigResolver(socketConfigResolver);
+        final RequestConfig config =
             RequestConfig.custom()
-                         .setConnectTimeout(timeout)
-                         .setConnectionRequestTimeout(timeout)
-                         .setSocketTimeout(timeout)
+                         .setConnectionRequestTimeout(timeout, TimeUnit.SECONDS)
                          .build();
+
 
         return HttpClientBuilder.create()
                                 .useSystemProperties()

@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
 import com.google.common.collect.Maps;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,7 +44,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -126,10 +126,9 @@ public class QueryEndpoint {
      */
     @Deprecated
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types", method = RequestMethod.GET)
-    @ApiOperation(value = "Get case types")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "List of case types for the given access criteria"),
-        @ApiResponse(code = 404, message = "No case types found for given access criteria")})
+    @Operation(summary = "Get case types")
+    @ApiResponse(responseCode = "200", description = "List of case types for the given access criteria")
+    @ApiResponse(responseCode = "404", description = "No case types found for given access criteria")
     @SuppressWarnings("squid:CallToDeprecatedMethod")
     public List<CaseTypeDefinition> getCaseTypes(@PathVariable("jid") final String jurisdictionId,
                                                  @RequestParam(value = "access", required = true) String access) {
@@ -138,10 +137,9 @@ public class QueryEndpoint {
     }
 
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions")
-    @ApiOperation(value = "Get jurisdictions available to the user")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "List of jurisdictions for the given access criteria"),
-        @ApiResponse(code = 404, message = "No jurisdictions found for given access criteria")})
+    @Operation(summary = "Get jurisdictions available to the user")
+    @ApiResponse(responseCode = "200", description = "List of jurisdictions for the given access criteria")
+    @ApiResponse(responseCode = "404", description = "No jurisdictions found for given access criteria")
     public List<JurisdictionDisplayProperties> getJurisdictions(@RequestParam(value = "access") String access) {
         if (accessMap.get(access) == null) {
             throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
@@ -157,10 +155,9 @@ public class QueryEndpoint {
 
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
         method = RequestMethod.GET)
-    @ApiOperation(value = "Get case data with UI layout")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "List of case data for the given search criteria"),
-        @ApiResponse(code = 412, message = "Mismatch between case type and workbasket definitions")})
+    @Operation(summary = "Get case data with UI layout")
+    @ApiResponse(responseCode = "200", description = "List of case data for the given search criteria")
+    @ApiResponse(responseCode = "412", description = "Mismatch between case type and workbasket definitions")
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", caseId = "T(uk.gov.hmcts.ccd.endpoint.ui.QueryEndpoint).buildCaseIds(#result)")
     public SearchResultView searchNew(@PathVariable("jid") final String jurisdictionId,
@@ -193,11 +190,9 @@ public class QueryEndpoint {
 
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/inputs",
         method = RequestMethod.GET)
-    @ApiOperation(value = "Get Search Input details")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Search Input data found for the given case type and jurisdiction"),
-        @ApiResponse(code = 404, message = "No SearchInput found for the given case type and jurisdiction")
-    })
+    @Operation(summary = "Get Search Input details")
+    @ApiResponse(responseCode = "200", description = "Search Input data found for the given case type and jurisdiction")
+    @ApiResponse(responseCode = "404", description = "No SearchInput found for the given case type and jurisdiction")
     public SearchInput[] findSearchInputDetails(@PathVariable("uid") final String uid,
                                                 @PathVariable("jid") final String jurisdictionId,
                                                 @PathVariable("ctid") final String caseTypeId) {
@@ -210,11 +205,9 @@ public class QueryEndpoint {
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/"
         + "work-basket-inputs",
         method = RequestMethod.GET)
-    @ApiOperation(value = "Get Workbasket Input details")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Workbasket Input data found for the given case type and jurisdiction"),
-        @ApiResponse(code = 404, message = "No Workbasket Input found for the given case type and jurisdiction")
-    })
+    @Operation(summary = "Get Workbasket Input details")
+    @ApiResponse(responseCode = "200", description = "Workbasket Input data found for the given case type and jurisdiction")
+    @ApiResponse(responseCode = "404", description = "No Workbasket Input found for the given case type and jurisdiction")
     public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final String uid,
                                                         @PathVariable("jid") final String jurisdictionId,
                                                         @PathVariable("ctid") final String caseTypeId) {
@@ -230,10 +223,8 @@ public class QueryEndpoint {
 
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
         method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch a case for display")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "A displayable case")
-    })
+    @Operation(summary = "Fetch a case for display")
+    @ApiResponse(responseCode = "200", description = "A displayable case")
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", caseId = "#cid")
     public CaseView findCase(@PathVariable("jid") final String jurisdictionId,
@@ -249,11 +240,9 @@ public class QueryEndpoint {
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/"
         + "event-triggers/{etid}",
         method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch an event trigger in the context of a case type")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Empty pre-state conditions"),
-        @ApiResponse(code = 422, message = "The case status did not qualify for the event")
-    })
+    @Operation(summary = "Fetch an event trigger in the context of a case type")
+    @ApiResponse(responseCode = "200", description = "Empty pre-state conditions")
+    @ApiResponse(responseCode = "422", description = "The case status did not qualify for the event")
     public CaseUpdateViewEvent getEventTriggerForCaseType(@PathVariable("uid") String userId,
                                                           @PathVariable("jid") String jurisdictionId,
                                                           @PathVariable("ctid") String caseTypeId,
@@ -268,10 +257,8 @@ public class QueryEndpoint {
         value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/"
             + "event-triggers/{etid}",
         method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch an event trigger in the context of a case")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Valid pre-state conditions")
-    })
+    @Operation(summary = "Fetch an event trigger in the context of a case")
+    @ApiResponse(responseCode = "200", description = "Valid pre-state conditions")
     public CaseUpdateViewEvent getEventTriggerForCase(@PathVariable("uid") String userId,
                                                       @PathVariable("jid") String jurisdictionId,
                                                       @PathVariable("ctid") String caseTypeId,
@@ -287,10 +274,8 @@ public class QueryEndpoint {
         value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}/"
             + "event-triggers/{etid}",
         method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch an event trigger in the context of a case")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Valid pre-state conditions")
-    })
+    @Operation(summary = "Fetch an event trigger in the context of a case")
+    @ApiResponse(responseCode = "200", description = "Valid pre-state conditions")
     public CaseUpdateViewEvent getEventTriggerForDraft(@PathVariable("uid") String userId,
                                                        @PathVariable("jid") String jurisdictionId,
                                                        @PathVariable("ctid") String caseTypeId,
@@ -305,11 +290,9 @@ public class QueryEndpoint {
         value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/"
             + "{eventId}/case-history",
         method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch case history for the event")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Displayable case data"),
-        @ApiResponse(code = 404, message = "Invalid jurisdiction/case type/case reference or event id")
-    })
+    @Operation(summary = "Fetch case history for the event")
+    @ApiResponse(responseCode = "200", description = "Displayable case data")
+    @ApiResponse(responseCode = "404", description = "Invalid jurisdiction/case type/case reference or event id")
     public CaseHistoryView getCaseHistoryForEvent(@PathVariable("jid") final String jurisdictionId,
                                                   @PathVariable("ctid") final String caseTypeId,
                                                   @PathVariable("cid") final String caseReference,

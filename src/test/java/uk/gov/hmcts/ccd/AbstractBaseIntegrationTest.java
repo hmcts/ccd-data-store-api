@@ -56,7 +56,7 @@ import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.charset.Charset;

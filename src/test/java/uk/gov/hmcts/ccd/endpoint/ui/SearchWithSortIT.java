@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 

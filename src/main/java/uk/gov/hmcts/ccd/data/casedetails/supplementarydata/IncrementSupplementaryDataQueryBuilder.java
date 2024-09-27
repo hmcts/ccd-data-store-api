@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 

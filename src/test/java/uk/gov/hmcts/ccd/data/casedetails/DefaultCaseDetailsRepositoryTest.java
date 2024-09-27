@@ -31,11 +31,11 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.OptimisticLockException;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequestEvent;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRequestEvent;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDate;

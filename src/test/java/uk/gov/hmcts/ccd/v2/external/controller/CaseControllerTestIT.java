@@ -39,7 +39,7 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

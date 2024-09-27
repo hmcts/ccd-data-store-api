@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +8,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
@@ -48,36 +48,34 @@ public class CaseUserController {
         path = "/{userId}",
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiOperation(
-        value = "Update a user's roles for a specific case. Grant access for added case roles and revoke access for "
+    @Operation(
+        description = "Update a user's roles for a specific case. Grant access for added case roles and revoke access for "
             + "removed case roles."
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 204,
-            message = "Access granted"
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.CASE_ID_INVALID
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.CASE_ROLE_REQUIRED
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.CASE_ROLE_INVALID
-            ),
-        @ApiResponse(
-            code = 403,
-            message = V2.Error.GRANT_FORBIDDEN
-            ),
-        @ApiResponse(
-            code = 404,
-            message = V2.Error.CASE_NOT_FOUND
-            )
-    })
+    @ApiResponse(
+        responseCode = "204",
+        description = "Access granted"
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.CASE_ID_INVALID
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.CASE_ROLE_REQUIRED
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.CASE_ROLE_INVALID
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = V2.Error.GRANT_FORBIDDEN
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = V2.Error.CASE_NOT_FOUND
+    )
     @LogAudit(operationType = AuditOperationType.UPDATE_CASE_ACCESS, caseId = "#caseReference",
         targetIdamId = "#userId",
         targetCaseRoles = "#caseUser.caseRoles")

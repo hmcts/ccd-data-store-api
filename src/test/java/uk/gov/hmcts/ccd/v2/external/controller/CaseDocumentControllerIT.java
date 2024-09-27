@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.sql.DataSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,13 +30,13 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseContractTest;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDocumentResource;
 
-public class CaseDocumentControllerIT extends WireMockBaseTest {
+public class CaseDocumentControllerIT extends WireMockBaseContractTest {
 
     @Inject
     private WebApplicationContext wac;

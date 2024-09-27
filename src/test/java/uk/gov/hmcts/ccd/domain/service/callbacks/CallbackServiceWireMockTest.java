@@ -37,7 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -48,13 +48,13 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseContractTest;
 
 @TestPropertySource(properties =
     {
     "ccd.callback.timeouts=1,2,3"
     })
-public class CallbackServiceWireMockTest extends WireMockBaseTest {
+public class CallbackServiceWireMockTest extends WireMockBaseContractTest {
     private static final ObjectMapper mapper = new ObjectMapper();
     public static final CallbackType TEST_CALLBACK = CallbackType.ABOUT_TO_START;
 

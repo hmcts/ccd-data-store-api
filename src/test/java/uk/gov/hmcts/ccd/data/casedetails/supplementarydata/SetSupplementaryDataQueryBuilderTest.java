@@ -1,15 +1,15 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import org.junit.Ignore;
-import javax.persistence.Query;
+import jakarta.persistence.Query;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseContractTest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import static org.mockito.Mockito.when;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
+class SetSupplementaryDataQueryBuilderTest extends WireMockBaseContractTest {
 
     private static final String CASE_REFERENCE = "1234569";
 

@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;

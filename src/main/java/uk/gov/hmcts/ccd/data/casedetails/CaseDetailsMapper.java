@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.data.casedetails;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.stream.Collectors;
 

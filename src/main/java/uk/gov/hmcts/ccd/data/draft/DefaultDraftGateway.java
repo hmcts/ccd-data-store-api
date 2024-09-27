@@ -13,7 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.net.URI;

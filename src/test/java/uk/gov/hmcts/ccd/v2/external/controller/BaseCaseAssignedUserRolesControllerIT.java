@@ -33,7 +33,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseContractTest;
 
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-public class SwaggerGeneratorTest extends WireMockBaseTest {
+public class SwaggerGeneratorTest extends WireMockBaseContractTest {
 
     private MockMvc mvc;
 

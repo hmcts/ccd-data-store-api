@@ -30,7 +30,7 @@ import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.SearchLog;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;

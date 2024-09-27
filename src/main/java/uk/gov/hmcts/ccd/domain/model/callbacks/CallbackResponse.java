@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
@@ -18,10 +20,10 @@ import static java.util.Optional.ofNullable;
 public class CallbackResponse {
 
     private static final String CALLBACK_RESPONSE_KEY_STATE = "state";
-    @ApiModelProperty("Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
+    @Schema(description = "Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
     private Map<String, JsonNode> data;
     @JsonProperty("data_classification")
-    @ApiModelProperty("Same structure as `data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
+    @Schema(description = "Same structure as `data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
         + "as field's value.")
     private Map<String, JsonNode> dataClassification;
     @JsonProperty("security_classification")

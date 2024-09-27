@@ -15,8 +15,8 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
-import javax.inject.Inject;
-import javax.transaction.Transactional;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 

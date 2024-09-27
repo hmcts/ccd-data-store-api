@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
-import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
+
 import java.util.Properties;
 import java.util.regex.Pattern;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.hibernate.query.NativeQuery;
 import pl.jalokim.propertiestojson.util.PropertiesToJsonConverter;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -32,7 +32,7 @@ public interface SupplementaryDataQueryBuilder {
         query.setParameter("value", fieldValue);
         query.setParameter("reference", caseReference);
         query.unwrap(NativeQuery.class)
-            .addScalar("supplementary_data", JsonNodeBinaryType.INSTANCE);
+            .addScalar("supplementary_data", new SupplementaryDataUserType().getBasicTypeReference());
     }
 
     default String requestedDataToJson(String fieldPath, Object fieldValue) {

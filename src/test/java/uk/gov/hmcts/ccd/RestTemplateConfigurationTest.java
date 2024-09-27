@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -18,7 +19,6 @@ import java.util.concurrent.Future;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.protocol.HTTP.CONTENT_TYPE;
@@ -29,7 +29,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
-import static wiremock.com.google.common.collect.Lists.newArrayList;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -81,7 +80,7 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
     @Test
     public void shouldBeAbleToUseMultipleTimes() throws Exception {
         stubResponse();
-        final List<Future<Integer>> futures = newArrayList();
+        final List<Future<Integer>> futures = new ArrayList<>();
         final ExecutorService executorService = Executors.newFixedThreadPool(25);
         final int totalNumberOfCalls = 200;
 

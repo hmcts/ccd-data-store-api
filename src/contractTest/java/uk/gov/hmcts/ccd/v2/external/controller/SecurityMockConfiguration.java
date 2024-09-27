@@ -1,14 +1,15 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.SecurityFilterChain;
+
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.ccd.security.filters.SecurityLoggingFilter;
@@ -18,15 +19,14 @@ import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 @Profile("SECURITY_MOCK")
 @Configuration
 @EnableWebSecurity
-@Order(1)
-public class SecurityMockConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityMockConfiguration {
 
 
     private final ServiceAuthFilter serviceAuthFilter;
@@ -49,10 +49,9 @@ public class SecurityMockConfiguration extends WebSecurityConfigurerAdapter {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
     }
 
-
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring().antMatchers(
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers(
             "/case-types/**",
             "/caseworkers/**",
             "/citizens/**",
@@ -61,14 +60,15 @@ public class SecurityMockConfiguration extends WebSecurityConfigurerAdapter {
             "/");
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers(
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests().requestMatchers(
             "/case-types/**",
             "/caseworkers/**",
             "/citizens/**",
             "/searchCases/**",
             "/cases/**"
         ).permitAll();
+        return http.build();
     }
 }

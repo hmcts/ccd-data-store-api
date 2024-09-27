@@ -18,11 +18,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 
 @AutoConfigureWireMock(port = 0)
-public abstract class WireMockBaseTest {
+public abstract class WireMockBaseContractTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
 

@@ -32,7 +32,7 @@ import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

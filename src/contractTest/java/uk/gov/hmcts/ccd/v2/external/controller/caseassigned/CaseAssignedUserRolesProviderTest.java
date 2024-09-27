@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseContractTest;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = {CaseAssignedUserRolesProviderTestContext.class, TestIdamConfiguration.class})
 @IgnoreNoPactsToVerify
 @ActiveProfiles("CASE_ASSIGNED")
-public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
+public class CaseAssignedUserRolesProviderTest extends WireMockBaseContractTest {
 
     @Autowired
     ApplicationParams applicationParams;

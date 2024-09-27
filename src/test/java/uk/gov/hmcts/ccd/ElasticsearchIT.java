@@ -56,7 +56,7 @@ import uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint;
 import uk.gov.hmcts.ccd.test.ElasticsearchTestHelper;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1846,7 +1846,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @ParameterizedTest(name = "Pagination: should apply Pagination: {0}")
-        @MethodSource("uk.gov.hmcts.ccd.ElasticsearchIT#providePaginationTestArguments")
+        @MethodSource("providePaginationTestArguments")
         @SuppressWarnings("unused")
         void shouldApplyPagination(String name,
                                    int startRecordNumber,
@@ -1898,7 +1898,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @ParameterizedTest(name = "Sort: should apply sort: {0}")
-        @MethodSource("uk.gov.hmcts.ccd.ElasticsearchIT#provideSortCriteriaTestArguments")
+        @MethodSource("provideSortCriteriaTestArguments")
         @SuppressWarnings("unused")
         void shouldApplySort(String name,
                              List<SortCriteria> sortCriteria,

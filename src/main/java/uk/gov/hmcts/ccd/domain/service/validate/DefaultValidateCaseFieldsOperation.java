@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.types.ValidationContext;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Map;
 
 @Service

@@ -40,7 +40,7 @@ import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 

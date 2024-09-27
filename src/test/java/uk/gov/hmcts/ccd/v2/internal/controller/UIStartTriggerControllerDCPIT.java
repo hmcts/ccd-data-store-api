@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
