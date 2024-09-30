@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.type.StringType;
@@ -27,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/testing-support")
 @ConditionalOnProperty(value = "testing.support.endpoint.enabled", havingValue = "true")
+@Slf4j
 public class TestingSupportController {
 
     private final CaseLinkService caseLinkService;
@@ -62,6 +64,7 @@ public class TestingSupportController {
     public void dataCaseTypeIdDelete(
         @ApiParam(value = "Change ID", required = true) @PathVariable("changeId") BigInteger changeId,
         @ApiParam(value = "Case Type ID", required = true) @RequestParam("caseTypeIds") String caseTypeIds) {
+        log.info("Invoked for changeId {} and caseTypeIds {} ", changeId, caseTypeIds);
 
         var caseIdList = Arrays.stream(caseTypeIds.split(",")).toList();
         var caseTypesWithChangeIds = caseIdList.stream().map(caseTypeId -> caseTypeId + "-" + changeId).toList();
@@ -82,6 +85,7 @@ public class TestingSupportController {
             caseTypesWithChangeIds);
 
         session.close();
+        log.info("Deleted records for changeId {} and caseTypeIds {} ", changeId, caseTypeIds);
     }
 
     private void executeSql(Session session, String sql, List<String> ids) {
