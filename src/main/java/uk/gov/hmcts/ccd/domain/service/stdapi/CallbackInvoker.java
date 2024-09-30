@@ -99,14 +99,11 @@ public class CallbackInvoker {
                 caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         }
 
-        if (callbackResponse.isPresent()) {
-            return validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
+        return callbackResponse.map(response -> validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
                 caseDetails,
                 ignoreWarning,
-                callbackResponse.get());
-        }
+                response)).orElseGet(AboutToSubmitCallbackResponse::new);
 
-        return new AboutToSubmitCallbackResponse();
     }
 
     public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEventDefinition
@@ -239,16 +236,14 @@ public class CallbackInvoker {
 
     private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
         return (callbackResponse.getSecurityClassification() != null
-            && callbackResponse.getDataClassification() != null) ? true : false;
+            && callbackResponse.getDataClassification() != null);
     }
 
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseTypeDefinition caseTypeDefinition,
                                                                                CaseDetails caseDetails) {
-        Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
-            caseTypeDefinition,
-            caseDetails.getData(),
-            EMPTY_DATA_CLASSIFICATION);
-        return defaultSecurityClassifications;
+        return caseDataService.getDefaultSecurityClassifications(caseTypeDefinition,
+                                                                caseDetails.getData(),
+                                                                EMPTY_DATA_CLASSIFICATION);
     }
 
     private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,
