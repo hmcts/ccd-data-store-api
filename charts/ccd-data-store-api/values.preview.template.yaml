@@ -226,6 +226,11 @@ logstash:
               timeout => 60
           }
       }
+ccd:
+  enabled: ${PREVIEW_CCD_ENABLED:true}
+  ccd:
+    adminWeb:
+      enabled: ${PREVIEW_CCD_ENABLED:true}
 
   ccd-admin-web:
     nodejs:
