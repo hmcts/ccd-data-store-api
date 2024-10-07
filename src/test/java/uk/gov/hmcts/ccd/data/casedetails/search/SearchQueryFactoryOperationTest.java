@@ -62,7 +62,7 @@ class SearchQueryFactoryOperationTest {
 
     @BeforeEach
     public void initMock() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
         when(caseTypeService.getCaseTypeForJurisdiction(anyString(), anyString())).thenReturn(caseTypeDefinition);
         classUnderTest = new SearchQueryFactoryOperation(criterionFactory,

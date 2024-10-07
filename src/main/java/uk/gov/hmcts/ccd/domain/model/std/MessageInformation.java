@@ -30,8 +30,10 @@ public class MessageInformation {
     @JsonProperty("NewStateId")
     private String newStateId;
     @JsonProperty("AdditionalData")
-    @Schema(description = "A JSON object (for future use) that contains additional case fields that have been configured "
-        + "to be included in the event information that is published.")
+    @Schema(
+        description = "A JSON object (for future use) that contains additional case fields that have been configured "
+        + "to be included in the event information that is published."
+    )
     private AdditionalMessageInformation data;
 
     public Long getId() {

@@ -92,7 +92,7 @@ class AuthorisedCreateCaseOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         authorisedCreateCaseOperation = new AuthorisedCreateCaseOperation(
             classifiedCreateCaseOperation, caseDefinitionRepository, accessControlService, caseAccessService);

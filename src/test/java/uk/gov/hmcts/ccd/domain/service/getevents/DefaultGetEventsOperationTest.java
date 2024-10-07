@@ -46,7 +46,7 @@ class DefaultGetEventsOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseDetails = new CaseDetails();
         caseDetails.setId(String.valueOf(CASE_ID));

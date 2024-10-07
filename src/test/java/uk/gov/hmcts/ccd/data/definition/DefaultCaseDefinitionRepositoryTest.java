@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.data.definition;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -51,7 +51,7 @@ public class DefaultCaseDefinitionRepositoryTest {
 
     @Before
     public void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(new HttpHeaders()).when(securityUtils).userAuthorizationHeaders();
 

@@ -53,7 +53,7 @@ class CaseDetailsQueryBuilderFactoryTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         factory = new CaseDetailsQueryBuilderFactory(asList(caseStateAuthorisationSecurity, userAuthorisationSecurity));
 
         when(em.getCriteriaBuilder()).thenReturn(criteriaBuilder);

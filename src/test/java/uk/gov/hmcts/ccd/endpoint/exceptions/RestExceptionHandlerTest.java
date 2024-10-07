@@ -90,7 +90,7 @@ public class RestExceptionHandlerTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         logger = (Logger) LoggerFactory.getLogger(RestExceptionHandler.class);
 

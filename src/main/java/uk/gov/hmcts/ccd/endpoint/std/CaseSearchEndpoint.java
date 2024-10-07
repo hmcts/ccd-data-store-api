@@ -63,9 +63,9 @@ public class CaseSearchEndpoint {
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, caseTypeIds = "#caseTypeIds",
         caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseSearchEndpoint).buildCaseIds(#result)")
     public CaseSearchResult searchCases(
-        @Parameter(description = "Comma separated list of case type ID(s) or '*' if the search should be applied on any "
-            + "existing case type. Note that using '*' is an expensive operation and might have low response times so "
-            + "always prefer explicitly listing the case types when known in advance", required = true)
+        @Parameter(description = "Comma separated list of case type ID(s) or '*' if the search should be applied on "
+            + "any existing case type. Note that using '*' is an expensive operation and might have low response times"
+            + " so always prefer explicitly listing the case types when known in advance", required = true)
         @RequestParam("ctid") List<String> caseTypeIds,
         @Parameter(description = "Native ElasticSearch Search API request. Please refer to the ElasticSearch official "
             + "documentation. For cross case type search, "

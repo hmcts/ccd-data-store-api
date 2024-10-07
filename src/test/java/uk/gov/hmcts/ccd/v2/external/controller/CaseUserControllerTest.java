@@ -58,7 +58,7 @@ class CaseUserControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(true);
         when(caseReferenceService.validateUID(NOT_CASE_REFERENCE)).thenReturn(false);

@@ -17,9 +17,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -1846,8 +1848,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @ParameterizedTest(name = "Pagination: should apply Pagination: {0}")
-        @MethodSource("providePaginationTestArguments")
-        @SuppressWarnings("unused")
+        @ArgumentsSource(value = PaginationTestProvider.class)
         void shouldApplyPagination(String name,
                                    int startRecordNumber,
                                    int maxReturnRecordCount,
@@ -1898,8 +1899,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @ParameterizedTest(name = "Sort: should apply sort: {0}")
-        @MethodSource("provideSortCriteriaTestArguments")
-        @SuppressWarnings("unused")
+        @ArgumentsSource(SortCriteriaTestProvider.class)
         void shouldApplySort(String name,
                              List<SortCriteria> sortCriteria,
                              List<String> expectedCaseReferenceOrder) throws Exception {
@@ -1966,7 +1966,14 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    public static class PaginationTestProvider implements ArgumentsProvider  {
+
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+            return providePaginationTestArguments();
+        }
+    }
+
     private static Stream<Arguments> providePaginationTestArguments() {
         // NB: sort order for test data same as sort test: "caseName.ASCENDING and createdDate.DESCENDING"
         List<String> defaultSortOrder = List.of(
@@ -2039,8 +2046,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         );
     }
 
-    @SuppressWarnings("unused")
-    private static Stream<Arguments> provideSortCriteriaTestArguments() {
+    public static class SortCriteriaTestProvider implements ArgumentsProvider  {
+
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+            return provideSortCriteriaTestArguments();
+        }
+
+    }
+
+    public static Stream<Arguments> provideSortCriteriaTestArguments() {
         return Stream.of(
             Arguments.of(
                 "DEFAULT",
@@ -2150,6 +2165,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         return sortCriteria;
     }
+    
 
     private void stubCaseTypeRoleAssignments(String... caseTypes) {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {

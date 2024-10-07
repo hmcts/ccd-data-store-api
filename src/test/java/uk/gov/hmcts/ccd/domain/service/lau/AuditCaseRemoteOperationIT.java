@@ -118,7 +118,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
 
     @Before
     public void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         IdamUser user = new IdamUser();
         user.setId(IDAM_ID);

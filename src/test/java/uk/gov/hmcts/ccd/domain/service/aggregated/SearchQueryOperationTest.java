@@ -33,11 +33,10 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -111,7 +110,7 @@ public class SearchQueryOperationTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         testCaseTypeDefinition = newCaseType()
             .withId(CASE_TYPE_ID)
@@ -174,7 +173,7 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+            () -> verify(mergeDataToSearchResultOperation).execute(any(), any(), argument.capture(),
                 eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(2)),
             () -> assertThat(argument.getValue(), hasDraftItemInResults())
@@ -194,7 +193,7 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verifyNoMoreInteractions(getDraftsOperation),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+            () -> verify(mergeDataToSearchResultOperation).execute(any(), any(), argument.capture(),
                 eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(1)),
             () -> assertThat(argument.getValue(), not(hasDraftItemInResults()))
@@ -213,7 +212,7 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verifyNoMoreInteractions(getDraftsOperation),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+            () -> verify(mergeDataToSearchResultOperation).execute(any(), any(), argument.capture(),
                 eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(1)),
             () -> assertThat(argument.getValue(), not(hasDraftItemInResults()))
@@ -232,7 +231,7 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), eq(cases),
+            () -> verify(mergeDataToSearchResultOperation).execute(any(), any(), eq(cases),
                 eq(DRAFT_STORE_DOWN_ERR_MESSAGE))
         );
     }
@@ -247,7 +246,7 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation, never()).execute(metadata, criteria),
             () -> verify(getDraftsOperation, never()).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation, never()).execute(anyObject(), any(), anyList(), anyString())
+            () -> verify(mergeDataToSearchResultOperation, never()).execute(any(), any(), anyList(), anyString())
         );
     }
 

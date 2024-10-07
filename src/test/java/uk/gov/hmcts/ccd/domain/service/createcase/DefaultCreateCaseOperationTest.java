@@ -10,6 +10,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
@@ -49,10 +50,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -65,7 +65,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -141,7 +141,7 @@ class DefaultCreateCaseOperationTest {
 
     @BeforeEach
     void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         defaultCreateCaseOperation = new DefaultCreateCaseOperation(userRepository,
                                                                     caseDefinitionRepository,
                                                                     eventTriggerService,
@@ -167,7 +167,7 @@ class DefaultCreateCaseOperationTest {
         CASE_TYPE = buildCaseType();
 
         SupplementaryData supplementaryData = new SupplementaryData();
-        when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+        when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any()))
             .thenReturn(supplementaryData);
     }
 
@@ -428,7 +428,7 @@ class DefaultCreateCaseOperationTest {
                 same(IGNORE_WARNING),
                 any()),
             () -> order.verify(draftGateway).delete(DRAFT_ID),
-            () -> verifyZeroInteractions(callbackInvoker),
+            () -> verifyNoInteractions(callbackInvoker),
             () -> assertCaseDetails(caseDetailsArgumentCaptor.getValue()),
             () -> assertThat(caseDetails, is(savedCaseType))
         );
@@ -487,7 +487,7 @@ class DefaultCreateCaseOperationTest {
                 any(CaseDetails.class),
                 same(IGNORE_WARNING),
                 any()),
-            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
+            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setIncompleteCallbackResponse(),
             () -> order.verify(draftGateway).delete(DRAFT_ID)
@@ -511,7 +511,7 @@ class DefaultCreateCaseOperationTest {
                                                       savedCaseType)).willReturn(response);
         given(response.hasBody()).willReturn(true);
         given(response.getBody()).willReturn(responseBody);
-        given(response.getStatusCodeValue()).willReturn(200);
+        given(response.getStatusCode()).willReturn(HttpStatusCode.valueOf(200));
         given(savedCaseType.getCaseTypeId()).willReturn(mockCaseTypeId);
         given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
             .willReturn(data);
@@ -551,7 +551,7 @@ class DefaultCreateCaseOperationTest {
                 any(CaseDetails.class),
                 same(IGNORE_WARNING),
                 any()),
-            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
+            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
             () -> order.verify(draftGateway).delete(DRAFT_ID)
@@ -577,7 +577,7 @@ class DefaultCreateCaseOperationTest {
             savedCaseType)).willReturn(response);
         given(response.hasBody()).willReturn(true);
         given(response.getBody()).willReturn(responseBody);
-        given(response.getStatusCodeValue()).willReturn(200);
+        given(response.getStatusCode()).willReturn(HttpStatusCode.valueOf(200));
         given(savedCaseType.getCaseTypeId()).willReturn(CASE_TYPE_ID);
         given(savedCaseType.getId()).willReturn(CASE_ID);
         given(savedCaseType.getData()).willReturn(data);
@@ -618,7 +618,7 @@ class DefaultCreateCaseOperationTest {
                 any(CaseDetails.class),
                 same(IGNORE_WARNING),
                 any()),
-            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
+            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
             () -> order.verify(caseLinkService).updateCaseLinks(caseDetails, CASE_TYPE.getCaseFieldDefinitions()),

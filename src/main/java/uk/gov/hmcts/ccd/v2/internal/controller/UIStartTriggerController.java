@@ -20,7 +20,6 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
 
 import static uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.forCase;
@@ -153,8 +152,8 @@ public class UIStartTriggerController {
             ),
         @ApiResponse(
             responseCode = "422",
-            description = "One of: Case event has no pre states, callback validation errors, unable to sanitize document "
-                + "for case field or missing user roles"
+            description = "One of: Case event has no pre states, callback validation errors, unable to"
+                + " sanitize document for case field or missing user roles"
             ),
         @ApiResponse(
             responseCode = "404",

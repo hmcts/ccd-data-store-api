@@ -141,7 +141,7 @@ public abstract class AbstractBaseIntegrationTest {
     @Before
     @BeforeEach
     public void initMock() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(roleAssignmentRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);

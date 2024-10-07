@@ -52,7 +52,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         when(caseTypeDefinition.getJurisdictionDefinition()).thenReturn(newJurisdiction().withJurisdictionId("jid")
             .build());
     }

@@ -47,7 +47,7 @@ class UserProfileViewResourceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         channels = new String[]{channel1, channel2};
         jurisdictionDisplayProperties =

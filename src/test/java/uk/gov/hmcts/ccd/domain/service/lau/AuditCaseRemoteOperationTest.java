@@ -87,7 +87,7 @@ class AuditCaseRemoteOperationTest {
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         doReturn("Bearer 1234").when(securityUtils).getServiceAuthorization();
         doReturn("http://localhost/caseAction").when(auditCaseRemoteConfiguration).getCaseActionAuditUrl();
         doReturn("http://localhost/caseSearch").when(auditCaseRemoteConfiguration).getCaseSearchAuditUrl();

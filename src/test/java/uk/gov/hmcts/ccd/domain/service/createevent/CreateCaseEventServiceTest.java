@@ -184,7 +184,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     @BeforeEach
     void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         data = buildJsonNodeData();
@@ -603,7 +603,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         Map<String, JsonNode> data = Maps.newHashMap();
         ObjectNode objectNode = createBasicDoc();
         final String uploadTimestamp = "2001-01-01T01:02:03.00Z";
-        objectNode.put(UPLOAD_TIMESTAMP, new TextNode(uploadTimestamp));
+        objectNode.set(UPLOAD_TIMESTAMP, new TextNode(uploadTimestamp));
         data.put("dataKey1", objectNode);
         caseDetails.setData(data);
         caseDetailsFromDB = caseDetails.shallowClone();
@@ -645,9 +645,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     private ObjectNode createBasicDoc() {
         ObjectNode node = MAPPER.createObjectNode();
-        node.put(DOCUMENT_URL, new TextNode(VALID_DOCUMENT_URL));
-        node.put(DOCUMENT_BINARY_URL, new TextNode(VALID_DOCUMENT_URL + "/binary"));
-        node.put("document_filename", new TextNode("test-a5.pdf"));
+        node.set(DOCUMENT_URL, new TextNode(VALID_DOCUMENT_URL));
+        node.set(DOCUMENT_BINARY_URL, new TextNode(VALID_DOCUMENT_URL + "/binary"));
+        node.set("document_filename", new TextNode("test-a5.pdf"));
 
         return node;
     }

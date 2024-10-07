@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.data.definition;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.collection.IsCollectionWithSize;
-import org.junit.Assert;
 import org.junit.Test;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -158,7 +157,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
             .willReturn(serverError()));
         final ServiceException exception = assertThrows(ServiceException.class,
             () -> caseDefinitionRepository.getClassificationsForUserRoleList(userRoles));
-        Assert.assertThat(exception.getMessage(),
+        assertThat(exception.getMessage(),
             startsWith("Error while retrieving classification for user roles " + userRoles + " because of "));
     }
 }

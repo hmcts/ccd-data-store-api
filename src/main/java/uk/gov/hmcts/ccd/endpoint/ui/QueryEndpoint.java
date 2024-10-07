@@ -206,8 +206,14 @@ public class QueryEndpoint {
         + "work-basket-inputs",
         method = RequestMethod.GET)
     @Operation(summary = "Get Workbasket Input details")
-    @ApiResponse(responseCode = "200", description = "Workbasket Input data found for the given case type and jurisdiction")
-    @ApiResponse(responseCode = "404", description = "No Workbasket Input found for the given case type and jurisdiction")
+    @ApiResponse(
+        responseCode = "200", 
+        description = "Workbasket Input data found for the given case type and jurisdiction"
+    )
+    @ApiResponse(
+        responseCode = "404", 
+        description = "No Workbasket Input found for the given case type and jurisdiction"
+    )
     public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final String uid,
                                                         @PathVariable("jid") final String jurisdictionId,
                                                         @PathVariable("ctid") final String caseTypeId) {

@@ -30,7 +30,7 @@ class AuthCheckingConfigurationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         authCheckerConfiguration = new AuthCheckerConfiguration(applicationParams);
     }

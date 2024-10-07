@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.WireMockBaseContractTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-public class SwaggerGeneratorTest extends WireMockBaseContractTest {
+public class SwaggerGeneratorTest extends WireMockBaseTest {
 
     private MockMvc mvc;
 
@@ -54,7 +54,7 @@ public class SwaggerGeneratorTest extends WireMockBaseContractTest {
     }
 
     private void generateSpecsFor(String groupName) throws Exception {
-        ResultActions perform = mvc.perform(get("/v2/api-docs?group=" + groupName));
+        ResultActions perform = mvc.perform(get("/v3/api-docs?group=" + groupName));
         byte[] specs = perform
             .andExpect(status().isOk())
             .andReturn()

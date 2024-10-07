@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.config;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
@@ -16,7 +17,6 @@ import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandl
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.util.StringUtils;
 
 import uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint;
 import uk.gov.hmcts.ccd.endpoint.ui.QueryEndpoint;
@@ -84,7 +84,7 @@ public class SwaggerConfiguration {
 
     private boolean shouldRegisterLinksMapping(WebEndpointProperties webEndpointProperties, Environment environment,
                                                String basePath) {
-        return webEndpointProperties.getDiscovery().isEnabled() && (StringUtils.hasText(basePath)
+        return webEndpointProperties.getDiscovery().isEnabled() && (StringUtils.isNotBlank(basePath)
             || ManagementPortType.get(environment).equals(ManagementPortType.DIFFERENT));
     }
 }

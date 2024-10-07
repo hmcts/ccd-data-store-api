@@ -151,7 +151,7 @@ class CaseSearchResultViewGeneratorTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         caseSearchesViewAccessControl = new CaseSearchesViewAccessControl(caseTypeService,
             searchResultDefinitionService, securityClassificationService, caseDataAccessControl);
 

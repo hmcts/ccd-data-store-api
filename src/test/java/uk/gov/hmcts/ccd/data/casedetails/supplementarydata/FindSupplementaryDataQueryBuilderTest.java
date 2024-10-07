@@ -5,12 +5,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.WireMockBaseContractTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class FindSupplementaryDataQueryBuilderTest  extends WireMockBaseContractTest {
+class FindSupplementaryDataQueryBuilderTest  extends WireMockBaseTest {
 
     private static final String CASE_REFERENCE = "1234567";
 

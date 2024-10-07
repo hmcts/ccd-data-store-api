@@ -17,12 +17,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseRoleDefinition;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
 import jakarta.inject.Inject;
-
-import static org.springframework.http.HttpMethod.GET;
 
 @Service
 @Qualifier(DefaultCaseRoleRepository.QUALIFIER)

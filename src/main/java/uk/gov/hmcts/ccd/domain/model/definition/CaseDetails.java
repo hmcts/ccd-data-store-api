@@ -72,7 +72,9 @@ public class CaseDetails implements Cloneable {
     private SecurityClassification securityClassification;
 
     @JsonProperty("case_data")
-    @Schema(description = "Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
+    @Schema(
+        description = "Case data as defined in case type definition. See `docs/api/case-data.md` for data structure."
+    )
     private Map<String, JsonNode> data;
 
     @JsonProperty("data_classification")
@@ -283,12 +285,12 @@ public class CaseDetails implements Cloneable {
     @JsonIgnore
     public void setDeleteDraftResponseEntity(final String draftId, final ResponseEntity<Void>
                                                          draftResponse) {
-        if (SC_OK == draftResponse.getStatusCodeValue()) {
+        if (SC_OK == draftResponse.getStatusCode().value()) {
             setDeleteDraftResponseEntity();
         } else {
             LOG.warn("Incomplete delete draft response for draft={}, statusCode={}",
                      draftId,
-                     draftResponse.getStatusCodeValue());
+                     draftResponse.getStatusCode().value());
             setIncompleteDeleteDraftResponse();
         }
     }
@@ -302,13 +304,13 @@ public class CaseDetails implements Cloneable {
     @SuppressWarnings("java:S2259")
     public void setAfterSubmitCallbackResponseEntity(final ResponseEntity<AfterSubmitCallbackResponse>
                                                          callBackResponse) {
-        if (SC_OK == callBackResponse.getStatusCodeValue()) {
+        if (SC_OK == callBackResponse.getStatusCode().value()) {
             setAfterSubmitCallbackResponseEntity(callBackResponse.getBody());
         } else {
             LOG.warn("Incomplete call back response for case {} (db id={}); status code {}, body {}",
                      reference,
                      id,
-                     callBackResponse.getStatusCodeValue(),
+                     callBackResponse.getStatusCode().value(),
                      callBackResponse.getBody().toJson());
             setIncompleteCallbackResponse();
         }

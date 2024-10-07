@@ -20,7 +20,9 @@ import static java.util.Optional.ofNullable;
 public class CallbackResponse {
 
     private static final String CALLBACK_RESPONSE_KEY_STATE = "state";
-    @Schema(description = "Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
+    @Schema(
+        description = "Case data as defined in case type definition. See `docs/api/case-data.md` for data structure."
+    )
     private Map<String, JsonNode> data;
     @JsonProperty("data_classification")
     @Schema(description = "Same structure as `data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "

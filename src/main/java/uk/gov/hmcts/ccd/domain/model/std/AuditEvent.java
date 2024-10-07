@@ -42,7 +42,10 @@ public class AuditEvent extends Event {
     @JsonProperty("state_name")
     private String stateName;
     @JsonProperty("data")
-    @Schema(description = "Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
+    @Schema(
+        description = "Case data as defined in case type definition. "
+        + "See `docs/api/case-data.md` for data structure."
+    )
     private Map<String, JsonNode> data;
     @JsonProperty("data_classification")
     @Schema(description = "Same structure as `data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "

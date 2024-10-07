@@ -32,7 +32,7 @@ public interface SupplementaryDataQueryBuilder {
         query.setParameter("value", fieldValue);
         query.setParameter("reference", caseReference);
         query.unwrap(NativeQuery.class)
-            .addScalar("supplementary_data", new SupplementaryDataUserType().getBasicTypeReference());
+            .addScalar("supplementary_data", SupplementaryDataUserType.CUSTOM_TYPE);
     }
 
     default String requestedDataToJson(String fieldPath, Object fieldValue) {

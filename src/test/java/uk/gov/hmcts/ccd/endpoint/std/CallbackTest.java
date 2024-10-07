@@ -48,7 +48,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
@@ -261,7 +261,7 @@ public class CallbackTest extends WireMockBaseTest {
             + "  }\n"
             + "}\n";
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_TEST_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();

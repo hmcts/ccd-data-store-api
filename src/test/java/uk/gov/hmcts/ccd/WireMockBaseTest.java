@@ -42,7 +42,7 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 @AutoConfigureWireMock(port = 0)
 public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseContractTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
 
     // data values as per: classpath:sql/insert_cases.sql
     public static final String CASE_01_REFERENCE = "1504259907353529";

@@ -145,14 +145,14 @@ public class CallbackService {
             if (logCallbackDetails(url)) {
                 LOG.info("Callback {} response received: {}", url, responseEntity);
             }
-            httpStatus = responseEntity.getStatusCodeValue();
+            httpStatus = responseEntity.getStatusCode().value();
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
             LOG.warn("Unable to connect to callback service {} because of {} {}",
                 url, e.getClass().getSimpleName(), e.getMessage());
             LOG.debug("", e);  // debug stack trace
             if (e instanceof HttpStatusCodeException) {
-                httpStatus = ((HttpStatusCodeException) e).getRawStatusCode();
+                httpStatus = ((HttpStatusCodeException) e).getStatusCode().value();
             }
             return Optional.empty();
         } finally {

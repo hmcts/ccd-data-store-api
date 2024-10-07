@@ -122,7 +122,7 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     @BeforeEach
     void setUp() throws IOException {
         super.initMock();
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);

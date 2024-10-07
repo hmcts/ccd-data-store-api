@@ -42,7 +42,7 @@ class CaseDetailsQueryBuilderTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
         when(criteriaBuilder.createQuery(CaseDetailsEntity.class)).thenReturn(criteriaQuery);
         when(criteriaQuery.from(CaseDetailsEntity.class)).thenReturn(root);

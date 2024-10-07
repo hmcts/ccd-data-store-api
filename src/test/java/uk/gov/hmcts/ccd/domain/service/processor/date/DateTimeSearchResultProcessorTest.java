@@ -23,8 +23,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser;
-import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 
@@ -63,9 +61,9 @@ class DateTimeSearchResultProcessorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
-        when(definitionRepository.getBaseTypes()).thenReturn(Collections.EMPTY_LIST);
+        when(definitionRepository.getBaseTypes()).thenReturn(Collections.emptyList());
         BaseType.setCaseDefinitionRepository(definitionRepository);
         BaseType.initialise();
         setUpBaseTypes();

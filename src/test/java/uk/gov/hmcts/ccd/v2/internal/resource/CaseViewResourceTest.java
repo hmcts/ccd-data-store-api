@@ -44,7 +44,7 @@ class CaseViewResourceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         mockArrays();
 

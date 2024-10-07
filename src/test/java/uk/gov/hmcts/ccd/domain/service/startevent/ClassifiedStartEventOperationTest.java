@@ -62,7 +62,7 @@ class ClassifiedStartEventOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
         startEvent = new StartEventResult();

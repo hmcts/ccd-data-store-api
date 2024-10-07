@@ -21,7 +21,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIELD_COL;
 
@@ -44,7 +44,7 @@ class ElasticsearchUserCaseAccessFilterTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
     }
 
@@ -79,7 +79,7 @@ class ElasticsearchUserCaseAccessFilterTest {
 
         assertTrue(optQueryBuilder.isEmpty());
 
-        verifyZeroInteractions(caseAccessService);
+        verifyNoInteractions(caseAccessService);
     }
 
 }

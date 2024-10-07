@@ -9,7 +9,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,13 +48,13 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.WireMockBaseContractTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 @TestPropertySource(properties =
     {
     "ccd.callback.timeouts=1,2,3"
     })
-public class CallbackServiceWireMockTest extends WireMockBaseContractTest {
+public class CallbackServiceWireMockTest extends WireMockBaseTest {
     private static final ObjectMapper mapper = new ObjectMapper();
     public static final CallbackType TEST_CALLBACK = CallbackType.ABOUT_TO_START;
 
@@ -248,7 +248,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseContractTest {
             null, caseDetails, String.class);
 
         assertAll(
-            () -> assertThat(result.getStatusCodeValue(), is(201)),
+            () -> assertThat(result.getStatusCode().value(), is(201)),
             () -> JSONAssert.assertEquals(
                 "{\"data\":null,\"errors\":[],\"warnings\":[],\"data_classification\":null,\"security_classification\""
                     + ":null}",

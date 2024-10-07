@@ -44,7 +44,7 @@ class UserAuthorisationSecurityTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         when(userAuthorisation.getUserId()).thenReturn(USER_ID);
     }
 

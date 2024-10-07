@@ -109,7 +109,7 @@ class DefaultDraftGatewayTest {
 
     @BeforeEach
     public void setUp() throws JsonProcessingException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(new HttpHeaders()).when(securityUtils).userAuthorizationHeaders();
         when(applicationParams.draftBaseURL()).thenReturn(draftBaseURL);

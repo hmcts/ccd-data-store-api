@@ -59,7 +59,7 @@ class CaseDataValidatorControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         when(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, EVENT_DATA)).thenReturn(DATA);
         when(midEventCallback.invoke(CASE_TYPE_ID, EVENT_DATA, PAGE_ID)).thenReturn(DATA_NODE);
     }

@@ -40,7 +40,7 @@ class CreatorGetCaseOperationTest {
 
     @BeforeEach
     public void setupMocks() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         classUnderTest = new CreatorGetCaseOperation(getCaseOperation, caseAccessService, applicationParams);
 

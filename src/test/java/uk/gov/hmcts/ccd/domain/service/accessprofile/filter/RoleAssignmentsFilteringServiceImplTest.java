@@ -60,7 +60,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         List<RoleAttributeMatcher> roleAttributeMatchers = Lists.newArrayList(new BeginDateEndDateMatcher(),
             new CaseIdMatcher(),
             new CaseTypeMatcher(),

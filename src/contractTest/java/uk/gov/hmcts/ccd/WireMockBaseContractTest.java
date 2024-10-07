@@ -24,7 +24,7 @@ import java.io.IOException;
 @AutoConfigureWireMock(port = 0)
 public abstract class WireMockBaseContractTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseContractTest.class);
 
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;

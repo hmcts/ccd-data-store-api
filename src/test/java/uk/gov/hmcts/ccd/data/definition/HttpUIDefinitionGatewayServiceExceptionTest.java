@@ -4,13 +4,13 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.ccd.WireMockBaseContractTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import jakarta.inject.Inject;
 import java.util.List;
 
-public class HttpUIDefinitionGatewayServiceExceptionTest extends WireMockBaseContractTest {
+public class HttpUIDefinitionGatewayServiceExceptionTest extends WireMockBaseTest {
 
     private static final int VERSION = 33;
 

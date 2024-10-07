@@ -82,7 +82,7 @@ class CallbackServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseEventDefinition.setId("TEST-EVENT");
 

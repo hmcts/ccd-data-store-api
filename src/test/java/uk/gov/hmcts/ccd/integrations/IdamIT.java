@@ -51,8 +51,8 @@ public class IdamIT {
             String.class
         );
 
-        assertThat(response.getStatusCodeValue(), not(401));
-        assertThat(response.getStatusCodeValue(), not(403));
+        assertThat(response.getStatusCode().value(), not(401));
+        assertThat(response.getStatusCode().value(), not(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
                    .withHeader("Authorization", equalTo(VALID_IDAM_TOKEN)));
     }
@@ -67,8 +67,8 @@ public class IdamIT {
             String.class
         );
 
-        assertThat(response.getStatusCodeValue(), not(401));
-        assertThat(response.getStatusCodeValue(), not(403));
+        assertThat(response.getStatusCode().value(), not(401));
+        assertThat(response.getStatusCode().value(), not(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
                    .withHeader("Authorization", equalTo(VALID_CITIZEN_TOKEN)));
     }
@@ -83,8 +83,8 @@ public class IdamIT {
             String.class
         );
 
-        assertThat(response.getStatusCodeValue(), not(401));
-        assertThat(response.getStatusCodeValue(), not(403));
+        assertThat(response.getStatusCode().value(), not(401));
+        assertThat(response.getStatusCode().value(), not(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
                    .withHeader("Authorization", equalTo(VALID_LETTERHOLDER_TOKEN)));
     }
@@ -108,7 +108,7 @@ public class IdamIT {
             String.class
         );
 
-        assertThat(response.getStatusCodeValue(), is(403));
+        assertThat(response.getStatusCode().value(), is(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
                    .withHeader("Authorization", equalTo(INVALID_IDAM_TOKEN)));
     }
@@ -123,7 +123,7 @@ public class IdamIT {
             String.class
         );
 
-        assertThat(response.getStatusCodeValue(), is(403));
+        assertThat(response.getStatusCode().value(), is(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
                    .withHeader("Authorization", equalTo(VALID_IDAM_TOKEN)));
     }
@@ -138,7 +138,7 @@ public class IdamIT {
             String.class
         );
 
-        assertThat(response.getStatusCodeValue(), is(403));
+        assertThat(response.getStatusCode().value(), is(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
                    .withHeader("Authorization", equalTo(VALID_IDAM_TOKEN)));
     }

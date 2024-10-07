@@ -9,7 +9,7 @@ import jakarta.persistence.Query;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import uk.gov.hmcts.ccd.WireMockBaseContractTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import static org.mockito.Mockito.when;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SetSupplementaryDataQueryBuilderTest extends WireMockBaseContractTest {
+class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
 
     private static final String CASE_REFERENCE = "1234569";
 

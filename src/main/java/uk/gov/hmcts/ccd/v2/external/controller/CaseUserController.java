@@ -49,8 +49,8 @@ public class CaseUserController {
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @Operation(
-        description = "Update a user's roles for a specific case. Grant access for added case roles and revoke access for "
-            + "removed case roles."
+        description = "Update a user's roles for a specific case. Grant access for added case roles and"
+            + " revoke access for removed case roles."
     )
     @ApiResponse(
         responseCode = "204",

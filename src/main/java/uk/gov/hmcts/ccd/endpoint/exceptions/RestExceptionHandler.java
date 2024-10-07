@@ -172,7 +172,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private HttpStatus checkAndRetrieveExceptionStatusCode(final Throwable causeOfException) {
         HttpStatus httpStatus = null;
         if (causeOfException instanceof HttpStatusCodeException) {
-            httpStatus = HttpStatus.valueOf(((HttpStatusCodeException) causeOfException).getRawStatusCode());
+            httpStatus = HttpStatus.valueOf(((HttpStatusCodeException) causeOfException).getStatusCode().value());
         } else if (causeOfException instanceof FeignException.FeignClientException
             || causeOfException instanceof FeignException.FeignServerException) {
             httpStatus = HttpStatus.valueOf(((FeignException) causeOfException).status());

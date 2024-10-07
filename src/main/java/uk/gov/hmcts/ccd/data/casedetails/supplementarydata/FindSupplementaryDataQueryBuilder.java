@@ -21,7 +21,7 @@ public class FindSupplementaryDataQueryBuilder implements SupplementaryDataQuery
         Query selectQuery = entityManager.createNativeQuery(SUPPLEMENTARY_DATA_QUERY);
         selectQuery.setParameter("reference", caseReference);
         selectQuery.unwrap(org.hibernate.query.NativeQuery.class)
-            .addScalar("supplementary_data", new SupplementaryDataUserType().getBasicTypeReference());
+            .addScalar("supplementary_data", SupplementaryDataUserType.CUSTOM_TYPE);
         return selectQuery;
     }
 

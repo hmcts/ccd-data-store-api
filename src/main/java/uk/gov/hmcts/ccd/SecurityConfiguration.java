@@ -50,6 +50,7 @@ public class SecurityConfiguration {
     private JwtAuthenticationConverter jwtAuthenticationConverter;
 
     private static final String[] AUTH_WHITELIST = {
+        "/v3/api-docs",
         "/v2/**",
         "/health/liveness",
         "/health/readiness",

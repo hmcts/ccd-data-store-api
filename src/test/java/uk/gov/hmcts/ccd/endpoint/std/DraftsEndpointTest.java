@@ -41,7 +41,7 @@ class DraftsEndpointTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         endpoint = new DraftsEndpoint(upsertDraftOperation, getDraftViewOperation, draftGateway);
     }
 

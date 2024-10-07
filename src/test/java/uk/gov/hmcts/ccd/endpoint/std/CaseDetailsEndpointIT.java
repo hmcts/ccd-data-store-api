@@ -65,16 +65,16 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.collection.IsIn.isIn;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.core.Every.everyItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
@@ -166,7 +166,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
@@ -447,8 +447,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
-        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(
-            sanitizedDataMap.entrySet())));
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(is(in(
+            sanitizedDataMap.entrySet()))));
         assertEquals("Incorrect security classification size", 5, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree(
             "{" +
@@ -949,8 +949,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
-        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(
-            sanitizedDataMap.entrySet())));
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(is(in(
+            sanitizedDataMap.entrySet()))));
         assertEquals("Incorrect security classification size", 4, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
             "  \"PersonAddress\":{" +
@@ -3672,7 +3672,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertThat(mvcResult.getResponse().getContentAsString(), CoreMatchers.is(isEmptyString()));
+        assertThat(mvcResult.getResponse().getContentAsString(), CoreMatchers.is(emptyString()));
     }
 
     private void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess(String userRole)
@@ -3704,7 +3704,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        assertThat(response, CoreMatchers.is(isEmptyString()));
+        assertThat(response, CoreMatchers.is(emptyString()));
     }
 
 
@@ -4284,7 +4284,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
         assertThat(
             "Incorrect Data content: Data should have changed",
-            savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedDataMap.entrySet())));
+            savedCaseDetails.getData().entrySet(), everyItem(is(in(sanitizedDataMap.entrySet()))));
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
         JSONAssert.assertEquals(expectedClassificationString,
             mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode
@@ -4370,7 +4370,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
         assertThat(
             "Incorrect Data content: Data should have changed",
-            savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedDataMap.entrySet())));
+            savedCaseDetails.getData().entrySet(), everyItem(is(in(sanitizedDataMap.entrySet()))));
     }
 
     @Test

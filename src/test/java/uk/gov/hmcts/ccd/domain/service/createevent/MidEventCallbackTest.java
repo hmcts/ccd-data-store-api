@@ -32,7 +32,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
@@ -74,7 +74,7 @@ class MidEventCallbackTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = new Event();
         event.setEventId("createCase");

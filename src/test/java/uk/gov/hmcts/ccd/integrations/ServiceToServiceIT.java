@@ -48,8 +48,8 @@ public class ServiceToServiceIT {
             String.class
         );
 
-        assertThat(response.getStatusCodeValue(), not(401));
-        assertThat(response.getStatusCodeValue(), not(403));
+        assertThat(response.getStatusCode().value(), not(401));
+        assertThat(response.getStatusCode().value(), not(403));
         verify(getRequestedFor(urlEqualTo("/s2s/details"))
                    .withHeader("Authorization", equalTo("Bearer " + SERVICE_TOKEN)));
 
@@ -74,7 +74,7 @@ public class ServiceToServiceIT {
             String.class
         );
 
-        assertThat(response.getStatusCodeValue(), is(403));
+        assertThat(response.getStatusCode().value(), is(403));
         verify(getRequestedFor(urlEqualTo("/s2s/details"))
                    .withHeader("Authorization", equalTo("Bearer " + INVALID_SERVICE_TOKEN)));
 

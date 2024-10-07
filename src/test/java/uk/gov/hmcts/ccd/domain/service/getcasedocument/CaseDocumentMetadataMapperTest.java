@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import uk.gov.hmcts.ccd.WireMockBaseContractTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class CaseDocumentMetadataMapperTest extends WireMockBaseContractTest {
+class CaseDocumentMetadataMapperTest extends WireMockBaseTest {
 
     @Autowired
     private CaseDocumentMetadataMapper mapper;
