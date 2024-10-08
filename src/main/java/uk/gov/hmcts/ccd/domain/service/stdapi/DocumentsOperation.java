@@ -80,6 +80,7 @@ public class DocumentsOperation {
     private CaseDetails getCaseDetails(String caseReference) {
         CaseDetails caseDetails = null;
         try {
+            Long.parseLong(caseReference); // Check if case reference is a number
             caseDetails = caseDetailsRepository.findByReference(caseReference)
                 .orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
         } catch (NumberFormatException nfe) {

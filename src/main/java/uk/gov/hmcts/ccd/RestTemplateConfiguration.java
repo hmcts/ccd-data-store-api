@@ -146,9 +146,9 @@ class RestTemplateConfiguration {
             @Override
             public ConnectionConfig resolve(HttpRoute route) {
                 return ConnectionConfig.custom()
-                        .setConnectTimeout(Timeout.ofSeconds(timeout))
-                        .setSocketTimeout(Timeout.ofSeconds(timeout))
-                        .setValidateAfterInactivity(TimeValue.ofSeconds(validateAfterInactivity))
+                        .setConnectTimeout(Timeout.ofMilliseconds(timeout))
+                        .setSocketTimeout(Timeout.ofMilliseconds(timeout))
+                        .setValidateAfterInactivity(TimeValue.ofMilliseconds(validateAfterInactivity))
                         .build();
             }
         };
@@ -157,14 +157,14 @@ class RestTemplateConfiguration {
             @Override
             public SocketConfig resolve(HttpRoute route) {
                 return SocketConfig.custom()
-                        .setSoTimeout(Timeout.ofSeconds(readTimeout))
+                        .setSoTimeout(Timeout.ofMilliseconds(timeout))
                         .build();
             }
         };
         cm.setSocketConfigResolver(socketConfigResolver);
         final RequestConfig config =
             RequestConfig.custom()
-                         .setConnectionRequestTimeout(timeout, TimeUnit.SECONDS)
+                         .setConnectionRequestTimeout(timeout, TimeUnit.MILLISECONDS)
                          .build();
 
 
