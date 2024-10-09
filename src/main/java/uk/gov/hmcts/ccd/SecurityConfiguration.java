@@ -17,7 +17,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
-
+import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
@@ -47,7 +47,9 @@ public class SecurityConfiguration {
     private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
     private final SecurityLoggingFilter securityLoggingFilter;
     private final ExceptionHandlingFilter exceptionHandlingFilter;
+    private CustomHeadersFilter customHeadersFilter;
     private JwtAuthenticationConverter jwtAuthenticationConverter;
+    private ApplicationParams applicationParams;
 
     private static final String[] AUTH_WHITELIST = {
         "/v3/api-docs",
@@ -70,7 +72,10 @@ public class SecurityConfiguration {
                                  final Function<HttpServletRequest, Optional<String>> userIdExtractor,
                                  final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
                                  final SecurityUtils securityUtils,
+                                 final ApplicationParams applicationParams,
                                  @Value("${security.logging.filter.path.regex}") String loggingFilterPathRegex) {
+        this.applicationParams = applicationParams;
+        this.customHeadersFilter = new CustomHeadersFilter(applicationParams);
         this.v1EndpointsPathParamSecurityFilter = new V1EndpointsPathParamSecurityFilter(
             userIdExtractor, authorizedRolesExtractor, securityUtils);
         this.securityLoggingFilter = new SecurityLoggingFilter(securityUtils, loggingFilterPathRegex);
@@ -88,12 +93,13 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .addFilterBefore(customHeadersFilter, BearerTokenAuthenticationFilter.class)
             .addFilterBefore(exceptionHandlingFilter, BearerTokenAuthenticationFilter.class)
             .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
             .addFilterAfter(securityLoggingFilter, BearerTokenAuthenticationFilter.class)
             .addFilterAfter(v1EndpointsPathParamSecurityFilter, SecurityLoggingFilter.class)
             .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf.disable()) // NOSONAR - CSRF is disabled purposely
             .formLogin(fl -> fl.disable())
             .logout(logout -> logout.disable())
             .authorizeHttpRequests(auth -> 

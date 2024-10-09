@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.type.StandardBasicTypes;
@@ -27,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/testing-support")
 @ConditionalOnProperty(value = "testing.support.endpoint.enabled", havingValue = "true")
+@Slf4j
 public class TestingSupportController {
 
     private final CaseLinkService caseLinkService;
@@ -60,12 +62,17 @@ public class TestingSupportController {
     public void dataCaseTypeIdDelete(
         @Parameter(name = "Change ID", required = true) @PathVariable("changeId") BigInteger changeId,
         @Parameter(name = "Case Type ID", required = true) @RequestParam("caseTypeIds") String caseTypeIds) {
+        log.info("Invoked for changeId {} and caseTypeIds {} ", changeId, caseTypeIds);
 
         var caseIdList = Arrays.stream(caseTypeIds.split(",")).toList();
         var caseTypesWithChangeIds = caseIdList.stream().map(caseTypeId -> caseTypeId + "-" + changeId).toList();
 
         Session session = sessionFactory.openSession();
 
+        executeSql(
+            session,
+            "DELETE FROM case_link WHERE case_type_id IN (:caseTypeReferences)",
+            caseTypesWithChangeIds);
         executeSql(
             session,
             "DELETE FROM case_event WHERE case_type_id IN (:caseTypeReferences)",
@@ -76,6 +83,7 @@ public class TestingSupportController {
             caseTypesWithChangeIds);
 
         session.close();
+        log.info("Deleted records for changeId {} and caseTypeIds {} ", changeId, caseTypeIds);
     }
 
     private void executeSql(Session session, String sql, List<String> ids) {

@@ -6,12 +6,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.getcase.AuthorisedGetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,17 +29,21 @@ import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassificationBuilder.aClassificationBuilder;
+import static org.mockito.Mockito.when;
 
 class SecurityValidationServiceTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private SecurityValidationService securityValidationService;
 
+    @Mock
+    private AuthorisedGetCaseOperation authorisedGetCaseOperation;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        securityValidationService = new SecurityValidationService();
+        securityValidationService = new SecurityValidationService(authorisedGetCaseOperation);
     }
 
     @Nested
@@ -160,6 +168,118 @@ class SecurityValidationServiceTest {
                         .withData("extraField2", getTextNode("RESTRICTED"))
                         .buildAsMap())
                 .build();
+
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName
+            ("should fail if neither deduced nor default dataClassification match callbackResponse dataClassification")
+        void shouldFailIfNeitherDeducedNorDefaultDataClassificationMatchesCallbackResponseDataClassification() {
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .withData("field2", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+
+            final CaseDetails caseDetails = newCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withReference(1111L)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+
+            final CaseDetails defaultCaseDetails = newCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+            when(authorisedGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(defaultCaseDetails));
+
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should PASS if default data classification matches callbackResponse data classification")
+        void shouldPassIfDefaultDataClassificationMatchesCallbackResponseDataClassification() {
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .withData("field2", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+
+            final CaseDetails caseDetails = newCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withReference(2222L)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+
+            final CaseDetails defaultCaseDetails = newCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .withData("field2", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+            when(authorisedGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(defaultCaseDetails));
+
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+                caseDetails.getDataClassification());
+            assertAll(
+                () -> Assert.assertThat(caseDetails.getDataClassification().size(), is(2)),
+                () -> Assert.assertThat(caseDetails.getDataClassification(), hasEntry("field1",
+                    getTextNode("PRIVATE"))),
+                () -> Assert.assertThat(caseDetails.getDataClassification(), hasEntry("field2",
+                    getTextNode("PRIVATE")))
+            );
+        }
+
+        @Test
+        @DisplayName
+            ("should fail if neither deduced nor default dataClassification match callbackResponse dataClassification")
+        void shouldFailIfNeitherDeducedNorDefaultDataClassificationMatchesCallbackResponseDataClassification2() {
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .withData("field2", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+
+            final CaseDetails caseDetails = newCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withReference(3333L)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+
+            final CaseDetails defaultCaseDetails = newCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .withData("field2", getTextNode("PRIVATE"))
+                        .withData("field3", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+            when(authorisedGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(defaultCaseDetails));
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
