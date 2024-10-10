@@ -77,7 +77,7 @@ public class SupplementaryDataUserType implements UserType<JsonNode> {
 
     @Override
     public JsonNode deepCopy(JsonNode value) {
-        if(value == null) {
+        if (value == null) {
             return null;
         }
         return value.deepCopy();
@@ -90,7 +90,7 @@ public class SupplementaryDataUserType implements UserType<JsonNode> {
 
     @Override
     public Serializable disassemble(JsonNode value) {
-        if(value == null) {
+        if (value == null) {
             return null;
         }
         return (Serializable) value;
@@ -98,7 +98,7 @@ public class SupplementaryDataUserType implements UserType<JsonNode> {
 
     @Override
     public JsonNode assemble(Serializable cached, Object owner) {
-        if(cached == null) {
+        if (cached == null) {
             return null;
         }
         return (JsonNode) cached;
