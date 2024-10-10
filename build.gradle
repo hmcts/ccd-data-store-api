@@ -14,6 +14,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.57'
     id 'au.com.dius.pact' version '4.1.0'
     id "org.jsonschema2pojo" version "1.2.1"
+    id("org.owasp.dependencycheck") version "10.0.4"
 }
 
 apply from: './gradle/suppress.gradle'
@@ -287,6 +288,23 @@ dependencyManagement {
     }
 
     dependencies {
+
+        dependencySet(group: 'commons-beanutils', version: '1.9.4') {
+            entry 'commons-beanutils'
+        }
+
+        dependencySet(group: 'com.squareup.okio', version: '3.9.1') {
+            entry 'okio'
+        }
+
+        dependencySet(group: 'com.google.guava', version: '33.3.1-jre') {
+            entry 'guava'
+        }
+
+        dependencySet(group: 'ch.qos.logback', version: '1.5.8') {
+            entry 'logback-classic'
+            entry 'logback-core'
+        }
 
         dependencySet(group: 'org.codehaus.groovy', version: '4.0.22') {
             entry 'groovy'

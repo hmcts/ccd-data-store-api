@@ -240,10 +240,10 @@ class SecurityValidationServiceTest {
             securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                 caseDetails.getDataClassification());
             assertAll(
-                () -> Assert.assertThat(caseDetails.getDataClassification().size(), is(2)),
-                () -> Assert.assertThat(caseDetails.getDataClassification(), hasEntry("field1",
+                () -> assertThat(caseDetails.getDataClassification().size(), is(2)),
+                () -> assertThat(caseDetails.getDataClassification(), hasEntry("field1",
                     getTextNode("PRIVATE"))),
-                () -> Assert.assertThat(caseDetails.getDataClassification(), hasEntry("field2",
+                () -> assertThat(caseDetails.getDataClassification(), hasEntry("field2",
                     getTextNode("PRIVATE")))
             );
         }
