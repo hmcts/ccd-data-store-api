@@ -47,11 +47,11 @@ public class SupplementaryDataUserType implements UserType<JsonNode> {
     @Override
     public JsonNode nullSafeGet(ResultSet rs, int position, SharedSessionContractImplementor session, Object owner)
             throws SQLException {
-        final String cellContent = rs.getString(position);
-        if (cellContent == null) {
-            return null;
-        }
         try {
+            final String cellContent = rs.getString(position);
+            if (cellContent == null) {
+                return null;
+            }
             return mapper.readValue(cellContent.getBytes("UTF-8"), returnedClass());
         } catch (final Exception ex) {
             throw new RuntimeException("Failed to convert String to MyJson: " + ex.getMessage(), ex);
