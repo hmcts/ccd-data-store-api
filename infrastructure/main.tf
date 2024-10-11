@@ -73,7 +73,7 @@ module "postgresql_v15" {
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
   }
-  
+
   admin_user_object_id = var.jenkins_AAD_objectId
   business_area        = "cft"
   common_tags          = var.common_tags
@@ -155,4 +155,11 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name         = "${var.component}-POSTGRES-DATABASE"
   value        = var.database_name
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
+}
+resource "azurerm_log_analytics_workspace" "LOG_ANALYTICS_WORKSPACE" {
+  name                = "ccd-log-analytics"
+  resource_group_name = "${local.sharedResourceGroup}"
+  location            = "${var.location}"
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
 }
