@@ -36,7 +36,7 @@ Scenario: must return appropriate negative response when case id is structurally
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-036 @Ignore # re-write as part of RDM-6847
+@S-036 # re-write as part of RDM-6847
 Scenario: must return appropriate negative response when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
@@ -50,8 +50,8 @@ Scenario: must return appropriate negative response when request does not provid
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-037 @Ignore # re-write as part of RDM-6847
-Scenario: must return appropriate negative response when request does not provide an authorized access
+@S-037 # re-write as part of RDM-6847
+Scenario: must return appropriate negative response 403 when request does not provide an authorized access
 
     Given a user with [an active profile in CCD],
 
