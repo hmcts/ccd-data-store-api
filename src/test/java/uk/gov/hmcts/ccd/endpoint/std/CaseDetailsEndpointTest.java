@@ -102,7 +102,7 @@ class CaseDetailsEndpointTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         params = initParams("STATE");
 

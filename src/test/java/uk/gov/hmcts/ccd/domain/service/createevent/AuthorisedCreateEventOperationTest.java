@@ -162,7 +162,7 @@ class AuthorisedCreateEventOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         EVENT.setEventId(EVENT_ID);
         authorisedCreateEventOperation = new AuthorisedCreateEventOperation(
             createEventOperation,

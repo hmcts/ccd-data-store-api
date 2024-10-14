@@ -19,7 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseContractTest;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -55,7 +55,7 @@ import java.util.Map;
 @TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
 @IgnoreNoPactsToVerify
-public class CasesControllerProviderTest extends WireMockBaseTest {
+public class CasesControllerProviderTest extends WireMockBaseContractTest {
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
     private static final String CASEWORKER_PASSWORD = "caseworkerPassword";

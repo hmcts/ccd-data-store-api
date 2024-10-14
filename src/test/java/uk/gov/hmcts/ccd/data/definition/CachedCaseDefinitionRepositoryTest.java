@@ -48,7 +48,7 @@ class CachedCaseDefinitionRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         doReturn(0).when(appParams).getRequestScopeCachedCaseTypesFromHour();
         doReturn(24).when(appParams).getRequestScopeCachedCaseTypesTillHour();
         doReturn(Arrays.asList("GrantOfRepresentation")).when(appParams).getRequestScopeCachedCaseTypes();

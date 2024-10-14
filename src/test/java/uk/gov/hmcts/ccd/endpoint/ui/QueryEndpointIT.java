@@ -38,7 +38,7 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;

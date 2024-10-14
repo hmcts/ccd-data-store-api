@@ -78,7 +78,7 @@ class CaseAssignedUserRolesControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(caseReferenceService.validateUID(CASE_ID_GOOD)).thenReturn(true);
         when(caseReferenceService.validateUID(CASE_ID_BAD)).thenReturn(false);

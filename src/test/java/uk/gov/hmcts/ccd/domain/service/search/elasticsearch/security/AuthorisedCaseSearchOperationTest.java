@@ -47,10 +47,10 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -88,7 +88,7 @@ class AuthorisedCaseSearchOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         caseTypeDefinition.setId(CASE_TYPE_ID_1);
         searchRequestJsonNode.set(QUERY, mock(ObjectNode.class));
         when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ))
@@ -165,9 +165,9 @@ class AuthorisedCaseSearchOperationTest {
                 () -> assertThat(result.getCases(), hasSize(0)),
                 () -> assertThat(result.getTotal(), is(0L)),
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
-                () -> verifyZeroInteractions(caseSearchOperation),
-                () -> verifyZeroInteractions(accessControlService),
-                () -> verifyZeroInteractions(userRepository)
+                () -> verifyNoInteractions(caseSearchOperation),
+                () -> verifyNoInteractions(accessControlService),
+                () -> verifyNoInteractions(userRepository)
             );
         }
 
@@ -206,7 +206,7 @@ class AuthorisedCaseSearchOperationTest {
             ObjectNode complexNode = JsonNodeFactory.instance.objectNode();
             complexNode.set("postcode", JsonNodeFactory.instance.textNode("W4"));
             dataNode.set("personAddress", complexNode);
-            when(objectMapperService.convertObjectToJsonNode(anyMapOf(String.class, JsonNode.class)))
+            when(objectMapperService.convertObjectToJsonNode(anyMap()))
                 .thenReturn(dataNode);
 
             SearchIndex searchIndex = new SearchIndex(
@@ -248,7 +248,7 @@ class AuthorisedCaseSearchOperationTest {
             ObjectNode complexNode = JsonNodeFactory.instance.objectNode();
             complexNode.set("postcode", JsonNodeFactory.instance.textNode("W4"));
             dataNode.set("personAddress", complexNode);
-            when(objectMapperService.convertObjectToJsonNode(anyMapOf(String.class, JsonNode.class)))
+            when(objectMapperService.convertObjectToJsonNode(anyMap()))
                 .thenReturn(dataNode);
 
             CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest.Builder()
@@ -279,7 +279,7 @@ class AuthorisedCaseSearchOperationTest {
             collectionNode.add(textNode);
             dataNode.set("collectionField", collectionNode);
 
-            when(objectMapperService.convertObjectToJsonNode(anyMapOf(String.class, JsonNode.class)))
+            when(objectMapperService.convertObjectToJsonNode(anyMap()))
                 .thenReturn(dataNode);
 
             CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest.Builder()

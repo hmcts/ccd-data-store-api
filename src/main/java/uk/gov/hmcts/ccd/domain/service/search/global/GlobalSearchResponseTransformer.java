@@ -20,8 +20,8 @@ import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.Suppleme
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.domain.types.DynamicListValidator;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

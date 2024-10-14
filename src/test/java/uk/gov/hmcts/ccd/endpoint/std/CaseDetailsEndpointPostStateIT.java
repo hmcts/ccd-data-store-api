@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;

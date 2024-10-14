@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.collection.ArrayMatching.arrayContainingInAnyOrder;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -37,7 +37,7 @@ public class DefaultGetUserProfileOperationTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         defaultGetUserProfileOperation = new DefaultGetUserProfileOperation(userService);
 
         userProfile.setUser(user);

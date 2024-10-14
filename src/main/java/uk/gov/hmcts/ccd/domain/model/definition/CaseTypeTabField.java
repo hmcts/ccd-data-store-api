@@ -3,18 +3,18 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
-@ApiModel(description = "")
+@Schema
 public class CaseTypeTabField implements Serializable, CommonDCPModel {
     private CaseFieldDefinition caseFieldDefinition = null;
     private Integer displayOrder = null;
     private String showCondition = null;
     private String displayContextParameter;
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("case_field")
     public CaseFieldDefinition getCaseFieldDefinition() {
         return caseFieldDefinition;
@@ -24,7 +24,7 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
         this.caseFieldDefinition = caseFieldDefinition;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("order")
     public Integer getDisplayOrder() {
         return displayOrder;
@@ -34,7 +34,7 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
         this.displayOrder = displayOrder;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("show_condition")
     public String getShowCondition() {
         return showCondition;
@@ -44,7 +44,7 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
         this.showCondition = showCondition;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("display_context_parameter")
     public String getDisplayContextParameter() {
         return displayContextParameter;

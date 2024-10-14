@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.util.ClientContextUtil;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.DocumentsResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
