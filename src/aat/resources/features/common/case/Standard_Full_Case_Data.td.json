@@ -36,6 +36,7 @@
 		"PostTown": "Westminster",
 		"County": "Greater London",
 		"PostCode": "SW1H 9AJ",
-		"Country": "UK"
+		"Country": "UK",
+		"UPRN": "UPRN number"
 	}
 }

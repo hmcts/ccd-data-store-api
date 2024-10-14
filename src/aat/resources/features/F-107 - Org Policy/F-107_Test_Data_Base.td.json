@@ -41,7 +41,13 @@
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1",
-            "OrganisationName": "orgName1"
+            "OrganisationName": "orgName1",
+            "OrganisationAddress": {
+              "AddressLine1": "102 Petty France",
+              "AddressLine2": "CCD",
+              "AddressLine3": "c/o HMCTS Reform",
+              "Country": "UK"
+            }
           }
         },
         "OrganisationPolicyField2": {
