@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import com.google.common.collect.Lists;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,8 +25,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Matchers.anyString;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -46,13 +51,14 @@ class CachedCaseDefinitionRepositoryTest {
     private CaseDefinitionRepository caseDefinitionRepository;
     private CachedCaseDefinitionRepository cachedCaseDefinitionRepository;
 
+    private AutoCloseable openMocks;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-        doReturn(0).when(appParams).getRequestScopeCachedCaseTypesFromHour();
-        doReturn(24).when(appParams).getRequestScopeCachedCaseTypesTillHour();
-        doReturn(Arrays.asList("GrantOfRepresentation")).when(appParams).getRequestScopeCachedCaseTypes();
-        cachedCaseDefinitionRepository = new CachedCaseDefinitionRepository(caseDefinitionRepository, appParams);
+        openMocks = MockitoAnnotations.openMocks(this);
+
+        doReturn(List.of("GrantOfRepresentation")).when(appParams).getRequestScopeCachedCaseTypes();
+        cachedCaseDefinitionRepository = new CachedCaseDefinitionRepository(caseDefinitionRepository);
     }
 
     @Nested
@@ -168,6 +174,7 @@ class CachedCaseDefinitionRepositoryTest {
     class GetCaseType {
 
         @Test
+        @Disabled("Disabled due to removal of parametric scope caching")
         @DisplayName("should retrieve latest version of case type hit at request scope cache")
         void shouldRetrieveLatestVersionCaseTypeByCaseTypeIdWithoutAndWithRequestScopeCacheForAnEnabledCaseType() {
             CaseTypeDefinition expected = new CaseTypeDefinition();
@@ -351,5 +358,56 @@ class CachedCaseDefinitionRepositoryTest {
                 () -> verifyNoMoreInteractions(caseDefinitionRepository)
             );
         }
+    }
+
+
+    private static final String CASE_TYPE_ID = "DIVORCE";
+    private static final int CASE_TYPE_VERSION = 1;
+
+    @Test
+    @DisplayName("should retrieve scoped cached case type from caseDefinitionRepository")
+    void shouldRetrieveScopedCachedCaseType() {
+        CaseTypeDefinition expectedCaseType = new CaseTypeDefinition();
+        expectedCaseType.setId(CASE_TYPE_ID);
+        CaseTypeDefinitionVersion caseTypeDefinitionVersion = new CaseTypeDefinitionVersion();
+        caseTypeDefinitionVersion.setVersion(CASE_TYPE_VERSION);
+        doReturn(caseTypeDefinitionVersion).when(caseDefinitionRepository).getLatestVersion(CASE_TYPE_ID);
+        doReturn(expectedCaseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_VERSION, CASE_TYPE_ID);
+
+        CaseTypeDefinition initialReturnOfCaseType =
+            cachedCaseDefinitionRepository.getScopedCachedCaseType(CASE_TYPE_ID);
+
+        assertAll(
+            () -> assertNotEquals(expectedCaseType, initialReturnOfCaseType),
+            () -> assertEquals(expectedCaseType.getId(), initialReturnOfCaseType.getId()),
+            () -> verify(caseDefinitionRepository, times(1)).getCaseType(CASE_TYPE_VERSION,
+                CASE_TYPE_ID)
+        );
+
+        reset(caseDefinitionRepository);
+
+        CaseTypeDefinition secondReturnOfCaseType =
+            cachedCaseDefinitionRepository.getScopedCachedCaseType(CASE_TYPE_ID);
+
+        assertAll(
+            () -> assertEquals(initialReturnOfCaseType, secondReturnOfCaseType),
+            () -> assertEquals(initialReturnOfCaseType.getId(), secondReturnOfCaseType.getId()),
+            () -> verify(caseDefinitionRepository, never()).getCaseType(CASE_TYPE_VERSION,
+                CASE_TYPE_ID)
+        );
+
+        CaseTypeDefinition thirdReturnOfCaseType = cachedCaseDefinitionRepository.getScopedCachedCaseType(CASE_TYPE_ID);
+
+        assertAll(
+            () -> assertEquals(secondReturnOfCaseType, thirdReturnOfCaseType),
+            () -> assertEquals(secondReturnOfCaseType.getId(), thirdReturnOfCaseType.getId()),
+            () -> verify(caseDefinitionRepository, never()).getCaseType(CASE_TYPE_VERSION,
+                CASE_TYPE_ID)
+        );
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        openMocks.close();
     }
 }
