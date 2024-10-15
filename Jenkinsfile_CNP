@@ -11,7 +11,7 @@ properties(
     ]
 )
 
-@Library("Infrastructure")
+@Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION")
 
 def type = "java"
 def product = "ccd"
@@ -107,12 +107,19 @@ env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
+// BEFTA retry env variables
+env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
+env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
+env.BEFTA_RETRY_MAX_DELAY = "1000"
+env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
+// Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
+env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
 
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
         enablePactAs([
-                AppPipelineDsl.PactRoles.PROVIDER
+            AppPipelineDsl.PactRoles.PROVIDER
         ])
     }
     if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
@@ -125,13 +132,8 @@ withPipeline(type, product, component) {
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
         enablePactAs([
-                AppPipelineDsl.PactRoles.PROVIDER
+            AppPipelineDsl.PactRoles.PROVIDER
         ])
-
-        def githubApi = new GithubAPI(this)
-        if (!githubApi.getLabelsbyPattern(env.BRANCH_NAME, "keep-helm")) {
-            enableCleanupOfHelmReleaseAlways()
-        }
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
@@ -139,7 +141,7 @@ withPipeline(type, product, component) {
         env.ELASTIC_SEARCH_FTA_ENABLED = "true"
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
-        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
 

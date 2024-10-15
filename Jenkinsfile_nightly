@@ -81,6 +81,8 @@ def vaultOverrides = [
 // vars needed for functional tests
 // Assume a feature build branched off 'develop', with dependencies develop-to-develop.
 env.TEST_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+// Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
+env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
 
 // Other env variables needed for BEFTA.
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
@@ -95,6 +97,11 @@ env.ELASTIC_SEARCH_FTA_ENABLED = "true"
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
+// BEFTA retry env variables
+env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
+env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
+env.BEFTA_RETRY_MAX_DELAY = "1000"
+env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 
 withNightlyPipeline(type, product, component) {
     overrideVaultEnvironments(vaultOverrides)

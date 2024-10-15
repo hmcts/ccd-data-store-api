@@ -245,6 +245,62 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
+    void checkOtherReferenceFieldPopulatedComplexTypeInSearchCriteriaWithNullValues() throws JsonProcessingException {
+
+        SearchCriteria searchCriteria1 = new SearchCriteria();
+        searchCriteria1.setOtherCaseReference("PersonAddress.AddressLine1");
+        SearchCriteria searchCriteria2 = new SearchCriteria();
+        searchCriteria2.setOtherCaseReference("Person.Name");
+
+        caseTypeDefinition.setSearchCriterias(List.of(searchCriteria1, searchCriteria2));
+
+        final String addressValue = "My address line 1";
+
+        caseData.put("PersonAddress", JacksonUtils.MAPPER.readTree("{\"AddressLine1\": \"" + addressValue  + "\"}"));
+        caseData.put("Person", JacksonUtils.MAPPER.readTree("{\"Name\": null}"));
+
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        JsonNode searchCriteriaNode = globalSearchData.get(SEARCH_CRITERIA);
+
+        assertEquals(1, searchCriteriaNode.size());
+        assertDoesNotThrow(() -> UUID.fromString(
+            searchCriteriaNode.findValue(ID).asText()));
+        assertDoesNotThrow(() -> UUID.fromString(
+            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asText()));
+        assertEquals(addressValue, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asText());
+        assertFalse(globalSearchData.get(SEARCH_CRITERIA).has(SEARCH_PARTIES));
+    }
+
+    @Test
+    void checkOtherReferenceFieldPopulatedSimpleFieldInSearchCriteriaWithNullValues() throws JsonProcessingException {
+
+        SearchCriteria searchCriteria1 = new SearchCriteria();
+        searchCriteria1.setOtherCaseReference("caseReference");
+        SearchCriteria searchCriteria2 = new SearchCriteria();
+        searchCriteria2.setOtherCaseReference("caseName");
+
+        caseTypeDefinition.setSearchCriterias(List.of(searchCriteria1, searchCriteria2));
+
+        final String caseReference = "123456789";
+
+        caseData.put("caseReference", JacksonUtils.convertValueJsonNode(caseReference));
+        caseData.put("caseName", JacksonUtils.MAPPER.nullNode());
+
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        JsonNode searchCriteriaNode = globalSearchData.get(SEARCH_CRITERIA);
+
+        assertEquals(1, searchCriteriaNode.size());
+        assertDoesNotThrow(() -> UUID.fromString(
+            searchCriteriaNode.findValue(ID).asText()));
+        assertDoesNotThrow(() -> UUID.fromString(
+            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asText()));
+        assertEquals(caseReference, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asText());
+        assertFalse(globalSearchData.get(SEARCH_CRITERIA).has(SEARCH_PARTIES));
+    }
+
+    @Test
     void checkSearchPartyNamePopulatedInSearchCriteria() throws JsonProcessingException {
 
         searchParty.setSearchPartyName("SearchPartyFirstName");

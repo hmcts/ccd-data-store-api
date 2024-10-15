@@ -102,7 +102,7 @@ public class CaseTypeService {
     @Deprecated
     @SuppressWarnings("squid:S1133")
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
-        final List<CaseTypeDefinition> caseTypeDefinitions =
+        List<CaseTypeDefinition> caseTypeDefinitions =
             caseDefinitionRepository.getCaseTypesForJurisdiction(jurisdictionId);
 
         if (null == caseTypeDefinitions
@@ -115,6 +115,9 @@ public class CaseTypeService {
                 )
             );
         }
-        return caseTypeDefinitions;
+
+        return caseTypeDefinitions.stream()
+            .map(CaseTypeDefinition::createCopy)
+            .toList();
     }
 }

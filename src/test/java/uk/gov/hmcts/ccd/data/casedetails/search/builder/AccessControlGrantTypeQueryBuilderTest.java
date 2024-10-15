@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -35,17 +36,20 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
+    ApplicationParams applicationParams;
+
+    @Mock
     private CaseTypeDefinition caseTypeDefinition;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         accessControlGrantTypeQueryBuilder = new AccessControlGrantTypeQueryBuilder(
-            new BasicGrantTypeQueryBuilder(accessControlService, caseDataAccessControl),
-            new SpecificGrantTypeQueryBuilder(accessControlService, caseDataAccessControl),
-            new StandardGrantTypeQueryBuilder(accessControlService, caseDataAccessControl),
-            new ChallengedGrantTypeQueryBuilder(accessControlService, caseDataAccessControl),
-            new ExcludedGrantTypeQueryBuilder(accessControlService, caseDataAccessControl));
+            new BasicGrantTypeQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
+            new SpecificGrantTypeQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
+            new StandardGrantTypeQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
+            new ChallengedGrantTypeQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
+            new ExcludedGrantTypeQueryBuilder(accessControlService, caseDataAccessControl, applicationParams));
 
         CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
         when(caseStateDefinition.getId()).thenReturn("CaseCreated");

@@ -28,6 +28,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             em.flush();
         } catch (StaleObjectStateException | OptimisticLockException e) {
             LOG.info("Optimistic Lock Exception: Case data has been altered, UUID={}", caseDetails.getReference(), e);
-            throw new CaseConcurrencyException("The case data has been altered outside of this transaction.");
+            throw new CaseConcurrencyException("""
+                Unfortunately we were unable to save your work to the case as \
+                another action happened at the same time.
+                Please review the case and try again.""");
         } catch (PersistenceException e) {
             if (e.getCause() instanceof ConstraintViolationException && isDuplicateReference(e)) {
                 LOG.warn("ConstraintViolationException happen for UUID={}. ConstraintName: {}",
@@ -155,9 +159,12 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata,
                                                         final Map<String, String> dataSearchParams) {
-        final Query query = getQuery(metadata, dataSearchParams, false);
-        paginate(query, metadata.getPage());
-        return caseDetailsMapper.entityToModel(query.getResultList());
+        return getQuery(metadata, dataSearchParams, false)
+            .map(query -> {
+                paginate(query, metadata.getPage());
+                return caseDetailsMapper.entityToModel((List<CaseDetailsEntity>) query.getResultList());
+            })
+            .orElse(Collections.emptyList());
     }
 
     @Override
@@ -174,13 +181,17 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData,
                                                               Map<String, String> dataSearchParams) {
-        final Query query = getQuery(metaData, dataSearchParams, true);
-        Integer totalResults = ((Number) query.getSingleResult()).intValue();
-        int pageSize = applicationParams.getPaginationPageSize();
-        PaginatedSearchMetadata sr = new PaginatedSearchMetadata();
-        sr.setTotalResultsCount(totalResults);
-        sr.setTotalPagesCount((int) Math.ceil((double) sr.getTotalResultsCount() / pageSize));
-        return sr;
+
+        return getQuery(metaData, dataSearchParams, true)
+            .map(query -> {
+                Integer totalResults = ((Number) query.getSingleResult()).intValue();
+                int pageSize = applicationParams.getPaginationPageSize();
+                PaginatedSearchMetadata sr = new PaginatedSearchMetadata();
+                sr.setTotalResultsCount(totalResults);
+                sr.setTotalPagesCount((int) Math.ceil((double) sr.getTotalResultsCount() / pageSize));
+                return sr;
+            })
+            .orElse(PaginatedSearchMetadata.EMPTY);
     }
 
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
@@ -226,11 +237,12 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return qb.getSingleResult();
     }
 
-    private Query getQuery(MetaData metadata, Map<String, String> dataSearchParams, boolean isCountQuery) {
+    private Optional<Query> getQuery(MetaData metadata, Map<String, String> dataSearchParams, boolean isCountQuery) {
         return getQueryByParameters(metadata, dataSearchParams, isCountQuery);
     }
 
-    private Query getQueryByParameters(MetaData metadata, final Map<String, String> requestData, boolean isCountQuery) {
+    private Optional<Query> getQueryByParameters(MetaData metadata, final Map<String, String> requestData,
+                                                 boolean isCountQuery) {
         Map<String, String> fieldData = new HashMap<>(requestData);
         return this.queryBuilder.build(metadata, fieldData, isCountQuery);
     }

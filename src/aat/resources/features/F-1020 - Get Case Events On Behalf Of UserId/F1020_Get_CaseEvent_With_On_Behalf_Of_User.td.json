@@ -1,0 +1,89 @@
+{
+	"_guid_": "F1020_Get_CaseEvent_With_On_Behalf_Of_User",
+
+	"productName": "CCD Data Store",
+	"operationName": "get event for an existing case (V2)",
+
+  "method": "GET",
+  "uri": "/cases/{cid}/events",
+
+  "specs": [
+    "to verify userid and proxied by user"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker2Solicitor1"
+    },
+    "solicitor3": {
+      "_extends_": "BeftaCaseworker2Solicitor3"
+    }
+  },
+
+	"request": {
+    "_extends_": "Common_Request",
+		"headers": {
+			"Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+			"experimental": true
+		},
+		"pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F1020_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+		}
+	},
+
+	"expectedResponse": {
+    "_extends_": "Common_200_Response",
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+    "body" : {
+      "auditEvents" : [ {
+        "id" : "UPDATE",
+        "summary" : "",
+        "description" : "",
+        "user_id": "${[scenarioContext][childContexts][F1020_Update_Case_With_On_Behalf_Of_User][testData][users][solicitor3][id]}",
+        "user_last_name" : "[[ANYTHING_PRESENT]]",
+        "user_first_name" : "[[ANYTHING_PRESENT]]",
+        "event_name" : "Update",
+        "created_date" : "[[ANYTHING_PRESENT]]",
+        "case_type_id" : "BEFTA_CASETYPE_2_1",
+        "case_type_version" : "[[ANYTHING_PRESENT]]",
+        "state_id" : "[[ANYTHING_PRESENT]]",
+        "state_name" : "[[ANYTHING_PRESENT]]",
+        "data" : null,
+        "data_classification" : null,
+        "security_classification" : "PUBLIC",
+        "significant_item" : null,
+        "proxied_by": "${[scenarioContext][childContexts][F1020_Update_Case_With_On_Behalf_Of_User][testData][users][invokingUser][id]}",
+        "proxied_by_last_name" : "[[ANYTHING_PRESENT]]",
+        "proxied_by_first_name" : "[[ANYTHING_PRESENT]]"
+      }, {
+        "id" : "CREATE",
+        "summary" : "",
+        "description" : "",
+        "user_id": "${[scenarioContext][childContexts][F1020_Update_Case_With_On_Behalf_Of_User][testData][users][invokingUser][id]}",
+        "user_last_name" : "[[ANYTHING_PRESENT]]",
+        "user_first_name" : "[[ANYTHING_PRESENT]]",
+        "event_name" : "Create a new case",
+        "created_date" : "[[ANYTHING_PRESENT]]",
+        "case_type_id" : "BEFTA_CASETYPE_2_1",
+        "case_type_version" : "[[ANYTHING_PRESENT]]",
+        "state_id" : "[[ANYTHING_PRESENT]]",
+        "state_name" : "[[ANYTHING_PRESENT]]",
+        "data" : null,
+        "data_classification" : null,
+        "security_classification" : "PUBLIC",
+        "significant_item" : null,
+        "proxied_by" : null,
+        "proxied_by_last_name" : null,
+        "proxied_by_first_name" : null
+      } ],
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+	}
+}

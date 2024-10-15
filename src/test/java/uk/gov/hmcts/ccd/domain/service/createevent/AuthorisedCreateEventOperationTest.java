@@ -30,6 +30,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRoleDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
@@ -153,6 +155,9 @@ class AuthorisedCreateEventOperationTest {
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
     private final List<CaseEventDefinition> events = Lists.newArrayList();
     private final String categoryId = "categoryId";
+
+    private final String accessTypeRole = "accessTypeRole";
+
     private final Map<String, JsonNode> documentData = new HashMap<>();
 
     @BeforeEach
@@ -182,6 +187,21 @@ class AuthorisedCreateEventOperationTest {
         CategoryDefinition categoryDefinition = new CategoryDefinition();
         categoryDefinition.setCategoryId(categoryId);
         caseTypeDefinition.setCategories(Lists.newArrayList(categoryDefinition));
+
+        AccessTypeRoleDefinition accessTypeRolesDefinition = new AccessTypeRoleDefinition();
+        accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedroleField");
+        accessTypeRolesDefinition.setGroupRoleName("groupRoleName");
+        accessTypeRolesDefinition.setCaseAssignedRoleField("caseAssignedRoleField");
+
+        caseTypeDefinition.setAccessTypeRoleDefinitions(Lists.newArrayList(accessTypeRolesDefinition));
+
+        AccessTypeDefinition accessTypeDefinition = new AccessTypeDefinition();
+        accessTypeDefinition.setDescription("description");
+        accessTypeDefinition.setDisplayOrder(10);
+        accessTypeDefinition.setOrganisationProfileId("OrganisationProfileId");
+
+        caseTypeDefinition.setAccessTypeDefinitions(Lists.newArrayList(accessTypeDefinition));
+
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getAccessProfiles(anyString())).thenReturn(USER_ROLES);

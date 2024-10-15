@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ToString
-public class CaseEventDefinition implements Serializable {
+public class CaseEventDefinition implements Serializable, Copyable<CaseEventDefinition> {
 
     private String id = null;
     private String name = null;
@@ -235,5 +236,38 @@ public class CaseEventDefinition implements Serializable {
 
     public void setTtlIncrement(Integer ttlIncrement) {
         this.ttlIncrement = ttlIncrement;
+    }
+
+    @JsonIgnore
+    @Override
+    public CaseEventDefinition createCopy() {
+        CaseEventDefinition copy = new CaseEventDefinition();
+        copy.setId(this.getId());
+        copy.setName(this.getName());
+        copy.setDescription(this.getDescription());
+        copy.setDisplayOrder(this.getDisplayOrder());
+        copy.setCaseFields(createCopyList(this.getCaseFields()));
+        copy.setPreStates(this.getPreStates() != null ? new ArrayList<>(this.getPreStates()) : null);
+        copy.setPostStates(createCopyList(this.getPostStates()));
+        copy.setRetriesTimeoutAboutToStartEvent(this.getRetriesTimeoutAboutToStartEvent() != null
+            ? new ArrayList<>(this.getRetriesTimeoutAboutToStartEvent()) : null);
+        copy.setRetriesTimeoutURLAboutToSubmitEvent(this.getRetriesTimeoutURLAboutToSubmitEvent() != null
+            ? new ArrayList<>(this.getRetriesTimeoutURLAboutToSubmitEvent()) : null);
+        copy.setRetriesTimeoutURLSubmittedEvent(this.getRetriesTimeoutURLSubmittedEvent() != null
+            ? new ArrayList<>(this.getRetriesTimeoutURLSubmittedEvent()) : null);
+        copy.setAccessControlLists(createACLCopyList(this.getAccessControlLists()));
+        copy.setCallBackURLAboutToStartEvent(this.getCallBackURLAboutToStartEvent());
+        copy.setCallBackURLAboutToSubmitEvent(this.getCallBackURLAboutToSubmitEvent());
+        copy.setCallBackURLSubmittedEvent(this.getCallBackURLSubmittedEvent());
+        copy.setSecurityClassification(this.getSecurityClassification());
+        copy.setShowSummary(this.getShowSummary());
+        copy.setShowEventNotes(this.getShowEventNotes());
+        copy.setEndButtonLabel(this.getEndButtonLabel());
+        copy.setCanSaveDraft(this.getCanSaveDraft());
+        copy.setPublish(this.getPublish());
+        copy.setEventEnablingCondition(this.getEventEnablingCondition());
+        copy.setTtlIncrement(this.getTtlIncrement());
+
+        return copy;
     }
 }

@@ -121,7 +121,7 @@ public class CaseFieldPathUtils {
     private static JsonNode reduce(JsonNode caseFields, List<String> pathElements) {
         String firstPathElement = pathElements.get(0);
 
-        JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement)).orElse(null);
+        JsonNode caseField = caseFields.get(firstPathElement);
 
         if (caseField == null || pathElements.size() == 1) {
             return caseField;

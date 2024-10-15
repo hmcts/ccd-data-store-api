@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
@@ -56,6 +57,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -136,6 +138,9 @@ class CaseSearchResultViewGeneratorTest {
     private CaseSearchesViewAccessControl caseSearchesViewAccessControl;
     @Mock
     private DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
+
+    @Mock
+    private ApplicationParams applicationParams;
 
     private CaseSearchResultViewGenerator classUnderTest;
 
@@ -320,10 +325,12 @@ class CaseSearchResultViewGeneratorTest {
             .thenReturn(true);
 
         classUnderTest = new CaseSearchResultViewGenerator(caseTypeService, searchResultDefinitionService,
-            dateTimeSearchResultProcessor, caseSearchesViewAccessControl, caseDataAccessControl);
+            dateTimeSearchResultProcessor, caseSearchesViewAccessControl, caseDataAccessControl, applicationParams);
 
         when(caseDataAccessControl.generateAccessMetadata(anyString()))
             .thenReturn(new CaseAccessMetadata());
+
+        when(applicationParams.getInternalSearchCaseAccessMetadataEnabled()).thenReturn(false);
     }
 
     private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
@@ -623,7 +630,27 @@ class CaseSearchResultViewGeneratorTest {
     }
 
     @Test
-    void shouldBuildResultsWithCaseAccessMetadata() {
+    void shouldNotBuildResultsWithCaseAccessMetadataByDefault() {
+        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+        caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
+        caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
+
+        when(caseDataAccessControl.generateAccessMetadata(anyString()))
+            .thenReturn(caseAccessMetadata);
+
+        CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
+            Collections.emptyList());
+
+        assertAll(
+            () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get(CaseAccessMetadata.ACCESS_PROCESS)),
+            () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get(CaseAccessMetadata.ACCESS_GRANTED)),
+            () -> verify(caseDataAccessControl, never()).generateAccessMetadata(anyString())
+        );
+    }
+    
+    @Test
+    void shouldBuildResultsWithCaseAccessMetadataWhenEnabled() {
+        when(applicationParams.getInternalSearchCaseAccessMetadataEnabled()).thenReturn(true);
         CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
         caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
         caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);

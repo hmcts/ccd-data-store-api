@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -10,6 +15,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -41,16 +47,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
@@ -62,6 +69,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventF
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.formatLogMessage;
 
 public class DefaultStartEventOperationTest {
 
@@ -667,6 +675,12 @@ public class DefaultStartEventOperationTest {
         @Test
         @DisplayName("Should fail to trigger if invalid event trigger")
         void shouldFailToTriggerIfInvalidEventTrigger() {
+            Logger logger = (Logger) LoggerFactory.getLogger(DefaultStartEventOperation.class);
+            logger.setLevel(Level.ERROR);
+            ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+            listAppender.start();
+            logger.addAppender(listAppender);
+
             doReturn(false).when(eventTriggerService).isPreStateValid(TEST_CASE_STATE, caseEventDefinition);
 
             Exception exception = assertThrows(ValidationException.class, () ->
@@ -674,6 +688,14 @@ public class DefaultStartEventOperationTest {
                     IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("The case status did not qualify for the event"));
+
+            assertEquals(
+                formatLogMessage("eventId={} cannot be triggered on case={} with currentStatus={}",
+                                    TEST_CASE_REFERENCE, TEST_EVENT_TRIGGER_ID, TEST_CASE_STATE),
+                listAppender.list.get(0).getFormattedMessage());
+
+            LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+            loggerContext.stop();
         }
     }
 }

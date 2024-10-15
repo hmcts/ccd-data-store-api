@@ -44,13 +44,6 @@
             "exists": true
           }
         },
-        "hazelcast": {
-          "status": "UP",
-          "details": {
-            "name": "hazelcast-instance-ccd",
-            "uuid": "[[ANYTHING_PRESENT]]"
-          }
-        },
         "livenessState": "[[ANY_OBJECT_NULLABLE]]",
         "ping": {
           "status": "UP"

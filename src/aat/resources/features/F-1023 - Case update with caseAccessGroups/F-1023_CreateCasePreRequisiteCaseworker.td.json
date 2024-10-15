@@ -1,0 +1,111 @@
+{
+  "_guid_": "F-1023_CreateCasePreRequisiteCaseworker",
+  "_extends_": "Case_Creation_Data_Base",
+  "specs": [
+    "to create a case",
+    "As a prerequisite"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1023_GetCreateToken"
+  }
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CaseAccessGroups"
+    },
+    "body": {
+      "data": {
+        "OrganisationPolicyField": {
+          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        },
+        "CaseAccessGroups": []
+      },
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "state" : "CaseCreated",
+      "case_type_id": "FT_CaseAccessGroups",
+      "supplementary_data" : null,
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "case_data": {
+        "CaseAccessGroups": [
+          {
+            "__ordering__": "ordered"
+          },
+          {
+            "id": "[[ANY_STRING_NOT_NULLABLE]]",
+            "value": {
+              "caseAccessGroupType": "CCD:all-cases-access",
+              "caseAccessGroupId": "BEFTA_MASTER:orgID1"
+            }
+          },
+          {
+            "id": "[[ANY_STRING_NOT_NULLABLE]]",
+            "value": {
+              "caseAccessGroupType": "CCD:all-cases-access",
+              "caseAccessGroupId": "BEFTA_MASTER:orgID1"
+            }
+          }
+        ],
+        "OrganisationPolicyField": {
+          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        }
+      },
+      "data_classification": {
+        "CaseAccessGroups" : {
+          "classification" : "PUBLIC",
+          "value" : [
+            {
+              "__ordering__": "ordered"
+            },
+            {
+              "id" : "[[ANY_STRING_NOT_NULLABLE]]",
+              "value" : {
+                "caseAccessGroupType" : "PUBLIC",
+                "caseAccessGroupId" : "PUBLIC"
+              }
+            },
+            {
+              "id" : "[[ANY_STRING_NOT_NULLABLE]]",
+              "value" : {
+                "caseAccessGroupType" : "PUBLIC",
+                "caseAccessGroupId" : "PUBLIC"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

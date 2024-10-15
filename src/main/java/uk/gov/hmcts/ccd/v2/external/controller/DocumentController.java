@@ -52,19 +52,19 @@ public class DocumentController {
             code = 200,
             message = "Success",
             response = DocumentsResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.CASE_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.CASE_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 500,
             message = V2.Error.PRINTABLE_DOCUMENTS_ENDPOINT_DOWN
-        )
+            )
     })
     public ResponseEntity<DocumentsResource> getDocuments(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {

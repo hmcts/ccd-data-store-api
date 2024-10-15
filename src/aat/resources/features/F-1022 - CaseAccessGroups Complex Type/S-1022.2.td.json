@@ -1,0 +1,112 @@
+{
+  "title": "must successfully update a case as a caseworker using V1: /citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events endpoint",
+  "_guid_": "S-1022.2",
+  "_extends_": "F-1022_CaseworkerUpdateCaseEvent",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains additional data fields that will be used to populate SearchCriteria",
+    "to get a caseworker event token to update the case just created"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1022_CreateCase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "caseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupType": "1234",
+              "caseAccessGroupId": "12345"
+            },
+            "id": null
+          }
+        ]
+      },
+      "event": {
+        "id": "updateCase"
+      },
+      "event_token": "${[scenarioContext][childContexts][F-1022_GetCaseworkerUpdateToken][testData][actualResponse][body][token]}",
+      "event_data": {
+        "caseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupType": "12345",
+              "caseAccessGroupId": "12345"
+            },
+            "id": null
+          }
+        ]
+      }
+    }
+  },
+  "expectedResponse": {
+    "responseCode" : 201,
+    "responseMessage" : "Created",
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Connection" : "keep-alive",
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json",
+      "Date" : "[[ANYTHING_PRESENT]]",
+      "Expires" : "0",
+      "Keep-Alive" : "timeout=60",
+      "Pragma" : "no-cache",
+      "Transfer-Encoding" : "chunked",
+      "vary" : "accept-encoding",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-XSS-Protection" : "1; mode=block"
+    },
+    "body" : {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_JURISDICTION_1",
+      "case_type_id": "CaseAccessGroups_Casetype",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "state": "CaseUpdated",
+      "security_classification": "PUBLIC",
+      "case_data": {
+        "caseAccessGroups": [
+          {
+            "__ordering__": "UNORDERED",
+            "__elementId__": "value"
+          },
+          {
+            "value": {
+              "caseAccessGroupType": "1234",
+              "caseAccessGroupId": "12345"
+            },
+            "id": "[[ANYTHING_PRESENT]]"
+          }
+        ]
+      },
+      "data_classification": {
+        "caseAccessGroups": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "value": {
+                "caseAccessGroupType": "PUBLIC",
+                "caseAccessGroupId": "PUBLIC"
+              },
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        }
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

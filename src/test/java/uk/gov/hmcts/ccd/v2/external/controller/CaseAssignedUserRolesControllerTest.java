@@ -344,6 +344,7 @@ class CaseAssignedUserRolesControllerTest {
     }
 
     @Nested
+    @SuppressWarnings("deprecations")
     @DisplayName("GET /case-users")
     class GetCaseUserRoles {
 

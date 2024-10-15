@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.startevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import java.util.function.BooleanSupplier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -33,12 +35,12 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
 
 
+@Slf4j
 @Service
 @Qualifier("default")
 public class DefaultStartEventOperation implements StartEventOperation {
@@ -118,7 +120,9 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
-        validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition));
+        validateEventTrigger(() ->
+                !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition),
+                caseReference, eventId, caseDetails.getState());
 
         Map<String, JsonNode> defaultValueData = caseService
             .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
@@ -182,7 +186,9 @@ public class DefaultStartEventOperation implements StartEventOperation {
             mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
         }
 
-        validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(caseEventDefinition));
+        validateEventTrigger(() ->
+                !eventTriggerService.isPreStateEmpty(caseEventDefinition),
+                caseDetails.getReferenceAsString(), eventId, caseDetails.getState());
 
         // TODO: we may need to take care of drafts that are saved for existing case so token needs to include the
         //  relevant draft payload
@@ -228,8 +234,11 @@ public class DefaultStartEventOperation implements StartEventOperation {
         return caseTypeDefinition;
     }
 
-    private void validateEventTrigger(Supplier<Boolean> validationOperation) {
-        if (validationOperation.get()) {
+    private void validateEventTrigger(BooleanSupplier validationOperation, String reference,
+                                                                            String eventId, String preStateId) {
+        if (validationOperation.getAsBoolean()) {
+            log.error("eventId={} cannot be triggered on case={} with currentStatus={}",
+                        reference, eventId, preStateId);
             throw new ValidationException("The case status did not qualify for the event");
         }
     }
