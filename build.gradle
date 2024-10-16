@@ -28,7 +28,7 @@ plugins {
 apply from: './gradle/suppress.gradle'
 
 def versions = [
-        pact_version    : '4.3.4',
+        pact_version    : '4.5.13',
 ]
 
 ext['spring-security.version'] = '5.7.11'
