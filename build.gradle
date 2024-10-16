@@ -249,9 +249,9 @@ dependencies {
 
     implementation "io.github.openfeign:feign-httpclient:11.0"
 
-    implementation group: 'net.minidev', name: 'json-smart', version: '2.4.7'
+    implementation group: 'net.minidev', name: 'json-smart', version: '2.4.9'
 
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.21'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.2'
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
 
     testImplementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
@@ -388,7 +388,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:32.1.2-jre'
 
         // CVE-2023-41080
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.82') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.91') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'

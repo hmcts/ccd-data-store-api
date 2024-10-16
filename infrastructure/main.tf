@@ -100,7 +100,20 @@ module "postgresql_v15" {
     {
       name  = "logfiles.retention_days"
       value = "7"
+    },
+    {
+      name = "pg_qs.query_capture_mode"
+      value = "ALL"
+    },
+    {
+      name  = "log_lock_waits"
+      value = "on"
+    },
+    {
+      name  = "pgms_wait_sampling.query_capture_mode"
+      value = "ALL"
     }
+
   ]
   pgsql_version    = "15"
   product          = var.product
