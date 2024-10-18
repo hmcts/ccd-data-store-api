@@ -15,7 +15,7 @@ Store/search cases and provide workbaskets.
 
 ### Prerequisites
 
-- [Open JDK 17](https://openjdk.java.net/)
+- [Open JDK 21](https://openjdk.java.net/)
 - [Docker](https://www.docker.com)
 
 #### Environment variables
