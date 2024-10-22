@@ -37,6 +37,7 @@
 					"MoneyGBPField": "4200",
 					"FixedListField": "VALUE3",
 					"AddressUKField": {
+						"UPRN" : "UPRN number",
 						"County": "Greater London",
 						"Country": "UK",
 						"PostCode": "SW1H 9AJ",
@@ -77,6 +78,7 @@
 					"FixedListField": "PUBLIC",
 					"AddressUKField": {
 						"value": {
+							"UPRN" : "PUBLIC",
 							"County": "PUBLIC",
 							"Country": "PUBLIC",
 							"PostCode": "PUBLIC",
