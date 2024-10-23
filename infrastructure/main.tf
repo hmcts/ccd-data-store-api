@@ -121,6 +121,7 @@ module "postgresql_v15" {
   pgsql_sku         = var.pgsql_sku
   pgsql_storage_mb  = var.pgsql_storage_mb
   auto_grow_enabled = var.auto_grow_enabled
+  enable_qpi        = true
 }
 
 ////////////////////////////////////
