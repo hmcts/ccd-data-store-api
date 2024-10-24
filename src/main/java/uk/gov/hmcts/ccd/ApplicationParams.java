@@ -613,14 +613,6 @@ public class ApplicationParams {
         return requestScopeCachedCaseTypes;
     }
 
-    public Integer getRequestScopeCachedCaseTypesFromHour() {
-        return requestScopeCachedCaseTypesFromHour;
-    }
-
-    public Integer getRequestScopeCachedCaseTypesTillHour() {
-        return requestScopeCachedCaseTypesTillHour;
-    }
-
     public Integer getSystemUserTokenCacheTTLSecs() {
         return systemUserTokenCacheTTLSecs;
     }
