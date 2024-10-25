@@ -261,7 +261,9 @@ public class AccessControlServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        accessControlService = new AccessControlServiceImpl(applicationParams, new CompoundAccessControlService());
+        DeleteAccessControlService deleteAccessControlService = new DeleteAccessControlService();
+        accessControlService = new AccessControlServiceImpl(applicationParams,
+            new CompoundAccessControlService(deleteAccessControlService));
     }
 
     @Nested

@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
@@ -41,253 +42,292 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeB
 class CompoundAccessControlServiceTest {
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private CompoundAccessControlService compoundAccessControlService;
-    private static final String newAddress1 = "      {\n"
-        + "        \"value\": {\n"
-        + "           \"Name\": \"home\",\n"
-        + "           \"Address\": {"
-        + "               \"Line1\": \"231 Clampton Road\",\n"
-        + "               \"Line2\": \"Fitzgrovia, London\",\n"
-        + "               \"PostCode\": \"EC2 5GN\",\n"
-        + "               \"Country\": \"United Kingdom\"\n"
-        + "           }\n"
-        + "        },\n"
-        + "        \"id\": \"null\"\n"
-        + "      }\n";
-    private static final String existingAddress1 = "      {\n"
-        + "        \"value\": {\n"
-        + "           \"Name\": \"home\",\n"
-        + "           \"Address\": {"
-        + "               \"Line1\": \"666 Clampton Road\",\n"
-        + "               \"Line2\": \"Fitzgrovia, London\",\n"
-        + "               \"PostCode\": \"EC2 5GN\",\n"
-        + "               \"Country\": \"United Kingdom\"\n"
-        + "           }\n"
-        + "        },\n"
-        + "        \"id\": \"2939423847298729384\"\n"
-        + "      }\n";
-    private static final String existingAddress1NullLine1 = "      {\n"
-        + "        \"value\": {\n"
-        + "           \"Name\": \"home\",\n"
-        + "           \"Address\": {"
-        + "               \"Line2\": \"Fitzgrovia, London\",\n"
-        + "               \"PostCode\": \"EC2 5GN\",\n"
-        + "               \"Country\": \"United Kingdom\"\n"
-        + "           }\n"
-        + "        },\n"
-        + "        \"id\": \"2939423847298729384\"\n"
-        + "      }\n";
-    private static final String existingAddressWMissingLines = "      {\n"
-        + "        \"value\": {\n"
-        + "           \"Name\": \"home\",\n"
-        + "           \"Address\": {"
-        + "               \"Country\": \"United Kingdom\"\n"
-        + "           }\n"
-        + "        },\n"
-        + "        \"id\": \"2939423847298729384\"\n"
-        + "      }\n";
-    private static final String existingAddressWNullLines = "      {\n"
-        + "        \"value\": {\n"
-        + "           \"Name\": \"home\",\n"
-        + "           \"Address\": {"
-        + "               \"Line1\": null,\n"
-        + "               \"Line2\": null,\n"
-        + "               \"Country\": \"United Kingdom\"\n"
-        + "           }\n"
-        + "        },\n"
-        + "        \"id\": \"2939423847298729384\"\n"
-        + "      }\n";
-    private static final String existingAddress1Line1Updated = "      {\n"
-        + "        \"value\": {\n"
-        + "           \"Name\": \"home\",\n"
-        + "           \"Address\": {"
-        + "               \"Line1\": \"XYZ Clampton Road\",\n"
-        + "               \"Line2\": \"Fitzgrovia, London\",\n"
-        + "               \"PostCode\": \"EC2 5GN\",\n"
-        + "               \"Country\": \"United Kingdom\"\n"
-        + "           }\n"
-        + "        },\n"
-        + "        \"id\": \"2939423847298729384\"\n"
-        + "      }\n";
-    private static final String existingAddress1LinesUpdated = "      {\n"
-        + "        \"value\": {\n"
-        + "           \"Name\": \"homerton\",\n"
-        + "           \"Address\": {"
-        + "               \"Line1\": \"ABC Clampton Road\",\n"
-        + "               \"Line2\": \"Belgravia, London\",\n"
-        + "               \"PostCode\": \"EC2 5GN\",\n"
-        + "               \"Country\": \"United Kingdom\"\n"
-        + "           }\n"
-        + "        },\n"
-        + "        \"id\": \"2939423847298729384\"\n"
-        + "      }\n";
-    private static final String existingAddress2 = "      {\n"
-        + "        \"value\": {\n"
-        + "           \"Name\": \"home\",\n"
-        + "           \"Address\": {"
-        + "               \"Line1\": \"101 Humanities Road\",\n"
-        + "               \"Line2\": \"Fitzgrovia, London\",\n"
-        + "               \"PostCode\": \"EC2 5GN\",\n"
-        + "               \"Country\": \"United Kingdom\"\n"
-        + "           }\n"
-        + "        },\n"
-        + "        \"id\": \"2939423847298729399\"\n"
-        + "      }\n";
-    private static final String newAddress2 = "      {\n"
-        + "        \"value\": {\n"
-        + "          \"Name\": \"home\",\n"
-        + "           \"Address\": {"
-        + "               \"Line1\": \"1 Hampton Road\",\n"
-        + "               \"Line2\": \"London\",\n"
-        + "               \"PostCode\": \"EC5 5GN\",\n"
-        + "               \"Country\": \"United Kingdom\"\n"
-        + "           }\n"
-        + "        },\n"
-        + "        \"id\": \"null\"\n"
-        + "      }\n";
-    private static final String newAddress3 = "      {\n"
-        + "        \"value\": {\n"
-        + "           \"Name\": \"work\",\n"
-        + "           \"Address\": {"
-        + "               \"Line1\": \"17 Prune Road\",\n"
-        + "               \"Line2\": \"London\",\n"
-        + "               \"PostCode\": \"EC5 5GN\",\n"
-        + "               \"Country\": \"United Kingdom\"\n"
-        + "           }\n"
-        + "        },\n"
-        + "        \"id\": \"null\"\n"
-        + "      }\n";
+
+    private static final String newAddress1 = """
+              {
+                "value": {
+                   "Name": "home",
+                   "Address": {\
+                       "Line1": "231 Clampton Road",
+                       "Line2": "Fitzgrovia, London",
+                       "PostCode": "EC2 5GN",
+                       "Country": "United Kingdom"
+                   }
+                },
+                "id": "null"
+              }
+        """;
+    private static final String existingAddress1 = """
+              {
+                "value": {
+                   "Name": "home",
+                   "Address": {\
+                       "Line1": "666 Clampton Road",
+                       "Line2": "Fitzgrovia, London",
+                       "PostCode": "EC2 5GN",
+                       "Country": "United Kingdom"
+                   }
+                },
+                "id": "2939423847298729384"
+              }
+        """;
+    private static final String existingAddress1NullLine1 = """
+              {
+                "value": {
+                   "Name": "home",
+                   "Address": {\
+                       "Line2": "Fitzgrovia, London",
+                       "PostCode": "EC2 5GN",
+                       "Country": "United Kingdom"
+                   }
+                },
+                "id": "2939423847298729384"
+              }
+        """;
+    private static final String existingAddressWMissingLines = """
+              {
+                "value": {
+                   "Name": "home",
+                   "Address": {\
+                       "Country": "United Kingdom"
+                   }
+                },
+                "id": "2939423847298729384"
+              }
+        """;
+    private static final String existingAddressWNullLines = """
+              {
+                "value": {
+                   "Name": "home",
+                   "Address": {\
+                       "Line1": null,
+                       "Line2": null,
+                       "Country": "United Kingdom"
+                   }
+                },
+                "id": "2939423847298729384"
+              }
+        """;
+    private static final String existingAddress1Line1Updated = """
+              {
+                "value": {
+                   "Name": "home",
+                   "Address": {\
+                       "Line1": "XYZ Clampton Road",
+                       "Line2": "Fitzgrovia, London",
+                       "PostCode": "EC2 5GN",
+                       "Country": "United Kingdom"
+                   }
+                },
+                "id": "2939423847298729384"
+              }
+        """;
+    private static final String existingAddress1LinesUpdated = """
+              {
+                "value": {
+                   "Name": "homerton",
+                   "Address": {\
+                       "Line1": "ABC Clampton Road",
+                       "Line2": "Belgravia, London",
+                       "PostCode": "EC2 5GN",
+                       "Country": "United Kingdom"
+                   }
+                },
+                "id": "2939423847298729384"
+              }
+        """;
+    private static final String existingAddress2 = """
+              {
+                "value": {
+                   "Name": "home",
+                   "Address": {\
+                       "Line1": "101 Humanities Road",
+                       "Line2": "Fitzgrovia, London",
+                       "PostCode": "EC2 5GN",
+                       "Country": "United Kingdom"
+                   }
+                },
+                "id": "2939423847298729399"
+              }
+        """;
+    private static final String newAddress2 = """
+              {
+                "value": {
+                  "Name": "home",
+                   "Address": {\
+                       "Line1": "1 Hampton Road",
+                       "Line2": "London",
+                       "PostCode": "EC5 5GN",
+                       "Country": "United Kingdom"
+                   }
+                },
+                "id": "null"
+              }
+        """;
+    private static final String newAddress3 = """
+              {
+                "value": {
+                   "Name": "work",
+                   "Address": {\
+                       "Line1": "17 Prune Road",
+                       "Line2": "London",
+                       "PostCode": "EC5 5GN",
+                       "Country": "United Kingdom"
+                   }
+                },
+                "id": "null"
+              }
+        """;
     private static final String addressEnd = "    ]\n";
     private static final String addresses =
         addressesStart + newAddress1 + "," + newAddress2 + "," + newAddress3 + addressEnd;
-    private static final String notes = "    \"Notes\": [\n"
-        + "      {\n"
-        + "        \"value\": {\n"
-        + "          \"Txt\": \"someNote11\",\n"
-        + "           \"Tags\": [\n"
-        + "               {\n"
-        + "                   \"value\": {\n"
-        + "                       \"Tag\": \"private\",\n"
-        + "                       \"Category\": \"Personal\"\n"
-        + "                   },\n"
-        + "                   \"id\": \"null\"\n"
-        + "               }\n"
-        + "           ]\n"
-        + "        },\n"
-        + "        \"id\": \"null\"\n"
-        + "      },\n"
-        + "      {\n"
-        + "        \"value\": {\n"
-        + "          \"Txt\": \"someNote21\"\n"
-        + "        },\n"
-        + "        \"id\": \"null\"\n"
-        + "      }\n"
-        + "    ]\n";
-    private static final String notesWId = "    \"Notes\": [\n"
-        + "      {\n"
-        + "        \"value\": {\n"
-        + "          \"Txt\": \"someNote11\",\n"
-        + "           \"Tags\": [\n"
-        + "               {\n"
-        + "                   \"value\": {\n"
-        + "                       \"Tag\": \"private\",\n"
-        + "                       \"Category\": \"Personal\"\n"
-        + "                   },\n"
-        + "                   \"id\": \"2342342345\"\n"
-        + "               }\n"
-        + "           ]\n"
-        + "        },\n"
-        + "        \"id\": \"456334563456\"\n"
-        + "      },\n"
-        + "      {\n"
-        + "        \"value\": {\n"
-        + "          \"Txt\": \"someNote21\"\n"
-        + "        },\n"
-        + "        \"id\": \"234234234\"\n"
-        + "      }\n"
-        + "    ]\n";
-    private static final String notesWIdDeletedTags = "    \"Notes\": [\n"
-        + "      {\n"
-        + "        \"value\": {\n"
-        + "          \"Txt\": \"someNote11\"\n"
-        + "        },\n"
-        + "        \"id\": \"456334563456\"\n"
-        + "      },\n"
-        + "      {\n"
-        + "        \"value\": {\n"
-        + "          \"Txt\": \"someNote21\"\n"
-        + "        },\n"
-        + "        \"id\": \"234234234\"\n"
-        + "      }\n"
-        + "    ]\n";
-    private static final String notesWIdWNewlyAddedTags = "    \"Notes\": [\n"
-        + "      {\n"
-        + "        \"value\": {\n"
-        + "          \"Txt\": \"someNote11\",\n"
-        + "           \"Tags\": [\n"
-        + "               {\n"
-        + "                   \"value\": {\n"
-        + "                       \"Tag\": \"private\",\n"
-        + "                       \"Category\": \"Personal\"\n"
-        + "                   },\n"
-        + "                   \"id\": \"2342342345\"\n"
-        + "               }\n"
-        + "           ]\n"
-        + "        },\n"
-        + "        \"id\": \"456334563456\"\n"
-        + "      },\n"
-        + "      {\n"
-        + "        \"value\": {\n"
-        + "          \"Txt\": \"someNote21\",\n"
-        + "           \"Tags\": [\n"
-        + "               {\n"
-        + "                   \"value\": {\n"
-        + "                       \"Tag\": \"private\",\n"
-        + "                       \"Category\": \"Personal\"\n"
-        + "                   },\n"
-        + "                   \"id\": \"null\"\n"
-        + "               },\n"
-        + "               {\n"
-        + "                   \"value\": {\n"
-        + "                       \"Tag\": \"private\",\n"
-        + "                       \"Category\": \"Personal\"\n"
-        + "                   },\n"
-        + "                   \"id\": \"null\"\n"
-        + "               },\n"
-        + "               {\n"
-        + "                   \"value\": {\n"
-        + "                       \"Tag\": \"private\",\n"
-        + "                       \"Category\": \"Personal\"\n"
-        + "                   },\n"
-        + "                   \"id\": \"null\"\n"
-        + "               }\n"
-        + "           ]\n"
-        + "        },\n"
-        + "        \"id\": \"234234234\"\n"
-        + "      }\n"
-        + "    ]\n";
-    private static final String birthInfo = "    \"BirthInfo\": {\n"
-        + "         \"BornCity\": \"Madrid\",\n"
-        + "         \"BornCountry\": \"Spain\",\n"
-        + "         \"BornAddress\": {\n"
-        + "               \"Name\": \"holiday\",\n"
-        + "               \"Address\": {"
-        + "                   \"Line1\": \"118 Chapman Lane\",\n"
-        + "                   \"Line2\": \"London\",\n"
-        + "                   \"PostCode\": \"EC5 5GN\",\n"
-        + "                   \"Country\": \"United Kingdom\"\n"
-        + "               }\n"
-        + "         }\n"
-        + "     }\n";
-    private static final String newPersonStart = "{\n"
-        + "  \"id\": \"null\",\n"
-        + "  \"value\": {\n";
-    private static final String existingPersonStart = "{\n"
-        + "  \"id\": \"273647284\",\n"
-        + "  \"value\": {\n";
-    private static final String name = "    \"FirstName\": \"Harry\",\n"
-        + "    \"LastName\": \"Potter\"\n";
-    private static final String nameUpdated = "    \"FirstName\": \"Harry Junior\",\n"
-        + "    \"LastName\": \"Potter\"\n";
+    private static final String notes = """
+            "Notes": [
+              {
+                "value": {
+                  "Txt": "someNote11",
+                   "Tags": [
+                       {
+                           "value": {
+                               "Tag": "private",
+                               "Category": "Personal"
+                           },
+                           "id": "null"
+                       }
+                   ]
+                },
+                "id": "null"
+              },
+              {
+                "value": {
+                  "Txt": "someNote21"
+                },
+                "id": "null"
+              }
+            ]
+        """;
+    private static final String notesWId = """
+            "Notes": [
+              {
+                "value": {
+                  "Txt": "someNote11",
+                   "Tags": [
+                       {
+                           "value": {
+                               "Tag": "private",
+                               "Category": "Personal"
+                           },
+                           "id": "2342342345"
+                       }
+                   ]
+                },
+                "id": "456334563456"
+              },
+              {
+                "value": {
+                  "Txt": "someNote21"
+                },
+                "id": "234234234"
+              }
+            ]
+        """;
+    private static final String notesWIdDeletedTags = """
+            "Notes": [
+              {
+                "value": {
+                  "Txt": "someNote11"
+                },
+                "id": "456334563456"
+              },
+              {
+                "value": {
+                  "Txt": "someNote21"
+                },
+                "id": "234234234"
+              }
+            ]
+        """;
+    private static final String notesWIdWNewlyAddedTags = """
+            "Notes": [
+              {
+                "value": {
+                  "Txt": "someNote11",
+                   "Tags": [
+                       {
+                           "value": {
+                               "Tag": "private",
+                               "Category": "Personal"
+                           },
+                           "id": "2342342345"
+                       }
+                   ]
+                },
+                "id": "456334563456"
+              },
+              {
+                "value": {
+                  "Txt": "someNote21",
+                   "Tags": [
+                       {
+                           "value": {
+                               "Tag": "private",
+                               "Category": "Personal"
+                           },
+                           "id": "null"
+                       },
+                       {
+                           "value": {
+                               "Tag": "private",
+                               "Category": "Personal"
+                           },
+                           "id": "null"
+                       },
+                       {
+                           "value": {
+                               "Tag": "private",
+                               "Category": "Personal"
+                           },
+                           "id": "null"
+                       }
+                   ]
+                },
+                "id": "234234234"
+              }
+            ]
+        """;
+    private static final String birthInfo = """
+            "BirthInfo": {
+                 "BornCity": "Madrid",
+                 "BornCountry": "Spain",
+                 "BornAddress": {
+                       "Name": "holiday",
+                       "Address": {\
+                           "Line1": "118 Chapman Lane",
+                           "Line2": "London",
+                           "PostCode": "EC5 5GN",
+                           "Country": "United Kingdom"
+                       }
+                 }
+             }
+        """;
+    private static final String newPersonStart = """
+        {
+          "id": "null",
+          "value": {
+        """;
+    private static final String existingPersonStart = """
+        {
+          "id": "273647284",
+          "value": {
+        """;
+    private static final String name = """
+            "FirstName": "Harry",
+            "LastName": "Potter"
+        """;
+    private static final String nameUpdated = """
+            "FirstName": "Harry Junior",
+            "LastName": "Potter"
+        """;
     private static final String personEnd = "  }\n"
         + "}";
     private static final String newPerson =
@@ -297,7 +337,8 @@ class CompoundAccessControlServiceTest {
 
     @BeforeEach
     void setup() {
-        compoundAccessControlService = new CompoundAccessControlService();
+        DeleteAccessControlService deleteAccessControlService = new DeleteAccessControlService();
+        compoundAccessControlService = new CompoundAccessControlService(deleteAccessControlService);
     }
 
     @Nested
@@ -914,6 +955,7 @@ class CompoundAccessControlServiceTest {
                     .withListElementCode("Addresses.Address.Line1")
                     .withRole(ROLE_IN_USER_ROLES)
                     .withUpdate(true)
+                    .withDelete(true)
                     .build(),
                 aComplexACL()
                     .withListElementCode("Addresses.Address.Line2")
@@ -1705,13 +1747,25 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to add multiple completely new children if child has the required ACLs")
         void shouldGrantAccessToMultipleNewChildIfChildrenHasAccess() throws IOException {
-            note.setAccessControlLists(asList(anAcl()
+            note.setAccessControlLists(Collections.singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
+                    .withDelete(true)
                 .build()));
 
-            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
-                caseField.propagateACLsToNestedFields());
+            note.getFieldTypeDefinition().getComplexFields().forEach(caseField -> {
+                if (caseField.getId().equals("Tags")) {
+                    caseField.setAccessControlLists(
+                        Collections.singletonList(anAcl()
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(true)
+                            .withDelete(true)
+                            .build())
+                    );
+                }
+            });
+
+            caseTypeDefinition.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithMultipleNewTags + noteEnd);
 
@@ -1856,13 +1910,12 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access to delete child if child has no ACLs")
         void shouldDenyAccessToDeleteChildIfChildrenHasNoAccess() throws IOException {
-            note.setAccessControlLists(asList(anAcl()
+            note.setAccessControlLists(Collections.singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(false)
                 .build()));
 
-            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
-                caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
