@@ -202,6 +202,9 @@ public class ApplicationParams {
     @Value("#{'${ccd.multiparty.case-types}'.split(',')}")
     private List<String> multipartyCaseTypes;
 
+    @Value("#{'${ccd.poc.case-types}'.split(',')}")
+    private List<String> pocCaseTypes;
+
     @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
     private boolean attachDocumentEnabled;
 
@@ -600,6 +603,10 @@ public class ApplicationParams {
 
     public List<String> getMultipartyCaseTypes() {
         return multipartyCaseTypes;
+    }
+
+    public List<String> getPocCaseTypes() {
+        return pocCaseTypes;
     }
 
     public List<String>  getRequestScopeCachedCaseTypes() {

@@ -21,7 +21,7 @@ plugins {
     id 'org.jetbrains.gradle.plugin.idea-ext' version '0.7'
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'uk.gov.hmcts.java' version '0.12.57'
-    id 'au.com.dius.pact' version '4.3.12'
+    id 'au.com.dius.pact' version '4.6.14'
     id "org.jsonschema2pojo" version "1.2.1"
 }
 

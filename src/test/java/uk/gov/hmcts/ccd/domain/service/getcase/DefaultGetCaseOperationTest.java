@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.clients.PocApiClient;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -32,6 +34,10 @@ class DefaultGetCaseOperationTest {
 
     @Mock
     private UIDService uidService;
+    @Mock
+    private ApplicationParams applicationParams;
+    @Mock
+    private PocApiClient pocApiClient;
 
     private DefaultGetCaseOperation getCaseOperation;
 
@@ -41,7 +47,8 @@ class DefaultGetCaseOperationTest {
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
-        getCaseOperation = new DefaultGetCaseOperation(caseDetailsRepository, uidService);
+        getCaseOperation = new DefaultGetCaseOperation(caseDetailsRepository,
+                uidService, applicationParams, pocApiClient);
     }
 
 
