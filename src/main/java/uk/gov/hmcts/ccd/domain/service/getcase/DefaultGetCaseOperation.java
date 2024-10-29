@@ -21,20 +21,16 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
     private final UIDService uidService;
     private final ApplicationParams applicationParams;
     private final PocApiClient pocApiClient;
-    private final SecurityUtils securityUtils;
 
     @Autowired
-    public DefaultGetCaseOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                       final CaseDetailsRepository caseDetailsRepository,
+    public DefaultGetCaseOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                    final UIDService uidService,
                                    final ApplicationParams applicationParams,
-                                   final PocApiClient pocApiClient,
-                                   final SecurityUtils securityUtils) {
+                                   final PocApiClient pocApiClient) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.uidService = uidService;
         this.applicationParams = applicationParams;
         this.pocApiClient = pocApiClient;
-        this.securityUtils = securityUtils;
     }
 
     @Override
@@ -46,8 +42,7 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
         }
 
         if (this.applicationParams.getPocCaseTypes().contains(caseTypeId)) {
-            return Optional.ofNullable(pocApiClient.getCase(caseReference, securityUtils.getUserBearerToken(),
-                    securityUtils.getServiceAuthorization()));
+            return Optional.ofNullable(pocApiClient.getCase(caseReference));
         }
 
         return Optional.ofNullable(caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
@@ -60,8 +55,6 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
         }
 
 //        return Optional.ofNullable(caseDetailsRepository.findByReference(Long.valueOf(caseReference)));
-        securityUtils.getServiceAuthorization();
-        return Optional.ofNullable(pocApiClient.getCase(caseReference, securityUtils.getUserBearerToken(),
-                securityUtils.getServiceAuthorization()));
+        return Optional.ofNullable(pocApiClient.getCase(caseReference));
     }
 }
