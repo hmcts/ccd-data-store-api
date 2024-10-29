@@ -4,6 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.FeignClientProperties;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 @FeignClient(name = "pocApi", url = "${poc.apis.url}", configuration =
@@ -11,5 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 public interface PocApiClient {
 
     @GetMapping(value = "/ccd/cases/{case-ref}")
-    CaseDetails getCase(@PathVariable("case-ref") String caseRef);
+    CaseDetails getCase(@PathVariable("case-ref") String caseRef,
+                        @RequestHeader("Authorization") String authorisation,
+                        @RequestHeader("ServiceAuthorization") String serviceAuthorization);
 }
