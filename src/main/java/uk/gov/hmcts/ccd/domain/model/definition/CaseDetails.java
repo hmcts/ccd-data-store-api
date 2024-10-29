@@ -117,7 +117,6 @@ public class CaseDetails implements Cloneable {
     private final Map<String, Object> metadata = new HashMap<>();
 
     @JsonIgnore
-    @JsonProperty("resolved_ttl")
     private LocalDate resolvedTTL;
 
     public String getId() {
