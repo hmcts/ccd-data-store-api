@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.clients.PocApiClient;
 import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilder;
 import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilderFactory;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -54,23 +55,27 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private final SearchQueryFactoryOperation queryBuilder;
     private final CaseDetailsQueryBuilderFactory queryBuilderFactory;
     private final ApplicationParams applicationParams;
+    private final PocApiClient pocApiClient;
 
     @Inject
     public DefaultCaseDetailsRepository(
-        final CaseDetailsMapper caseDetailsMapper,
-        final SearchQueryFactoryOperation queryBuilder,
-        final CaseDetailsQueryBuilderFactory queryBuilderFactory,
-        final ApplicationParams applicationParams) {
+            final CaseDetailsMapper caseDetailsMapper,
+            final SearchQueryFactoryOperation queryBuilder,
+            final CaseDetailsQueryBuilderFactory queryBuilderFactory,
+            final ApplicationParams applicationParams,
+            final PocApiClient pocApiClient) {
         this.caseDetailsMapper = caseDetailsMapper;
         this.queryBuilder = queryBuilder;
         this.queryBuilderFactory = queryBuilderFactory;
         this.applicationParams = applicationParams;
+        this.pocApiClient = pocApiClient;
     }
 
     @Override
     public CaseDetails set(final CaseDetails caseDetails) {
         final CaseDetailsEntity newCaseDetailsEntity = caseDetailsMapper.modelToEntity(caseDetails);
         newCaseDetailsEntity.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
+        CaseDetailsEntity aCase = pocApiClient.createCase(newCaseDetailsEntity);
         CaseDetailsEntity mergedEntity;
         try {
             mergedEntity = em.merge(newCaseDetailsEntity);
@@ -91,7 +96,11 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
                 throw new CasePersistenceException(e.getMessage());
             }
         }
-        return caseDetailsMapper.entityToModel(mergedEntity);
+        if (this.applicationParams.getPocCaseTypes().contains(caseDetails.getCaseTypeId())) {
+            return caseDetailsMapper.entityToModel(aCase);
+        } else {
+            return caseDetailsMapper.entityToModel(mergedEntity);
+        }
     }
 
     @Override

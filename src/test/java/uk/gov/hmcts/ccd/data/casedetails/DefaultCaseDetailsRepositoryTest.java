@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextListener;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.clients.PocApiClient;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
@@ -104,7 +105,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @MockBean
     private AccessControlService accessControlService;
 
-
+    @MockBean
+    private PocApiClient pocApiClient;
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
@@ -140,7 +142,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         DefaultCaseDetailsRepository defaultCaseDetailsRepository =
             new DefaultCaseDetailsRepository(caseDetailsMapper, null, null,
-                applicationParams);
+                applicationParams, pocApiClient);
 
         Field emField = DefaultCaseDetailsRepository.class.getDeclaredField("em");
         emField.setAccessible(true);
