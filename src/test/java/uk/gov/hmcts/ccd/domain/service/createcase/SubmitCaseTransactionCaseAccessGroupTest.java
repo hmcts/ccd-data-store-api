@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.clients.PocApiClient;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -133,6 +134,9 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     @Mock
     private ApplicationParams applicationParams;
 
+    @Mock
+    private PocApiClient pocApiClient;
+
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -164,7 +168,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             caseDocumentService,
             applicationParams,
             caseAccessGroupUtils,
-            caseDocumentTimestampService
+            caseDocumentTimestampService,
+            pocApiClient
         );
 
         idamUser = buildIdamUser();

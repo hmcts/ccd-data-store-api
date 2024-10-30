@@ -18,5 +18,5 @@ public interface PocApiClient {
 
     @PostMapping(value = "/ccd/cases", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    CaseDetailsEntity createCase(@RequestBody CaseDetailsEntity caseDetails);
+    CaseDetails createCase(@RequestBody CaseDetails caseDetails);
 }

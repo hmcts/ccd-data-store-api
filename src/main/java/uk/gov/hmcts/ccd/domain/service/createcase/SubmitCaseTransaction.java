@@ -6,8 +6,10 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.clients.PocApiClient;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -52,6 +54,7 @@ public class SubmitCaseTransaction implements AccessControl {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
+    private final PocApiClient pocApiClient;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -66,7 +69,8 @@ public class SubmitCaseTransaction implements AccessControl {
                                     final CaseDocumentService caseDocumentService,
                                     final ApplicationParams applicationParams,
                                     final CaseAccessGroupUtils caseAccessGroupUtils,
-                                    final CaseDocumentTimestampService caseDocumentTimestampService
+                                    final CaseDocumentTimestampService caseDocumentTimestampService,
+                                    final PocApiClient pocApiClient
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -81,6 +85,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
 
+        this.pocApiClient = pocApiClient;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -170,35 +175,38 @@ public class SubmitCaseTransaction implements AccessControl {
                                                      CaseDetails newCaseDetails,
                                                      IdamUser onBehalfOfUser) {
 
-        final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
+        final CaseDetails pocCaseDetails = pocApiClient.createCase(newCaseDetails);
+
+        caseDetailsRepository.set(newCaseDetails);
+//        final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());
         auditEvent.setEventName(caseEventDefinition.getName());
         auditEvent.setSummary(event.getSummary());
         auditEvent.setDescription(event.getDescription());
-        auditEvent.setCaseDataId(savedCaseDetails.getId());
-        auditEvent.setData(savedCaseDetails.getData());
-        auditEvent.setStateId(savedCaseDetails.getState());
+        auditEvent.setCaseDataId(pocCaseDetails.getId());
+        auditEvent.setData(pocCaseDetails.getData());
+        auditEvent.setStateId(pocCaseDetails.getState());
         CaseStateDefinition caseStateDefinition =
-            caseTypeService.findState(caseTypeDefinition, savedCaseDetails.getState());
+            caseTypeService.findState(caseTypeDefinition, pocCaseDetails.getState());
         auditEvent.setStateName(caseStateDefinition.getName());
         auditEvent.setCaseTypeId(caseTypeDefinition.getId());
         auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
         auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition,
             caseEventDefinition));
-        auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
+        auditEvent.setDataClassification(pocCaseDetails.getDataClassification());
         auditEvent.setSignificantItem(response.getSignificantItem());
         saveUserDetails(idamUser, onBehalfOfUser, auditEvent);
 
         caseAuditEventRepository.set(auditEvent);
 
         messageService.handleMessage(MessageContext.builder()
-            .caseDetails(savedCaseDetails)
+            .caseDetails(pocCaseDetails)
             .caseTypeDefinition(caseTypeDefinition)
             .caseEventDefinition(caseEventDefinition)
             .oldState(null).build());
-        return savedCaseDetails;
+        return pocCaseDetails;
     }
 
     private void saveUserDetails(IdamUser idamUser, IdamUser onBehalfOfUser, AuditEvent auditEvent) {

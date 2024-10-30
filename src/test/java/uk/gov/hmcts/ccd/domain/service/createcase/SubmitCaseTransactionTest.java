@@ -11,6 +11,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.clients.PocApiClient;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -116,6 +117,9 @@ class SubmitCaseTransactionTest {
     private CaseDocumentTimestampService caseDocumentTimestampService;
 
     @Mock
+    private PocApiClient pocApiClient;
+
+    @Mock
     private MessageService messageService;
 
     @Mock
@@ -153,8 +157,8 @@ class SubmitCaseTransactionTest {
             caseDocumentService,
             applicationParams,
             caseAccessGroupUtils,
-            caseDocumentTimestampService
-
+            caseDocumentTimestampService,
+            pocApiClient
         );
 
         idamUser = buildIdamUser();

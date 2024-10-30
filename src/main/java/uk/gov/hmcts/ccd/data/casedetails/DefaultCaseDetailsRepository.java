@@ -75,7 +75,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     public CaseDetails set(final CaseDetails caseDetails) {
         final CaseDetailsEntity newCaseDetailsEntity = caseDetailsMapper.modelToEntity(caseDetails);
         newCaseDetailsEntity.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
-        CaseDetailsEntity aCase = pocApiClient.createCase(newCaseDetailsEntity);
+//        CaseDetailsEntity aCase = pocApiClient.createCase(newCaseDetailsEntity);
         CaseDetailsEntity mergedEntity;
         try {
             mergedEntity = em.merge(newCaseDetailsEntity);
@@ -96,11 +96,11 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
                 throw new CasePersistenceException(e.getMessage());
             }
         }
-        if (this.applicationParams.getPocCaseTypes().contains(caseDetails.getCaseTypeId())) {
-            return caseDetailsMapper.entityToModel(aCase);
-        } else {
+//        if (this.applicationParams.getPocCaseTypes().contains(caseDetails.getCaseTypeId())) {
+//            return caseDetailsMapper.entityToModel(aCase);
+//        } else {
             return caseDetailsMapper.entityToModel(mergedEntity);
-        }
+//        }
     }
 
     @Override
