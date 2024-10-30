@@ -179,6 +179,10 @@ public class SubmitCaseTransaction implements AccessControl {
 
         final CaseDetails pocCaseDetails = pocApiClient.createCase(newCaseDetails);
         log.info("pocCaseDetails: {}", pocCaseDetails);
+        log.info("pocCaseDetails id: {}", pocCaseDetails.getId());
+        log.info("pocCaseDetails reference before: {}", pocCaseDetails.getReference());
+        pocCaseDetails.setReference(newCaseDetails.getReference());
+        log.info("pocCaseDetails reference: {}", pocCaseDetails.getReference());
         caseDetailsRepository.set(newCaseDetails);
 //        final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
