@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -39,6 +40,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
+@Slf4j
 @Service
 public class SubmitCaseTransaction implements AccessControl {
 
@@ -176,7 +178,7 @@ public class SubmitCaseTransaction implements AccessControl {
                                                      IdamUser onBehalfOfUser) {
 
         final CaseDetails pocCaseDetails = pocApiClient.createCase(newCaseDetails);
-
+        log.info("pocCaseDetails: {}", pocCaseDetails);
         caseDetailsRepository.set(newCaseDetails);
 //        final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
