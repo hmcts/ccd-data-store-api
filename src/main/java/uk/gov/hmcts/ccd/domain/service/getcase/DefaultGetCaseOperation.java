@@ -55,6 +55,14 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
         }
 
 //        return Optional.ofNullable(caseDetailsRepository.findByReference(Long.valueOf(caseReference)));
-        return Optional.ofNullable(pocApiClient.getCase(caseReference));
+        Optional<CaseDetails> caseDetails = Optional.ofNullable(pocApiClient.getCase(caseReference));
+        if (caseDetails.isPresent()
+                && this.applicationParams.getPocCaseTypes().contains(caseDetails.get().getCaseTypeId())) {
+            CaseDetails recievedCaseDetails = caseDetails.get();
+            recievedCaseDetails.setId(recievedCaseDetails.getReference().toString());
+            recievedCaseDetails.setReference(Long.valueOf(caseReference));
+            return Optional.of(recievedCaseDetails);
+        }
+        return caseDetails;
     }
 }

@@ -207,8 +207,9 @@ public class SubmitCaseTransaction implements AccessControl {
 
         caseAuditEventRepository.set(auditEvent);
 
-        CaseDetails messageCaseDetails = this.applicationParams.getPocCaseTypes().contains(savedCaseDetails.getCaseTypeId())
-        ? pocCaseDetails :savedCaseDetails;
+        CaseDetails messageCaseDetails
+                = this.applicationParams.getPocCaseTypes().contains(savedCaseDetails.getCaseTypeId())
+                ? pocCaseDetails : savedCaseDetails;
 
         messageService.handleMessage(MessageContext.builder()
             .caseDetails(messageCaseDetails)
