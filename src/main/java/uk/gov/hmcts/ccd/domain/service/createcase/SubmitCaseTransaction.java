@@ -184,36 +184,38 @@ public class SubmitCaseTransaction implements AccessControl {
         pocCaseDetails.setId(pocCaseDetails.getReference().toString());
         pocCaseDetails.setReference(newCaseDetails.getReference());
         log.info("pocCaseDetails reference: {}", pocCaseDetails.getReference());
-        caseDetailsRepository.set(newCaseDetails);
-//        final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
+        final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());
         auditEvent.setEventName(caseEventDefinition.getName());
         auditEvent.setSummary(event.getSummary());
         auditEvent.setDescription(event.getDescription());
-        auditEvent.setCaseDataId(pocCaseDetails.getId());
-        auditEvent.setData(pocCaseDetails.getData());
-        auditEvent.setStateId(pocCaseDetails.getState());
+        auditEvent.setCaseDataId(savedCaseDetails.getId());
+        auditEvent.setData(savedCaseDetails.getData());
+        auditEvent.setStateId(savedCaseDetails.getState());
         CaseStateDefinition caseStateDefinition =
-            caseTypeService.findState(caseTypeDefinition, pocCaseDetails.getState());
+            caseTypeService.findState(caseTypeDefinition, savedCaseDetails.getState());
         auditEvent.setStateName(caseStateDefinition.getName());
         auditEvent.setCaseTypeId(caseTypeDefinition.getId());
         auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
         auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition,
             caseEventDefinition));
-        auditEvent.setDataClassification(pocCaseDetails.getDataClassification());
+        auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
         auditEvent.setSignificantItem(response.getSignificantItem());
         saveUserDetails(idamUser, onBehalfOfUser, auditEvent);
 
         caseAuditEventRepository.set(auditEvent);
 
+        CaseDetails messageCaseDetails = this.applicationParams.getPocCaseTypes().contains(savedCaseDetails.getCaseTypeId())
+        ? pocCaseDetails :savedCaseDetails;
+
         messageService.handleMessage(MessageContext.builder()
-            .caseDetails(pocCaseDetails)
+            .caseDetails(messageCaseDetails)
             .caseTypeDefinition(caseTypeDefinition)
             .caseEventDefinition(caseEventDefinition)
             .oldState(null).build());
-        return pocCaseDetails;
+        return messageCaseDetails;
     }
 
     private void saveUserDetails(IdamUser idamUser, IdamUser onBehalfOfUser, AuditEvent auditEvent) {
