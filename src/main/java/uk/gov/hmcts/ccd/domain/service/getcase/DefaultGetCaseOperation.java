@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Qualifier("default")
 public class DefaultGetCaseOperation implements GetCaseOperation {
@@ -59,8 +61,12 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
         if (caseDetails.isPresent()
                 && this.applicationParams.getPocCaseTypes().contains(caseDetails.get().getCaseTypeId())) {
             CaseDetails recievedCaseDetails = caseDetails.get();
+            log.info("case details id before {}", recievedCaseDetails.getId());
+            log.info("case details reference before {}", recievedCaseDetails.getReference());
             recievedCaseDetails.setId(recievedCaseDetails.getReference().toString());
             recievedCaseDetails.setReference(Long.valueOf(caseReference));
+            log.info("case details id  after {}", recievedCaseDetails.getId());
+            log.info("case details reference after {}", recievedCaseDetails.getReference());
             return Optional.of(recievedCaseDetails);
         }
         return caseDetails;
