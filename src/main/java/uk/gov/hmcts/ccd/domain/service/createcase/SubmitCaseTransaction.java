@@ -181,6 +181,7 @@ public class SubmitCaseTransaction implements AccessControl {
         log.info("pocCaseDetails: {}", pocCaseDetails);
         log.info("pocCaseDetails id: {}", pocCaseDetails.getId());
         log.info("pocCaseDetails reference before: {}", pocCaseDetails.getReference());
+        pocCaseDetails.setId(pocCaseDetails.getReference().toString());
         pocCaseDetails.setReference(newCaseDetails.getReference());
         log.info("pocCaseDetails reference: {}", pocCaseDetails.getReference());
         caseDetailsRepository.set(newCaseDetails);
