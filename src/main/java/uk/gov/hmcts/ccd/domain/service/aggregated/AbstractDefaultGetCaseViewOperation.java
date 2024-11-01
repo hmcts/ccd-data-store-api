@@ -74,7 +74,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
 
     CaseDetails getCaseDetails(String caseReference) {
         Optional<CaseDetails> caseDetails = getCaseOperation.execute(caseReference);
-        log.info("caseDetails {}", caseDetails.get());
+        log.info("caseDetails  is present ? {}", caseDetails.isPresent());
         return caseDetails.orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
