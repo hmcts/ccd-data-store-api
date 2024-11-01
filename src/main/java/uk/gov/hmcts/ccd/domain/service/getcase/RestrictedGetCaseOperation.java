@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 
 @Service
 @Qualifier("restricted")
+@Slf4j
 public class RestrictedGetCaseOperation implements GetCaseOperation {
 
     private final GetCaseOperation defaultGetCaseOperation;
@@ -50,6 +52,7 @@ public class RestrictedGetCaseOperation implements GetCaseOperation {
 
     public Optional<CaseDetails> execute(String caseReference) {
         Optional<CaseDetails> authorisedCaseDetails = authorisedGetCaseOperation.execute(caseReference);
+        log.info("Coming here for authorisedCaseDetails {}", authorisedCaseDetails.isPresent());
 
         if (authorisedCaseDetails.isEmpty()) {
             defaultGetCaseOperation.execute(caseReference)

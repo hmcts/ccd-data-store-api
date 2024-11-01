@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
+@Slf4j
 @Service
 @Qualifier("authorised")
 public class AuthorisedGetCaseOperation implements GetCaseOperation {
@@ -71,6 +73,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, accessProfiles, CAN_READ)
             || !accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseType, accessProfiles,
             CAN_READ)) {
+            log.info("Coming here with no read access");
             return Optional.empty();
         }
 
@@ -88,6 +91,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
                 accessProfiles,
                 CAN_READ,
                 true)));
+        log.info("Coming here for case details id {}", caseDetails.getId());
 
         return Optional.of(caseDetails);
     }
