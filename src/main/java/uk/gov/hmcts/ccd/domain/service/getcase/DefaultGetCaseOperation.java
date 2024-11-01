@@ -56,17 +56,16 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
             throw new BadRequestException("Case reference is not valid");
         }
 
-        Optional<CaseDetails> caseDetails = Optional.ofNullable(pocApiClient.getCase(caseReference));
-        if (caseDetails.isPresent()
-                && this.applicationParams.getPocCaseTypes().contains(caseDetails.get().getCaseTypeId())) {
-            CaseDetails recievedCaseDetails = caseDetails.get();
-            log.info("case details id before {}", recievedCaseDetails.getId());
-            log.info("case details reference before {}", recievedCaseDetails.getReference());
-            recievedCaseDetails.setId(recievedCaseDetails.getReference().toString());
-            recievedCaseDetails.setReference(Long.valueOf(caseReference));
-            log.info("case details id  after {}", recievedCaseDetails.getId());
-            log.info("case details reference after {}", recievedCaseDetails.getReference());
-            return Optional.of(recievedCaseDetails);
+        CaseDetails caseDetails = pocApiClient.getCase(caseReference);
+        if (Optional.ofNullable(caseDetails).isPresent()
+                && this.applicationParams.getPocCaseTypes().contains(caseDetails.getCaseTypeId())) {
+            log.info("case details id before {}", caseDetails.getId());
+            log.info("case details reference before {}", caseDetails.getReference());
+            caseDetails.setId(caseDetails.getReference().toString());
+            caseDetails.setReference(Long.valueOf(caseReference));
+            log.info("case details id  after {}", caseDetails.getId());
+            log.info("case details reference after {}", caseDetails.getReference());
+            return Optional.of(caseDetails);
         }
         return Optional.ofNullable(caseDetailsRepository.findByReference(Long.valueOf(caseReference)));
     }
