@@ -56,7 +56,6 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
             throw new BadRequestException("Case reference is not valid");
         }
 
-//        return Optional.ofNullable(caseDetailsRepository.findByReference(Long.valueOf(caseReference)));
         Optional<CaseDetails> caseDetails = Optional.ofNullable(pocApiClient.getCase(caseReference));
         if (caseDetails.isPresent()
                 && this.applicationParams.getPocCaseTypes().contains(caseDetails.get().getCaseTypeId())) {
@@ -69,6 +68,6 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
             log.info("case details reference after {}", recievedCaseDetails.getReference());
             return Optional.of(recievedCaseDetails);
         }
-        return caseDetails;
+        return Optional.ofNullable(caseDetailsRepository.findByReference(Long.valueOf(caseReference)));
     }
 }
