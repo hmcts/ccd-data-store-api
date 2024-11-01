@@ -106,6 +106,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
+    public CaseTypeDefinition getScopedCachedCaseType(String caseTypeId) {
+        return this.getCaseType(caseTypeId);
+    }
+
+    @Override
     public List<FieldTypeDefinition> getBaseTypes() {
         try {
             return Arrays.asList(Objects.requireNonNull(definitionStoreClient

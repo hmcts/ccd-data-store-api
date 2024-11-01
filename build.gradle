@@ -12,7 +12,7 @@ plugins {
     id 'org.jetbrains.gradle.plugin.idea-ext' version '0.7'
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'uk.gov.hmcts.java' version '0.12.57'
-    id 'au.com.dius.pact' version '4.1.0'
+    id 'au.com.dius.pact' version '4.3.12'
     id "org.jsonschema2pojo" version "1.2.1"
     id("org.owasp.dependencycheck") version "10.0.4"
 }
@@ -99,7 +99,7 @@ repositories {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -244,7 +244,8 @@ dependencies {
     testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.12.0'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.22.0'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.2'
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.17.6'
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.2'
+
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testImplementation 'org.apiguardian:apiguardian-api:1.0.0'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
@@ -256,9 +257,11 @@ dependencies {
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.0'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
+    
     testImplementation group: 'io.github.openfeign', name: 'feign-jackson', version: '9.7.0'
-    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.19.3'
-    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.19.3'
+    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.20.2'
+    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.20.2'
+
     testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
     // for sonar analysis
@@ -279,6 +282,7 @@ dependencies {
     contractTestImplementation(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
+
 }
 // end::dependencies[]
 
@@ -822,7 +826,7 @@ task runProviderPactVerification(type:Test) {
         systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
     }
     systemProperty 'pact.provider.version', project.pactVersion
-    include "uk/gov/hmcts/ccd/v2/external/controller/**"
+    include "uk/gov/hmcts/reform/**"
 }
 
 runProviderPactVerification.finalizedBy pactVerify
