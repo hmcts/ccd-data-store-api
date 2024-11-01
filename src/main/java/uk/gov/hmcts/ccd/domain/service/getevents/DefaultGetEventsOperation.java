@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.clients.PocApiClient;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -22,6 +24,8 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     private final CaseAuditEventRepository auditEventRepository;
     private final GetCaseOperation getCaseOperation;
     private final UIDService uidService;
+    private final ApplicationParams applicationParams;
+    private final PocApiClient pocApiClient;
     private static final String RESOURCE_NOT_FOUND //
         = "No case found ( jurisdiction = '%s', case type id = '%s', case reference = '%s' )";
     private static final String CASE_RESOURCE_NOT_FOUND //
@@ -29,16 +33,26 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     private static final String CASE_EVENT_NOT_FOUND = "Case audit events not found";
 
     @Autowired
-    public DefaultGetEventsOperation(CaseAuditEventRepository auditEventRepository, @Qualifier(
-        CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation, UIDService uidService) {
+    public DefaultGetEventsOperation(
+            CaseAuditEventRepository auditEventRepository,
+            @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
+            UIDService uidService,
+            final ApplicationParams applicationParams,
+            final PocApiClient pocApiClient) {
         this.auditEventRepository = auditEventRepository;
         this.getCaseOperation = getCaseOperation;
         this.uidService = uidService;
+        this.applicationParams = applicationParams;
+        this.pocApiClient = pocApiClient;
     }
 
     @Override
     public List<AuditEvent> getEvents(CaseDetails caseDetails) {
-        return auditEventRepository.findByCase(caseDetails);
+        if (this.applicationParams.getPocCaseTypes().contains(caseDetails.getCaseTypeId())) {
+            return pocApiClient.getEvents(caseDetails.getReference().toString());
+        } else {
+            return auditEventRepository.findByCase(caseDetails);
+        }
     }
 
     @Override

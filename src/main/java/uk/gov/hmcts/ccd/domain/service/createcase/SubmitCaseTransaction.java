@@ -56,7 +56,7 @@ public class SubmitCaseTransaction implements AccessControl {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
-    private final PocApiClient pocApiClient;
+    private final POCSubmitCaseTransaction pocSubmitCaseTransaction;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -72,7 +72,7 @@ public class SubmitCaseTransaction implements AccessControl {
                                     final ApplicationParams applicationParams,
                                     final CaseAccessGroupUtils caseAccessGroupUtils,
                                     final CaseDocumentTimestampService caseDocumentTimestampService,
-                                    final PocApiClient pocApiClient
+                                    final POCSubmitCaseTransaction pocSubmitCaseTransaction
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -86,8 +86,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-
-        this.pocApiClient = pocApiClient;
+        this.pocSubmitCaseTransaction = pocSubmitCaseTransaction;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -177,13 +176,8 @@ public class SubmitCaseTransaction implements AccessControl {
                                                      CaseDetails newCaseDetails,
                                                      IdamUser onBehalfOfUser) {
 
-        final CaseDetails pocCaseDetails = pocApiClient.createCase(newCaseDetails);
-        log.info("pocCaseDetails: {}", pocCaseDetails);
-        log.info("pocCaseDetails id: {}", pocCaseDetails.getId());
-        log.info("pocCaseDetails reference before: {}", pocCaseDetails.getReference());
-        pocCaseDetails.setId(pocCaseDetails.getReference().toString());
-        pocCaseDetails.setReference(newCaseDetails.getReference());
-        log.info("pocCaseDetails reference: {}", pocCaseDetails.getReference());
+        final CaseDetails pocCaseDetails = pocSubmitCaseTransaction.saveAuditEventForCaseDetails(response,
+                event, caseTypeDefinition, idamUser, caseEventDefinition, newCaseDetails, onBehalfOfUser);
         final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());

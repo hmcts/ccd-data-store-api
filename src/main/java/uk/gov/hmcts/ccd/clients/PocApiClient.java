@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import uk.gov.hmcts.ccd.customheaders.UserAuthHeadersInterceptorConfig;
+import uk.gov.hmcts.ccd.domain.model.aggregated.POCCaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
@@ -20,7 +21,7 @@ public interface PocApiClient {
 
     @PostMapping(value = "/ccd/cases", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    CaseDetails createCase(@RequestBody CaseDetails caseDetails);
+    CaseDetails createCase(@RequestBody POCCaseDetails caseDetails);
 
     @PutMapping(value = "/ccd/cases/{case-ref}/events", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
