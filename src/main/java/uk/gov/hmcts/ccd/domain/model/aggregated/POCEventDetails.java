@@ -16,7 +16,7 @@ public class POCEventDetails {
     private String stateName;
     private String description;
     private String summary;
-    @JsonProperty("state_name")
+    @JsonProperty("proxied_by")
     private String proxiedBy;
     @JsonProperty("proxied_by_first_name")
     private String proxiedByFirstName;
