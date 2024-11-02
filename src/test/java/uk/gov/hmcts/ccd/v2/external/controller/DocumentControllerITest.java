@@ -1,30 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
-import uk.gov.hmcts.ccd.domain.model.definition.Document;
-import uk.gov.hmcts.ccd.util.ClientContextUtil;
-import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.resource.DocumentsResource;
-
-import jakarta.inject.Inject;
-import javax.sql.DataSource;
-import java.util.List;
-import java.util.Optional;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,6 +12,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
+import java.util.Optional;
+
+import javax.sql.DataSource;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
+
+import jakarta.inject.Inject;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
+import uk.gov.hmcts.ccd.domain.model.definition.Document;
+import uk.gov.hmcts.ccd.util.ClientContextUtil;
+import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.v2.external.resource.DocumentsResource;
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
@@ -69,7 +73,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
         + "      },\n"
         + "      \"name\": \"Test Address Book Case\",\n"
         + "      \"description\": \"Test Address Book Case\",\n"
-        + "      \"printable_document_url\": \"http://localhost:%s/printables\",\n"
+        + "      \"printable_document_url\": \"http://localhost:%d/printables\",\n"
         + "      \"jurisdiction\": {\n"
         + "        \"id\": \"PROBATE\",\n"
         + "        \"name\": \"Test\",\n"
@@ -121,7 +125,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200WhenGetValidCaseDocuments() throws Exception {
 
-        stubFor(com.github.tomakehurst.wiremock.client.WireMock
+        stubFor(WireMock
             .get(urlMatching("/api/data/case-type/TestAddressBookCase"))
                     .willReturn(aResponse()
                                     .withHeader("Content-Type", "application/json")
@@ -129,7 +133,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
 
         final MvcResult result = mockMvc
             .perform(
-                get(String.format("http://localhost:%s/cases/" + CASE_ID + "/documents", super.wiremockPort))
+                get("http://localhost:" + super.wiremockPort + "/cases/" + CASE_ID + "/documents")
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Accept", V2.MediaType.CASE_DOCUMENTS)
                     .header(REQUEST_ID, REQUEST_ID_VALUE)
@@ -148,7 +152,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
             ClientContextUtil.decodeFromBase64(result.getResponse().getHeader(CUSTOM_CONTEXT)));
         assertAll(
             () -> assertThat(self.get().getHref(),
-                is(String.format("http://localhost:%s/cases/" + CASE_ID + "/documents", super.wiremockPort))),
+                is("http://localhost:" + super.wiremockPort + "/cases/" + CASE_ID + "/documents")),
             () -> assertThat(documentResources,
                 hasItems(allOf(hasProperty("name", is("Claimant ID")),
                     hasProperty("description", is("Document identifying identity")),
