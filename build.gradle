@@ -13,8 +13,8 @@ plugins {
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'uk.gov.hmcts.java' version '0.12.57'
     id 'au.com.dius.pact' version '4.3.12'
-    id "org.jsonschema2pojo" version "1.2.1"
-    id("org.owasp.dependencycheck") version "10.0.4"
+    id 'org.jsonschema2pojo' version "1.2.1"
+    id 'org.owasp.dependencycheck' version '11.1.0'
 }
 
 apply from: './gradle/suppress.gradle'
@@ -125,6 +125,10 @@ configurations {
     contractTestRuntimeOnly.extendsFrom(testRuntimeOnly)
     contractTestAnnotationProcessor.extendsFrom(annotationProcessor)
     cucumberRuntime.extendsFrom(functionalRuntime)
+
+    all.collect { configuration ->
+        configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+    }
 }
 
 //This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
@@ -289,33 +293,6 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
-
-    dependencies {
-
-        dependencySet(group: 'commons-beanutils', version: '1.9.4') {
-            entry 'commons-beanutils'
-        }
-
-        dependencySet(group: 'com.squareup.okio', version: '3.9.1') {
-            entry 'okio'
-        }
-
-        dependencySet(group: 'com.google.guava', version: '33.3.1-jre') {
-            entry 'guava'
-        }
-
-        dependencySet(group: 'ch.qos.logback', version: '1.5.8') {
-            entry 'logback-classic'
-            entry 'logback-core'
-        }
-
-        dependencySet(group: 'org.codehaus.groovy', version: '4.0.22') {
-            entry 'groovy'
-            entry 'groovy-xml'
-            entry 'groovy-json'
-            entry 'groovy-all'
-        }
     }
 }
 
@@ -576,12 +553,6 @@ sonarqube {
 
 compileJava {
     options.annotationProcessorPath = configurations.annotationProcessor
-}
-
-configurations {
-    all.collect { configuration ->
-        configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
-    }
 }
 
 compileTestJava {
