@@ -41,6 +41,7 @@
             "total": "[[ANYTHING_PRESENT]]",
             "free": "[[ANYTHING_PRESENT]]",
             "threshold": "[[ANYTHING_PRESENT]]",
+            "path": "[[ANYTHING_PRESENT]]",
             "exists": true
           }
         },

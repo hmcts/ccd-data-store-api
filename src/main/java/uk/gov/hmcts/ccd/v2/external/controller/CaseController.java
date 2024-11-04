@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ExampleProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,6 +15,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -106,25 +109,20 @@ public class CaseController {
             V2.MediaType.CASE
         }
     )
-    @ApiOperation(
-        value = "Retrieve a case by ID",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(summary = "Retrieve a case by ID",description = V2.EXPERIMENTAL_WARNING)
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = CaseResource.class))
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = CaseResource.class
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.CASE_ID_INVALID
-            ),
-        @ApiResponse(
-            code = 404,
-            message = V2.Error.CASE_NOT_FOUND
-            )
-    })
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.CASE_ID_INVALID
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = V2.Error.CASE_NOT_FOUND
+    )
     @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
@@ -148,49 +146,45 @@ public class CaseController {
             V2.MediaType.CREATE_EVENT
         }
     )
-    @ApiOperation(
-        value = "Submit an event for a case"
+    @Operation(summary = "Submit an event for a case")
+    @Parameters({
+        @Parameter(name = V2.EXPERIMENTAL_HEADER, description = "'true' to use this endpoint", in = ParameterIn.HEADER)
+    })
+    @ApiResponse(
+        responseCode = "201",
+        description = "Event has been created successfully",
+        content = @Content(schema = @Schema(implementation = CaseResource.class))
     )
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = V2.EXPERIMENTAL_HEADER, value = "'true' to use this endpoint", paramType = "header")
-    })
-    @ApiResponses({
-        @ApiResponse(
-            code = 201,
-            message = "Event has been created successfully",
-            response = CaseResource.class
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.CASE_ID_INVALID
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.EVENT_TRIGGER_NOT_FOUND
-            ),
-        @ApiResponse(
-            code = 404,
-            message = V2.Error.CASE_NOT_FOUND
-            ),
-        @ApiResponse(
-            code = 422,
-            message = "The event could not be processed, for example due to one of the following:\n"
-                + "- Data validation failed\n"
-                + "- Invalid event (e.g. event ID not provided/known)\n"
-                + "- Case does not comply with pre-state condition for event\n"
-            ),
-        @ApiResponse(
-            code = 504,
-            message = V2.Error.CALLBACK_EXCEPTION
-            )
-    })
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.CASE_ID_INVALID
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.EVENT_TRIGGER_NOT_FOUND
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = V2.Error.CASE_NOT_FOUND
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = "The event could not be processed, for example due to one of the following:\n"
+            + "- Data validation failed\n"
+            + "- Invalid event (e.g. event ID not provided/known)\n"
+            + "- Case does not comply with pre-state condition for event\n"
+    )
+    @ApiResponse(
+        responseCode = "504",
+        description = V2.Error.CALLBACK_EXCEPTION
+        )
     @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction",
         caseType = "#result.body.caseType", eventName = "#content.event.eventId")
-    public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted",
+    public ResponseEntity<CaseResource> createEvent(@Parameter(name = "Case ID for which the event is being submitted",
         required = true)
                                                     @PathVariable("caseId") String caseId,
-                                                    @ApiParam(value = "Case data content for the event. Note that the "
+                                                    @Parameter(name = "Case data content for the event. Note that the "
                                                         + "`data` property "
                                                         + "is used for event submission data; NOT the `event_data`. "
                                                         + "For example:\n"
@@ -261,69 +255,64 @@ public class CaseController {
             V2.MediaType.CREATE_CASE
         }
     )
-    @ApiOperation(
-        value = "Submit case creation",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(summary = "Submit case creation", description = V2.EXPERIMENTAL_WARNING)
+    @ApiResponse(
+        responseCode = "201",
+        description = "Created",
+        content = @Content(schema = @Schema(implementation = CaseResource.class))
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 201,
-            message = "Created",
-            response = CaseResource.class
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.MISSING_EVENT_TOKEN
-            ),
-        @ApiResponse(
-            code = 403,
-            message = V2.Error.GRANT_FORBIDDEN
-            ),
-        @ApiResponse(
-            code = 404,
-            message = V2.Error.EVENT_TRIGGER_NOT_FOUND
-            ),
-        @ApiResponse(
-            code = 404,
-            message = V2.Error.NO_MATCHING_EVENT_TRIGGER
-            ),
-        @ApiResponse(
-            code = 409,
-            message = V2.Error.CASE_ALTERED
-            ),
-        @ApiResponse(
-            code = 422,
-            message = V2.Error.CASE_DATA_NOT_FOUND
-            ),
-        @ApiResponse(
-            code = 422,
-            message = V2.Error.CASE_TYPE_NOT_FOUND
-            ),
-        @ApiResponse(
-            code = 422,
-            message = V2.Error.USER_ROLE_NOT_FOUND
-            ),
-        @ApiResponse(
-            code = 422,
-            message = V2.Error.EVENT_TRIGGER_NOT_SPECIFIED
-            ),
-        @ApiResponse(
-            code = 422,
-            message = V2.Error.EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE
-            ),
-        @ApiResponse(
-            code = 422,
-            message = V2.Error.EVENT_TRIGGER_HAS_PRE_STATE
-            ),
-        @ApiResponse(
-            code = 422,
-            message = V2.Error.CASE_FIELD_INVALID
-            ),
-        @ApiResponse(
-            code = 504,
-            message = V2.Error.CALLBACK_EXCEPTION
-            )
-    })
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.MISSING_EVENT_TOKEN
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = V2.Error.GRANT_FORBIDDEN
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = V2.Error.EVENT_TRIGGER_NOT_FOUND
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = V2.Error.NO_MATCHING_EVENT_TRIGGER
+    )
+    @ApiResponse(
+        responseCode = "409",
+        description = V2.Error.CASE_ALTERED
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = V2.Error.CASE_DATA_NOT_FOUND
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = V2.Error.CASE_TYPE_NOT_FOUND
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = V2.Error.USER_ROLE_NOT_FOUND
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = V2.Error.EVENT_TRIGGER_NOT_SPECIFIED
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = V2.Error.EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = V2.Error.EVENT_TRIGGER_HAS_PRE_STATE
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = V2.Error.CASE_FIELD_INVALID
+    )
+    @ApiResponse(
+        responseCode = "504",
+        description = V2.Error.CALLBACK_EXCEPTION
+    )
     @LogAudit(operationType = CREATE_CASE, caseId = "#result.body.reference",
         jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") @ValidCaseTypeId String caseTypeId,
@@ -342,33 +331,28 @@ public class CaseController {
             V2.MediaType.CASE_EVENTS
         }
     )
-    @ApiOperation(
-        value = "Retrieve audit events by case ID",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(summary = "Retrieve audit events by case ID", description = V2.EXPERIMENTAL_WARNING)
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = CaseEventsResource.class))
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = CaseEventsResource.class
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.ERROR_CASE_ID_INVALID
-            ),
-        @ApiResponse(
-            code = 422,
-            message = V2.Error.CASE_TYPE_DEF_NOT_FOUND_FOR_CASE_ID
-            ),
-        @ApiResponse(
-            code = 422,
-            message = V2.Error.ROLES_FOR_CASE_ID_NOT_FOUND
-            ),
-        @ApiResponse(
-            code = 404,
-            message = V2.Error.CASE_AUDIT_EVENTS_NOT_FOUND
-            )
-    })
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.ERROR_CASE_ID_INVALID
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = V2.Error.CASE_TYPE_DEF_NOT_FOUND_FOR_CASE_ID
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = V2.Error.ROLES_FOR_CASE_ID_NOT_FOUND
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = V2.Error.CASE_AUDIT_EVENTS_NOT_FOUND
+    )
     public ResponseEntity<CaseEventsResource> getCaseEvents(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.ERROR_CASE_ID_INVALID);
@@ -383,43 +367,41 @@ public class CaseController {
     @PostMapping(
         path = "/cases/{caseId}/supplementary-data"
     )
-    @ApiOperation(
-        value = "Update Case Supplementary Data"
+    @Operation(summary = "Update Case Supplementary Data")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Updated",
+        content = @Content(schema = @Schema(implementation = SupplementaryDataResource.class))
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Updated",
-            response = SupplementaryDataResource.class
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.CASE_ID_INVALID
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.SUPPLEMENTARY_DATA_UPDATE_INVALID
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.MORE_THAN_ONE_NESTED_LEVEL
-            ),
-        @ApiResponse(
-            code = 404,
-            message = V2.Error.CASE_NOT_FOUND
-            ),
-        @ApiResponse(
-            code = 403,
-            message = V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA
-            )
-    })
-    @ApiImplicitParams({
-        @ApiImplicitParam(
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.CASE_ID_INVALID
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.SUPPLEMENTARY_DATA_UPDATE_INVALID
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.MORE_THAN_ONE_NESTED_LEVEL
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = V2.Error.CASE_NOT_FOUND
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA
+    )
+    @Parameters({
+        @Parameter(
             name = "supplementaryDataUpdateRequest",
-            dataTypeClass = SupplementaryDataUpdateRequest.class,
-            examples = @io.swagger.annotations.Example(
-                value = {
-                    @ExampleProperty(value = "{\n"
+            schema = @Schema(
+                implementation = SupplementaryDataUpdateRequest.class,
+                contentMediaType = "application/json"
+            ),
+            examples = @ExampleObject(
+                value = "{\n"
                         + "\t\"$inc\": {\n"
                         + "\t\t\"orgs_assigned_users.OrgA\": 1,\n"
                         + "\t\t\"orgs_assigned_users.OrgB\": -1\n"
@@ -428,8 +410,9 @@ public class CaseController {
                         + "\t\t\"orgs_assigned_users.OrgZ\": 34,\n"
                         + "\t\t\"processed\": true\n"
                         + "\t}\n"
-                        + "}", mediaType = "application/json")
-                }))
+                        + "}" 
+                )
+            )
     })
     public ResponseEntity<SupplementaryDataResource> updateCaseSupplementaryData(@PathVariable("caseId") String caseId,
                                                                                  @RequestBody
@@ -466,23 +449,19 @@ public class CaseController {
         path = "getLinkedCases/{caseReference}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiOperation(
-        value = "Retrieve Linked Cases"
-    )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = GetLinkedCasesResponse.class),
-        @ApiResponse(
-            code = 400,
-            message = "One or more of the following reasons:"
-                + "\n1) " + V2.Error.CASE_ID_INVALID
-                + "\n2) " + V2.Error.PARAM_NOT_NUM),
-        @ApiResponse(
-            code = 404,
-            message = V2.Error.CASE_NOT_FOUND)
-    })
+    @Operation(summary = "Retrieve Linked Cases")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = GetLinkedCasesResponse.class)))
+    @ApiResponse(
+        responseCode = "400",
+        description = "One or more of the following reasons:"
+            + "\n1) " + V2.Error.CASE_ID_INVALID
+            + "\n2) " + V2.Error.PARAM_NOT_NUM)
+    @ApiResponse(
+        responseCode = "404",
+        description = V2.Error.CASE_NOT_FOUND)
     @LogAudit(operationType = LINKED_CASES_ACCESSED,
         caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseController).buildCaseIds(#caseReference, #result.body)")
     public ResponseEntity<GetLinkedCasesResponse> getLinkedCase(

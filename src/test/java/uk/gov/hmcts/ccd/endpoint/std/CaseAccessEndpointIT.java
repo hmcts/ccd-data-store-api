@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.std.UserId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 

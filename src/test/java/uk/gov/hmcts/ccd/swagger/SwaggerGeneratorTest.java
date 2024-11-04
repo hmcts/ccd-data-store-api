@@ -54,7 +54,7 @@ public class SwaggerGeneratorTest extends WireMockBaseTest {
     }
 
     private void generateSpecsFor(String groupName) throws Exception {
-        ResultActions perform = mvc.perform(get("/v2/api-docs?group=" + groupName));
+        ResultActions perform = mvc.perform(get("/v3/api-docs?group=" + groupName));
         byte[] specs = perform
             .andExpect(status().isOk())
             .andReturn()

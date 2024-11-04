@@ -74,7 +74,7 @@ class DocumentSanitiserTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         documentSanitiser = new DocumentSanitiser(documentManagementRestClient);
         documentValueInitial.put("document_url", DOCUMENT_URL_VALUE);

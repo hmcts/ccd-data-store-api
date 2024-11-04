@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.domain.types;
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.util.Collections;

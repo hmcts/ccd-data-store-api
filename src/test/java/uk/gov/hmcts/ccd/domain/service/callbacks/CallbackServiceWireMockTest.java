@@ -8,7 +8,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,7 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -419,7 +419,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             caseEventDefinition, null, caseDetails, String.class);
 
         assertAll(
-            () -> assertThat(result.getStatusCodeValue(), is(201)),
+            () -> assertThat(result.getStatusCode().value(), is(201)),
             () -> JSONAssert.assertEquals(
                 "{\"data\":null,\"errors\":[],\"warnings\":[],\"data_classification\":null,\""
                     + "security_classification\"" + ":null}",

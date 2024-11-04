@@ -6,7 +6,7 @@ import uk.gov.hmcts.ccd.AbstractBaseIntegrationTest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @org.junit.Ignore("Fixed by Mario's PR")

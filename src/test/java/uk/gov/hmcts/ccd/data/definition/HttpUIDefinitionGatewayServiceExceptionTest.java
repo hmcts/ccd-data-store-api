@@ -7,7 +7,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 
 public class HttpUIDefinitionGatewayServiceExceptionTest extends WireMockBaseTest {
