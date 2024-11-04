@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,6 +36,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
 
+@Slf4j
 @Service
 @Qualifier(DefaultGetCaseViewOperation.QUALIFIER)
 public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
@@ -129,6 +131,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
             .filter(event -> this.caseEventEnablingService.isEventEnabled(event.getEventEnablingCondition(),
                 caseDetails, updatedMetadataFields))
             .map(event -> {
+                log.info("Case event details {}", event);
                 final CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
                 caseViewActionableEvent.setId(event.getId());
                 caseViewActionableEvent.setName(event.getName());
