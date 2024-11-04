@@ -79,6 +79,8 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         final CaseTypeDefinition caseTypeDefinition =
             getCaseType(caseDetails.getJurisdiction(), caseDetails.getCaseTypeId());
         final List<AuditEvent> events = getEventsOperation.getEvents(caseDetails);
+        log.info("fetched Case event details {}", events);
+
         final CaseTypeTabsDefinition caseTypeTabsDefinition = getCaseTabCollection(caseDetails.getCaseTypeId());
 
         return merge(caseDetails, events, caseTypeDefinition, caseTypeTabsDefinition);
