@@ -247,35 +247,30 @@ public class CreateCaseEventService {
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 
-        final CaseDetails savedCaseDetails = saveCaseDetails(
-            caseDetailsInDatabase,
-            caseDetailsAfterCallbackWithoutHashes,
-            caseEventDefinition,
-            newState,
-            timeNow
-        );
+        boolean isPocCaseType = this.applicationParams.getPocCaseTypes().contains(caseDetailsInDatabase.getCaseTypeId());
 
-        caseLinkService.updateCaseLinks(savedCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+        CaseDetails finalCaseDetails = isPocCaseType
+                ? pocCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(), caseEventDefinition,
+                caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase)
+                : saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
+                newState, timeNow);
 
-        saveAuditEventForCaseDetails(
-            aboutToSubmitCallbackResponse,
-            content.getEvent(),
-            caseEventDefinition,
-            savedCaseDetails,
-            caseTypeDefinition,
-            timeNow,
-            oldState,
-            content.getOnBehalfOfUserToken(),
-            content.getOnBehalfOfId(),
-            securityClassificationService.getClassificationForEvent(caseTypeDefinition,
-                caseEventDefinition)
-        );
+        caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
-        CaseDetails pocCaseDetails = pocCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(),
-                caseEventDefinition,
-                savedCaseDetails,
-                caseTypeDefinition,
-                caseDetailsInDatabase);
+        if (!isPocCaseType) {
+            saveAuditEventForCaseDetails(
+                    aboutToSubmitCallbackResponse,
+                    content.getEvent(),
+                    caseEventDefinition,
+                    finalCaseDetails,
+                    caseTypeDefinition,
+                    timeNow,
+                    oldState,
+                    content.getOnBehalfOfUserToken(),
+                    content.getOnBehalfOfId(),
+                    securityClassificationService.getClassificationForEvent(caseTypeDefinition, caseEventDefinition)
+            );
+        }
 
         caseDocumentService.attachCaseDocuments(
             caseDetails.getReferenceAsString(),
@@ -284,13 +279,9 @@ public class CreateCaseEventService {
             documentHashes
         );
 
-        CaseDetails messageCaseDetails
-                = this.applicationParams.getPocCaseTypes().contains(savedCaseDetails.getCaseTypeId())
-                ? pocCaseDetails : savedCaseDetails;
-
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
-            .savedCaseDetails(messageCaseDetails)
+            .savedCaseDetails(finalCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
     }
