@@ -1,19 +1,17 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.clients.PocApiClient;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,10 +23,11 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
     private final PocApiClient pocApiClient;
 
     @Autowired
-    public DefaultGetCaseOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
-                                   final UIDService uidService,
-                                   final ApplicationParams applicationParams,
-                                   final PocApiClient pocApiClient) {
+    public DefaultGetCaseOperation(
+            @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+            final UIDService uidService,
+            final ApplicationParams applicationParams,
+            final PocApiClient pocApiClient) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.uidService = uidService;
         this.applicationParams = applicationParams;

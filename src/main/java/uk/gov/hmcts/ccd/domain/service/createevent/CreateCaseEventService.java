@@ -35,6 +35,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
@@ -95,6 +96,8 @@ public class CreateCaseEventService {
     private final TimeToLiveService timeToLiveService;
     private final CaseLinkService caseLinkService;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
+    private final GetCaseOperation getCaseOperation;
+    private final POCCreateCaseEventService pocCreateCaseEventService;
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
 
@@ -130,7 +133,9 @@ public class CreateCaseEventService {
                                   final CaseLinkService caseLinkService,
                                   final ApplicationParams applicationParams,
                                   final CaseAccessGroupUtils caseAccessGroupUtils,
-                                  final CaseDocumentTimestampService caseDocumentTimestampService) {
+                                  final CaseDocumentTimestampService caseDocumentTimestampService,
+                                  @Qualifier("default") final GetCaseOperation getCaseOperation,
+                                  final POCCreateCaseEventService pocCreateCaseEventService) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -161,12 +166,14 @@ public class CreateCaseEventService {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-
+        this.getCaseOperation = getCaseOperation;
+        this.pocCreateCaseEventService = pocCreateCaseEventService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CreateCaseEventResult createCaseEvent(final String caseReference, final CaseDataContent content) {
 
+        //TODO get case details from service
         final CaseDetails caseDetails = getCaseDetails(caseReference);
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
         final CaseEventDefinition caseEventDefinition = findAndValidateCaseEvent(
@@ -264,6 +271,12 @@ public class CreateCaseEventService {
                 caseEventDefinition)
         );
 
+        CaseDetails pocCaseDetails = pocCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(),
+                caseEventDefinition,
+                savedCaseDetails,
+                caseTypeDefinition,
+                caseDetailsInDatabase);
+
         caseDocumentService.attachCaseDocuments(
             caseDetails.getReferenceAsString(),
             caseDetails.getCaseTypeId(),
@@ -271,9 +284,13 @@ public class CreateCaseEventService {
             documentHashes
         );
 
+        CaseDetails messageCaseDetails
+                = this.applicationParams.getPocCaseTypes().contains(savedCaseDetails.getCaseTypeId())
+                ? pocCaseDetails : savedCaseDetails;
+
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
-            .savedCaseDetails(savedCaseDetails)
+            .savedCaseDetails(messageCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
     }
@@ -391,9 +408,13 @@ public class CreateCaseEventService {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
-        return caseDetailsRepository.findByReference(caseReference)
-            .orElseThrow(() ->
-                new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
+        // TODO need to handle this
+        // return caseDetailsRepository.findByReference(caseReference)
+        //    .orElseThrow(() ->
+        //        new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
+       return getCaseOperation.execute(caseReference)
+                .orElseThrow(() ->
+                    new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }
 
     private CaseDetails saveCaseDetails(final CaseDetails caseDetailsBefore,

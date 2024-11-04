@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.createcase.POCSubmitCaseTransaction;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
@@ -105,8 +106,6 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @MockBean
     private AccessControlService accessControlService;
 
-    @MockBean
-    private PocApiClient pocApiClient;
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
@@ -142,7 +141,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         DefaultCaseDetailsRepository defaultCaseDetailsRepository =
             new DefaultCaseDetailsRepository(caseDetailsMapper, null, null,
-                applicationParams, pocApiClient);
+                applicationParams);
 
         Field emField = DefaultCaseDetailsRepository.class.getDeclaredField("em");
         emField.setAccessible(true);

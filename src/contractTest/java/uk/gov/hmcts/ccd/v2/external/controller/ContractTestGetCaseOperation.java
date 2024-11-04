@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.clients.PocApiClient;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -27,8 +29,10 @@ public class ContractTestGetCaseOperation extends DefaultGetCaseOperation {
     @Autowired
     public ContractTestGetCaseOperation(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
                                             CaseDetailsRepository caseDetailsRepository,
-                                        UIDService uidService, ContractTestSecurityUtils contractTestSecurityUtils) {
-        super(caseDetailsRepository, uidService);
+                                        UIDService uidService,
+                                        ContractTestSecurityUtils contractTestSecurityUtils,
+                                        ApplicationParams applicationParams, PocApiClient pocApiClient) {
+        super(caseDetailsRepository, uidService, applicationParams, pocApiClient);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
 
     }

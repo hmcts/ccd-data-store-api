@@ -9,11 +9,13 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 @Builder
 public class POCCaseDetails {
 
+    private CaseDetails caseDetailsBefore;
     private CaseDetails caseDetails;
     private POCEventDetails eventDetails;
 
     @JsonCreator
-    public POCCaseDetails(CaseDetails caseDetails, POCEventDetails eventDetails) {
+    public POCCaseDetails(CaseDetails caseDetailsBefore, CaseDetails caseDetails, POCEventDetails eventDetails) {
+        this.caseDetailsBefore = caseDetailsBefore;
         this.caseDetails = caseDetails;
         this.eventDetails = eventDetails;
     }

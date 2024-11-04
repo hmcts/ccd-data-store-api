@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
@@ -7,24 +11,23 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ccd.clients.PocApiClient;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
@@ -33,12 +36,6 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
-import uk.gov.hmcts.ccd.ApplicationParams;
-
-import javax.inject.Inject;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -59,21 +56,20 @@ public class SubmitCaseTransaction implements AccessControl {
     private final POCSubmitCaseTransaction pocSubmitCaseTransaction;
 
     @Inject
-    public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                     final CaseDetailsRepository caseDetailsRepository,
-                                    final CaseAuditEventRepository caseAuditEventRepository,
-                                    final CaseTypeService caseTypeService,
-                                    final CallbackInvoker callbackInvoker,
-                                    final UIDService uidService,
-                                    final SecurityClassificationService securityClassificationService,
-                                    final CaseDataAccessControl caseDataAccessControl,
-                                    final @Qualifier("caseEventMessageService") MessageService messageService,
-                                    final CaseDocumentService caseDocumentService,
-                                    final ApplicationParams applicationParams,
-                                    final CaseAccessGroupUtils caseAccessGroupUtils,
-                                    final CaseDocumentTimestampService caseDocumentTimestampService,
-                                    final POCSubmitCaseTransaction pocSubmitCaseTransaction
-                                 ) {
+    public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                                 final CaseAuditEventRepository caseAuditEventRepository,
+                                 final CaseTypeService caseTypeService,
+                                 final CallbackInvoker callbackInvoker,
+                                 final UIDService uidService,
+                                 final SecurityClassificationService securityClassificationService,
+                                 final CaseDataAccessControl caseDataAccessControl,
+                                 final @Qualifier("caseEventMessageService") MessageService messageService,
+                                 final CaseDocumentService caseDocumentService,
+                                 final ApplicationParams applicationParams,
+                                 final CaseAccessGroupUtils caseAccessGroupUtils,
+                                 final CaseDocumentTimestampService caseDocumentTimestampService,
+                                 final POCSubmitCaseTransaction pocSubmitCaseTransaction
+    ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
         this.caseTypeService = caseTypeService;
@@ -91,9 +87,9 @@ public class SubmitCaseTransaction implements AccessControl {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Retryable(
-        value = {ReferenceKeyUniqueConstraintException.class},
-        maxAttempts = 2,
-        backoff = @Backoff(delay = 50)
+            value = {ReferenceKeyUniqueConstraintException.class},
+            maxAttempts = 2,
+            backoff = @Backoff(delay = 50)
     )
 
     public CaseDetails submitCase(Event event,
@@ -120,49 +116,48 @@ public class SubmitCaseTransaction implements AccessControl {
             collisions.
          */
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
-            caseEventDefinition,
-            null,
-            caseDetailsWithoutHashes,
-            caseTypeDefinition,
-            ignoreWarning
+                caseEventDefinition,
+                null,
+                caseDetailsWithoutHashes,
+                caseTypeDefinition,
+                ignoreWarning
         );
 
         caseDocumentTimestampService.addUploadTimestamps(caseDetailsWithoutHashes, null);
 
-        @SuppressWarnings("UnnecessaryLocalVariable")
-        final CaseDetails caseDetailsAfterCallback = caseDetailsWithoutHashes;
+        @SuppressWarnings("UnnecessaryLocalVariable") final CaseDetails caseDetailsAfterCallback = caseDetailsWithoutHashes;
 
         final List<DocumentHashToken> documentHashes = caseDocumentService.extractDocumentHashToken(
-            caseDetails.getData(),
-            caseDetailsAfterCallback.getData()
+                caseDetails.getData(),
+                caseDetailsAfterCallback.getData()
         );
 
         final CaseDetails caseDetailsAfterCallbackWithoutHashes = caseDocumentService.stripDocumentHashes(
-            caseDetailsAfterCallback
+                caseDetailsAfterCallback
         );
 
         if (this.applicationParams.getCaseGroupAccessFilteringEnabled()) {
             caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetailsAfterCallbackWithoutHashes,
-                caseTypeDefinition);
+                    caseTypeDefinition);
         }
 
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(
-            aboutToSubmitCallbackResponse,
-            event,
-            caseTypeDefinition,
-            idamUser,
-            caseEventDefinition,
-            caseDetailsAfterCallbackWithoutHashes,
-            onBehalfOfUser
+                aboutToSubmitCallbackResponse,
+                event,
+                caseTypeDefinition,
+                idamUser,
+                caseEventDefinition,
+                caseDetailsAfterCallbackWithoutHashes,
+                onBehalfOfUser
         );
 
         caseDataAccessControl.grantAccess(savedCaseDetails, idamUser.getId());
 
         caseDocumentService.attachCaseDocuments(
-            caseDetails.getReferenceAsString(),
-            caseDetails.getCaseTypeId(),
-            caseDetails.getJurisdiction(),
-            documentHashes
+                caseDetails.getReferenceAsString(),
+                caseDetails.getCaseTypeId(),
+                caseDetails.getJurisdiction(),
+                documentHashes
         );
 
         return savedCaseDetails;
@@ -188,13 +183,13 @@ public class SubmitCaseTransaction implements AccessControl {
         auditEvent.setData(savedCaseDetails.getData());
         auditEvent.setStateId(savedCaseDetails.getState());
         CaseStateDefinition caseStateDefinition =
-            caseTypeService.findState(caseTypeDefinition, savedCaseDetails.getState());
+                caseTypeService.findState(caseTypeDefinition, savedCaseDetails.getState());
         auditEvent.setStateName(caseStateDefinition.getName());
         auditEvent.setCaseTypeId(caseTypeDefinition.getId());
         auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
         auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition,
-            caseEventDefinition));
+                caseEventDefinition));
         auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
         auditEvent.setSignificantItem(response.getSignificantItem());
         saveUserDetails(idamUser, onBehalfOfUser, auditEvent);
@@ -206,10 +201,10 @@ public class SubmitCaseTransaction implements AccessControl {
                 ? pocCaseDetails : savedCaseDetails;
 
         messageService.handleMessage(MessageContext.builder()
-            .caseDetails(messageCaseDetails)
-            .caseTypeDefinition(caseTypeDefinition)
-            .caseEventDefinition(caseEventDefinition)
-            .oldState(null).build());
+                .caseDetails(messageCaseDetails)
+                .caseTypeDefinition(caseTypeDefinition)
+                .caseEventDefinition(caseEventDefinition)
+                .oldState(null).build());
         return messageCaseDetails;
     }
 

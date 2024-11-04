@@ -135,7 +135,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     private ApplicationParams applicationParams;
 
     @Mock
-    private PocApiClient pocApiClient;
+    private POCSubmitCaseTransaction pocSubmitCaseTransaction;
 
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
@@ -169,7 +169,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             applicationParams,
             caseAccessGroupUtils,
             caseDocumentTimestampService,
-            pocApiClient
+            pocSubmitCaseTransaction
         );
 
         idamUser = buildIdamUser();
