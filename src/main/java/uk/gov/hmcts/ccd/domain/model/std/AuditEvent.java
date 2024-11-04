@@ -18,7 +18,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class AuditEvent extends Event {
-//    @JsonIgnore
+    @JsonIgnore
     private Long id;
     @JsonProperty("user_id")
     private String userId;
