@@ -31,7 +31,6 @@ import static org.mockito.Mockito.when;
     url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
     consumerVersionSelectors = {@VersionSelector(tag = "master")})
 @IgnoreNoPactsToVerify
-//@PactFolder("target/pacts/reform/caseassigneduserroles/both_tests")
 @ExtendWith(SpringExtension.class)
 public class CasesProviderTest {
 
@@ -77,8 +76,7 @@ public class CasesProviderTest {
 
     private List<CaseAssignedUserRole> mockCaseAssignedUserRoles() {
         List<CaseAssignedUserRole> caseAssignedUserRoles = new ArrayList<>();
-        caseAssignedUserRoles.add(new CaseAssignedUserRole("caseDataId", "userId",
-            "caseRole"));
+        caseAssignedUserRoles.add(new CaseAssignedUserRole("caseDataId", "userId", "caseRole"));
         return caseAssignedUserRoles;
     }
 
