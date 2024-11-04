@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.getevents;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
+@Slf4j
 @Service
 @Qualifier("default")
 public class DefaultGetEventsOperation implements GetEventsOperation {
@@ -49,7 +51,9 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     @Override
     public List<AuditEvent> getEvents(CaseDetails caseDetails) {
         if (this.applicationParams.getPocCaseTypes().contains(caseDetails.getCaseTypeId())) {
-            return pocApiClient.getEvents(caseDetails.getReference().toString());
+            List<AuditEvent> events = pocApiClient.getEvents(caseDetails.getReference().toString());
+            log.info("case event Details {}", events);
+            return events;
         } else {
             return auditEventRepository.findByCase(caseDetails);
         }
