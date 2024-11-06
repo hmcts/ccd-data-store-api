@@ -249,7 +249,7 @@ dependencies {
 
     implementation "io.github.openfeign:feign-httpclient:11.0"
 
-    implementation group: 'net.minidev', name: 'json-smart', version: '2.4.9'
+    implementation group: 'net.minidev', name: 'json-smart', version: '2.4.11'
 
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.2'
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
