@@ -90,13 +90,8 @@ public class DeleteAccessControlService {
 
     private Optional<String> findDeletedFieldPath(final String rootFieldName, final JsonNode existingData,
                                                   final JsonNode newData) {
-        if (existingData == null || newData == null || newData.isNull()) {
-            log.debug("Missing nodes. ExistingData: {}, NewData: {}", existingData, newData);
+        if (isComparableNodeMissing(existingData, newData)) {
             return Optional.of(rootFieldName);
-        }
-
-        if (existingData.equals(newData)) {
-            return Optional.empty();
         }
 
         for (Iterator<String> fieldNames = existingData.fieldNames(); fieldNames.hasNext(); ) {
@@ -104,27 +99,46 @@ public class DeleteAccessControlService {
             JsonNode existingFieldNode = existingData.get(fieldName);
             JsonNode newFieldNode = newData.get(fieldName);
 
-            if (newFieldNode == null || newFieldNode.isNull()) {
-                log.debug("Field '{}' is missing or null in new data but exists in existing data.", fieldName);
-                return Optional.of(rootFieldName + "." + fieldName);
+            if (existingFieldNode.equals(newFieldNode)) {
+                continue;
             }
 
-            if (existingFieldNode.isObject() && newFieldNode.isObject()) {
-                Optional<String> nestedFieldPath = findDeletedFieldPath(rootFieldName + "." + fieldName,
-                    existingFieldNode, newFieldNode);
-                if (nestedFieldPath.isPresent()) {
-                    return nestedFieldPath;
-                }
-            } else if (existingFieldNode.isArray() && newFieldNode.isArray()) {
-                Optional<String> deletedPath = findDeletedCollectionItemPath(rootFieldName, fieldName,
-                    existingFieldNode, newFieldNode);
-                if (deletedPath.isPresent()) {
-                    return deletedPath;
-                }
+            Optional<String> missingFieldPath = findMissingOrDeletedField(rootFieldName, fieldName, existingFieldNode,
+                newFieldNode);
+            if (missingFieldPath.isPresent()) {
+                return missingFieldPath;
             }
         }
 
         return Optional.empty();
+    }
+
+    private Optional<String> findMissingOrDeletedField(final String rootFieldName, final String fieldName,
+                                                       final JsonNode existingFieldNode, final JsonNode newFieldNode) {
+        if (isNodeNull(newFieldNode)) {
+            log.debug("Field '{}' is missing or null in new data but exists in existing data.", fieldName);
+            return Optional.of(rootFieldName + "." + fieldName);
+        }
+
+        if (existingFieldNode.isObject() && newFieldNode.isObject()) {
+            return findDeletedFieldPath(rootFieldName + "." + fieldName, existingFieldNode, newFieldNode);
+        } else if (existingFieldNode.isArray() && newFieldNode.isArray()) {
+            return findDeletedCollectionItemPath(rootFieldName, fieldName, existingFieldNode, newFieldNode);
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean isComparableNodeMissing(final JsonNode existingData, final JsonNode newData) {
+        if (isNodeNull(existingData) || isNodeNull(newData)) {
+            log.debug("Missing nodes. ExistingData: {}, NewData: {}", existingData, newData);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isNodeNull(final JsonNode node) {
+        return node == null || node.isNull();
     }
 
     private Optional<String> findDeletedCollectionItemPath(String rootFieldName, String fieldName,

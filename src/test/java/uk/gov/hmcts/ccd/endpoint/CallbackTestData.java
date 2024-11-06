@@ -298,7 +298,7 @@ public class CallbackTestData {
             "            \"create\": true,\n" +
             "            \"read\": true,\n" +
             "            \"update\": true,\n" +
-            "            \"delete\": false\n" +
+            "            \"delete\": true\n" +
             "       }]," +
             "      \"field_type\": {\n" +
             "        \"id\": \"Address\",\n" +

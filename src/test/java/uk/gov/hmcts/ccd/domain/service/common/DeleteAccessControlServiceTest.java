@@ -104,6 +104,27 @@ class DeleteAccessControlServiceTest {
           }
         }
         """;
+
+    static String nestedComplexTypeArrayPayload = """
+        {
+           "caseCategory": {
+               "value": {
+                   "code": "Test",
+                   "label": "Test"
+               },
+               "list_items": [
+                   {
+                       "id": "123456",
+                       "value": {
+                           "code": "Test",
+                           "label": "Test"
+                       }
+                   }
+               ]
+           }
+        }
+        """;
+
     private Logger logger;
     private ListAppender<ILoggingEvent> listAppender;
     private List<ILoggingEvent> loggingEventList;
@@ -348,6 +369,395 @@ class DeleteAccessControlServiceTest {
         return note;
     }
 
+    private CaseFieldDefinition caseCategoryFieldWithoutDeletePermission() {
+        CaseFieldDefinition caseCategory = newCaseField()
+            .withId("caseCategory")
+            .withFieldType(aFieldType()
+                .withId("CaseCategoryComplex")
+                .withType(COMPLEX)
+
+                .withComplexField(newCaseField()
+                    .withId("value")
+                    .withFieldType(aFieldType()
+                        .withId("ValueComplex")
+                        .withType(COMPLEX)
+                        .withComplexField(newCaseField()
+                            .withId("code")
+                            .withFieldType(aFieldType()
+                                .withId("Text")
+                                .withType("Text")
+                                .build())
+                            .build())
+                        .withComplexField(newCaseField()
+                            .withId("label")
+                            .withFieldType(aFieldType()
+                                .withId("Text")
+                                .withType("Text")
+                                .build())
+                            .build())
+                        .build())
+                    .build())
+
+                .withComplexField(newCaseField()
+                    .withId("list_items")
+                    .withFieldType(aFieldType()
+                        .withId("ListItemsCollection")
+                        .withType(COLLECTION)
+                        .withCollectionFieldType(aFieldType()
+                            .withId("ListItemComplex")
+                            .withType(COMPLEX)
+
+                            .withComplexField(newCaseField()
+                                .withId("id")
+                                .withFieldType(aFieldType()
+                                    .withId("Text")
+                                    .withType("Text")
+                                    .build())
+                                .build())
+
+                            .withComplexField(newCaseField()
+                                .withId("value")
+                                .withFieldType(aFieldType()
+                                    .withId("ValueComplex")
+                                    .withType(COMPLEX)
+                                    .withComplexField(newCaseField()
+                                        .withId("code")
+                                        .withFieldType(aFieldType()
+                                            .withId("Text")
+                                            .withType("Text")
+                                            .build())
+                                        .build())
+                                    .withComplexField(newCaseField()
+                                        .withId("label")
+                                        .withFieldType(aFieldType()
+                                            .withId("Text")
+                                            .withType("Text")
+                                            .build())
+                                        .build())
+                                    .build())
+                                .build())
+                            .build())
+                        .build())
+                    .build())
+                .build())
+            .build();
+
+        final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(caseCategory).build();
+        caseTypeDefinition.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+
+        return caseCategory;
+    }
+
+    private CaseFieldDefinition caseCategoryFieldWithDeletePermission() {
+        AccessControlList deletePermission = new AccessControlList();
+        deletePermission.setAccessProfile("caseworker-probate-loa1");
+        deletePermission.setDelete(true);
+
+        CaseFieldDefinition caseCategory = caseCategoryFieldWithoutDeletePermission();
+        caseCategory.setAccessControlLists(List.of(deletePermission));
+
+        final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(caseCategory).build();
+        caseTypeDefinition.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+
+        return caseCategory;
+    }
+
+    @Test
+    void shouldCaptureDeletionOfNullFieldFromNestedComplexTypeArrayWithoutPermission() {
+        final String nestedComplexTypeArrayPayload = """
+            {
+               "caseCategory": {
+                   "value": {
+                       "code": null,
+                       "label": "Test"
+                   },
+                   "list_items": [
+                       {
+                           "id": "123456",
+                           "value": {
+                               "code": "Test",
+                               "label": "Test"
+                           }
+                       }
+                   ]
+               }
+            }
+            """;
+
+        final String newDataString = """
+            {
+               "caseCategory": {
+                    "value": {
+                       "label": "Test"
+                   },
+                   "list_items": [
+                       {
+                           "id": "123456",
+                           "value": {
+                               "code": "Test",
+                               "label": "Test"
+                           }
+                       }
+                   ]
+                }
+            }
+            """;
+
+        String expectedMessage = "A child 'code' of 'caseCategory' has been deleted but has no Delete ACL";
+
+        assertFalse(assertDeleteAccessAndLogging(nestedComplexTypeArrayPayload, newDataString,
+            caseCategoryFieldWithoutDeletePermission(),
+            Level.INFO, expectedMessage));
+    }
+
+    @Test
+    void shouldDoNothingWhenNewNullFieldAddedToComplexType() {
+        final String nestedComplexTypeArrayPayload = """
+            {
+               "caseCategory": {
+                   "value": {
+                       "label": null
+                   },
+                   "list_items": [
+                       {
+                           "id": "123456",
+                           "value": {
+                               "code": null,
+                               "label": null
+                           }
+                       }
+                   ]
+               }
+            }
+            """;
+
+        final String newDataString = """
+            {
+               "caseCategory": {
+                    "value": {
+                       "code": null,
+                       "label": "Test"
+                   },
+                   "list_items": [
+                       {
+                           "id": "123456",
+                           "value": {
+                               "code": "Test",
+                               "label": "Test"
+                           }
+                       }
+                   ]
+                }
+            }
+            """;
+
+        JsonNode existingData = getJsonNode(nestedComplexTypeArrayPayload);
+        JsonNode newData = getJsonNode(newDataString);
+        boolean canDelete = service.canDeleteCaseFields(newData, existingData,
+            caseCategoryFieldWithoutDeletePermission(), ACCESS_PROFILES);
+
+        assertTrue(canDelete);
+    }
+
+    @Test
+    void shouldNotPermitDeletionOfValueFieldFromNestedComplexTypeArrayWithoutPermission() {
+        final String newDataString = """
+            {
+               "caseCategory": {
+                   "list_items": [
+                       {
+                           "id": "123456",
+                           "value": {
+                               "code": "Test",
+                               "label": "Test"
+                           }
+                       }
+                   ]
+                }
+            }
+            """;
+
+        String expectedMessage = "A child 'value' of 'caseCategory' has been deleted but has no Delete ACL";
+
+        assertFalse(assertDeleteAccessAndLogging(nestedComplexTypeArrayPayload, newDataString,
+            caseCategoryFieldWithoutDeletePermission(),
+            Level.INFO, expectedMessage));
+    }
+
+    @Test
+    void shouldNotPermitNullOfValueFieldFromNestedComplexTypeArrayWithoutPermission() {
+        final String newDataString = """
+            {
+               "caseCategory": {
+                   "value": null,
+                   "list_items": [
+                       {
+                           "id": "123456",
+                           "value": {
+                               "code": "Test",
+                               "label": "Test"
+                           }
+                       }
+                   ]
+               }
+            }
+            """;
+
+        String expectedMessage = "A child 'value' of 'caseCategory' has been deleted but has no Delete ACL";
+
+        assertFalse(assertDeleteAccessAndLogging(nestedComplexTypeArrayPayload, newDataString,
+            caseCategoryFieldWithoutDeletePermission(),
+            Level.INFO, expectedMessage));
+    }
+
+    @Test
+    void shouldNotPermitDeletionOfArrayFieldFromNestedComplexTypeArrayWithoutPermission() {
+        final String newDataString = """
+            {
+               "caseCategory": {
+                   "value": {
+                       "code": "Test",
+                       "label": "Test"
+                   }
+               }
+            }
+            """;
+
+        String expectedMessage = "A child 'list_items' of 'caseCategory' has been deleted but has no Delete ACL";
+
+        assertFalse(assertDeleteAccessAndLogging(nestedComplexTypeArrayPayload, newDataString,
+            caseCategoryFieldWithoutDeletePermission(),
+            Level.INFO, expectedMessage));
+    }
+
+    @Test
+    void shouldNotPermitDeletionOfArrayNodeFieldFromNestedComplexTypeArrayWithoutPermission() {
+        final String newDataString = """
+            {
+               "caseCategory": {
+                   "value": {
+                       "code": "Test",
+                       "label": "Test"
+                   },
+                   "list_items": [
+                       {
+                           "id": "444",
+                           "value": {
+                               "code": "Test",
+                               "label": "Test"
+                           }
+                       }
+                   ]
+               }
+            }
+            """;
+
+        String expectedMessage = "A child 'list_items' of 'caseCategory' has been deleted but has no Delete ACL";
+
+        assertFalse(assertDeleteAccessAndLogging(nestedComplexTypeArrayPayload, newDataString,
+            caseCategoryFieldWithoutDeletePermission(),
+            Level.INFO, expectedMessage));
+    }
+
+    @Test
+    void shouldPermitDeletionOfValueFieldFromNestedComplexTypeArrayWithDeletePermission() {
+        final String newDataString = """
+            {
+               "caseCategory": {
+                   "list_items": [
+                       {
+                           "id": "123456",
+                           "value": {
+                               "code": "Test",
+                               "label": "Test"
+                           }
+                       }
+                   ]
+               }
+            }
+            """;
+
+        String expectedMessage = "Field 'value' is missing or null in new data but exists in existing data.";
+
+        assertTrue(assertDeleteAccessAndLogging(nestedComplexTypeArrayPayload, newDataString,
+            caseCategoryFieldWithDeletePermission(),
+            Level.DEBUG, expectedMessage));
+    }
+
+    @Test
+    void shouldPermitNullOfValueFieldFromNestedComplexTypeArrayWithDeletePermission() {
+        final String newDataString = """
+            {
+               "caseCategory": {
+                   "value": null,
+                   "list_items": [
+                       {
+                           "id": "123456",
+                           "value": {
+                               "code": "Test",
+                               "label": "Test"
+                           }
+                       }
+                   ]
+               }
+            }
+            """;
+
+        String expectedMessage = "Field 'value' is missing or null in new data but exists in existing data.";
+
+        assertTrue(assertDeleteAccessAndLogging(nestedComplexTypeArrayPayload, newDataString,
+            caseCategoryFieldWithDeletePermission(),
+            Level.DEBUG, expectedMessage));
+    }
+
+    @Test
+    void shouldPermitDeletionOfArrayFieldFromNestedComplexTypeArrayWithDeletePermission() {
+        final String newDataString = """
+            {
+               "caseCategory": {
+                   "value": {
+                       "code": "Test",
+                       "label": "Test"
+                   }
+               }
+            }
+            """;
+
+        String expectedMessage = "Field 'list_items' is missing or null in new data but exists in existing data.";
+
+        assertTrue(assertDeleteAccessAndLogging(nestedComplexTypeArrayPayload, newDataString,
+            caseCategoryFieldWithDeletePermission(),
+            Level.DEBUG, expectedMessage));
+    }
+
+    @Test
+    void shouldPermitDeletionOfArrayNodeFieldFromNestedComplexTypeArrayWithoutPermission() {
+        final String newDataString = """
+            {
+               "caseCategory": {
+                   "value": {
+                       "code": "Test",
+                       "label": "Test"
+                   },
+                   "list_items": [
+                       {
+                           "id": "444",
+                           "value": {
+                               "code": "Test",
+                               "label": "Test"
+                           }
+                       }
+                   ]
+               }
+            }
+            """;
+
+        String expectedMessage = "Deleted collection item with ID '\"123456\"' under '.list_items'.";
+
+        assertTrue(assertDeleteAccessAndLogging(nestedComplexTypeArrayPayload, newDataString,
+            caseCategoryFieldWithDeletePermission(),
+            Level.DEBUG, expectedMessage));
+    }
 
     @Test
     void shouldNotPermitDeletionOfFieldFromComplexTypeArrayWithoutPermission() {

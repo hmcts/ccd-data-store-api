@@ -64,71 +64,77 @@ public class CallbackTest extends WireMockBaseTest {
 
     private static JsonNode DATA = null;
     private static final String DATA_JSON_STRING =
-        "{\n" +
-        "  \"PersonFirstName\": \"ccd-First Name\",\n" +
-        "  \"PersonLastName\": \"Last Name\",\n" +
-        "  \"PersonAddress\": {\n" +
-        "    \"AddressLine1\": \"Address Line 1\",\n" +
-        "    \"AddressLine2\": \"Address Line 2\"\n" +
-        "  }\n" +
-        "}\n";
+        """
+            {
+              "PersonFirstName": "ccd-First Name",
+              "PersonLastName": "Last Name",
+              "PersonAddress": {
+                "AddressLine1": "Address Line 1",
+                "AddressLine2": "Address Line 2"
+              }
+            }
+            """;
 
     private static JsonNode DATA_CLASSIFICATION = null;
     private static final String DATA_CLASSIFICATION_JSON_STRING =
-        "{\n" +
-        "    \"PersonFirstName\": \"PUBLIC\",\n" +
-        "    \"PersonLastName\": \"PUBLIC\",\n" +
-        "    \"PersonAddress\": {\n" +
-        "      \"classification\" : \"PUBLIC\",\n" +
-        "      \"value\" : {\n" +
-        "        \"AddressLine1\": \"PUBLIC\",\n" +
-        "        \"AddressLine2\": \"PUBLIC\"\n" +
-        "      }\n" +
-        "    },\n" +
-        "    \"D8Document\": \"PUBLIC\"" +
-        "  }";
+        """
+            {
+                "PersonFirstName": "PUBLIC",
+                "PersonLastName": "PUBLIC",
+                "PersonAddress": {
+                  "classification" : "PUBLIC",
+                  "value" : {
+                    "AddressLine1": "PUBLIC",
+                    "AddressLine2": "PUBLIC"
+                  }
+                },
+                "D8Document": "PUBLIC"\
+              }""";
 
     private static JsonNode CALLBACK_DATA_CLASSIFICATION = null;
     private static final String CALLBACK_DATA_CLASSIFICATION_JSON_STRING =
-        "{\n" +
-        "    \"PersonFirstName\": \"PRIVATE\",\n" +
-        "    \"PersonLastName\": \"PRIVATE\",\n" +
-        "    \"PersonAddress\": {\n" +
-        "      \"classification\" : \"PRIVATE\",\n" +
-        "      \"value\" : {\n" +
-        "        \"AddressLine1\": \"PRIVATE\",\n" +
-        "        \"AddressLine2\": \"PRIVATE\"\n" +
-        "      }\n" +
-        "    },\n" +
-        "    \"D8Document\": \"PRIVATE\"" +
-        "  }";
+        """
+            {
+                "PersonFirstName": "PRIVATE",
+                "PersonLastName": "PRIVATE",
+                "PersonAddress": {
+                  "classification" : "PRIVATE",
+                  "value" : {
+                    "AddressLine1": "PRIVATE",
+                    "AddressLine2": "PRIVATE"
+                  }
+                },
+                "D8Document": "PRIVATE"\
+              }""";
 
     private static JsonNode CALLBACK_DATA_WITH_MISSING_CLASSIFICATION = null;
     private static final String CALLBACK_DATA_WITH_MISSING_CLASSIFICATION_JSON_STRING =
-        "{\n" +
-        "    \"PersonFirstName\": \"PRIVATE\",\n" +
-        "    \"PersonLastName\": \"PRIVATE\",\n" +
-        "    \"PersonAddress\": {\n" +
-        "      \"classification\" : \"PRIVATE\",\n" +
-        "      \"value\" : {\n" +
-        "        \"AddressLine1\": \"PRIVATE\",\n" +
-        "        \"AddressLine2\": \"PRIVATE\"\n" +
-        "      }\n" +
-        "    }\n" +
-        "  }";
+        """
+            {
+                "PersonFirstName": "PRIVATE",
+                "PersonLastName": "PRIVATE",
+                "PersonAddress": {
+                  "classification" : "PRIVATE",
+                  "value" : {
+                    "AddressLine1": "PRIVATE",
+                    "AddressLine2": "PRIVATE"
+                  }
+                }
+              }""";
 
     private static final String EXPECTED_CALLBACK_DATA_CLASSIFICATION_STRING =
-        "{\n" +
-        "    \"PersonLastName\": \"PRIVATE\",\n" +
-        "    \"PersonAddress\": {\n" +
-        "      \"classification\" : \"PRIVATE\",\n" +
-        "      \"value\" : {\n" +
-        "        \"AddressLine1\": \"PRIVATE\",\n" +
-        "        \"AddressLine2\": \"PRIVATE\"\n" +
-        "      }\n" +
-        "    },\n" +
-        "    \"D8Document\": \"PRIVATE\"" +
-        "  }";
+        """
+            {
+                "PersonLastName": "PRIVATE",
+                "PersonAddress": {
+                  "classification" : "PRIVATE",
+                  "value" : {
+                    "AddressLine1": "PRIVATE",
+                    "AddressLine2": "PRIVATE"
+                  }
+                },
+                "D8Document": "PRIVATE"\
+              }""";
 
     private String modifiedDataString;
 

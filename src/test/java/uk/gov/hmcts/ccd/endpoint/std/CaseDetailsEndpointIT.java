@@ -519,39 +519,40 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String caseType = "MessagePublishing";
         String eventId = "CREATE";
         String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
-        final JsonNode DATA = mapper.readTree("{\n"
-            + "  \"MoneyGBPField\": \"1000\",\n"
-            + "  \"FixedListField\": \"VALUE3\",\n"
-            + "  \"AddressUKField\": {\n"
-            + "    \"AddressLine1\": null,\n"
-            + "    \"AddressLine2\": null,\n"
-            + "    \"AddressLine3\": null,\n"
-            + "    \"PostTown\": null,\n"
-            + "    \"County\": null,\n"
-            + "    \"PostCode\": null,\n"
-            + "    \"Country\": null\n"
-            + "  },\n"
-            + "  \"ComplexField\": {\n"
-            + "  \"ComplexTextField\": \"text field\",\n"
-            + "   \"ComplexFixedListField\": null,\n"
-            + "    \"ComplexNestedField\": {\n"
-            + "      \"NestedNumberField\": null,\n"
-            + "      \"NestedCollectionTextField\": []\n"
-            + "    }\n"
-            + "  },\n"
-            + "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n"
-            + "  \"PhoneUKField\": \"09876528531\",\n"
-            + "  \"NumberField\": 90,\n"
-            + "  \"MultiSelectListField\": [\n"
-            + "    \"OPTION4\",\n"
-            + "    \"OPTION2\"\n"
-            + "  ],\n"
-            + "  \"YesOrNoField\": \"No\",\n"
-            + "  \"EmailField\": \"test@test.com\",\n"
-            + "  \"TextField\": \"text\",\n"
-            + "  \"DateField\": \"2000-01-01\",\n"
-            + "  \"TextAreaField\": \"text areas\"\n"
-            + "}");
+        final JsonNode DATA = mapper.readTree("""
+            {
+              "MoneyGBPField": "1000",
+              "FixedListField": "VALUE3",
+              "AddressUKField": {
+                "AddressLine1": null,
+                "AddressLine2": null,
+                "AddressLine3": null,
+                "PostTown": null,
+                "County": null,
+                "PostCode": null,
+                "Country": null
+              },
+              "ComplexField": {
+              "ComplexTextField": "text field",
+               "ComplexFixedListField": null,
+                "ComplexNestedField": {
+                  "NestedNumberField": null,
+                  "NestedCollectionTextField": []
+                }
+              },
+              "DateTimeField": "2000-01-01T11:11:11.000",
+              "PhoneUKField": "09876528531",
+              "NumberField": 90,
+              "MultiSelectListField": [
+                "OPTION4",
+                "OPTION2"
+              ],
+              "YesOrNoField": "No",
+              "EmailField": "test@test.com",
+              "TextField": "text",
+              "DateField": "2000-01-01",
+              "TextAreaField": "text areas"
+            }""");
 
 
         Map data = JacksonUtils.convertValue(DATA);
@@ -571,201 +572,202 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
         assertEquals("Incorrect number of rows in messageQueue", 1, messageQueueList.size());
 
-        assertEquals(messageQueueList.get(0).getMessageInformation().get("AdditionalData").get("Definition"),
-            mapper.readTree("{\n"
-                + "    \"OtherAlias\": {\n"
-                + "        \"type\": \"SimpleNumber\",\n"
-                + "        \"subtype\": \"Number\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"ComplexNestedField.NestedNumberField\"\n"
-                + "    },\n"
-                + "    \"NumberField\": {\n"
-                + "        \"type\": \"SimpleNumber\",\n"
-                + "        \"subtype\": \"Number\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"NumberField\"\n"
-                + "    },\n"
-                + "    \"ComplexField\": {\n"
-                + "        \"type\": \"Complex\",\n"
-                + "        \"subtype\": \"ComplexType\",\n"
-                + "        \"typeDef\": {\n"
-                + "            \"ComplexTextField\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"ComplexTextField\"\n"
-                + "            },\n"
-                + "            \"ComplexNestedField\": {\n"
-                + "                \"type\": \"Complex\",\n"
-                + "                \"subtype\": \"NestedComplexType\",\n"
-                + "                \"typeDef\": {\n"
-                + "                    \"NestedNumberField\": {\n"
-                + "                        \"type\": \"SimpleNumber\",\n"
-                + "                        \"subtype\": \"Number\",\n"
-                + "                        \"typeDef\": null,\n"
-                + "                        \"originalId\": \"NestedNumberField\"\n"
-                + "                    }\n"
-                + "                },\n"
-                + "                \"originalId\": \"ComplexNestedField\"\n"
-                + "            }\n"
-                + "        },\n"
-                + "        \"originalId\": \"ComplexField\"\n"
-                + "    },\n"
-                + "    \"YesOrNoField\": {\n"
-                + "        \"type\": \"SimpleBoolean\",\n"
-                + "        \"subtype\": \"YesOrNo\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"YesOrNoField\"\n"
-                + "    },\n"
-                + "    \"DateTimeField\": {\n"
-                + "        \"type\": \"SimpleDateTime\",\n"
-                + "        \"subtype\": \"DateTime\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"DateTimeField\"\n"
-                + "    },\n"
-                + "    \"DocumentField\": {\n"
-                + "        \"type\": \"Complex\",\n"
-                + "        \"subtype\": \"Document\",\n"
-                + "        \"typeDef\": {\n"
-                + "            \"document_url\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"document_url\"\n"
-                + "            },\n"
-                + "            \"document_filename\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"document_filename\"\n"
-                + "            },\n"
-                + "            \"document_binary_url\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"document_binary_url\"\n"
-                + "            },\n"
-                + "            \"category_id\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"category_id\"\n"
-                + "            },\n"
-                + "           \"upload_timestamp\": {\n"
-                + "                \"type\": \"SimpleDateTime\",\n"
-                + "                \"subtype\": \"DateTime\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"upload_timestamp\"\n"
-                + "            }\n"
-                + "        },\n"
-                + "        \"originalId\": \"DocumentField\"\n"
-                + "    },\n"
-                + "    \"AddressUKField\": {\n"
-                + "        \"type\": \"Complex\",\n"
-                + "        \"subtype\": \"AddressUK\",\n"
-                + "        \"typeDef\": {\n"
-                + "            \"County\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"County\"\n"
-                + "            },\n"
-                + "            \"Country\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"Country\"\n"
-                + "            },\n"
-                + "            \"PostCode\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"PostCode\"\n"
-                + "            },\n"
-                + "            \"PostTown\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"PostTown\"\n"
-                + "            },\n"
-                + "            \"AddressLine1\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"AddressLine1\"\n"
-                + "            },\n"
-                + "            \"AddressLine2\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"AddressLine2\"\n"
-                + "            },\n"
-                + "            \"AddressLine3\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"AddressLine3\"\n"
-                + "            }\n"
-                + "        },\n"
-                + "        \"originalId\": \"AddressUKField\"\n"
-                + "    },\n"
-                + "    \"CollectionField\": {\n"
-                + "        \"type\": \"Collection\",\n"
-                + "        \"subtype\": \"Text\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"CollectionField\"\n"
-                + "    },\n"
-                + "    \"TopLevelPublish\": {\n"
-                + "        \"type\": \"SimpleText\",\n"
-                + "        \"subtype\": \"Text\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"ComplexTextField\"\n"
-                + "    },\n"
-                + "    \"AliasForTextField\": {\n"
-                + "        \"type\": \"SimpleText\",\n"
-                + "        \"subtype\": \"Text\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"TextField\"\n"
-                + "    },\n"
-                + "    \"ComplexCollectionField\": {\n"
-                + "        \"type\": \"Collection\",\n"
-                + "        \"subtype\": \"ComplexType\",\n"
-                + "        \"typeDef\": {\n"
-                + "            \"ComplexTextField\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"ComplexTextField\"\n"
-                + "            },\n"
-                + "            \"ComplexNestedField\": {\n"
-                + "                \"type\": \"Complex\",\n"
-                + "                \"subtype\": \"NestedComplexType\",\n"
-                + "                \"typeDef\": {\n"
-                + "                    \"NestedNumberField\": {\n"
-                + "                        \"type\": \"SimpleNumber\",\n"
-                + "                        \"subtype\": \"Number\",\n"
-                + "                        \"typeDef\": null,\n"
-                + "                        \"originalId\": \"NestedNumberField\"\n"
-                + "                    },\n"
-                + "                    \"NestedCollectionTextField\": {\n"
-                + "                        \"type\": \"Collection\",\n"
-                + "                        \"subtype\": \"Text\",\n"
-                + "                        \"typeDef\": null,\n"
-                + "                        \"originalId\": \"NestedCollectionTextField\"\n"
-                + "                    }\n"
-                + "                },\n"
-                + "                \"originalId\": \"ComplexNestedField\"\n"
-                + "            },\n"
-                + "            \"ComplexFixedListField\": {\n"
-                + "                \"type\": \"FixedList\",\n"
-                + "                \"subtype\": \"FixedList\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"ComplexFixedListField\"\n"
-                + "            }\n"
-                + "        },\n"
-                + "        \"originalId\": \"ComplexCollectionField\"\n"
-                + "    }\n"
-                + "}"));
+        assertEquals(messageQueueList.getFirst().getMessageInformation().get("AdditionalData").get("Definition"),
+            mapper.readTree("""
+                {
+                    "OtherAlias": {
+                        "type": "SimpleNumber",
+                        "subtype": "Number",
+                        "typeDef": null,
+                        "originalId": "ComplexNestedField.NestedNumberField"
+                    },
+                    "NumberField": {
+                        "type": "SimpleNumber",
+                        "subtype": "Number",
+                        "typeDef": null,
+                        "originalId": "NumberField"
+                    },
+                    "ComplexField": {
+                        "type": "Complex",
+                        "subtype": "ComplexType",
+                        "typeDef": {
+                            "ComplexTextField": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "ComplexTextField"
+                            },
+                            "ComplexNestedField": {
+                                "type": "Complex",
+                                "subtype": "NestedComplexType",
+                                "typeDef": {
+                                    "NestedNumberField": {
+                                        "type": "SimpleNumber",
+                                        "subtype": "Number",
+                                        "typeDef": null,
+                                        "originalId": "NestedNumberField"
+                                    }
+                                },
+                                "originalId": "ComplexNestedField"
+                            }
+                        },
+                        "originalId": "ComplexField"
+                    },
+                    "YesOrNoField": {
+                        "type": "SimpleBoolean",
+                        "subtype": "YesOrNo",
+                        "typeDef": null,
+                        "originalId": "YesOrNoField"
+                    },
+                    "DateTimeField": {
+                        "type": "SimpleDateTime",
+                        "subtype": "DateTime",
+                        "typeDef": null,
+                        "originalId": "DateTimeField"
+                    },
+                    "DocumentField": {
+                        "type": "Complex",
+                        "subtype": "Document",
+                        "typeDef": {
+                            "document_url": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "document_url"
+                            },
+                            "document_filename": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "document_filename"
+                            },
+                            "document_binary_url": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "document_binary_url"
+                            },
+                            "category_id": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "category_id"
+                            },
+                           "upload_timestamp": {
+                                "type": "SimpleDateTime",
+                                "subtype": "DateTime",
+                                "typeDef": null,
+                                "originalId": "upload_timestamp"
+                            }
+                        },
+                        "originalId": "DocumentField"
+                    },
+                    "AddressUKField": {
+                        "type": "Complex",
+                        "subtype": "AddressUK",
+                        "typeDef": {
+                            "County": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "County"
+                            },
+                            "Country": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "Country"
+                            },
+                            "PostCode": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "PostCode"
+                            },
+                            "PostTown": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "PostTown"
+                            },
+                            "AddressLine1": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "AddressLine1"
+                            },
+                            "AddressLine2": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "AddressLine2"
+                            },
+                            "AddressLine3": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "AddressLine3"
+                            }
+                        },
+                        "originalId": "AddressUKField"
+                    },
+                    "CollectionField": {
+                        "type": "Collection",
+                        "subtype": "Text",
+                        "typeDef": null,
+                        "originalId": "CollectionField"
+                    },
+                    "TopLevelPublish": {
+                        "type": "SimpleText",
+                        "subtype": "Text",
+                        "typeDef": null,
+                        "originalId": "ComplexTextField"
+                    },
+                    "AliasForTextField": {
+                        "type": "SimpleText",
+                        "subtype": "Text",
+                        "typeDef": null,
+                        "originalId": "TextField"
+                    },
+                    "ComplexCollectionField": {
+                        "type": "Collection",
+                        "subtype": "ComplexType",
+                        "typeDef": {
+                            "ComplexTextField": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "ComplexTextField"
+                            },
+                            "ComplexNestedField": {
+                                "type": "Complex",
+                                "subtype": "NestedComplexType",
+                                "typeDef": {
+                                    "NestedNumberField": {
+                                        "type": "SimpleNumber",
+                                        "subtype": "Number",
+                                        "typeDef": null,
+                                        "originalId": "NestedNumberField"
+                                    },
+                                    "NestedCollectionTextField": {
+                                        "type": "Collection",
+                                        "subtype": "Text",
+                                        "typeDef": null,
+                                        "originalId": "NestedCollectionTextField"
+                                    }
+                                },
+                                "originalId": "ComplexNestedField"
+                            },
+                            "ComplexFixedListField": {
+                                "type": "FixedList",
+                                "subtype": "FixedList",
+                                "typeDef": null,
+                                "originalId": "ComplexFixedListField"
+                            }
+                        },
+                        "originalId": "ComplexCollectionField"
+                    }
+                }"""));
     }
 
     @Test
