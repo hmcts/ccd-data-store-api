@@ -13,6 +13,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseHistoryRoleAccessException;
 
 @Service
 @Qualifier(AuthorisedGetCaseHistoryViewOperation.QUALIFIER)
@@ -21,6 +23,7 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
 
     public static final String QUALIFIER = "authorised-case-history";
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
+    private final CaseAccessService caseAccessService;
 
     public AuthorisedGetCaseHistoryViewOperation(
         @Qualifier(DefaultGetCaseHistoryViewOperation.QUALIFIER)
@@ -28,10 +31,12 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
         AccessControlService accessControlService,
         @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
-        final CaseDataAccessControl caseDataAccessControl) {
+        final CaseDataAccessControl caseDataAccessControl,
+        CaseAccessService caseAccessService) {
 
         super(caseDefinitionRepository, accessControlService, caseDetailsRepository, caseDataAccessControl);
         this.getCaseHistoryViewOperation = getCaseHistoryViewOperation;
+        this.caseAccessService = caseAccessService;
     }
 
     @Override
@@ -40,9 +45,20 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
         CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getCaseTypeId());
         Set<AccessProfile> accessProfiles = getAccessProfiles(caseDetails.getReferenceAsString());
         verifyCaseTypeReadAccess(caseTypeDefinition, accessProfiles);
+
         CaseHistoryView caseHistoryView = getCaseHistoryViewOperation.execute(caseReference, eventId);
         filterCaseTabFieldsByReadAccess(caseHistoryView, accessProfiles);
         filterAllowedTabsWithFields(caseHistoryView, accessProfiles);
+
+        if (isUserExternal()) {
+            //external user prevent from accessing case event history case data
+            throw new CaseHistoryRoleAccessException("Case History not accessible to the user");
+        }
         return caseHistoryView;
     }
+
+    private Boolean isUserExternal(){
+        return caseAccessService.userCanOnlyAccessExplicitlyGrantedCases();
+    }
+
 }
