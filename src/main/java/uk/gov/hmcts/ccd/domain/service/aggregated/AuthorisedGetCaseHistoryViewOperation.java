@@ -57,7 +57,7 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
         return caseHistoryView;
     }
 
-    private Boolean isUserExternal(){
+    private Boolean isUserExternal() {
         return caseAccessService.userCanOnlyAccessExplicitlyGrantedCases();
     }
 
