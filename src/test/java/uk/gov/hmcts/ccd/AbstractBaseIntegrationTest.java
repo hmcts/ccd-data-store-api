@@ -97,7 +97,7 @@ public abstract class AbstractBaseIntegrationTest {
         + "INNER JOIN pg_class ON conrelid=pg_class.oid " 
         + "INNER JOIN pg_namespace ON pg_namespace.oid=pg_class.relnamespace " 
         + "WHERE relname = '%s'" 
-        "ORDER BY CASE WHEN contype='f' THEN 0 ELSE 1 END,contype,nspname,relname,conname;";
+        + "ORDER BY CASE WHEN contype='f' THEN 0 ELSE 1 END,contype,nspname,relname,conname;";
 
     protected static final String recreateTableFKConstraint =
         "SELECT 'ALTER TABLE \"'||nspname||'\".\"'||relname||'\" ADD CONSTRAINT \"'||conname||'\" '|| " 
