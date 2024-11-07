@@ -50,15 +50,10 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
         filterCaseTabFieldsByReadAccess(caseHistoryView, accessProfiles);
         filterAllowedTabsWithFields(caseHistoryView, accessProfiles);
 
-        if (isUserExternal()) {
-            //external user prevent from accessing case event history case data
+        if (caseAccessService.isExternalUser()) {
             throw new CaseHistoryRoleAccessException("Case History not accessible to the user");
         }
         return caseHistoryView;
-    }
-
-    private Boolean isUserExternal() {
-        return caseAccessService.userCanOnlyAccessExplicitlyGrantedCases();
     }
 
 }

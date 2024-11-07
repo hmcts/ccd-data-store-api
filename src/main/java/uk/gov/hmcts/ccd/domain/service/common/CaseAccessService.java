@@ -163,6 +163,13 @@ public class CaseAccessService {
         return Boolean.FALSE;
     }
 
+    public Boolean isExternalUser() {
+        if (!userCanOnlyAccessExplicitlyGrantedCases()) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
     public Boolean userCanOnlyAccessExplicitlyGrantedCases() {
         return userRepository.anyRoleMatches(RESTRICT_GRANTED_ROLES_PATTERN);
     }
