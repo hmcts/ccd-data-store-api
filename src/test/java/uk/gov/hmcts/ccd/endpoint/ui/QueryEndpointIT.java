@@ -1741,6 +1741,33 @@ public class QueryEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_case_event_history.sql"})
+    public void shouldReturn403WhenEventUserRoleIsExternal() throws Exception {
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_EXTERNAL_USER);
+
+        // Check that we have the expected test data set size
+        List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect data initiation", 1, resultList.size());
+
+        List<AuditEvent> eventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("Incorrect data initiation", 3, eventList.size());
+
+        MvcResult result = mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT, eventList.get(1).getId()))
+                .contentType(JSON_CONTENT_TYPE)
+                .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        // User role has access to PUBLIC and event is classified as PRIVATE
+        mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT, eventList.get(2).getId()))
+                .contentType(JSON_CONTENT_TYPE)
+                .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(403))
+            .andReturn();
+    }
+
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_case_dcp.sql"})
     public void shouldSearchCasesWithFormattedDCP() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_DCP_CASEWORKER);
