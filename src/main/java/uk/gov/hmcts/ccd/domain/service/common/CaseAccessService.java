@@ -164,10 +164,7 @@ public class CaseAccessService {
     }
 
     public Boolean isExternalUser() {
-        if (!userCanOnlyAccessExplicitlyGrantedCases()) {
-            return Boolean.TRUE;
-        }
-        return Boolean.FALSE;
+        return userCanOnlyAccessExplicitlyGrantedCases();
     }
 
     public Boolean userCanOnlyAccessExplicitlyGrantedCases() {
