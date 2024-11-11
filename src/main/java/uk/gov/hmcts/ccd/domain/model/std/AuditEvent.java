@@ -27,7 +27,7 @@ public class AuditEvent extends Event {
     private String userFirstName;
     @JsonProperty("event_name")
     private String eventName;
-    @JsonProperty("case_type_id")
+    @JsonProperty("case_data_id")
     private String caseDataId;
     @JsonProperty("created_date")
     private LocalDateTime createdDate;

@@ -82,7 +82,6 @@ public class SubmitCaseTransaction implements AccessControl {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-
         this.pocSubmitCaseTransaction = pocSubmitCaseTransaction;
     }
 
@@ -173,9 +172,6 @@ public class SubmitCaseTransaction implements AccessControl {
                                                      CaseDetails newCaseDetails,
                                                      IdamUser onBehalfOfUser) {
 
-        final CaseDetails pocCaseDetails = pocSubmitCaseTransaction.saveAuditEventForCaseDetails(response,
-                event, caseTypeDefinition, idamUser, caseEventDefinition, newCaseDetails, onBehalfOfUser);
-
         final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());
@@ -197,9 +193,10 @@ public class SubmitCaseTransaction implements AccessControl {
         auditEvent.setSignificantItem(response.getSignificantItem());
         saveUserDetails(idamUser, onBehalfOfUser, auditEvent);
 
-        CaseDetails messageCaseDetails
-                = this.applicationParams.getPocCaseTypes().contains(savedCaseDetails.getCaseTypeId())
-                ? pocCaseDetails : savedCaseDetails;
+        CaseDetails messageCaseDetails = this.applicationParams.isPocFeatureEnabled()
+                ? pocSubmitCaseTransaction.saveAuditEventForCaseDetails(response,
+                event, caseTypeDefinition, idamUser, caseEventDefinition, newCaseDetails, onBehalfOfUser)
+                : savedCaseDetails;
 
         caseAuditEventRepository.set(auditEvent);
 
