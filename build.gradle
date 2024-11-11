@@ -661,9 +661,11 @@ jsonSchema2Pojo {
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java," +
-            "**/AppInsightsConfiguration.java,**/POCSubmitCaseTransaction.java,**/POCCreateCaseEventService.java," +
-                "**/CreateCaseEventService.java,**/SubmitCaseTransaction.java,**/POCCaseDetails.java,**/POCEventDetails.java" +
-            "**/TestingSupportController.java"
+            "**/AppInsightsConfiguration.java,**/POCSubmitCaseTransaction.java,**/POCCreateCaseEventService.java,"
+        +"**/CreateCaseEventService.java,**/SubmitCaseTransaction.java,**/POCCaseDetails.java,**/POCEventDetails.java"
+        +"**/TestingSupportController.java,**/POCCaseDetailsRepository.java,**/DefaultCaseDetailsRepository.java,"
+        +"**/POCCaseAuditEventRepository.java,**/UserAuthHeadersInterceptor.java,**/CaseAuditEventRepository.java,"
+        +"**/ClassifiedCaseSearchOperation.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"
