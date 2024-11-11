@@ -130,6 +130,8 @@ class SubmitCaseTransactionTest {
     private CaseStateDefinition state;
     @Mock
     private ApplicationParams applicationParams;
+    @Mock
+    private POCSubmitCaseTransaction pocSubmitCaseTransaction;
     private CaseAccessGroupUtils caseAccessGroupUtils;
     private ObjectMapper objectMapper;
 
@@ -153,8 +155,8 @@ class SubmitCaseTransactionTest {
             caseDocumentService,
             applicationParams,
             caseAccessGroupUtils,
-            caseDocumentTimestampService
-
+            caseDocumentTimestampService,
+            pocSubmitCaseTransaction
         );
 
         idamUser = buildIdamUser();

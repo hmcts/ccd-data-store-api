@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,7 +17,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class AuditEvent extends Event {
-    @JsonIgnore
+    @JsonProperty("event_instance_id")
     private Long id;
     @JsonProperty("user_id")
     private String userId;
@@ -28,7 +27,7 @@ public class AuditEvent extends Event {
     private String userFirstName;
     @JsonProperty("event_name")
     private String eventName;
-    @JsonIgnore
+    @JsonProperty("case_type_id")
     private String caseDataId;
     @JsonProperty("created_date")
     private LocalDateTime createdDate;
