@@ -7,11 +7,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 @Named
 @Singleton
@@ -233,6 +232,9 @@ public class ApplicationParams {
     @Value("${enable-case-group-access-filtering}")
     private boolean enableCaseGroupAccessFiltering;
 
+    @Value("#{'${ccd.callback.passthru-header-contexts}'.split(',')}")
+    private List<String> callbackPassthruHeaderContexts;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -242,11 +244,7 @@ public class ApplicationParams {
     }
 
     public static String encodeBase64(final String stringToEncode) {
-        try {
-            return Base64.getEncoder().encodeToString(stringToEncode.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            throw new ServiceException(e.getMessage());
-        }
+        return Base64.getEncoder().encodeToString(stringToEncode.getBytes(StandardCharsets.UTF_8));
     }
 
     public List<String> getAuthorisedServicesForCaseUserRoles() {
@@ -452,7 +450,8 @@ public class ApplicationParams {
     }
 
     public List<String> getElasticSearchDataHosts() {
-        return elasticSearchDataHosts.stream().map(quotedHost -> quotedHost.replace("\"", "")).collect(toList());
+        return elasticSearchDataHosts.stream().map(quotedHost ->
+            quotedHost.replace("\"", "")).toList();
     }
 
     public Boolean isElasticsearchNodeDiscoveryEnabled() {
@@ -607,14 +606,6 @@ public class ApplicationParams {
         return requestScopeCachedCaseTypes;
     }
 
-    public Integer getRequestScopeCachedCaseTypesFromHour() {
-        return requestScopeCachedCaseTypesFromHour;
-    }
-
-    public Integer getRequestScopeCachedCaseTypesTillHour() {
-        return requestScopeCachedCaseTypesTillHour;
-    }
-
     public Integer getSystemUserTokenCacheTTLSecs() {
         return systemUserTokenCacheTTLSecs;
     }
@@ -629,6 +620,10 @@ public class ApplicationParams {
 
     public void setCaseGroupAccessFilteringEnabled(boolean enableCaseGroupAccessFiltering) {
         this.enableCaseGroupAccessFiltering = enableCaseGroupAccessFiltering;
+    }
+
+    public List<String> getCallbackPassthruHeaderContexts() {
+        return callbackPassthruHeaderContexts;
     }
 
     public List<String> getUploadTimestampFeaturedCaseTypes() {
