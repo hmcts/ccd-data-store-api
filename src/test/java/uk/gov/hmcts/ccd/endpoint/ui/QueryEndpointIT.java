@@ -1746,16 +1746,13 @@ public class QueryEndpointIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_case_event_history.sql"})
     public void shouldReturnForbiddenWhenEventUserRoleIsExternal() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_EXTERNAL_USER);
-        // Verify initial data setup
-        final int EXPECTED_CASE_DATA_COUNT = 1;
-        final int EXPECTED_EVENT_COUNT = 3;
 
         // Check that we have the expected test data set size
         List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", EXPECTED_CASE_DATA_COUNT, resultList.size());
+        assertEquals("Incorrect data initiation", 1, resultList.size());
 
         List<AuditEvent> eventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("Incorrect data initiation", EXPECTED_EVENT_COUNT, eventList.size());
+        assertEquals("Incorrect data initiation", 3, eventList.size());
 
         // Perform allowed access check (expecting 200 OK)
         MvcResult result = mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT, eventList.get(1).getId()))
