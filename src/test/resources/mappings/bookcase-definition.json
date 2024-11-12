@@ -64,13 +64,6 @@
           "read": true,
           "update": false,
           "delete": false
-        },
-        {
-          "role": "caseworker-divorce",
-          "create": true,
-          "read": true,
-          "update": true,
-          "delete": false
         }
       ],
       "roleToAccessProfiles": [
@@ -161,17 +154,6 @@
           "live_to": null,
           "role_name": "hmcts-judiciary",
           "case_access_categories": null
-        },
-        {
-          "case_type_id": "TestAddressBookCase",
-          "disabled": false,
-          "read_only": false,
-          "authorisations": null,
-          "access_profiles": "caseworker-divorce",
-          "live_from": "2017-01-01",
-          "live_to": null,
-          "role_name": "idam:caseworker-divorce",
-          "case_access_categories": null
         }
       ],
       "events": [
@@ -209,13 +191,6 @@
               "read": true,
               "update": false,
               "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
-              "create": true,
-              "read": true,
-              "update": false,
-              "delete": false
             }],
           "show_event_notes": false,
           "can_save_draft": false
@@ -246,13 +221,6 @@
           "acls": [
             {
               "role": "caseworker-probate-public",
-              "create": true,
-              "read": true,
-              "update": false,
-              "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
               "create": true,
               "read": true,
               "update": false,
@@ -309,13 +277,6 @@
               "read": true,
               "update": false,
               "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
-              "create": false,
-              "read": true,
-              "update": false,
-              "delete": false
             }],
           "show_event_notes": true,
           "can_save_draft": false
@@ -336,13 +297,6 @@
           "acls": [
             {
               "role": "caseworker-probate-public",
-              "create": true,
-              "read": true,
-              "update": false,
-              "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
               "create": true,
               "read": true,
               "update": false,
@@ -384,13 +338,6 @@
               "read": true,
               "update": false,
               "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
-              "create": false,
-              "read": true,
-              "update": true,
-              "delete": false
             }]
         },
         {
@@ -415,13 +362,6 @@
               "read": true,
               "update": true,
               "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
-              "create": false,
-              "read": true,
-              "update": true,
-              "delete": false
             }]
         },
         {
@@ -434,13 +374,6 @@
               "read": true,
               "update": true,
               "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
-              "create": false,
-              "read": true,
-              "update": true,
-              "delete": false
             }]
         },
         {
@@ -449,13 +382,6 @@
           "acls": [
             {
               "role": "caseworker-probate-public",
-              "create": false,
-              "read": true,
-              "update": true,
-              "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
               "create": false,
               "read": true,
               "update": true,
@@ -475,13 +401,6 @@
             },
             {
               "role": "caseworker-probate-private",
-              "create": false,
-              "read": true,
-              "update": true,
-              "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
               "create": false,
               "read": true,
               "update": true,
@@ -548,13 +467,6 @@
               "read": true,
               "update": true,
               "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
             }],
           "field_type": {
             "type": "Text",
@@ -583,13 +495,6 @@
             },
             {
               "role": "caseworker-probate-private",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
               "create": true,
               "read": true,
               "update": true,
@@ -662,13 +567,6 @@
             },
             {
               "role": "caseworker-probate-private",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
-            },
-            {
-              "role": "caseworker-divorce",
               "create": true,
               "read": true,
               "update": true,

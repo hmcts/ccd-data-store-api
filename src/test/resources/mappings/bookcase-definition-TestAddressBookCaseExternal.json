@@ -1,0 +1,130 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/case-type/TestAddressBookCaseExternal"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "TestAddressBookCaseExternal",
+      "version": {
+        "number": 1,
+        "live_from": "2017-01-01"
+      },
+      "name": "Test Address Book Case External",
+      "description": "Test Address Book Case External",
+      "jurisdiction": {
+        "id": "PROBATE",
+        "name": "Test",
+        "description": "Test Jurisdiction"
+      },
+      "security_classification": "PUBLIC",
+      "events": [
+        {
+          "id": "TEST_EVENT",
+          "name": "string",
+          "description": "string",
+          "case_fields": [
+            {
+              "case_field_id": "string",
+              "required": true
+            }
+          ],
+          "pre_states": [
+            "string"
+          ],
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "string"
+          }],
+          "acls": [
+            {
+              "role": "caseworker-divorce",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }]
+        }
+      ],
+      "states": [
+        {
+          "id": "CaseCreated",
+          "name": "Case Created",
+          "acls": [
+            {
+              "role": "caseworker-divorce",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }
+          ]
+        }
+      ],
+      "case_fields": [
+        {
+          "id": "PersonFirstName",
+          "case_type_id": "TestAddressBookCaseExternal",
+          "label": "First name",
+          "field_type": {
+            "type": "Text"
+          },
+          "acls": [
+            {
+              "role": "caseworker-divorce",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }]
+        },
+        {
+          "id": "PersonLastName",
+          "case_type_id": "TestAddressBookCaseExternal",
+          "label": "Last name",
+          "field_type": {
+            "type": "Text"
+          },
+          "acls": [
+            {
+              "role": "caseworker-divorce",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }]
+        },
+        {
+          "id": "PersonAddress",
+          "case_type_id": "TestAddressBookCaseExternal",
+          "label": "Address",
+          "field_type": {
+            "type": "Address"
+          },
+          "acls": [
+            {
+              "role": "caseworker-divorce",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }]
+        }
+      ],
+      "acls": [
+        {
+          "role": "caseworker-divorce",
+          "create": true,
+          "read": true,
+          "update": false,
+          "delete": false
+        }
+      ]
+    }
+  }
+}
