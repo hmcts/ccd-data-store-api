@@ -45,7 +45,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
 
 class CaseAccessServiceTest {
 
@@ -126,8 +125,6 @@ class CaseAccessServiceTest {
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
             final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-            boolean externalUser = caseAccessService.isExternalUser();
-            assertThat(externalUser, is(false));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -163,8 +160,6 @@ class CaseAccessServiceTest {
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
             final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-            boolean externalUser = caseAccessService.isExternalUser();
-            assertThat(externalUser, is(false));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -200,8 +195,6 @@ class CaseAccessServiceTest {
         @DisplayName("should give ALL access level")
         void accessLevel() {
             final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-            boolean externalUser = caseAccessService.isExternalUser();
-            assertThat(externalUser, is(false));
             assertThat(accessLevel, equalTo(AccessLevel.ALL));
         }
     }
@@ -238,8 +231,6 @@ class CaseAccessServiceTest {
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
             final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-            boolean externalUser = caseAccessService.isExternalUser();
-            assertThat(externalUser, is(false));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -285,8 +276,6 @@ class CaseAccessServiceTest {
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
             final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-            boolean externalUser = caseAccessService.isExternalUser();
-            assertThat(externalUser, is(false));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -322,8 +311,6 @@ class CaseAccessServiceTest {
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
             final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-            boolean externalUser = caseAccessService.isExternalUser();
-            assertThat(externalUser, is(false));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -359,8 +346,6 @@ class CaseAccessServiceTest {
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
             final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-            boolean externalUser = caseAccessService.isExternalUser();
-            assertThat(externalUser, is(false));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -400,8 +385,6 @@ class CaseAccessServiceTest {
         @DisplayName("should give ALL access level")
         void accessLevel() {
             final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-            boolean externalUser = caseAccessService.isExternalUser();
-            assertThat(externalUser, is(false));
             assertThat(accessLevel, equalTo(AccessLevel.ALL));
         }
     }
@@ -432,7 +415,7 @@ class CaseAccessServiceTest {
                     .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
 
                 assertThat(result.isPresent(), is(true));
-                assertGrantedCaseIds(result.get(), 1);
+                assertGrantedCaseIds(result.get());
             }
 
 
@@ -473,15 +456,6 @@ class CaseAccessServiceTest {
                     () -> verify(roleAssignmentService).getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)
                 );
             }
-
-            @Test
-            @DisplayName("should give GRANTED access level")
-            void accessLevel() {
-                final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-                boolean externalUser = caseAccessService.isExternalUser();
-                assertThat(externalUser, is(false));
-                assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
-            }
         }
 
         @Nested
@@ -508,16 +482,6 @@ class CaseAccessServiceTest {
                 assertThat(result.isPresent(), is(true));
                 assertGrantedCaseIdsForRA(result.get());
             }
-
-            @Test
-            @DisplayName("should give ALL access level")
-            void accessLevel() {
-                final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-                boolean externalUser = caseAccessService.isExternalUser();
-                assertThat(externalUser, is(false));
-                assertThat(accessLevel, equalTo(AccessLevel.ALL));
-            }
-
         }
 
         @Nested
@@ -541,68 +505,8 @@ class CaseAccessServiceTest {
                 );
                 final var result = caseAccessService
                     .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
-
                 assertThat(result.isPresent(), is(true));
                 assertGrantedCaseIdsForRA(result.get());
-            }
-
-            @Test
-            @DisplayName("should give ALL access level")
-            void accessLevel() {
-                final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-                boolean externalUser = caseAccessService.isExternalUser();
-                assertThat(externalUser, is(false));
-                assertThat(accessLevel, equalTo(AccessLevel.ALL));
-            }
-        }
-
-        @Nested
-        @DisplayName("when a external user")
-        class WhenExternalUser {
-            private final String[] roles = {
-                "fpl-caseworker-publiclaw"
-            };
-
-            @BeforeEach
-            void setUp() {
-                withRoles(roles);
-            }
-
-            @Test
-            @DisplayName("Should return granted case ids for user with hmcts-judiciary role")
-            void shouldReturnCaseIds() {
-                when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
-                when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)).thenReturn(
-                    caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
-                );
-                final var result = caseAccessService
-                    .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
-
-                assertThat(result.isPresent(), is(true));
-                assertGrantedCaseIdsForRA(result.get());
-            }
-
-            @Test
-            @DisplayName("Should return true externalUser with fpl-caseworker-publiclaw-solicitor role")
-            void shouldReturnIsExternalUser() {
-                when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
-                when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)).thenReturn(
-                    caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
-                );
-                final var result = caseAccessService
-                    .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
-
-                assertThat(result.isPresent(), is(false));
-
-            }
-
-            @Test
-            @DisplayName("should give GRANTED access level")
-            void accessLevel() {
-                final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-                boolean externalUser = caseAccessService.isExternalUser();
-                assertThat(externalUser, is(false));
-                assertThat(accessLevel, equalTo(AccessLevel.ALL));
             }
         }
 
@@ -628,16 +532,7 @@ class CaseAccessServiceTest {
                     .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
 
                 assertThat(result.isPresent(), is(true));
-                assertGrantedCaseIds(result.get(),1);
-            }
-
-            @Test
-            @DisplayName("should give GRANTED access level")
-            void accessLevel() {
-                final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-                boolean externalUser = caseAccessService.isExternalUser();
-                assertThat(externalUser, is(false));
-                assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
+                assertGrantedCaseIds(result.get());
             }
         }
 
@@ -662,16 +557,7 @@ class CaseAccessServiceTest {
                 Optional<List<Long>> result = caseAccessService
                     .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
                 assertThat(result.isPresent(), is(true));
-                assertGrantedCaseIds(result.get(), 1);
-            }
-
-            @Test
-            @DisplayName("should give GRANTED access level")
-            void accessLevel() {
-                final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-                assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
-                boolean externalUser = caseAccessService.isExternalUser();
-                assertThat(externalUser, is(false));
+                assertGrantedCaseIds(result.get());
             }
         }
 
@@ -695,22 +581,13 @@ class CaseAccessServiceTest {
 
                 assertThat(result.isPresent(), is(false));
             }
-
-            @Test
-            @DisplayName("should give ALL access level")
-            void accessLevel() {
-                final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
-                boolean externalUser = caseAccessService.isExternalUser();
-                assertThat(externalUser, is(false));
-                assertThat(accessLevel, equalTo(AccessLevel.ALL));
-            }
         }
 
-        private void assertGrantedCaseIds(List<Long> result, int noOfTimes) {
+        private void assertGrantedCaseIds(List<Long> result) {
             assertAll(
                 () -> assertThat(result, hasItems(Long.valueOf(CASE_REFERENCE1), Long.valueOf(CASE_REFERENCE2))),
                 () -> verify(userRepository).getUserId(),
-                () -> verify(userRepository, times(noOfTimes)).anyRoleMatches(any()),
+                () -> verify(userRepository).anyRoleMatches(any()),
                 () -> verify(caseUserRepository).findCasesUserIdHasAccessTo(USER_ID)
             );
         }

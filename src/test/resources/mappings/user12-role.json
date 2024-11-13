@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "role": "caseworker-divorce",
+      "role": "caseworker-divorce-solicitor",
       "security_classification": "PUBLIC"
     }
   }
