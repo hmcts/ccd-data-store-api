@@ -74,7 +74,7 @@
           "security_classification": "PRIVATE",
           "acls": [
             {
-              "role": "caseworker-probate-public",
+              "role": "caseworker-divorce-solicitor",
               "create": true,
               "read": true,
               "update": false,
