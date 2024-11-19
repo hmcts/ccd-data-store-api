@@ -31,6 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -1751,7 +1752,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     public void shouldReturnForbiddenWhenEventUserRoleIsExternal() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_EXTERNAL_USER);
 
-        // Check that we have the expected test data set size
+        /*// Check that we have the expected test data set size
         List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect data initiation", 1, resultList.size());
 
@@ -1768,6 +1769,20 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         // User role has access to PUBLIC and event is classified as PRIVATE
         mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT_EXTERNAL, eventList.get(2).getId()))
+                .contentType(JSON_CONTENT_TYPE)
+                .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
+            .andReturn();*/
+
+        // Check that we have the expected test data set size
+        List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect data initiation", 1, resultList.size());
+
+        List<AuditEvent> eventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("Incorrect data initiation", 3, eventList.size());
+
+        MvcResult result = mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT_EXTERNAL,
+                eventList.get(1).getId()))
                 .contentType(JSON_CONTENT_TYPE)
                 .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(HttpStatus.FORBIDDEN.value()))

@@ -29,6 +29,41 @@
           "read": true,
           "update": true,
           "delete": false
+        },
+        {
+          "role": "caseworker-befta_jurisdiction_1",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-probate-private",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-test-public",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "citizen",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "role-citizen",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
         }
       ],
       "roleToAccessProfiles": [
@@ -41,6 +76,72 @@
           "live_from": "2017-01-01",
           "live_to": null,
           "role_name": "idam:caseworker-divorce-solicitor",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCaseExternal",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "caseworker-befta_jurisdiction_1",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "idam:caseworker-befta_jurisdiction_1",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCaseExternal",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "caseworker-probate-private",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "idam:caseworker-probate-private",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCaseExternal",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "caseworker-test-public",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "idam:caseworker-test-public",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCaseExternal",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "citizen",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "idam:citizen",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCaseExternal",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "role-citizen",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "idam:role-citizen",
+          "case_access_categories": null
+        },
+        {
+          "case_type_id": "TestAddressBookCaseExternal",
+          "disabled": false,
+          "read_only": false,
+          "authorisations": null,
+          "access_profiles": "[CREATOR]",
+          "live_from": "2017-01-01",
+          "live_to": null,
+          "role_name": "[CREATOR]",
           "case_access_categories": null
         }
       ],
@@ -77,7 +178,7 @@
               "role": "caseworker-divorce-solicitor",
               "create": true,
               "read": true,
-              "update": false,
+              "update": true,
               "delete": false
             }],
           "show_event_notes": false,
@@ -136,7 +237,7 @@
               "role": "caseworker-divorce-solicitor",
               "create": true,
               "read": true,
-              "update": false,
+              "update": true,
               "delete": false
             }],
           "show_event_notes": true,
@@ -201,6 +302,20 @@
           "acls": [
             {
               "role": "caseworker-divorce-solicitor",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": false,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "role-citizen",
               "create": false,
               "read": true,
               "update": true,

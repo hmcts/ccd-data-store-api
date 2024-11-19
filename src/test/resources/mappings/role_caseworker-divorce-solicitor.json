@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/user-roles/caseworker-divorce-solicitor"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "role": "caseworker-divorce-solicitor",
+        "security_classification": "PUBLIC"
+      }
+    ]
+  }
+}
