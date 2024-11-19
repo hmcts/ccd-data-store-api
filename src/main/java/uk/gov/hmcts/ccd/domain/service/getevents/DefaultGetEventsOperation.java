@@ -3,9 +3,11 @@ package uk.gov.hmcts.ccd.domain.service.getevents;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -22,6 +24,7 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     private final CaseAuditEventRepository auditEventRepository;
     private final GetCaseOperation getCaseOperation;
     private final UIDService uidService;
+    private final ApplicationParams applicationParams;
     private static final String RESOURCE_NOT_FOUND //
         = "No case found ( jurisdiction = '%s', case type id = '%s', case reference = '%s' )";
     private static final String CASE_RESOURCE_NOT_FOUND //
@@ -29,11 +32,15 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     private static final String CASE_EVENT_NOT_FOUND = "Case audit events not found";
 
     @Autowired
-    public DefaultGetEventsOperation(CaseAuditEventRepository auditEventRepository, @Qualifier(
-        CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation, UIDService uidService) {
+    public DefaultGetEventsOperation(
+            CaseAuditEventRepository auditEventRepository,
+            @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
+            UIDService uidService,
+            final ApplicationParams applicationParams) {
         this.auditEventRepository = auditEventRepository;
         this.getCaseOperation = getCaseOperation;
         this.uidService = uidService;
+        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -65,7 +72,10 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
 
     @Override
     public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
+        if (applicationParams.isPocFeatureEnabled()) {
+            return getEvents(caseDetails).stream().filter(event -> event.getId().equals(eventId)).findFirst();
+        }
         return auditEventRepository.findByEventId(eventId).map(Optional::of)
-            .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }
 }
