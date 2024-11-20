@@ -4084,7 +4084,7 @@
     {
       "id":"FT_DateTimeFormats",
       "description":"CaseType for testing DateTime formats",
-      "name":"FT-DateTime Fomratting",
+      "name":"FT-DateTime Formatting",
       "states":[
         {
           "id":"TODO",
