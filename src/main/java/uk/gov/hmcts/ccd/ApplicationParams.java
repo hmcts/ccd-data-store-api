@@ -12,8 +12,6 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @Named
 @Singleton
 public class ApplicationParams {
