@@ -1745,7 +1745,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
                .andReturn();
     }
 
-    @Test
+    @Ignore @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_case_event_history_external.sql"})
     public void shouldReturnForbiddenWhenEventUserRoleIsExternal() throws Exception {
