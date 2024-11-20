@@ -3,8 +3,10 @@ package uk.gov.hmcts.ccd.config;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,10 +23,13 @@ import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;
 @EnableCaching
 @EnableScheduling
 @Slf4j
-public class CacheConfiguration {
+public class CacheConfiguration extends CachingConfigurerSupport {
 
     private static final int TTL_ZERO = 0;
     private final ApplicationParams applicationParams;
+
+    // create a Caffeine Cache manager
+    private final CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
 
     public CacheConfiguration(ApplicationParams applicationParams) {
         this.applicationParams = applicationParams;
@@ -77,7 +82,9 @@ public class CacheConfiguration {
             newMapConfigWithTtl(SERVICES_CACHE, applicationParams.getRefDataCacheTtlInSec())
         ));
 
-        return cacheManager;
+        caffeineCacheManager.setCaffeine(Caffeine.newBuilder().recordStats());
+        caffeineCacheManager.setCacheNames(cacheManager.getCacheNames());
+        return caffeineCacheManager;
     }
 
     private CaffeineCache newMapConfigWithMaxIdle(final String cacheName, final Integer maxIdle) {
@@ -99,6 +106,12 @@ public class CacheConfiguration {
         }
 
         cacheBuilder.maximumSize(applicationParams.getDefaultCacheMaxSize());
-        return new CaffeineCache(cacheName, cacheBuilder.build());
+        log.debug("creating custom cache: name='{}'", cacheName);
+        CaffeineCache caffeineCache = new CaffeineCache(cacheName, cacheBuilder.recordStats().build());
+        caffeineCacheManager.registerCustomCache(cacheName, cacheBuilder.build());
+        log.debug("registering custom cache: name='{}'", cacheName);
+
+        return caffeineCache;
+
     }
 }
