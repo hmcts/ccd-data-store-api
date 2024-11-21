@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
@@ -14,13 +15,16 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 public class ClassifiedCreateEventOperation implements CreateEventOperation {
     private final CreateEventOperation createEventOperation;
     private final SecurityClassificationServiceImpl classificationService;
+    private final ApplicationParams applicationParams;
 
     @Autowired
     public ClassifiedCreateEventOperation(@Qualifier("default") CreateEventOperation createEventOperation,
-                                          SecurityClassificationServiceImpl classificationService) {
+                                          SecurityClassificationServiceImpl classificationService,
+                                          ApplicationParams applicationParams) {
 
         this.createEventOperation = createEventOperation;
         this.classificationService = classificationService;
+        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -28,7 +32,9 @@ public class ClassifiedCreateEventOperation implements CreateEventOperation {
                                        CaseDataContent content) {
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference,
                                                                            content);
-        return Optional.ofNullable(caseDetails)
+        return applicationParams.isPocFeatureEnabled()
+                ? caseDetails
+                : Optional.ofNullable(caseDetails)
                        .flatMap(classificationService::applyClassification)
                        .orElse(null);
     }

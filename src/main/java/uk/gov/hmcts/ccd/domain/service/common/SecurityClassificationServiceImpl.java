@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -44,17 +45,22 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     private final CaseDataAccessControl caseDataAccessControl;
     private final CaseDefinitionRepository caseDefinitionRepository;
+    private final ApplicationParams applicationParams;
 
     @Autowired
     public SecurityClassificationServiceImpl(CaseDataAccessControl caseDataAccessControl,
                                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                             final CaseDefinitionRepository caseDefinitionRepository) {
+                                             final CaseDefinitionRepository caseDefinitionRepository,
+                                             ApplicationParams applicationParams) {
         this.caseDataAccessControl = caseDataAccessControl;
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.applicationParams = applicationParams;
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
-        return applyClassification(caseDetails, false);
+        return  (applicationParams.isPocFeatureEnabled())
+                ? applyClassification(caseDetails, false)
+                : Optional.of(caseDetails);
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
 
+@Slf4j
 public abstract class AbstractDefaultGetCaseViewOperation {
 
     public static final String QUALIFIER = "default";
@@ -70,8 +73,9 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     }
 
     CaseDetails getCaseDetails(String caseReference) {
-        return getCaseOperation.execute(caseReference)
-                               .orElseThrow(() -> new CaseNotFoundException(caseReference));
+        Optional<CaseDetails> caseDetails = getCaseOperation.execute(caseReference);
+        log.info("caseDetails  is present ? {}", caseDetails.isPresent());
+        return caseDetails.orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
     CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data) {

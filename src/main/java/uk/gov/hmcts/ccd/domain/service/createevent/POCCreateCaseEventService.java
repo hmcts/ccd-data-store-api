@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.clients.PocApiClient;
-import uk.gov.hmcts.ccd.domain.model.aggregated.POCCaseDetails;
+import uk.gov.hmcts.ccd.domain.model.aggregated.POCCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.POCEventDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -52,14 +52,14 @@ public class POCCreateCaseEventService {
         //TODO Significant item is not yet set
         //auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 
-        POCCaseDetails pocCaseDetails = POCCaseDetails.builder()
+        POCCaseEvent pocCaseEvent = POCCaseEvent.builder()
                 .caseDetailsBefore(caseDetailsBefore)
                 .caseDetails(caseDetails)
                 .eventDetails(eventDetails.build())
                 .build();
 
         try {
-            return pocApiClient.createCase(pocCaseDetails);
+            return pocApiClient.createEvent(pocCaseEvent);
         } catch (FeignException.Conflict conflict) {
             throw new CaseConcurrencyException("""
                     Unfortunately we were unable to save your work to the case as \

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.getcase;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.Optional;
@@ -14,22 +15,29 @@ public class ClassifiedGetCaseOperation implements GetCaseOperation {
 
     private final GetCaseOperation getCaseOperation;
     private final SecurityClassificationServiceImpl classificationService;
+    private final ApplicationParams applicationParams;
 
     public ClassifiedGetCaseOperation(@Qualifier("default") GetCaseOperation getCaseOperation,
-                                      SecurityClassificationServiceImpl classificationService) {
+                                      SecurityClassificationServiceImpl classificationService,
+                                      ApplicationParams applicationParams) {
         this.getCaseOperation = getCaseOperation;
         this.classificationService = classificationService;
+        this.applicationParams = applicationParams;
     }
 
     @Override
     public Optional<CaseDetails> execute(String jurisdictionId, String caseTypeId, String caseReference) {
-        return getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference)
-                               .flatMap(classificationService::applyClassification);
+        return applicationParams.isPocFeatureEnabled()
+                ? getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference)
+                : getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference)
+                .flatMap(classificationService::applyClassification);
     }
 
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
-        return getCaseOperation.execute(caseReference)
-                               .flatMap(classificationService::applyClassification);
+        return applicationParams.isPocFeatureEnabled()
+                ? getCaseOperation.execute(caseReference)
+                : getCaseOperation.execute(caseReference)
+                .flatMap(classificationService::applyClassification);
     }
 }

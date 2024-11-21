@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
@@ -28,18 +29,21 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDataService caseDataService;
     private final DraftGateway draftGateway;
+    private final ApplicationParams applicationParams;
 
     public ClassifiedStartEventOperation(@Qualifier("default") StartEventOperation startEventOperation,
                                          SecurityClassificationServiceImpl classificationService,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                          final CaseDefinitionRepository caseDefinitionRepository,
                                          final CaseDataService caseDataService,
-                                         @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
+                                         @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
+                                         ApplicationParams applicationParams) {
         this.startEventOperation = startEventOperation;
         this.classificationService = classificationService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDataService = caseDataService;
         this.draftGateway = draftGateway;
+        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -86,10 +90,14 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     private StartEventResult applyClassificationIfCaseDetailsExist(String caseReference,
                                                                    StartEventResult startEventResult) {
+        if (applicationParams.isPocFeatureEnabled()) {
+            return startEventResult;
+        }
+
         CaseDetails caseDetails = startEventResult.getCaseDetails();
         if (null != caseDetails) {
             startEventResult.setCaseDetails(classificationService.applyClassification(caseDetails)
-                .orElseThrow(() -> new CaseNotFoundException(caseReference)));
+                    .orElseThrow(() -> new CaseNotFoundException(caseReference)));
         }
         return startEventResult;
     }

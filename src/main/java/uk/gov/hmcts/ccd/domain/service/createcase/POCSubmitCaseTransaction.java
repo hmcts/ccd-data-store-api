@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.clients.PocApiClient;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
-import uk.gov.hmcts.ccd.domain.model.aggregated.POCCaseDetails;
+import uk.gov.hmcts.ccd.domain.model.aggregated.POCCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.POCEventDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -53,12 +53,12 @@ public class POCSubmitCaseTransaction {
                     .proxiedByFirstName(onBehalfOfUser.getSurname());
         }
 
-        POCCaseDetails pocCaseDetails = POCCaseDetails.builder()
+        POCCaseEvent pocCaseEvent = POCCaseEvent.builder()
                 .caseDetails(newCaseDetails).eventDetails(eventDetails.build()).build();
 
 
         try {
-            CaseDetails caseDetails = pocApiClient.createCase(pocCaseDetails);
+            CaseDetails caseDetails = pocApiClient.createEvent(pocCaseEvent);
             log.info("pocCaseDetails: {}", caseDetails);
             log.info("pocCaseDetails id: {}", caseDetails.getId());
             log.info("pocCaseDetails reference before: {}", caseDetails.getReference());

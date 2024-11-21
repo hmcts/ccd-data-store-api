@@ -7,14 +7,14 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 @Data
 @Builder
-public class POCCaseDetails {
+public class POCCaseEvent {
 
     private CaseDetails caseDetailsBefore;
     private CaseDetails caseDetails;
     private POCEventDetails eventDetails;
 
     @JsonCreator
-    public POCCaseDetails(CaseDetails caseDetailsBefore, CaseDetails caseDetails, POCEventDetails eventDetails) {
+    public POCCaseEvent(CaseDetails caseDetailsBefore, CaseDetails caseDetails, POCEventDetails eventDetails) {
         this.caseDetailsBefore = caseDetailsBefore;
         this.caseDetails = caseDetails;
         this.eventDetails = eventDetails;
