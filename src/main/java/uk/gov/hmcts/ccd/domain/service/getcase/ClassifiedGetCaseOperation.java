@@ -27,10 +27,10 @@ public class ClassifiedGetCaseOperation implements GetCaseOperation {
 
     @Override
     public Optional<CaseDetails> execute(String jurisdictionId, String caseTypeId, String caseReference) {
+        Optional<CaseDetails> caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference);
         return applicationParams.isPocFeatureEnabled()
-                ? getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference)
-                : getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference)
-                .flatMap(classificationService::applyClassification);
+                ? caseDetails
+                : caseDetails.flatMap(classificationService::applyClassification);
     }
 
     @Override

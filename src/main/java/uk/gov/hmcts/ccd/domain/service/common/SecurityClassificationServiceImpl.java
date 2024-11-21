@@ -58,9 +58,9 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
-        return  (applicationParams.isPocFeatureEnabled())
-                ? applyClassification(caseDetails, false)
-                : Optional.of(caseDetails);
+        return applicationParams.isPocFeatureEnabled()
+                ? Optional.of(caseDetails)
+                : applyClassification(caseDetails, false);
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
