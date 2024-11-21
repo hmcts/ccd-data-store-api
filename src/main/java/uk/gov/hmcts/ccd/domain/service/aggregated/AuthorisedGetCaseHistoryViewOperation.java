@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.Set;
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
@@ -50,7 +51,7 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
         filterCaseTabFieldsByReadAccess(caseHistoryView, accessProfiles);
         filterAllowedTabsWithFields(caseHistoryView, accessProfiles);
 
-        if (caseAccessService.isExternalUser()) {
+        if (BooleanUtils.isTrue(caseAccessService.isExternalUser())) {
             throw new CaseHistoryRoleAccessException("Case History not accessible to the user");
         }
         return caseHistoryView;

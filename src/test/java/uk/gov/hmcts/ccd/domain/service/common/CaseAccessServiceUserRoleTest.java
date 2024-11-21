@@ -14,7 +14,7 @@ public class CaseAccessServiceUserRoleTest {
         + "+-localAuthority$");
 
     @Test
-    public void shouldMatchRestrictedRolesIsExternalUser() {
+    void shouldMatchRestrictedRolesIsExternalUser() {
         assertTrue(RESTRICT_GRANTED_ROLES_PATTERN.matcher("caseworker-divorce-solicitor").matches());
         assertTrue(RESTRICT_GRANTED_ROLES_PATTERN.matcher("caseworker-criminal-panelmember").matches());
         assertTrue(RESTRICT_GRANTED_ROLES_PATTERN.matcher("citizen").matches());
@@ -25,7 +25,7 @@ public class CaseAccessServiceUserRoleTest {
     }
 
     @Test
-    public void shouldNotMatchNonRestrictedRolesIsLocalUser() {
+    void shouldNotMatchNonRestrictedRolesIsLocalUser() {
         assertFalse(RESTRICT_GRANTED_ROLES_PATTERN.matcher("caseworker-divorce").matches());
         assertFalse(RESTRICT_GRANTED_ROLES_PATTERN.matcher("admin").matches());
         assertFalse(RESTRICT_GRANTED_ROLES_PATTERN.matcher("caseworker").matches());

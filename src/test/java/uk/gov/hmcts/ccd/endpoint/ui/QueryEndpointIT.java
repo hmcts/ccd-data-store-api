@@ -1758,7 +1758,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         List<AuditEvent> eventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect data initiation", 3, eventList.size());
 
-        MvcResult result = mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT_EXTERNAL,
+        mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT_EXTERNAL,
                 eventList.get(1).getId()))
                 .contentType(JSON_CONTENT_TYPE)
                 .header(AUTHORIZATION, "Bearer user1"))
