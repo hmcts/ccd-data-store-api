@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.EventTokenException;
 
 class EventTokenServiceTest {
 
@@ -274,7 +274,7 @@ class EventTokenServiceTest {
 
         doReturn(eventTokenProperties).when(spyEventTokenService).parseToken(token);
 
-        assertThrows(ResourceNotFoundException.class,  () -> spyEventTokenService.validateToken(token, uid,
+        assertThrows(EventTokenException.class,  () -> spyEventTokenService.validateToken(token, uid,
             caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
     }
 
@@ -291,7 +291,7 @@ class EventTokenServiceTest {
 
         doReturn(eventTokenProperties).when(spyEventTokenService).parseToken(token);
 
-        assertThrows(ResourceNotFoundException.class,  () -> spyEventTokenService.validateToken(token, uid,
+        assertThrows(EventTokenException.class,  () -> spyEventTokenService.validateToken(token, uid,
             caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
     }
 
@@ -308,7 +308,7 @@ class EventTokenServiceTest {
 
         doReturn(eventTokenProperties).when(spyEventTokenService).parseToken(token);
 
-        assertThrows(ResourceNotFoundException.class,  () -> spyEventTokenService.validateToken(token, uid,
+        assertThrows(EventTokenException.class,  () -> spyEventTokenService.validateToken(token, uid,
             caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
     }
 
@@ -325,7 +325,7 @@ class EventTokenServiceTest {
 
         doReturn(eventTokenProperties).when(spyEventTokenService).parseToken(token);
 
-        assertThrows(ResourceNotFoundException.class,  () -> spyEventTokenService.validateToken(token, uid,
+        assertThrows(EventTokenException.class,  () -> spyEventTokenService.validateToken(token, uid,
             caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
     }
 
@@ -343,7 +343,7 @@ class EventTokenServiceTest {
         doReturn(eventTokenProperties).when(spyEventTokenService).parseToken(token);
 
         uid = "differentUid";
-        assertThrows(ResourceNotFoundException.class,  () -> spyEventTokenService.validateToken(token, uid,
+        assertThrows(EventTokenException.class,  () -> spyEventTokenService.validateToken(token, uid,
             caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
     }
 

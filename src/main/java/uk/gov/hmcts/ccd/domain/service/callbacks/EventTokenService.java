@@ -9,7 +9,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.EventTokenException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.RandomKeyGenerator;
 
 import java.util.Date;
@@ -94,7 +93,7 @@ public class EventTokenService {
                 toString(claims.get(EventTokenProperties.ENTITY_VERSION)));
 
         } catch (ExpiredJwtException | SignatureException e) {
-            throw new EventTokenException("Token is not valid");
+            throw new EventTokenException("Token is not valid: " + e.getMessage());
         }
     }
 
@@ -121,7 +120,7 @@ public class EventTokenService {
         if (isValidateTokenClaims && !isTokenPropertiesMatching(eventTokenProperties, uid, caseDetails, event,
             jurisdictionDefinition,
             caseTypeDefinition)) {
-            throw new ResourceNotFoundException("Cannot find matching start trigger");
+            throw new EventTokenException("Token properties do not match the expected values");
         }
 
         if (eventTokenProperties.getEntityVersion() != null) {
