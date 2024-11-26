@@ -53,11 +53,19 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
+    private void jclog(String message) {
+        LOG.info("JCDEBUG: SecurityClassificationServiceImpl: info: " + message);
+        LOG.warn("JCDEBUG: SecurityClassificationServiceImpl: warn: " + message);
+        LOG.error("JCDEBUG: SecurityClassificationServiceImpl: error: " + message);
+        LOG.debug("JCDEBUG: SecurityClassificationServiceImpl: debug: " + message);
+    }
+
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
         return applyClassification(caseDetails, false);
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
+        jclog("applyClassification (#3)");
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         return userClassificationOpt
             .flatMap(securityClassification ->
