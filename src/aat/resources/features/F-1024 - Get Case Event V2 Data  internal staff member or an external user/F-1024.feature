@@ -9,7 +9,7 @@ Background:
   #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1024.1
-  Scenario: must return negative response for Specific Case Event Data by External Parties
+  Scenario: must return negative response for CaseView Event Data for authorised access by External Parties
 
     Given a user with [an active profile in CCD],
 
