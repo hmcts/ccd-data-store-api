@@ -49,9 +49,6 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     private void jclog(String message) {
         LOG.info("JCDEBUG: SecurityClassificationServiceImpl: info: {}", message);
-        LOG.warn("JCDEBUG: SecurityClassificationServiceImpl: warn: {}", message);
-        LOG.error("JCDEBUG: SecurityClassificationServiceImpl: error: {}", message);
-        LOG.debug("JCDEBUG: SecurityClassificationServiceImpl: debug: {}", message);
     }
 
     @Override
