@@ -1,21 +1,26 @@
 {
   "_guid_": "S-1024.1",
-  "_extends_": "F-1024_Test_Data_Base_External",
+  "_extends_": "F-1024_Private_Autotest_Test_Data_Base_External",
   "title": "must return negative response for Specific Case Event Data accessible by External Parties",
 
   "specs": [
     "an active profile in CCD",
     "contains the reference of the case just created and the event id valid for that case",
-    "contains a case that has just been created as in S-1024_Get_Case_Data_External",
+    "contains a case that has just been created as in S-1024_Get_Private_AutoTest_Case_Data_External",
     "contains details of the case just created, along with an HTTP-200 OK",
-    "contains the case view history",
-    "contains HTTP 200 Ok"
+    "contains the case view history, along with an HTTP-403 Forbidden",
+    "contains HTTP 403 Forbidden"
   ],
 
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "body": {
-      "message": "Access Denied"
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseHistoryRoleAccessException",
+      "message": "Case History not accessible to the user",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+
     }
   }
 }

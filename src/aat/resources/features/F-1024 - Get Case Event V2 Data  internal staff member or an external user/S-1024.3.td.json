@@ -1,13 +1,14 @@
 {
   "_guid_": "S-1024.3",
-  "_extends_": "F-1024_Test_Data_Base_Internal",
+  "_extends_": "F-1024_Test_Data_Base_Read_Internal",
   "title": "must return negative response for unauthorised access by Internal Parties",
 
   "specs": [
     "an active profile in CCD",
     "contains the reference of the case just created and the event id valid for that case",
     "contains a case that has just been created as in S-1024_Get_Case_Data_Internal",
-    "contains details of the case just created, along with an HTTP-401 Unauthorised",
+    "contains details of the case just created, along with an HTTP-200 OK",
+    "contains the case view history, along with an HTTP-401 Unauthorised",
     "includes a HTTP 401 Unauthorised"
   ],
 

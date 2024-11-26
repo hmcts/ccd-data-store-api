@@ -1,0 +1,7 @@
+{
+  "_guid_": "CaseworkerBeftaJurisdiction1NoReadAccessControlList",
+  "_extends_": "NoReadAccessControlList",
+
+  "role": "caseworker-befta_jurisdiction_1",
+  "delete": false
+}

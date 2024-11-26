@@ -1,9 +1,9 @@
 {
-  "_guid_": "S-1024_Get_Case_Data_External",
+  "_guid_": "S-1024_Get_Case_Data_Read_Internal",
   "title": "to get the details about case event for the case just created",
 
   "productName": "CCD Data Store",
-  "operationName": "Retrieve a CaseView Event by case for access to External Parties",
+  "operationName": "Retrieve a CaseView Event by case for access to Internal Parties",
 
   "method": "GET",
   "uri": "/internal/cases/{cid}",
@@ -14,7 +14,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "ExternalCaseworkerSolicitor"
+      "_extends_": "BeftaCaseworker1"
     }
   },
 
@@ -24,7 +24,7 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Case_Data_Extension_External][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Case_Data_Extension_Internal][testData][actualResponse][body][id]}"
     }
   },
 

@@ -1,0 +1,13 @@
+{
+  "_guid_": "CaseFieldDefinitionWithReadACLs",
+  "_extends_": "CaseFieldDefinitionWithoutACLs",
+
+  "acls": [
+    {
+      "_extends_" : "NoReadAccessControlList"
+    },
+    {
+      "_extends_" : "NoReadAccessControlList"
+    }
+  ]
+}
