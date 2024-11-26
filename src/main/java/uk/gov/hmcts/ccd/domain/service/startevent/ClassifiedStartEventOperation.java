@@ -48,10 +48,10 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     }
 
     private void jclog(String message) {
-        LOG.info("JCDEBUG: ClassifiedStartEventOperation: info: " + message);
-        LOG.warn("JCDEBUG: ClassifiedStartEventOperation: warn: " + message);
-        LOG.error("JCDEBUG: ClassifiedStartEventOperation: error: " + message);
-        LOG.debug("JCDEBUG: ClassifiedStartEventOperation: debug: " + message);
+        LOG.info("JCDEBUG: SecurityClassificationServiceImpl: info: {}", message);
+        LOG.warn("JCDEBUG: SecurityClassificationServiceImpl: warn: {}", message);
+        LOG.error("JCDEBUG: SecurityClassificationServiceImpl: error: {}", message);
+        LOG.debug("JCDEBUG: SecurityClassificationServiceImpl: debug: {}", message);
     }
 
     @Override

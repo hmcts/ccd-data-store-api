@@ -54,10 +54,10 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     private void jclog(String message) {
-        LOG.info("JCDEBUG: SecurityClassificationServiceImpl: info: " + message);
-        LOG.warn("JCDEBUG: SecurityClassificationServiceImpl: warn: " + message);
-        LOG.error("JCDEBUG: SecurityClassificationServiceImpl: error: " + message);
-        LOG.debug("JCDEBUG: SecurityClassificationServiceImpl: debug: " + message);
+        LOG.info("JCDEBUG: SecurityClassificationServiceImpl: info: {}", message);
+        LOG.warn("JCDEBUG: SecurityClassificationServiceImpl: warn: {}", message);
+        LOG.error("JCDEBUG: SecurityClassificationServiceImpl: error: {}", message);
+        LOG.debug("JCDEBUG: SecurityClassificationServiceImpl: debug: {}", message);
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
