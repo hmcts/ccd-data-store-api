@@ -233,7 +233,7 @@
           "id" : "FT_DateTimeFormats",
           "description" : "CaseType for testing DateTime formats",
           "version" : null,
-          "name" : "FT-DateTime Fomratting",
+          "name" : "FT-DateTime Formatting",
           "events" : "[[ANYTHING_PRESENT]]",
           "states" : "[[ANYTHING_PRESENT]]",
           "searchAliasFields" : [ ],
