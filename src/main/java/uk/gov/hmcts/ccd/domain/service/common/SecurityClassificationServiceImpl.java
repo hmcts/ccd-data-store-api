@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,25 +62,61 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         return applyClassification(caseDetails, false);
     }
 
+
+    /*
+     * Called from ClassifiedStartEventOperation (line 102)
+     */
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
+        jclog("applyClassification (#3)");
+        Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
+        if (!userClassificationOpt.isPresent()) {
+            return Optional.empty();
+        }
+
+        SecurityClassification securityClassification = userClassificationOpt.get();
+        if (!caseHasClassificationEqualOrLowerThan(securityClassification).test(caseDetails)) {
+            return Optional.empty();
+        }
+
+        if (caseDetails.getDataClassification() == null) {
+            LOG.warn("No data classification for case with reference={}, all fields removed",
+                caseDetails.getReference());
+            caseDetails.setDataClassification(Maps.newHashMap());
+        }
+
+        JsonNode data = filterNestedObject(
+            JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+            JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
+            securityClassification
+        );
+        caseDetails.setData(JacksonUtils.convertValue(data));
+        return Optional.of(caseDetails);
+    }
+
+
+
+    /*
+     * BACKUP COPY of original applyClassification(CaseDetails caseDetails, boolean create)
+     */
+    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create, boolean backupCopy) {
         jclog("applyClassification (#3)");
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         return userClassificationOpt
             .flatMap(securityClassification ->
                 Optional.of(caseDetails).filter(caseHasClassificationEqualOrLowerThan(securityClassification))
-                .map(cd -> {
-                    if (cd.getDataClassification() == null) {
-                        LOG.warn("No data classification for case with reference={},"
-                            + " all fields removed", cd.getReference());
-                        cd.setDataClassification(Maps.newHashMap());
-                    }
+                    .map(cd -> {
+                        if (cd.getDataClassification() == null) {
+                            LOG.warn("No data classification for case with reference={},"
+                                + " all fields removed", cd.getReference());
+                            cd.setDataClassification(Maps.newHashMap());
+                        }
 
-                    JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
-                        JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
-                        securityClassification);
-                    caseDetails.setData(JacksonUtils.convertValue(data));
-                    return cd;
-                }));
+                        JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                            JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
+                            securityClassification);
+                        caseDetails.setData(JacksonUtils.convertValue(data));
+                        return cd;
+                    }));
     }
 
     public List<AuditEvent> applyClassification(CaseDetails caseDetails, List<AuditEvent> events) {
