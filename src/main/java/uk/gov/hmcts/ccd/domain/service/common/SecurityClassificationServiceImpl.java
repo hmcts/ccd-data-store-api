@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,36 +70,69 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
         jclog("applyClassification (#3)");
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
-        if (!userClassificationOpt.isPresent()) {
-            return Optional.empty();
-        }
+        // TODO: Log userClassificationOpt
 
-        SecurityClassification securityClassification = userClassificationOpt.get();
-        if (!caseHasClassificationEqualOrLowerThan(securityClassification).test(caseDetails)) {
-            return Optional.empty();
-        }
+        Function<SecurityClassification, Optional<CaseDetails>> flatmapFunction = new Function<SecurityClassification,
+                                                                                              Optional<CaseDetails>>() {
+            @Override
+            public Optional<CaseDetails> apply(SecurityClassification securityClassification) {
+                Optional<CaseDetails> caseDetails1 = Optional.of(caseDetails);
+                // TODO: Log caseDetails1
+                Optional<CaseDetails> caseDetails2 = caseDetails1.filter(
+                    caseHasClassificationEqualOrLowerThan(securityClassification));
+                // TODO: Log caseDetails2
+                Optional<CaseDetails> caseDetails3 = caseDetails2.map(
+                    new MapFunctionWrapper(caseDetails, securityClassification).mapFunction);
+                // TODO: Log caseDetails3
+                return caseDetails3;
+            }
+        };
 
-        if (caseDetails.getDataClassification() == null) {
-            LOG.warn("No data classification for case with reference={}, all fields removed",
-                caseDetails.getReference());
-            caseDetails.setDataClassification(Maps.newHashMap());
-        }
-
-        JsonNode data = filterNestedObject(
-            JacksonUtils.convertValueJsonNode(caseDetails.getData()),
-            JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
-            securityClassification
-        );
-        caseDetails.setData(JacksonUtils.convertValue(data));
-        return Optional.of(caseDetails);
+        Optional<CaseDetails> caseDetails4 = userClassificationOpt.flatMap(flatmapFunction);
+        // TODO: Log caseDetails4
+        return caseDetails4;
     }
+
+    // START OF INNER CLASS mapFunctionWrapper
+    class MapFunctionWrapper {
+        final CaseDetails caseDetails;
+        final SecurityClassification securityClassification;
+
+        MapFunctionWrapper(final CaseDetails caseDetails, final SecurityClassification securityClassification) {
+            this.caseDetails = caseDetails;
+            this.securityClassification = securityClassification;
+        }
+
+        Function<CaseDetails, CaseDetails> mapFunction = new Function<CaseDetails, CaseDetails>() {
+            @Override
+            public CaseDetails apply(CaseDetails cd) {
+                if (cd.getDataClassification() == null) {
+                    LOG.warn("No data classification for case with reference={}, all fields removed",
+                        cd.getReference());
+                    jclog("No data classification for case with reference="
+                        + cd.getReference() + ", all fields removed");
+                    cd.setDataClassification(Maps.newHashMap());
+                }
+
+                JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                    JacksonUtils.convertValueJsonNode(cd.getDataClassification()),
+                    securityClassification);
+                cd.setData(JacksonUtils.convertValue(data));
+                // TODO: Log variable cd  (and JsonNode data ?)
+                return cd;
+            }
+        };
+    }
+    // END OF INNER CLASS mapFunctionWrapper
+
 
 
 
     /*
-     * BACKUP COPY of original applyClassification(CaseDetails caseDetails, boolean create)
+     * BACKUP OF ORIGINAL applyClassification(CaseDetails caseDetails, boolean create)
+     * ******************
      */
-    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create, boolean backupCopy) {
+    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create, boolean backupOriginal) {
         jclog("applyClassification (#3)");
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         return userClassificationOpt
