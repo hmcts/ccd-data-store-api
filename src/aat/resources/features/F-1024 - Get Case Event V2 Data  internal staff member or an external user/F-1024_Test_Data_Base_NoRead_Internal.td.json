@@ -20,8 +20,8 @@
 			"Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
 		},
 		"pathVariables": {
-			"cid": "${[scenarioContext][childContexts][Befta_Case_Data_Extension_Internal][testData][actualResponse][body][id]}",
-			"eventId": "${[scenarioContext][childContexts][S-1024_Get_Case_Data_Internal][testData][actualResponse][body][events][0][id]}"
+			"cid": "${[scenarioContext][childContexts][Befta_Case_Data_Extension_Read_Internal][testData][actualResponse][body][id]}",
+			"eventId": "${[scenarioContext][childContexts][S-1024_Get_Case_Data_Read_Internal][testData][actualResponse][body][events][0][id]}"
 		},
     "body": {
       "data": {
@@ -35,12 +35,6 @@
 			"Content-Encoding": "gzip",
 			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Content-Type": "[[ANYTHING_PRESENT]]"
-		},
-    "case_data": {
-      "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Solicitor_1"
-    },
-    "data_classification": {
-      "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification_Solicitor_1"
-    }
+		}
   }
 }
