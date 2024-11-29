@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -74,6 +76,7 @@ import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.arrayOf;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.mapOf;
 
+@ExtendWith(MockitoExtension.class)
 public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
         + "TestAddressBookCase/cases";
