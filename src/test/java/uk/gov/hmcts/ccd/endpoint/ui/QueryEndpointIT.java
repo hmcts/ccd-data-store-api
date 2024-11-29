@@ -74,7 +74,7 @@ import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.arrayOf;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.mapOf;
 
-public class QueryEndpointIT extends WireMockBaseTest {
+class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
         + "TestAddressBookCase/cases";
     private static final String GET_CASES_NO_READ_CASE_FIELD_ACCESS =
@@ -173,7 +173,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private JdbcTemplate template;
 
     @Before
-    public void setUp() {
+    public void setup() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
