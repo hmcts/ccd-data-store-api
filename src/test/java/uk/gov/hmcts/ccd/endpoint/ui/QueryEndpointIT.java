@@ -1725,7 +1725,6 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Timestamp", "2017-05-09T15:31:43", event.getTimestamp().format(DateTimeFormatter.ISO_DATE_TIME));
     }
 
-    @Ignore
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_case_event_history.sql"})
@@ -1749,7 +1748,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_case_event_history_external.sql"})
-    public void shouldReturnForbiddenWhenEventUserRoleIsExternal() throws Exception {
+    void shouldReturnForbiddenWhenEventUserRoleIsExternal() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_EXTERNAL_USER);
 
         // Check that we have the expected test data set size
