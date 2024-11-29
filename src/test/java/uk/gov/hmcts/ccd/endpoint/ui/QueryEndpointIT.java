@@ -74,7 +74,7 @@ import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.arrayOf;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.mapOf;
 
-class QueryEndpointIT extends WireMockBaseTest {
+public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
         + "TestAddressBookCase/cases";
     private static final String GET_CASES_NO_READ_CASE_FIELD_ACCESS =
@@ -1748,7 +1748,7 @@ class QueryEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_case_event_history_external.sql"})
-    void shouldReturnForbiddenWhenEventUserRoleIsExternal() throws Exception {
+    public void shouldReturnForbiddenWhenEventUserRoleIsExternal() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_EXTERNAL_USER);
 
         // Check that we have the expected test data set size
