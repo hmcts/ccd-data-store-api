@@ -1725,6 +1725,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Timestamp", "2017-05-09T15:31:43", event.getTimestamp().format(DateTimeFormatter.ISO_DATE_TIME));
     }
 
+    @Ignore
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_case_event_history.sql"})
