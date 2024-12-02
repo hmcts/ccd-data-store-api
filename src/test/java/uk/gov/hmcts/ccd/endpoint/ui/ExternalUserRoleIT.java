@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.endpoint.ui;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
@@ -33,14 +33,14 @@ public class ExternalUserRoleIT extends WireMockBaseTest {
     @Inject
     private WebApplicationContext wac;
 
-    @MockBean
+    @SpyBean
     private AuditRepository auditRepository;
     private MockMvc mockMvc;
     private JdbcTemplate template;
 
     @Before
     public void setUp() {
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_EXTERNAL_USER);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
     }
@@ -49,7 +49,6 @@ public class ExternalUserRoleIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_case_event_history_external.sql"})
     public void shouldReturnForbiddenWhenEventUserRoleIsExternal() throws Exception {
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_EXTERNAL_USER);
 
         // Check that we have the expected test data set size
         List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
