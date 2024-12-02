@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.endpoint.ui;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
@@ -33,7 +33,7 @@ public class ExternalUserRoleIT extends WireMockBaseTest {
     @Inject
     private WebApplicationContext wac;
 
-    @SpyBean
+    @MockBean
     private AuditRepository auditRepository;
     private MockMvc mockMvc;
     private JdbcTemplate template;
