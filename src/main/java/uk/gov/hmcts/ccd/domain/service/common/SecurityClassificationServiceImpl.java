@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
@@ -47,6 +49,8 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     private final CaseDataAccessControl caseDataAccessControl;
     private final CaseDefinitionRepository caseDefinitionRepository;
 
+    final ObjectMapper objectMapper = new ObjectMapper();
+
     @Autowired
     public SecurityClassificationServiceImpl(CaseDataAccessControl caseDataAccessControl,
                                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -59,21 +63,18 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         LOG.info("JCDEBUG: SecurityClassificationServiceImpl: info: {}", message);
     }
 
-    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
-        return applyClassification(caseDetails, false);
-    }
-
 
     /*
-     * Called from ClassifiedStartEventOperation (line 102)
+     * MODIFIED "version 1" applyClassification(CaseDetails caseDetails, boolean create).
+     * ********
      */
-    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
-        jclog("applyClassification (#3)");
+    public Optional<CaseDetails> applyClassificationModifiedVersion1(CaseDetails caseDetails, boolean create) {
+        jclog("applyClassification (MODIFIED version 1)");
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         // TODO: Log userClassificationOpt
 
-        Function<SecurityClassification, Optional<CaseDetails>> flatmapFunction = new Function<SecurityClassification,
-                                                                                              Optional<CaseDetails>>() {
+        Function<SecurityClassification, Optional<CaseDetails>> flatmapFunctionV1 = new Function<SecurityClassification,
+            Optional<CaseDetails>>() {
             @Override
             public Optional<CaseDetails> apply(SecurityClassification securityClassification) {
                 Optional<CaseDetails> caseDetails1 = Optional.of(caseDetails);
@@ -88,10 +89,38 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
             }
         };
 
-        Optional<CaseDetails> caseDetails4 = userClassificationOpt.flatMap(flatmapFunction);
+        Optional<CaseDetails> caseDetails4 = userClassificationOpt.flatMap(flatmapFunctionV1);
         // TODO: Log caseDetails4
         return caseDetails4;
     }
+
+
+    /*
+     * MODIFIED "version 2" applyClassification(CaseDetails caseDetails, boolean create).
+     * ********
+     */
+    public Optional<CaseDetails> applyClassificationModifiedVersion2(CaseDetails caseDetails, boolean create) {
+        jclog("applyClassification (MODIFIED version 2)");
+        Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
+        // TODO: Log userClassificationOpt
+
+        Function<SecurityClassification, Optional<CaseDetails>> flatmapFunctionV2 = new Function<SecurityClassification,
+            Optional<CaseDetails>>() {
+            @Override
+            public Optional<CaseDetails> apply(SecurityClassification securityClassification) {
+                Optional<CaseDetails> caseDetails1 = Optional.of(caseDetails)
+                    .filter(caseHasClassificationEqualOrLowerThan(securityClassification))
+                    .map(new MapFunctionWrapper(caseDetails, securityClassification).mapFunction);
+                // TODO: Log caseDetails1
+                return caseDetails1;
+            }
+        };
+
+        Optional<CaseDetails> caseDetails4 = userClassificationOpt.flatMap(flatmapFunctionV2);
+        // TODO: Log caseDetails4
+        return caseDetails4;
+    }
+
 
     // START OF INNER CLASS mapFunctionWrapper
     class MapFunctionWrapper {
@@ -129,11 +158,42 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
 
     /*
-     * BACKUP OF ORIGINAL applyClassification(CaseDetails caseDetails, boolean create)
-     * ******************
+     * Using this method as "test harness" to call both ORIGINAL applyClassification() (-BELOW-)
+     * and MODIFIED applyClassification() (-ABOVE-).
      */
-    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create, boolean backupOriginal) {
-        jclog("applyClassification (#3)");
+    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
+        // Call ORIGINAL applyClassification() (method -BELOW-).
+        Optional<CaseDetails> original = applyClassification(caseDetails, false);
+
+        // Call MODIFIED applyClassification() (methods -ABOVE-).
+        Optional<CaseDetails> modifiedV1 = applyClassificationModifiedVersion1(caseDetails, false);
+        Optional<CaseDetails> modifiedV2 = applyClassificationModifiedVersion2(caseDetails, false);
+
+        try {
+            final int originalHashCode = objectMapper.writeValueAsString(original).hashCode();
+            final int modifiedV1HashCode = objectMapper.writeValueAsString(modifiedV1).hashCode();
+            final int modifiedV2HashCode = objectMapper.writeValueAsString(modifiedV2).hashCode();
+            jclog("originalHashCode and modifiedV1HashCode: "
+                + (originalHashCode == modifiedV1HashCode ? "SAME" : "DIFFER"));
+            jclog("originalHashCode and modifiedV2HashCode: "
+                + (originalHashCode == modifiedV2HashCode ? "SAME" : "DIFFER"));
+        } catch (JsonProcessingException e) {
+            jclog("originalHashCode and modifiedV2HashCode: ERROR");
+        }
+
+        return original;
+    }
+
+
+
+
+    /*
+     * BACKUP OF ORIGINAL applyClassification(CaseDetails caseDetails, boolean create).
+     * ******************
+     * Called from ClassifiedStartEventOperation (line 102).
+     */
+    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
+        jclog("applyClassification (ORIGINAL)");
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         return userClassificationOpt
             .flatMap(securityClassification ->
