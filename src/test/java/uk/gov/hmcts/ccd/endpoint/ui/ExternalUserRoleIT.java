@@ -25,13 +25,16 @@ import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER;
-import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.*;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.userRoleAssignmentJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponseJson;
 
 public class ExternalUserRoleIT extends WireMockBaseTest {
 
+    private static final String EXTERNAL_CASETYPE = "TestAddressBookCaseExternal";
     private static final String GET_CASE_HISTORY_FOR_EVENT_EXTERNAL =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseExternal/cases/1504259907353529/"
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
+            + EXTERNAL_CASETYPE + "/cases/1504259907353529/"
             + "events/%d/case-history";
 
 
@@ -52,7 +55,7 @@ public class ExternalUserRoleIT extends WireMockBaseTest {
         String userId = "124";
         stubUserInfo(userId, MockUtils.ROLE_EXTERNAL_USER);
         String roleAssignmentResponseJson = roleAssignmentResponseJson(
-            userRoleAssignmentJson(userId, MockUtils.ROLE_EXTERNAL_USER, CASE_01_REFERENCE, "TestAddressBookCaseExternal")
+            userRoleAssignmentJson(userId, MockUtils.ROLE_EXTERNAL_USER, CASE_01_REFERENCE, EXTERNAL_CASETYPE)
         );
         stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
             .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
