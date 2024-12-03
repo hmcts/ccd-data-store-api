@@ -11,7 +11,7 @@
     "jsonBody": {
       "roleAssignmentResponse" : [
         {
-          "id": "6d96923f-991a-4cb1-863e-9bec44d1689a",
+          "id": "7d96923f-991a-4cb1-863e-9bec44d1689a",
           "actorIdType": "IDAM",
           "actorId": "123",
           "roleType": "CASE",
