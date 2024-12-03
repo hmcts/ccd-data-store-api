@@ -33,8 +33,7 @@
           "roles": [
             "caseworker",
             "caseworker-test",
-            "caseworker-probate-public", "caseworker-probate", "caseworker-divorce", "caseworker-sscs",
-            "caseworker-divorce-solicitor"
+            "caseworker-probate-public", "caseworker-probate", "caseworker-divorce", "caseworker-sscs"
           ],
           "name": "Cloud Strife",
           "given_name": "Cloud",
