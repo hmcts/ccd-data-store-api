@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -57,6 +58,9 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
                                              final CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDataAccessControl = caseDataAccessControl;
         this.caseDefinitionRepository = caseDefinitionRepository;
+
+        // Enables deserialisation of java.util.Optional
+        objectMapper.registerModule(new Jdk8Module());
     }
 
     private void jclog(String message) {
@@ -178,7 +182,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
             jclog("originalHashCode and modifiedV2HashCode: "
                 + (originalHashCode == modifiedV2HashCode ? "SAME" : "DIFFER"));
         } catch (JsonProcessingException e) {
-            jclog("originalHashCode and modifiedV2HashCode: ERROR");
+            jclog("originalHashCode and modifiedHashCode: ERROR: " + e.getMessage());
         }
 
         return original;
