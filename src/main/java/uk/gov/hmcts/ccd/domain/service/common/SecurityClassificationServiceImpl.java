@@ -60,7 +60,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         this.caseDataAccessControl = caseDataAccessControl;
         this.caseDefinitionRepository = caseDefinitionRepository;
 
-        // Enables deserialisation of java.util.Optional and java.time.LocalDateTime
+        // Enables serialisation of java.util.Optional and java.time.LocalDateTime
         objectMapper.registerModule(new Jdk8Module());
         objectMapper.registerModule(new JavaTimeModule());
     }
