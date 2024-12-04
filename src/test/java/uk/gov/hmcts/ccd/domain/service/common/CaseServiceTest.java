@@ -335,6 +335,68 @@ class CaseServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("buildJsonFromCaseFieldsWithDefaultValueNullifyByDefault()")
+    class BuildJsonFromCaseFieldsWithDefaultValueNullifyByDefault {
+        @Test
+        @DisplayName("builds a Json representation from CaseEventDefinition caseFields nullify by default")
+        void buildsJsonRepresentationFromEventCaseFields() throws Exception {
+
+            final List<CaseEventFieldDefinition> caseFields = Arrays.asList(
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("ChangeOrganisationRequestField")
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("Reason")
+                        .defaultValue("SomeReasonX")
+                        .build())
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("CaseRoleId")
+                        .defaultValue(null)
+                        .build())
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("OrganisationToAdd.OrganisationID")
+                        .defaultValue("Solicitor firm 1")
+                        .build())
+                    .build(),
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("OrganisationPolicyField")
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("OrgPolicyCaseAssignedRole")
+                        .defaultValue("[Claimant]")
+                        .build())
+                    .build(),
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("TextField0")
+                    .withDefaultValue("Default text")
+                    .withNullifyByDefault(true)
+                    .build()
+            );
+
+            Map<String, JsonNode> result = caseService.buildJsonFromCaseFieldsWithDefaultValue(caseFields);
+
+            assertAll(
+                () -> assertThat(result.size(), is(3)),
+
+                () -> assertTrue(result.containsKey("ChangeOrganisationRequestField")),
+                () -> assertNotNull(result.get("ChangeOrganisationRequestField").get("Reason")),
+                () -> assertNull(result.get("ChangeOrganisationRequestField").get("CaseRoleId")),
+                () -> assertNotNull(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd")
+                    .get("OrganisationID")),
+                () -> assertThat(result.get("ChangeOrganisationRequestField").get("Reason").asText(),
+                    is("SomeReasonX")),
+                () -> assertThat(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd")
+                    .get("OrganisationID").asText(), is("Solicitor firm 1")),
+
+                () -> assertTrue(result.containsKey("OrganisationPolicyField")),
+                () -> assertNotNull(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole")),
+                () -> assertThat(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole").asText(),
+                    is("[Claimant]")),
+                () -> assertTrue(result.containsKey("TextField0")),
+                () -> assertThat(result.get("TextField0").asText(), is("Default text"))
+            );
+        }
+    }
+
     private CaseDetails buildCaseDetails() {
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION);
