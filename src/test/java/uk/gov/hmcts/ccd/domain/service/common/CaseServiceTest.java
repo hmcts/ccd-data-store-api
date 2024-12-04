@@ -367,7 +367,7 @@ class CaseServiceTest {
                     .build(),
                 TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
                     .withCaseFieldId("TextField0")
-                    .withDefaultValue("Default text")
+                    .withDefaultValue(null)
                     .withNullifyByDefault(true)
                     .build()
             );
@@ -392,7 +392,7 @@ class CaseServiceTest {
                 () -> assertThat(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole").asText(),
                     is("[Claimant]")),
                 () -> assertTrue(result.containsKey("TextField0")),
-                () -> assertThat(result.get("TextField0").asText(), is("Default text"))
+                () -> assertThat(result.get("TextField0").asText(), is("null"))
             );
         }
     }
