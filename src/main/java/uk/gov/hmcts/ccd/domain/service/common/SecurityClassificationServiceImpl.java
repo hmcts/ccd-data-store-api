@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -59,8 +60,9 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         this.caseDataAccessControl = caseDataAccessControl;
         this.caseDefinitionRepository = caseDefinitionRepository;
 
-        // Enables deserialisation of java.util.Optional
+        // Enables deserialisation of java.util.Optional and java.time.LocalDateTime
         objectMapper.registerModule(new Jdk8Module());
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     private void jclog(String message) {
@@ -164,6 +166,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     /*
      * Using this method as "test harness" to call both ORIGINAL applyClassification() (-BELOW-)
      * and MODIFIED applyClassification() (-ABOVE-).
+     * Called from ClassifiedStartEventOperation (line 102).
      */
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
         // Call ORIGINAL applyClassification() (method -BELOW-).
@@ -194,7 +197,6 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     /*
      * BACKUP OF ORIGINAL applyClassification(CaseDetails caseDetails, boolean create).
      * ******************
-     * Called from ClassifiedStartEventOperation (line 102).
      */
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
         jclog("applyClassification (ORIGINAL)");
