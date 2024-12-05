@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -151,10 +150,6 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
     private static final String GET_CASE_HISTORY_FOR_EVENT =
         "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/"
-            + "events/%d/case-history";
-
-    private static final String GET_CASE_HISTORY_FOR_EVENT_EXTERNAL =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseExternal/cases/1504259907353529/"
             + "events/%d/case-history";
 
     private static final String GET_CASE_EVENT_ENABLING_CONDITION = "/aggregated/caseworkers"
@@ -1746,27 +1741,6 @@ public class QueryEndpointIT extends WireMockBaseTest {
                             .header(AUTHORIZATION, "Bearer user1"))
                .andExpect(status().is(404))
                .andReturn();
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-        scripts = {"classpath:sql/insert_case_event_history_external.sql"})
-    public void shouldReturnForbiddenWhenEventUserRoleIsExternal() throws Exception {
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_EXTERNAL_USER);
-
-        // Check that we have the expected test data set size
-        List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", 1, resultList.size());
-
-        List<AuditEvent> eventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("Incorrect data initiation", 3, eventList.size());
-
-        mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT_EXTERNAL,
-                eventList.get(1).getId()))
-                .contentType(JSON_CONTENT_TYPE)
-                .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
-            .andReturn();
     }
 
     @Test

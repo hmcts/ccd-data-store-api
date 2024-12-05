@@ -56,5 +56,4 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
         }
         return caseHistoryView;
     }
-
 }
