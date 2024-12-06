@@ -8,12 +8,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
@@ -22,19 +18,18 @@ import java.util.function.Function;
 
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.caseHasClassificationEqualOrLowerThan;
 
-@Service
-public class SecurityClassificationServiceLogger extends SecurityClassificationServiceImpl {
+public class SecurityClassificationServiceLogger {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityClassificationServiceLogger.class);
 
+    private final SecurityClassificationServiceImpl securityClassificationServiceImpl;
+
     final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    public SecurityClassificationServiceLogger(CaseDataAccessControl caseDataAccessControl,
-                                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+    public SecurityClassificationServiceLogger(final CaseDataAccessControl caseDataAccessControl,
                                                final CaseDefinitionRepository caseDefinitionRepository) {
-        super(caseDataAccessControl, caseDefinitionRepository);
-
+        securityClassificationServiceImpl = new SecurityClassificationServiceImpl(caseDataAccessControl,
+                                                                                  caseDefinitionRepository);
         // Enables serialisation of java.util.Optional and java.time.LocalDateTime
         objectMapper.registerModule(new Jdk8Module());
         objectMapper.registerModule(new JavaTimeModule());
@@ -70,7 +65,7 @@ public class SecurityClassificationServiceLogger extends SecurityClassificationS
 
     /*
      * Test harness :-
-     * 1. Calls "MODIFIED" version of applyClassification() (method below).
+     * 1. Calls "MODIFIED" version of applyClassification() with logging (method below).
      * 2. Verifies hashcodes of "ORIGINAL" and "MODIFIED" filtered case details are the same.
      */
     public void applyClassification(final CaseDetails caseDetails,
@@ -93,7 +88,8 @@ public class SecurityClassificationServiceLogger extends SecurityClassificationS
      */
     public Optional<CaseDetails> applyClassificationModifiedVersion1(CaseDetails caseDetails, boolean create) {
         jclog("applyClassification (MODIFIED version 1)");
-        Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
+        Optional<SecurityClassification> userClassificationOpt =
+            securityClassificationServiceImpl.getUserClassification(caseDetails, create);
         jclog("    userClassificationOpt", userClassificationOpt);
 
         Function<SecurityClassification, Optional<CaseDetails>> flatmapFunctionV1 = new Function<SecurityClassification,
@@ -138,7 +134,8 @@ public class SecurityClassificationServiceLogger extends SecurityClassificationS
                     cd.setDataClassification(Maps.newHashMap());
                 }
 
-                JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                JsonNode data = securityClassificationServiceImpl.filterNestedObject(
+                    JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                     JacksonUtils.convertValueJsonNode(cd.getDataClassification()),
                     securityClassification);
                 jclog("    data", data);
