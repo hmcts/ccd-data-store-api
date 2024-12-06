@@ -8,8 +8,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
@@ -18,6 +22,7 @@ import java.util.function.Function;
 
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.caseHasClassificationEqualOrLowerThan;
 
+@Service
 public class SecurityClassificationServiceLogger {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityClassificationServiceLogger.class);
@@ -26,8 +31,10 @@ public class SecurityClassificationServiceLogger {
 
     final ObjectMapper objectMapper = new ObjectMapper();
 
-    public SecurityClassificationServiceLogger(final CaseDataAccessControl caseDataAccessControl,
-                                               final CaseDefinitionRepository caseDefinitionRepository) {
+    @Autowired
+    public SecurityClassificationServiceLogger(CaseDataAccessControl caseDataAccessControl,
+                                             @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                             final CaseDefinitionRepository caseDefinitionRepository) {
         securityClassificationServiceImpl = new SecurityClassificationServiceImpl(caseDataAccessControl,
                                                                                   caseDefinitionRepository);
         // Enables serialisation of java.util.Optional and java.time.LocalDateTime
