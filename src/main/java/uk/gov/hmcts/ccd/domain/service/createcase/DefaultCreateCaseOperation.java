@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -67,6 +69,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final GlobalSearchProcessorService globalSearchProcessorService;
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
+
+    private Logger LOG = LoggerFactory.getLogger(DefaultCreateCaseOperation.class);
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -140,6 +144,11 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             caseTypeDefinition.getJurisdictionDefinition(),
             caseTypeDefinition);
 
+        // CCD-5966 extra logging to catch case create data issues
+        if (event.getEventId() == "solicitorCreateApplication" && (caseDataContent.getData().isEmpty() || caseDataContent.getData().get("solsSOTForenames") == null)) {
+            LOG.error("solicitorCreateApplication is missing expected case data #1");
+        }
+
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
 
         final CaseDetails newCaseDetails = new CaseDetails();
@@ -158,6 +167,11 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             EMPTY_DATA_CLASSIFICATION));
         updateCaseState(caseEventDefinition, newCaseDetails);
 
+        // CCD-5966 extra logging to catch case create data issues
+        if (event.getEventId() == "solicitorCreateApplication" && (newCaseDetails.getData().isEmpty() || newCaseDetails.getData().get("solsSOTForenames") == null)) {
+            LOG.error("solicitorCreateApplication is missing expected case data #2");
+        }
+
         final IdamUser idamUser = userRepository.getUser();
         caseDataIssueLogger.logAnyDataIssuesIn(null, newCaseDetails);
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
@@ -167,6 +181,11 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             newCaseDetails,
             ignoreWarning,
             getOnBehalfOfUser(caseDataContent.getOnBehalfOfId()));
+
+        // CCD-5966 extra logging to catch case create data issues
+        if (event.getEventId() == "solicitorCreateApplication" && (savedCaseDetails.getData().isEmpty() || savedCaseDetails.getData().get("solsSOTForenames") == null)) {
+            LOG.error("solicitorCreateApplication is missing expected case data #3");
+        }
 
         submittedCallback(caseEventDefinition, savedCaseDetails);
 
