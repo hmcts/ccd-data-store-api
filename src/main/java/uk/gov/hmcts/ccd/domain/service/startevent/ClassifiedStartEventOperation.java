@@ -48,7 +48,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     }
 
     private void jclog(String message) {
-        LOG.info("JCDEBUG: SecurityClassificationServiceImpl: info: {}", message);
+        LOG.info("JCDEBUG: ClassifiedStartEventOperation: {}", message);
     }
 
     @Override
@@ -76,12 +76,14 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     private StartEventResult deduceDefaultClassificationsForDraft(StartEventResult startEventResult,
                                                                   String caseTypeId) {
+        jclog("deduceDefaultClassificationsForDraft");
         CaseDetails caseDetails = startEventResult.getCaseDetails();
         deduceDefaultClassificationIfCaseDetailsPresent(caseTypeId, caseDetails);
         return startEventResult;
     }
 
     private void deduceDefaultClassificationIfCaseDetailsPresent(String caseTypeId, CaseDetails caseDetails) {
+        jclog("deduceDefaultClassificationIfCaseDetailsPresent");
         if (null != caseDetails) {
             final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
             if (caseTypeDefinition == null) {
