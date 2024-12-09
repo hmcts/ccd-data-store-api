@@ -70,7 +70,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
 
-    private Logger LOG = LoggerFactory.getLogger(DefaultCreateCaseOperation.class);
+    private Logger log = LoggerFactory.getLogger(DefaultCreateCaseOperation.class);
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -145,8 +145,10 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             caseTypeDefinition);
 
         // CCD-5966 extra logging to catch case create data issues
-        if (event.getEventId() == "solicitorCreateApplication" && (caseDataContent.getData().isEmpty() || caseDataContent.getData().get("solsSOTForenames") == null)) {
-            LOG.error("solicitorCreateApplication is missing expected case data #1");
+        if (event.getEventId() == "solicitorCreateApplication" 
+                && (caseDataContent.getData().isEmpty() 
+                    || caseDataContent.getData().get("solsSOTForenames") == null)) {
+            log.error("solicitorCreateApplication is missing expected case data #1");
         }
 
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
@@ -168,8 +170,10 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         updateCaseState(caseEventDefinition, newCaseDetails);
 
         // CCD-5966 extra logging to catch case create data issues
-        if (event.getEventId() == "solicitorCreateApplication" && (newCaseDetails.getData().isEmpty() || newCaseDetails.getData().get("solsSOTForenames") == null)) {
-            LOG.error("solicitorCreateApplication is missing expected case data #2");
+        if (event.getEventId() == "solicitorCreateApplication" 
+                && (newCaseDetails.getData().isEmpty() 
+                    || newCaseDetails.getData().get("solsSOTForenames") == null)) {
+            log.error("solicitorCreateApplication is missing expected case data #2");
         }
 
         final IdamUser idamUser = userRepository.getUser();
@@ -183,8 +187,10 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             getOnBehalfOfUser(caseDataContent.getOnBehalfOfId()));
 
         // CCD-5966 extra logging to catch case create data issues
-        if (event.getEventId() == "solicitorCreateApplication" && (savedCaseDetails.getData().isEmpty() || savedCaseDetails.getData().get("solsSOTForenames") == null)) {
-            LOG.error("solicitorCreateApplication is missing expected case data #3");
+        if (event.getEventId() == "solicitorCreateApplication" 
+                && (savedCaseDetails.getData().isEmpty() 
+                    || savedCaseDetails.getData().get("solsSOTForenames") == null)) {
+            log.error("solicitorCreateApplication is missing expected case data #3");
         }
 
         submittedCallback(caseEventDefinition, savedCaseDetails);
