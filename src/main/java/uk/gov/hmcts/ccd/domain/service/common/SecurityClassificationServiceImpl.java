@@ -45,19 +45,29 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     private final CaseDataAccessControl caseDataAccessControl;
     private final CaseDefinitionRepository caseDefinitionRepository;
 
+    private final SecurityClassificationServiceLogger securityClassificationServiceLogger;
+
     @Autowired
     public SecurityClassificationServiceImpl(CaseDataAccessControl caseDataAccessControl,
                                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                              final CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDataAccessControl = caseDataAccessControl;
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.securityClassificationServiceLogger = new SecurityClassificationServiceLogger(this);
     }
 
-    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
-        return applyClassification(caseDetails, false);
+    /*
+     * Called from ClassifiedStartEventOperation (line 104).
+     * Calls "ORIGINAL" version of applyClassification() (method below).
+     */
+    public Optional<CaseDetails> applyClassification(final CaseDetails caseDetails) {
+        final Optional<CaseDetails> filteredCaseDetails = applyClassification(caseDetails, false);
+        securityClassificationServiceLogger.applyClassification(caseDetails, filteredCaseDetails);
+        return filteredCaseDetails;
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
+        LOG.info("JCDEBUG: SecurityClassificationServiceImpl: applyClassification (ORIGINAL)");
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         return userClassificationOpt
             .flatMap(securityClassification ->
@@ -145,7 +155,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
             .max(comparingInt(SecurityClassification::getRank));
     }
 
-    private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification,
+    protected JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification,
                                         SecurityClassification userClassification) {
         if (isAnyNull(data, dataClassification)) {
             return EMPTY_NODE;
