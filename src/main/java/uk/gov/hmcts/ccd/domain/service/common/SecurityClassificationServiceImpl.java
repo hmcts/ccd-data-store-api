@@ -53,8 +53,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
                                              final CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDataAccessControl = caseDataAccessControl;
         this.caseDefinitionRepository = caseDefinitionRepository;
-        this.securityClassificationServiceLogger = new SecurityClassificationServiceLogger(caseDataAccessControl,
-                                                                                           caseDefinitionRepository);
+        this.securityClassificationServiceLogger = new SecurityClassificationServiceLogger(this);
     }
 
     /*

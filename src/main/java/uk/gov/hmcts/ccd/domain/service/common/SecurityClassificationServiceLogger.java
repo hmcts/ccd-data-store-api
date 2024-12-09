@@ -8,35 +8,25 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.caseHasClassificationEqualOrLowerThan;
 
-@Service
 public class SecurityClassificationServiceLogger {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityClassificationServiceLogger.class);
 
-    private final SecurityClassificationServiceImpl securityClassificationServiceImpl;
+    private final SecurityClassificationServiceImpl securityClassificationService;
 
     final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    public SecurityClassificationServiceLogger(CaseDataAccessControl caseDataAccessControl,
-                                             @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                             final CaseDefinitionRepository caseDefinitionRepository) {
-        securityClassificationServiceImpl = new SecurityClassificationServiceImpl(caseDataAccessControl,
-                                                                                  caseDefinitionRepository);
+    public SecurityClassificationServiceLogger(final SecurityClassificationServiceImpl securityClassificationService) {
+        this.securityClassificationService = securityClassificationService;
+
         // Enables serialisation of java.util.Optional and java.time.LocalDateTime
         objectMapper.registerModule(new Jdk8Module());
         objectMapper.registerModule(new JavaTimeModule());
@@ -96,7 +86,7 @@ public class SecurityClassificationServiceLogger {
     public Optional<CaseDetails> applyClassificationModifiedVersion1(CaseDetails caseDetails, boolean create) {
         jclog("applyClassification (MODIFIED version 1)");
         Optional<SecurityClassification> userClassificationOpt =
-            securityClassificationServiceImpl.getUserClassification(caseDetails, create);
+            securityClassificationService.getUserClassification(caseDetails, create);
         jclog("    userClassificationOpt", userClassificationOpt);
 
         Function<SecurityClassification, Optional<CaseDetails>> flatmapFunctionV1 = new Function<SecurityClassification,
@@ -141,7 +131,7 @@ public class SecurityClassificationServiceLogger {
                     cd.setDataClassification(Maps.newHashMap());
                 }
 
-                JsonNode data = securityClassificationServiceImpl.filterNestedObject(
+                JsonNode data = securityClassificationService.filterNestedObject(
                     JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                     JacksonUtils.convertValueJsonNode(cd.getDataClassification()),
                     securityClassification);
