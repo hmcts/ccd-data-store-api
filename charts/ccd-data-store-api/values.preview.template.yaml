@@ -27,12 +27,12 @@ java:
     DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
     DATA_STORE_DB_MAX_POOL_SIZE: 10
-    DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-575-java/
+    DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-1492-java/
     USER_PROFILE_HOST: http://ccd-user-profile-api-pr-399-java/
     ELASTIC_SEARCH_ENABLED: true # enable whenever ES required on a particular PR
-    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
-    ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
-    ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
+    ELASTIC_SEARCH_HOSTS: "elastic-poc-ccd.es.privatelink.uksouth.azure.elastic-cloud.com:443"
+    ELASTIC_SEARCH_DATA_NODES_HOSTS: "https://elastic-poc-ccd.es.privatelink.uksouth.azure.elastic-cloud.com:443"
     TESTING_SUPPORT_ENABLED: true
     MIGRATIONS_ENDPOINT_ENABLED: true
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
@@ -42,7 +42,7 @@ java:
     enabled: true
 
 elastic:
-  enabled: true # enable whenever required on a particular PR
+  enabled: true # enable whenever required on a particular PR - disable for POC
 
 elasticsearch:
   nameOverride: ${SERVICE_NAME}-es
@@ -91,9 +91,10 @@ logstash:
       mountPath: /usr/share/logstash/ccd
   logstashConfig:
     logstash.yml: |
+      log.level: trace
       http.host: 0.0.0.0
       xpack.monitoring.enabled: false
-      xpack.monitoring.elasticsearch.hosts: ["http://{{ .Release.Name }}-es-master:9200"]
+      xpack.monitoring.elasticsearch.hosts: ["https://elastic-poc-ccd.es.privatelink.uksouth.azure.elastic-cloud.com:443"]
       queue.type: persisted
       dead_letter_queue.enable: true
     pipelines.yml: |
@@ -218,7 +219,7 @@ logstash:
     03_output.conf: |
       output {
           elasticsearch {
-              hosts => ["http://{{ .Release.Name }}-es-master:9200"]
+              hosts => ["https://elastic-poc-ccd.es.privatelink.uksouth.azure.elastic-cloud.com:443"]
               sniffing => false
               index => "%{[index_id]}"
               document_type => "_doc"
