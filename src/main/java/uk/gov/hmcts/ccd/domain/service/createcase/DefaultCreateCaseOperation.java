@@ -148,9 +148,9 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             caseTypeDefinition);
 
         // CCD-5966 extra logging to catch case create data issues
-        if (event.getEventId() == "solicitorCreateApplication" 
+        if (event.getEventId().equals(ccd5966Event)
                 && (caseDataContent.getData().isEmpty() 
-                    || caseDataContent.getData().get("solsSOTForenames") == null)) {
+                    || caseDataContent.getData().get(ccd5966Field) == null)) {
             log.error("solicitorCreateApplication is missing expected case data #1");
         }
 
