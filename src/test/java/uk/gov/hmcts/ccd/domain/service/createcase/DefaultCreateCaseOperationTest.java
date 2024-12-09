@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
+
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
@@ -52,8 +56,13 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.any;
@@ -70,6 +79,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.createcase.DefaultCreateCaseOperation.ccd5966Event;
+import static uk.gov.hmcts.ccd.domain.service.createcase.DefaultCreateCaseOperation.ccd5966Field;
 
 class DefaultCreateCaseOperationTest {
 
@@ -121,6 +132,7 @@ class DefaultCreateCaseOperationTest {
     private CaseLinkService caseLinkService;
 
     private DefaultCreateCaseOperation defaultCreateCaseOperation;
+    private Logger mockLogger = Mockito.mock(Logger.class);
 
     private static final String UID = "244";
     private static final String JURISDICTION_ID = "jid";
@@ -159,6 +171,8 @@ class DefaultCreateCaseOperationTest {
                                                                     supplementaryDataUpdateOperation,
                                                                     supplementaryDataValidator,
                                                                     caseLinkService);
+        
+        defaultCreateCaseOperation.log = mockLogger;
         data = buildJsonNodeData();
         given(userRepository.getUser()).willReturn(IDAM_USER);
         given(userRepository.getUserId()).willReturn(UID);
@@ -349,6 +363,72 @@ class DefaultCreateCaseOperationTest {
         verify(draftGateway, never()).delete(DRAFT_ID);
         verify(supplementaryDataUpdateOperation, never())
             .updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class));
+    }
+
+    @Test
+    @DisplayName("Should call CCD-5966 logging")
+    void shouldCallCCD5966Logging() {
+        final String caseEventStateId = "Some state";
+        event.setEventId(ccd5966Event);
+        eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(null).build();
+        eventData.setSupplementaryDataRequest(null);
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
+        given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
+        given(eventTriggerService.findCaseEvent(CASE_TYPE, ccd5966Event)).willReturn(eventTrigger);
+        given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
+        given(savedCaseType.getState()).willReturn(caseEventStateId);
+        given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
+        given(caseSanitiser.sanitise(any(CaseTypeDefinition.class), anyMap())).willReturn(data);
+        given(submitCaseTransaction.submitCase(same(event),
+            same(CASE_TYPE),
+            same(IDAM_USER),
+            same(eventTrigger),
+            any(CaseDetails.class),
+            same(IGNORE_WARNING),
+            any()))
+            .willReturn(savedCaseType);
+        given(savedCaseType.getData()).willReturn(data);
+
+        defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+            eventData,
+            IGNORE_WARNING);
+
+        verify(mockLogger,times(3)).error(anyString());
+    }
+
+    @Test
+    @DisplayName("Should not call CCD-5966 logging")
+    void shouldNotCallCCD5966Logging() {
+        final String caseEventStateId = "Some state";
+        event.setEventId(ccd5966Event);
+        TextNode ccd5966Data = TextNode.valueOf("ccd-5966");
+        data.put(ccd5966Field, ccd5966Data);
+        eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(null).build();
+        eventData.setSupplementaryDataRequest(null);
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
+        given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
+        given(eventTriggerService.findCaseEvent(CASE_TYPE, ccd5966Event)).willReturn(eventTrigger);
+        given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
+        given(savedCaseType.getState()).willReturn(caseEventStateId);
+        given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
+        given(caseSanitiser.sanitise(any(CaseTypeDefinition.class), anyMap())).willReturn(data);
+        given(submitCaseTransaction.submitCase(same(event),
+            same(CASE_TYPE),
+            same(IDAM_USER),
+            same(eventTrigger),
+            any(CaseDetails.class),
+            same(IGNORE_WARNING),
+            any()))
+            .willReturn(savedCaseType);
+        given(savedCaseType.getData()).willReturn(data);
+
+        defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+            eventData,
+            IGNORE_WARNING);
+
+        verify(mockLogger,times(0)).error(anyString());
     }
 
     @Test

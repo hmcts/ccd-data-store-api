@@ -70,7 +70,9 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
 
-    private Logger log = LoggerFactory.getLogger(DefaultCreateCaseOperation.class);
+    Logger log;
+    static String ccd5966Event = "solicitorCreateApplication";
+    static String ccd5966Field = "solsSOTForenames";
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -109,6 +111,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.supplementaryDataValidator = supplementaryDataValidator;
         this.caseLinkService = caseLinkService;
+        this.log = LoggerFactory.getLogger(DefaultCreateCaseOperation.class);
     }
 
     @Transactional
@@ -170,9 +173,9 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         updateCaseState(caseEventDefinition, newCaseDetails);
 
         // CCD-5966 extra logging to catch case create data issues
-        if (event.getEventId() == "solicitorCreateApplication" 
+        if (event.getEventId().equals(ccd5966Event) 
                 && (newCaseDetails.getData().isEmpty() 
-                    || newCaseDetails.getData().get("solsSOTForenames") == null)) {
+                    || newCaseDetails.getData().get(ccd5966Field) == null)) {
             log.error("solicitorCreateApplication is missing expected case data #2");
         }
 
@@ -187,9 +190,9 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             getOnBehalfOfUser(caseDataContent.getOnBehalfOfId()));
 
         // CCD-5966 extra logging to catch case create data issues
-        if (event.getEventId() == "solicitorCreateApplication" 
+        if (event.getEventId().equals(ccd5966Event) 
                 && (savedCaseDetails.getData().isEmpty() 
-                    || savedCaseDetails.getData().get("solsSOTForenames") == null)) {
+                    || savedCaseDetails.getData().get(ccd5966Field) == null)) {
             log.error("solicitorCreateApplication is missing expected case data #3");
         }
 
