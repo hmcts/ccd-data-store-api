@@ -1,6 +1,6 @@
 {
-  "_guid_": "Befta_Case_Data_Extension_Read_Internal",
-  "_extends_": "Befta_Default_Full_Case_Creation_Data",
+  "_guid_": "Befta_Case_Data_Extension_NoRead_Internal",
+  "_extends_": "Befta_Default_Full_Case_Creation_Data_NoRead",
 
   "specs": [
     "to create a full case"
@@ -8,7 +8,7 @@
 
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][parentContext][childContexts][Befta_Default_Token_Creation_Data_For_Case_Creation_Read][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][parentContext][childContexts][Befta_Default_Token_Creation_Data_For_Case_Creation_NoRead][testData][actualResponse][body][token]}"
     }
   }
 }
