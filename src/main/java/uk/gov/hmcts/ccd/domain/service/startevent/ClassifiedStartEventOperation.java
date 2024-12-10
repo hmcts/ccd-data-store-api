@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -22,6 +24,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 @Service
 @Qualifier("classified")
 public class ClassifiedStartEventOperation implements StartEventOperation {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ClassifiedStartEventOperation.class);
+
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
     private final StartEventOperation startEventOperation;
     private final SecurityClassificationServiceImpl classificationService;
@@ -42,6 +47,10 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         this.draftGateway = draftGateway;
     }
 
+    private void jclog(String message) {
+        LOG.info("JCDEBUG: ClassifiedStartEventOperation: {}", message);
+    }
+
     @Override
     public StartEventResult triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
         return startEventOperation.triggerStartForCaseType(caseTypeId,
@@ -51,6 +60,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     @Override
     public StartEventResult triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
+        jclog("triggerStartForCase (#1)");
         return applyClassificationIfCaseDetailsExist(caseReference, startEventOperation
             .triggerStartForCase(caseReference, eventId, ignoreWarning));
     }
@@ -66,12 +76,14 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     private StartEventResult deduceDefaultClassificationsForDraft(StartEventResult startEventResult,
                                                                   String caseTypeId) {
+        jclog("deduceDefaultClassificationsForDraft");
         CaseDetails caseDetails = startEventResult.getCaseDetails();
         deduceDefaultClassificationIfCaseDetailsPresent(caseTypeId, caseDetails);
         return startEventResult;
     }
 
     private void deduceDefaultClassificationIfCaseDetailsPresent(String caseTypeId, CaseDetails caseDetails) {
+        jclog("deduceDefaultClassificationIfCaseDetailsPresent");
         if (null != caseDetails) {
             final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
             if (caseTypeDefinition == null) {
@@ -86,6 +98,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     private StartEventResult applyClassificationIfCaseDetailsExist(String caseReference,
                                                                    StartEventResult startEventResult) {
+        jclog("applyClassificationIfCaseDetailsExist (#2)");
         CaseDetails caseDetails = startEventResult.getCaseDetails();
         if (null != caseDetails) {
             startEventResult.setCaseDetails(classificationService.applyClassification(caseDetails)
