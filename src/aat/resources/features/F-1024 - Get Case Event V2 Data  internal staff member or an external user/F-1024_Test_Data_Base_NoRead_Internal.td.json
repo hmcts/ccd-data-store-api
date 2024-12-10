@@ -22,7 +22,12 @@
 		"pathVariables": {
 			"cid": "${[scenarioContext][childContexts][Befta_Case_Data_Extension_NoRead_Internal][testData][actualResponse][body][id]}",
 			"eventId": "${[scenarioContext][childContexts][S-1024_Get_Case_Data_NoRead_Internal][testData][actualResponse][body][events][0][id]}"
-		}
+		},
+    "body": {
+      "data": {
+        "_extends_": "Befta_Default_Full_Case_Data"
+      }
+    }
 	},
 
 	"expectedResponse": {
