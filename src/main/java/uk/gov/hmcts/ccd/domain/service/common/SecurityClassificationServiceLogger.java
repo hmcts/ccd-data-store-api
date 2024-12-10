@@ -13,8 +13,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import java.util.Optional;
 import java.util.function.Function;
-
-import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.caseHasClassificationEqualOrLowerThan;
+import java.util.function.Predicate;
 
 public class SecurityClassificationServiceLogger {
 
@@ -60,8 +59,24 @@ public class SecurityClassificationServiceLogger {
         }
     }
 
+    private void jclog(String message, SecurityClassification securityClassification) {
+        try {
+            jclog(message + ": " + objectMapper.writeValueAsString(securityClassification));
+        } catch (JsonProcessingException e) {
+            jclog(message + ": JSON ERROR");
+        }
+    }
+
+    private void jclog(String message, Boolean bool) {
+        try {
+            jclog(message + ": " + objectMapper.writeValueAsString(bool));
+        } catch (JsonProcessingException e) {
+            jclog(message + ": JSON ERROR");
+        }
+    }
+
     /*
-     * Test harness :-
+     * TEST HARNESS :-
      * 1. Calls "MODIFIED" version of applyClassification() with logging (method below).
      * 2. Verifies hashcodes of "ORIGINAL" and "MODIFIED" filtered case details are the same.
      */
@@ -99,7 +114,7 @@ public class SecurityClassificationServiceLogger {
                     caseHasClassificationEqualOrLowerThan(securityClassification));
                 jclog("    caseDetails2", caseDetails2);
                 Optional<CaseDetails> caseDetails3 = caseDetails2.map(
-                    new MapFunctionWrapper(caseDetails, securityClassification).mapFunction);
+                    makeCaseDetailsMapFunction(caseDetails, securityClassification));
                 jclog("    caseDetails3", caseDetails3);
                 return caseDetails3;
             }
@@ -110,7 +125,69 @@ public class SecurityClassificationServiceLogger {
         return caseDetails4;
     }
 
+
+    /*
+     * Provides filter predicate for modified version of applyClassification().
+     */
+    private Predicate<CaseDetails> caseHasClassificationEqualOrLowerThan(SecurityClassification classification) {
+        return new Predicate<CaseDetails>() {
+            @Override
+            public boolean test(CaseDetails cd) {
+                jclog("    PREDICATE.CD", cd);
+                final Function<SecurityClassification, Boolean> predicateMapFunction =
+                                                                       new Function<SecurityClassification, Boolean>() {
+                        @Override
+                        public Boolean apply(SecurityClassification sc) {
+                            jclog("    predicate.sc", sc);
+                            SecurityClassification sc2 = cd.getSecurityClassification();
+                            jclog("    PREDICATE.SC2", sc2);
+                            Boolean result = sc.higherOrEqualTo(sc2);
+                            jclog("    predicate.result", result);
+                            return result;
+                        }
+                    };
+
+                Optional<SecurityClassification> optionalSecurityClassification = Optional.ofNullable(classification);
+                jclog("    predicate.optionalSecurityClassification", optionalSecurityClassification);
+                Boolean result = optionalSecurityClassification.map(predicateMapFunction).orElse(false);
+                jclog("    predicate.result", result);
+                return result;
+            }
+        };
+    }
+
+
+    /*
+     * Provides map function for modified version of applyClassification().
+     */
+    private Function<CaseDetails, CaseDetails> makeCaseDetailsMapFunction(final CaseDetails caseDetails,
+                                                                  final SecurityClassification securityClassification) {
+        return new Function<CaseDetails, CaseDetails>() {
+            @Override
+            public CaseDetails apply(CaseDetails cd) {
+                if (cd.getDataClassification() == null) {
+                    LOG.warn("No data classification for case with reference={}, all fields removed",
+                        cd.getReference());
+                    jclog("No data classification for case with reference="
+                        + cd.getReference() + ", all fields removed");
+                    cd.setDataClassification(Maps.newHashMap());
+                }
+
+                JsonNode data = securityClassificationService.filterNestedObject(
+                    JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                    JacksonUtils.convertValueJsonNode(cd.getDataClassification()),
+                    securityClassification);
+                jclog("    data", data);
+                cd.setData(JacksonUtils.convertValue(data));
+                jclog("    cd", cd);
+                return cd;
+            }
+        };
+    }
+
+
     // START OF INNER CLASS mapFunctionWrapper
+    /*
     class MapFunctionWrapper {
         final CaseDetails caseDetails;
         final SecurityClassification securityClassification;
@@ -142,6 +219,7 @@ public class SecurityClassificationServiceLogger {
             }
         };
     }
+    */
     // END OF INNER CLASS mapFunctionWrapper
 
 }
