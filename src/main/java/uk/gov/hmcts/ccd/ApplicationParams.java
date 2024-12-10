@@ -235,6 +235,9 @@ public class ApplicationParams {
     @Value("#{'${ccd.callback.passthru-header-contexts}'.split(',')}")
     private List<String> callbackPassthruHeaderContexts;
 
+    @Value("${token.claim.validation.enabled}")
+    private boolean validateTokenClaims;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -629,4 +632,9 @@ public class ApplicationParams {
     public List<String> getUploadTimestampFeaturedCaseTypes() {
         return uploadTimestampFeaturedCaseTypes;
     }
+
+    public boolean isValidateTokenClaims() {
+        return validateTokenClaims;
+    }
+
 }
