@@ -2,7 +2,9 @@ package uk.gov.hmcts.ccd.domain.service.startevent;
 
 import java.util.HashMap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,8 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     private final CaseDataService caseDataService;
     private final DraftGateway draftGateway;
 
+    final ObjectMapper objectMapper = new ObjectMapper();
+
     public ClassifiedStartEventOperation(@Qualifier("default") StartEventOperation startEventOperation,
                                          SecurityClassificationServiceImpl classificationService,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -51,6 +55,14 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         LOG.info("JCDEBUG: ClassifiedStartEventOperation: {}", message);
     }
 
+    private void jclog(String message, StartEventResult startEventResult) {
+        try {
+            jclog(message + ": " + objectMapper.writeValueAsString(startEventResult));
+        } catch (JsonProcessingException e) {
+            jclog(message + ": JSON ERROR");
+        }
+    }
+
     @Override
     public StartEventResult triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
         return startEventOperation.triggerStartForCaseType(caseTypeId,
@@ -60,9 +72,13 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     @Override
     public StartEventResult triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
-        jclog("triggerStartForCase (#1)");
-        return applyClassificationIfCaseDetailsExist(caseReference, startEventOperation
-            .triggerStartForCase(caseReference, eventId, ignoreWarning));
+        jclog("triggerStartForCase (ENTRY-POINT , caseReference = " + caseReference + " , eventId = " + eventId + ")");
+        StartEventResult startEventResult = startEventOperation.triggerStartForCase(caseReference, eventId,
+                                                                                    ignoreWarning);
+        jclog("    startEventResult", startEventResult);
+        StartEventResult startEventResult2 = applyClassificationIfCaseDetailsExist(caseReference, startEventResult);
+        jclog("    startEventResult2", startEventResult2);
+        return startEventResult2;
     }
 
     @Override
