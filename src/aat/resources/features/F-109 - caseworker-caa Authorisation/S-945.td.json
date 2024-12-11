@@ -47,23 +47,19 @@
                 "min": null,
                 "max": null,
                 "regular_expression": null,
-                "fixed_list_items": [
-                  {
-                    "code": "DONE",
-                    "label": "Done",
-                    "order": null
-                  },
-                  {
-                    "code": "IN_PROGRESS",
-                    "label": "In progress",
-                    "order": null
-                  },
-                  {
-                    "code": "TODO",
-                    "label": "To do",
-                    "order": null
-                  }
-                ],
+                "fixed_list_items": [{
+                  "code" : "TODO",
+                  "label" : "To do",
+                  "order" : "1"
+                }, {
+                  "code" : "IN_PROGRESS",
+                  "label" : "In progress",
+                  "order" : "2"
+                }, {
+                  "code" : "DONE",
+                  "label" : "Done",
+                  "order" : "3"
+                }],
                 "complex_fields": [],
                 "collection_field_type": null
               },
