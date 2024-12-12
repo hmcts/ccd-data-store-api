@@ -27,6 +27,9 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.extrac
 @Service
 public class RestrictedFieldProcessor {
 
+    private static final String VALUE = "value";
+    private static final String ID = "id";
+
     private final CaseAccessService caseAccessService;
 
     public RestrictedFieldProcessor(CaseAccessService caseAccessService) {
@@ -48,23 +51,25 @@ public class RestrictedFieldProcessor {
         sanitisedData.forEach((key, sanitizedValue) -> {
             JsonNode existingValue = existingData.get(key);
 
-            if (existingValue != null) {
-                CaseFieldDefinition rootFieldDefinition = caseTypeDefinition.getCaseFieldDefinitions()
-                    .stream()
-                    .filter(field -> field.getId().equals(key))
-                    .findFirst()
-                    .orElse(null);
+            if (existingValue == null) {
+                return;
+            }
 
-                if (rootFieldDefinition != null && rootFieldDefinition.isCompoundFieldType()) {
-                    JsonNode updatedValue = processSubFieldsRecursively(
-                        rootFieldDefinition,
-                        sanitizedValue,
-                        existingValue,
-                        accessProfileNames
-                    );
+            CaseFieldDefinition rootFieldDefinition = caseTypeDefinition.getCaseFieldDefinitions()
+                .stream()
+                .filter(field -> field.getId().equals(key))
+                .findFirst()
+                .orElse(null);
 
-                    mergedData.put(key, updatedValue);
-                }
+            if (rootFieldDefinition != null && rootFieldDefinition.isCompoundFieldType()) {
+                JsonNode updatedValue = processSubFieldsRecursively(
+                    rootFieldDefinition,
+                    sanitizedValue,
+                    existingValue,
+                    accessProfileNames
+                );
+
+                mergedData.put(key, updatedValue);
             }
         });
 
@@ -87,10 +92,7 @@ public class RestrictedFieldProcessor {
             return sanitizedNode;
         }
 
-        ObjectNode sanitizedObjectNode = sanitizedNode != null && sanitizedNode.isObject()
-            ? (ObjectNode) sanitizedNode.deepCopy()
-            : JsonNodeFactory.instance.objectNode();
-
+        ObjectNode sanitizedObjectNode = initializeSanitizedObjectNode(sanitizedNode);
         ObjectNode existingObjectNode = (ObjectNode) existingNode;
 
         existingObjectNode.fieldNames().forEachRemaining(fieldName -> {
@@ -118,56 +120,97 @@ public class RestrictedFieldProcessor {
         return sanitizedObjectNode;
     }
 
+    private static ObjectNode initializeSanitizedObjectNode(JsonNode sanitizedNode) {
+        return sanitizedNode != null && sanitizedNode.isObject()
+            ? (ObjectNode) sanitizedNode.deepCopy()
+            : JsonNodeFactory.instance.objectNode();
+    }
+
     private JsonNode processCollectionFields(CaseFieldDefinition subFieldDefinition,
                                              JsonNode sanitizedArrayNode,
                                              JsonNode existingArrayNode,
                                              Set<String> accessProfileNames) {
-
-        ArrayNode sanitizedArray = sanitizedArrayNode != null && sanitizedArrayNode.isArray()
-            ? (ArrayNode) sanitizedArrayNode.deepCopy()
-            : JsonNodeFactory.instance.arrayNode();
-
+        ArrayNode sanitizedArray = initializeSanitizedArrayNode(sanitizedArrayNode);
         ArrayNode existingArray = (ArrayNode) existingArrayNode;
 
         for (JsonNode existingItem : existingArray) {
-            JsonNode existingItemId = existingItem.get("id");
-
-            Optional<JsonNode> matchingNewItem = StreamSupport.stream(sanitizedArray.spliterator(), false)
-                .filter(newItem -> !isNullId(newItem) && newItem.get("id").equals(existingItemId))
-                .findFirst();
-
-            if (matchingNewItem.isEmpty()) {
-                log.debug("Missing collection item with ID '{}' under '{}'.", existingItemId,
-                    subFieldDefinition.getId());
-
-                if (isCreateWithoutReadAllowed(subFieldDefinition.getAccessControlLists(), accessProfileNames)) {
-                    log.info("Adding missing collection item with ID '{}' under '{}'.", existingItemId,
-                        subFieldDefinition.getId());
-                    sanitizedArray.add(existingItem);
-                }
-            } else {
-                JsonNode newValueField = matchingNewItem.get().get("value");
-                JsonNode existingValueField = existingItem.get("value");
-
-                if (existingValueField != null) {
-                    JsonNode processedValueField;
-
-                    if (existingValueField.isObject()) {
-                        processedValueField = processSubFieldsRecursively(subFieldDefinition,
-                            newValueField,
-                            existingValueField,
-                            accessProfileNames);
-                    } else {
-                        processedValueField = processSimpleValueField(
-                            subFieldDefinition, newValueField, existingValueField, accessProfileNames);
-                    }
-
-                    ((ObjectNode) matchingNewItem.get()).set("value", processedValueField);
-                }
-            }
+            processExistingItem(subFieldDefinition, sanitizedArray, existingItem, accessProfileNames);
         }
 
         return sanitizedArray;
+    }
+
+    private ArrayNode initializeSanitizedArrayNode(JsonNode sanitizedArrayNode) {
+        return sanitizedArrayNode != null && sanitizedArrayNode.isArray()
+            ? (ArrayNode) sanitizedArrayNode.deepCopy()
+            : JsonNodeFactory.instance.arrayNode();
+    }
+
+    private void processExistingItem(CaseFieldDefinition subFieldDefinition,
+                                     ArrayNode sanitizedArray,
+                                     JsonNode existingItem,
+                                     Set<String> accessProfileNames) {
+        JsonNode existingItemId = existingItem.get(ID);
+
+        Optional<JsonNode> matchingNewItem = findMatchingNewItem(sanitizedArray, existingItemId);
+
+        if (matchingNewItem.isEmpty()) {
+            handleMissingItem(subFieldDefinition, sanitizedArray, existingItem, accessProfileNames, existingItemId);
+        } else {
+            processMatchingItem(subFieldDefinition, matchingNewItem.get(), existingItem, accessProfileNames);
+        }
+    }
+
+    private Optional<JsonNode> findMatchingNewItem(ArrayNode sanitizedArray, JsonNode existingItemId) {
+        return StreamSupport.stream(sanitizedArray.spliterator(), false)
+            .filter(newItem -> !isNullId(newItem) && newItem.get(ID).equals(existingItemId))
+            .findFirst();
+    }
+
+    private void handleMissingItem(CaseFieldDefinition subFieldDefinition,
+                                   ArrayNode sanitizedArray,
+                                   JsonNode existingItem,
+                                   Set<String> accessProfileNames,
+                                   JsonNode existingItemId) {
+        log.debug("Missing collection item with ID '{}' under '{}'.", existingItemId,
+            subFieldDefinition.getId());
+
+        if (isCreateWithoutReadAllowed(subFieldDefinition.getAccessControlLists(), accessProfileNames)) {
+            log.info("Adding missing collection item with ID '{}' under '{}'.", existingItemId,
+                subFieldDefinition.getId());
+            sanitizedArray.add(existingItem);
+        }
+    }
+
+    private void processMatchingItem(CaseFieldDefinition subFieldDefinition,
+                                     JsonNode matchingNewItem,
+                                     JsonNode existingItem,
+                                     Set<String> accessProfileNames) {
+        JsonNode newValueField = matchingNewItem.get(VALUE);
+        JsonNode existingValueField = existingItem.get(VALUE);
+
+        if (existingValueField != null) {
+            JsonNode processedValueField = processValueField(subFieldDefinition, newValueField, existingValueField,
+                accessProfileNames);
+            ((ObjectNode) matchingNewItem).set(VALUE, processedValueField);
+        }
+    }
+
+    private JsonNode processValueField(CaseFieldDefinition subFieldDefinition,
+                                       JsonNode newValueField,
+                                       JsonNode existingValueField,
+                                       Set<String> accessProfileNames) {
+        if (existingValueField.isObject()) {
+            return processSubFieldsRecursively(subFieldDefinition,
+                newValueField,
+                existingValueField,
+                accessProfileNames);
+        } else {
+            return processSimpleValueField(subFieldDefinition,
+                newValueField,
+                existingValueField,
+                accessProfileNames);
+        }
     }
 
     private JsonNode processSimpleValueField(CaseFieldDefinition subFieldDefinition, JsonNode newValueField,
@@ -186,9 +229,9 @@ public class RestrictedFieldProcessor {
     }
 
     private boolean isNullId(JsonNode newItem) {
-        return newItem.get("id") == null
-            || newItem.get("id").equals(NullNode.getInstance())
-            || "null".equalsIgnoreCase(newItem.get("id").asText());
+        return newItem.get(ID) == null
+            || newItem.get(ID).equals(NullNode.getInstance())
+            || "null".equalsIgnoreCase(newItem.get(ID).asText());
     }
 
     private boolean isCreateWithoutReadAllowed(List<AccessControlList> fieldAccessControlLists,

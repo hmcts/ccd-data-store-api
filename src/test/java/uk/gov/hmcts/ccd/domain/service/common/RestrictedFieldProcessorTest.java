@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -110,7 +113,7 @@ class RestrictedFieldProcessorTest {
         }
         """;
 
-    static String nestedComplexTypeArrayPayload = """
+    static String nestedCaseCategoryComplexTypeArrayPayload = """
         {
            "caseCategory": {
                "value": {
@@ -691,7 +694,8 @@ class RestrictedFieldProcessorTest {
 
         String expectedMessage = "Adding missing field 'value' under 'caseCategory'.";
 
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedComplexTypeArrayPayload, newDataString,
+        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedCaseCategoryComplexTypeArrayPayload,
+            newDataString,
             caseCategoryFieldWithCreateWithoutReadPermission(),
             Level.INFO, expectedMessage);
 
@@ -726,7 +730,8 @@ class RestrictedFieldProcessorTest {
 
         String expectedMessage = "Adding missing field 'code' under 'value'.";
 
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedComplexTypeArrayPayload, newDataString,
+        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedCaseCategoryComplexTypeArrayPayload,
+            newDataString,
             caseCategoryFieldWithCreateWithoutReadPermission(),
             Level.INFO, expectedMessage);
 
@@ -755,7 +760,8 @@ class RestrictedFieldProcessorTest {
 
         String expectedMessage = "Adding missing field 'list_items' under 'caseCategory'.";
 
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedComplexTypeArrayPayload, newDataString,
+        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedCaseCategoryComplexTypeArrayPayload,
+            newDataString,
             caseCategoryFieldWithCreateWithoutReadPermission(),
             Level.INFO, expectedMessage);
 
@@ -791,7 +797,8 @@ class RestrictedFieldProcessorTest {
 
         String expectedMessage = "Adding missing collection item with ID '\"123456\"' under 'list_items'.";
 
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedComplexTypeArrayPayload, newDataString,
+        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedCaseCategoryComplexTypeArrayPayload,
+            newDataString,
             caseCategoryFieldWithCreateWithoutReadPermission(),
             Level.INFO, expectedMessage);
 
@@ -823,7 +830,8 @@ class RestrictedFieldProcessorTest {
 
         String expectedMessage = "Missing field 'value' under 'caseCategory'.";
 
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedComplexTypeArrayPayload, newDataString,
+        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedCaseCategoryComplexTypeArrayPayload,
+            newDataString,
             caseCategoryFieldWithoutCreateAndReadPermission(),
             Level.DEBUG, expectedMessage);
 
@@ -855,7 +863,8 @@ class RestrictedFieldProcessorTest {
 
         String expectedMessage = "Missing field 'label' under 'value'.";
 
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedComplexTypeArrayPayload, newDataString,
+        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedCaseCategoryComplexTypeArrayPayload,
+            newDataString,
             caseCategoryFieldWithoutCreateAndReadPermission(),
             Level.DEBUG, expectedMessage);
 
@@ -883,7 +892,8 @@ class RestrictedFieldProcessorTest {
 
         String expectedMessage = "Missing field 'list_items' under 'caseCategory'.";
 
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedComplexTypeArrayPayload, newDataString,
+        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedCaseCategoryComplexTypeArrayPayload,
+            newDataString,
             caseCategoryFieldWithoutCreateAndReadPermission(),
             Level.DEBUG, expectedMessage);
 
@@ -920,7 +930,8 @@ class RestrictedFieldProcessorTest {
 
         String expectedMessage = "Missing collection item with ID '\"123456\"' under 'list_items'.";
 
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedComplexTypeArrayPayload, newDataString,
+        Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedCaseCategoryComplexTypeArrayPayload,
+            newDataString,
             caseCategoryFieldWithoutCreateAndReadPermission(),
             Level.DEBUG, expectedMessage);
 
@@ -2007,20 +2018,17 @@ class RestrictedFieldProcessorTest {
         assertAll(
             () -> assertTrue(result.containsKey("Tags")),
             () -> assertEquals(3, result.get("Tags").size()),
-            () -> assertTrue(result.get("Tags").get(0).has("value")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText()),
             () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText()),
             () -> assertTrue(result.get("Tags").get(0).has("id")),
             () -> assertEquals("999", result.get("Tags").get(0).get("id").asText()),
-            () -> assertTrue(result.get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Category")),
             () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
             () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
             () -> assertEquals("456", result.get("Tags").get(1).get("id").asText()),
-            () -> assertTrue(result.get("Tags").get(2).has("value")),
             () -> assertTrue(result.get("Tags").get(2).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(2).get("value").has("Category")),
             () -> assertEquals("private", result.get("Tags").get(2).get("value").get("Tag").asText()),
@@ -2029,30 +2037,82 @@ class RestrictedFieldProcessorTest {
         );
     }
 
-    @Test
-    void shouldAddMissingCollectionTypeSubFieldsWithoutCreateWithoutReadPermission() {
-        final String newDataString = """
-             {
-                "Tags": [
-                  {
-                    "id": "123"
-                  },
-                  {
-                    "value": {
-                      "Tag": "public",
-                      "Category": "Work"
-                    },
-                    "id": "456"
-                  }
-                ]
-            }
-            """;
+    private static Stream<TestCase> tagsTestCases() {
+        return Stream.of(
+            new TestCase(
+                """
+                {
+                    "Tags": [
+                      {
+                        "id": "123"
+                      },
+                      {
+                        "value": {
+                          "Tag": "public",
+                          "Category": "Work"
+                        },
+                        "id": "456"
+                      }
+                    ]
+                }
+                """,
+                "Adding missing field 'Tag' under 'Tags'."
+            ),
+            new TestCase(
+                """
+                {
+                    "Tags": [
+                      {
+                        "value": null,
+                        "id": "123"
+                      },
+                      {
+                        "value": {
+                          "Tag": "public",
+                          "Category": "Work"
+                        },
+                        "id": "456"
+                      }
+                    ]
+                }
+                """,
+                "Adding missing field 'Tag' under 'Tags'."
+            ),
+            new TestCase(
+                """
+                {
+                    "Tags": [
+                      {
+                        "value": {
+                          "Tag": "private",
+                          "Category": "Personal"
+                        },
+                        "id": "123"
+                      },
+                      {
+                        "value": {
+                          "Category": "Work"
+                        },
+                        "id": "456"
+                      }
+                    ]
+                }
+                """,
+                "Adding missing field 'Tag' under 'Tags'."
+            )
+        );
+    }
 
-        String expectedMessage = "Adding missing field 'Tag' under 'Tags'.";
-
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(arrayPayload, newDataString,
+    @ParameterizedTest
+    @MethodSource("tagsTestCases")
+    void shouldHandleTagFilteringWithCreatePermissionWithoutReadPermission(TestCase testCase) {
+        Map<String, JsonNode> result = assertFilterServiceAndLogging(
+            arrayPayload,
+            testCase.inputJson,
             tagsWithCreatePermissionWithoutReadPermission(),
-            Level.INFO, expectedMessage);
+            Level.INFO,
+            testCase.expectedMessage
+        );
 
         assertAll(
             () -> assertTrue(result.containsKey("Tags")),
@@ -2068,86 +2128,7 @@ class RestrictedFieldProcessorTest {
         );
     }
 
-    @Test
-    void shouldAddNullCollectionTypeValueWithoutCreateWithoutReadPermission() {
-        final String newDataString = """
-             {
-                "Tags": [
-                  {
-                    "value": null,
-                    "id": "123"
-                  },
-                  {
-                    "value": {
-                      "Tag": "public",
-                      "Category": "Work"
-                    },
-                    "id": "456"
-                  }
-                ]
-            }
-            """;
-
-        String expectedMessage = "Adding missing field 'Tag' under 'Tags'.";
-
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(arrayPayload, newDataString,
-            tagsWithCreatePermissionWithoutReadPermission(),
-            Level.INFO, expectedMessage);
-
-        assertAll(
-            () -> assertTrue(result.containsKey("Tags")),
-            () -> assertEquals(2, result.get("Tags").size()),
-            () -> assertTrue(result.get("Tags").get(0).has("id")),
-            () -> assertEquals("123", result.get("Tags").get(0).get("id").asText()),
-            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText()),
-            () -> assertTrue(result.get("Tags").get(1).has("value")),
-            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Tags").get(1).get("id").asText())
-        );
-    }
-
-    @Test
-    void shouldAddMissingCollectionTypeSecondNodeFieldWithoutCreateWithoutReadPermission() {
-        final String newDataString = """
-             {
-                "Tags": [
-                  {
-                    "value": {
-                      "Tag": "private",
-                      "Category": "Personal"
-                    },
-                    "id": "123"
-                  },
-                  {
-                    "value": {
-                      "Category": "Work"
-                    },
-                    "id": "456"
-                  }
-                ]
-            }
-            """;
-
-        String expectedMessage = "Adding missing field 'Tag' under 'Tags'.";
-
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(arrayPayload, newDataString,
-            tagsWithCreatePermissionWithoutReadPermission(),
-            Level.INFO, expectedMessage);
-
-        assertAll(
-            () -> assertTrue(result.containsKey("Tags")),
-            () -> assertEquals(2, result.get("Tags").size()),
-            () -> assertTrue(result.get("Tags").get(0).has("id")),
-            () -> assertEquals("123", result.get("Tags").get(0).get("id").asText()),
-            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText()),
-            () -> assertTrue(result.get("Tags").get(1).has("value")),
-            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Tags").get(1).get("id").asText())
-        );
+    private record TestCase(String inputJson, String expectedMessage) {
     }
 
     @Test
@@ -2777,38 +2758,22 @@ class RestrictedFieldProcessorTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertTrue(result.get("Note").has("type")),
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertTrue(result.get("Note").has("metadata")),
-            () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
             () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
             () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertTrue(result.get("Note").has("content")),
-            () -> assertTrue(result.get("Note").get("content").has("title")),
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("body")),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("noteID")),
             () -> assertEquals("abc123",
                 result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("category")),
             () -> assertEquals("Meeting",
                 result.get("Note").get("content").get("additionalInfo").get("category").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("tags")),
             () -> assertEquals("project, timeline, deliverable", result.get("Note").get("content")
                     .get("additionalInfo").get("tags").asText()),
-            () -> assertTrue(result.get("Note").has("location")),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("123 Main Street",
                 result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine2")),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("City")),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("State"))
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText())
         );
     }
 
@@ -2848,42 +2813,24 @@ class RestrictedFieldProcessorTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertTrue(result.get("Note").has("type")),
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertTrue(result.get("Note").has("metadata")),
-            () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
             () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
             () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertTrue(result.get("Note").has("content")),
-            () -> assertTrue(result.get("Note").get("content").has("title")),
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("body")),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("noteID")),
             () -> assertEquals("abc123",
                 result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("category")),
             () -> assertEquals("Meeting",
                 result.get("Note").get("content").get("additionalInfo").get("category").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("tags")),
             () -> assertEquals("project, timeline, deliverable",
                 result.get("Note").get("content").get("additionalInfo").get("tags").asText()),
-            () -> assertTrue(result.get("Note").has("location")),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("123 Main Street",
                 result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine2")),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("City")),
             () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("State")),
             () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("Country")),
             () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("PostalCode")),
             () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
         );
     }
@@ -2924,41 +2871,25 @@ class RestrictedFieldProcessorTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertTrue(result.get("Note").has("type")),
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertTrue(result.get("Note").has("metadata")),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
             () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
             () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
             () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertTrue(result.get("Note").has("content")),
-            () -> assertTrue(result.get("Note").get("content").has("title")),
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("body")),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("category")),
             () -> assertEquals("Meeting",
                 result.get("Note").get("content").get("additionalInfo").get("category").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("tags")),
             () -> assertEquals("project, timeline, deliverable",
                 result.get("Note").get("content").get("additionalInfo").get("tags").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("noteID")),
             () -> assertEquals("abc123",
                 result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
-            () -> assertTrue(result.get("Note").has("location")),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine2")),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("City")),
             () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("State")),
             () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("Country")),
             () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("PostalCode")),
             () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
         );
 
@@ -3037,41 +2968,24 @@ class RestrictedFieldProcessorTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertTrue(result.get("Note").has("type")),
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertTrue(result.get("Note").has("metadata")),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
             () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
             () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertTrue(result.get("Note").has("content")),
-            () -> assertTrue(result.get("Note").get("content").has("title")),
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("body")),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("noteID")),
             () -> assertEquals("abc123",
                 result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("category")),
             () -> assertEquals("Meeting",
                 result.get("Note").get("content").get("additionalInfo").get("category").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("tags")),
             () -> assertEquals("project, timeline, deliverable",
                 result.get("Note").get("content").get("additionalInfo").get("tags").asText()),
-            () -> assertTrue(result.get("Note").has("location")),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine2")),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("City")),
             () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("State")),
             () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("Country")),
             () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("PostalCode")),
             () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
         );
     }
@@ -3108,41 +3022,23 @@ class RestrictedFieldProcessorTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertTrue(result.get("Note").has("type")),
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertTrue(result.get("Note").has("metadata")),
-            () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
             () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
             () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertTrue(result.get("Note").has("content")),
-            () -> assertTrue(result.get("Note").get("content").has("title")),
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("body")),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("noteID")),
             () -> assertEquals("abc123",
                 result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("category")),
             () -> assertEquals("Meeting",
                 result.get("Note").get("content").get("additionalInfo").get("category").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("tags")),
             () -> assertEquals("project, timeline, deliverable",
                 result.get("Note").get("content").get("additionalInfo").get("tags").asText()),
-            () -> assertTrue(result.get("Note").has("location")),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine2")),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("City")),
             () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("State")),
             () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("Country")),
             () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("PostalCode")),
             () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
         );
     }
@@ -3175,37 +3071,22 @@ class RestrictedFieldProcessorTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertTrue(result.get("Note").has("type")),
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertTrue(result.get("Note").has("metadata")),
-            () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
             () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
             () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertTrue(result.get("Note").has("location")),
             () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("123 Main Street", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine2")),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("City")),
             () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("State")),
             () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("Country")),
             () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("PostalCode")),
             () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText()),
-            () -> assertTrue(result.get("Note").has("content")),
-            () -> assertTrue(result.get("Note").get("content").has("title")),
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("body")),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
             () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("noteID")),
             () -> assertEquals("abc123",
                 result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("category")),
             () -> assertEquals("Meeting",
                 result.get("Note").get("content").get("additionalInfo").get("category").asText()),
             () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("tags")),
@@ -3243,41 +3124,25 @@ class RestrictedFieldProcessorTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertTrue(result.get("Note").has("type")),
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertTrue(result.get("Note").has("metadata")),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
             () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
             () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertTrue(result.get("Note").has("location")),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("123 Main Street",
                 result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine2")),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("City")),
             () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("State")),
             () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("Country")),
             () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("PostalCode")),
             () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText()),
-            () -> assertTrue(result.get("Note").has("content")),
-            () -> assertTrue(result.get("Note").get("content").has("title")),
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("body")),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
             () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("noteID")),
             () -> assertEquals("abc123",
                 result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("category")),
             () -> assertEquals("Meeting",
                 result.get("Note").get("content").get("additionalInfo").get("category").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("tags")),
             () -> assertEquals("project, timeline, deliverable",
                 result.get("Note").get("content").get("additionalInfo").get("tags").asText())
         );
@@ -3321,39 +3186,24 @@ class RestrictedFieldProcessorTest {
         assertAll(
             () -> assertTrue(result.get("Note").has("type")),
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertTrue(result.get("Note").has("metadata")),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
             () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
             () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertTrue(result.get("Note").has("location")),
             () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("123 Main Street",
                 result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine2")),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("City")),
             () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("State")),
             () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("Country")),
             () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("PostalCode")),
             () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText()),
-            () -> assertTrue(result.get("Note").has("content")),
-            () -> assertTrue(result.get("Note").get("content").has("title")),
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("body")),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("noteID")),
             () -> assertEquals("abc123",
                 result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("category")),
             () -> assertEquals("Meeting",
                 result.get("Note").get("content").get("additionalInfo").get("category").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("tags")),
             () -> assertEquals("project, timeline, deliverable",
                 result.get("Note").get("content").get("additionalInfo").get("tags").asText())
         );
@@ -3399,111 +3249,158 @@ class RestrictedFieldProcessorTest {
         assertEquals(newDataNode, filteredFields);
     }
 
-    @Test
-    void shouldDoNothingWhenComplexTypeIsMissingInComplexNestedObjectWithoutCreateAndReadPermission() {
-        final String newDataString = """
-             {
-               "Note": {
-                 "type": "PersonalNote",
-                 "metadata": {
-                   "authorName": "John Doe",
-                   "creationDate": "2024-11-04"
-                 },
-                 "content": {
-                   "title": "Meeting Notes",
-                   "body": "Discussion about project timelines and deliverables.",
-                   "additionalInfo": {
-                     "noteID": "abc123",
-                     "category": "Meeting",
-                     "tags": "project, timeline, deliverable"
-                   }
-                 }
-               }
-             }
-            """;
-
-        String expectedMessage = "Missing field 'location' under 'Note'.";
-
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(complexTypePayload, newDataString,
-            noteWithNestedFieldsWithoutCreateAndReadPermission(), Level.DEBUG, expectedMessage);
-
-        assertEquals(getJsonMapNode(newDataString), result);
+    private static Stream<TestCase> noteTestCases() {
+        return Stream.of(
+            new TestCase(
+                """
+                {
+                  "Note": {
+                    "type": "PersonalNote",
+                    "metadata": {
+                      "authorName": "John Doe",
+                      "creationDate": "2024-11-04"
+                    },
+                    "content": {
+                      "title": "Meeting Notes",
+                      "body": "Discussion about project timelines and deliverables.",
+                      "additionalInfo": {
+                        "noteID": "abc123",
+                        "category": "Meeting",
+                        "tags": "project, timeline, deliverable"
+                      }
+                    }
+                  }
+                }
+                """,
+                "Missing field 'location' under 'Note'."
+            ),
+            new TestCase(
+                """
+                {
+                  "Note": {
+                    "type": "PersonalNote",
+                    "metadata": {
+                      "authorName": "John Doe",
+                      "creationDate": "2024-11-04"
+                    },
+                    "content": {
+                      "title": "Meeting Notes",
+                      "body": "Discussion about project timelines and deliverables.",
+                      "additionalInfo": {
+                        "noteID": "abc123",
+                        "category": "Meeting",
+                        "tags": "project, timeline, deliverable"
+                      }
+                    },
+                    "location": {
+                      "AddressLine2": "Suite 500",
+                      "City": "Anytown",
+                      "State": "Anystate",
+                      "Country": "AnyCountry",
+                      "PostalCode": "12345"
+                    }
+                  }
+                }
+                """,
+                "Missing field 'AddressLine1' under 'location'."
+            ),
+            new TestCase(
+                """
+                {
+                  "Note": {
+                    "type": "PersonalNote",
+                    "metadata": {
+                      "authorName": "John Doe",
+                      "creationDate": "2024-11-04"
+                    },
+                    "content": {
+                      "title": "Meeting Notes",
+                      "body": "Discussion about project timelines and deliverables.",
+                      "additionalInfo": {
+                        "category": "Meeting",
+                        "tags": "project, timeline, deliverable"
+                      }
+                    },
+                    "location": {
+                      "AddressLine1": "address1",
+                      "AddressLine2": "Suite 500",
+                      "City": "Anytown",
+                      "State": "Anystate",
+                      "Country": "AnyCountry",
+                      "PostalCode": "12345"
+                    }
+                  }
+                }
+                """,
+                "Missing field 'noteID' under 'additionalInfo'."
+            ),
+            new TestCase(
+                """
+                {
+                  "Note": {
+                    "type": "PersonalNote",
+                    "metadata": {
+                      "authorName": "John Doe",
+                      "creationDate": "2024-11-04"
+                    },
+                    "location": {
+                      "AddressLine1": "123 Main Street",
+                      "AddressLine2": "Suite 500",
+                      "City": "Anytown",
+                      "State": "Anystate",
+                      "Country": "AnyCountry",
+                      "PostalCode": "12345"
+                    }
+                  }
+                }
+                """,
+                "Missing field 'content' under 'Note'."
+            ),
+            new TestCase(
+                """
+                {
+                  "Note": {
+                    "metadata": {
+                      "authorName": "John Doe",
+                      "creationDate": "2024-11-04"
+                    },
+                    "content": {
+                      "title": "Meeting Notes",
+                      "body": "Discussion about project timelines and deliverables.",
+                      "additionalInfo": {
+                        "noteID": "abc123",
+                        "category": "Meeting",
+                        "tags": "project, timeline, deliverable"
+                      }
+                    },
+                    "location": {
+                      "AddressLine1": "123 Main Street",
+                      "AddressLine2": "Suite 500",
+                      "City": "Anytown",
+                      "State": "Anystate",
+                      "Country": "AnyCountry",
+                      "PostalCode": "12345"
+                    }
+                  }
+                }
+                """,
+                "Missing field 'type' under 'Note'."
+            )
+        );
     }
 
-    @Test
-    void shouldDoNothingWhenSubFieldIsMissingInComplexNestedObjectWithoutCreateAndReadPermission() {
-        final String newDataString = """
-             {
-               "Note": {
-                 "type": "PersonalNote",
-                 "metadata": {
-                   "authorName": "John Doe",
-                   "creationDate": "2024-11-04"
-                 },
-                 "content": {
-                   "title": "Meeting Notes",
-                   "body": "Discussion about project timelines and deliverables.",
-                   "additionalInfo": {
-                     "noteID": "abc123",
-                     "category": "Meeting",
-                     "tags": "project, timeline, deliverable"
-                   }
-                 },
-                 "location": {
-                   "AddressLine2": "Suite 500",
-                   "City": "Anytown",
-                   "State": "Anystate",
-                   "Country": "AnyCountry",
-                   "PostalCode": "12345"
-                 }
-               }
-             }
-            """;
+    @ParameterizedTest
+    @MethodSource("noteTestCases")
+    void shouldHandleMissingFieldsInComplexNestedObjects(TestCase testCase) {
+        Map<String, JsonNode> result = assertFilterServiceAndLogging(
+            complexTypePayload,
+            testCase.inputJson,
+            noteWithNestedFieldsWithoutCreateAndReadPermission(),
+            Level.DEBUG,
+            testCase.expectedMessage
+        );
 
-        String expectedMessage = "Missing field 'AddressLine1' under 'location'.";
-
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(complexTypePayload, newDataString,
-            noteWithNestedFieldsWithoutCreateAndReadPermission(), Level.DEBUG, expectedMessage);
-
-        assertEquals(getJsonMapNode(newDataString), result);
-    }
-
-    @Test
-    void shouldDoNothingWhenComplexTypeSubFieldIsMissingInComplexNestedObjectWithoutCreateAndReadPermission() {
-        final String newDataString = """
-             {
-               "Note": {
-                 "type": "PersonalNote",
-                 "metadata": {
-                   "authorName": "John Doe",
-                   "creationDate": "2024-11-04"
-                 },
-                 "content": {
-                   "title": "Meeting Notes",
-                   "body": "Discussion about project timelines and deliverables.",
-                   "additionalInfo": {
-                     "category": "Meeting",
-                     "tags": "project, timeline, deliverable"
-                   }
-                 },
-                 "location": {
-                   "AddressLine1": "address1",
-                   "AddressLine2": "Suite 500",
-                   "City": "Anytown",
-                   "State": "Anystate",
-                   "Country": "AnyCountry",
-                   "PostalCode": "12345"
-                 }
-               }
-             }
-            """;
-
-        String expectedMessage = "Missing field 'noteID' under 'additionalInfo'.";
-
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(complexTypePayload, newDataString,
-            noteWithNestedFieldsWithoutCreateAndReadPermission(), Level.DEBUG, expectedMessage);
-
-        assertEquals(getJsonMapNode(newDataString), result);
+        assertEquals(getJsonMapNode(testCase.inputJson), result);
     }
 
     @Test
@@ -3581,31 +3478,20 @@ class RestrictedFieldProcessorTest {
         assertAll(
             () -> assertTrue(result.get("Note").has("type")),
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertTrue(result.get("Note").has("metadata")),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
             () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
             () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
             () -> assertTrue(result.get("Note").has("content")),
-            () -> assertTrue(result.get("Note").get("content").has("title")),
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("body")),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
             () -> assertTrue(result.get("Note").get("content").get("additionalInfo").isObject()),
             () -> assertTrue(result.get("Note").has("location")),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine2")),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("City")),
             () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("State")),
             () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("Country")),
             () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("PostalCode")),
             () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
         );
     }
@@ -3644,61 +3530,20 @@ class RestrictedFieldProcessorTest {
         assertAll(
             () -> assertTrue(result.get("Note").has("type")),
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertTrue(result.get("Note").has("metadata")),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
             () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
             () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertTrue(result.get("Note").has("content")),
-            () -> assertTrue(result.get("Note").get("content").has("title")),
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
-            () -> assertTrue(result.get("Note").get("content").has("body")),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
             () -> assertTrue(result.get("Note").has("location")),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("AddressLine2")),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("City")),
             () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("State")),
             () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("Country")),
             () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertTrue(result.get("Note").get("location").has("PostalCode")),
             () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
         );
-    }
-
-    @Test
-    void shouldDoNothingWhenParentComplexFieldIsMissingInMainObjectWithoutCreateAndReadPermission() {
-        final String newDataString = """
-              {
-                  "Note": {
-                    "type": "PersonalNote",
-                    "metadata": {
-                      "authorName": "John Doe",
-                      "creationDate": "2024-11-04"
-                    },
-                    "location": {
-                      "AddressLine1": "123 Main Street",
-                      "AddressLine2": "Suite 500",
-                      "City": "Anytown",
-                      "State": "Anystate",
-                      "Country": "AnyCountry",
-                      "PostalCode": "12345"
-                    }
-                  }
-                }
-            """;
-
-        String expectedMessage = "Missing field 'content' under 'Note'.";
-
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(complexTypePayload, newDataString,
-            noteWithNestedFieldsWithoutCreateAndReadPermission(), Level.DEBUG, expectedMessage);
-
-        assertEquals(getJsonMapNode(newDataString), result);
     }
 
     @Test
@@ -3753,44 +3598,6 @@ class RestrictedFieldProcessorTest {
             () -> assertTrue(result.get("Note").get("location").has("PostalCode")),
             () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
         );
-    }
-
-    @Test
-    void shouldDoNothingWhenSimpleFieldIsMissingInParentObjectWithoutCreateAndReadPermission() {
-        final String newDataString = """
-              {
-                  "Note": {
-                    "metadata": {
-                      "authorName": "John Doe",
-                      "creationDate": "2024-11-04"
-                    },
-                    "content": {
-                      "title": "Meeting Notes",
-                      "body": "Discussion about project timelines and deliverables.",
-                      "additionalInfo": {
-                        "noteID": "abc123",
-                        "category": "Meeting",
-                        "tags": "project, timeline, deliverable"
-                      }
-                    },
-                    "location": {
-                      "AddressLine1": "123 Main Street",
-                      "AddressLine2": "Suite 500",
-                      "City": "Anytown",
-                      "State": "Anystate",
-                      "Country": "AnyCountry",
-                      "PostalCode": "12345"
-                    }
-                  }
-                }
-            """;
-
-        String expectedMessage = "Missing field 'type' under 'Note'.";
-
-        Map<String, JsonNode> result = assertFilterServiceAndLogging(complexTypePayload, newDataString,
-            noteWithNestedFieldsWithoutCreateAndReadPermission(), Level.DEBUG, expectedMessage);
-
-        assertEquals(getJsonMapNode(newDataString), result);
     }
 
     @Test
@@ -4027,13 +3834,9 @@ class RestrictedFieldProcessorTest {
         assertAll(
             () -> assertTrue(result.get("generatedCaseDocuments").isArray()),
             () -> assertEquals(1, result.get("generatedCaseDocuments").size()),
-            () -> assertTrue(result.get("generatedCaseDocuments").get(0).has("id")),
             () -> assertEquals("123", result.get("generatedCaseDocuments").get(0).get("id").asText()),
-            () -> assertTrue(result.get("generatedCaseDocuments").get(0).has("value")),
-            () -> assertTrue(result.get("generatedCaseDocuments").get(0).get("value").has("createdBy")),
             () -> assertEquals("Test",
                 result.get("generatedCaseDocuments").get(0).get("value").get("createdBy").asText()),
-            () -> assertTrue(result.get("generatedCaseDocuments").get(0).get("value").has("documentLink")),
             () -> assertTrue(result.get("generatedCaseDocuments").get(0).get("value").get("documentLink").has(
                 "document_url")),
             () -> assertEquals("http_document_url",
@@ -4051,16 +3854,12 @@ class RestrictedFieldProcessorTest {
                 .has("category_id")),
             () -> assertEquals("detailsOfClaim", result.get("generatedCaseDocuments").get(0)
                 .get("value").get("documentLink").get("category_id").asText()),
-            () -> assertTrue(result.get("generatedCaseDocuments").get(0).get("value").has("documentName")),
             () -> assertEquals("document.pdf", result.get("generatedCaseDocuments").get(0)
                 .get("value").get("documentName").asText()),
-            () -> assertTrue(result.get("generatedCaseDocuments").get(0).get("value").has("documentSize")),
             () -> assertEquals(34805, result.get("generatedCaseDocuments").get(0).get("value")
                 .get("documentSize").asInt()),
-            () -> assertTrue(result.get("generatedCaseDocuments").get(0).get("value").has("documentType")),
             () -> assertEquals("CLAIM", result.get("generatedCaseDocuments").get(0).get("value")
                 .get("documentType").asText()),
-            () -> assertTrue(result.get("generatedCaseDocuments").get(0).get("value").has("createdDatetime")),
             () -> assertEquals("2024-10-16T10:47:03", result.get("generatedCaseDocuments").get(0)
                 .get("value").get("createdDatetime").asText())
         );
