@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,24 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         this.securityClassificationServiceLogger = new SecurityClassificationServiceLogger(this);
     }
 
+    // PART OF FIX.  (Provides mapFunction.)
+    private Function<CaseDetails, CaseDetails> mapFunction(final CaseDetails caseDetails,
+                                                           final SecurityClassification securityClassification) {
+        return cd -> {
+            if (cd.getDataClassification() == null) {
+                LOG.warn("No data classification for case with reference={},"
+                    + " all fields removed", cd.getReference());
+                cd.setDataClassification(Maps.newHashMap());
+            }
+
+            JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
+                securityClassification);
+            caseDetails.setData(JacksonUtils.convertValue(data));
+            return cd;
+        };
+    }
+
     /*
      * Called from ClassifiedStartEventOperation (line 104).
      * Calls "ORIGINAL" version of applyClassification() (method below).
@@ -66,25 +85,14 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         return filteredCaseDetails;
     }
 
+    // PART OF FIX.  (Re-factored to make use of mapFunction.)
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
-        LOG.info("JCDEBUG: SecurityClassificationServiceImpl: applyClassification (ORIGINAL)");
+        LOG.info("JCDEBUG: SecurityClassificationServiceImpl: applyClassification (NORMAL case)");
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         return userClassificationOpt
             .flatMap(securityClassification ->
                 Optional.of(caseDetails).filter(caseHasClassificationEqualOrLowerThan(securityClassification))
-                .map(cd -> {
-                    if (cd.getDataClassification() == null) {
-                        LOG.warn("No data classification for case with reference={},"
-                            + " all fields removed", cd.getReference());
-                        cd.setDataClassification(Maps.newHashMap());
-                    }
-
-                    JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
-                        JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
-                        securityClassification);
-                    caseDetails.setData(JacksonUtils.convertValue(data));
-                    return cd;
-                }));
+                    .map(mapFunction(caseDetails, securityClassification)));
     }
 
     public List<AuditEvent> applyClassification(CaseDetails caseDetails, List<AuditEvent> events) {
@@ -103,6 +111,16 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         }
 
         return classifiedEvents;
+    }
+
+    // PART OF FIX.  (Based on normal case but without filter.)
+    public Optional<CaseDetails> applyClassificationToRestictedCase(CaseDetails caseDetails) {
+        LOG.info("JCDEBUG: SecurityClassificationServiceImpl: applyClassification (RESTRICTED case)");
+        Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, false);
+        return userClassificationOpt
+            .flatMap(securityClassification ->
+                Optional.of(caseDetails)
+                    .map(mapFunction(caseDetails, securityClassification)));
     }
 
     public SecurityClassification getClassificationForEvent(CaseTypeDefinition caseTypeDefinition,

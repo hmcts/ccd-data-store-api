@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
@@ -112,13 +113,21 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         }
     }
 
+    // PART OF FIX.
     private StartEventResult applyClassificationIfCaseDetailsExist(String caseReference,
                                                                    StartEventResult startEventResult) {
         jclog("applyClassificationIfCaseDetailsExist (#2)");
         CaseDetails caseDetails = startEventResult.getCaseDetails();
         if (null != caseDetails) {
-            startEventResult.setCaseDetails(classificationService.applyClassification(caseDetails)
-                .orElseThrow(() -> new CaseNotFoundException(caseReference)));
+            if (caseDetails.getSecurityClassification() == SecurityClassification.RESTRICTED) {
+                jclog("applyClassificationIfCaseDetailsExist (handle RESTRICTED case)");
+                startEventResult.setCaseDetails(classificationService.applyClassificationToRestictedCase(caseDetails)
+                    .orElseThrow(() -> new CaseNotFoundException(caseReference)));
+            } else {
+                jclog("applyClassificationIfCaseDetailsExist (handle NORMAL case)");
+                startEventResult.setCaseDetails(classificationService.applyClassification(caseDetails)
+                    .orElseThrow(() -> new CaseNotFoundException(caseReference)));
+            }
         }
         return startEventResult;
     }
