@@ -1232,17 +1232,17 @@
             "max" : null,
             "regular_expression" : null,
             "fixed_list_items" : [ {
-              "code" : "DONE",
-              "label" : "Done",
-              "order" : null
+              "code" : "TODO",
+              "label" : "To do",
+              "order" : "1"
             }, {
               "code" : "IN_PROGRESS",
               "label" : "In progress",
-              "order" : null
+              "order" : "2"
             }, {
-              "code" : "TODO",
-              "label" : "To do",
-              "order" : null
+              "code" : "DONE",
+              "label" : "Done",
+              "order" : "3"
             } ],
             "complex_fields" : [ ],
             "collection_field_type" : null
