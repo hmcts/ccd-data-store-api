@@ -23,7 +23,7 @@
     "body" : {
       "headers" : [
         {
-          "__ordering__": "unordered"
+          "__ordering__": "ordered"
         },
         {
         "metadata" : {
