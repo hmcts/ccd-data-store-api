@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
@@ -56,7 +57,9 @@ class ClassifiedStartEventOperationTest {
     private ClassifiedStartEventOperation classifiedStartEventOperation;
 
     private CaseDetails caseDetails;
+    private CaseDetails restrictedCaseDetails;
     private CaseDetails classifiedDetails;
+    private CaseDetails declassifiedDetails;
     private StartEventResult startEvent;
     private CaseTypeDefinition caseTypeDefinition;
 
@@ -71,6 +74,11 @@ class ClassifiedStartEventOperationTest {
 
         classifiedDetails = new CaseDetails();
         doReturn(Optional.of(classifiedDetails)).when(classificationService).applyClassification(caseDetails);
+
+        restrictedCaseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
+        restrictedCaseDetails.setSecurityClassification(SecurityClassification.RESTRICTED);
+        declassifiedDetails = new CaseDetails();
+        doReturn(Optional.of(declassifiedDetails)).when(classificationService).applyClassificationToRestictedCase(restrictedCaseDetails);
 
         classifiedStartEventOperation = new ClassifiedStartEventOperation(startEventOperation,
                                                                           classificationService,
@@ -150,6 +158,21 @@ class ClassifiedStartEventOperationTest {
         }
 
         @Test
+        @DisplayName("should call decorated start event operation for Restricted case")
+        void shouldCallDecoratedStartEventOperationForRestrictedCase() {
+
+            startEvent.setCaseDetails(restrictedCaseDetails);
+
+            classifiedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
+
+            verify(startEventOperation).triggerStartForCase(CASE_REFERENCE,
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
+        }
+
+        @Test
         @DisplayName("should return event trigger as is when case details null")
         void shouldReturnEventTriggerWhenCaseDetailsNull() {
             startEvent.setCaseDetails(null);
@@ -175,6 +198,22 @@ class ClassifiedStartEventOperationTest {
             assertAll(
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedDetails)),
                 () -> verify(classificationService).applyClassification(caseDetails)
+            );
+        }
+
+        @Test
+        @DisplayName("should return event trigger with Restricted case details when not null")
+        void shouldReturnEventTriggerWithRestrictedCaseDetails() {
+
+            startEvent.setCaseDetails(restrictedCaseDetails);
+
+            final StartEventResult output = classifiedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
+
+            assertAll(
+                () -> assertThat(output.getCaseDetails(), sameInstance(declassifiedDetails)),
+                () -> verify(classificationService).applyClassificationToRestictedCase(restrictedCaseDetails)
             );
         }
     }
