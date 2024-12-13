@@ -90,3 +90,8 @@ java:
     DATA_STORE_CROSS_JURISDICTIONAL_ROLES: caseworker-caa,caseworker-approver,next-hearing-date-admin
     DATA_STORE_CITIZEN_ROLES: citizen,letter-holder
     DATA_STORE_SECURITY_LOGGING_FILTER_PATH_REGEX: 'DISABLED'
+
+    PACT_BROKER_FULL_URL: https://pact-broker.platform.hmcts.net
+    PACT_BROKER_URL: pact-broker.platform.hmcts.net
+    PACT_BROKER_PORT: 443
+    PACT_BROKER_SCHEME: https
