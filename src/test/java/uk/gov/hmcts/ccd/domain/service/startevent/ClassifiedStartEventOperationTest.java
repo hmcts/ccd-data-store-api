@@ -78,7 +78,8 @@ class ClassifiedStartEventOperationTest {
         restrictedCaseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
         restrictedCaseDetails.setSecurityClassification(SecurityClassification.RESTRICTED);
         declassifiedDetails = new CaseDetails();
-        doReturn(Optional.of(declassifiedDetails)).when(classificationService).applyClassificationToRestictedCase(restrictedCaseDetails);
+        doReturn(Optional.of(declassifiedDetails)).when(classificationService)
+            .applyClassificationToRestictedCase(restrictedCaseDetails);
 
         classifiedStartEventOperation = new ClassifiedStartEventOperation(startEventOperation,
                                                                           classificationService,
