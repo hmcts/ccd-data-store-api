@@ -56,9 +56,10 @@ public class TimeToLiveService {
     }
 
     private Boolean isNullifyByDefault(@NonNull CaseEventDefinition caseEventDefinition) {
-        List<CaseEventFieldDefinition> caseEventFieldDefinitions = Optional.ofNullable(caseEventDefinition.getCaseFields()).orElse(Collections.emptyList())
-            .stream().filter(cefDefinition -> TTL_CASE_FIELD_ID.equals(cefDefinition.getCaseFieldId()))
-            .filter(cefDefinition -> cefDefinition.getNullifyByDefault() != null).toList();
+        List<CaseEventFieldDefinition> caseEventFieldDefinitions =
+            Optional.ofNullable(caseEventDefinition.getCaseFields()).orElse(Collections.emptyList())
+                .stream().filter(cefDefinition -> TTL_CASE_FIELD_ID.equals(cefDefinition.getCaseFieldId()))
+                .filter(cefDefinition -> cefDefinition.getNullifyByDefault() != null).toList();
         return !caseEventFieldDefinitions.isEmpty() && caseEventFieldDefinitions.getFirst().getNullifyByDefault();
     }
 
