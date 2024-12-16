@@ -79,7 +79,7 @@ class ClassifiedStartEventOperationTest {
         restrictedCaseDetails.setSecurityClassification(SecurityClassification.RESTRICTED);
         declassifiedDetails = new CaseDetails();
         doReturn(Optional.of(declassifiedDetails)).when(classificationService)
-            .applyClassificationToRestictedCase(restrictedCaseDetails);
+            .applyClassificationToRestrictedCase(restrictedCaseDetails);
 
         classifiedStartEventOperation = new ClassifiedStartEventOperation(startEventOperation,
                                                                           classificationService,
@@ -214,7 +214,7 @@ class ClassifiedStartEventOperationTest {
 
             assertAll(
                 () -> assertThat(output.getCaseDetails(), sameInstance(declassifiedDetails)),
-                () -> verify(classificationService).applyClassificationToRestictedCase(restrictedCaseDetails)
+                () -> verify(classificationService).applyClassificationToRestrictedCase(restrictedCaseDetails)
             );
         }
     }

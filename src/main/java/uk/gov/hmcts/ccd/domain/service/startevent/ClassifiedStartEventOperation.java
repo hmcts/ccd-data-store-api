@@ -121,7 +121,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         if (null != caseDetails) {
             if (caseDetails.getSecurityClassification() == SecurityClassification.RESTRICTED) {
                 jclog("applyClassificationIfCaseDetailsExist (handle RESTRICTED case)");
-                startEventResult.setCaseDetails(classificationService.applyClassificationToRestictedCase(caseDetails)
+                startEventResult.setCaseDetails(classificationService.applyClassificationToRestrictedCase(caseDetails)
                     .orElseThrow(() -> new CaseNotFoundException(caseReference)));
             } else {
                 jclog("applyClassificationIfCaseDetailsExist (handle NORMAL case)");

@@ -114,7 +114,8 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     // PART OF FIX.  (Based on normal case but without filter.)
-    public Optional<CaseDetails> applyClassificationToRestictedCase(CaseDetails caseDetails) {
+    // TODO: Will need unit test.
+    public Optional<CaseDetails> applyClassificationToRestrictedCase(CaseDetails caseDetails) {
         LOG.info("JCDEBUG: SecurityClassificationServiceImpl: applyClassification (RESTRICTED case)");
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, false);
         return userClassificationOpt
