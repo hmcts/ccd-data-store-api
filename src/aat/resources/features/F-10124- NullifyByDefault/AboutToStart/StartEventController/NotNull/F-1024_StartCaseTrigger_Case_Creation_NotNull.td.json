@@ -15,11 +15,14 @@
 
   "expectedResponse": {
     "body": {
-      "case_data": {
-        "_extends_": "TTL_Case_Data_NBD"
+      "case_data" : {
+        "TTL" : { }
       },
-      "data_classification": {
-        "_extends_": "TTL_Classifications"
+      "data_classification" : {
+        "TTL" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        }
       }
     }
   }

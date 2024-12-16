@@ -22,7 +22,7 @@
     "pathVariables": {
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
+      "cid": "${[scenarioContext][childContexts][F-1024_StartCaseTrigger_Case_Creation_NotNull][testData][actualResponse][body][id]}",
       "etid": "createCaseTTLNBDNotNull"
     }
   },

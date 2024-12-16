@@ -45,11 +45,14 @@
         "last_modified": null,
         "last_state_modified_date": null,
         "security_classification": null,
-        "case_data": {
-          "TTL" : null
+        "case_data" : {
+          "TTL" : { }
         },
-        "data_classification": {
-          "_extends_": "TTL_Classifications"
+        "data_classification" : {
+          "TTL" : {
+            "classification" : "PUBLIC",
+            "value" : { }
+          }
         },
         "supplementary_data": null,
         "after_submit_callback_response": null,

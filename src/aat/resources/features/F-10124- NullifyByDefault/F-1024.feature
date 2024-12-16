@@ -59,7 +59,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     When a request is prepared with appropriate values,
     And   the request [contains correctly configured event details]
     And   the request [is configured to trigger an About To Start callback that has changed value of the TTL values and is not null]
-    And   it is submitted to call the [Start event creation as Case worker] operation of [CCD Data Store]
+    And   it is submitted to call the [Start event creation as Citizen] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
