@@ -2,6 +2,10 @@
   "_guid_": "F-1024_StartEvent_For_Citizen_RequestTTL_NotNull",
   "_extends_": "Citizen_Token_Creation_Data_For_Case_Creation",
 
+  "specs": [
+    "to create a case"
+  ],
+
   "request": {
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
