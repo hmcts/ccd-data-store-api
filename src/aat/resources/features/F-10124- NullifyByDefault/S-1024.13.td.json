@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-1024.13",
+  "_extends_": "MidEvent_v1Ext_Caseworker__Base",
+
+  "title": "During validation, Mid-event callback updates TTL value for v1_external#/case-details-endpoint/validateCaseDetailsUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details for case C1",
+    "C1, which has been",
+    "is configured to trigger an Mid event callback that has changed the value of TTL and it is not null",
+    "has the 400 OK code",
+    "contains the TTL set to null"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "cid": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCaseworker_MidEventUpdate][testData][actualResponse][body][id]}",
+      "etid": "updateCaseTTLMENotNull"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

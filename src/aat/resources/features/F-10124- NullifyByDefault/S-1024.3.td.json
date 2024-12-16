@@ -1,0 +1,46 @@
+{
+  "_guid_": "S-1024.3",
+  "_extends_": "F-1024_StartCaseTrigger",
+
+  "title": "Applying NullifyByDefault at start of case creation for v2_external#/start-event-controller/getStartCaseTriggerUsingGET",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "is configured to trigger an About To Start callback that has TTL value is still null",
+    "has the 200 OK code",
+    "contains the TTL set to null"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
+      "etid": "updateCaseTTLNullifyByDefault"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "id": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
+        "version": 0,
+        "jurisdiction": "BEFTA_MASTER",
+        "state": "CaseCreated",
+        "case_type_id": "FT_MasterCaseType",
+        "case_data": {
+          "TTL" : null
+        },
+        "data_classification": {
+          "_extends_": "TTL_Classifications"
+        }
+      },
+      "event_id": "updateCaseTTLNullifyByDefault"
+    }
+  }
+}

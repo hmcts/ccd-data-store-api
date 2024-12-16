@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -124,10 +122,7 @@ public class CaseService {
             caseField -> {
 
                 String defaultValue = caseField.getDefaultValue();
-                Boolean nullifyByDefault = caseField.getNullifyByDefault();
-                if (BooleanUtils.isTrue(nullifyByDefault) && StringUtils.isEmpty(defaultValue)) {
-                    data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().nullNode());
-                } else if (defaultValue != null) {
+                if (defaultValue != null) {
                     data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().textNode(defaultValue));
                 }
 

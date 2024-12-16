@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-1024.4",
+  "_extends_": "F-1024_StartEventForCaseworker_NotNull",
+
+  "title": "About to start callback changes the value of TTL during case creation for v1_external#/case-details-endpoint/startCaseForCaseworkerUsingGET",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "is configured to trigger an About To Start callback that has changed value of the TTL values and is not null",
+    "has the 400 OK code"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "etid": "createCaseTTLNBDNotNull"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "_guid_": "S-1024.19",
+  "_extends_": "SubmitEvent_v1Ext_Caseworker__PositiveResponse_Base",
+
+  "title": "During Submit case creation adjust any validation on TTL for  v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details for case C1",
+    "C1, which has been",
+    "contains TTL value is not null",
+    "is configured to trigger an About to submit callback that has changed the value of TTL and it is still null",
+    "has the 200 OK code",
+    "contains the TTL set to null"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCaseworker_AboutToSubmit][testData][actualResponse][body][id]}",
+      "etid": "updateCaseTTLASEvent"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "id": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCaseworker_AboutToSubmit][testData][actualResponse][body][id]}",
+        "jurisdiction": "BEFTA_MASTER",
+        "state": "CaseCreated",
+        "version": 0,
+        "case_type_id": "FT_MasterCaseType",
+
+        "case_data": {
+          "TTL" : null,
+          "SearchCriteria" : { }
+        },
+        "data_classification": {
+          "_extends_": "TTL_Classifications",
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "event_id": "updateCaseTTLASEvent"
+    }
+  }
+}

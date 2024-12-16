@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,10 +56,10 @@ public class TimeToLiveService {
     }
 
     private Boolean isNullifyByDefault(@NonNull CaseEventDefinition caseEventDefinition) {
-        return Optional.ofNullable(caseEventDefinition.getCaseFields()).orElse(Collections.emptyList())
+        List<CaseEventFieldDefinition> caseEventFieldDefinitions = Optional.ofNullable(caseEventDefinition.getCaseFields()).orElse(Collections.emptyList())
             .stream().filter(cefDefinition -> TTL_CASE_FIELD_ID.equals(cefDefinition.getCaseFieldId()))
-            .map(CaseEventFieldDefinition::getNullifyByDefault)
-            .findFirst().orElse(false);
+            .filter(cefDefinition -> cefDefinition.getNullifyByDefault() != null).toList();
+        return !caseEventFieldDefinitions.isEmpty() && caseEventFieldDefinitions.getFirst().getNullifyByDefault();
     }
 
     public Map<String, JsonNode> updateCaseDataClassificationWithTTL(Map<String, JsonNode> data,
@@ -139,7 +140,7 @@ public class TimeToLiveService {
                 // if "before TTL has changed, including callback setting it to null"
                 // or "no-before TTl but callback is trying to add a TTL"
                 if ((beforeTtl != null && !beforeTtl.equals(callbackTtl))
-                        || (beforeTtl == null && callbackTtl != null)) {
+                    || (beforeTtl == null && callbackTtl != null)) {
                     throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
                 }
             }

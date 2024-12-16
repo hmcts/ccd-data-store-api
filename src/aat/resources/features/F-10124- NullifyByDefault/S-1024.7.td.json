@@ -1,0 +1,33 @@
+{
+  "_guid_": "S-1024.7",
+  "_extends_": "F-1024_StartEvent_For_Caseworker_RequestTTL_NotNull",
+
+  "title": "Value of TTL is not null before case creation for v1_external#/case-details-endpoint/startCaseForCaseworkerUsingGET",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains TTL value is not null",
+    "contains correctly configured event details",
+    "is configured to trigger an About To Start callback that has TTL value is still not null",
+    "has the 400 OK code"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "etid": "createCaseTTLNBDNotNull"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

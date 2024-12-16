@@ -1,0 +1,56 @@
+{
+  "_guid_": "S-1024.12",
+  "_extends_": "MidEvent_v2Ext__PositiveResponse_Base",
+
+  "title": "During validation, adjust any validation on TTL for v2_external#/case-data-validator-controller/validateUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details for case C1",
+    "C1, which has been",
+    "is configured to trigger an Mid event callback that has changed the value of TTL and it is still null",
+    "has the 200 OK code",
+    "contains the TTL set to null"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "cid": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateCaseTTLMidEventNull"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "id": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+        "jurisdiction": "BEFTA_MASTER",
+        "state": "CaseCreated",
+        "version": 0,
+        "case_type_id": "FT_MasterCaseType",
+
+        "case_data": {
+          "TTL" : null,
+          "SearchCriteria" : { }
+        },
+        "data_classification": {
+          "_extends_": "TTL_Classifications",
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "event_id": "updateCaseTTLMidEventNull"
+    }
+  }
+}
