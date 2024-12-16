@@ -231,6 +231,48 @@ public class SecurityClassificationServiceTest {
     }
 
     @Nested
+    @DisplayName("Apply to Restricted CaseDetails")
+    class ApplyToRestrictedCaseDetails {
+
+        private CaseDetails caseDetails;
+
+        @BeforeEach
+        void setUp() throws IOException {
+            caseDetails = new CaseDetails();
+            caseDetails.setJurisdiction(JURISDICTION_ID);
+            caseDetails.setSecurityClassification(RESTRICTED);
+        }
+
+        Optional<CaseDetails> applyClassificationToRestrictedCase(SecurityClassification userClassification) {
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(userClassification));
+
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
+                .thenReturn(newHashSet(userClassification));
+
+            return securityClassificationService.applyClassificationToRestrictedCase(caseDetails);
+        }
+
+        @Test
+        @DisplayName("should return null when user has no classification")
+        void shouldReturnNullWhenUserNoClassification() {
+            assertThat(applyClassificationToRestrictedCase(null).isPresent(), is(false));
+        }
+
+        @Test
+        @DisplayName("should return case when user has private classification")
+        void shouldReturnCaseWhenUserSameClassification() {
+            assertThat(applyClassificationToRestrictedCase(PRIVATE).get(), sameInstance(caseDetails));
+        }
+
+        @Test
+        @DisplayName("should return case when user has restricted classification")
+        void shouldReturnCaseWhenUserHigherClassification() {
+            assertThat(applyClassificationToRestrictedCase(RESTRICTED).get(), sameInstance(caseDetails));
+        }
+    }
+
+    @Nested
     @DisplayName("CaseDetails case access categories")
     class ApplyCaseAccessCategoriesToCaseDetails {
 
