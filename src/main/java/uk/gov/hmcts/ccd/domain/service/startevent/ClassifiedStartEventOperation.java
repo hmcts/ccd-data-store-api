@@ -5,6 +5,8 @@ import java.util.HashMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +52,10 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDataService = caseDataService;
         this.draftGateway = draftGateway;
+
+        // Enables serialisation of java.util.Optional and java.time.LocalDateTime
+        objectMapper.registerModule(new Jdk8Module());
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     private void jclog(String message) {
