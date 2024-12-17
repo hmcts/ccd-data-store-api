@@ -16,12 +16,20 @@
   "expectedResponse": {
     "body": {
       "case_data" : {
-        "TTL" : { }
+        "TTL" : {
+          "SystemTTL" : "2021-03-04",
+          "OverrideTTL" : "2021-03-05",
+          "Suspended" : "No"
+        }
       },
       "data_classification" : {
         "TTL" : {
           "classification" : "PUBLIC",
-          "value" : { }
+          "value" : {
+            "SystemTTL" : "PUBLIC",
+            "OverrideTTL" : "PUBLIC",
+            "Suspended" : "PUBLIC"
+          }
         }
       }
     }

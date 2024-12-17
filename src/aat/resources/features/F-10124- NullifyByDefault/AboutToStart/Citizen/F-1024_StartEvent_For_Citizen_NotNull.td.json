@@ -2,7 +2,7 @@
   "_guid_": "F-1024_StartEventForCitizen_NotNull",
 
   "productName": "CCD Data Store",
-  "operationName": "Start event creation as Case worker",
+  "operationName": "Start event creation as Citizen",
 
   "method": "GET",
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",

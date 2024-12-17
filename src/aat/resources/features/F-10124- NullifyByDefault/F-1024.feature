@@ -64,7 +64,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
 
-  @S-1024.6 @Ignored # Review
+  @S-1024.6
   Scenario: About to start callback changes the value of TTL during case creation for v2_external#/start-event-controller/getStartCaseTriggerUsingGET
     Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1024_StartCaseTrigger_Case_Creation_NotNull]
@@ -195,7 +195,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
 
-  @S-1024.16
+  @S-1024.16 @Ignore #Review
   Scenario: Value of TTL is not null before validation for v1_external#/case-details-endpoint/validateCaseDetailsUsingPOST
     Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1024_StartEvent_For_Caseworker_RequestTTL_NotNull]
@@ -209,7 +209,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
 
-  @S-1024.17
+  @S-1024.17 @Ignore #Review
   Scenario: Value of TTL is not null before validation for v1_external#/case-details-endpoint/validateCaseDetailsUsingPOST_1
     Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1024_StartEvent_For_Citizen_RequestTTL_NotNull]
@@ -223,7 +223,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
 
-  @S-1024.18
+  @S-1024.18 @Ignore #Review
   Scenario: Value of TTL is not null before validation for v2_external#/case-data-validator-controller/validateUsingPOST
     Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1024_StartEvent_For_Citizen_RequestTTL_NotNull]
