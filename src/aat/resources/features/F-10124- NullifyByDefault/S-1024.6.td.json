@@ -7,7 +7,7 @@
   "specs": [
     "an active profile in CCD",
     "contains correctly configured event details",
-    "is configured to trigger an About To Start callback that has changed value of the TTL values and is not null",
+    "is configured to trigger an About To Start callback that has TTL value is not null",
     "has the 400 OK code"
   ],
 

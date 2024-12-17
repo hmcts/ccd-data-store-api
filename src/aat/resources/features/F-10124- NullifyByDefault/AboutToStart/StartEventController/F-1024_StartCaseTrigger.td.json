@@ -17,8 +17,8 @@
 			"experimental": "true"
 		},
 		"pathVariables": {
-			"caseId": "${[scenarioContext][childContexts][F-1024_StartCaseTrigger_Case_Creation_NotNull][testData][actualResponse][body][id]}",
-			"triggerId": "START_PROGRESS"
+			"caseId": "${[scenarioContext][childContexts][F-1024_StartCaseTrigger_Case_Creation][testData][actualResponse][body][id]}",
+			"triggerId": "updateCaseTTLNullifyByDefault"
 		}
 	}
 }

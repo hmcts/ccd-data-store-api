@@ -215,7 +215,7 @@ public class TimeToLiveService {
     }
 
     private TTL getTTLFromJson(JsonNode ttlJsonNode) {
-        if (ttlJsonNode != null) {
+        if (ttlJsonNode != null && !ttlJsonNode.isEmpty()) {
             try {
                 return objectMapper.readValue(ttlJsonNode.toString(), TTL.class);
             } catch (JsonProcessingException e) {

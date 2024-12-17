@@ -18,13 +18,6 @@
     }
   },
 
-  "request": {
-    "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1024_StartCaseTrigger_Case_Creation][testData][actualResponse][body][id]}",
-      "etid": "updateCaseTTLNullifyByDefault"
-    }
-  },
-
   "expectedResponse": {
     "body": {
       "case_details": {
