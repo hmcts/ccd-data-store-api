@@ -11,24 +11,6 @@
     "has the 400 OK code"
   ],
 
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
-    }
-  },
-
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType",
-      "etid": "createCaseTTLNBDNotNull"
-    }
-  },
-
   "expectedResponse": {
     "_extends_": "400_TTL_Modified"
   }
