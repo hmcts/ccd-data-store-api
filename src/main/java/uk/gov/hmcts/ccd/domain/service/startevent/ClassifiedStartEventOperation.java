@@ -60,7 +60,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         try {
             jclog(message + ": " + objectMapper.writeValueAsString(startEventResult));
         } catch (JsonProcessingException e) {
-            jclog(message + ": JSON ERROR");
+            jclog(message + ": JSON ERROR: " + e.getMessage());
         }
     }
 
