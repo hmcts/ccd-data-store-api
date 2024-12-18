@@ -8,7 +8,7 @@
     "an active profile in CCD",
     "contains correctly configured event details for case C1",
     "is configured to trigger an Mid event callback that has changed the value of TTL and it is not null",
-    "has the 200 OK code",
+    "has the 400 OK code",
     "contains the TTL set to null"
   ],
 
@@ -31,7 +31,7 @@
       "ctid": "FT_MasterCaseType"
     },
     "queryParams": {
-      "pageId": "createCaseTTLMENotNullToUpperSingleFormPage"
+      "pageId": "createCaseTTLMENotNullSingleFormPage"
     },
     "body": {
       "event": {

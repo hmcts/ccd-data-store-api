@@ -27,11 +27,10 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType"
     },
     "queryParams": {
-      "pageId": "createCaseTTLMENotNullToUpperSingleFormPage"
+      "pageId": "createCaseTTLMENotNullSingleFormPage"
     },
     "body": {
       "data": {
