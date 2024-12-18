@@ -165,6 +165,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         updateCaseDetailsWithTtlIncrement(newCaseDetails, caseTypeDefinition, caseEventDefinition);
         timeToLiveService.validateTTLChangeAgainstTTLGuard(newCaseDetails.getData(), null);
 
+        newCaseDetails.setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(newCaseDetails.getData()));
+
         final IdamUser idamUser = userRepository.getUser();
         caseDataIssueLogger.logAnyDataIssuesIn(null, newCaseDetails);
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
