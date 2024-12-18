@@ -1,0 +1,6 @@
+{
+  "_guid_": "ExternalCaseworkerSolicitor",
+
+  "username": "[[$CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL]]",
+  "password": "[[$CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD]]"
+}
