@@ -79,6 +79,14 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         }
     }
 
+    private void jclog(String message, SecurityClassification securityClassification) {
+        try {
+            jclog(message + ": " + objectMapper.writeValueAsString(securityClassification));
+        } catch (JsonProcessingException e) {
+            jclog(message + ": JSON ERROR: " + e.getMessage());
+        }
+    }
+
     @Override
     public StartEventResult triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
         return startEventOperation.triggerStartForCaseType(caseTypeId,
@@ -135,20 +143,25 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         CaseDetails caseDetails = startEventResult.getCaseDetails();
         if (null != caseDetails) {
             if (caseDetails.getSecurityClassification() == SecurityClassification.RESTRICTED) {
-                jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE]", caseDetails);
+                jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 1]", caseDetails);
                 Optional<CaseDetails> caseDetails1 = classificationService
                     .applyClassificationToRestrictedCase(caseDetails);
                 if (caseDetails1.isPresent()) {
-                    jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE]",
+                    jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 2]",
                         caseDetails1.get());
+                    jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 3]",
+                        caseDetails1.get().getSecurityClassification());
                 }
                 startEventResult.setCaseDetails(caseDetails1
                     .orElseThrow(() -> new CaseNotFoundException(caseReference)));
             } else {
-                jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE]", caseDetails);
+                jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 1]", caseDetails);
                 Optional<CaseDetails> caseDetails1 = classificationService.applyClassification(caseDetails);
                 if (caseDetails1.isPresent()) {
-                    jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE]", caseDetails1.get());
+                    jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 2]",
+                        caseDetails1.get());
+                    jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 3]",
+                        caseDetails1.get().getSecurityClassification());
                 }
                 startEventResult.setCaseDetails(caseDetails1
                     .orElseThrow(() -> new CaseNotFoundException(caseReference)));
