@@ -1,8 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,6 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,36 +50,59 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     private final CaseDataAccessControl caseDataAccessControl;
     private final CaseDefinitionRepository caseDefinitionRepository;
 
+    private final SecurityClassificationServiceLogger securityClassificationServiceLogger;
+
+    final ObjectMapper objectMapper = new ObjectMapper();
+
     @Autowired
     public SecurityClassificationServiceImpl(CaseDataAccessControl caseDataAccessControl,
                                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                              final CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDataAccessControl = caseDataAccessControl;
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.securityClassificationServiceLogger = new SecurityClassificationServiceLogger(this);
+
+        // Enables serialisation of java.util.Optional and java.time.LocalDateTime
+        objectMapper.registerModule(new Jdk8Module());
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
-    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
-        return applyClassification(caseDetails, false);
+    // PART OF FIX.  (Provides mapFunction.)
+    private Function<CaseDetails, CaseDetails> mapFunction(final CaseDetails caseDetails,
+                                                           final SecurityClassification securityClassification) {
+        return cd -> {
+            if (cd.getDataClassification() == null) {
+                LOG.warn("No data classification for case with reference={},"
+                    + " all fields removed", cd.getReference());
+                cd.setDataClassification(Maps.newHashMap());
+            }
+
+            JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
+                securityClassification);
+            caseDetails.setData(JacksonUtils.convertValue(data));
+            return cd;
+        };
     }
 
+    /*
+     * Called from ClassifiedStartEventOperation (line 104).
+     * Calls "ORIGINAL" version of applyClassification() (method below).
+     */
+    public Optional<CaseDetails> applyClassification(final CaseDetails caseDetails) {
+        final Optional<CaseDetails> filteredCaseDetails = applyClassification(caseDetails, false);
+        securityClassificationServiceLogger.applyClassification(caseDetails, filteredCaseDetails);
+        return filteredCaseDetails;
+    }
+
+    // PART OF FIX.  (Re-factored to make use of mapFunction.)
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
+        LOG.info("JCDEBUG: SecurityClassificationServiceImpl: applyClassification (NORMAL case)");
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         return userClassificationOpt
             .flatMap(securityClassification ->
                 Optional.of(caseDetails).filter(caseHasClassificationEqualOrLowerThan(securityClassification))
-                .map(cd -> {
-                    if (cd.getDataClassification() == null) {
-                        LOG.warn("No data classification for case with reference={},"
-                            + " all fields removed", cd.getReference());
-                        cd.setDataClassification(Maps.newHashMap());
-                    }
-
-                    JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
-                        JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
-                        securityClassification);
-                    caseDetails.setData(JacksonUtils.convertValue(data));
-                    return cd;
-                }));
+                    .map(mapFunction(caseDetails, securityClassification)));
     }
 
     public List<AuditEvent> applyClassification(CaseDetails caseDetails, List<AuditEvent> events) {
@@ -93,6 +121,24 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         }
 
         return classifiedEvents;
+    }
+
+    // PART OF FIX.  (Based on normal case but without filter.)
+    public Optional<CaseDetails> applyClassificationToRestrictedCase(CaseDetails caseDetails) {
+        LOG.info("JCDEBUG: SecurityClassificationServiceImpl: applyClassification (RESTRICTED case)");
+        Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, false);
+        Optional<CaseDetails> caseDetails1 = userClassificationOpt
+            .flatMap(securityClassification ->
+                Optional.of(caseDetails)
+                    .map(mapFunction(caseDetails, securityClassification)));
+        // Log caseDetails1
+        try {
+            LOG.info("JCDEBUG: SecurityClassificationServiceImpl: applyClassification (RESTRICTED case): {}",
+                objectMapper.writeValueAsString(caseDetails1));
+        } catch (JsonProcessingException e) {
+            LOG.info("JCDEBUG: SecurityClassificationServiceImpl: applyClassification (RESTRICTED case): JSON ERROR");
+        }
+        return caseDetails1;
     }
 
     public SecurityClassification getClassificationForEvent(CaseTypeDefinition caseTypeDefinition,
@@ -145,7 +191,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
             .max(comparingInt(SecurityClassification::getRank));
     }
 
-    private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification,
+    protected JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification,
                                         SecurityClassification userClassification) {
         if (isAnyNull(data, dataClassification)) {
             return EMPTY_NODE;
