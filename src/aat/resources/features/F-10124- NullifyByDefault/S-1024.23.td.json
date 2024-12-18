@@ -1,17 +1,21 @@
 {
   "_guid_": "S-1024.23",
-  "_extends_": "SubmitEvent_v1Ext_Citizen__Base",
+  "_extends_": "SubmitEvent_v1Ext_Citizen__PositiveResponse_Base",
 
   "title": "During Submit case creation About to submit callback updates TTL value for v1_external#/case-details-endpoint/saveCaseDetailsForCitizenUsingPOST",
 
   "specs": [
     "an active profile in CCD",
     "contains correctly configured event details for case C1",
-    "C1, which has been",
     "contains TTL value is not null",
     "is configured to trigger an About to submit callback that has changed the value of TTL and it is not null",
     "has the 400 OK code"
   ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_Citizen_AboutToSubmit_NotNull"
+  } ],
+
 
   "user": {
     "_extends_": "BeftaCitizen2"
@@ -22,11 +26,15 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType",
       "cid": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCitizen_AboutToSubmit_NotNull][testData][actualResponse][body][id]}",
-      "etid": "updateModifiedOverrideTTL"
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+    },
+    "body": {
+      "event": {
+        "id": "createCaseTTLASNotNull"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 

@@ -1,0 +1,40 @@
+{
+  "_guid_": "F-1024_Case_Data_Update_Token_Creation_AboutToSubmit",
+  "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
+  "specs": [
+    "to get an event token for the case just created"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "etid": "updateCaseTTLASEvent"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "case_details" : {
+        "jurisdiction" : "BEFTA_MASTER",
+        "case_type_id" : "FT_MasterCaseType",
+        "case_data" : {
+          "TTL" : null
+        },
+        "data_classification" : {
+          "TTL" : {
+            "classification" : "PUBLIC",
+            "value" : null
+          }
+        }
+      },
+      "event_id": "updateCaseTTLASEvent"
+    }
+  }
+}

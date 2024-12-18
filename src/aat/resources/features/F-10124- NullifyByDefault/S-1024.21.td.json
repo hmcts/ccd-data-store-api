@@ -7,12 +7,15 @@
   "specs": [
     "an active profile in CCD",
     "contains correctly configured event details for case C1",
-    "C1, which has been",
     "contains TTL value is not null",
     "is configured to trigger an About to submit callback that has changed the value of TTL and it is still null",
     "has the 200 OK code",
     "contains the TTL set to null"
   ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_Citizen_AboutToSubmit"
+  } ],
 
   "users": {
     "invokingUser": {
@@ -25,8 +28,13 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCitizen_AboutToSubmit][testData][actualResponse][body][id]}",
-      "etid": "updateCaseTTLASEvent"
+      "cid": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCitizen_AboutToSubmit][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "event": {
+        "id": "createCaseTTLASEvent"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 
@@ -48,7 +56,7 @@
           "SearchCriteria" : "[[ANYTHING_PRESENT]]"
         }
       },
-      "event_id": "updateCaseTTLASEvent"
+      "event_id": "createCaseTTLASEvent"
     }
   }
 }
