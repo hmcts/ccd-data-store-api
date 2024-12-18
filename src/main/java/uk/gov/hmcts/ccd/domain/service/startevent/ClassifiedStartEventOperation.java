@@ -138,13 +138,18 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
                 jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE]", caseDetails);
                 Optional<CaseDetails> caseDetails1 = classificationService
                     .applyClassificationToRestrictedCase(caseDetails);
-                jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE]", caseDetails1.get());
+                if (caseDetails1.isPresent()) {
+                    jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE]",
+                        caseDetails1.get());
+                }
                 startEventResult.setCaseDetails(caseDetails1
                     .orElseThrow(() -> new CaseNotFoundException(caseReference)));
             } else {
                 jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE]", caseDetails);
                 Optional<CaseDetails> caseDetails1 = classificationService.applyClassification(caseDetails);
-                jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE]", caseDetails1.get());
+                if (caseDetails1.isPresent()) {
+                    jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE]", caseDetails1.get());
+                }
                 startEventResult.setCaseDetails(caseDetails1
                     .orElseThrow(() -> new CaseNotFoundException(caseReference)));
             }
