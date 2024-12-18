@@ -2,8 +2,8 @@
   "_guid_": "TTL_Case_Data",
 
   "TTL": {
-    "SystemTTL": "2021-03-04",
-    "OverrideTTL": "2021-03-05",
+    "SystemTTL": "${[scenarioContext][customValues][today]}",
+    "OverrideTTL": "${[scenarioContext][customValues][today]}",
     "Suspended": "No"
   }
 }
