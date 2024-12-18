@@ -39,7 +39,7 @@ public class SecurityClassificationServiceLogger {
         try {
             jclog(message + ": " + objectMapper.writeValueAsString(optional));
         } catch (JsonProcessingException e) {
-            jclog(message + ": JSON ERROR");
+            jclog(message + ": JSON ERROR: " + e.getMessage());
         }
     }
 
@@ -47,7 +47,7 @@ public class SecurityClassificationServiceLogger {
         try {
             jclog(message + ": " + objectMapper.writeValueAsString(jsonNode));
         } catch (JsonProcessingException e) {
-            jclog(message + ": JSON ERROR");
+            jclog(message + ": JSON ERROR: " + e.getMessage());
         }
     }
 
@@ -55,7 +55,7 @@ public class SecurityClassificationServiceLogger {
         try {
             jclog(message + ": " + objectMapper.writeValueAsString(caseDetails));
         } catch (JsonProcessingException e) {
-            jclog(message + ": JSON ERROR");
+            jclog(message + ": JSON ERROR: " + e.getMessage());
         }
     }
 
@@ -63,7 +63,7 @@ public class SecurityClassificationServiceLogger {
         try {
             jclog(message + ": " + objectMapper.writeValueAsString(securityClassification));
         } catch (JsonProcessingException e) {
-            jclog(message + ": JSON ERROR");
+            jclog(message + ": JSON ERROR: " + e.getMessage());
         }
     }
 
@@ -71,7 +71,7 @@ public class SecurityClassificationServiceLogger {
         try {
             jclog(message + ": " + objectMapper.writeValueAsString(bool));
         } catch (JsonProcessingException e) {
-            jclog(message + ": JSON ERROR");
+            jclog(message + ": JSON ERROR: " + e.getMessage());
         }
     }
 
@@ -99,29 +99,29 @@ public class SecurityClassificationServiceLogger {
      * MODIFIED "version 1" applyClassification(CaseDetails caseDetails, boolean create).
      */
     public Optional<CaseDetails> applyClassificationModifiedVersion1(CaseDetails caseDetails, boolean create) {
-        jclog("applyClassification (MODIFIED version 1)");
+        jclog("applyClassification() [MODIFIED version 1]");
         Optional<SecurityClassification> userClassificationOpt =
             securityClassificationService.getUserClassification(caseDetails, create);
-        jclog("    userClassificationOpt", userClassificationOpt);
+        jclog("applyClassification() userClassificationOpt", userClassificationOpt);
 
         Function<SecurityClassification, Optional<CaseDetails>> flatmapFunctionV1 = new Function<SecurityClassification,
             Optional<CaseDetails>>() {
             @Override
             public Optional<CaseDetails> apply(SecurityClassification securityClassification) {
                 Optional<CaseDetails> caseDetails1 = Optional.of(caseDetails);
-                jclog("    caseDetails1", caseDetails1);
+                jclog("applyClassification() caseDetails1", caseDetails1);
                 Optional<CaseDetails> caseDetails2 = caseDetails1.filter(
                     caseHasClassificationEqualOrLowerThan(securityClassification));
-                jclog("    caseDetails2", caseDetails2);
+                jclog("applyClassification() caseDetails2", caseDetails2);
                 Optional<CaseDetails> caseDetails3 = caseDetails2.map(
                     makeCaseDetailsMapFunction(caseDetails, securityClassification));
-                jclog("    caseDetails3", caseDetails3);
+                jclog("applyClassification() caseDetails3", caseDetails3);
                 return caseDetails3;
             }
         };
 
         Optional<CaseDetails> caseDetails4 = userClassificationOpt.flatMap(flatmapFunctionV1);
-        jclog("    caseDetails4", caseDetails4);
+        jclog("applyClassification() caseDetails4", caseDetails4);
         return caseDetails4;
     }
 
@@ -184,42 +184,5 @@ public class SecurityClassificationServiceLogger {
             }
         };
     }
-
-
-    // START OF INNER CLASS mapFunctionWrapper
-    /*
-    class MapFunctionWrapper {
-        final CaseDetails caseDetails;
-        final SecurityClassification securityClassification;
-
-        MapFunctionWrapper(final CaseDetails caseDetails, final SecurityClassification securityClassification) {
-            this.caseDetails = caseDetails;
-            this.securityClassification = securityClassification;
-        }
-
-        Function<CaseDetails, CaseDetails> mapFunction = new Function<CaseDetails, CaseDetails>() {
-            @Override
-            public CaseDetails apply(CaseDetails cd) {
-                if (cd.getDataClassification() == null) {
-                    LOG.warn("No data classification for case with reference={}, all fields removed",
-                        cd.getReference());
-                    jclog("No data classification for case with reference="
-                        + cd.getReference() + ", all fields removed");
-                    cd.setDataClassification(Maps.newHashMap());
-                }
-
-                JsonNode data = securityClassificationService.filterNestedObject(
-                    JacksonUtils.convertValueJsonNode(caseDetails.getData()),
-                    JacksonUtils.convertValueJsonNode(cd.getDataClassification()),
-                    securityClassification);
-                jclog("    data", data);
-                cd.setData(JacksonUtils.convertValue(data));
-                jclog("    cd", cd);
-                return cd;
-            }
-        };
-    }
-    */
-    // END OF INNER CLASS mapFunctionWrapper
 
 }
