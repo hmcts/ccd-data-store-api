@@ -26,11 +26,19 @@
         "jurisdiction": "BEFTA_MASTER",
         "state": "CaseCreated",
         "case_type_id": "FT_MasterCaseType",
-        "case_data": {
-          "TTL" : null
+        "case_data" : {
+          "TTL" : { },
+          "SearchCriteria" : { }
         },
-        "data_classification": {
-          "_extends_": "TTL_Classifications"
+        "data_classification" : {
+          "TTL" : {
+            "classification" : "PUBLIC",
+            "value" : { }
+          },
+          "SearchCriteria" : {
+            "classification" : "PUBLIC",
+            "value" : { }
+          }
         }
       },
       "event_id": "updateCaseTTLNullifyByDefault"

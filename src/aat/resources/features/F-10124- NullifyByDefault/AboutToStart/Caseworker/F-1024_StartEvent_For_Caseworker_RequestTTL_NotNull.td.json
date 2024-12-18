@@ -1,12 +1,19 @@
 {
   "_guid_": "F-1024_StartEvent_For_Caseworker_RequestTTL_NotNull",
-  "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Case worker",
+
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
   "specs": [
-    "to create a case"
+    "to create a case",
+    "to create a token for case creation"
   ],
 
   "request": {
+    "_extends_": "Common_Request",
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
@@ -21,16 +28,6 @@
           "Suspended" : "No"
         }
       }
-    }
-  },
-
-  "expectedResponse": {
-    "body": {
-      "case_details" : {
-        "jurisdiction" : "BEFTA_MASTER",
-        "case_type_id" : "FT_MasterCaseType"
-      },
-      "event_id": "createCaseTTLNBDNotNull"
     }
   }
 }

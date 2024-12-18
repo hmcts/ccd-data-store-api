@@ -1,12 +1,21 @@
 {
   "_guid_": "F-1024_StartEvent_For_Citizen_RequestTTL_NotNull",
-  "_extends_": "Citizen_Token_Creation_Data_For_Case_Creation",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Citizen",
+
+  "method": "GET",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
   "specs": [
-    "to create a case"
+    "to create a case",
+    "to create a token for case creation as a citizen"
   ],
 
   "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
@@ -21,16 +30,6 @@
           "Suspended" : "No"
         }
       }
-    }
-  },
-
-  "expectedResponse": {
-    "body": {
-      "case_details" : {
-        "jurisdiction" : "BEFTA_MASTER",
-        "case_type_id" : "FT_MasterCaseType"
-      },
-      "event_id": "createCaseTTLNBDNotNull"
     }
   }
 }

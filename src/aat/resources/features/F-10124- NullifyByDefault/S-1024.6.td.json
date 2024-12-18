@@ -17,13 +17,6 @@
     }
   },
 
-  "request": {
-    "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1024_StartCaseTrigger_Case_Creation_NotNull][testData][actualResponse][body][id]}",
-      "etid": "updateCaseTTLNBDNotNull"
-    }
-  },
-
   "expectedResponse": {
     "_extends_": "400_TTL_Modified"
   }

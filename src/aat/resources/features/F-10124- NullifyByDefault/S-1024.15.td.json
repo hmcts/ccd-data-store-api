@@ -7,10 +7,13 @@
   "specs": [
     "an active profile in CCD",
     "contains correctly configured event details for case C1",
-    "C1, which has been",
     "is configured to trigger an Mid event callback that has changed the value of TTL and it is not null",
     "has the 400 OK code"
   ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_Citizen_MidEventUpdate"
+  } ],
 
   "users": {
     "invokingUser": {
@@ -19,9 +22,23 @@
   },
 
   "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+      "experimental": true
+    },
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCitizen_MidEventUpdate][testData][actualResponse][body][id]}",
-      "etid": "updateCaseTTLMENotNull"
+      "ctid": "FT_MasterCaseType"
+    },
+    "queryParams": {
+      "pageId": "createCaseTTLMENotNullToUpperSingleFormPage"
+    },
+    "body": {
+      "event": {
+        "id": "createCaseTTLMENotNull"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
     }
   },
 

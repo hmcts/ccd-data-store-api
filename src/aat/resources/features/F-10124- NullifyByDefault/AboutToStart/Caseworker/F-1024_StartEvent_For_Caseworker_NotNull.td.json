@@ -17,6 +17,7 @@
     }
   },
   "request": {
+    "_extends_": "Common_Request",
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
