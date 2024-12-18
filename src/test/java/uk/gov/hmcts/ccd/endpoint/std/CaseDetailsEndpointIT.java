@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -46,6 +51,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
+import uk.gov.hmcts.ccd.domain.service.common.RestrictedFieldProcessor;
 
 import javax.inject.Inject;
 import java.nio.charset.StandardCharsets;
@@ -65,6 +71,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
@@ -104,6 +111,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String UPLOAD_TIMESTAMP = "2000-02-29T00:00:00.000000000";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_TYPE = "TestAddressBookCase";
+    private static final String CASE_TYPE_FILTERED = "TestAddressBookCaseFiltered";
     private static final String CASE_TYPE_VALIDATE = "TestAddressBookCaseValidate";
     private static final String CASE_TYPE_VALIDATE_MULTI_PAGE = "TestAddressBookCaseValidateMultiPage";
     private static final String CASE_TYPE_NO_CREATE_CASE_ACCESS = "TestAddressBookCaseNoCreateCaseAccess";
@@ -5594,6 +5602,412 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Long expectedCaseId = 1L;
 
         assertCaseLinks(expectedCaseId, Collections.emptyList());
+    }
+
+    private Logger logger;
+    private ListAppender<ILoggingEvent> listAppender;
+    private List<ILoggingEvent> loggingEventList;
+
+    private Logger setupLogging() {
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        logger = (Logger) LoggerFactory.getLogger(RestrictedFieldProcessor.class);
+        logger.detachAndStopAllAppenders();
+        if (loggingEventList != null && !loggingEventList.isEmpty()) {
+            loggingEventList.clear();
+        }
+        logger.addAppender(listAppender);
+        return logger;
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldNotPerformActionWhenFieldsMissingAndReadFalseCreateTrueMismatch() throws Exception {
+        final String caseReference = "1504259907353529";
+        final String URL =
+            "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+
+        final JsonNode sanitizedData = mapper.readTree(
+            "{" +
+            "\"PersonAddress\":{" +
+            "\"Country\":\"_ Wales\"," +
+            "\"Postcode\":\"W11 5DF\"," +
+            "\"AddressLine1\":\"_ Flat 9\"," +
+            "\"AddressLine3\":\"_ ButtonVillie\"}," +
+            "\"PersonLastName\":\"_ Roof\"," +
+            "\"PersonFirstName\":\"_ George\"," +
+            "\"D8Document\":{" +
+            "    \"document_url\": \"http://localhost:" + getPort()
+            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
+            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
+            + "/binary\","
+            + "    \"document_filename\": \"Seagulls_Square.jpg\""
+            + "}" +
+            "}");
+
+        final JsonNode data = mapper.readTree(createExampleEventDataWithMissingItems());
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+        final String expectedClassificationString = "{" +
+            "  \"PersonAddress\":{" +
+            "    \"classification\": \"PUBLIC\"," +
+            "    \"value\": {" +
+            "      \"Country\":\"PUBLIC\"," +
+            "      \"Postcode\":\"PUBLIC\"," +
+            "      \"AddressLine1\":\"PUBLIC\"," +
+            "      \"AddressLine3\":\"PUBLIC\"" +
+            "    }" +
+            "  }," +
+            "  \"PersonLastName\":\"PUBLIC\"," +
+            "  \"PersonFirstName\":\"PUBLIC\"," +
+            "  \"D8Document\": \"PUBLIC\"" +
+            "}";
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final Level logLevel = Level.DEBUG;
+        setupLogging().setLevel(logLevel);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().is(201))
+            .andReturn();
+
+        final String expectedLogMessage = "Missing field 'AddressLine2' under 'PersonAddress'.";
+        loggingEventList = listAppender.list;
+
+        assertTrue("Expected log message not found: " + expectedLogMessage,
+            loggingEventList.stream().anyMatch(log -> log.getLevel() == logLevel
+                    && log.getFormattedMessage().equals(expectedLogMessage)));
+        assertEqualsSanitizedData(sanitizedData, mvcResult);
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.stream()
+            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(savedCaseDetails);
+        assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
+        Map<String, JsonNode> sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
+        assertThat(
+            "Incorrect Data content: Data should have changed",
+            savedCaseDetails.getData().entrySet(),
+            containsInAnyOrder(sanitizedDataMap.entrySet().toArray())
+        );
+        assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
+        JSONAssert.assertEquals(expectedClassificationString,
+            mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode
+                .LENIENT);
+
+        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("A new event should have been created", 6, caseAuditEventList.size());
+
+        // Assertion belows are for creation event
+        final AuditEvent caseAuditEvent = caseAuditEventList.getLast();
+        assertAll(
+            () -> assertEquals(sanitizedDataMap, caseAuditEvent.getData()),
+            () -> assertEquals("123", caseAuditEvent.getUserId()),
+            () -> assertEquals("Strife", caseAuditEvent.getUserLastName()),
+            () -> assertEquals("Cloud", caseAuditEvent.getUserFirstName()),
+            () -> assertEquals("HAS PRE STATES EVENT", caseAuditEvent.getEventName()),
+            () -> assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId()),
+            () -> assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId()),
+            () -> assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue()),
+            () -> assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId()),
+            () -> assertEquals("Case in state 4", caseAuditEvent.getStateName()),
+            () -> assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData()),
+            () -> assertEquals(SUMMARY, caseAuditEvent.getSummary()),
+            () -> assertEquals(DESCRIPTION, caseAuditEvent.getDescription()),
+            () -> JSONAssert.assertEquals(expectedClassificationString,
+                mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(),
+                JSONCompareMode.LENIENT)
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldAddMissingFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
+        final String caseReference = "1202264432028419";
+        final String URL =
+            "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_FILTERED
+                + "/cases/" + caseReference + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+
+        final JsonNode sanitizedData = mapper.readTree(
+            "{" +
+                "\"PersonAddress\":{" +
+                "\"Country\":\"_ Wales\"," +
+                "\"Postcode\":\"W11 5DF\"," +
+                "\"AddressLine1\":\"_ Flat 9\"," +
+                "\"AddressLine2\":\"Fake Street\"," +
+                "\"AddressLine3\":\"_ ButtonVillie\"}," +
+                "\"PersonLastName\":\"_ Roof\"," +
+                "\"PersonFirstName\":\"_ George\"," +
+                "\"D8Document\":{" +
+                "    \"document_url\": \"http://localhost:" + getPort()
+                + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
+                "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
+                + "/binary\","
+                + "    \"document_filename\": \"Seagulls_Square.jpg\""
+                + "}" +
+                "}");
+
+        final JsonNode data = mapper.readTree(createExampleEventDataWithMissingItems());
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+        final String expectedClassificationString = "{" +
+            "  \"PersonAddress\":{" +
+            "    \"classification\": \"PUBLIC\"," +
+            "    \"value\": {" +
+            "      \"Country\":\"PUBLIC\"," +
+            "      \"Postcode\":\"PUBLIC\"," +
+            "      \"AddressLine1\":\"PUBLIC\"," +
+            "      \"AddressLine3\":\"PUBLIC\"" +
+            "    }" +
+            "  }," +
+            "  \"PersonLastName\":\"PUBLIC\"," +
+            "  \"PersonFirstName\":\"PUBLIC\"," +
+            "  \"D8Document\": \"PUBLIC\"" +
+            "}";
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE_FILTERED, caseReference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final Level logLevel = Level.INFO;
+        setupLogging().setLevel(logLevel);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().is(201))
+            .andReturn();
+
+        assertNotNull(mvcResult);
+
+        final String expectedLogMessage = "Adding missing field 'AddressLine2' under 'PersonAddress'.";
+        loggingEventList = listAppender.list;
+
+        assertTrue("Expected log message not found: " + expectedLogMessage,
+            loggingEventList.stream().anyMatch(log -> log.getLevel() == logLevel
+                && log.getFormattedMessage().equals(expectedLogMessage)));
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.stream()
+            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(savedCaseDetails);
+        assertEquals("Incorrect Case Type", CASE_TYPE_FILTERED, savedCaseDetails.getCaseTypeId());
+        Map<String, JsonNode> sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
+        assertThat(
+            "Incorrect Data content: Data should have changed",
+            savedCaseDetails.getData().entrySet(),
+            containsInAnyOrder(sanitizedDataMap.entrySet().toArray())
+        );
+        assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
+        JSONAssert.assertEquals(expectedClassificationString,
+            mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode
+                .LENIENT);
+
+        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("A new event should have been created", 6, caseAuditEventList.size());
+
+        final AuditEvent caseAuditEvent = caseAuditEventList.getLast();
+        assertAll(
+            () -> assertEquals(sanitizedDataMap, caseAuditEvent.getData()),
+            () -> assertEquals("123", caseAuditEvent.getUserId()),
+            () -> assertEquals("Strife", caseAuditEvent.getUserLastName()),
+            () -> assertEquals("Cloud", caseAuditEvent.getUserFirstName()),
+            () -> assertEquals("HAS PRE STATES EVENT", caseAuditEvent.getEventName()),
+            () -> assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId()),
+            () -> assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId()),
+            () -> assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue()),
+            () -> assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId()),
+            () -> assertEquals("Case in state 4", caseAuditEvent.getStateName()),
+            () -> assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData()),
+            () -> assertEquals(SUMMARY, caseAuditEvent.getSummary()),
+            () -> assertEquals(DESCRIPTION, caseAuditEvent.getDescription()),
+            () -> JSONAssert.assertEquals(expectedClassificationString,
+                mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(),
+                JSONCompareMode.LENIENT)
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldAddMissingCollectionFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
+        final String caseReference = "6512245793128983";
+        final String URL =
+            "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_FILTERED
+                + "/cases/" + caseReference + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+
+        final JsonNode sanitizedData = mapper.readTree(
+            "{" +
+                "\"PersonAddress\":{" +
+                "\"Country\":\"_ Wales\"," +
+                "\"Postcode\":\"W11 5DF\"," +
+                "\"AddressLine1\":\"_ Flat 9\"," +
+                "\"AddressLine2\":\"Fake Street\"," +
+                "\"AddressLine3\":\"_ ButtonVillie\"}," +
+                "\"Aliases\":[" +
+                "{\"id\":\"2\",\"value\":\"Alias2\"}," +
+                "{\"id\":\"1\",\"value\":\"Alias1\"}," +
+                "{\"id\":\"3\",\"value\":\"Alias3\"}" +
+                "]," +
+                "\"PersonLastName\":\"_ Roof\"," +
+                "\"PersonFirstName\":\"_ George\"," +
+                "\"D8Document\":{" +
+                "    \"document_url\": \"http://localhost:" + getPort()
+                + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
+                "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
+                + "/binary\","
+                + "    \"document_filename\": \"Seagulls_Square.jpg\""
+                + "}" +
+                "}");
+
+        final JsonNode data = mapper.readTree(createExampleEventDataWithCollectionMissingItems());
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+        final String expectedClassificationString = "{" +
+            "  \"PersonAddress\":{" +
+            "    \"classification\": \"PUBLIC\"," +
+            "    \"value\": {" +
+            "      \"Country\":\"PUBLIC\"," +
+            "      \"Postcode\":\"PUBLIC\"," +
+            "      \"AddressLine1\":\"PUBLIC\"," +
+            "      \"AddressLine3\":\"PUBLIC\"" +
+            "    }" +
+            "  }," +
+            "  \"PersonLastName\":\"PUBLIC\"," +
+            "  \"PersonFirstName\":\"PUBLIC\"," +
+            "  \"D8Document\": \"PUBLIC\"" +
+            "}";
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE_FILTERED, caseReference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final Level logLevel = Level.INFO;
+
+        setupLogging().setLevel(logLevel);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().is(201))
+            .andReturn();
+
+        assertNotNull(mvcResult);
+
+        final List<String> expectedLogMessages = List.of(
+            "Adding missing field 'AddressLine2' under 'PersonAddress'.",
+            "Adding missing collection item with ID '\"1\"' under 'Aliases'.",
+            "Adding missing collection item with ID '\"3\"' under 'Aliases'.");
+        loggingEventList = listAppender.list;
+        List<String> actualLogMessages = loggingEventList.stream()
+            .filter(log -> log.getLevel() == logLevel)
+            .map(ILoggingEvent::getFormattedMessage)
+            .toList();
+
+        List<String> missingMessages = expectedLogMessages.stream()
+            .filter(expected -> !actualLogMessages.contains(expected))
+            .toList();
+        assertTrue(
+            "The following expected log messages were not found: " + missingMessages,
+            missingMessages.isEmpty()
+        );
+        List<String> unexpectedMessages = actualLogMessages.stream()
+            .filter(actual -> !expectedLogMessages.contains(actual))
+            .toList();
+        assertTrue(
+            "The following unexpected log messages were found: " + unexpectedMessages,
+            unexpectedMessages.isEmpty()
+        );
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.stream()
+            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(savedCaseDetails);
+        assertEquals("Incorrect Case Type", CASE_TYPE_FILTERED, savedCaseDetails.getCaseTypeId());
+        Map<String, JsonNode> sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
+        assertThat(
+            "Incorrect Data content: Data should have changed",
+            savedCaseDetails.getData().entrySet(),
+            containsInAnyOrder(sanitizedDataMap.entrySet().toArray())
+        );
+        assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
+        JSONAssert.assertEquals(expectedClassificationString,
+            mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode
+                .LENIENT);
+
+        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("A new event should have been created", 6, caseAuditEventList.size());
+
+        final AuditEvent caseAuditEvent = caseAuditEventList.getLast();
+        assertAll(
+            () -> assertEquals(sanitizedDataMap, caseAuditEvent.getData()),
+            () -> assertEquals("123", caseAuditEvent.getUserId()),
+            () -> assertEquals("Cloud", caseAuditEvent.getUserFirstName()),
+            () -> assertEquals("HAS PRE STATES EVENT", caseAuditEvent.getEventName()),
+            () -> assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId()),
+            () -> assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId()),
+            () -> assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue()),
+            () -> assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId()),
+            () -> assertEquals("Case in state 4", caseAuditEvent.getStateName()),
+            () -> assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData()),
+            () -> assertEquals(SUMMARY, caseAuditEvent.getSummary()),
+            () -> assertEquals(DESCRIPTION, caseAuditEvent.getDescription()),
+            () -> JSONAssert.assertEquals(expectedClassificationString,
+                mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(),
+                JSONCompareMode.LENIENT)
+        );
+    }
+
+    private String createExampleEventDataWithMissingItems() {
+        return "{"
+            + "\"PersonAddress\":{"
+            + "\"Country\":\"_ Wales\","
+            + "\"Postcode\":\"W11 5DF\","
+            + "\"AddressLine1\":\"_ Flat 9\","
+            + "\"AddressLine3\":\"_ ButtonVillie\"},"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort()
+            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
+    }
+
+    private String createExampleEventDataWithCollectionMissingItems() {
+        return "{"
+            + "\"PersonAddress\":{"
+            + "\"Country\":\"_ Wales\","
+            + "\"Postcode\":\"W11 5DF\","
+            + "\"AddressLine1\":\"_ Flat 9\","
+            + "\"AddressLine3\":\"_ ButtonVillie\"},"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"Aliases\":["
+            + "{\"id\":\"2\",\"value\":\"Alias2\"}"
+            + "],"
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort()
+            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
     }
 
     private void assertCaseLinks(Long expectedCaseId, List<CaseLink> expectedCaseLinks) {
