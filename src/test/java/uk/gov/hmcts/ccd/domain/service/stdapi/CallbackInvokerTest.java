@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.stdapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -15,6 +17,15 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.appinsights.AppInsights;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -33,6 +44,8 @@ import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
+import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,10 +61,13 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -98,6 +114,21 @@ class CallbackInvokerTest {
 
     @Mock
     private GlobalSearchProcessorService globalSearchProcessorService;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
+    @Mock
+    private SecurityUtils securityUtils;
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private ApplicationParams applicationParams;
+
+    @Mock
+    private AppInsights appinsights;
 
     @InjectMocks
     private CallbackInvoker callbackInvoker;
@@ -166,6 +197,41 @@ class CallbackInvokerTest {
             verify(callbackService, times(1)).sendSingleRequest(URL_ABOUT_TO_START,
                 ABOUT_TO_START, caseEventDefinition, null, caseDetails, false);
             verifyNoMoreInteractions(callbackService);
+        }
+
+        @Test
+        @DisplayName("should handle exception in printCallbackDetails gracefully")
+        void shouldHandleExceptionInPrintCallbackDetailsGracefully() throws JsonProcessingException {
+            when(applicationParams.getCcdCallbackLogControl()).thenReturn(Collections.singletonList("*"));
+            doNothing().when(appinsights).trackCallbackEvent(any(), anyString(), anyString(), any(Duration.class));
+
+            CallbackService callbackService = new CallbackService(securityUtils,
+                restTemplate,
+                applicationParams,
+                appinsights,
+                null,
+                objectMapper);
+
+            when(objectMapper.writeValueAsString(any()))
+                .thenThrow(new RuntimeException("Mocked exception"));
+            when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+            when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
+                eq(CallbackResponse.class)))
+                .thenReturn(new ResponseEntity<>(new CallbackResponse(), HttpStatus.OK));
+
+            Optional<CallbackResponse> response = callbackService.sendSingleRequest(
+                URL_ABOUT_TO_START,
+                ABOUT_TO_START,
+                caseEventDefinition,
+                null,
+                caseDetails,
+                IGNORE_WARNING
+            );
+
+            assertTrue(response.isPresent());
+            verify(objectMapper, times(2)).writeValueAsString(any());
+            verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
+                eq(CallbackResponse.class));
         }
     }
 
