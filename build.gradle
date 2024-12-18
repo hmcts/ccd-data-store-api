@@ -328,8 +328,8 @@ dependencies {
     // for sonar analysis
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
     //excluding log4j-core which causes a vulnerability issue
     implementation(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
