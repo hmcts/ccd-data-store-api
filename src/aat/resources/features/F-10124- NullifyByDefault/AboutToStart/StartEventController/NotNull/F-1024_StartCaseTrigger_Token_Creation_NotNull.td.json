@@ -17,7 +17,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "etid": "createCaseTTLNBDNotNull"
+      "etid": "createCaseTTLSECNotNull"
     }
   },
   "expectedResponse": {
@@ -26,16 +26,16 @@
         "jurisdiction" : "BEFTA_MASTER",
         "case_type_id" : "FT_MasterCaseType",
         "case_data" : {
-          "TTL" : { }
+          "TTL" : null
         },
         "data_classification" : {
           "TTL" : {
             "classification" : "PUBLIC",
-            "value" : { }
+            "value" : null
           }
         }
       },
-      "event_id": "createCaseTTLNBDNotNull"
+      "event_id": "createCaseTTLSECNotNull"
     }
   }
 }
