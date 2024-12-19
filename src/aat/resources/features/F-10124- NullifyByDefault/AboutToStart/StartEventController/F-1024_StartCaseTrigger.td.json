@@ -1,0 +1,26 @@
+{
+	"_guid_": "F-1024_StartCaseTrigger",
+
+	"productName": "CCD Data Store",
+	"operationName": "Retrieve a trigger for case by ID",
+
+	"method": "GET",
+	"uri": "cases/{caseId}/event-triggers/{triggerId}",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": "true"
+    },
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-1024_StartCaseTrigger_Case_Creation][testData][actualResponse][body][id]}",
+      "triggerId": "updateCaseTTLNullifyByDefault"
+    }
+  }
+}
