@@ -19,7 +19,14 @@
   },
 
   "expectedResponse": {
+    "_extends_": "Common_200_Response",
     "body": {
+      "token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "_links": {
+        "self": {
+          "href": "[[ANY_STRING_NOT_NULLABLE]]"
+        }
+      },
       "case_details": {
         "id": "${[scenarioContext][childContexts][F-1024_StartCaseTrigger_Case_Creation][testData][actualResponse][body][id]}",
         "version": 0,
@@ -31,15 +38,10 @@
         "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
         "security_classification" : "[[ANYTHING_PRESENT]]",
         "case_data" : {
-          "TTL" : { },
-          "SearchCriteria" : { }
+          "TTL" : { }
         },
         "data_classification" : {
           "TTL" : {
-            "classification" : "PUBLIC",
-            "value" : { }
-          },
-          "SearchCriteria" : {
             "classification" : "PUBLIC",
             "value" : { }
           }

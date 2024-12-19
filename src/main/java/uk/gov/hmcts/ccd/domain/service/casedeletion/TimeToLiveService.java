@@ -92,14 +92,14 @@ public class TimeToLiveService {
                                                           CaseEventDefinition caseEventDefinition,
                                                           CaseTypeDefinition caseTypeDefinition) {
         Map<String, JsonNode> outputData = data;
-        Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
 
         if (isCaseTypeUsingTTL(caseTypeDefinition)) {
-            // load existing TTL
             if (isNullifyByDefault(caseEventDefinition)) {
                 outputData = cloneOrNewJsonMap(data);
                 outputData.put(TTL_CASE_FIELD_ID, objectMapper.getNodeFactory().nullNode());
             } else {
+                // load existing TTL
+                Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
                 if (ttlIncrement != null) {
                     outputData = cloneOrNewJsonMap(data);
                     TTL timeToLive = getTTLFromCaseData(outputData);

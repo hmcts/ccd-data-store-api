@@ -23,12 +23,8 @@
       "ctid": "FT_MasterCaseType"
     },
     "body": {
-      "data": { },
-      "data_classification": { },
       "event": {
-        "id": "createCaseTTLNullifyByDefault",
-        "summary": "",
-        "description": ""
+        "id": "createCaseTTLNullifyByDefault"
       },
       "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
