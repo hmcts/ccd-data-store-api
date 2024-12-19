@@ -430,63 +430,6 @@ class DefaultCreateCaseOperationTest {
     }
 
     @Test
-    @DisplayName("Should fail ttl guard")
-    void shouldUFailTtlGuard() {
-        final String caseEventStateId = "Some state";
-        eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(null).build();
-        eventData.setSupplementaryDataRequest(null);
-        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
-        given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
-        given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);
-        given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
-        given(savedCaseType.getState()).willReturn(caseEventStateId);
-        given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
-        given(caseSanitiser.sanitise(eq(CASE_TYPE), anyMap())).willReturn(data);
-        
-        // SETUP TTL FAIL
-        TTL timeToLive = TTL.builder().suspended(TTL.NO)
-            .systemTTL(LocalDate.now()).overrideTTL(LocalDate.now()).build();
-        data.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
-        // SETUP TTL
-        CaseFieldDefinition ttlDefinition = new CaseFieldDefinition();
-        ttlDefinition.setId("TTL");
-        List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
-        caseFieldDefinitions.addAll(CASE_TYPE.getCaseFieldDefinitions());
-        caseFieldDefinitions.add(ttlDefinition);
-        CASE_TYPE.setCaseFieldDefinitions(caseFieldDefinitions);
-        eventTrigger.setTtlIncrement(1);
-        given(caseDataService.getDefaultSecurityClassifications(eq(CASE_TYPE), anyMap(), anyMap()))
-            .willAnswer(new Answer<Map<String, JsonNode>>() {
-                @SuppressWarnings("unchecked")
-                @Override
-                public Map<String, JsonNode> answer(InvocationOnMock invocation) throws Throwable {
-                    return (Map<String, JsonNode>) invocation.getArguments()[1];
-                }
-            });
-        given(applicationParams.getTtlGuard()).willReturn(2);
-    
-        given(submitCaseTransaction.submitCase(same(event),
-            same(CASE_TYPE),
-            same(IDAM_USER),
-            same(eventTrigger),
-            any(CaseDetails.class),
-            same(IGNORE_WARNING),
-            any())).willAnswer(new Answer<CaseDetails>() {
-                @Override
-                public CaseDetails answer(InvocationOnMock invocation) throws Throwable {
-                    CaseDetails caseDetails = (CaseDetails) invocation.getArguments()[4];
-                    return caseDetails;
-                }  
-            });
-
-        assertThrows(ValidationException.class, () -> defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
-            eventData,
-            IGNORE_WARNING));
-
-    }
-
-    @Test
     @DisplayName("Should set incomplete_delete_draft when exception thrown during draft delete")
     void shouldSetIncompleteDeleteDraftWhenDeleteDraftThrowsException() {
         final String caseEventStateId = "Some state";

@@ -163,7 +163,6 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         updateCaseState(caseEventDefinition, newCaseDetails);
 
         updateCaseDetailsWithTtlIncrement(newCaseDetails, caseTypeDefinition, caseEventDefinition);
-        timeToLiveService.validateTTLChangeAgainstTTLGuard(newCaseDetails.getData(), null);
 
         newCaseDetails.setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(newCaseDetails.getData()));
 
