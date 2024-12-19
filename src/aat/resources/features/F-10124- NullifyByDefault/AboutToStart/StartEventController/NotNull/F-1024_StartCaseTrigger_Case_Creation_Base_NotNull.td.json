@@ -7,7 +7,7 @@
   ],
 
   "prerequisites" : [ {
-    "Token_Creation": "F-1024_StartCaseTrigger_Token_Creation"
+    "Token_Creation": "F-1024_StartCaseTrigger_Token_Creation_NotNull"
   }
   ],
 
@@ -26,7 +26,7 @@
       "data": { },
       "data_classification": { },
       "event": {
-        "id": "createCaseTTLNullifyByDefault",
+        "id": "createCaseTTLNBDNotNull",
         "summary": "",
         "description": ""
       },

@@ -13,7 +13,7 @@
   ],
 
   "prerequisites" : [ {
-    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_Citizen_AboutToSubmit_NotNull"
+    "Token_Creation": "F-1024_GetUpdateCaseTokenCitizen_NotNull"
   } ],
 
   "user": {
@@ -30,7 +30,7 @@
     },
     "body": {
       "event": {
-        "id": "createCaseTTLASNotNull"
+        "id": "updateCaseTTLASNotNull"
       },
       "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }

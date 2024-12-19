@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1024.22",
-  "_extends_": "SubmitEvent_v1Ext_Caseworker__PositiveResponse_Base",
+  "_extends_": "SubmitEvent_v1Ext_Caseworker__Base",
 
   "title": "During Submit case creation About to submit callback updates TTL value for v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST",
 
@@ -13,7 +13,7 @@
   ],
 
   "prerequisites" : [ {
-    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_AboutToSubmit_NotNull"
+    "Token_Creation": "F-1024_GetUpdateCaseTokenCaseworker_NotNull"
   } ],
 
   "users": {
@@ -33,7 +33,7 @@
     },
     "body": {
       "event": {
-        "id": "createCaseTTLASNotNull"
+        "id": "updateCaseTTLASNotNull"
       },
       "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }

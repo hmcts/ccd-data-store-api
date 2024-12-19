@@ -14,7 +14,7 @@
   ],
 
   "prerequisites" : [ {
-    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_Citizen_AboutToSubmit"
+    "Token_Creation": "F-1024_GetUpdateCaseTokenCitizen"
   } ],
 
 
@@ -35,7 +35,7 @@
     },
     "body": {
       "event": {
-        "id": "createCaseTTLASEvent"
+        "id": "updateCaseTTLASEvent"
       },
       "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
@@ -43,23 +43,20 @@
 
   "expectedResponse": {
     "body": {
-      "case_details": {
-        "id": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCitizen_AboutToSubmit][testData][actualResponse][body][id]}",
-        "jurisdiction": "BEFTA_MASTER",
-        "state": "CaseCreated",
-        "version": 0,
-        "case_type_id": "FT_MasterCaseType",
+      "id":"${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCitizen_AboutToSubmit][testData][actualResponse][body][id]}",
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseUpdated",
+      "case_type_id": "FT_MasterCaseType",
 
-        "case_data": {
-          "TTL" : null,
-          "SearchCriteria" : { }
-        },
-        "data_classification": {
-          "_extends_": "TTL_Classifications",
-          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
-        }
+      "case_data": {
+        "TTL" : { }
       },
-      "event_id": "createCaseTTLASEvent"
+      "data_classification": {
+        "TTL" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        }
+      }
     }
   }
 }

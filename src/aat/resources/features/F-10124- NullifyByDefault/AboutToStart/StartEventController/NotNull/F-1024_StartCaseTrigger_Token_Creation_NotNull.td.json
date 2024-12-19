@@ -17,7 +17,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "etid": "createCaseTTLNullifyByDefault"
+      "etid": "createCaseTTLNBDNotNull"
     }
   },
   "expectedResponse": {
@@ -35,7 +35,7 @@
           }
         }
       },
-      "event_id": "createCaseTTLNullifyByDefault"
+      "event_id": "createCaseTTLNBDNotNull"
     }
   }
 }

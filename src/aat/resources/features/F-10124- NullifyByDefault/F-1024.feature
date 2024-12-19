@@ -163,7 +163,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
 
-  @S-1024.14  @Ignore # Review
+  @S-1024.14
   Scenario: During validation, Mid-event callback updates TTL value for v1_external#/case-details-endpoint/validateCaseDetailsUsingPOST_1
     Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1024_CreateCasePreRequisiteCitizen_MidEventUpdate]
@@ -171,7 +171,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the request [contains correctly configured event details for case C1]
     And   the request [is configured to trigger an Mid event callback that has changed the value of TTL and it is not null]
     And   it is submitted to call the [validation of a set of fields as Citizen (v1_ext citizen)] operation of [CCD Data Store]
-    Then  a positive response is received,
+    Then  a negative response is received
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
     And   the response [contains the TTL set to null]
@@ -227,7 +227,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
 
-  @S-1024.19 @Ignore # Review
+  @S-1024.19
   Scenario: During Submit case creation adjust any validation on TTL for  v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
     Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1024_CreateCasePreRequisiteCaseworker_AboutToSubmit]
@@ -241,7 +241,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response has all other details as expected
     And   the response [contains the TTL set to null]
 
-  @S-1024.20 @Ignore # Review
+  @S-1024.20
   Scenario: During Submit case creation adjust any validation on TTL for v1_external#/case-details-endpoint/saveCaseDetailsForCitizenUsingPOST
     Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1024_CreateCasePreRequisiteCitizen_AboutToSubmit]
@@ -255,7 +255,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response has all other details as expected
     And   the response [contains the TTL set to null]
 
-  @S-1024.21 @Ignore # Revieww
+  @S-1024.21
   Scenario:  During Submit case creation adjust any validation on TTL for v2_external#/case-controller/createCaseUsingPOST
     Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1024_CreateCasePreRequisiteCitizen_AboutToSubmit]
@@ -269,7 +269,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response has all other details as expected
     And   the response [contains the TTL set to null]
 
-  @S-1024.22 @Ignore # Review
+  @S-1024.22
   Scenario: During Submit case creation About to submit callback updates TTL value for v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
     Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1024_CreateCasePreRequisiteCaseworker_AboutToSubmit_NotNull]
@@ -282,7 +282,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
 
-  @S-1024.23 @Ignore # Review
+  @S-1024.23
   Scenario: During Submit case creation About to submit callback updates TTL value for v1_external#/case-details-endpoint/saveCaseDetailsForCitizenUsingPOST
     Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1024_CreateCasePreRequisiteCitizen_AboutToSubmit_NotNull]
@@ -295,7 +295,7 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
 
-  @S-1024.24 @Ignore # Review
+  @S-1024.24
   Scenario: During Submit case creation About to submit callback updates TTL value for v2_external#/case-controller/createCaseUsingPOST
     Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1024_CreateCasePreRequisiteCitizen_AboutToSubmit_NotNull]
