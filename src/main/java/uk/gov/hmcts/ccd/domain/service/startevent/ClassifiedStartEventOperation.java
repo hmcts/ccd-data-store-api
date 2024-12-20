@@ -60,7 +60,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     }
 
     private void jclog(String message) {
-        LOG.info("JCDEBUG: ClassifiedStartEventOperation: {}", message);
+        LOG.info("| JCDEBUG: ClassifiedStartEventOperation: {}", message);
     }
 
     private void jclog(String message, StartEventResult startEventResult) {
@@ -89,6 +89,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     @Override
     public StartEventResult triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
+        jclog("triggerStartForCaseType()");
         return startEventOperation.triggerStartForCaseType(caseTypeId,
                                                            eventId,
                                                            ignoreWarning);
@@ -96,7 +97,8 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     @Override
     public StartEventResult triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
-        jclog("triggerStartForCase() [ENTRYPOINT , caseReference = " + caseReference + " , eventId = " + eventId + "]");
+        jclog("triggerStartForCase() [ENTRYPOINT , built 20-Dec-2024]");
+        jclog("triggerStartForCase() [caseReference = " + caseReference + " , eventId = " + eventId + "]");
         StartEventResult startEventResult = startEventOperation.triggerStartForCase(caseReference, eventId,
                                                                                     ignoreWarning);
         jclog("triggerStartForCase() startEventResult", startEventResult);
@@ -108,6 +110,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     @Override
     public StartEventResult triggerStartForDraft(String draftReference,
                                                  Boolean ignoreWarning) {
+        jclog("triggerStartForDraft()");
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         return applyClassificationIfCaseDetailsExist(draftReference,
             deduceDefaultClassificationsForDraft(startEventOperation
@@ -136,7 +139,6 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         }
     }
 
-    // PART OF FIX.
     private StartEventResult applyClassificationIfCaseDetailsExist(String caseReference,
                                                                    StartEventResult startEventResult) {
         jclog("applyClassificationIfCaseDetailsExist() [#2]");
