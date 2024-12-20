@@ -1,12 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -50,7 +46,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     private final CaseDataAccessControl caseDataAccessControl;
     private final CaseDefinitionRepository caseDefinitionRepository;
 
-    final ObjectMapper objectMapper = new ObjectMapper();
+    final JcLogger jcLogger = new JcLogger("SecurityClassificationServiceImpl");
 
     @Autowired
     public SecurityClassificationServiceImpl(CaseDataAccessControl caseDataAccessControl,
@@ -58,38 +54,6 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
                                              final CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDataAccessControl = caseDataAccessControl;
         this.caseDefinitionRepository = caseDefinitionRepository;
-
-        // Enables serialisation of java.util.Optional and java.time.LocalDateTime
-        objectMapper.registerModule(new Jdk8Module());
-        objectMapper.registerModule(new JavaTimeModule());
-    }
-
-    private void jclog(String message) {
-        LOG.info("| JCDEBUG: SecurityClassificationServiceImpl: {}", message);
-    }
-
-    private void jclog(String message, Optional optional) {
-        try {
-            jclog(message + ": " + objectMapper.writeValueAsString(optional));
-        } catch (JsonProcessingException e) {
-            jclog(message + ": JSON ERROR: " + e.getMessage());
-        }
-    }
-
-    private void jclog(String message, CaseDetails caseDetails) {
-        try {
-            jclog(message + ": " + objectMapper.writeValueAsString(caseDetails));
-        } catch (JsonProcessingException e) {
-            jclog(message + ": JSON ERROR: " + e.getMessage());
-        }
-    }
-
-    private void jclog(String message, SecurityClassification securityClassification) {
-        try {
-            jclog(message + ": " + objectMapper.writeValueAsString(securityClassification));
-        } catch (JsonProcessingException e) {
-            jclog(message + ": JSON ERROR: " + e.getMessage());
-        }
     }
 
     private Function<CaseDetails, CaseDetails> mapFunction(final CaseDetails caseDetails,
@@ -98,7 +62,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
             if (cd.getDataClassification() == null) {
                 LOG.warn("No data classification for case with reference={},"
                     + " all fields removed", cd.getReference());
-                jclog("No data classification for case with reference " + cd.getReference());
+                jcLogger.jclog("No data classification for case with reference " + cd.getReference());
                 cd.setDataClassification(Maps.newHashMap());
             }
 
@@ -115,25 +79,25 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
-        jclog("applyClassification (NORMAL case)", caseDetails);
-        jclog("applyClassification (NORMAL case)", caseDetails.getSecurityClassification());
+        jcLogger.jclog("applyClassification (NORMAL case)", caseDetails);
+        jcLogger.jclog("applyClassification (NORMAL case)", caseDetails.getSecurityClassification());
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         Optional<CaseDetails> caseDetails1 = userClassificationOpt
             .flatMap(securityClassification ->
                 Optional.of(caseDetails).filter(caseHasClassificationEqualOrLowerThan(securityClassification))
                     .map(mapFunction(caseDetails, securityClassification)));
-        jclog("applyClassification (NORMAL case)", caseDetails1);
+        jcLogger.jclog("applyClassification (NORMAL case)", caseDetails1);
         try {
-            jclog("applyClassification (NORMAL case)" + (caseDetails1.isPresent()
+            jcLogger.jclog("applyClassification (NORMAL case)" + (caseDetails1.isPresent()
                 ? caseDetails1.get().getSecurityClassification().toString() : "NOT PRESENT"));
         } catch (Exception e) {
-            jclog("applyClassification (NORMAL case) ERROR GETTING SECURITY CLASSIFICATION");
+            jcLogger.jclog("applyClassification (NORMAL case) ERROR GETTING SECURITY CLASSIFICATION");
         }
         return caseDetails1;
     }
 
     public List<AuditEvent> applyClassification(CaseDetails caseDetails, List<AuditEvent> events) {
-        jclog("applyClassification (AuditEvent)");
+        jcLogger.jclog("applyClassification (AuditEvent)");
         final Optional<SecurityClassification> userClassification = getUserClassification(caseDetails, false);
 
         if (null == events || !userClassification.isPresent()) {
@@ -152,26 +116,26 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     public Optional<CaseDetails> applyClassificationToRestrictedCase(CaseDetails caseDetails) {
-        jclog("applyClassification (RESTRICTED case)", caseDetails);
-        jclog("applyClassification (RESTRICTED case)", caseDetails.getSecurityClassification());
+        jcLogger.jclog("applyClassification (RESTRICTED case)", caseDetails);
+        jcLogger.jclog("applyClassification (RESTRICTED case)", caseDetails.getSecurityClassification());
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, false);
         Optional<CaseDetails> caseDetails1 = userClassificationOpt
             .flatMap(securityClassification ->
                 Optional.of(caseDetails)
                     .map(mapFunction(caseDetails, securityClassification)));
-        jclog("JCDEBUG: applyClassification (RESTRICTED case)", caseDetails1);
+        jcLogger.jclog("applyClassification (RESTRICTED case)", caseDetails1);
         try {
-            jclog("JCDEBUG: applyClassification (RESTRICTED case)" + (caseDetails1.isPresent()
+            jcLogger.jclog("applyClassification (RESTRICTED case)" + (caseDetails1.isPresent()
                 ? caseDetails1.get().getSecurityClassification().toString() : "NOT PRESENT"));
         } catch (Exception e) {
-            jclog("JCDEBUG: applyClassification (RESTRICTED case) ERROR GETTING SECURITY CLASSIFICATION");
+            jcLogger.jclog("applyClassification (RESTRICTED case) ERROR GETTING SECURITY CLASSIFICATION");
         }
         return caseDetails1;
     }
 
     public SecurityClassification getClassificationForEvent(CaseTypeDefinition caseTypeDefinition,
                                                             CaseEventDefinition caseEventDefinition) {
-        jclog("getClassificationForEvent()");
+        jcLogger.jclog("getClassificationForEvent()");
         return caseTypeDefinition
             .getEvents()
             .stream()
@@ -184,37 +148,37 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId,
                                                                CaseTypeDefinition caseTypeDefinition,
                                                                String fieldId) {
-        jclog("userHasEnoughSecurityClassificationForField()");
+        jcLogger.jclog("userHasEnoughSecurityClassificationForField()");
         final Optional<SecurityClassification> userClassification =
             getUserClassification(caseTypeDefinition, false);
         boolean b = userClassification.map(securityClassification ->
             securityClassification.higherOrEqualTo(caseTypeDefinition.getClassificationForField(fieldId)))
             .orElse(false);
-        jclog("userHasEnoughSecurityClassificationForField() " + b);
+        jcLogger.jclog("userHasEnoughSecurityClassificationForField() " + b);
         return b;
     }
 
     public boolean userHasEnoughSecurityClassificationForField(CaseTypeDefinition caseTypeDefinition,
                                                                SecurityClassification otherClassification) {
-        jclog("userHasEnoughSecurityClassificationForField()");
+        jcLogger.jclog("userHasEnoughSecurityClassificationForField()");
         final Optional<SecurityClassification> userClassification = getUserClassification(caseTypeDefinition, false);
         boolean b = userClassification.map(securityClassification ->
             securityClassification.higherOrEqualTo(otherClassification))
             .orElse(false);
-        jclog("userHasEnoughSecurityClassificationForField() " + b);
+        jcLogger.jclog("userHasEnoughSecurityClassificationForField() " + b);
         return b;
     }
 
     public Optional<SecurityClassification> getUserClassification(CaseTypeDefinition caseTypeDefinition,
                                                                   boolean isCreateProfile) {
-        jclog("getUserClassification()");
+        jcLogger.jclog("getUserClassification()");
         return maxSecurityClassification(caseDataAccessControl
             .getUserClassifications(caseTypeDefinition, isCreateProfile));
     }
 
     @Override
     public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails, boolean create) {
-        jclog("getUserClassification()");
+        jcLogger.jclog("getUserClassification()");
         if (create) {
             return maxSecurityClassification(caseDataAccessControl.getUserClassifications(
                 caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId()), true));
@@ -223,7 +187,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     private Optional<SecurityClassification> maxSecurityClassification(Set<SecurityClassification> classifications) {
-        jclog("maxSecurityClassification()");
+        jcLogger.jclog("maxSecurityClassification()");
         return classifications.stream()
             .filter(classification -> classification != null)
             .max(comparingInt(SecurityClassification::getRank));
@@ -231,7 +195,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification,
                                         SecurityClassification userClassification) {
-        jclog("filterNestedObject()");
+        jcLogger.jclog("filterNestedObject()");
         if (isAnyNull(data, dataClassification)) {
             return EMPTY_NODE;
         }
@@ -266,7 +230,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
                                   Iterator<Map.Entry<String, JsonNode>> dataIterator,
                                   JsonNode dataClassificationElement,
                                   JsonNode dataElementValue) {
-        jclog("filterCollection()");
+        jcLogger.jclog("filterCollection()");
         // Apply collection-level classification
         filterSimpleField(userClassification,
             dataIterator,
@@ -291,7 +255,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
                 } else {
                     LOG.warn("Invalid security classification structure for collection item: {}",
                         relevantDataClassificationValue.toString());
-                    jclog("Invalid security classification structure for collection item: "
+                    jcLogger.jclog("Invalid security classification structure for collection item: "
                         + relevantDataClassificationValue.toString());
                     dataCollectionIterator.remove();
                 }
@@ -317,7 +281,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
                               Iterator<Map.Entry<String, JsonNode>> dataIterator,
                               JsonNode dataClassificationParent,
                               JsonNode dataElementValue) {
-        jclog("filterObject()");
+        jcLogger.jclog("filterObject()");
         filterNestedObject(dataElementValue,
             dataClassificationParent.get(VALUE),
             userClassification);
@@ -330,7 +294,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     private void filterSimpleField(SecurityClassification userClassification, Iterator iterator,
                                    JsonNode dataClassificationValue) {
-        jclog("filterSimpleField()");
+        jcLogger.jclog("filterSimpleField()");
         Optional<SecurityClassification> securityClassification = getSecurityClassification(dataClassificationValue);
         if (!securityClassification.isPresent() || !userClassification.higherOrEqualTo(securityClassification.get())) {
             iterator.remove();
