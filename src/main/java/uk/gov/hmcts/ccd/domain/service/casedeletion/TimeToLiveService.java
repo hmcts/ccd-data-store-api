@@ -1,15 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.casedeletion;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,6 +55,14 @@ public class TimeToLiveService {
             .stream().anyMatch(caseFieldDefinition -> TTL_CASE_FIELD_ID.equals(caseFieldDefinition.getId()));
     }
 
+    private Boolean isNullifyByDefault(@NonNull CaseEventDefinition caseEventDefinition) {
+        List<CaseEventFieldDefinition> caseEventFieldDefinitions =
+            Optional.ofNullable(caseEventDefinition.getCaseFields()).orElse(Collections.emptyList())
+                .stream().filter(cefDefinition -> TTL_CASE_FIELD_ID.equals(cefDefinition.getCaseFieldId()))
+                .filter(cefDefinition -> cefDefinition.getNullifyByDefault() != null).toList();
+        return !caseEventFieldDefinitions.isEmpty() && caseEventFieldDefinitions.getFirst().getNullifyByDefault();
+    }
+
     public Map<String, JsonNode> updateCaseDataClassificationWithTTL(Map<String, JsonNode> data,
                                                                      Map<String, JsonNode> dataClassification,
                                                                      CaseEventDefinition caseEventDefinition,
@@ -82,22 +92,28 @@ public class TimeToLiveService {
                                                           CaseEventDefinition caseEventDefinition,
                                                           CaseTypeDefinition caseTypeDefinition) {
         Map<String, JsonNode> outputData = data;
-        Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
 
-        if (isCaseTypeUsingTTL(caseTypeDefinition) && (ttlIncrement != null)) {
+        if (isCaseTypeUsingTTL(caseTypeDefinition)) {
+            if (isNullifyByDefault(caseEventDefinition)) {
+                outputData = cloneOrNewJsonMap(data);
+                outputData.put(TTL_CASE_FIELD_ID, objectMapper.getNodeFactory().nullNode());
+            } else {
+                // load existing TTL
+                Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
+                if (ttlIncrement != null) {
+                    outputData = cloneOrNewJsonMap(data);
+                    TTL timeToLive = getTTLFromCaseData(outputData);
 
-            // load existing TTL
-            outputData = cloneOrNewJsonMap(data);
-            TTL timeToLive = getTTLFromCaseData(outputData);
+                    // if TTL still missing create one
+                    if (timeToLive == null) {
+                        timeToLive = TTL.builder().suspended(NO).build();
+                    }
 
-            // if TTL still missing create one
-            if (timeToLive == null) {
-                timeToLive = TTL.builder().suspended(NO).build();
+                    // set system TTL and write TTL field to cloned data
+                    timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
+                    outputData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
+                }
             }
-
-            // set system TTL and write TTL field to cloned data
-            timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
-            outputData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
         }
 
         return outputData;
@@ -125,7 +141,7 @@ public class TimeToLiveService {
                 // if "before TTL has changed, including callback setting it to null"
                 // or "no-before TTl but callback is trying to add a TTL"
                 if ((beforeTtl != null && !beforeTtl.equals(callbackTtl))
-                        || (beforeTtl == null && callbackTtl != null)) {
+                    || (beforeTtl == null && callbackTtl != null)) {
                     throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
                 }
             }
@@ -199,7 +215,7 @@ public class TimeToLiveService {
     }
 
     private TTL getTTLFromJson(JsonNode ttlJsonNode) {
-        if (ttlJsonNode != null) {
+        if (ttlJsonNode != null && !ttlJsonNode.isEmpty()) {
             try {
                 return objectMapper.readValue(ttlJsonNode.toString(), TTL.class);
             } catch (JsonProcessingException e) {

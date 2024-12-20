@@ -1,0 +1,26 @@
+{
+  "_guid_": "F-1024_StartCaseTrigger_Case_Creation_NotNull",
+  "_extends_": "F-1024_StartCaseTrigger_Case_Creation_Base_NotNull",
+
+  "request": {
+    "body": {
+      "data": {
+        "_extends_": "TTL_Case_Data_NBD"
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "_extends_": "TTL_Case_Data_NBD"
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications"
+      }
+    }
+  }
+}
