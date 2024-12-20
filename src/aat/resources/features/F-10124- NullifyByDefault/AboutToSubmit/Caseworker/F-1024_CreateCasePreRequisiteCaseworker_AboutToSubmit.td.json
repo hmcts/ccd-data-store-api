@@ -15,23 +15,11 @@
 
   "expectedResponse": {
     "body": {
-      "case_data" : {
-        "TTL" : {
-          "SystemTTL" : "2021-03-04",
-          "OverrideTTL" : "2021-03-05",
-          "Suspended" : "No"
-        },
-        "SearchCriteria" : { }
+      "case_data": {
+        "_extends_": "TTL_Case_Data_NBD"
       },
       "data_classification" : {
-        "TTL" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "SystemTTL" : "PUBLIC",
-            "OverrideTTL" : "PUBLIC",
-            "Suspended" : "PUBLIC"
-          }
-        },
+        "_extends_": "TTL_Classifications",
         "SearchCriteria" : {
           "classification" : "PUBLIC",
           "value" : { }
