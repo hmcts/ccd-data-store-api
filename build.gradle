@@ -162,6 +162,10 @@ tasks.withType(Test) {
 
 dependencies {
 
+    // Enables serialisation of java.util.Optional and java.time.LocalDateTime
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.18.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+
     implementation('org.springframework.cloud:spring-cloud-starter-bootstrap') {
         version {
             strictly '4.0.5'
