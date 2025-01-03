@@ -1,0 +1,17 @@
+{
+  "_guid_": "S-1023_GetUpdateTokenCitizen",
+  "_extends_": "S-1023_GetEventTokenBase",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1023_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  }
+}
+

@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.callbacks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -25,7 +27,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
@@ -33,7 +34,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @TestPropertySource(properties =
     {
-        "http.client.read.timeout=500"
+    "http.client.read.timeout=500"
     })
 public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
@@ -56,6 +57,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         String testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
         caseEventDefinition.setCallBackURLAboutToStartEvent(testUrl);
         caseEventDefinition.setName("Test");
+        wireMockServer.resetAll();
     }
 
     @Test
@@ -94,7 +96,8 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
         CallbackException callbackException = assertThrows(CallbackException.class, () ->
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false));
-        assertEquals("Callback to service has been unsuccessful for event Test", callbackException.getMessage());
+        MatcherAssert.assertThat(callbackException.getMessage(),
+            CoreMatchers.containsString("Callback to service has been unsuccessful for event Test url"));
         verify(exactly(1), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 

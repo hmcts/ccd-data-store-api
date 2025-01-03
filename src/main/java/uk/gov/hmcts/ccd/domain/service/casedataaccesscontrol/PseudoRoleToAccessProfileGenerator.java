@@ -18,7 +18,7 @@ import static uk.gov.hmcts.ccd.domain.service.AccessControl.IDAM_PREFIX;
 @Component
 public class PseudoRoleToAccessProfileGenerator {
 
-    private static final String CASE_ROLE_ID_REGEX = "^(\\[[A-Za-z]+\\])$";
+    private static final String CASE_ROLE_ID_REGEX = "^\\[[a-zA-Z]([a-zA-Z0-9-_]*)\\]$";
 
     @Cacheable(value = "caseTypePseudoRoleToAccessProfileCache",
         key = "{#caseTypeDefinition.version.number, #caseTypeDefinition.id}")

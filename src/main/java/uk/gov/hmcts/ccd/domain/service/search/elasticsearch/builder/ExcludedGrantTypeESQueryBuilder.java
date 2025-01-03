@@ -5,6 +5,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -25,8 +26,9 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIEL
 public class ExcludedGrantTypeESQueryBuilder extends GrantTypeESQueryBuilder {
 
     ExcludedGrantTypeESQueryBuilder(AccessControlService accessControlService,
-                                    CaseDataAccessControl caseDataAccessControl) {
-        super(accessControlService, caseDataAccessControl);
+                                    CaseDataAccessControl caseDataAccessControl,
+                                    ApplicationParams applicationParams) {
+        super(accessControlService, caseDataAccessControl, applicationParams);
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @ApiModel(description = "")
-public class CaseStateDefinition implements Serializable {
+public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefinition> {
 
     @JsonIgnore
     public static final String ANY = "*";
@@ -81,5 +81,19 @@ public class CaseStateDefinition implements Serializable {
 
     public void setAccessControlLists(List<AccessControlList> accessControlLists) {
         this.accessControlLists = accessControlLists;
+    }
+
+    @JsonIgnore
+    @Override
+    public CaseStateDefinition createCopy() {
+        CaseStateDefinition copy = new CaseStateDefinition();
+        copy.setId(this.getId());
+        copy.setName(this.getName());
+        copy.setDescription(this.getDescription());
+        copy.setDisplayOrder(this.getDisplayOrder());
+        copy.setTitleDisplay(this.getTitleDisplay());
+        copy.setAccessControlLists(createACLCopyList(this.getAccessControlLists()));
+
+        return copy;
     }
 }

@@ -96,7 +96,7 @@ class CaseServiceTest {
 
         @Test
         @DisplayName("should fail for bad CASE_REFERENCE")
-        void shoudThrowBadRequestException() {
+        void shouldThrowBadRequestException() {
             doThrow(new BadRequestException("...")).when(uidService).validateUID(CASE_REFERENCE);
 
             assertThrows(BadRequestException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
@@ -104,7 +104,7 @@ class CaseServiceTest {
 
         @Test
         @DisplayName("should fail when case isn't found in the DB")
-        void shoudThrowResourceNotFoundException() {
+        void shouldThrowResourceNotFoundException() {
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
 
             assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION,
@@ -128,7 +128,7 @@ class CaseServiceTest {
 
         @Test
         @DisplayName("should fail when case isn't found in the DB")
-        void shoudThrowResourceNotFoundException() {
+        void shouldThrowResourceNotFoundException() {
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReferenceWithNoAccessControl(CASE_REFERENCE);
 
             assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetailsByCaseReference(
@@ -258,7 +258,7 @@ class CaseServiceTest {
 
         @Test
         @DisplayName("should fail for bad CASE_REFERENCE")
-        void shoudThrowBadRequestException() {
+        void shouldThrowBadRequestException() {
             doThrow(new BadRequestException("...")).when(uidService).validateUID(CASE_REFERENCE);
 
             assertThrows(BadRequestException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
@@ -266,7 +266,7 @@ class CaseServiceTest {
 
         @Test
         @DisplayName("should fail when case isn't found in the DB")
-        void shoudThrowResourceNotFoundException() {
+        void shouldThrowResourceNotFoundException() {
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
 
             assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION,

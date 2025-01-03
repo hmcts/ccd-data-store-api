@@ -1,0 +1,39 @@
+{
+  "_guid_": "S-106",
+  "_extends_": "F-051_Test_Data_Base_V2",
+  "title": "must return default user setting successfully for a user having a profile in CCD",
+
+  "specs": [
+    "a detailed profile in CCD",
+    "has the 200 return code"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "user": {
+        "idam": {
+          "id": "${[scenarioContext][theInvokingUser][id]}",
+          "email": "${[scenarioContext][theInvokingUser][username]}",
+          "forename": "[[ANYTHING_PRESENT]]",
+          "surname": "[[ANYTHING_PRESENT]]",
+          "roles": "[[ANYTHING_PRESENT]]",
+          "defaultService": null
+        }
+      },
+      "channels": null,
+      "jurisdictions": "[[ANYTHING_PRESENT]]",
+      "default": {
+        "workbasket": {
+          "jurisdiction_id": "[[ANYTHING_PRESENT]]",
+          "case_type_id": "[[ANYTHING_PRESENT]]",
+          "state_id": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+  }
+}

@@ -41,7 +41,7 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
     private static final String ASSIGNMENT_3 = "assignment3";
     private static final String CASE_ID_1 = "1504259907353529";
     private static final String CASE_TYPE = "TestAddressBookNoEventAccessToCaseRole";
-    private static final String CASE_ROLE_1 = "[TEST-EVENT-ACCESS-ROLE]";
+    private static final String CASE_ROLE_1 = "[02-TEST-EVENT-ACCESS-ROLE]";
     private static final String CASE_ROLE_2 = "citizen";
     private static final String CASE_ROLE_3 = "caseworker-probate-public";
 

@@ -14,10 +14,10 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataExtractor;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -27,6 +27,7 @@ import javax.inject.Named;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toUnmodifiableList;
+import static uk.gov.hmcts.ccd.domain.types.DateTimeValidator.DATE_TIME_FORMATTER;
 
 @Named
 public class CategoriesAndDocumentsService {
@@ -38,8 +39,6 @@ public class CategoriesAndDocumentsService {
     private static final String DOCUMENT_FILENAME = "document_filename";
     private static final String CATEGORY_ID = "category_id";
     private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
-
-    private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     private final CaseDataExtractor caseDataExtractor;
     private final CaseTypeService caseTypeService;
@@ -61,7 +60,8 @@ public class CategoriesAndDocumentsService {
 
         final Map<String, List<Document>> documentDictionary = buildCategorisedDocumentDictionary(
             caseData,
-            caseTypeDefinition.getCaseFieldDefinitions()
+            caseTypeDefinition.getCaseFieldDefinitions(),
+            caseTypeDefinition.getCategories()
         );
 
         final List<Category> categories = buildCategories(caseTypeDefinition.getCategories(), documentDictionary);
@@ -129,7 +129,8 @@ public class CategoriesAndDocumentsService {
 
     Map<String, List<Document>> buildCategorisedDocumentDictionary(
         final Map<String, JsonNode> caseData,
-        final List<CaseFieldDefinition> caseFieldDefinitions
+        final List<CaseFieldDefinition> caseFieldDefinitions,
+        List<CategoryDefinition> categories
     ) {
         final List<CaseFieldMetadata> caseFieldExtracts = caseDataExtractor.extractFieldTypePaths(
             caseData,
@@ -138,21 +139,28 @@ public class CategoriesAndDocumentsService {
         );
 
         return caseFieldExtracts.stream()
-            .map(caseFieldExtract -> transformDocument(caseFieldExtract, caseData))
+            .map(caseFieldExtract -> transformDocument(caseFieldExtract, caseData, categories))
+            .filter(Objects::nonNull)
             .collect(Collectors.groupingBy(tuple -> tuple._1,
                 collectingAndThen(toUnmodifiableList(), DOCUMENTS_FUNCTION)));
     }
 
     Tuple2<String, Optional<Document>> transformDocument(@NonNull final CaseFieldMetadata caseFieldMetadata,
-                                                         @NonNull final Map<String, JsonNode> caseData) {
+                                                         @NonNull final Map<String, JsonNode> caseData,
+                                                         List<CategoryDefinition> categories) {
         final Tuple2<String, Map<String, String>> documentNode =
             fileViewDocumentService.getDocumentNode(caseFieldMetadata.getPath(), caseData);
+
+        if (documentNode._2 == null) {
+            return null;
+        }
 
         final Document document = buildDocument(documentNode._1, documentNode._2);
 
         final String resolvedCategory = resolveDocumentCategory(
             documentNode._2.get(CATEGORY_ID),
-            caseFieldMetadata.getCategoryId()
+            caseFieldMetadata.getCategoryId(),
+            categories
         );
 
         return new Tuple2<>(resolvedCategory, Optional.of(document));
@@ -169,9 +177,16 @@ public class CategoriesAndDocumentsService {
     }
 
     String resolveDocumentCategory(final String categoryOnDocument,
-                                   final String categoryOnFieldDefinition) {
-        return Optional.ofNullable(categoryOnDocument)
-            .orElseGet(() -> resolveDocumentCategory(categoryOnFieldDefinition));
+                                   final String categoryOnFieldDefinition,
+                                   final List<CategoryDefinition> categories) {
+        if (categoryOnDocument != null && !categories.stream()
+            .anyMatch(category ->
+                category.getCategoryId().equals(categoryOnDocument))) {
+            return UNCATEGORISED_KEY;
+        } else {
+            return Optional.ofNullable(categoryOnDocument)
+                .orElseGet(() -> resolveDocumentCategory(categoryOnFieldDefinition));
+        }
     }
 
     private String resolveDocumentCategory(final String categoryOnFieldDefinition) {
@@ -180,10 +195,7 @@ public class CategoriesAndDocumentsService {
 
     LocalDateTime parseUploadTimestamp(final String uploadTimestamp) {
         return Optional.ofNullable(uploadTimestamp)
-            .map(timestamp -> {
-                final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TIMESTAMP_PATTERN);
-                return LocalDateTime.parse(timestamp, dateTimeFormatter);
-            })
+            .map(timestamp -> LocalDateTime.parse(timestamp, DATE_TIME_FORMATTER))
             .orElse(null);
     }
 

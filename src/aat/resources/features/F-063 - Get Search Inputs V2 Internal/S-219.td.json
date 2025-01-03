@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-219",
+  "_extends_": "F-063_Base_Private_Test_Data",
+  "title": "should retrieve search inputs for dynamic display",
+
+  "specs": [
+    "an active Public profile in CCD",
+    "contains a valid Private case type",
+    "does not contain the search inputs for the given Private case type, along with an HTTP 200 OK"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "CaseworkerAutotest"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-search-input-details.v2+json;charset=UTF-8"
+    },
+    "body": {
+      "searchInputs": [ ],
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+  }
+}

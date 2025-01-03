@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -29,11 +30,14 @@ public abstract class GrantTypeQueryBuilder {
 
     private final AccessControlService accessControlService;
     private final CaseDataAccessControl caseDataAccessControl;
+    private final ApplicationParams applicationParams;
 
     protected GrantTypeQueryBuilder(AccessControlService accessControlService,
-                                      CaseDataAccessControl caseDataAccessControl) {
+                                    CaseDataAccessControl caseDataAccessControl,
+                                    ApplicationParams applicationParams) {
         this.accessControlService = accessControlService;
         this.caseDataAccessControl = caseDataAccessControl;
+        this.applicationParams = applicationParams;
     }
 
     protected abstract GrantType getGrantType();
@@ -104,6 +108,10 @@ public abstract class GrantTypeQueryBuilder {
             .filter(ap -> ap.getCaseAccessCategories() != null)
             .flatMap(ap -> Arrays.stream(ap.getCaseAccessCategories().split(",")))
             .collect(Collectors.toList());
+    }
+
+    protected ApplicationParams getApplicationParams() {
+        return applicationParams;
     }
 
     private boolean ignoreCaseAccessCategoryQuery(Set<AccessProfile> accessProfiles) {

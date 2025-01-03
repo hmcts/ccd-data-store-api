@@ -46,8 +46,9 @@
 				"DocumentField2": {
           "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}/binary",
-					"document_filename": "Elastic Search test Case.png"
-				},
+  		  "document_filename": "Elastic Search test Case.png",
+          "upload_timestamp": "2000-02-29T00:00:00.000000000"
+        },
 				"ComplexField": {
 					"ComplexTextField": null,
 					"ComplexNestedField": {

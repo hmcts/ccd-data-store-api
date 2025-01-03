@@ -20,7 +20,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @ToString
 @ApiModel(description = "")
-public class CaseFieldDefinition implements Serializable, CommonField {
+public class CaseFieldDefinition implements Serializable, CommonField, Copyable<CaseFieldDefinition> {
 
     private static final long serialVersionUID = -4257574164546267919L;
 
@@ -230,7 +230,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().forEach(nestedField -> {
                 final List<AccessControlList> cloneACLs =
-                    acls.stream().map(AccessControlList::duplicate).collect(toList());
+                    acls.stream().map(AccessControlList::createCopy).collect(toList());
                 nestedField.setAccessControlLists(cloneACLs);
                 propagateACLsToNestedFields(nestedField, acls);
             });
@@ -358,5 +358,45 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         return caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition() != null
             && caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields() != null
             && !caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().isEmpty();
+    }
+
+    @JsonIgnore
+    @Override
+    public CaseFieldDefinition createCopy() {
+        CaseFieldDefinition copy = new CaseFieldDefinition();
+        copy.setId(this.getId());
+        copy.setCaseTypeId(this.getCaseTypeId());
+        copy.setLabel(this.getLabel());
+        copy.setHintText(this.getHintText());
+        copy.setFieldTypeDefinition(this.getFieldTypeDefinition() != null
+            ? this.getFieldTypeDefinition().createCopy() : null);
+        copy.setHidden(this.getHidden());
+        copy.setSecurityLabel(this.getSecurityLabel());
+        copy.setLiveFrom(this.getLiveFrom());
+        copy.setLiveUntil(this.getLiveUntil());
+        copy.setOrder(this.getOrder());
+        copy.setShowCondition(this.getShowCondition());
+        copy.setAccessControlLists(createACLCopyList(this.getAccessControlLists()));
+        copy.setComplexACLs(deepCopyComplexACLs(this.getComplexACLs()));
+        copy.setMetadata(this.isMetadata());
+        copy.setDisplayContext(this.getDisplayContext());
+        copy.setDisplayContextParameter(this.getDisplayContextParameter());
+        copy.setRetainHiddenValue(this.getRetainHiddenValue());
+        copy.setFormattedValue(this.getFormattedValue());
+        copy.setCategoryId(this.getCategoryId());
+
+        return copy;
+    }
+
+    private List<ComplexACL> deepCopyComplexACLs(List<ComplexACL> complexACLs) {
+        if (complexACLs == null || complexACLs.isEmpty()) {
+            return complexACLs;
+        }
+
+        List<ComplexACL> copiedACLs = new ArrayList<>(complexACLs.size());
+        for (ComplexACL acl : complexACLs) {
+            copiedACLs.add(acl.deepCopy());
+        }
+        return copiedACLs;
     }
 }

@@ -111,7 +111,7 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
     public void shouldReturnEventHistoryDataForCitizenWhoHasCaseRoleAccess() throws Exception {
         String roleAssignmentResponseJson = roleAssignmentResponseJson(
-            roleAssignmentJson("idam:[TEST-EVENT-ACCESS-ROLE]", "PROBATE", "TestAddressBookNoEventAccessToCaseRole",
+            roleAssignmentJson("idam:[02-TEST-EVENT-ACCESS-ROLE]", "PROBATE", "TestAddressBookNoEventAccessToCaseRole",
                 "1504259907353529")
         );
 

@@ -56,16 +56,16 @@ public class StartEventController {
             code = 200,
             message = "Success",
             response = StartEventResource.class
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document"
                 + " for case field or missing user roles"
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = EVENT_TRIGGER_NOT_FOUND
-        )
+            )
     })
     public ResponseEntity<StartEventResource> getStartCaseEvent(@PathVariable("caseTypeId") String caseTypeId,
                                                                 @PathVariable("triggerId") String triggerId,
@@ -95,23 +95,23 @@ public class StartEventController {
             code = 200,
             message = "Success",
             response = StartEventResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = ERROR_CASE_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 401,
             message = AUTHENTICATION_TOKEN_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = V2.Error.UNAUTHORISED_S2S_SERVICE
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = EVENT_TRIGGER_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = "One of the following reasons:\n"
@@ -119,7 +119,7 @@ public class StartEventController {
                 + "2. Callback validation errors\n"
                 + "3. Unable to sanitize document for case field\n"
                 + "4. Missing user roles"
-        ),
+            ),
     })
     public ResponseEntity<StartEventResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
                                                                    @PathVariable("eventId") String eventId,

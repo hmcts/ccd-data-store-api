@@ -86,6 +86,59 @@ class FileViewDocumentServiceTest {
             });
     }
 
+    @ParameterizedTest
+    @MethodSource("provideDocumentParametersWithMultipleNestedComplexPaths")
+    void testShouldGetDocumentNodeFromMultipleNestedComplexPaths(final String input,
+                                    final String expectedPath,
+                                    final Map<String, String> documentNode) {
+        final Tuple2<String, Map<String, String>> actualResult = underTest.getDocumentNode(input, caseData);
+
+        assertThat(actualResult)
+                .isNotNull()
+                .satisfies(x -> {
+                    assertThat(x._1).isNotNull().isEqualTo(expectedPath);
+                    assertThat(x._2).isNotNull().isEqualTo(documentNode);
+                });
+    }
+
+    private static Stream<Arguments> provideDocumentParametersWithMultipleNestedComplexPaths() {
+        return Stream.of(
+                Arguments.of("caseBundles.0.partyDetail.0.documents.0.type",
+                        "caseBundles[efc3f6bb-7e8c-4313-9433-a5e6a186f079]"
+                                + ".partyDetail[737ff730-90bb-4949-96e5-ac177ff71a54]"
+                                + ".documents[2c003bf7-e879-4a79-9a50-a24de3c71047].type",
+                        Map.of(
+                                "document_url", "http://dm-store:8080//documents/1d1f4521-3ab7-4257-a887-340d021c6de8",
+                                "document_filename", "test-a5.pdf",
+                                "document_binary_url", "http://dm-store:8080//documents/1d1f4521-3ab7-4257-a887-340d021c6de8/binary"
+                        )
+                ),
+                Arguments.of("caseBundles.0.partyDetail.1.documents.0.partyDocuments.0.type",
+                        "caseBundles[efc3f6bb-7e8c-4313-9433-a5e6a186f079]"
+                                + ".partyDetail[bab28064-e781-4c49-9261-f63d56c4311b]"
+                                + ".documents[a9248472-82f2-4ccf-baa3-cee344ca1be2]"
+                                + ".partyDocuments[20ea77f0-c588-4fb5-86fe-16984449c73b].type",
+                        Map.of(
+                                "document_url", "http://dm-store:8080//documents/dd1088dc-a2e1-4e2a-bea5-53f0596a808c",
+                                "document_filename", "E_402 evidence.pdf",
+                                "document_binary_url", "http://dm-store:8080//documents/dd1088dc-a2e1-4e2a-bea5-53f0596a808c/binary"
+                        )
+                ),
+                Arguments.of("caseBundles.0.partyDetail.0.documents.1.supportDocuments.0.extra.0.type",
+                        "caseBundles[efc3f6bb-7e8c-4313-9433-a5e6a186f079]"
+                                + ".partyDetail[737ff730-90bb-4949-96e5-ac177ff71a54]"
+                                + ".documents[a2398363-51af-4ba8-bdfd-d00bee5a3560]"
+                                + ".supportDocuments[20ea77f0-c588-4fb5-86fe-16984449c73b]"
+                                + ".extra[263dd0f2-20fb-41aa-8b01-6f8453aa86eb].type",
+                        Map.of(
+                                "document_url", "http://dm-store:8080//documents/c1c12494-73f5-4c7a-a92d-afdd4e254917",
+                                "document_filename", "test-a5-document.pdf",
+                                "document_binary_url", "http://dm-store:8080//documents/c1c12494-73f5-4c7a-a92d-afdd4e254917/binary"
+                        )
+                )
+        );
+    }
+
     protected static Stream<Arguments> provideNullParameters() {
         return Stream.of(
             Arguments.of(null, emptyMap()),

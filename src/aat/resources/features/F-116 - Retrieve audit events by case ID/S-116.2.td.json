@@ -1,0 +1,27 @@
+{
+  "title": "must return an error response for a malformed Case ID",
+  "_guid_": "S-116.2",
+  "_extends_": "F-116_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains an malformed case ID",
+    "Retrieve audit events by case ID",
+    "contains an error message saying that the case ID is invalid"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "167447455346956"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message": "Case ID is not valid",
+      "path": "/cases/167447455346956/events",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

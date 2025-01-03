@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.casefileview;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import io.vavr.Tuple2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,6 +8,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.vavr.Tuple2;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.domain.model.casefileview.CategoriesAndDocuments;
 import uk.gov.hmcts.ccd.domain.model.casefileview.Category;
@@ -34,6 +34,7 @@ import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -111,7 +112,10 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
     void testShouldResolveDocumentCategory(final String categoryOnDocument,
                                            final String categoryOnFieldDefinition,
                                            final String expectedCategory) {
-        final String result = underTest.resolveDocumentCategory(categoryOnDocument, categoryOnFieldDefinition);
+        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
+            "document-cat", "", null, null, 1, "");
+        final String result = underTest.resolveDocumentCategory(categoryOnDocument, categoryOnFieldDefinition,
+            asList(categoryDefinition));
 
         assertThat(result)
             .isNotNull()
@@ -123,7 +127,9 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
             Arguments.of(null, null, "uncategorised_documents"),
             Arguments.of(null, "def-cat", "def-cat"),
             Arguments.of("document-cat", null, "document-cat"),
-            Arguments.of("document-cat", "def-cat", "document-cat")
+            Arguments.of("document-cat", "def-cat", "document-cat"),
+            Arguments.of("document-NonCat", null, "uncategorised_documents"),
+            Arguments.of("document-NonCat", "def-cat", "uncategorised_documents")
         );
     }
 
@@ -132,12 +138,14 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
     void testShouldTransformDocument(final CaseFieldMetadata caseFieldExtract,
                final Tuple2<String, Map<String, String>> documentNode,
                final Document expectedDocument) throws Exception {
-
+        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
+            "document-cat", "", null, null, 1, "");
         final Map<String, JsonNode> caseData =
             loadCaseDataFromJson(String.format("tests/%s", "CaseDataExtractorDocumentData.json"));
         doReturn(documentNode).when(fileViewDocumentService).getDocumentNode(caseFieldExtract.getPath(), caseData);
 
-        final Tuple2<String, Optional<Document>> actualResult = underTest.transformDocument(caseFieldExtract, caseData);
+        final Tuple2<String, Optional<Document>> actualResult = underTest.transformDocument(caseFieldExtract, caseData,
+            asList(categoryDefinition));
 
         assertThat(actualResult)
             .isNotNull()
@@ -145,6 +153,24 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
                 .isPresent()
                 .map(document -> document)
                 .hasValue(expectedDocument));
+    }
+
+    @Test
+    void testShouldTransformNullDocumentToNull() throws Exception {
+        final CaseFieldMetadata caseFieldExtract = new CaseFieldMetadata("draftOrderDoc", null);
+        final Tuple2<String, Map<String, String>> documentNode = new Tuple2<>(
+            "draftOrderDoc",
+            null
+        );
+
+        final Map<String, JsonNode> caseData =
+            loadCaseDataFromJson(String.format("tests/%s", "CaseDataExtractorDocumentData.json"));
+        doReturn(documentNode).when(fileViewDocumentService).getDocumentNode(caseFieldExtract.getPath(), caseData);
+        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
+            "document-cat", "", null, null, 1, "");
+        final Tuple2<String, Optional<Document>> actualResult = underTest.transformDocument(caseFieldExtract, caseData,
+            asList(categoryDefinition));
+        assertThat(actualResult).isNull();
     }
 
     @Test
@@ -168,8 +194,10 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
             .extractFieldTypePaths(caseData, caseFieldDefinitions, documentType);
         primeFileViewDocumentServiceForDocumentDictionary(caseData);
 
+        CategoryDefinition categoryDefinition =  new CategoryDefinition("document-cat",
+            "document-cat", "", null, null, 1, "");
         final Map<String, List<Document>> results =
-            underTest.buildCategorisedDocumentDictionary(caseData, caseFieldDefinitions);
+            underTest.buildCategorisedDocumentDictionary(caseData, caseFieldDefinitions, asList(categoryDefinition));
 
         assertThat(results)
             .isNotEmpty()
@@ -226,16 +254,34 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
             .isInstanceOf(RuntimeException.class);
     }
 
-    @Test
-    void testShouldParseTimestamp() {
-        final String timestamp = "2022-04-06 16:44:52";
-        final LocalDateTime expectedTimestamp = LocalDateTime.of(2022, 4, 6, 16, 44, 52);
-
+    @ParameterizedTest
+    @MethodSource("provideTimestampParameters")
+    void testShouldParseTimestamps(String timestamp, LocalDateTime expectedTimestamp) {
         final LocalDateTime result = underTest.parseUploadTimestamp(timestamp);
 
         assertThat(result)
             .isNotNull()
             .isEqualTo(expectedTimestamp);
+    }
+
+    private static Stream<Arguments> provideTimestampParameters() {
+        return Stream.of(
+            Arguments.of(
+                "2022-04-06T16:44:52.000000000Z", LocalDateTime.of(2022, 4, 6, 16, 44, 52)
+            ),
+            Arguments.of(
+                "2022-04-06T16:44:52.000000000", LocalDateTime.of(2022, 4, 6, 16, 44, 52)
+            ),
+            Arguments.of(
+                "2022-04-06T16:44:52.000", LocalDateTime.of(2022, 4, 6, 16, 44, 52)
+            ),
+            Arguments.of(
+                "2022-04-06T16:44:52.123", LocalDateTime.of(2022, 4, 6, 16, 44, 52, 123000000)
+            ),
+            Arguments.of(
+                "2022-04-06T16:44:52", LocalDateTime.of(2022, 4, 6, 16, 44, 52)
+            )
+        );
     }
 
     private static Stream<Arguments> provideCaseFieldExtractParameters() {

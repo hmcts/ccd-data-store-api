@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
 import com.google.common.collect.Sets;
+import java.util.Optional;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -26,6 +28,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import static com.google.common.collect.Maps.newHashMap;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
+@Slf4j
 @Service
 @Qualifier("authorised")
 public class AuthorisedStartEventOperation implements StartEventOperation {
@@ -65,16 +68,27 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventResult triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
+    public StartEventResult triggerStartForCase(String caseReference, String eventId,
+        Boolean ignoreWarning) {
 
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
 
-        return caseDetailsRepository.findByReference(caseReference)
-            .map(caseDetails -> verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation
-                .triggerStartForCase(caseReference, eventId, ignoreWarning)))
-            .orElseThrow(() -> new CaseNotFoundException(caseReference));
+        Optional<CaseDetails> caseDetailsOptional = caseDetailsRepository.findByReference(
+            caseReference);
+        if (caseDetailsOptional.isEmpty()) {
+            throw new CaseNotFoundException(caseReference);
+        }
+
+        return caseDetailsOptional.map(
+                caseDetails -> verifyReadAccess(caseDetails.getCaseTypeId(),
+                    startEventOperation.triggerStartForCase(caseReference, eventId, ignoreWarning)))
+            .orElseThrow(() -> {
+                log.error("event={} could not be started for case={} in state={}",
+                    eventId, caseReference, caseDetailsOptional.get().getState());
+                return new ValidationException(caseReference);
+            });
     }
 
     @Override

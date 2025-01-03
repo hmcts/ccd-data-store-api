@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 
 import com.google.common.collect.Maps;
 import java.io.IOException;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.AccessControlGrantTypeQueryBuilder;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -17,6 +19,8 @@ import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataServ
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -77,6 +81,8 @@ class SearchQueryFactoryOperationTest {
         MetaData metadata = new MetaData(META_DATA_0_VALUE, META_DATA_1_VALUE);
 
         TypedQuery query = mock(TypedQuery.class);
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(anyString(), anyString(), any()))
+            .thenReturn(List.of("caseStateId_1"));
         when(entityManager.createNativeQuery(anyString())).thenReturn(query);
 
         classUnderTest.build(metadata, Maps.newHashMap(), true);
@@ -90,6 +96,8 @@ class SearchQueryFactoryOperationTest {
         MetaData metadata = new MetaData(META_DATA_0_VALUE, META_DATA_1_VALUE);
 
         TypedQuery query = mock(TypedQuery.class);
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(anyString(), anyString(), any()))
+            .thenReturn(List.of("caseStateId_1"));
         when(entityManager.createNativeQuery(anyString(), any(Class.class))).thenReturn(query);
 
         classUnderTest.build(metadata, Maps.newHashMap(), false);
@@ -102,6 +110,10 @@ class SearchQueryFactoryOperationTest {
     void shouldCallRoleAssignmentServiceWhenRAEnabled() {
         when(applicationParam.getEnableAttributeBasedAccessControl()).thenReturn(true);
         when(userAuthorisation.getUserId()).thenReturn("Test User");
+        when(accessControlGrantTypeQueryBuilder.createQuery(anyList(), anyMap(), any(CaseTypeDefinition.class)))
+            .thenReturn("Select * from case_data");
+        when(caseDataAccessControl.generateRoleAssignments(any(CaseTypeDefinition.class)))
+            .thenReturn(List.of(RoleAssignment.builder().build()));
 
         TypedQuery query = mock(TypedQuery.class);
         when(entityManager.createNativeQuery(anyString(), any(Class.class))).thenReturn(query);

@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.ContextCleanupListener;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.DefinitionStoreClient;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 
@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 class TestConfiguration extends ContextCleanupListener {
 
     private final ApplicationParams applicationParams;
+    private final DefinitionStoreClient definitionStoreClient;
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -97,8 +98,9 @@ class TestConfiguration extends ContextCleanupListener {
             + "]";
 
     @Autowired
-    TestConfiguration(final ApplicationParams applicationParams) {
+    TestConfiguration(final ApplicationParams applicationParams, DefinitionStoreClient definitionStoreClient) {
         this.applicationParams = applicationParams;
+        this.definitionStoreClient = definitionStoreClient;
     }
 
     @Bean
@@ -110,7 +112,7 @@ class TestConfiguration extends ContextCleanupListener {
         final DefaultCaseDefinitionRepository caseDefinitionRepository = mock(DefaultCaseDefinitionRepository.class);
 
         ReflectionTestUtils.setField(caseDefinitionRepository, "applicationParams", applicationParams);
-        ReflectionTestUtils.setField(caseDefinitionRepository, "restTemplate", new RestTemplate());
+        ReflectionTestUtils.setField(caseDefinitionRepository, "definitionStoreClient", definitionStoreClient);
 
         when(caseDefinitionRepository.getCaseType(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getLatestVersion(anyString())).thenCallRealMethod();
@@ -123,7 +125,7 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getUserRoleClassifications(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getClassificationsForUserRoleList(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getJurisdiction(anyString())).thenCallRealMethod();
-        when(caseDefinitionRepository.getJurisdictionFromDefinitionStore(anyString())).thenCallRealMethod();
+        when(caseDefinitionRepository.retrieveJurisdictions(any())).thenCallRealMethod();
         return caseDefinitionRepository;
     }
 

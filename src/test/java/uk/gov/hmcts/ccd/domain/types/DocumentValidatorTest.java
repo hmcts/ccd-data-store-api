@@ -63,12 +63,12 @@ public class DocumentValidatorTest implements IVallidatorTest {
     private static final String UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL =
         "https://dm.reform.hmcts.net.example.com/documents/a1-2Z-3-x";
     private static final String VALID_CATEGORY_ID = "mainEvidence";
+    private static final String NON_EXISTENT_CATEGORY_ID = "notInCategoriesList";
     private static final String VALID_UPLOAD_TIMESTAMP = "2012-12-10T00:00:00";
     private DocumentValidator validator;
     private CaseFieldDefinition caseFieldDefinition;
     private ObjectNode data;
     private List<ValidationResult> validDocumentUrlResult;
-    private TextValidator textValidator;
     private DateTimeValidator dateTimeValidator;
     private CaseDefinitionRepository caseDefinitionRepository;
 
@@ -98,7 +98,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         final ApplicationParams ap = mock(ApplicationParams.class);
         when(ap.getDocumentURLPattern()).thenReturn(urlBase + "/documents/[A-Za-z0-9-]+(?:/binary)?");
 
-        return new DocumentValidator(ap,textValidator,dateTimeValidator, caseDefinitionRepository);
+        return new DocumentValidator(ap,dateTimeValidator, caseDefinitionRepository);
     }
 
     @Before
@@ -114,17 +114,13 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
         BaseType.setCaseDefinitionRepository(caseDefinitionRepository);
 
-        final ObjectNode data;
-        final List<ValidationResult> validDocumentUrlResult;
-
         final ApplicationParams applicationParams = mock(ApplicationParams.class);
         when(applicationParams.getDocumentURLPattern()).thenReturn("https://dm.reform.hmcts.net/documents/[A-Za-z0-9-]+(?:/binary)?");
 
-        textValidator = new TextValidator();
         dateTimeValidator = new DateTimeValidator();
 
         validator = new DocumentValidator(
-            applicationParams,textValidator,dateTimeValidator, caseDefinitionRepository);
+            applicationParams, dateTimeValidator, caseDefinitionRepository);
         caseFieldDefinition = MAPPER.readValue(CASE_FIELD_STRING, CaseFieldDefinition.class);
     }
 
@@ -440,6 +436,17 @@ public class DocumentValidatorTest implements IVallidatorTest {
     }
 
     @Test
+    public void shouldValidateNonExistentCategoryId() {
+
+        setupWithCategories();
+        data = createDoc(CATEGORY_ID, NON_EXISTENT_CATEGORY_ID);
+        caseFieldDefinition.setCaseTypeId(CASE_TYPE_ID);
+
+        validDocumentUrlResult = validator.validate(CATEGORY_ID, data, caseFieldDefinition);
+        assertThat(validDocumentUrlResult, empty());
+    }
+
+    @Test
     public void shouldFail_whenValidatingNullUploadTimeStamp() {
         data = createDoc(UPLOAD_TIMESTAMP,null);
         validDocumentUrlResult = validator.validate(UPLOAD_TIMESTAMP, data, caseFieldDefinition);
@@ -462,7 +469,6 @@ public class DocumentValidatorTest implements IVallidatorTest {
         assertThat(validDocumentUrlResult, empty());
     }
 
-
     private ObjectNode createDoc(String documentUrl) {
         data = MAPPER.createObjectNode();
         data.set(DOCUMENT_URL, new TextNode(documentUrl));
@@ -482,7 +488,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
             + "em-hrs-api-(pr-[0-9]+|preview).service.core-compute-preview).internal(?::d+)?/"
             + "hearing-recordings/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
             + "[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/segments/[0-9]+");
-        validator = new DocumentValidator(applicationParams,null, null, null);
+        validator = new DocumentValidator(applicationParams, null, null);
         return validator;
     }
 
@@ -496,4 +502,5 @@ public class DocumentValidatorTest implements IVallidatorTest {
         doReturn(categories)
             .when(caseTypeDefinition).getCategories();
     }
+
 }

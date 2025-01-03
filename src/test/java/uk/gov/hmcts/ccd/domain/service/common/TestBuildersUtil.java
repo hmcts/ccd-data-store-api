@@ -255,6 +255,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseDataContentBuilder withOnBehalfOfId(String onBehalfOfId) {
+            this.caseDataContent.setOnBehalfOfId(onBehalfOfId);
+            return this;
+        }
+
         public static CaseDataContentBuilder newCaseDataContent() {
             return new CaseDataContentBuilder();
         }

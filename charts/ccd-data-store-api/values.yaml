@@ -9,15 +9,15 @@ java:
   applicationPort: 4452
   aadIdentityName: ccd
   autoscaling:
-    enabled: true
+    enabled: false
     maxReplicas: 9
     minReplicas: 6
   keyVaults:
     ccd:
       secrets:
-        - name: data-store-api-POSTGRES-USER
+        - name: data-store-api-POSTGRES-USER-V15
           alias: DATA_STORE_DB_USERNAME
-        - name: data-store-api-POSTGRES-PASS
+        - name: data-store-api-POSTGRES-PASS-V15
           alias: DATA_STORE_DB_PASSWORD
         - name: data-store-api-draft-key
           alias: CCD_DRAFT_ENCRYPTION_KEY
@@ -29,8 +29,8 @@ java:
           alias: ELASTIC_SEARCH_DATA_NODES_HOSTS
         - name: ccd-ELASTIC-SEARCH-PASSWORD
           alias: ELASTIC_SEARCH_PASSWORD
-        - name: AppInsightsInstrumentationKey
-          alias: azure.application-insights.instrumentation-key
+        - name: app-insights-connection-string
+          alias: app-insights-connection-string
         - name: idam-data-store-client-secret
           alias: IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET
         - name: idam-data-store-system-user-username
@@ -41,7 +41,7 @@ java:
   environment:
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
-    DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com
+    DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-v15-{{ .Values.global.environment }}.postgres.database.azure.com
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&sslmode=require&gssEncMode=disable"
     DATA_STORE_DB_MAX_POOL_SIZE: 48
 # this variable takes a comma separated list of callback urls for which details needs to be logged, or '*' for all
@@ -49,7 +49,7 @@ java:
     CCD_DRAFT_TTL_DAYS: 180
     TTL_GUARD: 365
 
-    DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration,employment_tribunals,ethos_repl_service,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,bulk_scan_payment_processor,pcq_consolidation_service,em_npa_app,ecm_consumer,aac_manage_case_assignment,unspec_service,divorce_frontend,wa_task_configuration_api,wa_task_monitor,ccd_case_document_am_api,hmc_cft_hearing_service,prl_citizen_frontend,prl_cos_api,et_cos,et_msg_handler, ccd_next_hearing_date_updater,et_sya_api
+    DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration,employment_tribunals,ethos_repl_service,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,bulk_scan_payment_processor,pcq_consolidation_service,em_npa_app,ecm_consumer,aac_manage_case_assignment,unspec_service,divorce_frontend,wa_task_configuration_api,wa_task_monitor,ccd_case_document_am_api,hmc_cft_hearing_service,prl_citizen_frontend,prl_cos_api,et_cos,et_msg_handler,ccd_next_hearing_date_updater,et_sya_api,sptribs_case_api,civil_general_applications,fis_ds_update_web
 
     DEFAULT_CACHE_MAX_IDLE_SEC: 14400
     DEFAULT_CACHE_TTL_SEC: 30
@@ -64,13 +64,14 @@ java:
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: 'true'
     ELASTIC_SEARCH_NODES_DISCOVERY_FREQUENCY_MILLIS: '5000'
     ELASTIC_SEARCH_NODES_DISCOVERY_FILTER: '_all'
+    ENABLE_CASE_GROUP_ACCESS_FILTERING: true
 
     LOG_AND_AUDIT_CASE_ENABLED: false
 
     IDAM_S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DEFINITION_STORE_HOST: http://ccd-definition-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     USER_PROFILE_HOST: http://ccd-user-profile-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    CCD_DOCUMENT_URL_PATTERN: ^https?://(((?:api-gateway\.preprod\.dm\.reform\.hmcts\.net|dm-store-{{ .Values.global.environment }}\.service\.core-compute-{{ .Values.global.environment }}\.internal(?::\d+)?)\/documents\/[A-Za-z0-9-]+(?:\/binary)?)|(em-hrs-api-{{ .Values.global.environment }}\.service\.core-compute-{{ .Values.global.environment }}\.internal(?::\d+)?\/hearing-recordings\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\/segments\/[0-9]+))
+    CCD_DOCUMENT_URL_PATTERN: ^https?://(((?:api-gateway\.preprod\.dm\.reform\.hmcts\.net|dm-store-{{ .Values.global.environment }}\.service\.core-compute-{{ .Values.global.environment }}\.internal(?::\d+)?)\/documents\/[A-Za-z0-9-]+(?:\/binary)?)|(em-hrs-api-{{ .Values.global.environment }}\.service\.core-compute-{{ .Values.global.environment }}\.internal(?::\d+)?\/hearing-recordings\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\/((segments\/[0-9]+)|(file/\S+))))
     IDAM_API_BASE_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     IDAM_OIDC_URL: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
@@ -90,4 +91,9 @@ java:
 
     DATA_STORE_CROSS_JURISDICTIONAL_ROLES: caseworker-caa,caseworker-approver,next-hearing-date-admin
     DATA_STORE_CITIZEN_ROLES: citizen,letter-holder
-    DATA_STORE_SECURITY_LOGGING_FILTER_PATH_REGEX: '.*'
+    DATA_STORE_SECURITY_LOGGING_FILTER_PATH_REGEX: 'DISABLED'
+
+    PACT_BROKER_FULL_URL: https://pact-broker.platform.hmcts.net
+    PACT_BROKER_URL: pact-broker.platform.hmcts.net
+    PACT_BROKER_PORT: 443
+    PACT_BROKER_SCHEME: https

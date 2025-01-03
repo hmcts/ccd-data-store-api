@@ -277,7 +277,8 @@ class DefaultCreateCaseOperationTest {
                                                same(IDAM_USER),
                                                same(eventTrigger),
                                                any(CaseDetails.class),
-                                               same(IGNORE_WARNING)))
+                                               same(IGNORE_WARNING),
+                                               any()))
             .willReturn(savedCaseType);
 
         defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
@@ -306,7 +307,8 @@ class DefaultCreateCaseOperationTest {
             same(IDAM_USER),
             same(eventTrigger),
             any(CaseDetails.class),
-            same(IGNORE_WARNING)))
+            same(IGNORE_WARNING),
+            any()))
             .willReturn(savedCaseType);
 
         defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
@@ -336,7 +338,8 @@ class DefaultCreateCaseOperationTest {
             same(IDAM_USER),
             same(eventTrigger),
             any(CaseDetails.class),
-            same(IGNORE_WARNING)))
+            same(IGNORE_WARNING),
+            any()))
             .willReturn(savedCaseType);
 
         defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
@@ -366,7 +369,8 @@ class DefaultCreateCaseOperationTest {
             same(IDAM_USER),
             same(eventTrigger),
             any(CaseDetails.class),
-            same(IGNORE_WARNING)))
+            same(IGNORE_WARNING),
+            any()))
             .willReturn(savedCaseType);
         doThrow(RuntimeException.class).when(draftGateway).delete(draftId);
 
@@ -387,11 +391,12 @@ class DefaultCreateCaseOperationTest {
         given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
-                                               same(CASE_TYPE),
-                                               same(IDAM_USER),
-                                               same(eventTrigger),
-                                               any(CaseDetails.class),
-                                               same(IGNORE_WARNING)))
+            same(CASE_TYPE),
+            same(IDAM_USER),
+            same(eventTrigger),
+            any(CaseDetails.class),
+            same(IGNORE_WARNING),
+            any()))
             .willReturn(savedCaseType);
         willDoNothing().given(draftGateway).delete(DRAFT_ID);
         eventTrigger.setCallBackURLSubmittedEvent("   ");
@@ -416,11 +421,12 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
             () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                                                                 same(CASE_TYPE),
-                                                                 same(IDAM_USER),
-                                                                 same(eventTrigger),
-                                                                 caseDetailsArgumentCaptor.capture(),
-                                                                 same(IGNORE_WARNING)),
+                same(CASE_TYPE),
+                same(IDAM_USER),
+                same(eventTrigger),
+                caseDetailsArgumentCaptor.capture(),
+                same(IGNORE_WARNING),
+                any()),
             () -> order.verify(draftGateway).delete(DRAFT_ID),
             () -> verifyZeroInteractions(callbackInvoker),
             () -> assertCaseDetails(caseDetailsArgumentCaptor.getValue()),
@@ -451,7 +457,8 @@ class DefaultCreateCaseOperationTest {
                 same(IDAM_USER),
                 same(eventTrigger),
                 any(CaseDetails.class),
-                same(IGNORE_WARNING)))
+                same(IGNORE_WARNING),
+                any()))
             .willReturn(savedCaseType);
 
         defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
@@ -474,11 +481,12 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
             () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                                                                 same(CASE_TYPE),
-                                                                 same(IDAM_USER),
-                                                                 same(eventTrigger),
-                                                                 any(CaseDetails.class),
-                                                                 same(IGNORE_WARNING)),
+                same(CASE_TYPE),
+                same(IDAM_USER),
+                same(eventTrigger),
+                any(CaseDetails.class),
+                same(IGNORE_WARNING),
+                any()),
             () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setIncompleteCallbackResponse(),
@@ -513,7 +521,8 @@ class DefaultCreateCaseOperationTest {
             same(IDAM_USER),
             same(eventTrigger),
             any(CaseDetails.class),
-            same(IGNORE_WARNING)))
+            same(IGNORE_WARNING),
+            any()))
             .willReturn(savedCaseType);
 
         final CaseDetails caseDetails = defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
@@ -536,11 +545,12 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
             () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                                                                 same(CASE_TYPE),
-                                                                 same(IDAM_USER),
-                                                                 same(eventTrigger),
-                                                                 any(CaseDetails.class),
-                                                                 same(IGNORE_WARNING)),
+                same(CASE_TYPE),
+                same(IDAM_USER),
+                same(eventTrigger),
+                any(CaseDetails.class),
+                same(IGNORE_WARNING),
+                any()),
             () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
@@ -579,7 +589,8 @@ class DefaultCreateCaseOperationTest {
             same(IDAM_USER),
             same(eventTrigger),
             any(CaseDetails.class),
-            same(IGNORE_WARNING)))
+            same(IGNORE_WARNING),
+            any()))
             .willReturn(savedCaseType);
 
         final CaseDetails caseDetails = defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
@@ -605,7 +616,8 @@ class DefaultCreateCaseOperationTest {
                 same(IDAM_USER),
                 same(eventTrigger),
                 any(CaseDetails.class),
-                same(IGNORE_WARNING)),
+                same(IGNORE_WARNING),
+                any()),
             () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),

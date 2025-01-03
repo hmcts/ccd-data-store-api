@@ -133,7 +133,7 @@
           "security_classification": "PRIVATE",
           "acls": [
             {
-              "role": "[TEST-EVENT-ACCESS-ROLE]",
+              "role": "[02-TEST-EVENT-ACCESS-ROLE]",
               "create": true,
               "read": true,
               "update": false,

@@ -36,6 +36,7 @@ public class AuditCaseRemoteConfiguration {
     @Bean(name = "httpClientAudit")
     public HttpClient httpClientAudit() {
         return HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
             .build();
     }
 

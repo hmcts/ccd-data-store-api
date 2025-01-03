@@ -161,11 +161,12 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         final IdamUser idamUser = userRepository.getUser();
         caseDataIssueLogger.logAnyDataIssuesIn(null, newCaseDetails);
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
-                                                                              caseTypeDefinition,
-                                                                              idamUser,
-                                                                              caseEventDefinition,
-                                                                              newCaseDetails,
-                                                                              ignoreWarning);
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            newCaseDetails,
+            ignoreWarning,
+            getOnBehalfOfUser(caseDataContent.getOnBehalfOfId()));
 
         submittedCallback(caseEventDefinition, savedCaseDetails);
 
@@ -176,6 +177,11 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         createSupplementaryData(caseDataContent, savedCaseDetails);
 
         return savedCaseDetails;
+    }
+
+    private IdamUser getOnBehalfOfUser(String onBehalfOfId) {
+        boolean onBehalfOfIdExists = !StringUtils.isEmpty(onBehalfOfId);
+        return onBehalfOfIdExists ? userRepository.getUserByUserId(onBehalfOfId) : null;
     }
 
     private void updateCaseState(CaseEventDefinition caseEventDefinition, CaseDetails newCaseDetails) {

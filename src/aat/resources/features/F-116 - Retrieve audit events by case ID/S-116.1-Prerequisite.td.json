@@ -1,0 +1,25 @@
+{
+  "_guid_": "S-116.1-Prerequisite",
+  "_extends_": "Token_Creation_For_Case_Update",
+
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "etid": "UPDATE"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "jurisdiction": "AUTOTEST1",
+        "case_type_id": "AAT_AUTH_15",
+        "state": "TODO",
+        "case_data": "[[ANYTHING_PRESENT]]",
+        "data_classification": "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}

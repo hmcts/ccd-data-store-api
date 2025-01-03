@@ -297,3 +297,113 @@ Feature: F-108: Elasticsearch external endpoint
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then the response [contains no results],
     And the response has all other details as expected.
+
+#-- Group Access GA-14 Tests -------------------------------------------------------------------------------------------------
+  @S-948
+  Scenario: User should be able to search a case as role assignment attribute and case caseAccessGroupId both match along with matching AccessProfiles
+    Given a case that has just been created as in [GroupAccess_Full_Case_Creation_Data],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
+    And a user with [a role with security classification of PRIVATE],
+    When the request [is configured to search for the previously created case via exact match],
+    And a request is prepared with appropriate values,
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
+    Then a positive response is received,
+    And the response [contains the previously created case data],
+    And the response [does not contain fields with RESTRICTED security classification].
+
+  @S-949 @Ignore
+  Scenario: User should be able to search case as role assignment attribute and at least one of caseAccessGroupId in the case both match along with matching AccessProfiles
+    Given a user with [an active profile in CCD]
+    And the user has [Role Assignment has attribute having caseAccessGroupId set CIVIL:all-cases:123:12345]
+    And the Role Assignment has [RoleName set to 'Role1'] which [matches to an existing AccessProfiles 'caseworker-befta_master' in tab RoleToAccessProfiles in the CCD case definition file]
+    And in CCD Case Definition [AuthorisationCaseType has a UserRole 'caseworker-befta_master' for a CaseType 'FT_MasterCaseType']
+    And a case exists [with at least one caseAccessGroupId is set to CIVIL:all-cases:123:12345 in a collection of CaseAccessGroup]
+    When a request is prepared with appropriate values
+    And a request is submitted to [Search a case] operation of [CCD Data Store],
+    Then [User should be able to search the case as role assignment attribute match at least of caseAccessGroupId present in collection of CaseAccessGroup]
+
+  @S-950 @Ignore
+  Scenario: User should not be able to access case as caseAccessGroupId in not set for the case but role assignment has attribute set
+    Given a user with [an active profile in CCD]
+    And the user has [Role Assignment has attribute having caseAccessGroupId set CIVIL:all-cases:123:12345]
+    And a case exists [which does not have any caseAccessGroupId value set]
+    When a request is prepared with appropriate values
+    And a request is submitted to [Search a case] operation of [CCD Data Store],
+    Then [User should not be able to access the case as role assignment attribute has caseAccessGroupId set but case does not have any caseAccessGroupId present in collection of CaseAccessGroup]
+
+  @S-951 @Ignore
+  Scenario: User should not be able to access case as collection of CaseAccessGroup is empty for the case but role assignment has attribute set
+    Given a user with [an active profile in CCD]
+    And the user has [Role Assignment has attribute having caseAccessGroupId set CIVIL:all-cases:123:12345]
+    And a case exists[which has empty collection of CaseAccessGroup]
+    When a request is prepared with appropriate values
+    And a request is submitted to [Search a case] operation of [CCD Data Store],
+    Then [User should not be able to access the case as role assignment attribute has caseAccessGroupId set but case has empty collection of CaseAccessGroup]
+
+  @S-951 @Ignore
+  Scenario: User should not be able to access case if role assignment attribute and case caseAccessGroupId both don't match
+    Given a user with [an active profile in CCD]
+    And the user has [Role Assignment has attribute having caseAccessGroupId set CIVIL:all-cases:123:12346]
+    And a case exists [with only one caseAccessGroupId is set to CIVIL:all-cases:123:12345 in a collection of CaseAccessGroup]
+    When a request is prepared with appropriate values
+    And a request is submitted to [Search a case] operation of [CCD Data Store],
+    Then [User should not be able to access the case as role assignment attribute does match caseAccessGroupId set in collection of CaseAccessGroup]
+
+  @S-952 @Ignore
+  Scenario: User should not be able to access case if role assignment attribute and none of caseAccessGroupId in the case don't match
+    Given a user with [an active profile in CCD]
+    And the user has [Role Assignment has attribute having caseAccessGroupId set CIVIL:all-cases:123:12346]
+    And a case exists [with at least one caseAccessGroupId is set to CIVIL:all-cases:123:12345 in a collection of CaseAccessGroup]
+    When a request is prepared with appropriate values
+    And a request is submitted to [Search a case] operation of [CCD Data Store],
+    Then [User should not be able to access the case as role assignment attribute don't match any of caseAccessGroupId present in collection of CaseAccessGroup]
+
+  @S-953 @Ignore
+  Scenario: User should not be able to access case if role assignment attribute is not set but case has caseAccessGroupId value
+    Given a user with [an active profile in CCD]
+    And the user has [Role Assignment does not have any attribute set]
+    And a case exists [with only one caseAccessGroupId is set to CIVIL:all-cases:123:12345 in a collection of CaseAccessGroup]
+    When a request is prepared with appropriate values
+    And a request is submitted to [Access a case] operation of [CCD Data Store],
+    Then [User should not be able to access the case as role assignment attribute is not set but caseAccessGroupId is set for the case]
+
+  @S-954 @Ignore
+  Scenario: User should be able to access case as caseAccessGroupId in not set for the case and role assignment is also not set
+    Given a user with [an active profile in CCD]
+    And the user has [Role Assignment does not have any attribute set]
+    And a case exists [which does not have any caseAccessGroupId value set]
+    When a request is prepared with appropriate values
+    And a request is submitted to [Search a case] operation of [CCD Data Store],
+    Then [User should be able to access the case as role assignment attribute match caseAccessGroupId set in collection of CaseAccessGroup]
+
+  @S-955 @Ignore
+  Scenario: User should not be able to access case as role assignment attribute and case caseAccessGroupId both don't match
+    Given a user with [an active profile in CCD]
+    And the user has [Role Assignment has attribute having caseAccessGroupId set CIVIL:all-cases:123:12346]
+    And a case exists [with only one caseAccessGroupId is set to CIVIL:all-cases:123:12345 in a collection of CaseAccessGroup]
+    When a request is prepared with appropriate values
+    And a request is submitted to [Search a case] operation of [CCD Data Store],
+    Then [User should not be able to access the case as role assignment attribute don't match caseAccessGroupId set in collection of CaseAccessGroup]
+
+  @S-956 @Ignore
+  Scenario: User should not be able to access case as RoleName is missing in RoleToAccessProfiles
+    Given a user with [an active profile in CCD]
+    And the user has [Role Assignment has attribute having caseAccessGroupId set CIVIL:all-cases:123:12345]
+    And the Role Assignment has [RoleName set to 'Role1'] which [does not matches to an existing AccessProfiles in tab RoleToAccessProfiles in the CCD case definition file]
+    And a case exists [with only one caseAccessGroupId is set to CIVIL:all-cases:123:12345 in a collection of CaseAccessGroup which belongs to CaseType 'FT_MasterCaseType']
+    When a request is prepared with appropriate values
+    And a request is submitted to [Search a case] operation of [CCD Data Store],
+    Then [User should not be able to access the case RoleName is missing in the RoleToAccessProfiles]
+
+  @S-957 @Ignore
+  Scenario: User should not be able to access case as UserRole is missing in AuthorisationCaseType
+    Given a user with [an active profile in CCD]
+    And the user has [Role Assignment has attribute having caseAccessGroupId set CIVIL:all-cases:123:12345]
+    And the Role Assignment has [RoleName set to 'Role1'] which [matches to an existing AccessProfiles 'caseworker-befta_master' in tab RoleToAccessProfiles in the CCD case definition file]
+    And in CCD Case Definition [AuthorisationCaseType does not have  matching UserRole]
+    And a case exists [with only one caseAccessGroupId is set to CIVIL:all-cases:123:12345 in a collection of CaseAccessGroup which belongs to CaseType 'FT_MasterCaseType']
+    When a request is prepared with appropriate values
+    And a request is submitted to [Search a case] operation of [CCD Data Store],
+    Then [User should not be able to access the case UserRole is missing in the AuthorisationCaseType]
+
+#-- END Group Access Tests ---------------------------------------------------------------------------------------------

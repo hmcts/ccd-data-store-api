@@ -11,11 +11,12 @@
 
   "request": {
     "headers": {
-      "Authorization": "invalid user token"
+      "Authorization": "Bearer invalid user token"
     }
   },
 
   "expectedResponse": {
-    "_extends_": "Common_401_Response"
+    "_extends_": "Common_401_Response",
+    "body" : null
   }
 }

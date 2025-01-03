@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -48,8 +49,9 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
     public static final String CASE_ACCESS_CATEGORY = "data" + " #>> '{CaseAccessCategory}'";
 
     protected GrantTypeSqlQueryBuilder(AccessControlService accessControlService,
-                                       CaseDataAccessControl caseDataAccessControl) {
-        super(accessControlService, caseDataAccessControl);
+                                       CaseDataAccessControl caseDataAccessControl,
+                                       ApplicationParams applicationParams) {
+        super(accessControlService, caseDataAccessControl, applicationParams);
     }
 
     public String createQuery(List<RoleAssignment> roleAssignments,
@@ -70,6 +72,8 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
                     return innerQuery;
                 }
 
+                innerQuery = addOptionalInQueryForCaseGroupId(representative.getCaseAccessGroupId(),
+                    innerQuery);
                 innerQuery = addEqualsQueryForOptionalAttribute(representative.getJurisdiction(),
                     innerQuery, JURISDICTION);
                 innerQuery = addEqualsQueryForOptionalAttribute(representative.getRegion(),
@@ -99,6 +103,17 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
                 + String.format(QUERY, STATES, statesParam);
         }
         return parentQuery;
+    }
+
+    private String addOptionalInQueryForCaseGroupId(String caseAccessGroupId, String parentQuery) {
+        if (!getApplicationParams().getCaseGroupAccessFilteringEnabled()) {
+            return parentQuery;
+        }
+        if (StringUtils.isBlank(caseAccessGroupId)) {
+            return parentQuery;
+        }
+        return parentQuery + getOperator(parentQuery, AND)
+            + "data->'CaseAccessGroups' @> '[{\"value\":{\"caseAccessGroupId\": \"" + caseAccessGroupId + "\"}}]'";
     }
 
     private String addInQueryForReference(Map<String, Object> params,

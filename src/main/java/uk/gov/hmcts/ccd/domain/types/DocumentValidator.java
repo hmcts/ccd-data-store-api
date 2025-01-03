@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -31,17 +31,14 @@ public class DocumentValidator implements BaseTypeValidator {
     private static final Logger LOG = LoggerFactory.getLogger(DocumentValidator.class);
 
     private final ApplicationParams applicationParams;
-    private final TextValidator textValidator;
     private final DateTimeValidator dateTimeValidator;
     private final CaseDefinitionRepository caseDefinitionRepository;
 
     public DocumentValidator(ApplicationParams applicationParams,
-                             @Qualifier("TextValidator") TextValidator textValidator,
                              @Qualifier("DateTimeValidator") DateTimeValidator dateTimeValidator,
                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                  CaseDefinitionRepository caseDefinitionRepository) {
         this.applicationParams = applicationParams;
-        this.textValidator = textValidator;
         this.dateTimeValidator = dateTimeValidator;
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
@@ -108,7 +105,7 @@ public class DocumentValidator implements BaseTypeValidator {
 
         if (dataValue.has(UPLOAD_TIMESTAMP)) {
             final JsonNode uploadTimeStamp = dataValue.get(UPLOAD_TIMESTAMP);
-            validationResults = validateUploadTimeStamp(dataFieldId,uploadTimeStamp,caseFieldDefinition);
+            validationResults = validateUploadTimeStamp(dataFieldId, uploadTimeStamp);
             if (!validationResults.isEmpty()) {
                 return validationResults;
             }
@@ -149,38 +146,27 @@ public class DocumentValidator implements BaseTypeValidator {
             return Collections.emptyList();
         }
 
-        List<ValidationResult> validationResults =
-            textValidator.validate(dataFieldId, categoryId, caseFieldDefinition);
-        if (!validationResults.isEmpty()) {
-            return validationResult(CATEGORY_ID,validationResults);
-        }
-
-        final List<CategoryDefinition> categoryList =
-            caseDefinitionRepository.getCaseType(caseFieldDefinition.getCaseTypeId()).getCategories();
-        String categoryIdValue = categoryId.textValue();
-        final boolean caseTypeContainsKnownCategoryId = categoryList.stream()
-            .anyMatch(category ->
-                category.getCategoryId().equals(categoryIdValue));
-
-        if (!caseTypeContainsKnownCategoryId) {
-            LOG.error("{} value not recognised as a valid Case Category", CATEGORY_ID);
-            return Collections.singletonList(new ValidationResult(
-                CATEGORY_ID + " value not found", dataFieldId));
+        if (!categoryId.isTextual()) {
+            final String nodeType = categoryId.getNodeType().toString().toLowerCase();
+            return Collections.singletonList(new ValidationResult(nodeType + " is not a string : " + CATEGORY_ID,
+                    dataFieldId));
         }
         return Collections.emptyList();
     }
 
     private List<ValidationResult> validateUploadTimeStamp(final String dataFieldId,
-                                                           final JsonNode uploadTimeStamp,
-                                                           final CaseFieldDefinition caseFieldDefinition) {
+                                                           final JsonNode uploadTimeStamp) {
 
         if (isNullOrEmpty(uploadTimeStamp)) {
             LOG.debug("{}{}",UPLOAD_TIMESTAMP,NOT_TEXT_OR_NULL);
             return Collections.emptyList();
         }
 
+        CaseFieldDefinition emptyCaseFieldDefinition = new CaseFieldDefinition();
+        emptyCaseFieldDefinition.setFieldTypeDefinition(new FieldTypeDefinition());
+
         List<ValidationResult> validationResults =
-            dateTimeValidator.validate(dataFieldId, uploadTimeStamp, caseFieldDefinition);
+            dateTimeValidator.validate(dataFieldId, uploadTimeStamp, emptyCaseFieldDefinition);
         if (!validationResults.isEmpty()) {
             return validationResult(UPLOAD_TIMESTAMP,validationResults);
         }

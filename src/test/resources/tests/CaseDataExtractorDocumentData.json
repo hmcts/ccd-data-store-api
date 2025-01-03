@@ -157,5 +157,80 @@
         "document_binary_url": "http://dm-store:8080/documents/f6d623f2-db67-4a01-ae6e-3b6ee14a8b20/binary"
       }
     }
+  ],
+  "caseBundles": [
+    {
+      "id": "efc3f6bb-7e8c-4313-9433-a5e6a186f079",
+      "value": {
+        "id": "06e89056-47ff-4c36-90e5-01fbf0cf29ff",
+        "partyDetail": [
+          {
+            "id": "737ff730-90bb-4949-96e5-ac177ff71a54",
+            "value": {
+              "documents": [
+                {
+                  "id": "2c003bf7-e879-4a79-9a50-a24de3c71047",
+                  "value": {
+                    "type": {
+                      "document_url": "http://dm-store:8080//documents/1d1f4521-3ab7-4257-a887-340d021c6de8",
+                      "document_filename": "test-a5.pdf",
+                      "document_binary_url": "http://dm-store:8080//documents/1d1f4521-3ab7-4257-a887-340d021c6de8/binary"
+                    }
+                  }
+                },
+                {
+                  "id": "a2398363-51af-4ba8-bdfd-d00bee5a3560",
+                  "value": {
+                    "supportDocuments": [
+                      {
+                        "id": "20ea77f0-c588-4fb5-86fe-16984449c73b",
+                        "value": {
+                          "extra": [
+                            {
+                              "id": "263dd0f2-20fb-41aa-8b01-6f8453aa86eb",
+                              "value": {
+                                "type": {
+                                  "document_url": "http://dm-store:8080//documents/c1c12494-73f5-4c7a-a92d-afdd4e254917",
+                                  "document_filename": "test-a5-document.pdf",
+                                  "document_binary_url": "http://dm-store:8080//documents/c1c12494-73f5-4c7a-a92d-afdd4e254917/binary"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "bab28064-e781-4c49-9261-f63d56c4311b",
+            "value": {
+              "documents": [
+                {
+                  "id": "a9248472-82f2-4ccf-baa3-cee344ca1be2",
+                  "value": {
+                    "partyDocuments": [
+                      {
+                        "id": "20ea77f0-c588-4fb5-86fe-16984449c73b",
+                        "value": {
+                          "type": {
+                            "document_url": "http://dm-store:8080//documents/dd1088dc-a2e1-4e2a-bea5-53f0596a808c",
+                            "document_filename": "E_402 evidence.pdf",
+                            "document_binary_url": "http://dm-store:8080//documents/dd1088dc-a2e1-4e2a-bea5-53f0596a808c/binary"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
   ]
 }

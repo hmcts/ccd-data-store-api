@@ -278,28 +278,28 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[CAN_CREATE]",
+              "role": "[01-CAN_CREATE]",
               "create": true,
               "read": false,
               "update": false,
               "delete": false
             },
             {
-              "role": "[CAN_READ]",
+              "role": "[0-CAN_READ]",
               "create": false,
               "read": true,
               "update": false,
               "delete": false
             },
             {
-              "role": "[CAN_UPDATE]",
+              "role": "[01-CAN_UPDATE]",
               "create": false,
               "read": false,
               "update": true,
               "delete": false
             },
             {
-              "role": "[CAN_DELETE]",
+              "role": "[01-CAN_DELETE]",
               "create": false,
               "read": false,
               "update": false,

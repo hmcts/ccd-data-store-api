@@ -111,4 +111,4 @@ INSERT INTO case_event (
 
 
 insert into case_users (case_data_id, user_id, case_role)
-values (1, 123, '[TEST-EVENT-ACCESS-ROLE]');
+values (1, 123, '[02-TEST-EVENT-ACCESS-ROLE]');
