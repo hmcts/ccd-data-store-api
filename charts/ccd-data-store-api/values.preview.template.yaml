@@ -97,6 +97,7 @@ ccd:
         ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master"
         DEFINITION_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         DEFINITION_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+        DEFINITION_STORE_DB_OPTIONS: ""
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
       secrets:
           DEFINITION_STORE_DB_PASSWORD:
@@ -113,6 +114,7 @@ ccd:
         USER_PROFILE_DB_HOST: "{{ .Release.Name }}-postgresql"
         USER_PROFILE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         USER_PROFILE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+        USER_PROFILE_DB_OPTIONS: ""
       secrets:
         USER_PROFILE_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
@@ -126,6 +128,7 @@ ccd:
         ROLE_ASSIGNMENT_DB_HOST: "{{ .Release.Name }}-postgresql"
         ROLE_ASSIGNMENT_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         ROLE_ASSIGNMENT_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+        ROLE_ASSIGNMENT_DB_OPTIONS: ""
       secrets:
         ROLE_ASSIGNMENT_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
