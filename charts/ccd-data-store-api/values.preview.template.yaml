@@ -85,10 +85,7 @@ ccd:
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master"
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
-      keyVaults:
-        ccd:
-          secrets:
-            - ccd-definition-s2s-secret
+      keyVaults: []
 
   ccd-user-profile-api:
     java:
@@ -100,10 +97,7 @@ ccd:
   am-role-assignment-service:
     java:
       ingressHost: am-role-assignment-service-${SERVICE_FQDN}
-      keyVaults: 
-        am:
-          secrets:
-            - role-assignment-service-LD-SDK-KEY
+      keyVaults: []
 
 elastic:
   enabled: true
