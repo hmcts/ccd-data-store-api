@@ -23,8 +23,8 @@ java:
     AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "2dcb834e-768e-4429-9050-ab15af959995"
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
     DATA_STORE_DB_NAME: data-store
-    DATA_STORE_DB_USERNAME: hmcts
-    DATA_STORE_DB_PASSWORD: hmcts
+    DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
     DATA_STORE_DB_MAX_POOL_SIZE: 10
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
@@ -40,7 +40,15 @@ java:
     LOG_CALLBACK_DETAILS:
     DEFAULT_CACHE_TTL_SEC: 1
   postgresql:
-    enabled: false
+    enabled: true
+    primary:
+      initdb:
+        scripts:
+          init.sql: |
+            CREATE DATABASE "data-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "definition-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role_assignment" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
 ccd:
   enabled: true
@@ -60,6 +68,8 @@ ccd:
     ras:
       enabled: true
     elastic:
+      enabled: false
+    postgresql:
       enabled: false
 
   ingressHost: ${SERVICE_FQDN}
@@ -85,6 +95,8 @@ ccd:
         DEFINITION_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master"
+        DEFINITION_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+        DEFINITION_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
       secrets:
           DEFINITION_STORE_DB_PASSWORD:
@@ -99,6 +111,8 @@ ccd:
       imagePullPolicy: Always
       environment:
         USER_PROFILE_DB_HOST: "{{ .Release.Name }}-postgresql"
+        USER_PROFILE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+        USER_PROFILE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
       secrets:
         USER_PROFILE_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
@@ -110,6 +124,8 @@ ccd:
       ingressHost: am-role-assignment-service-${SERVICE_FQDN}
       environment:
         ROLE_ASSIGNMENT_DB_HOST: "{{ .Release.Name }}-postgresql"
+        ROLE_ASSIGNMENT_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+        ROLE_ASSIGNMENT_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
       secrets:
         ROLE_ASSIGNMENT_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
@@ -180,8 +196,8 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
-          jdbc_user => "hmcts"
-          jdbc_password => "hmcts"
+          jdbc_user => "javapostgres"
+          jdbc_password => "javapassword"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
