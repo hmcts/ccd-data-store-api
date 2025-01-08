@@ -200,7 +200,7 @@ public class CaseAssignedUserRolesController {
      *             instead: were query params have been moved into the request payload, to avoid hitting
      *             `414 URI Too Long` issues, see <a href="https://tools.hmcts.net/jira/browse/CCD-3588">CCD-3588</a>.
      */
-    @Deprecated(forRemoval = true)
+
     @GetMapping(
         path = "/case-users"
     )
