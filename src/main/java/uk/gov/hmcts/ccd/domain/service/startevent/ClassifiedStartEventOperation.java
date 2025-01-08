@@ -108,27 +108,32 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
             if (caseDetails.getSecurityClassification() == SecurityClassification.RESTRICTED) {
                 jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 1]",
                     caseDetails);
+                jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 2]",
+                    caseDetails.hashCode());
                 Optional<CaseDetails> caseDetails1 = classificationService
                     .applyClassificationToRestrictedCase(caseDetails);
                 if (caseDetails1.isPresent()) {
-                    jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 2]",
-                        caseDetails1.get());
                     jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 3]",
-                        caseDetails1.get().hashCode());
+                        caseDetails1.get());
                     jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 4]",
+                        caseDetails1.get().hashCode());
+                    jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 5]",
                         caseDetails1.get().getSecurityClassification());
                 }
                 startEventResult.setCaseDetails(caseDetails1
                     .orElseThrow(() -> new CaseNotFoundException(caseReference)));
             } else {
-                jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 1]", caseDetails);
+                jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 1]",
+                    caseDetails);
+                jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 2]",
+                    caseDetails.hashCode());
                 Optional<CaseDetails> caseDetails1 = classificationService.applyClassification(caseDetails);
                 if (caseDetails1.isPresent()) {
-                    jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 2]",
-                        caseDetails1.get());
                     jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 3]",
-                        caseDetails1.get().hashCode());
+                        caseDetails1.get());
                     jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 4]",
+                        caseDetails1.get().hashCode());
+                    jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 5]",
                         caseDetails1.get().getSecurityClassification());
                 }
                 startEventResult.setCaseDetails(caseDetails1
