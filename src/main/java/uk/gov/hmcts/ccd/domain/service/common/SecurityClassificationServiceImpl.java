@@ -79,19 +79,19 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
-        jcLogger.jclog("applyClassification (NORMAL case)", caseDetails);
-        jcLogger.jclog("applyClassification (NORMAL case)", caseDetails.getSecurityClassification());
+        jcLogger.jclog("applyClassification [NORMAL case 1]", caseDetails);
+        jcLogger.jclog("applyClassification [NORMAL case 2]", caseDetails.getSecurityClassification());
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         Optional<CaseDetails> caseDetails1 = userClassificationOpt
             .flatMap(securityClassification ->
                 Optional.of(caseDetails).filter(caseHasClassificationEqualOrLowerThan(securityClassification))
                     .map(mapFunction(caseDetails, securityClassification)));
-        jcLogger.jclog("applyClassification (NORMAL case)", caseDetails1);
+        jcLogger.jclog("applyClassification [NORMAL case 3]", caseDetails1);
         try {
-            jcLogger.jclog("applyClassification (NORMAL case)" + (caseDetails1.isPresent()
+            jcLogger.jclog("applyClassification [NORMAL case 4]" + (caseDetails1.isPresent()
                 ? caseDetails1.get().getSecurityClassification().toString() : "NOT PRESENT"));
         } catch (Exception e) {
-            jcLogger.jclog("applyClassification (NORMAL case) ERROR GETTING SECURITY CLASSIFICATION");
+            jcLogger.jclog("applyClassification [NORMAL case 5] ERROR GETTING SECURITY CLASSIFICATION");
         }
         return caseDetails1;
     }
@@ -116,19 +116,19 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     public Optional<CaseDetails> applyClassificationToRestrictedCase(CaseDetails caseDetails) {
-        jcLogger.jclog("applyClassification (RESTRICTED case)", caseDetails);
-        jcLogger.jclog("applyClassification (RESTRICTED case)", caseDetails.getSecurityClassification());
+        jcLogger.jclog("applyClassification [RESTRICTED case 1]", caseDetails);
+        jcLogger.jclog("applyClassification [RESTRICTED case 2]", caseDetails.getSecurityClassification());
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, false);
         Optional<CaseDetails> caseDetails1 = userClassificationOpt
             .flatMap(securityClassification ->
                 Optional.of(caseDetails)
                     .map(mapFunction(caseDetails, securityClassification)));
-        jcLogger.jclog("applyClassification (RESTRICTED case)", caseDetails1);
+        jcLogger.jclog("applyClassification [RESTRICTED case 3]", caseDetails1);
         try {
-            jcLogger.jclog("applyClassification (RESTRICTED case)" + (caseDetails1.isPresent()
+            jcLogger.jclog("applyClassification [RESTRICTED case 4]" + (caseDetails1.isPresent()
                 ? caseDetails1.get().getSecurityClassification().toString() : "NOT PRESENT"));
         } catch (Exception e) {
-            jcLogger.jclog("applyClassification (RESTRICTED case) ERROR GETTING SECURITY CLASSIFICATION");
+            jcLogger.jclog("applyClassification [RESTRICTED case 5] ERROR GETTING SECURITY CLASSIFICATION");
         }
         return caseDetails1;
     }
