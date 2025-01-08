@@ -57,25 +57,7 @@
       "metadataFields": "[[ANYTHING_PRESENT]]",
       "state": "[[ANYTHING_PRESENT]]",
       "triggers": "[[ANYTHING_PRESENT]]",
-      "events": [
-        {
-          "id": "[[ANYTHING_PRESENT]]",
-          "timestamp": "[[ANYTHING_PRESENT]]",
-          "summary": "",
-          "comment": "",
-          "event_id": "CREATE",
-          "event_name": "Create a new case",
-          "user_id": "[[ANYTHING_PRESENT]]",
-          "user_last_name": "[[ANYTHING_PRESENT]]",
-          "user_first_name": "[[ANYTHING_PRESENT]]",
-          "state_name": "To do",
-          "state_id": "TODO",
-          "significant_item": null,
-          "proxied_by" : null,
-          "proxied_by_last_name" : null,
-          "proxied_by_first_name" : null
-        }
-      ]
+      "events": []
     }
   }
 }
