@@ -30,6 +30,10 @@ public class JcLogger {
         LOG.info("| JCDEBUG: {}: {}", classname, message);
     }
 
+    public void jclog(String message, int i) {
+        jclog(message + ": " + i);
+    }
+
     public void jclog(String message, Optional optional) {
         try {
             jclog(message + ": " + objectMapper.writeValueAsString(optional));

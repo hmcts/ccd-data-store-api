@@ -58,7 +58,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     @Override
     public StartEventResult triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
-        jcLogger.jclog("triggerStartForCase() [ENTRYPOINT , built 6-Jan-2025]");
+        jcLogger.jclog("triggerStartForCase() [ENTRYPOINT , built 08-Jan-2025]");
         jcLogger.jclog("triggerStartForCase() [caseReference = " + caseReference + " , eventId = " + eventId + "]");
         StartEventResult startEventResult = startEventOperation.triggerStartForCase(caseReference, eventId,
                                                                                     ignoreWarning);
@@ -114,6 +114,8 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
                     jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 2]",
                         caseDetails1.get());
                     jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 3]",
+                        caseDetails1.get().hashCode());
+                    jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE RESTRICTED CASE 4]",
                         caseDetails1.get().getSecurityClassification());
                 }
                 startEventResult.setCaseDetails(caseDetails1
@@ -125,6 +127,8 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
                     jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 2]",
                         caseDetails1.get());
                     jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 3]",
+                        caseDetails1.get().hashCode());
+                    jcLogger.jclog("applyClassificationIfCaseDetailsExist() [HANDLE NORMAL CASE 4]",
                         caseDetails1.get().getSecurityClassification());
                 }
                 startEventResult.setCaseDetails(caseDetails1
