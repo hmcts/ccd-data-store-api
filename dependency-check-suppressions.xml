@@ -1,19 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?><suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-  <suppress>
-    <notes>Temporary Suppression
-        CVE-2019-10086 refer [Ticket]
-        CVE-2023-2976 refer [Ticket]
-        CVE-2020-8908 refer [Ticket]
-        CVE-2023-6378 refer [Ticket]
-        CVE-2024-45772 refer [Ticket]
-        CVE-2023-3635 refer [Ticket]
-        CVE-2024-38820 refer [Ticket]</notes>
-    <cve>CVE-2019-10086</cve>
-    <cve>CVE-2023-2976</cve>
-    <cve>CVE-2020-8908</cve>
-    <cve>CVE-2023-6378</cve>
-    <cve>CVE-2024-45772</cve>
-    <cve>CVE-2023-3635</cve>
-    <cve>CVE-2024-38820</cve>
-  </suppress>
 </suppressions>
