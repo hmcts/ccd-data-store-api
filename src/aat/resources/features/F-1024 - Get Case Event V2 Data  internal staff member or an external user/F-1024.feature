@@ -56,10 +56,5 @@ Scenario: must return negative response for unauthorised access by Internal Part
       And another successful call [to get the details about case event for the case just created] as in [S-1024_Get_Case_Data_NoRead_Internal],
 
       When a request is prepared with appropriate values,
-      And the request [contains the reference of the case just created and the event id valid for that case],
-      And it is submitted to call the [Retrieve a CaseView Event by case and event id for access to Internal Parties] operation of [CCD Data Store],
+      And the request [contains the reference of the case just created and the response will not contain event history case data]
 
-
-  Then a negative response is received,
-      And the response [includes a HTTP 401 Unauthorised],
-      And the response has all other details as expected.

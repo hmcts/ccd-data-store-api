@@ -5,7 +5,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "contains the reference of the case just created and the event id valid for that case",
+    "contains the reference of the case just created and the response will not contain event history case data",
     "contains a case that has just been created as in S-1024_Get_Case_Data_NoRead_Internal",
     "contains details of the case just created, along with an HTTP-200 OK",
     "contains the case view history, along with an HTTP-401 Unauthorised",

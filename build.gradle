@@ -34,6 +34,8 @@ def versions = [
 ext['spring-security.version'] = '5.7.11'
 ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.16.0'
+ext['beftaFwVersion'] = '9.2.0'
+ext['ccdTestDefinitionVersion'] = '7.25.0'
 
 configurations {
     compileClasspath {
@@ -337,8 +339,8 @@ dependencies {
     implementation 'org.jooq:jool-java-8:0.9.14'
     implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version:  '7.25.0'
-    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.0'
+    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version:  ccdTestDefinitionVersion
+    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
 
     contractTestImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     contractTestImplementation "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
