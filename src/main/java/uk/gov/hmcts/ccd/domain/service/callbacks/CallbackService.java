@@ -105,9 +105,9 @@ public class CallbackService {
         final Optional<ResponseEntity<CallbackResponse>> responseEntity =
             sendRequest(url, callbackType, CallbackResponse.class, callbackRequest);
         return responseEntity.map(re -> Optional.of(re.getBody())).orElseThrow(() -> {
-            jcLogger.jclog("sendSingleRequest() Unsuccessful callback to " + url + " for caseType "
+            jcLogger.jclog("sendSingleRequest1() Unsuccessful callback to " + url + " for caseType "
                 + caseDetails.getCaseTypeId() + " and event " + caseEvent.getId());
-            jcLogger.jclog("sendSingleRequest() CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
+            jcLogger.jclog("sendSingleRequest1() CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
             LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(),
                 caseEvent.getId());
             String callbackTypeString = callbackType != null ? callbackType.getValue() : "null";
@@ -126,9 +126,9 @@ public class CallbackService {
         final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
         final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, callbackType, clazz, callbackRequest);
         return requestEntity.orElseThrow(() -> {
-            jcLogger.jclog("sendSingleRequest() Unsuccessful callback to " + url + " for caseType "
+            jcLogger.jclog("sendSingleRequest2() Unsuccessful callback to " + url + " for caseType "
                 + caseDetails.getCaseTypeId() + " and event " + caseEvent.getId());
-            jcLogger.jclog("sendSingleRequest() CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
+            jcLogger.jclog("sendSingleRequest2() CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
             LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(),
                 caseEvent.getId());
             return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
