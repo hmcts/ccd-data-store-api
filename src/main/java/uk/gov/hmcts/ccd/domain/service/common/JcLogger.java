@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Optional;
 
 public class JcLogger {
@@ -64,5 +67,12 @@ public class JcLogger {
         } catch (JsonProcessingException e) {
             jclog(message + ": JSON ERROR: " + e.getMessage());
         }
+    }
+
+    public static String getStackTraceAsString(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        return sw.toString().replaceAll("\r\n", " ").replaceAll("\n", " ");
     }
 }

@@ -33,6 +33,7 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateReques
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalResults;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.GetLinkedCasesResponseCreator;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
@@ -74,6 +75,8 @@ public class CaseController {
     private final SupplementaryDataUpdateRequestValidator requestValidator;
     private final CaseLinkRetrievalService caseLinkRetrievalService;
     private final GetLinkedCasesResponseCreator getLinkedCasesResponseCreator;
+
+    final JcLogger jcLogger = new JcLogger("CaseController");
 
     @Autowired
     public CaseController(
@@ -133,7 +136,10 @@ public class CaseController {
         }
 
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
-            .orElseThrow(() -> new CaseNotFoundException(caseId));
+            .orElseThrow(() -> {
+                jcLogger.jclog("getCase() Case not found: " + caseId);
+                return new CaseNotFoundException(caseId);
+            });
 
         return ResponseEntity.ok(new CaseResource(caseDetails));
     }

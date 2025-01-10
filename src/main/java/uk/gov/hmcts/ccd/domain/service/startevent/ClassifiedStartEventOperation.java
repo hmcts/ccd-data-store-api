@@ -58,8 +58,9 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     @Override
     public StartEventResult triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
-        jcLogger.jclog("triggerStartForCase() [ENTRYPOINT , built 08-Jan-2025]");
+        jcLogger.jclog("triggerStartForCase() [ENTRYPOINT , built 10-Jan-2025]");
         jcLogger.jclog("triggerStartForCase() [caseReference = " + caseReference + " , eventId = " + eventId + "]");
+        jcLogger.jclog("triggerStartForCase() CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
         StartEventResult startEventResult = startEventOperation.triggerStartForCase(caseReference, eventId,
                                                                                     ignoreWarning);
         jcLogger.jclog("triggerStartForCase() startEventResult", startEventResult);
