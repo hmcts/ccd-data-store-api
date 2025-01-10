@@ -200,6 +200,10 @@ public class CaseDetails implements Cloneable {
     public void setSecurityClassification(SecurityClassification securityClassification) {
         jcLogger.jclog("setSecurityClassification() "
             + (securityClassification == null ? "NULL" : securityClassification.toString()));
+        if (securityClassification == SecurityClassification.RESTRICTED) {
+            jcLogger.jclog("setSecurityClassification() CALL STACK = "
+                + JcLogger.getStackTraceAsString(new Exception()));
+        }
         this.securityClassification = securityClassification;
     }
 
