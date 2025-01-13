@@ -47,11 +47,11 @@ class SecurityValidationServiceTest {
     }
 
     @Nested
-    @DisplayName("Validate data classification case")
+    @DisplayName("Validate security classification case")
     class ValidateDataClassificationCase {
 
         @Test
-        @DisplayName("should fail if invalid classification level for case")
+        @DisplayName("should fail if invalid security classification level for case")
         void shouldFailIfInvalidClassificationLevelForCase() {
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PRIVATE)
@@ -66,7 +66,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
+            assertThrowsSecurityClassificationValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
 
@@ -79,7 +79,6 @@ class SecurityValidationServiceTest {
                     aClassificationBuilder()
                         .buildAsMap())
                 .build();
-            final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PRIVATE)
                 .withDataClassification(
@@ -87,8 +86,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
-                defaultDataClassification);
+            securityValidationService.updateSecurityClassificationIfValid(callbackResponse, caseDetails);
 
             Assert.assertThat(caseDetails.getSecurityClassification(), is(PRIVATE));
         }
@@ -117,7 +115,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+            securityValidationService.setDataClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                 defaultDataClassification);
 
             assertAll(
@@ -237,7 +235,7 @@ class SecurityValidationServiceTest {
                 .build();
             when(authorisedGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(defaultCaseDetails));
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+            securityValidationService.setDataClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                 caseDetails.getDataClassification());
             assertAll(
                 () -> Assert.assertThat(caseDetails.getDataClassification().size(), is(2)),
@@ -364,7 +362,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+            securityValidationService.setDataClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                 defaultDataClassification);
 
             assertAll(
@@ -769,7 +767,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+            securityValidationService.setDataClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                 defaultDataClassification);
 
             assertAll(
@@ -1152,12 +1150,22 @@ class SecurityValidationServiceTest {
                                                                             CallbackResponse callbackResponse) {
         final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
         ValidationException validationException = assertThrows(ValidationException.class,
-            () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
+            () -> securityValidationService.setDataClassificationFromCallbackIfValid(callbackResponse,
                 caseDetails,
                 defaultDataClassification));
         assertEquals("The event cannot be complete due to a callback returned data validation error (c)",
             validationException.getMessage());
     }
+
+    private void assertThrowsSecurityClassificationValidationDueToClassificationException(CaseDetails caseDetails,
+                                                                            CallbackResponse callbackResponse) {
+        ValidationException validationException = assertThrows(ValidationException.class,
+            () -> securityValidationService.updateSecurityClassificationIfValid(callbackResponse,
+                caseDetails));
+        assertEquals("The event cannot be complete due to a callback returned data validation error (c)",
+            validationException.getMessage());
+    }
+
 
     private JsonNode getTextNode(String value) {
         return JSON_NODE_FACTORY.textNode(value);
