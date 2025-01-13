@@ -35,6 +35,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
@@ -97,6 +98,8 @@ public class CreateCaseEventService {
     private final CaseDocumentTimestampService caseDocumentTimestampService;
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
+
+    final JcLogger jcLogger = new JcLogger("CreateCaseEventService");
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -203,6 +206,11 @@ public class CreateCaseEventService {
 
         final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
 
+        // Is this called in both "Mark as restricted" and "Mark as Public" scenarios ?
+        // In "Mark as restricted" scenario , it calls setSecurityClassification(RESTRICTED)
+        jcLogger.jclog("createCaseEvent() --> invokeAboutToSubmitCallback() "
+            + caseDetailsInDatabase.getSecurityClassification() + " "
+            + updatedCaseDetailsWithoutHashes.getSecurityClassification());
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
             caseEventDefinition,
             caseDetailsInDatabase,
@@ -210,6 +218,9 @@ public class CreateCaseEventService {
             caseTypeDefinition,
             content.getIgnoreWarning()
         );
+        jcLogger.jclog("createCaseEvent() <-- invokeAboutToSubmitCallback() "
+            + caseDetailsInDatabase.getSecurityClassification() + " "
+            + updatedCaseDetailsWithoutHashes.getSecurityClassification());
 
         final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
 
@@ -240,6 +251,11 @@ public class CreateCaseEventService {
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 
+        // Is this called in both "Mark as restricted" and "Mark as Public" scenarios ?
+        // In "Mark as restricted" scenario , it calls setSecurityClassification(RESTRICTED)
+        jcLogger.jclog("createCaseEvent() --> saveCaseDetails() "
+            + caseDetailsInDatabase.getSecurityClassification() + " "
+            + caseDetailsAfterCallbackWithoutHashes.getSecurityClassification());
         final CaseDetails savedCaseDetails = saveCaseDetails(
             caseDetailsInDatabase,
             caseDetailsAfterCallbackWithoutHashes,
@@ -247,6 +263,9 @@ public class CreateCaseEventService {
             newState,
             timeNow
         );
+        jcLogger.jclog("createCaseEvent() <-- saveCaseDetails() "
+            + caseDetailsInDatabase.getSecurityClassification() + " "
+            + caseDetailsAfterCallbackWithoutHashes.getSecurityClassification());
 
         caseLinkService.updateCaseLinks(savedCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
@@ -410,7 +429,19 @@ public class CreateCaseEventService {
         }
 
         caseDataIssueLogger.logAnyDataIssuesIn(caseDetailsBefore, caseDetails);
-        return caseDetailsRepository.set(caseDetails);
+
+        // Is this called in both "Mark as restricted" and "Mark as Public" scenarios ?
+        // In "Mark as restricted" scenario , it calls setSecurityClassification(RESTRICTED)
+        jcLogger.jclog("saveCaseDetails() --> caseDetailsRepository.set() "
+            + caseDetailsBefore.getSecurityClassification() + " "
+            + caseDetails.getSecurityClassification());
+        CaseDetails caseDetails1 = caseDetailsRepository.set(caseDetails);
+        jcLogger.jclog("saveCaseDetails() <-- caseDetailsRepository.set() "
+            + caseDetailsBefore.getSecurityClassification() + " "
+            + caseDetails.getSecurityClassification() + " "
+            + caseDetails1.getSecurityClassification());
+
+        return caseDetails1;
     }
 
     private void updateCaseState(CaseDetails caseDetails, CaseEventDefinition caseEventDefinition) {
