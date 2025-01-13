@@ -33,7 +33,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     private final CaseDataService caseDataService;
     private final DraftGateway draftGateway;
 
-    final JcLogger jcLogger = new JcLogger("ClassifiedStartEventOperation");
+    final JcLogger jcLogger = new JcLogger("ClassifiedStartEventOperation", true);
 
     public ClassifiedStartEventOperation(@Qualifier("default") StartEventOperation startEventOperation,
                                          SecurityClassificationServiceImpl classificationService,

@@ -76,7 +76,7 @@ public class CaseController {
     private final CaseLinkRetrievalService caseLinkRetrievalService;
     private final GetLinkedCasesResponseCreator getLinkedCasesResponseCreator;
 
-    final JcLogger jcLogger = new JcLogger("CaseController");
+    final JcLogger jcLogger = new JcLogger("CaseController", true);
 
     @Autowired
     public CaseController(

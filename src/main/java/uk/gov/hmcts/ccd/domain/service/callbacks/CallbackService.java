@@ -53,7 +53,7 @@ public class CallbackService {
     private final AppInsights appinsights;
     private final HttpServletRequest request;
 
-    final JcLogger jcLogger = new JcLogger("CallbackService");
+    final JcLogger jcLogger = new JcLogger("CallbackService", true);
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,

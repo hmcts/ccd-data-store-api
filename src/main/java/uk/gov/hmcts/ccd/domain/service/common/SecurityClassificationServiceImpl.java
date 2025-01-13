@@ -46,7 +46,8 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     private final CaseDataAccessControl caseDataAccessControl;
     private final CaseDefinitionRepository caseDefinitionRepository;
 
-    final JcLogger jcLogger = new JcLogger("SecurityClassificationServiceImpl");
+    // JcLogger disabled to 'quieten' overall logging.
+    final JcLogger jcLogger = new JcLogger("SecurityClassificationServiceImpl", false);
 
     @Autowired
     public SecurityClassificationServiceImpl(CaseDataAccessControl caseDataAccessControl,

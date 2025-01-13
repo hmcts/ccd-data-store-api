@@ -99,7 +99,7 @@ public class CreateCaseEventService {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
 
-    final JcLogger jcLogger = new JcLogger("CreateCaseEventService");
+    final JcLogger jcLogger = new JcLogger("CreateCaseEventService", true);
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,

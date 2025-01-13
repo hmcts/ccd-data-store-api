@@ -20,17 +20,22 @@ public class JcLogger {
 
     private final String classname;
 
+    private final boolean enabled;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JcLogger(final String classname) {
+    public JcLogger(final String classname, final boolean enabled) {
         this.classname = classname;
+        this.enabled = enabled;
         // Enables serialisation of java.util.Optional and java.time.LocalDateTime
         objectMapper.registerModule(new Jdk8Module());
         objectMapper.registerModule(new JavaTimeModule());
     }
 
     public void jclog(String message) {
-        LOG.info("| JCDEBUG: {}: {}", classname, message);
+        if (enabled) {
+            LOG.info("| JCDEBUG: {}: {}", classname, message);
+        }
     }
 
     public void jclog(String message, int i) {
@@ -73,6 +78,7 @@ public class JcLogger {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         throwable.printStackTrace(pw);
-        return sw.toString().replaceAll("\r\n", " ").replaceAll("\n", " ");
+        String stackTrace = sw.toString().replaceAll("\r\n", " ").replaceAll("\n", " ");
+        return stackTrace.hashCode() + " " + stackTrace;
     }
 }
