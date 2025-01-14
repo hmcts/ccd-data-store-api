@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1024_Get_Case_Data_Read_Internal",
+  "_guid_": "S-1024_Get_Case_Data_NoRead_Internal",
   "title": "to get the details about case event for the case just created",
 
   "productName": "CCD Data Store",
@@ -24,7 +24,7 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Case_Data_Extension_Read_Internal][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Case_Data_Extension_NoRead_Internal][testData][actualResponse][body][id]}"
     }
   },
 
@@ -44,8 +44,8 @@
       "case_id": "[[ANYTHING_PRESENT]]",
       "case_type": {
         "id": "BEFTA_CASETYPE_NO_READ",
-        "name": "BEFTA Case Type 1 1",
-        "description": "Create a case of type BEFTA_CASETYPE_1_1",
+        "name": "BEFTA Case Type No Read",
+        "description": "Create a case of type BEFTA_CASETYPE_NO_READ",
         "jurisdiction": {
           "id": "BEFTA_JURISDICTION_1",
           "name": "BEFTA_JURISDICTION_1",
@@ -57,25 +57,7 @@
       "metadataFields": "[[ANYTHING_PRESENT]]",
       "state": "[[ANYTHING_PRESENT]]",
       "triggers": "[[ANYTHING_PRESENT]]",
-      "events": [
-        {
-          "id": "[[ANYTHING_PRESENT]]",
-          "timestamp": "[[ANYTHING_PRESENT]]",
-          "summary": "",
-          "comment": "",
-          "event_id": "CREATE",
-          "event_name": "Create a new case",
-          "user_id": "[[ANYTHING_PRESENT]]",
-          "user_last_name": "[[ANYTHING_PRESENT]]",
-          "user_first_name": "[[ANYTHING_PRESENT]]",
-          "state_name": "To do",
-          "state_id": "TODO",
-          "significant_item": null,
-          "proxied_by" : null,
-          "proxied_by_last_name" : null,
-          "proxied_by_first_name" : null
-        }
-      ]
+      "events": []
     }
   }
 }
