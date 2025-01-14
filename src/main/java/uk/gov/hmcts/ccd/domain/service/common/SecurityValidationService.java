@@ -38,32 +38,33 @@ public class SecurityValidationService {
         this.authorisedGetCaseOperation = authorisedGetCaseOperation;
     }
 
-    public void setClassificationFromCallbackIfValid(final CallbackResponse callbackResponse,
-                                                     final CaseDetails caseDetails,
-                                                     final Map<String, JsonNode> deducedDataClassification) {
+    public void setDataClassificationFromCallbackIfValid(final CallbackResponse callbackResponse,
+                                                         final CaseDetails caseDetails,
+                                                         final Map<String, JsonNode> deducedDataClassification) {
+        try {
+            validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
+                JacksonUtils.convertValueJsonNode(deducedDataClassification));
+        } catch (ValidationException deducedDataClassificationException) {
+            final Optional<CaseDetails> authorisedCaseDetails;
+            try {
+                authorisedCaseDetails = authorisedGetCaseOperation.execute(caseDetails.getReferenceAsString());
+            } catch (Exception authorisedDataClassificationException) {
+                throw new ValidationException(VALIDATION_ERR_MSG);
+            }
+            if (authorisedCaseDetails.isEmpty()) {
+                throw new ValidationException(VALIDATION_ERR_MSG);
+            } else {
+                validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
+                    JacksonUtils.convertValueJsonNode(authorisedCaseDetails.get().getDataClassification()));
+            }
+        }
 
+        caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
+    }
+
+    public void updateSecurityClassificationIfValid(CallbackResponse callbackResponse, CaseDetails caseDetails) {
         if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
-
-            try {
-                validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
-                    JacksonUtils.convertValueJsonNode(deducedDataClassification));
-            } catch (ValidationException deducedDataClassificationException) {
-                final Optional<CaseDetails> authorisedCaseDetails;
-                try {
-                    authorisedCaseDetails = authorisedGetCaseOperation.execute(caseDetails.getReferenceAsString());
-                } catch (Exception authorisedDataClassificationException) {
-                    throw new ValidationException(VALIDATION_ERR_MSG);
-                }
-                if (authorisedCaseDetails.isEmpty()) {
-                    throw new ValidationException(VALIDATION_ERR_MSG);
-                } else {
-                    validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
-                        JacksonUtils.convertValueJsonNode(authorisedCaseDetails.get().getDataClassification()));
-                }
-            }
-
-            caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
         } else {
             LOG.warn("CallbackCaseClassification={} has lower classification than caseClassification={} for "
                     + "caseReference={}, jurisdiction={} and caseType={}",

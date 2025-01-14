@@ -536,7 +536,7 @@ class CallbackInvokerTest {
                         caseDetails.getData(),
                         caseDetails.getDataClassification()),
                     () -> inOrder.verify(securityValidationService, never())
-                        .setClassificationFromCallbackIfValid(any(),
+                        .setDataClassificationFromCallbackIfValid(any(),
                             any(),
                             any())
                 );
@@ -562,7 +562,7 @@ class CallbackInvokerTest {
                         any(),
                         any()),
                     () -> inOrder.verify(securityValidationService, never())
-                        .setClassificationFromCallbackIfValid(any(),
+                        .setDataClassificationFromCallbackIfValid(any(),
                             any(),
                             any())
                 );
@@ -601,7 +601,7 @@ class CallbackInvokerTest {
                         any(),
                         any()),
                     () -> inOrder.verify(securityValidationService, never())
-                        .setClassificationFromCallbackIfValid(any(),
+                        .setDataClassificationFromCallbackIfValid(any(),
                             any(),
                             any())
                 );
@@ -664,7 +664,7 @@ class CallbackInvokerTest {
                             eq(caseDetails.getData()),
                             eq(currentDataClassification)),
                     () -> inOrder.verify(securityValidationService, never())
-                        .setClassificationFromCallbackIfValid(any(),
+                        .setDataClassificationFromCallbackIfValid(any(),
                             any(),
                             any())
                 );
@@ -689,7 +689,10 @@ class CallbackInvokerTest {
                             eq(caseDetails.getData()),
                             eq(currentDataClassification)),
                     () -> inOrder.verify(securityValidationService, never())
-                        .setClassificationFromCallbackIfValid(any(),
+                        .updateSecurityClassificationIfValid(any(),
+                            any()),
+                    () -> inOrder.verify(securityValidationService, times(1))
+                        .setDataClassificationFromCallbackIfValid(any(),
                             any(),
                             any()),
                     () -> assertEquals(callbackResponse.getState(), "ngitb")
@@ -721,10 +724,13 @@ class CallbackInvokerTest {
                             eq(caseDetails.getData()),
                             eq(currentDataClassification)),
                     () -> inOrder.verify(securityValidationService, never())
-                        .setClassificationFromCallbackIfValid(any(),
+                        .updateSecurityClassificationIfValid(any(),
+                            any()),
+                    () -> inOrder.verify(securityValidationService, times(1))
+                        .setDataClassificationFromCallbackIfValid(any(),
                             any(),
                             any()),
-                    () -> assertEquals(callbackResponse.getState(), null)
+                    () -> assertNull(callbackResponse.getState())
                 );
             }
 
@@ -749,7 +755,7 @@ class CallbackInvokerTest {
                         .getDefaultSecurityClassifications(eq(caseTypeDefinition),
                             eq(caseDetails.getData()),
                             argumentDataClassification.capture()),
-                    () -> inOrder.verify(securityValidationService).setClassificationFromCallbackIfValid(eq(
+                    () -> inOrder.verify(securityValidationService).setDataClassificationFromCallbackIfValid(eq(
                         callbackResponse), eq(caseDetails), eq(allFieldsDataClassification)),
                     () -> assertThat(argumentDataClassification.getAllValues(),
                         contains(currentDataClassification, Maps.newHashMap())),
@@ -774,7 +780,7 @@ class CallbackInvokerTest {
                         .getDefaultSecurityClassifications(eq(caseTypeDefinition),
                             eq(caseDetails.getData()),
                             argumentDataClassification.capture()),
-                    () -> inOrder.verify(securityValidationService).setClassificationFromCallbackIfValid(
+                    () -> inOrder.verify(securityValidationService).setDataClassificationFromCallbackIfValid(
                         callbackResponse,
                         caseDetails,
                         allFieldsDataClassification),
@@ -808,7 +814,7 @@ class CallbackInvokerTest {
                         any(),
                         any()),
                     () -> inOrder.verify(securityValidationService, never())
-                        .setClassificationFromCallbackIfValid(any(),
+                        .setDataClassificationFromCallbackIfValid(any(),
                             any(),
                             any())
                 );
@@ -855,7 +861,7 @@ class CallbackInvokerTest {
                         caseDetails.getData(),
                         caseDetails.getDataClassification()),
                     () -> inOrder.verify(securityValidationService, never())
-                        .setClassificationFromCallbackIfValid(any(), any(), any())
+                        .setDataClassificationFromCallbackIfValid(any(), any(), any())
                 );
             }
 
@@ -882,7 +888,7 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
                     () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(),
                         any()),
-                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(
+                    () -> inOrder.verify(securityValidationService, never()).setDataClassificationFromCallbackIfValid(
                         any(), any(), any())
                 );
             }
@@ -919,7 +925,7 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
                     () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(),
                         any()),
-                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(
+                    () -> inOrder.verify(securityValidationService, never()).setDataClassificationFromCallbackIfValid(
                         any(), any(), any())
                 );
             }
