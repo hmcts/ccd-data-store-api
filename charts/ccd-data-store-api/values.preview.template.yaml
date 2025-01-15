@@ -128,7 +128,7 @@ ccd:
         ROLE_ASSIGNMENT_DB_HOST: "{{ .Release.Name }}-postgresql"
         ROLE_ASSIGNMENT_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         ROLE_ASSIGNMENT_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
-        ROLE_ASSIGNMENT_DB_OPTIONS: ""
+        ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
       secrets:
         ROLE_ASSIGNMENT_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
