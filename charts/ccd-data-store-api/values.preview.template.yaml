@@ -89,8 +89,10 @@ ccd:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
-      devmemoryRequests: "1024Mi"
-      devmemoryLimits: "2048Mi"
+      devmemoryRequests: 2048Mi
+      devcpuRequests: 2000m
+      devmemoryLimits: 4096Mi
+      devcpuLimits: 4000m
       environment:
         DEFINITION_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
         ELASTIC_SEARCH_ENABLED: true
@@ -134,6 +136,10 @@ ccd:
           secretRef: "{{ .Values.global.postgresSecret }}"
           key: PASSWORD
           disabled: true
+      devmemoryRequests: 1024Mi
+      devcpuRequests: 250m
+      devmemoryLimits: 2048Mi
+      devcpuLimits: 1500m
 
 elastic:
   enabled: true
