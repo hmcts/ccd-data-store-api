@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.caseHasClassificationEqualOrLowerThan;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getSecurityClassification;
 
@@ -36,6 +35,12 @@ public class SecurityValidationService {
     public SecurityValidationService(
         @Qualifier("authorised") final AuthorisedGetCaseOperation authorisedGetCaseOperation) {
         this.authorisedGetCaseOperation = authorisedGetCaseOperation;
+    }
+
+    public void updateSecurityClassificationIfValid(CallbackResponse callbackResponse, CaseDetails caseDetails) {
+        if (callbackResponse.getSecurityClassification() != null) {
+            caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
+        }
     }
 
     public void setDataClassificationFromCallbackIfValid(final CallbackResponse callbackResponse,
@@ -60,21 +65,6 @@ public class SecurityValidationService {
         }
 
         caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
-    }
-
-    public void updateSecurityClassificationIfValid(CallbackResponse callbackResponse, CaseDetails caseDetails) {
-        if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
-            caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
-        } else {
-            LOG.warn("CallbackCaseClassification={} has lower classification than caseClassification={} for "
-                    + "caseReference={}, jurisdiction={} and caseType={}",
-                callbackResponse.getSecurityClassification(),
-                caseDetails.getSecurityClassification(),
-                caseDetails.getReference(),
-                caseDetails.getJurisdiction(),
-                caseDetails.getCaseTypeId());
-            throw new ValidationException(VALIDATION_ERR_MSG);
-        }
     }
 
     private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
