@@ -7,10 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.clients.PocApiClient;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 
 @Service
 @Slf4j
@@ -18,11 +21,17 @@ public class POCCaseDetailsRepository implements CaseDetailsRepository {
 
     private final ApplicationParams applicationParams;
     private final PocApiClient pocApiClient;
+    private final SecurityUtils securityUtils;
+    private final RoleAssignmentService roleAssignmentService;
 
     public POCCaseDetailsRepository(final ApplicationParams applicationParams,
-                                    final PocApiClient pocApiClient) {
+                                    final PocApiClient pocApiClient,
+                                    final SecurityUtils securityUtils,
+                                    final RoleAssignmentService roleAssignmentService) {
         this.applicationParams = applicationParams;
         this.pocApiClient = pocApiClient;
+        this.securityUtils = securityUtils;
+        this.roleAssignmentService = roleAssignmentService;
     }
 
     @Override
@@ -71,7 +80,8 @@ public class POCCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     private CaseDetails getCaseDetails(String reference) {
-        CaseDetails caseDetails = pocApiClient.getCase(reference);
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+        CaseDetails caseDetails = pocApiClient.getCase(reference, roleAssignments);
         log.info("case Id {}", caseDetails.getId());
         log.info("case reference {}", caseDetails.getReference());
         if (Optional.ofNullable(caseDetails).isPresent()) {

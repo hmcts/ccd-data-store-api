@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import uk.gov.hmcts.ccd.customheaders.UserAuthHeadersInterceptorConfig;
 import uk.gov.hmcts.ccd.domain.model.aggregated.POCCaseEvent;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
@@ -16,12 +17,12 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 public interface PocApiClient {
 
     @GetMapping(value = "/ccd/cases/{case-ref}")
-    CaseDetails getCase(@PathVariable("case-ref") String caseRef);
+    CaseDetails getCase(@PathVariable("case-ref") String caseRef, RoleAssignments roleAssignments);
 
     @PostMapping(value = "/ccd/cases", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    CaseDetails createEvent(@RequestBody POCCaseEvent caseEvent);
+    CaseDetails createEvent(@RequestBody POCCaseEvent caseEvent, RoleAssignments roleAssignments);
 
     @GetMapping(value = "/ccd/cases/{case-ref}/history")
-    List<AuditEvent> getEvents(@PathVariable("case-ref") String caseReference);
+    List<AuditEvent> getEvents(@PathVariable("case-ref") String caseReference, RoleAssignments roleAssignments);
 }
