@@ -215,7 +215,7 @@ public class TimeToLiveService {
     }
 
     private TTL getTTLFromJson(JsonNode ttlJsonNode) {
-        if (ttlJsonNode == null) {
+        if (isEmptyNode(ttlJsonNode)) {
             ttlJsonNode = objectMapper.getNodeFactory().nullNode();
         }
         try {
@@ -223,6 +223,10 @@ public class TimeToLiveService {
         } catch (JsonProcessingException e) {
             throw new ValidationException(FAILED_TO_READ_TTL_FROM_CASE_DATA);
         }
+    }
+
+    private boolean isEmptyNode(JsonNode ttlJsonNode) {
+        return ttlJsonNode == null || ttlJsonNode.isNull() || ttlJsonNode.isEmpty();
     }
 
     private Map<String, JsonNode> cloneOrNewJsonMap(Map<String, JsonNode> jsonMap) {
