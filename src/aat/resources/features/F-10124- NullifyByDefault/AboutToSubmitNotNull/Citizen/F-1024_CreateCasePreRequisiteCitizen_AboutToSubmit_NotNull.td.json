@@ -5,7 +5,7 @@
   "request": {
     "body": {
       "data": {
-        "_extends_": "TTL_Case_Data_NBD"
+        "_extends_": "TTL_Case_Data"
       },
       "data_classification": {
         "_extends_": "TTL_Classifications"
