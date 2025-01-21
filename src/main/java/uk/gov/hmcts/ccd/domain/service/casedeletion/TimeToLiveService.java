@@ -215,14 +215,14 @@ public class TimeToLiveService {
     }
 
     private TTL getTTLFromJson(JsonNode ttlJsonNode) {
-        if (ttlJsonNode != null) {
-            try {
-                return objectMapper.readValue(ttlJsonNode.toString(), TTL.class);
-            } catch (JsonProcessingException e) {
-                throw new ValidationException(FAILED_TO_READ_TTL_FROM_CASE_DATA);
-            }
+        if (ttlJsonNode == null) {
+            ttlJsonNode = objectMapper.getNodeFactory().nullNode();
         }
-        return null;
+        try {
+            return objectMapper.readValue(ttlJsonNode.toString(), TTL.class);
+        } catch (JsonProcessingException e) {
+            throw new ValidationException(FAILED_TO_READ_TTL_FROM_CASE_DATA);
+        }
     }
 
     private Map<String, JsonNode> cloneOrNewJsonMap(Map<String, JsonNode> jsonMap) {
