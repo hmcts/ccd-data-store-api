@@ -37,7 +37,7 @@ class CachedCaseUserRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         doReturn(caseUserRoles).when(caseUserRepository).findCaseRoles(caseId, userId);
         doReturn(caseIds).when(caseUserRepository).findCasesUserIdHasAccessTo(userId);

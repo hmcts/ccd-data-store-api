@@ -14,7 +14,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
@@ -30,7 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.SearchLog;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
@@ -83,7 +84,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     @Mock
     private AuditRepository auditRepository;
 
-    @SpyBean
+    @MockitoSpyBean
     private AuditCaseRemoteOperation auditCaseRemoteOperation;
 
     @Inject
@@ -118,7 +119,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
 
     @Before
     public void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         IdamUser user = new IdamUser();
         user.setId(IDAM_ID);

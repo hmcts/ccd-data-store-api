@@ -15,11 +15,11 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseContractTest;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -55,7 +55,7 @@ import java.util.Map;
 @TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
 @IgnoreNoPactsToVerify
-public class CasesControllerProviderTest extends WireMockBaseTest {
+public class CasesControllerProviderTest extends WireMockBaseContractTest {
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
     private static final String CASEWORKER_PASSWORD = "caseworkerPassword";
@@ -66,58 +66,41 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @Autowired
     ContractTestSecurityUtils securityUtils;
-
-    @MockBean
+    @MockitoBean
     UserAuthorisationSecurity userAuthorisationSecurity;
-
     @Autowired
     ContractTestCreateCaseOperation contractTestCreateCaseOperation;
-
     @Autowired
     ContractTestGetCaseOperation getCaseOperation;
-
     @Autowired
     ContractTestStartEventOperation startEventOperation;
-
     @Autowired
     ObjectMapper objectMapper;
-
-    @MockBean
+    @MockitoBean
     EventTokenService eventTokenServiceMock;
-
-    @MockBean
+    @MockitoBean
     DocumentSanitiser documentSanitiser;
-
     @Autowired
     ContractTestCaseDefinitionRepository contractTestCaseDefinitionRepository;
-
-    @MockBean
+    @MockitoBean
     AuthorisedCaseSearchOperation elasticsearchCaseSearchOperationMock;
-
-    @MockBean
+    @MockitoBean
     AuthorisedSearchOperation authorisedSearchOperation;
-
-    @MockBean
+    @MockitoBean
     UserAuthorisation userAuthorisation;
-
-    @MockBean
+    @MockitoBean
     AuditService auditService;
-
-    @MockBean
+    @MockitoBean
     CaseAccessService caseAccessService;
-    @MockBean
+    @MockitoBean
     AccessControlService accessControlService;
-
-    @MockBean
+    @MockitoBean
     TelemetryClient telemetryClient;
-
     @Autowired
     ContractTestCreateEventOperation createEventOperation;
-
-    @MockBean
+    @MockitoBean
     CaseDataService caseDataService;
-
-    @MockBean
+    @MockitoBean
     MessageService messageService;
 
     @TestTemplate

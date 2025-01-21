@@ -7,8 +7,8 @@ import org.hibernate.validator.constraints.Range;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 import uk.gov.hmcts.ccd.domain.model.std.validator.globalsearch.ValidSearchCriteria;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 
 @Getter

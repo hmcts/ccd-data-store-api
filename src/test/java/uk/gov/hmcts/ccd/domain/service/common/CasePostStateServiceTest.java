@@ -27,7 +27,7 @@ class CasePostStateServiceTest extends BaseStateReferenceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         casePostStateService = new CasePostStateService(new PrioritiseEnablingCondition(),
             this.casePostStateEvaluationService);

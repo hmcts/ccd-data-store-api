@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinksResource;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

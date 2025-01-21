@@ -9,10 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
@@ -41,10 +41,10 @@ public class IdamRepositoryCachingIT {
     private static final String TEST_SYS_ACCESS_TOKEN_TWO = "testSysAccessTokenTwo";
 
     // Need to Spy ApplicationParams rather than Mock it as it is used during setup of other beans
-    @SpyBean
+    @MockitoSpyBean
     private ApplicationParams applicationParams;
 
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
 
     // SpyBean and MockBean annotations mean that IdamRepository bean will automatically use

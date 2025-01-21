@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.domain.model.std.validator.globalsearch;
 
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortByCategory;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class SortByValidator implements ConstraintValidator<ValidSortBy, String> {
 
