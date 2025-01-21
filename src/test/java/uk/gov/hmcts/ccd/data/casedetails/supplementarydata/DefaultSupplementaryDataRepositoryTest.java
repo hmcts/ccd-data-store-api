@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
 import com.google.common.collect.Sets;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
