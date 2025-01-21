@@ -7,9 +7,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository;
@@ -31,7 +31,7 @@ public class CaseRoleDefinitionCachingIT {
     @Autowired
     private ApplicationParams applicationParams;
 
-    @SpyBean
+    @MockitoSpyBean
     private DefaultCaseRoleRepository caseRoleRepository;
 
     private final String caseTypeId1 = "caseTypeId1";

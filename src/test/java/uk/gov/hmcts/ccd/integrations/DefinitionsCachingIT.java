@@ -8,10 +8,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -71,7 +71,7 @@ public class DefinitionsCachingIT {
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_2 = new JurisdictionDefinition();
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_3 = new JurisdictionDefinition();
 
-    @SpyBean
+    @MockitoSpyBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;
 
     @Autowired
@@ -80,13 +80,13 @@ public class DefinitionsCachingIT {
     @Autowired
     ApplicationParams applicationParams;
 
-    @SpyBean
+    @MockitoSpyBean
     UIDefinitionRepository uiDefinitionRepository;
 
-    @SpyBean
+    @MockitoSpyBean
     private HttpUIDefinitionGateway httpUIDefinitionGateway;
 
-    @SpyBean
+    @MockitoSpyBean
     private CachedUIDefinitionGateway cachedUIDefinitionGateway;
 
     @Mock

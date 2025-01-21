@@ -14,6 +14,8 @@ import uk.gov.hmcts.ccd.infrastructure.RandomKeyGenerator;
 
 import java.util.Date;
 
+import javax.crypto.SecretKey;
+
 import com.google.common.collect.Maps;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -21,6 +23,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.impl.TextCodec;
+import io.jsonwebtoken.security.Keys;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -75,9 +79,12 @@ public class EventTokenService {
 
     public EventTokenProperties parseToken(final String token) {
         try {
+            SecretKey key = Keys.hmacShaKeyFor(tokenSecret.getBytes());
             final Claims claims = Jwts.parser()
-                .setSigningKey(TextCodec.BASE64.encode(tokenSecret))
-                .parseClaimsJws(token).getBody();
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
 
             return new EventTokenProperties(
                 claims.getSubject(),

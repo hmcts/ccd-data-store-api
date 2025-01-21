@@ -6,10 +6,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,13 +95,13 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     private RequestContextListener listener;
     private ServletContext context;
 
-    @MockBean
+    @MockitoBean
     private UserAuthorisation userAuthorisation;
 
-    @MockBean
+    @MockitoBean
     private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
 
-    @MockBean
+    @MockitoBean
     private AccessControlService accessControlService;
 
 

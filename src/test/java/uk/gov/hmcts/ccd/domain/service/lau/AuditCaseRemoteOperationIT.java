@@ -14,7 +14,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
@@ -83,7 +84,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     @Mock
     private AuditRepository auditRepository;
 
-    @SpyBean
+    @MockitoSpyBean
     private AuditCaseRemoteOperation auditCaseRemoteOperation;
 
     @Inject

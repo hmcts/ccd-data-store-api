@@ -4,8 +4,8 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
@@ -22,8 +22,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
 
 @Transactional
 public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
@@ -47,10 +47,10 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
 
     private JdbcTemplate template;
 
-    @MockBean
+    @MockitoBean
     private CaseUserAuditRepository auditRepository;
 
-    @MockBean
+    @MockitoBean
     RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     @Autowired

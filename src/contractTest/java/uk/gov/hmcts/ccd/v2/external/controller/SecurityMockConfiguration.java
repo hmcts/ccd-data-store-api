@@ -62,13 +62,13 @@ public class SecurityMockConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests().requestMatchers(
+        http.authorizeHttpRequests(ahr ->  ahr.requestMatchers(
             "/case-types/**",
             "/caseworkers/**",
             "/citizens/**",
             "/searchCases/**",
             "/cases/**"
-        ).permitAll();
+        ).permitAll());
         return http.build();
     }
 }

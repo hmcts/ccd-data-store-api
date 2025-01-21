@@ -82,7 +82,8 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
                 another action happened at the same time.
                 Please review the case and try again.""");
         } catch (PersistenceException e) {
-            if (e.getCause() instanceof ConstraintViolationException && isDuplicateReference(e)) {
+            if ((e instanceof ConstraintViolationException || e.getCause() instanceof ConstraintViolationException) 
+                    && isDuplicateReference(e)) {
                 LOG.warn("ConstraintViolationException happen for UUID={}. ConstraintName: {}",
                     caseDetails.getReference(), UNIQUE_REFERENCE_KEY_CONSTRAINT);
                 throw new ReferenceKeyUniqueConstraintException(e.getMessage());
@@ -259,7 +260,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         query.setMaxResults(limit);
     }
 
-    private boolean isDuplicateReference(PersistenceException e) {
+    private boolean isDuplicateReference(Exception e) {
+        if (e instanceof ConstraintViolationException) {
+            return ((ConstraintViolationException) e).getConstraintName().equals(UNIQUE_REFERENCE_KEY_CONSTRAINT);
+        }
         return ((ConstraintViolationException) e.getCause()).getConstraintName()
             .equals(UNIQUE_REFERENCE_KEY_CONSTRAINT);
     }
