@@ -61,7 +61,7 @@ public class SubmitCaseTransaction implements AccessControl {
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
 
-    private static final String ORGANISATION_POLICY_FIELD = "OrganisationPolicyField";
+
     private static final String ORGANISATION = "Organisation";
     private static final String ORGANISATIONID = "OrganisationID";
     private static final String ORG_POLICY_NEW_CASE = "newCase";
@@ -156,13 +156,13 @@ public class SubmitCaseTransaction implements AccessControl {
         }
 
         // Identify organizations with newCase set to true
-        List<JsonNode> organizations = getOrganizationsWithNewCaseTrue(caseDetailsAfterCallbackWithoutHashes);
+        List<JsonNode> organizations = findOrganisationPolicyNodeForNewCase(caseDetailsAfterCallbackWithoutHashes);
 
         // Update case supplementary data
         updateCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizations);
 
         // Clear newCase attributes
-        clearNewCaseAttributes(caseDetailsAfterCallbackWithoutHashes);
+        clearNewCaseAttributes(organizations);
 
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
@@ -240,32 +240,18 @@ public class SubmitCaseTransaction implements AccessControl {
         }
     }
 
-    public List<JsonNode> getOrganizationsWithNewCaseTrue(CaseDetails caseDetails) {
-        List<JsonNode> newCaseOrganizations = new ArrayList<>();
-        JsonNode orgPolicyJsonNodes = caseDetails.getData().get(ORGANISATION_POLICY_FIELD);
-
-        if (orgPolicyJsonNodes != null) {
-            if (orgPolicyJsonNodes.has(ORG_POLICY_NEW_CASE)
-                && orgPolicyJsonNodes.get(ORG_POLICY_NEW_CASE).asBoolean()) {
-                if (orgPolicyJsonNodes.has(ORGANISATION)) {
-                    newCaseOrganizations.add(orgPolicyJsonNodes.get(ORGANISATION));
-                }
-            }
-        }
-        LOG.debug("Organisation found for caseType={} version={} newCaseOrganizations={}.",
-            caseDetails.getCaseTypeId(), caseDetails.getVersion(), newCaseOrganizations);
-        return newCaseOrganizations;
-    }
-
-    public void updateCaseSupplementaryData(CaseDetails caseDetails, List<JsonNode> organizations) {
+    public void updateCaseSupplementaryData(CaseDetails caseDetails, List<JsonNode> organizationProfiles) {
         Map<String, JsonNode> supplementaryData = caseDetails.getSupplementaryData();
-        if (supplementaryData == null) {
-            supplementaryData = new HashMap<>();
-        }
 
-        for (JsonNode organization : organizations) {
+        for (JsonNode orgProfile : organizationProfiles) {
+            if (supplementaryData == null) {
+                supplementaryData = new HashMap<>();
+            }
+            String orgIdentifier = orgProfile.get(ORGANISATION)
+                .get(ORGANISATIONID).textValue();
+
             JsonNode orgNode = new ObjectMapper().createObjectNode()
-                .put(organization.get(ORGANISATIONID).textValue(), Boolean.TRUE.toString());
+                .put(orgIdentifier, Boolean.TRUE.toString());
             supplementaryData.put(SUPPLEMENTRY_DATA_NEW_CASE, orgNode);
         }
 
@@ -273,11 +259,33 @@ public class SubmitCaseTransaction implements AccessControl {
         caseDetails.setSupplementaryData(supplementaryData);
     }
 
-    public void clearNewCaseAttributes(CaseDetails caseDetails) {
-        JsonNode orgPolicyJsonNodes = caseDetails.getData().get(ORGANISATION_POLICY_FIELD);
+    public void clearNewCaseAttributes(List<JsonNode> organizationProfiles) {
 
-        if (orgPolicyJsonNodes != null) {
-            ((ObjectNode) orgPolicyJsonNodes).remove(ORG_POLICY_NEW_CASE);
+        for (JsonNode orgProfile : organizationProfiles) {
+            ((ObjectNode) orgProfile).remove(ORG_POLICY_NEW_CASE);
         }
+    }
+
+    public List<JsonNode> findOrganisationPolicyNodeForNewCase(CaseDetails caseDetails) {
+        List<JsonNode> newCaseOrganizations = new ArrayList<>();
+
+        JsonNode orgPolicyNewCaseNode = caseDetails.getData().values().stream()
+            .filter(node -> node.get(ORG_POLICY_NEW_CASE) != null
+                && node.get(ORG_POLICY_NEW_CASE).asText().equals(Boolean.TRUE.toString()))
+            .reduce((a, b) -> {
+                LOG.debug("No Organisation found for caseType={} version={} ORGANISATION={},"
+                        + "ORGANISATIONID={}, ORG_POLICY_CASE_ASSIGNED_ROLE={}.",
+                    caseDetails.getCaseTypeId(),caseDetails.getVersion(),
+                    ORGANISATION,ORGANISATIONID,ORG_POLICY_NEW_CASE);
+                return null;
+            }).orElse(null);
+
+        LOG.debug("Organisation found for  caseType={} version={} ORGANISATION={},"
+                + "ORGANISATIONID={}, ORG_POLICY_CASE_ASSIGNED_ROLE={}.",
+            caseDetails.getCaseTypeId(),caseDetails.getVersion(),
+            ORGANISATION,ORGANISATIONID,ORG_POLICY_NEW_CASE);
+
+        newCaseOrganizations =orgPolicyNewCaseNode != null ? List.of(orgPolicyNewCaseNode) : new ArrayList<>();
+        return newCaseOrganizations;
     }
 }

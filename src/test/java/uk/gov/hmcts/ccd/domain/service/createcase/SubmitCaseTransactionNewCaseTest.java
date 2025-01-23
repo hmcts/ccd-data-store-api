@@ -89,6 +89,10 @@ class SubmitCaseTransactionNewCaseTest {
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
 
+
+    private static final String ORG_POLICY_NEW_CASE = "newCase";
+    private static final String SUPPLEMENTRY_DATA_NEW_CASE = "new_case";
+
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
     @Mock
@@ -220,8 +224,9 @@ class SubmitCaseTransactionNewCaseTest {
 
         inputCaseDetails.setData(dataMap);
 
-        Map<String, JsonNode> dataOrganisation = organisationPolicyCaseDataNewCase("caseAssignedField",
-            "\"550e8400-e29b-41d4-a716-446655440000\"");
+        Map<String, JsonNode> dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField", "caseAssignedField",
+            "\"550e8400-e29b-41d4-a716-446655440000\"",true, true);
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
@@ -291,12 +296,14 @@ class SubmitCaseTransactionNewCaseTest {
 
     @Test
     @DisplayName("should create a case With Organisations for new case false")
-    void shouldPersistCreateCaseEventWithOrganisationNewCaseFalse() {
+    void shouldPersistCreateCaseEventWithOrganisationNewCaseFalse() throws JsonProcessingException {
+        Map<String, JsonNode> dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField","caseAssignedField",
+            "\"550e8400-e29b-41d4-a716-446655440000\"", true,false);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
         inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
-
-        //Map<String, JsonNode> dataCaseAccessGroup = new HashMap<>();
-        //dataCaseAccessGroup.put(CaseAccessGroups, inputCaseDetails.getData().get(CaseAccessGroups));
 
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(caseDetails, caseTypeDefinition);
@@ -307,10 +314,28 @@ class SubmitCaseTransactionNewCaseTest {
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
         doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
 
-        submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser, caseEventDefinition, inputCaseDetails,
+        CaseDetails caseDetailsWithSupplementryNewCase = submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser, caseEventDefinition, inputCaseDetails,
             IGNORE_WARNING, null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+        assertTrue(caseDetailsWithSupplementryNewCase.getSupplementaryData() == null);
+    }
+
+    @Test
+    @DisplayName("should create a case With OrganisationID, multiple organisationProfileField for new case false and true")
+    void shouldPersistCreateCaseEventWithOrganisationIDCaseMultipleOrganisationProfileFieldNewCase() throws JsonProcessingException {
+
+        organisationPolicyMultipleCaseDataNewCase(inputCaseDetails);
+
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
+        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+
+        CaseDetails caseDetailsWithSupplementryNewCase = submitCaseTransaction.submitCase(event, caseTypeDefinition,
+            idamUser, caseEventDefinition, inputCaseDetails, IGNORE_WARNING, null);
+
+        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+        assertCaseDataSupplementry(caseDetailsWithSupplementryNewCase, "\"550e8400-e29b-41d4-a716-446655440000\"");
     }
 
     @Test
@@ -346,7 +371,7 @@ class SubmitCaseTransactionNewCaseTest {
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
         doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
 
-        CaseDetails caseDetailsWithCaseAccessGroup = submitCaseTransaction.submitCase(event,
+        CaseDetails caseDetailsWithSupplementryNewCase = submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
             idamUser,
             caseEventDefinition,
@@ -355,52 +380,83 @@ class SubmitCaseTransactionNewCaseTest {
             null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-        assertCaseDataSupplementry(caseDetailsWithCaseAccessGroup, "\"550e8400-e29b-41d4-a716-446655440000\"");
+        assertCaseDataSupplementry(caseDetailsWithSupplementryNewCase, "\"550e8400-e29b-41d4-a716-446655440000\"");
 
     }
 
-    private Map<String, JsonNode> organisationPolicyCaseDataNewCase(String role, String organisationId)
+    private Map<String, JsonNode> organisationPolicyCaseDataNewCase(String orgPolicyField, String role,
+                                                                    String organisationId, boolean includeNewCase,
+                                                                    boolean newCase)
         throws JsonProcessingException {
+        JsonNode data;
+        if (includeNewCase) {
 
-        JsonNode data = MAPPER.readTree(""
-            + "{"
-            + "  \"Organisation\": {"
-            + "    \"OrganisationID\": " + organisationId + ","
-            + "    \"OrganisationName\": \"OrganisationName1\""
-            + "  },"
-            + "  \"OrgPolicyReference\": null,"
-            + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\","
-            + "  \"newCase\": \"true\""
-            + "}");
+            data = MAPPER.readTree(""
+                + "{"
+                + "  \"Organisation\": {"
+                + "    \"OrganisationID\": " + organisationId + ","
+                + "    \"OrganisationName\": \"OrganisationName1\""
+                + "  },"
+                + "  \"OrgPolicyReference\": null,"
+                + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\","
+                + "  \"newCase\": \"" + newCase + "\""
+                + "}");
+        } else {
+            data = MAPPER.readTree(""
+                + "{"
+                + "  \"Organisation\": {"
+                + "    \"OrganisationID\": " + organisationId + ","
+                + "    \"OrganisationName\": \"OrganisationName1\""
+                + "  },"
+                + "  \"OrgPolicyReference\": null,"
+                + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\""
+                + "}");
+        }
 
         Map<String, JsonNode> result = new HashMap<>();
-        result.put("OrganisationPolicyField", data);
+        result.put(orgPolicyField, data);
         return result;
     }
 
-    private Map<String, JsonNode> organisationPolicyMultipleCaseDataNewCase(String role, String organisationId)
+    private void organisationPolicyMultipleCaseDataNewCase(CaseDetails inputCaseDetails)
         throws JsonProcessingException {
 
-        JsonNode data = MAPPER.readTree(""
-            + "{"
-            + "  \"Organisation\": {"
-            + "    \"OrganisationID\": " + organisationId + ","
-            + "    \"OrganisationName\": \"OrganisationName1\""
-            + "  },"
-            + "  \"OrgPolicyReference\": null,"
-            + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\","
-            + "  \"newCase\": \"true\""
-            + "}");
+        Map<String, JsonNode> dataOrganisation = organisationPolicyCaseDataNewCase("OrganisationPolicyField","caseAssignedField",
+            "\"550e8400-e29b-41d4-a716-446655440000\"", true,true);
 
-        Map<String, JsonNode> result = new HashMap<>();
-        result.put("OrganisationPolicyField", data);
-        return result;
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+        dataOrganisation = organisationPolicyCaseDataNewCase("OrganisationPolicyField1","caseAssignedField",
+            "\"organisationA\"", true,false);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+        dataOrganisation = organisationPolicyCaseDataNewCase("OrganisationPolicyField2","caseAssignedField",
+            "\"organisationB\"", true,false);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+        dataOrganisation = organisationPolicyCaseDataNewCase("OrganisationPolicyField3","caseAssignedField",
+            "\"organisationC\"", true,true);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+
     }
 
     private void assertCaseDataSupplementry(final CaseDetails caseDetails, String organisationId) {
-        JsonNode supplementryDataJsonNode = caseDetails.getSupplementaryData().get("new_case");
-        assertAll("Assert Casedetails, Data, organisationId",
-            () -> assertTrue((supplementryDataJsonNode.toString().contains(organisationId)))
+        assertTrue(caseDetails.getSupplementaryData() != null);
+;
+        JsonNode supplementryDataJsonNode = caseDetails.getSupplementaryData().get(SUPPLEMENTRY_DATA_NEW_CASE);
+        JsonNode orgPolicyNewCaseNode = caseDetails.getData().values().stream()
+            .filter(node -> node.get(ORG_POLICY_NEW_CASE) != null)
+            .reduce((a, b) -> {
+                return null;
+            }).orElse(null);
+
+        assertAll("Assert CaseDetails, Data, organisationId",
+            () -> assertTrue((supplementryDataJsonNode.toString().contains(organisationId))),
+            () -> assertTrue( orgPolicyNewCaseNode == null)
         );
     }
 
