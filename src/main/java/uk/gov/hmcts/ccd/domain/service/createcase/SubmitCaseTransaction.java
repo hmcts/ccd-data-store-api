@@ -285,7 +285,7 @@ public class SubmitCaseTransaction implements AccessControl {
             caseDetails.getCaseTypeId(),caseDetails.getVersion(),
             ORGANISATION,ORGANISATIONID,ORG_POLICY_NEW_CASE);
 
-        newCaseOrganizations =orgPolicyNewCaseNode != null ? List.of(orgPolicyNewCaseNode) : new ArrayList<>();
+        newCaseOrganizations = orgPolicyNewCaseNode != null ? List.of(orgPolicyNewCaseNode) : new ArrayList<>();
         return newCaseOrganizations;
     }
 }
