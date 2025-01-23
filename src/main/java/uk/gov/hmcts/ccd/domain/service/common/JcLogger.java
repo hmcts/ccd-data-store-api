@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -41,6 +42,14 @@ public class JcLogger {
 
     public void jclog(String message, int i) {
         jclog(message + ": " + i);
+    }
+
+    public void jclog(String message, CaseDataContent caseDataContent) {
+        try {
+            jclog(message + ": " + objectMapper.writeValueAsString(caseDataContent));
+        } catch (JsonProcessingException e) {
+            jclog(message + ": JSON ERROR: " + e.getMessage());
+        }
     }
 
     public void jclog(String message, CallbackRequest callbackRequest) {
