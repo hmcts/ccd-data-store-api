@@ -323,8 +323,8 @@ class SubmitCaseTransactionNewCaseTest {
     }
 
     @Test
-    @DisplayName("should create a case With OrganisationID, multiple organisationProfileField for " +
-        "new case false and true")
+    @DisplayName("should create a case With OrganisationID, multiple organisationProfileField for "
+        + "new case false and true")
     void shouldPersistCreateCaseEventWithOrganisationIDCaseMultipleOrganisationProfileFieldNewCase()
         throws JsonProcessingException {
 
