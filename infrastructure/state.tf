@@ -8,7 +8,7 @@
   alias                      = "postgres_network"
   subscription_id            = var.aks_subscription_id
 }
- 
+
  terraform {
   backend "azurerm" {}
 
