@@ -63,12 +63,16 @@ public class CaseDataContent {
         return data;
     }
 
-    public void setData(Map<String, JsonNode> data) {
+    private void logData(final Map<String, JsonNode> data, final String methodName) {
         final String json = jcLogger.getObjectAsString(data);
         if (json.contains("dummy.pdf") || json.contains("JSON ERROR")) {
-            jcLogger.jclog("setData() json = " + json);
-            jcLogger.jclog("setData() CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
+            jcLogger.jclog(methodName + " json = " + json);
+            jcLogger.jclog(methodName + " CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
         }
+    }
+
+    public void setData(Map<String, JsonNode> data) {
+        logData(data, "setData()");
         this.data = data;
     }
 
@@ -77,11 +81,7 @@ public class CaseDataContent {
     }
 
     public void setEventData(Map<String, JsonNode> eventData) {
-        final String json = jcLogger.getObjectAsString(eventData);
-        if (json.contains("dummy.pdf") || json.contains("JSON ERROR")) {
-            jcLogger.jclog("setEventData() json = " + json);
-            jcLogger.jclog("setEventData() CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
-        }
+        logData(eventData, "setEventData()");
         this.eventData = eventData;
     }
 
