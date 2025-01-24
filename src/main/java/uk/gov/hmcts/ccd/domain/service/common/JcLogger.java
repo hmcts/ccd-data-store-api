@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Map;
 import java.util.Optional;
 
 public class JcLogger {
@@ -89,6 +91,15 @@ public class JcLogger {
             jclog(message + ": " + objectMapper.writeValueAsString(startEventResult));
         } catch (JsonProcessingException e) {
             jclog(message + ": JSON ERROR: " + e.getMessage());
+        }
+    }
+
+    public String getObjectAsString(final Map<String, JsonNode> value) {
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            jclog("JSON ERROR: " + e.getMessage());
+            return "JSON ERROR: " + e.getMessage();
         }
     }
 

@@ -6,9 +6,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 
 @ToString
 public class CaseDataContent {
+    final JcLogger jcLogger = new JcLogger("CaseDataContent", true);
+
     private Event event;
     private Map<String, JsonNode> data;
 
@@ -61,6 +64,11 @@ public class CaseDataContent {
     }
 
     public void setData(Map<String, JsonNode> data) {
+        final String json = jcLogger.getObjectAsString(data);
+        if (json.contains("dummy.pdf") || json.contains("JSON ERROR")) {
+            jcLogger.jclog("setData() json = " + json);
+            jcLogger.jclog("setData() CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
+        }
         this.data = data;
     }
 
@@ -69,6 +77,11 @@ public class CaseDataContent {
     }
 
     public void setEventData(Map<String, JsonNode> eventData) {
+        final String json = jcLogger.getObjectAsString(eventData);
+        if (json.contains("dummy.pdf") || json.contains("JSON ERROR")) {
+            jcLogger.jclog("setEventData() json = " + json);
+            jcLogger.jclog("setEventData() CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
+        }
         this.eventData = eventData;
     }
 

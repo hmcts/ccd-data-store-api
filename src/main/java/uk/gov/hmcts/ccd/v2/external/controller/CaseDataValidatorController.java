@@ -74,8 +74,15 @@ public class CaseDataValidatorController {
     public ResponseEntity<CaseDataResource> validate(@PathVariable("caseTypeId") String caseTypeId,
                                                      @RequestParam(required = false) final String pageId,
                                                      @RequestBody final CaseDataContent content) {
-        // Does CaseDataContent contain "dummy.pdf" ?
-        jcLogger.jclog("validate() caseTypeId = " + caseTypeId + ", pageId = " + pageId);
+        /*
+         * JC note:
+         * CaseDataContent DOES contain "dummy.pdf" ,  caseTypeId = "FinancialRemedyMVP2" ,  pageId = "FR_generalEmail1"
+         * POST path = "/case-types/FinancialRemedyMVP2/validate"
+         *
+         * Next question:
+         * Where is CaseDataContent data and eventData derived from ?
+         */
+        jcLogger.jclog("validate() caseTypeId = " + caseTypeId + " , pageId = " + pageId + " , [built 24th Jan]");
         jcLogger.jclog("validate() caseDataContent", content);
 
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
