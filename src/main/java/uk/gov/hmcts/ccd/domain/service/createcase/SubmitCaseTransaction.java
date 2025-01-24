@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
@@ -40,10 +39,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 @Service
 public class SubmitCaseTransaction implements AccessControl {
@@ -61,11 +57,6 @@ public class SubmitCaseTransaction implements AccessControl {
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
 
-
-    private static final String ORGANISATION = "Organisation";
-    private static final String ORGANISATIONID = "OrganisationID";
-    private static final String ORG_POLICY_NEW_CASE = "newCase";
-    private static final String SUPPLEMENTRY_DATA_NEW_CASE = "new_case";
     private static final Logger LOG = LoggerFactory.getLogger(SubmitCaseTransaction.class);
 
     @Inject
@@ -156,13 +147,14 @@ public class SubmitCaseTransaction implements AccessControl {
         }
 
         // Identify organizations with newCase set to true
-        List<JsonNode> organizations = findOrganisationPolicyNodeForNewCase(caseDetailsAfterCallbackWithoutHashes);
+        List<JsonNode> organizations
+            = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetailsAfterCallbackWithoutHashes);
 
         // Update case supplementary data
-        updateCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizations);
+        NewCaseUtils.updateCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizations);
 
         // Clear newCase attributes
-        clearNewCaseAttributes(organizations);
+        NewCaseUtils.clearNewCaseAttributes(organizations);
 
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
@@ -238,54 +230,5 @@ public class SubmitCaseTransaction implements AccessControl {
             auditEvent.setProxiedByLastName(idamUser.getSurname());
             auditEvent.setProxiedByFirstName(idamUser.getForename());
         }
-    }
-
-    public void updateCaseSupplementaryData(CaseDetails caseDetails, List<JsonNode> organizationProfiles) {
-        Map<String, JsonNode> supplementaryData = caseDetails.getSupplementaryData();
-
-        for (JsonNode orgProfile : organizationProfiles) {
-            if (supplementaryData == null) {
-                supplementaryData = new HashMap<>();
-            }
-            String orgIdentifier = orgProfile.get(ORGANISATION)
-                .get(ORGANISATIONID).textValue();
-
-            JsonNode orgNode = new ObjectMapper().createObjectNode()
-                .put(orgIdentifier, Boolean.TRUE.toString());
-            supplementaryData.put(SUPPLEMENTRY_DATA_NEW_CASE, orgNode);
-        }
-
-        LOG.debug("SupplementaryData ={} .", supplementaryData);
-        caseDetails.setSupplementaryData(supplementaryData);
-    }
-
-    public void clearNewCaseAttributes(List<JsonNode> organizationProfiles) {
-
-        for (JsonNode orgProfile : organizationProfiles) {
-            ((ObjectNode) orgProfile).remove(ORG_POLICY_NEW_CASE);
-        }
-    }
-
-    public List<JsonNode> findOrganisationPolicyNodeForNewCase(CaseDetails caseDetails) {
-        List<JsonNode> newCaseOrganizations = new ArrayList<>();
-
-        JsonNode orgPolicyNewCaseNode = caseDetails.getData().values().stream()
-            .filter(node -> node.get(ORG_POLICY_NEW_CASE) != null
-                && node.get(ORG_POLICY_NEW_CASE).asText().equals(Boolean.TRUE.toString()))
-            .reduce((a, b) -> {
-                LOG.debug("No Organisation found for caseType={} version={} ORGANISATION={},"
-                        + "ORGANISATIONID={}, ORG_POLICY_CASE_ASSIGNED_ROLE={}.",
-                    caseDetails.getCaseTypeId(),caseDetails.getVersion(),
-                    ORGANISATION,ORGANISATIONID,ORG_POLICY_NEW_CASE);
-                return null;
-            }).orElse(null);
-
-        LOG.debug("Organisation found for  caseType={} version={} ORGANISATION={},"
-                + "ORGANISATIONID={}, ORG_POLICY_CASE_ASSIGNED_ROLE={}.",
-            caseDetails.getCaseTypeId(),caseDetails.getVersion(),
-            ORGANISATION,ORGANISATIONID,ORG_POLICY_NEW_CASE);
-
-        newCaseOrganizations = orgPolicyNewCaseNode != null ? List.of(orgPolicyNewCaseNode) : new ArrayList<>();
-        return newCaseOrganizations;
     }
 }

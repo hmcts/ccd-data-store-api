@@ -35,6 +35,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
@@ -90,8 +91,8 @@ class SubmitCaseTransactionNewCaseTest {
     public static final String COLLECTION = "Collection";
 
 
-    private static final String ORG_POLICY_NEW_CASE = "newCase";
-    private static final String SUPPLEMENTRY_DATA_NEW_CASE = "new_case";
+    private static final String ORG_POLICY_NEW_CASE = NewCaseUtils.ORG_POLICY_NEW_CASE;
+    private static final String SUPPLEMENTRY_DATA_NEW_CASE = NewCaseUtils.SUPPLEMENTRY_DATA_NEW_CASE;
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -432,7 +433,7 @@ class SubmitCaseTransactionNewCaseTest {
 
         dataOrganisation =
             organisationPolicyCaseDataNewCase("OrganisationPolicyField1","caseAssignedField",
-            "\"organisationA\"", true,false);
+            "\"organisationA\"", false,false);
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
@@ -446,8 +447,8 @@ class SubmitCaseTransactionNewCaseTest {
             organisationPolicyCaseDataNewCase("OrganisationPolicyField3","caseAssignedField",
             "\"organisationC\"", true,true);
 
-        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
     }
 
@@ -455,15 +456,11 @@ class SubmitCaseTransactionNewCaseTest {
         assertTrue(caseDetails.getSupplementaryData() != null);
 ;
         JsonNode supplementryDataJsonNode = caseDetails.getSupplementaryData().get(SUPPLEMENTRY_DATA_NEW_CASE);
-        JsonNode orgPolicyNewCaseNode = caseDetails.getData().values().stream()
-            .filter(node -> node.get(ORG_POLICY_NEW_CASE) != null)
-            .reduce((a, b) -> {
-                return null;
-            }).orElse(null);
+        List<JsonNode> organizations = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetails);
 
         assertAll("Assert CaseDetails, Data, organisationId",
             () -> assertTrue((supplementryDataJsonNode.toString().contains(organisationId))),
-            () -> assertTrue(orgPolicyNewCaseNode == null)
+            () -> assertTrue(organizations.isEmpty())
         );
     }
 

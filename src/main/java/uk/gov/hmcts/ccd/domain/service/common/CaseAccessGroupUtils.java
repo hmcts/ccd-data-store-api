@@ -16,7 +16,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -57,22 +61,24 @@ public class CaseAccessGroupUtils {
         if (filteredAccessTypeRolesDefinitions != null) {
             List<CaseAccessGroupWithId> caseAccessGroupWithIds = new ArrayList<>();
             for (AccessTypeRoleDefinition acd : filteredAccessTypeRolesDefinitions) {
-                JsonNode caseAssignedRoleFieldNode = findOrganisationPolicyNodeForCaseRole(caseDetails,
-                    acd.getCaseAssignedRoleField());
-                if (caseAssignedRoleFieldNode != null) {
-                    String orgIdentifier = caseAssignedRoleFieldNode.get(ORGANISATION)
-                        .get(ORGANISATIONID).textValue();
+                List<JsonNode> caseAssignedRoleFieldNodes =
+                    findListOfOrganisationPolicyNodeForCaseRole(caseDetails, acd.getCaseAssignedRoleField());
+                for (JsonNode caseAssignedRoleFieldNode : caseAssignedRoleFieldNodes) {
+                    if (caseAssignedRoleFieldNode != null) {
+                        String orgIdentifier = caseAssignedRoleFieldNode.get(ORGANISATION)
+                            .get(ORGANISATIONID).textValue();
 
-                    if (orgIdentifier != null && !orgIdentifier.isEmpty()) {
-                        String caseGroupID = acd.getCaseAccessGroupIdTemplate()
-                            .replace(ORG_IDENTIFIER_TEMPLATE, orgIdentifier);
+                        if (orgIdentifier != null && !orgIdentifier.isEmpty()) {
+                            String caseGroupID = acd.getCaseAccessGroupIdTemplate()
+                                .replace(ORG_IDENTIFIER_TEMPLATE, orgIdentifier);
 
-                        CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseGroupID)
-                            .caseAccessGroupType(CCD_ALL_CASES).build();
-                        CaseAccessGroupWithId caseAccessGroupWithId = CaseAccessGroupWithId.builder()
-                            .caseAccessGroup(caseAccessGroup).id(UUID.randomUUID().toString()).build();
+                            CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseGroupID)
+                                .caseAccessGroupType(CCD_ALL_CASES).build();
+                            CaseAccessGroupWithId caseAccessGroupWithId = CaseAccessGroupWithId.builder()
+                                .caseAccessGroup(caseAccessGroup).id(UUID.randomUUID().toString()).build();
 
-                        caseAccessGroupWithIds.add(caseAccessGroupWithId);
+                            caseAccessGroupWithIds.add(caseAccessGroupWithId);
+                        }
                     }
                 }
             }
@@ -149,15 +155,18 @@ public class CaseAccessGroupUtils {
 
     public JsonNode findOrganisationPolicyNodeForCaseRole(CaseDetails caseDetails, String caseRoleId) {
         JsonNode caseRoleNode = caseDetails.getData().values().stream()
-            .filter(node -> node.get(ORG_POLICY_CASE_ASSIGNED_ROLE) != null
+            .filter(Objects::nonNull)
+            .filter(node -> node != null && node.get(ORG_POLICY_CASE_ASSIGNED_ROLE) != null
                 && node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equalsIgnoreCase(caseRoleId))
+            .peek(node -> System.out.println(node))
+            .filter(Objects::nonNull)
             .reduce((a, b) -> {
                 LOG.debug("No Organisation found for CASE_ACCESS_GROUPS={} caseType={} version={} ORGANISATION={},"
                     + "ORGANISATIONID={}, ORG_POLICY_CASE_ASSIGNED_ROLE={}.",
                     CASE_ACCESS_GROUPS,
                     caseDetails.getCaseTypeId(),caseDetails.getVersion(),
                     ORGANISATION,ORGANISATIONID,ORG_POLICY_CASE_ASSIGNED_ROLE);
-                return null;
+                return Objects.requireNonNull(a);
             }).orElse(null);
 
         LOG.debug("Organisation found for CASE_ACCESS_GROUPS={} caseType={} version={} ORGANISATION={},"
@@ -168,9 +177,27 @@ public class CaseAccessGroupUtils {
         return caseRoleNode;
     }
 
+    public List<JsonNode> findListOfOrganisationPolicyNodeForCaseRole(CaseDetails caseDetails, String caseRoleId) {
+
+        List<JsonNode> caseRoleNodes = Optional.ofNullable(caseDetails.getData().values())
+            .orElseGet(Collections::emptyList)
+            .stream()
+            .filter(Objects::nonNull)
+            .filter(node -> node != null && node.get(ORG_POLICY_CASE_ASSIGNED_ROLE) != null
+                && node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equalsIgnoreCase(caseRoleId))
+            .collect(Collectors.toList());
+
+        LOG.debug("Organisations found for CASE_ACCESS_GROUPS={} caseType={} version={} ORGANISATION={},"
+                + "ORGANISATIONID={}, ORG_POLICY_CASE_ASSIGNED_ROLE={} .caseRoleNodes={}.",
+            CASE_ACCESS_GROUPS,
+            caseDetails.getCaseTypeId(),caseDetails.getVersion(),
+            ORGANISATION,ORGANISATIONID,ORG_POLICY_CASE_ASSIGNED_ROLE, caseRoleNodes);
+        return caseRoleNodes;
+    }
 
     public boolean hasOrganisationPolicyNodeForCaseRole(CaseDetails caseDetails, String caseRoleId) {
-        JsonNode organisationPolicyNodeForCaseRole = findOrganisationPolicyNodeForCaseRole(caseDetails, caseRoleId);
+        List<JsonNode> organisationPolicyNodeForCaseRole =
+            findListOfOrganisationPolicyNodeForCaseRole(caseDetails, caseRoleId);
         return (organisationPolicyNodeForCaseRole != null && !organisationPolicyNodeForCaseRole.isEmpty());
     }
 
