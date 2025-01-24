@@ -360,6 +360,44 @@ public class CaseFieldDefinition implements Serializable, CommonField, Copyable<
             && !caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().isEmpty();
     }
 
+    public Optional<CaseFieldDefinition> getSubfieldDefinition(String fieldName) {
+        FieldTypeDefinition fieldType = this.getFieldTypeDefinition();
+
+        if (fieldType != null) {
+            Optional<CaseFieldDefinition> complexField = fieldType.getComplexFieldById(fieldName);
+            if (complexField.isPresent()) {
+                return complexField;
+            }
+
+            return findFieldInComplexOrCollection(fieldType, fieldName);
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<CaseFieldDefinition> findFieldInComplexOrCollection(FieldTypeDefinition fieldType, String fieldName) {
+        for (CaseFieldDefinition caseField : fieldType.getComplexFields()) {
+            if (caseField.getId().equals(fieldName)) {
+                return Optional.of(caseField);
+            }
+
+            FieldTypeDefinition nestedFieldType = caseField.getFieldTypeDefinition();
+            if (nestedFieldType != null) {
+                Optional<CaseFieldDefinition> nestedField = findFieldInComplexOrCollection(nestedFieldType, fieldName);
+                if (nestedField.isPresent()) {
+                    return nestedField;
+                }
+            }
+        }
+
+        FieldTypeDefinition collectionFieldType = fieldType.getCollectionFieldTypeDefinition();
+        if (collectionFieldType != null) {
+            return findFieldInComplexOrCollection(collectionFieldType, fieldName);
+        }
+
+        return Optional.empty();
+    }
+
     @JsonIgnore
     @Override
     public CaseFieldDefinition createCopy() {

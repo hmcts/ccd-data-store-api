@@ -11,7 +11,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.HashMap;
@@ -23,23 +22,41 @@ import java.util.stream.StreamSupport;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.extractAccessProfileNames;
 
+/**
+ * The ConditionalFieldRestorer is responsible for evaluating and handling fields
+ * that are missing from sanitized data based on field-level permissions.
+ * <p>
+ * It processes the data as follows:
+ * - Identifies fields missing from the sanitized client request by comparing
+ *   it with existing data.
+ * - Checks whether the missing fields are excluded due to restricted field
+ *   permissions (e.g., no Read permission but Create permission is allowed).
+ * - Restores the missing fields to the sanitized data if the field permissions
+ *   allow it (e.g., Create permission is granted even when Read is restricted).
+ * - Ensures compliance with access control rules defined at the field level
+ *   to maintain data integrity.
+ * <p>
+ * This class operates as an intermediate step in the data sanitization and
+ * merge process, addressing incomplete field data while adhering to field-level
+ * permission constraints.
+ */
 @Slf4j
 @Service
-public class RestrictedFieldProcessor {
+public class ConditionalFieldRestorer {
 
     private static final String VALUE = "value";
     private static final String ID = "id";
 
     private final CaseAccessService caseAccessService;
 
-    public RestrictedFieldProcessor(CaseAccessService caseAccessService) {
+    public ConditionalFieldRestorer(CaseAccessService caseAccessService) {
         this.caseAccessService = caseAccessService;
     }
 
-    public Map<String, JsonNode> filterRestrictedFields(final CaseTypeDefinition caseTypeDefinition,
-                                                         final Map<String, JsonNode> sanitisedData,
-                                                         final Map<String, JsonNode> existingData,
-                                                         final String caseReference) {
+    public Map<String, JsonNode> restoreConditionalFields(final CaseTypeDefinition caseTypeDefinition,
+                                                          final Map<String, JsonNode> sanitisedData,
+                                                          final Map<String, JsonNode> existingData,
+                                                          final String caseReference) {
         Set<AccessProfile> accessProfiles = caseAccessService.getAccessProfilesByCaseReference(caseReference);
         if (accessProfiles == null || accessProfiles.isEmpty()) {
             throw new ValidationException("Cannot find user roles for the user");
@@ -55,22 +72,20 @@ public class RestrictedFieldProcessor {
                 return;
             }
 
-            CaseFieldDefinition rootFieldDefinition = caseTypeDefinition.getCaseFieldDefinitions()
-                .stream()
-                .filter(field -> field.getId().equals(key))
-                .findFirst()
-                .orElse(null);
+            Optional<CaseFieldDefinition> optionalRootFieldDefinition = caseTypeDefinition.getCaseField(key);
 
-            if (rootFieldDefinition != null && rootFieldDefinition.isCompoundFieldType()) {
-                JsonNode updatedValue = processSubFieldsRecursively(
-                    rootFieldDefinition,
-                    sanitizedValue,
-                    existingValue,
-                    accessProfileNames
-                );
+            optionalRootFieldDefinition.ifPresent(rootFieldDefinition -> {
+                if (rootFieldDefinition.isCompoundFieldType()) {
+                    JsonNode updatedValue = processSubFieldsRecursively(
+                        rootFieldDefinition,
+                        sanitizedValue,
+                        existingValue,
+                        accessProfileNames
+                    );
 
-                mergedData.put(key, updatedValue);
-            }
+                    mergedData.put(key, updatedValue);
+                }
+            });
         });
 
         return mergedData;
@@ -99,7 +114,8 @@ public class RestrictedFieldProcessor {
             JsonNode existingSubField = existingObjectNode.get(fieldName);
             JsonNode sanitizedSubField = sanitizedObjectNode.get(fieldName);
 
-            CaseFieldDefinition subFieldDefinition = getFieldDefinition(fieldName, parentFieldDefinition);
+            CaseFieldDefinition subFieldDefinition = parentFieldDefinition.getSubfieldDefinition(fieldName)
+                .orElse(parentFieldDefinition);
 
             if (sanitizedSubField == null) {
                 log.debug("Missing field '{}' under '{}'.", fieldName, parentFieldDefinition.getId());
@@ -238,43 +254,12 @@ public class RestrictedFieldProcessor {
                                                Set<String> accessProfileNames) {
         boolean hasReadPermission = fieldAccessControlLists
             .stream()
-            .anyMatch(acl -> accessProfileNames.contains(acl.getAccessProfile())
-                && Boolean.TRUE.equals(acl.isRead()));
+            .anyMatch(acl -> accessProfileNames.contains(acl.getAccessProfile()) && acl.isRead());
 
         boolean hasCreatePermission = fieldAccessControlLists
             .stream()
-            .anyMatch(acl -> accessProfileNames.contains(acl.getAccessProfile())
-                && Boolean.TRUE.equals(acl.isCreate()));
+            .anyMatch(acl -> accessProfileNames.contains(acl.getAccessProfile()) && acl.isCreate());
 
         return !hasReadPermission && hasCreatePermission;
-    }
-
-    private CaseFieldDefinition getFieldDefinition(String fieldName,
-                                                   CaseFieldDefinition parentFieldDefinition) {
-        // Check if the parent field's definition contains subfields
-        FieldTypeDefinition parentFieldType = parentFieldDefinition.getFieldTypeDefinition();
-
-        if (parentFieldType == null) {
-            return parentFieldDefinition;
-        }
-
-        if (parentFieldType.getComplexFields() != null && !parentFieldType.getComplexFields().isEmpty()) {
-            return parentFieldType.getComplexFields()
-                .stream()
-                .filter(subField -> subField.getId().equals(fieldName))
-                .findFirst()
-                .orElse(parentFieldDefinition);
-        }
-
-        if (parentFieldType.getCollectionFieldTypeDefinition() != null && !parentFieldType
-            .getCollectionFieldTypeDefinition().getComplexFields().isEmpty()) {
-            return parentFieldType.getCollectionFieldTypeDefinition().getComplexFields()
-                .stream()
-                .filter(subField -> subField.getId().equals(fieldName))
-                .findFirst()
-                .orElse(parentFieldDefinition);
-        }
-
-        return parentFieldDefinition;
     }
 }

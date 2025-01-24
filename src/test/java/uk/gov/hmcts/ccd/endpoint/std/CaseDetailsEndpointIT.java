@@ -51,7 +51,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
-import uk.gov.hmcts.ccd.domain.service.common.RestrictedFieldProcessor;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 
 import javax.inject.Inject;
 import java.nio.charset.StandardCharsets;
@@ -5611,7 +5611,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private Logger setupLogging() {
         listAppender = new ListAppender<>();
         listAppender.start();
-        logger = (Logger) LoggerFactory.getLogger(RestrictedFieldProcessor.class);
+        logger = (Logger) LoggerFactory.getLogger(ConditionalFieldRestorer.class);
         logger.detachAndStopAllAppenders();
         if (loggingEventList != null && !loggingEventList.isEmpty()) {
             loggingEventList.clear();

@@ -33,7 +33,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.common.RestrictedFieldProcessor;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -98,7 +98,7 @@ public class CreateCaseEventService {
     private final CaseDocumentTimestampService caseDocumentTimestampService;
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
-    private final RestrictedFieldProcessor restrictedFieldProcessor;
+    private final ConditionalFieldRestorer conditionalFieldRestorer;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -133,7 +133,7 @@ public class CreateCaseEventService {
                                   final ApplicationParams applicationParams,
                                   final CaseAccessGroupUtils caseAccessGroupUtils,
                                   final CaseDocumentTimestampService caseDocumentTimestampService,
-                                  final RestrictedFieldProcessor restrictedFieldProcessor) {
+                                  final ConditionalFieldRestorer conditionalFieldRestorer) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -164,7 +164,7 @@ public class CreateCaseEventService {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-        this.restrictedFieldProcessor = restrictedFieldProcessor;
+        this.conditionalFieldRestorer = conditionalFieldRestorer;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -441,7 +441,7 @@ public class CreateCaseEventService {
                     .orElse(emptyMap()));
 
                 final Map<String, JsonNode> filteredData =
-                    restrictedFieldProcessor.filterRestrictedFields(caseTypeDefinition, sanitisedData, caseData,
+                    conditionalFieldRestorer.restoreConditionalFields(caseTypeDefinition, sanitisedData, caseData,
                         caseDetails.getReferenceAsString());
 
                 caseData.putAll(filteredData);

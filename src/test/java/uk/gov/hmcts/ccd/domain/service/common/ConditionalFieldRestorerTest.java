@@ -40,7 +40,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
-class RestrictedFieldProcessorTest {
+class ConditionalFieldRestorerTest {
 
     static String complexTypeArrayPayload = """
         {
@@ -140,14 +140,14 @@ class RestrictedFieldProcessorTest {
     private Logger logger;
     private ListAppender<ILoggingEvent> listAppender;
     private List<ILoggingEvent> loggingEventList;
-    private RestrictedFieldProcessor service;
+    private ConditionalFieldRestorer service;
     private AutoCloseable openMocks;
 
     @BeforeEach
     void setUp() {
         openMocks = MockitoAnnotations.openMocks(this);
 
-        service = new RestrictedFieldProcessor(caseAccessService);
+        service = new ConditionalFieldRestorer(caseAccessService);
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(ACCESS_PROFILES);
     }
 
@@ -661,7 +661,7 @@ class RestrictedFieldProcessorTest {
             newCaseType().withField(caseCategoryFieldWithCreateWithoutReadPermission()).build();
         Map<String, JsonNode> existingData = getJsonMapNode(nestedComplexTypeArrayPayload);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
-        Map<String, JsonNode> filteredFields = service.filterRestrictedFields(caseTypeDefinition, newData,
+        Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition, newData,
             existingData, "123");
 
         assertAll(
@@ -1022,7 +1022,7 @@ class RestrictedFieldProcessorTest {
         Map<String, JsonNode> existingData = getJsonMapNode(complexTypeArrayPayload);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
-        Map<String, JsonNode> result = service.filterRestrictedFields(caseTypeDefinition, newData, existingData,
+        Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
             "123");
 
         assertAll(
@@ -2161,7 +2161,7 @@ class RestrictedFieldProcessorTest {
         Map<String, JsonNode> existingData = getJsonMapNode(arrayPayload);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
-        Map<String, JsonNode> filteredFields = service.filterRestrictedFields(caseTypeDefinition, newData,
+        Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition, newData,
             existingData, "123");
         assertEquals(existingData, filteredFields);
 
@@ -2461,7 +2461,7 @@ class RestrictedFieldProcessorTest {
         Map<String, JsonNode> existingData = getJsonMapNode(arrayPayload);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
-        Map<String, JsonNode> filteredFields = service.filterRestrictedFields(caseTypeDefinition, newData,
+        Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition, newData,
             existingData, "123");
         assertEquals(existingData, filteredFields);
 
@@ -2534,7 +2534,7 @@ class RestrictedFieldProcessorTest {
         CaseTypeDefinition caseTypeDefinition =
             newCaseType().withField(caseFieldDefinition).build();
 
-        Map<String, JsonNode> filteredFields = service.filterRestrictedFields(caseTypeDefinition, newData,
+        Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition, newData,
             existingData, "123");
 
         assertAll(
@@ -2651,7 +2651,7 @@ class RestrictedFieldProcessorTest {
         CaseTypeDefinition caseTypeDefinition =
             newCaseType().withField(caseFieldDefinition).build();
 
-        Map<String, JsonNode> filteredFields = service.filterRestrictedFields(caseTypeDefinition, newData,
+        Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition, newData,
             existingData, "123");
         assertAll(
             () -> assertTrue(filteredFields.containsKey("Documents")),
@@ -2723,7 +2723,7 @@ class RestrictedFieldProcessorTest {
         CaseTypeDefinition  caseTypeDefinition =
             newCaseType().withField(noteWithNestedFieldsWithoutCreateAndReadPermission()).build();
         var newDataNode = getJsonMapNode(newDataString);
-        Map<String, JsonNode> filteredFields = service.filterRestrictedFields(caseTypeDefinition,
+        Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition,
             newDataNode, getJsonMapNode(complexTypePayload), "123");
 
         assertEquals(newDataNode, filteredFields);
@@ -2929,7 +2929,7 @@ class RestrictedFieldProcessorTest {
         CaseTypeDefinition  caseTypeDefinition =
             newCaseType().withField(noteWithNestedFieldsWithCreateAndWithoutReadPermission()).build();
         Map<String, JsonNode> newDataNode = getJsonMapNode(newDataString);
-        Map<String, JsonNode> filteredFields = service.filterRestrictedFields(caseTypeDefinition,
+        Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition,
             newDataNode, getJsonMapNode(complexTypePayload), "123");
 
         assertEquals(newDataNode, filteredFields);
@@ -3243,7 +3243,7 @@ class RestrictedFieldProcessorTest {
         CaseTypeDefinition  caseTypeDefinition =
             newCaseType().withField(noteWithNestedFieldsWithoutCreateAndReadPermission()).build();
         Map<String, JsonNode> newDataNode = getJsonMapNode(newDataString);
-        Map<String, JsonNode> filteredFields = service.filterRestrictedFields(caseTypeDefinition,
+        Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition,
             newDataNode, getJsonMapNode(complexTypePayload), "123");
 
         assertEquals(newDataNode, filteredFields);
@@ -3437,7 +3437,7 @@ class RestrictedFieldProcessorTest {
         CaseTypeDefinition  caseTypeDefinition =
             newCaseType().withField(noteWithNestedFieldsWithoutCreateAndReadPermission()).build();
         Map<String, JsonNode> newDataNode = getJsonMapNode(newDataString);
-        Map<String, JsonNode> filteredFields = service.filterRestrictedFields(caseTypeDefinition,
+        Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition,
             newDataNode, getJsonMapNode(complexTypePayload), "123");
 
         assertEquals(newDataNode, filteredFields);
@@ -3616,7 +3616,7 @@ class RestrictedFieldProcessorTest {
         Map<String, JsonNode> existingData = getJsonMapNode(complexTypePayload);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
-        Map<String, JsonNode> result = service.filterRestrictedFields(caseTypeDefinition, newData, existingData,
+        Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
             "123");
 
         assertAll(
@@ -3649,7 +3649,7 @@ class RestrictedFieldProcessorTest {
         Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
-        service.filterRestrictedFields(caseTypeDefinition, newData, existingData, "123");
+        service.restoreConditionalFields(caseTypeDefinition, newData, existingData, "123");
 
         assertEquals(0, listAppender.list.size());
     }
@@ -3678,7 +3678,7 @@ class RestrictedFieldProcessorTest {
         Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
-        service.filterRestrictedFields(caseTypeDefinition, newData, existingData,
+        service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
             "123");
 
         assertEquals(0, listAppender.list.size());
@@ -3707,7 +3707,7 @@ class RestrictedFieldProcessorTest {
         Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
-        service.filterRestrictedFields(caseTypeDefinition, newData, existingData,
+        service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
             "123");
 
         assertEquals(0, listAppender.list.size());
@@ -3737,7 +3737,7 @@ class RestrictedFieldProcessorTest {
         Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
-        Map<String, JsonNode> result = service.filterRestrictedFields(caseTypeDefinition, newData, existingData,
+        Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
             "123");
 
         assertAll(
@@ -3773,7 +3773,7 @@ class RestrictedFieldProcessorTest {
         Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
-        service.filterRestrictedFields(caseTypeDefinition, newData, existingData,
+        service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
             "123");
 
         assertEquals("Missing field 'type' under 'Note'.", listAppender.list.getFirst().getFormattedMessage());
@@ -3923,7 +3923,7 @@ class RestrictedFieldProcessorTest {
     private Logger setupLogging() {
         listAppender = new ListAppender<>();
         listAppender.start();
-        logger = (Logger) LoggerFactory.getLogger(RestrictedFieldProcessor.class);
+        logger = (Logger) LoggerFactory.getLogger(ConditionalFieldRestorer.class);
         logger.detachAndStopAllAppenders();
         if (loggingEventList != null && !loggingEventList.isEmpty()) {
             loggingEventList.clear();
@@ -3954,7 +3954,7 @@ class RestrictedFieldProcessorTest {
         Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
-        Map<String, JsonNode> result = service.filterRestrictedFields(caseTypeDefinition, newData, existingData,
+        Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
             "123");
 
         loggingEventList = listAppender.list;
@@ -3966,6 +3966,354 @@ class RestrictedFieldProcessorTest {
         );
 
         return result;
+    }
+
+    private CaseFieldDefinition caseCategoryFieldWithNestedList() {
+        return newCaseField()
+            .withId("caseCategory")
+            .withFieldType(aFieldType()
+                .withId("CaseCategoryComplex")
+                .withType(COMPLEX)
+                .withComplexField(newCaseField()
+                    .withId("list_items")
+                    .withFieldType(aFieldType()
+                        .withId("ListItemsCollection")
+                        .withType(COLLECTION)
+                        .withCollectionFieldType(aFieldType()
+                            .withId("ListItemComplex")
+                            .withType(COMPLEX)
+                            .withComplexField(newCaseField()
+                                .withId("id")
+                                .withFieldType(aFieldType()
+                                    .withId("Text")
+                                    .withType("Text")
+                                    .build())
+                                .build())
+                            .withComplexField(newCaseField()
+                                .withId("value")
+                                .withFieldType(aFieldType()
+                                    .withId("ValueComplex")
+                                    .withType(COMPLEX)
+                                    .withComplexField(newCaseField()
+                                        .withId("nested_wrapper")
+                                        .withFieldType(aFieldType()
+                                            .withId("NestedWrapperComplex")
+                                            .withType(COMPLEX)
+                                            .withComplexField(newCaseField()
+                                                .withId("nested_list")
+                                                .withFieldType(aFieldType()
+                                                    .withId("NestedListCollection")
+                                                    .withType(COLLECTION)
+                                                    .withCollectionFieldType(aFieldType()
+                                                        .withId("NestedItemComplex")
+                                                        .withType(COMPLEX)
+                                                        .withComplexField(newCaseField()
+                                                            .withId("id")
+                                                            .withFieldType(aFieldType()
+                                                                .withId("Text")
+                                                                .withType("Text")
+                                                                .build())
+                                                            .build())
+                                                        .withComplexField(newCaseField()
+                                                            .withId("value")
+                                                            .withFieldType(aFieldType()
+                                                                .withId("NestedValueComplex")
+                                                                .withType(COMPLEX)
+                                                                .withComplexField(newCaseField()
+                                                                    .withId("code")
+                                                                    .withFieldType(aFieldType()
+                                                                        .withId("Text")
+                                                                        .withType("Text")
+                                                                        .build())
+                                                                    .build())
+                                                                .withComplexField(newCaseField()
+                                                                    .withId("label")
+                                                                    .withFieldType(aFieldType()
+                                                                        .withId("Text")
+                                                                        .withType("Text")
+                                                                        .build())
+                                                                    .build())
+                                                                .build())
+                                                            .build())
+                                                        .build())
+                                                    .build())
+                                                .build())
+                                            .build())
+                                        .build())
+                                    .build())
+                                .build())
+                            .build())
+                        .build())
+                    .build())
+                .build())
+            .build();
+    }
+
+    private CaseFieldDefinition caseCategoryFieldWithNestedListWithCreatePermissionWithoutReadPermission() {
+        AccessControlList controlList = new AccessControlList();
+        controlList.setAccessProfile("caseworker-probate-loa1");
+        controlList.setCreate(true);
+        controlList.setRead(false);
+
+        CaseFieldDefinition caseCategory = caseCategoryFieldWithNestedList();
+        caseCategory.setAccessControlLists(List.of(controlList));
+
+        final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(caseCategory).build();
+        caseTypeDefinition.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+
+        return caseCategory;
+    }
+
+    @Test
+    void shouldAddMissingCollectionFieldsInNestedCollections() {
+        // Nested collection of collections payload
+        final String existingDataString = """
+        {
+            "caseCategory": {
+                "list_items": [
+                    {
+                        "id": "123456",
+                        "value": {
+                            "nested_wrapper": {
+                                "nested_list": [
+                                    {
+                                        "id": "nested_1",
+                                        "value": {
+                                            "code": "NestedTest1",
+                                            "label": "NestedLabel1"
+                                        }
+                                    },
+                                    {
+                                        "id": "nested_2",
+                                        "value": {
+                                            "code": "NestedTest2",
+                                            "label": "NestedLabel2"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+         }
+        """;
+
+        final String newDataString = """
+        {
+           "caseCategory": {
+               "list_items": [
+                   {
+                       "id": "123456",
+                       "value": {
+                           "nested_wrapper": {
+                                "nested_list": []
+                            }
+                       }
+                   }
+               ]
+           }
+        }
+        """;
+
+        setupLogging().setLevel(Level.INFO);
+
+        CaseTypeDefinition caseTypeDefinition =
+            newCaseType().withField(caseCategoryFieldWithNestedListWithCreatePermissionWithoutReadPermission()).build();
+
+        Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
+        Map<String, JsonNode> newData = getJsonMapNode(newDataString);
+
+        Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
+            "123");
+
+        assertAll(
+            () -> assertTrue(result.containsKey("caseCategory")),
+            () -> assertTrue(result.get("caseCategory").has("list_items")),
+            () -> {
+                JsonNode listItems = result.get("caseCategory").get("list_items");
+                assertTrue(listItems.isArray());
+                assertTrue(listItems.get(0).has("value"));
+                JsonNode nestedList = listItems.get(0).get("value").get("nested_wrapper").get("nested_list");
+                assertEquals(2, nestedList.size());
+            },
+            () -> assertTrue(listAppender.list.stream()
+                .anyMatch(event -> event.getFormattedMessage()
+                    .contains("Adding missing collection item with ID '\"nested_1\"' under 'nested_list'."))),
+            () -> assertTrue(listAppender.list.stream()
+                .anyMatch(event -> event.getFormattedMessage()
+                    .contains("Adding missing collection item with ID '\"nested_2\"' under 'nested_list'.")))
+        );
+    }
+
+    @Test
+    void shouldAddMissingCollectionSingleFieldInNestedCollections() {
+        // Nested collection of collections payload
+        final String existingDataString = """
+        {
+            "caseCategory": {
+                "list_items": [
+                    {
+                        "id": "123456",
+                        "value": {
+                            "nested_wrapper": {
+                                "nested_list": [
+                                    {
+                                        "id": "nested_1",
+                                        "value": {
+                                            "code": "NestedTest1",
+                                            "label": "NestedLabel1"
+                                        }
+                                    },
+                                    {
+                                        "id": "nested_2",
+                                        "value": {
+                                            "code": "NestedTest2",
+                                            "label": "NestedLabel2"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+         }
+        """;
+
+        final String newDataString = """
+        {
+           "caseCategory": {
+               "list_items": [
+                   {
+                       "id": "123456",
+                       "value": {
+                           "nested_wrapper": {
+                                "nested_list": [
+                                    {
+                                        "id": "nested_2",
+                                        "value": {
+                                            "code": "NestedTest2"
+                                        }
+                                    }
+                                ]
+                            }
+                       }
+                   }
+               ]
+           }
+        }
+        """;
+
+        setupLogging().setLevel(Level.INFO);
+
+        CaseTypeDefinition caseTypeDefinition =
+            newCaseType().withField(caseCategoryFieldWithNestedListWithCreatePermissionWithoutReadPermission()).build();
+
+        Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
+        Map<String, JsonNode> newData = getJsonMapNode(newDataString);
+
+        Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
+            "123");
+
+        assertAll(
+            () -> assertTrue(result.containsKey("caseCategory")),
+            () -> assertTrue(result.get("caseCategory").has("list_items")),
+            () -> {
+                JsonNode listItems = result.get("caseCategory").get("list_items");
+                assertTrue(listItems.isArray());
+                assertTrue(listItems.get(0).has("value"));
+                JsonNode nestedList = listItems.get(0).get("value").get("nested_wrapper").get("nested_list");
+                assertEquals(2, nestedList.size());
+            },
+            () -> assertTrue(listAppender.list.stream()
+                .anyMatch(event -> event.getFormattedMessage()
+                    .contains("Adding missing collection item with ID '\"nested_1\"' under 'nested_list'."))),
+            () -> assertTrue(listAppender.list.stream()
+                .anyMatch(event -> event.getFormattedMessage()
+                    .contains("Adding missing field 'label' under 'nested_list'.")))
+        );
+    }
+
+    @Test
+    void shouldIgnoreMissingCollectionFieldsInNestedCollections() {
+        final String existingDataString = """
+        {
+            "caseCategory": {
+                "list_items": [
+                    {
+                        "id": "123456",
+                        "value": {
+                            "nested_wrapper": {
+                                "nested_list": [
+                                    {
+                                        "id": "nested_1",
+                                        "value": {
+                                            "code": "NestedTest1",
+                                            "label": "NestedLabel1"
+                                        }
+                                    },
+                                    {
+                                        "id": "nested_2",
+                                        "value": {
+                                            "code": "NestedTest2",
+                                            "label": "NestedLabel2"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+         }
+        """;
+
+        final String newDataString = """
+        {
+           "caseCategory": {
+               "list_items": [
+                   {
+                       "id": "123456",
+                       "value": {
+                           "nested_wrapper": {
+                                "nested_list": []
+                            }
+                       }
+                   }
+               ]
+           }
+        }
+        """;
+
+        setupLogging().setLevel(Level.DEBUG);
+
+        CaseTypeDefinition caseTypeDefinition =
+            newCaseType().withField(caseCategoryFieldWithNestedList()).build();
+
+        Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
+        Map<String, JsonNode> newData = getJsonMapNode(newDataString);
+
+        Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
+            "123");
+
+        assertAll(
+            () -> assertTrue(result.containsKey("caseCategory")),
+            () -> assertTrue(result.get("caseCategory").has("list_items")),
+            () -> {
+                JsonNode listItems = result.get("caseCategory").get("list_items");
+                assertTrue(listItems.isArray());
+                assertTrue(listItems.get(0).has("value"));
+                assertTrue(listItems.get(0).get("value").get("nested_wrapper").has("nested_list"));
+                assertEquals(0, listItems.get(0).get("value").get("nested_wrapper").get("nested_list").size());
+            },
+            () -> assertTrue(listAppender.list.stream()
+                .anyMatch(event -> event.getFormattedMessage()
+                    .contains("Missing collection item with ID '\"nested_1\"' under 'nested_list'."))),
+            () -> assertTrue(listAppender.list.stream()
+                .anyMatch(event -> event.getFormattedMessage()
+                    .contains("Missing collection item with ID '\"nested_2\"' under 'nested_list'.")))
+        );
     }
 
     @AfterEach
