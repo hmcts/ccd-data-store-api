@@ -34,6 +34,9 @@ public class NewCaseUtils {
     }
 
     public static List<JsonNode> findListOfOrganisationPolicyNodesForNewCase(CaseDetails caseDetails) {
+        if (caseDetails != null && caseDetails.getData() == null) {
+            return Collections.EMPTY_LIST;
+        }
 
         List<JsonNode> orgPolicyNewCaseNodes = Optional.ofNullable(caseDetails.getData().values())
             .orElseGet(Collections::emptyList)
@@ -51,13 +54,11 @@ public class NewCaseUtils {
     }
 
     public static void updateCaseSupplementaryData(CaseDetails caseDetails, List<JsonNode> organizationProfiles) {
-        Map<String, JsonNode> supplementaryData = caseDetails.getSupplementaryData();
+
         List<JsonNode> orgIdList = new ArrayList<>();
 
         for (JsonNode orgProfile : organizationProfiles) {
-            if (supplementaryData == null) {
-                supplementaryData = new HashMap<>();
-            }
+
             String orgIdentifier = orgProfile.get(ORGANISATION)
                 .get(ORGANISATIONID).textValue();
 
@@ -67,11 +68,17 @@ public class NewCaseUtils {
         }
 
         if (!orgIdList.isEmpty()) {
+            Map<String, JsonNode> supplementaryData = caseDetails.getSupplementaryData();
+            if (supplementaryData == null) {
+                supplementaryData = new HashMap<>();
+            }
             JsonNode jsonNode = new ObjectMapper().createArrayNode().addAll(orgIdList);
             supplementaryData.put(SUPPLEMENTRY_DATA_NEW_CASE, jsonNode);
+
+            LOG.debug("SupplementaryData ={} .", supplementaryData);
+            caseDetails.setSupplementaryData(supplementaryData);
         }
-        LOG.debug("SupplementaryData ={} .", supplementaryData);
-        caseDetails.setSupplementaryData(supplementaryData);
+
     }
 
     public static void clearNewCaseAttributes(List<JsonNode> organizationProfiles) {
