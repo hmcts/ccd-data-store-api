@@ -239,14 +239,10 @@ public class CreateCaseEventService {
         }
 
         // Identify organizations with newCase set to true
-        List<JsonNode> organizations
-            = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetailsAfterCallbackWithoutHashes);
-
         // Update case supplementary data
-        NewCaseUtils.updateCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizations);
-
         // Clear newCase attributes
-        NewCaseUtils.clearNewCaseAttributes(organizations);
+        NewCaseUtils newCaseUtils = new NewCaseUtils();
+        newCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
 
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));

@@ -33,8 +33,20 @@ public class NewCaseUtils {
     public NewCaseUtils() {
     }
 
+    public static void setupSupplementryDataWithNewCase(CaseDetails caseDetailsAfterCallbackWithoutHashes) {
+        // Identify organizations with newCase set to true
+        List<JsonNode> organizations
+            = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetailsAfterCallbackWithoutHashes);
+
+        // Update case supplementary data
+        NewCaseUtils.updateCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizations);
+
+        // Clear newCase attributes
+        NewCaseUtils.clearNewCaseAttributes(organizations);
+    }
+
     public static List<JsonNode> findListOfOrganisationPolicyNodesForNewCase(CaseDetails caseDetails) {
-        if (caseDetails != null && caseDetails.getData() == null) {
+        if (caseDetails.getData() == null) {
             return Collections.EMPTY_LIST;
         }
 
@@ -53,7 +65,7 @@ public class NewCaseUtils {
         return orgPolicyNewCaseNodes;
     }
 
-    public static void updateCaseSupplementaryData(CaseDetails caseDetails, List<JsonNode> organizationProfiles) {
+    private static void updateCaseSupplementaryData(CaseDetails caseDetails, List<JsonNode> organizationProfiles) {
 
         List<JsonNode> orgIdList = new ArrayList<>();
 
@@ -81,7 +93,7 @@ public class NewCaseUtils {
 
     }
 
-    public static void clearNewCaseAttributes(List<JsonNode> organizationProfiles) {
+    private static void clearNewCaseAttributes(List<JsonNode> organizationProfiles) {
         for (JsonNode orgProfile : organizationProfiles) {
             ((ObjectNode) orgProfile).remove(ORG_POLICY_NEW_CASE);
         }

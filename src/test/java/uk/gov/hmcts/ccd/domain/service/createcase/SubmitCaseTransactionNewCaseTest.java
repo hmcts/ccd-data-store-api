@@ -90,10 +90,6 @@ class SubmitCaseTransactionNewCaseTest {
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
 
-
-    private static final String ORG_POLICY_NEW_CASE = NewCaseUtils.ORG_POLICY_NEW_CASE;
-    private static final String SUPPLEMENTRY_DATA_NEW_CASE = NewCaseUtils.SUPPLEMENTRY_DATA_NEW_CASE;
-
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
     @Mock
@@ -455,7 +451,8 @@ class SubmitCaseTransactionNewCaseTest {
     private void assertCaseDataSupplementry(final CaseDetails caseDetails, String organisationId) {
         assertTrue(caseDetails.getSupplementaryData() != null);
 ;
-        JsonNode supplementryDataJsonNode = caseDetails.getSupplementaryData().get(SUPPLEMENTRY_DATA_NEW_CASE);
+        JsonNode supplementryDataJsonNode = caseDetails.getSupplementaryData()
+            .get(NewCaseUtils.SUPPLEMENTRY_DATA_NEW_CASE);
         List<JsonNode> organizations = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetails);
 
         assertAll("Assert CaseDetails, Data, organisationId",

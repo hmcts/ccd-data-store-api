@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -56,8 +53,6 @@ public class SubmitCaseTransaction implements AccessControl {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
-
-    private static final Logger LOG = LoggerFactory.getLogger(SubmitCaseTransaction.class);
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -146,15 +141,8 @@ public class SubmitCaseTransaction implements AccessControl {
                 caseTypeDefinition);
         }
 
-        // Identify organizations with newCase set to true
-        List<JsonNode> organizations
-            = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetailsAfterCallbackWithoutHashes);
-
-        // Update case supplementary data
-        NewCaseUtils.updateCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizations);
-
-        // Clear newCase attributes
-        NewCaseUtils.clearNewCaseAttributes(organizations);
+        NewCaseUtils newCaseUtils = new NewCaseUtils();
+        newCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
 
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
@@ -231,4 +219,5 @@ public class SubmitCaseTransaction implements AccessControl {
             auditEvent.setProxiedByFirstName(idamUser.getForename());
         }
     }
+
 }
