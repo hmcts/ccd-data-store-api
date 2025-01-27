@@ -360,6 +360,15 @@ public class CaseFieldDefinition implements Serializable, CommonField, Copyable<
             && !caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().isEmpty();
     }
 
+    /**
+     * Retrieves the subfield definition for the specified field name.
+     * If the field name corresponds to a subfield within the current field's
+     * complex fields or collection field type, the subfield definition is returned.
+     * If no match is found, an empty Optional is returned.
+     *
+     * @param fieldName The name of the subfield to retrieve.
+     * @return An Optional containing the matching subfield definition, or empty if no match is found.
+     */
     public Optional<CaseFieldDefinition> getSubfieldDefinition(String fieldName) {
         FieldTypeDefinition fieldType = this.getFieldTypeDefinition();
 
@@ -369,30 +378,13 @@ public class CaseFieldDefinition implements Serializable, CommonField, Copyable<
                 return complexField;
             }
 
-            return findFieldInComplexOrCollection(fieldType, fieldName);
-        }
-
-        return Optional.empty();
-    }
-
-    private Optional<CaseFieldDefinition> findFieldInComplexOrCollection(FieldTypeDefinition fieldType, String fieldName) {
-        for (CaseFieldDefinition caseField : fieldType.getComplexFields()) {
-            if (caseField.getId().equals(fieldName)) {
-                return Optional.of(caseField);
-            }
-
-            FieldTypeDefinition nestedFieldType = caseField.getFieldTypeDefinition();
-            if (nestedFieldType != null) {
-                Optional<CaseFieldDefinition> nestedField = findFieldInComplexOrCollection(nestedFieldType, fieldName);
-                if (nestedField.isPresent()) {
-                    return nestedField;
+            FieldTypeDefinition collectionFieldType = fieldType.getCollectionFieldTypeDefinition();
+            if (collectionFieldType != null) {
+                Optional<CaseFieldDefinition> collectionField = collectionFieldType.getComplexFieldById(fieldName);
+                if (collectionField.isPresent()) {
+                    return collectionField;
                 }
             }
-        }
-
-        FieldTypeDefinition collectionFieldType = fieldType.getCollectionFieldTypeDefinition();
-        if (collectionFieldType != null) {
-            return findFieldInComplexOrCollection(collectionFieldType, fieldName);
         }
 
         return Optional.empty();

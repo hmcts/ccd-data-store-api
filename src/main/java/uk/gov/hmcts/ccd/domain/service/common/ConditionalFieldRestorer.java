@@ -25,8 +25,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.extrac
 /**
  * The ConditionalFieldRestorer is responsible for evaluating and handling fields
  * that are missing from sanitized data based on field-level permissions.
- * <p>
- * It processes the data as follows:
+ *
+ * <p>It processes the data as follows:
  * - Identifies fields missing from the sanitized client request by comparing
  *   it with existing data.
  * - Checks whether the missing fields are excluded due to restricted field
@@ -35,8 +35,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.extrac
  *   allow it (e.g., Create permission is granted even when Read is restricted).
  * - Ensures compliance with access control rules defined at the field level
  *   to maintain data integrity.
- * <p>
- * This class operates as an intermediate step in the data sanitization and
+ *
+ * <p>This class operates as an intermediate step in the data sanitization and
  * merge process, addressing incomplete field data while adhering to field-level
  * permission constraints.
  */

@@ -5,6 +5,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DOCUMENT;
@@ -3968,159 +3970,88 @@ class ConditionalFieldRestorerTest {
         return result;
     }
 
-    private CaseFieldDefinition caseCategoryFieldWithNestedList() {
-        return newCaseField()
-            .withId("caseCategory")
-            .withFieldType(aFieldType()
-                .withId("CaseCategoryComplex")
-                .withType(COMPLEX)
-                .withComplexField(newCaseField()
-                    .withId("list_items")
-                    .withFieldType(aFieldType()
-                        .withId("ListItemsCollection")
-                        .withType(COLLECTION)
-                        .withCollectionFieldType(aFieldType()
-                            .withId("ListItemComplex")
-                            .withType(COMPLEX)
-                            .withComplexField(newCaseField()
-                                .withId("id")
-                                .withFieldType(aFieldType()
-                                    .withId("Text")
-                                    .withType("Text")
-                                    .build())
-                                .build())
-                            .withComplexField(newCaseField()
-                                .withId("value")
-                                .withFieldType(aFieldType()
-                                    .withId("ValueComplex")
-                                    .withType(COMPLEX)
-                                    .withComplexField(newCaseField()
-                                        .withId("nested_wrapper")
-                                        .withFieldType(aFieldType()
-                                            .withId("NestedWrapperComplex")
-                                            .withType(COMPLEX)
-                                            .withComplexField(newCaseField()
-                                                .withId("nested_list")
-                                                .withFieldType(aFieldType()
-                                                    .withId("NestedListCollection")
-                                                    .withType(COLLECTION)
-                                                    .withCollectionFieldType(aFieldType()
-                                                        .withId("NestedItemComplex")
-                                                        .withType(COMPLEX)
-                                                        .withComplexField(newCaseField()
-                                                            .withId("id")
-                                                            .withFieldType(aFieldType()
-                                                                .withId("Text")
-                                                                .withType("Text")
-                                                                .build())
-                                                            .build())
-                                                        .withComplexField(newCaseField()
-                                                            .withId("value")
-                                                            .withFieldType(aFieldType()
-                                                                .withId("NestedValueComplex")
-                                                                .withType(COMPLEX)
-                                                                .withComplexField(newCaseField()
-                                                                    .withId("code")
-                                                                    .withFieldType(aFieldType()
-                                                                        .withId("Text")
-                                                                        .withType("Text")
-                                                                        .build())
-                                                                    .build())
-                                                                .withComplexField(newCaseField()
-                                                                    .withId("label")
-                                                                    .withFieldType(aFieldType()
-                                                                        .withId("Text")
-                                                                        .withType("Text")
-                                                                        .build())
-                                                                    .build())
-                                                                .build())
-                                                            .build())
-                                                        .build())
-                                                    .build())
-                                                .build())
-                                            .build())
-                                        .build())
-                                    .build())
-                                .build())
-                            .build())
-                        .build())
-                    .build())
-                .build())
-            .build();
+    private CaseTypeDefinition caseDefinitionWithNestedList() {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+            String defContent  = fromFileAsString("tests/nested-list-definition.json");
+
+            return objectMapper.readValue(defContent, CaseTypeDefinition.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private CaseFieldDefinition caseCategoryFieldWithNestedListWithCreatePermissionWithoutReadPermission() {
+    private CaseTypeDefinition caseTypeDefinitionWithNestedListWithCreatePermissionWithoutReadPermission() {
         AccessControlList controlList = new AccessControlList();
         controlList.setAccessProfile("caseworker-probate-loa1");
         controlList.setCreate(true);
         controlList.setRead(false);
 
-        CaseFieldDefinition caseCategory = caseCategoryFieldWithNestedList();
-        caseCategory.setAccessControlLists(List.of(controlList));
-
-        final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(caseCategory).build();
-        caseTypeDefinition.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
-
-        return caseCategory;
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionWithNestedList();
+        caseTypeDefinition.getCaseFieldDefinitions().getFirst().setAccessControlLists(List.of(controlList));
+        caseTypeDefinition.getCaseFieldDefinitions().forEach(definition -> {
+            definition.setAccessControlLists(List.of(controlList));
+            definition.propagateACLsToNestedFields();
+        });
+        return caseTypeDefinition;
     }
 
     @Test
-    void shouldAddMissingCollectionFieldsInNestedCollections() {
-        // Nested collection of collections payload
+    void shouldAddMissingSingleCollectionFieldInNestedCollections() {
         final String existingDataString = """
-        {
-            "caseCategory": {
-                "list_items": [
-                    {
-                        "id": "123456",
-                        "value": {
-                            "nested_wrapper": {
-                                "nested_list": [
-                                    {
-                                        "id": "nested_1",
-                                        "value": {
-                                            "code": "NestedTest1",
-                                            "label": "NestedLabel1"
-                                        }
-                                    },
-                                    {
-                                        "id": "nested_2",
-                                        "value": {
-                                            "code": "NestedTest2",
-                                            "label": "NestedLabel2"
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                ]
+            {
+             	"applicant1Flags": {
+             		"details": [
+             			{
+             				"id": "d84ee6ec",
+             				"value": {
+             					"name": "Removal of things",
+             					"path": [
+             						{
+             							"id": "fcf1d29b",
+             							"value": "Party"
+             						},
+             						{
+             							"id": "be4fcd2e",
+             							"value": "Special measure"
+             						}
+             					],
+             					"status": "Active"
+             				}
+             			}
+             		]
+             	}
             }
-         }
-        """;
+            """;
 
         final String newDataString = """
-        {
-           "caseCategory": {
-               "list_items": [
-                   {
-                       "id": "123456",
-                       "value": {
-                           "nested_wrapper": {
-                                "nested_list": []
-                            }
-                       }
-                   }
-               ]
-           }
-        }
-        """;
+            {
+             	"applicant1Flags": {
+             		"details": [
+             			{
+             				"id": "d84ee6ec",
+             				"value": {
+             					"name": "Removal of things",
+             					"path": [
+             						{
+             							"id": "be4fcd2e",
+             							"value": "Special measure"
+             						}
+             					],
+             					"status": "Active"
+             				}
+             			}
+             		]
+             	}
+            }
+            """;
 
         setupLogging().setLevel(Level.INFO);
 
         CaseTypeDefinition caseTypeDefinition =
-            newCaseType().withField(caseCategoryFieldWithNestedListWithCreatePermissionWithoutReadPermission()).build();
-
+            caseTypeDefinitionWithNestedListWithCreatePermissionWithoutReadPermission();
         Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
@@ -4128,88 +4059,70 @@ class ConditionalFieldRestorerTest {
             "123");
 
         assertAll(
-            () -> assertTrue(result.containsKey("caseCategory")),
-            () -> assertTrue(result.get("caseCategory").has("list_items")),
+            () -> assertTrue(result.containsKey("applicant1Flags")),
+            () -> assertTrue(result.get("applicant1Flags").has("details")),
             () -> {
-                JsonNode listItems = result.get("caseCategory").get("list_items");
-                assertTrue(listItems.isArray());
-                assertTrue(listItems.get(0).has("value"));
-                JsonNode nestedList = listItems.get(0).get("value").get("nested_wrapper").get("nested_list");
-                assertEquals(2, nestedList.size());
+                JsonNode details = result.get("applicant1Flags").get("details");
+                assertTrue(details.isArray());
+                assertTrue(details.get(0).has("value"));
+                JsonNode path = details.get(0).get("value").get("path");
+                assertEquals(2, path.size());
             },
             () -> assertTrue(listAppender.list.stream()
                 .anyMatch(event -> event.getFormattedMessage()
-                    .contains("Adding missing collection item with ID '\"nested_1\"' under 'nested_list'."))),
-            () -> assertTrue(listAppender.list.stream()
-                .anyMatch(event -> event.getFormattedMessage()
-                    .contains("Adding missing collection item with ID '\"nested_2\"' under 'nested_list'.")))
+                    .contains("Adding missing collection item with ID '\"fcf1d29b\"' under 'path'.")))
         );
     }
 
     @Test
-    void shouldAddMissingCollectionSingleFieldInNestedCollections() {
-        // Nested collection of collections payload
+    void shouldAddMissingCollectionFieldsInNestedCollections() {
         final String existingDataString = """
-        {
-            "caseCategory": {
-                "list_items": [
-                    {
-                        "id": "123456",
-                        "value": {
-                            "nested_wrapper": {
-                                "nested_list": [
-                                    {
-                                        "id": "nested_1",
-                                        "value": {
-                                            "code": "NestedTest1",
-                                            "label": "NestedLabel1"
-                                        }
-                                    },
-                                    {
-                                        "id": "nested_2",
-                                        "value": {
-                                            "code": "NestedTest2",
-                                            "label": "NestedLabel2"
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                ]
+            {
+             	"applicant1Flags": {
+             		"details": [
+             			{
+             				"id": "d84ee6ec",
+             				"value": {
+             					"name": "Removal of things",
+             					"path": [
+             						{
+             							"id": "fcf1d29b",
+             							"value": "Party"
+             						},
+             						{
+             							"id": "be4fcd2e",
+             							"value": "Special measure"
+             						}
+             					],
+             					"status": "Active"
+             				}
+             			}
+             		]
+             	}
             }
-         }
-        """;
+            """;
 
         final String newDataString = """
-        {
-           "caseCategory": {
-               "list_items": [
-                   {
-                       "id": "123456",
-                       "value": {
-                           "nested_wrapper": {
-                                "nested_list": [
-                                    {
-                                        "id": "nested_2",
-                                        "value": {
-                                            "code": "NestedTest2"
-                                        }
-                                    }
-                                ]
-                            }
-                       }
-                   }
-               ]
-           }
-        }
-        """;
+            {
+             	"applicant1Flags": {
+             		"details": [
+             			{
+             				"id": "d84ee6ec",
+             				"value": {
+             					"name": "Removal of things",
+             					"path": [],
+             					"status": "Active"
+             				}
+             			}
+             		]
+             	}
+            }
+            """;
 
         setupLogging().setLevel(Level.INFO);
 
         CaseTypeDefinition caseTypeDefinition =
-            newCaseType().withField(caseCategoryFieldWithNestedListWithCreatePermissionWithoutReadPermission()).build();
-
+            caseTypeDefinitionWithNestedListWithCreatePermissionWithoutReadPermission();
         Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
@@ -4217,80 +4130,72 @@ class ConditionalFieldRestorerTest {
             "123");
 
         assertAll(
-            () -> assertTrue(result.containsKey("caseCategory")),
-            () -> assertTrue(result.get("caseCategory").has("list_items")),
+            () -> assertTrue(result.containsKey("applicant1Flags")),
+            () -> assertTrue(result.get("applicant1Flags").has("details")),
             () -> {
-                JsonNode listItems = result.get("caseCategory").get("list_items");
-                assertTrue(listItems.isArray());
-                assertTrue(listItems.get(0).has("value"));
-                JsonNode nestedList = listItems.get(0).get("value").get("nested_wrapper").get("nested_list");
-                assertEquals(2, nestedList.size());
+                JsonNode details = result.get("applicant1Flags").get("details");
+                assertTrue(details.isArray());
+                assertTrue(details.get(0).has("value"));
+                JsonNode path = details.get(0).get("value").get("path");
+                assertEquals(2, path.size());
             },
             () -> assertTrue(listAppender.list.stream()
                 .anyMatch(event -> event.getFormattedMessage()
-                    .contains("Adding missing collection item with ID '\"nested_1\"' under 'nested_list'."))),
+                    .contains("Adding missing collection item with ID '\"fcf1d29b\"' under 'path'."))),
             () -> assertTrue(listAppender.list.stream()
                 .anyMatch(event -> event.getFormattedMessage()
-                    .contains("Adding missing field 'label' under 'nested_list'.")))
+                    .contains("Adding missing collection item with ID '\"be4fcd2e\"' under 'path'.")))
         );
     }
 
     @Test
     void shouldIgnoreMissingCollectionFieldsInNestedCollections() {
         final String existingDataString = """
-        {
-            "caseCategory": {
-                "list_items": [
-                    {
-                        "id": "123456",
-                        "value": {
-                            "nested_wrapper": {
-                                "nested_list": [
-                                    {
-                                        "id": "nested_1",
-                                        "value": {
-                                            "code": "NestedTest1",
-                                            "label": "NestedLabel1"
-                                        }
-                                    },
-                                    {
-                                        "id": "nested_2",
-                                        "value": {
-                                            "code": "NestedTest2",
-                                            "label": "NestedLabel2"
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                ]
+            {
+             	"applicant1Flags": {
+             		"details": [
+             			{
+             				"id": "d84ee6ec",
+             				"value": {
+             					"name": "Removal of things",
+             					"path": [
+             						{
+             							"id": "fcf1d29b",
+             							"value": "Party"
+             						},
+             						{
+             							"id": "be4fcd2e",
+             							"value": "Special measure"
+             						}
+             					],
+             					"status": "Active"
+             				}
+             			}
+             		]
+             	}
             }
-         }
-        """;
+            """;
 
         final String newDataString = """
-        {
-           "caseCategory": {
-               "list_items": [
-                   {
-                       "id": "123456",
-                       "value": {
-                           "nested_wrapper": {
-                                "nested_list": []
-                            }
-                       }
-                   }
-               ]
-           }
-        }
-        """;
+            {
+             	"applicant1Flags": {
+             		"details": [
+             			{
+             				"id": "d84ee6ec",
+             				"value": {
+             					"name": "Removal of things",
+             					"path": [],
+             					"status": "Active"
+             				}
+             			}
+             		]
+             	}
+            }
+            """;
 
         setupLogging().setLevel(Level.DEBUG);
 
-        CaseTypeDefinition caseTypeDefinition =
-            newCaseType().withField(caseCategoryFieldWithNestedList()).build();
-
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionWithNestedList();
         Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
@@ -4298,21 +4203,22 @@ class ConditionalFieldRestorerTest {
             "123");
 
         assertAll(
-            () -> assertTrue(result.containsKey("caseCategory")),
-            () -> assertTrue(result.get("caseCategory").has("list_items")),
+            () -> assertTrue(result.containsKey("applicant1Flags")),
+            () -> assertTrue(result.get("applicant1Flags").has("details")),
             () -> {
-                JsonNode listItems = result.get("caseCategory").get("list_items");
-                assertTrue(listItems.isArray());
-                assertTrue(listItems.get(0).has("value"));
-                assertTrue(listItems.get(0).get("value").get("nested_wrapper").has("nested_list"));
-                assertEquals(0, listItems.get(0).get("value").get("nested_wrapper").get("nested_list").size());
+                JsonNode details = result.get("applicant1Flags").get("details");
+                assertTrue(details.isArray());
+                assertTrue(details.get(0).has("value"));
+                JsonNode path = details.get(0).get("value").get("path");
+                assertEquals(0, path.size());
             },
+            () -> assertEquals(2, listAppender.list.size()),
             () -> assertTrue(listAppender.list.stream()
                 .anyMatch(event -> event.getFormattedMessage()
-                    .contains("Missing collection item with ID '\"nested_1\"' under 'nested_list'."))),
+                    .contains("Missing collection item with ID '\"fcf1d29b\"' under 'path'."))),
             () -> assertTrue(listAppender.list.stream()
                 .anyMatch(event -> event.getFormattedMessage()
-                    .contains("Missing collection item with ID '\"nested_2\"' under 'nested_list'.")))
+                    .contains("Missing collection item with ID '\"be4fcd2e\"' under 'path'.")))
         );
     }
 
