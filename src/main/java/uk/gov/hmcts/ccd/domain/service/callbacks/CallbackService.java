@@ -25,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
@@ -45,6 +46,8 @@ public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
     private static final String WILDCARD = "*";
     public static final String CLIENT_CONTEXT = "Client-Context";
+
+    final JcLogger jcLogger = new JcLogger("CallbackService", false);
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
@@ -126,6 +129,11 @@ public class CallbackService {
         });
     }
 
+    /*
+     * JC note:
+     * CallbackRequest DOES contain "dummy.pdf" , for both "Continue 1" (with attachment) and "Continue 2" (without).
+     * Called from CaseDataValidatorController.
+     */
     private <T> Optional<ResponseEntity<T>> sendRequest(final String url,
                                                         final CallbackType callbackType,
                                                         final Class<T> clazz,
@@ -146,6 +154,9 @@ public class CallbackService {
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
             if (logCallbackDetails(url)) {
+                jcLogger.jclog("sendRequest() url = " + url + " , callbackType = " + callbackType);
+                jcLogger.jclog("sendRequest() callbackRequest", callbackRequest);
+                jcLogger.jclog("sendRequest() CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
                 LOG.info("Invoking callback {} of type {} with request: {}", url, callbackType, requestEntity);
             }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
