@@ -389,6 +389,11 @@ class SubmitCaseTransactionNewCaseTest {
                                                                     boolean newCase)
         throws JsonProcessingException {
         JsonNode data;
+        String yesOrNo = "No";
+        if (newCase) {
+            yesOrNo = "Yes";
+        }
+
         if (includeNewCase) {
 
             data = MAPPER.readTree(""
@@ -399,7 +404,7 @@ class SubmitCaseTransactionNewCaseTest {
                 + "  },"
                 + "  \"OrgPolicyReference\": null,"
                 + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\","
-                + "  \"newCase\": \"" + newCase + "\""
+                + "  \"newCase\": \"" + yesOrNo + "\""
                 + "}");
         } else {
             data = MAPPER.readTree(""

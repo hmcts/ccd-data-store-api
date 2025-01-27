@@ -55,7 +55,7 @@ public class NewCaseUtils {
             .stream()
             .filter(Objects::nonNull)
             .filter(node -> node != null && node.get(ORG_POLICY_NEW_CASE) != null
-                && node.get(ORG_POLICY_NEW_CASE).asText().equals(Boolean.TRUE.toString()))
+                && node.get(ORG_POLICY_NEW_CASE).asText().toUpperCase().equals("YES"))
             .collect(Collectors.toList());
 
         LOG.debug("Organisation found for  caseType={} version={} ORGANISATION={},"
