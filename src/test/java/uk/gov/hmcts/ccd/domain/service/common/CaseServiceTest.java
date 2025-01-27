@@ -372,25 +372,10 @@ class CaseServiceTest {
                     .build()
             );
 
-            Map<String, JsonNode> result = caseService.buildJsonFromCaseFieldsWithDefaultValue(caseFields);
+            Map<String, JsonNode> result = caseService.buildJsonFromCaseFieldsWithNullifyByDefault(caseFields);
 
             assertAll(
-                () -> assertThat(result.size(), is(3)),
-
-                () -> assertTrue(result.containsKey("ChangeOrganisationRequestField")),
-                () -> assertNotNull(result.get("ChangeOrganisationRequestField").get("Reason")),
-                () -> assertNull(result.get("ChangeOrganisationRequestField").get("CaseRoleId")),
-                () -> assertNotNull(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd")
-                    .get("OrganisationID")),
-                () -> assertThat(result.get("ChangeOrganisationRequestField").get("Reason").asText(),
-                    is("SomeReasonX")),
-                () -> assertThat(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd")
-                    .get("OrganisationID").asText(), is("Solicitor firm 1")),
-
-                () -> assertTrue(result.containsKey("OrganisationPolicyField")),
-                () -> assertNotNull(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole")),
-                () -> assertThat(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole").asText(),
-                    is("[Claimant]")),
+                () -> assertThat(result.size(), is(1)),
                 () -> assertTrue(result.containsKey("TextField0")),
                 () -> assertThat(result.get("TextField0").asText(), is("null"))
             );
