@@ -5,7 +5,7 @@
   "request": {
     "body": {
       "data": {
-        "_extends_": "TTL_Case_Data"
+        "_extends_": "TTL_Case_Data_NBD"
       },
       "data_classification": {
         "_extends_": "TTL_Classifications"
@@ -16,7 +16,7 @@
   "expectedResponse": {
     "body": {
       "case_data": {
-        "_extends_": "TTL_Case_Data"
+        "_extends_": "TTL_Case_Data_NBD"
       },
       "data_classification": {
         "_extends_": "TTL_Classifications"
