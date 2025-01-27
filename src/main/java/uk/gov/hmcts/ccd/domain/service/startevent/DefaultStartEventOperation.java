@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.startevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import java.util.function.BooleanSupplier;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,6 +34,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
@@ -135,11 +135,18 @@ public class DefaultStartEventOperation implements StartEventOperation {
             caseDetails.getData(), caseEventDefinition, caseTypeDefinition
         );
         caseDetails.setData(caseDataWithTtl);
+
         // update TTL in data classification
         Map<String, JsonNode> caseDataClassificationWithTtl = timeToLiveService.updateCaseDataClassificationWithTTL(
             caseDetails.getData(), caseDetails.getDataClassification(), caseEventDefinition, caseTypeDefinition
         );
         caseDetails.setDataClassification(caseDataClassificationWithTtl);
+
+        Map<String, JsonNode> nullifyByDefaultData = caseService
+            .buildJsonFromCaseFieldsWithNullifyByDefault(caseEventDefinition.getCaseFields());
+        if (!nullifyByDefaultData.isEmpty()) {
+            mergeDataAndClassificationForNewFields(nullifyByDefaultData, caseDetails, caseTypeDefinition);
+        }
 
         final String eventToken = eventTokenService.generateToken(uid,
             caseDetails,
@@ -184,6 +191,12 @@ public class DefaultStartEventOperation implements StartEventOperation {
             .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
         if (!defaultValueData.isEmpty()) {
             mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
+        }
+
+        Map<String, JsonNode> nullifyByDefaultData = caseService
+            .buildJsonFromCaseFieldsWithNullifyByDefault(caseEventDefinition.getCaseFields());
+        if (!nullifyByDefaultData.isEmpty()) {
+            mergeDataAndClassificationForNewFields(nullifyByDefaultData, caseDetails, caseTypeDefinition);
         }
 
         validateEventTrigger(() ->

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -127,11 +126,6 @@ public class CaseService {
                     data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().textNode(defaultValue));
                 }
 
-                Boolean nullifyByDefault = caseField.getNullifyByDefault();
-                if (Boolean.TRUE.equals(nullifyByDefault) && StringUtils.isEmpty(defaultValue)) {
-                    data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().nullNode());
-                }
-
                 List<JsonNode> collect = caseField.getCaseEventFieldComplexDefinitions().stream()
                     .filter(e -> e.getDefaultValue() != null)
                     .filter(e -> !e.getReference().isBlank())
@@ -146,6 +140,25 @@ public class CaseService {
                         objectNode.set(next, e.findValue(next));
                     });
                     data.put(caseField.getCaseFieldId(), objectNode);
+                }
+            });
+
+        return data;
+    }
+
+    /**
+     * Builds a json representation of the caseFields with a defaultValue present.
+     * Has no knowledge of the collections, hence all ArrayNodes are represented as an ObjectNode.
+     */
+    public Map<String, JsonNode> buildJsonFromCaseFieldsWithNullifyByDefault(
+        List<CaseEventFieldDefinition> caseEventDefinition) {
+        Map<String, JsonNode> data = new HashMap<>();
+
+        caseEventDefinition.forEach(
+            caseField -> {
+                Boolean nullifyByDefault = caseField.getNullifyByDefault();
+                if (Boolean.TRUE.equals(nullifyByDefault)) {
+                    data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().nullNode());
                 }
             });
 

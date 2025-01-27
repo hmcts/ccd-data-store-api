@@ -3,9 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.casedeletion;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +23,6 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonObjectMapperConfig;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -45,8 +42,6 @@ import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,7 +49,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -487,58 +481,6 @@ class TimeToLiveServiceTest {
             );
 
             assertEquals(TimeToLiveService.FAILED_TO_READ_TTL_FROM_CASE_DATA, exception.getMessage());
-        }
-
-        @Test
-        void updateCaseDetailsWithTTL_NullifByDefaultValueSetToTrue() throws IOException {
-
-            // GIVEN
-            var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
-            JsonNode ttlNodeAsString = objectMapper.valueToTree(ttl);
-
-            caseData.put(TTL.TTL_CASE_FIELD_ID, ttlNodeAsString);
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
-            CaseEventFieldDefinition caseEventFieldDefinition = mock(CaseEventFieldDefinition.class);
-            when(caseEventFieldDefinition.getCaseFieldId()).thenReturn(TTL_CASE_FIELD_ID);
-            when(caseEventFieldDefinition.getNullifyByDefault()).thenReturn(true);
-            List<CaseEventFieldDefinition> caseFields = Lists.newArrayList(caseEventFieldDefinition);
-            caseEventDefinition.setCaseFields(caseFields);
-
-            // WHEN / THEN
-            Map<String, JsonNode> outputData = timeToLiveService
-                .updateCaseDetailsWithTTL(caseData, caseEventDefinition, caseTypeDefinition);
-
-            JsonNode timeToLiveNode = outputData.get(TTL.TTL_CASE_FIELD_ID);
-            assertNotNull(timeToLiveNode);
-            assertInstanceOf(NullNode.class, timeToLiveNode);
-        }
-
-        @Test
-        void updateCaseDetailsWithTTL_NullifByDefaultValueSetToFalse() throws IOException {
-
-            // GIVEN
-            var caseTypeDefinition = createCaseTypeDefinitionWithTTL();
-            var caseEventDefinition = new CaseEventDefinition();
-            TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
-            JsonNode ttlNodeAsString = objectMapper.valueToTree(ttl);
-
-            caseData.put(TTL.TTL_CASE_FIELD_ID, ttlNodeAsString);
-            caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
-            CaseEventFieldDefinition caseEventFieldDefinition = mock(CaseEventFieldDefinition.class);
-            when(caseEventFieldDefinition.getCaseFieldId()).thenReturn(TTL_CASE_FIELD_ID);
-            when(caseEventFieldDefinition.getNullifyByDefault()).thenReturn(false);
-            List<CaseEventFieldDefinition> caseFields = Lists.newArrayList(caseEventFieldDefinition);
-            caseEventDefinition.setCaseFields(caseFields);
-
-            // WHEN / THEN
-            Map<String, JsonNode> outputData = timeToLiveService
-                .updateCaseDetailsWithTTL(caseData, caseEventDefinition, caseTypeDefinition);
-
-            JsonNode timeToLiveNode = outputData.get(TTL.TTL_CASE_FIELD_ID);
-            assertInstanceOf(ObjectNode.class, timeToLiveNode);
-            assertNotNull(timeToLiveNode.get("SystemTTL"));
         }
     }
 
