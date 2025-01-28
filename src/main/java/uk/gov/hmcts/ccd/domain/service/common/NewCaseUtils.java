@@ -28,24 +28,31 @@ public class NewCaseUtils {
     private static final String ORGANISATIONID = "OrganisationID";
     public static final String ORG_POLICY_NEW_CASE = "newCase";
     public static final String SUPPLEMENTRY_DATA_NEW_CASE = "new_case";
+    public static final String CASE_NEW_YES = "YES";
+    public static final String CASE_NEW_NO = "NO";
 
     @Autowired
     public NewCaseUtils() {
     }
 
     public static void setupSupplementryDataWithNewCase(CaseDetails caseDetailsAfterCallbackWithoutHashes) {
-        // Identify organizations with newCase set to true
-        List<JsonNode> organizations
-            = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetailsAfterCallbackWithoutHashes);
+        // Identify organizationProfiles with newCase set to (YES) true
+        List<JsonNode> organizationProfiles
+            = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetailsAfterCallbackWithoutHashes,
+            CASE_NEW_YES);
 
         // Update case supplementary data
-        NewCaseUtils.updateCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizations);
+        NewCaseUtils.updateCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizationProfiles);
 
-        // Clear newCase attributes
-        NewCaseUtils.clearNewCaseAttributes(organizations);
+        // Clear organizationProfiles newCase attributes from case data
+        NewCaseUtils.clearNewCaseAttributes(organizationProfiles);
+
+        // Clear newCase attributes from case data if case_new set to No (false)
+        clearNewCaseAttributesFromCaseDetailsSetToFalse(caseDetailsAfterCallbackWithoutHashes);
     }
 
-    public static List<JsonNode> findListOfOrganisationPolicyNodesForNewCase(CaseDetails caseDetails) {
+    public static List<JsonNode> findListOfOrganisationPolicyNodesForNewCase(CaseDetails caseDetails,
+                                                                             String newCaseValue) {
         if (caseDetails.getData() == null) {
             return Collections.EMPTY_LIST;
         }
@@ -55,7 +62,7 @@ public class NewCaseUtils {
             .stream()
             .filter(Objects::nonNull)
             .filter(node -> node != null && node.get(ORG_POLICY_NEW_CASE) != null
-                && node.get(ORG_POLICY_NEW_CASE).asText().toUpperCase().equals("YES"))
+                && node.get(ORG_POLICY_NEW_CASE).asText().toUpperCase().equals(newCaseValue))
             .collect(Collectors.toList());
 
         LOG.debug("Organisation found for  caseType={} version={} ORGANISATION={},"
@@ -73,10 +80,11 @@ public class NewCaseUtils {
 
             String orgIdentifier = orgProfile.get(ORGANISATION)
                 .get(ORGANISATIONID).textValue();
-
-            JsonNode orgNode = new ObjectMapper().createObjectNode()
-                .put(orgIdentifier, Boolean.TRUE.toString());
-            orgIdList.add(orgNode);
+            if (orgIdentifier != null && !orgIdentifier.isEmpty()) {
+                JsonNode orgNode = new ObjectMapper().createObjectNode()
+                    .put(orgIdentifier, Boolean.TRUE.toString());
+                orgIdList.add(orgNode);
+            }
         }
 
         if (!orgIdList.isEmpty()) {
@@ -87,13 +95,23 @@ public class NewCaseUtils {
             JsonNode jsonNode = new ObjectMapper().createArrayNode().addAll(orgIdList);
             supplementaryData.put(SUPPLEMENTRY_DATA_NEW_CASE, jsonNode);
 
-            LOG.debug("SupplementaryData ={} .", supplementaryData);
+            LOG.debug("new_case SupplementaryData ={} .", supplementaryData);
             caseDetails.setSupplementaryData(supplementaryData);
         }
 
     }
 
     private static void clearNewCaseAttributes(List<JsonNode> organizationProfiles) {
+        for (JsonNode orgProfile : organizationProfiles) {
+            ((ObjectNode) orgProfile).remove(ORG_POLICY_NEW_CASE);
+        }
+    }
+
+    public static void clearNewCaseAttributesFromCaseDetailsSetToFalse(CaseDetails caseDetails) {
+        // Identify organizationProfiles with newCase set to (No) false
+        List<JsonNode> organizationProfiles
+            = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetails, CASE_NEW_NO);
+
         for (JsonNode orgProfile : organizationProfiles) {
             ((ObjectNode) orgProfile).remove(ORG_POLICY_NEW_CASE);
         }

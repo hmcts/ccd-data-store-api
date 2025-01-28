@@ -458,11 +458,12 @@ class SubmitCaseTransactionNewCaseTest {
 ;
         JsonNode supplementryDataJsonNode = caseDetails.getSupplementaryData()
             .get(NewCaseUtils.SUPPLEMENTRY_DATA_NEW_CASE);
-        List<JsonNode> organizations = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetails);
+        List<JsonNode> organizationProfiles = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetails,
+            NewCaseUtils.CASE_NEW_YES);
 
         assertAll("Assert CaseDetails, Data, organisationId",
             () -> assertTrue((supplementryDataJsonNode.toString().contains(organisationId))),
-            () -> assertTrue(organizations.isEmpty())
+            () -> assertTrue(organizationProfiles.isEmpty())
         );
     }
 
