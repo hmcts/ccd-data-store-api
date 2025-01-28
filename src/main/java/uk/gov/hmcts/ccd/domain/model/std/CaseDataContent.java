@@ -72,7 +72,7 @@ public class CaseDataContent {
     }
 
     public void setData(Map<String, JsonNode> data) {
-        logData(data, "setData()");
+        logData(data, "CaseDataContent.setData()");
         this.data = data;
     }
 
@@ -81,7 +81,7 @@ public class CaseDataContent {
     }
 
     public void setEventData(Map<String, JsonNode> eventData) {
-        logData(eventData, "setEventData()");
+        logData(eventData, "CaseDataContent.setEventData()");
         this.eventData = eventData;
     }
 
