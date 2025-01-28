@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,6 +55,14 @@ public class TimeToLiveService {
             .stream().anyMatch(caseFieldDefinition -> TTL_CASE_FIELD_ID.equals(caseFieldDefinition.getId()));
     }
 
+    private Boolean isNullifyByDefault(@NonNull CaseEventDefinition caseEventDefinition) {
+        List<CaseEventFieldDefinition> caseEventFieldDefinitions =
+            Optional.ofNullable(caseEventDefinition.getCaseFields()).orElse(Collections.emptyList())
+                .stream().filter(cefDefinition -> TTL_CASE_FIELD_ID.equals(cefDefinition.getCaseFieldId()))
+                .filter(cefDefinition -> cefDefinition.getNullifyByDefault() != null).toList();
+        return !caseEventFieldDefinitions.isEmpty() && caseEventFieldDefinitions.getFirst().getNullifyByDefault();
+    }
+
     public Map<String, JsonNode> updateCaseDataClassificationWithTTL(Map<String, JsonNode> data,
                                                                      Map<String, JsonNode> dataClassification,
                                                                      CaseEventDefinition caseEventDefinition,
@@ -61,7 +71,10 @@ public class TimeToLiveService {
         Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
 
         // if TTL is in play then ensure data classification contains TTL data
-        if (isCaseTypeUsingTTL(caseTypeDefinition) && (ttlIncrement != null) && isTtlCaseFieldPresent(data)) {
+        if (!isNullifyByDefault(caseEventDefinition)
+            && isCaseTypeUsingTTL(caseTypeDefinition)
+            && (ttlIncrement != null)
+            && isTtlCaseFieldPresent(data)) {
 
             // generate just the TTL data classification from just the TTL field data
             Map<String, JsonNode> justTtlDataClassification = caseDataService.getDefaultSecurityClassifications(
@@ -83,7 +96,7 @@ public class TimeToLiveService {
                                                           CaseTypeDefinition caseTypeDefinition) {
         Map<String, JsonNode> outputData = data;
 
-        if (isCaseTypeUsingTTL(caseTypeDefinition)) {
+        if (!isNullifyByDefault(caseEventDefinition) && isCaseTypeUsingTTL(caseTypeDefinition)) {
             // load existing TTL
             Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
             if (ttlIncrement != null) {
