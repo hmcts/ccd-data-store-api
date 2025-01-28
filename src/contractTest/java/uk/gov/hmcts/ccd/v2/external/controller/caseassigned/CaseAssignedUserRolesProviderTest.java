@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 @Provider("ccdDataStoreAPI_caseAssignedUserRoles")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-        @VersionSelector(tag = "master")})
+        @VersionSelector(tag = "prl-citizen-pact-test")})
 @TestPropertySource(locations = "/application.properties")
 @WebMvcTest({CaseAssignedUserRolesController.class})
 @AutoConfigureMockMvc(addFilters = false)
