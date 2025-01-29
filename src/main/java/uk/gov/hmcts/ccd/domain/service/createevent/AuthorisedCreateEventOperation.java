@@ -99,7 +99,9 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
-        updateCaseDetailsWithTtlIncrement(existingCaseDetails, caseTypeDefinition, content.getEvent());
+        CaseEventDefinition caseEventDefinition = findCaseEvent(caseTypeDefinition, content.getEvent());
+        updateCaseDetailsWithNullifyByDefault(existingCaseDetails, caseEventDefinition);
+        updateCaseDetailsWithTtlIncrement(existingCaseDetails, caseTypeDefinition, caseEventDefinition);
 
         verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails,
             caseTypeDefinition, accessProfiles);
@@ -265,12 +267,9 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
     private void updateCaseDetailsWithTtlIncrement(CaseDetails caseDetails,
                                                    CaseTypeDefinition caseTypeDefinition,
-                                                   Event event) {
-
-        String eventId = event != null ? event.getEventId() : null;
+                                                   CaseEventDefinition caseEventDefinition) {
 
         if (timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition)) {
-            CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
             if (caseEventDefinition != null) {
 
                 // update TTL in data
@@ -285,6 +284,27 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                 caseDetails.setDataClassification(caseDataClassificationWithTtl);
 
             } // NB: not throwing exception for missing event ID as there are other checks elsewhere for that.
+        }
+    }
+
+    private CaseEventDefinition findCaseEvent(CaseTypeDefinition caseTypeDefinition,
+                                              Event event) {
+        String eventId = event != null ? event.getEventId() : null;
+        return eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
+    }
+
+    public void updateCaseDetailsWithNullifyByDefault(CaseDetails caseDetails,
+                                                      CaseEventDefinition caseEventDefinition) {
+        if (caseEventDefinition != null) {
+            Map<String, JsonNode> outputData = caseDetails.getData();
+            caseEventDefinition.getCaseFields().forEach(
+                caseField -> {
+                    Boolean nullifyByDefault = caseField.getNullifyByDefault();
+                    if (Boolean.TRUE.equals(nullifyByDefault)) {
+                        outputData.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().nullNode());
+                    }
+                });
+            caseDetails.setData(outputData);
         }
     }
 
