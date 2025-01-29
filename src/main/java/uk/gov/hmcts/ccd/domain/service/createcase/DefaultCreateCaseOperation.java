@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 @Service
 @Qualifier("default")
@@ -163,8 +162,6 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             EMPTY_DATA_CLASSIFICATION));
         updateCaseState(caseEventDefinition, newCaseDetails);
 
-        updateCaseDetailsWithNullifyByDefault(newCaseDetails, caseEventDefinition);
-
         updateCaseDetailsWithTtlIncrement(newCaseDetails, caseTypeDefinition, caseEventDefinition);
 
         newCaseDetails.setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(newCaseDetails.getData()));
@@ -258,19 +255,5 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             caseDetails.setDataClassification(caseDataClassificationWithTtl);
 
         }
-    }
-
-    public void updateCaseDetailsWithNullifyByDefault(CaseDetails caseDetails,
-                                                                       CaseEventDefinition caseEventDefinition) {
-        Map<String, JsonNode> outputData = caseDetails.getData();
-
-        caseEventDefinition.getCaseFields().forEach(
-            caseField -> {
-                Boolean nullifyByDefault = caseField.getNullifyByDefault();
-                if (Boolean.TRUE.equals(nullifyByDefault)) {
-                    outputData.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().nullNode());
-                }
-            });
-        caseDetails.setData(outputData);
     }
 }
