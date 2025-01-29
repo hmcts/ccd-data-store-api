@@ -64,7 +64,6 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 @Service
 public class CreateCaseEventService {
@@ -174,8 +173,6 @@ public class CreateCaseEventService {
             caseTypeDefinition,
             content.getEvent()
         );
-
-        updateCaseDetailsWithNullifyByDefault(caseDetails, caseEventDefinition);
 
         updateCaseDetailsWithTtlIncrement(caseDetails, caseTypeDefinition, caseEventDefinition);
 
@@ -541,19 +538,5 @@ public class CreateCaseEventService {
             caseDetails.setDataClassification(caseDataClassificationWithTtl);
 
         }
-    }
-
-    public void updateCaseDetailsWithNullifyByDefault(CaseDetails caseDetails,
-                                                      CaseEventDefinition caseEventDefinition) {
-        Map<String, JsonNode> outputData = caseDetails.getData();
-
-        caseEventDefinition.getCaseFields().forEach(
-            caseField -> {
-                Boolean nullifyByDefault = caseField.getNullifyByDefault();
-                if (Boolean.TRUE.equals(nullifyByDefault)) {
-                    outputData.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().nullNode());
-                }
-            });
-        caseDetails.setData(outputData);
     }
 }

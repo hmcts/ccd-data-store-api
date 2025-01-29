@@ -100,7 +100,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         }
 
         CaseEventDefinition caseEventDefinition = findCaseEvent(caseTypeDefinition, content.getEvent());
-        updateCaseDetailsWithNullifyByDefault(existingCaseDetails, caseEventDefinition);
         updateCaseDetailsWithTtlIncrement(existingCaseDetails, caseTypeDefinition, caseEventDefinition);
 
         verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails,
@@ -291,21 +290,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                               Event event) {
         String eventId = event != null ? event.getEventId() : null;
         return eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
-    }
-
-    public void updateCaseDetailsWithNullifyByDefault(CaseDetails caseDetails,
-                                                      CaseEventDefinition caseEventDefinition) {
-        if (caseEventDefinition != null) {
-            Map<String, JsonNode> outputData = caseDetails.getData();
-            caseEventDefinition.getCaseFields().forEach(
-                caseField -> {
-                    Boolean nullifyByDefault = caseField.getNullifyByDefault();
-                    if (Boolean.TRUE.equals(nullifyByDefault)) {
-                        outputData.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().nullNode());
-                    }
-                });
-            caseDetails.setData(outputData);
-        }
     }
 
 }

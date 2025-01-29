@@ -130,6 +130,12 @@ public class DefaultStartEventOperation implements StartEventOperation {
             mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
         }
 
+        Map<String, JsonNode> nullifyByDefaultData = caseService
+            .buildJsonFromCaseFieldsWithNullifyByDefault(caseEventDefinition.getCaseFields());
+        if (!nullifyByDefaultData.isEmpty()) {
+            mergeDataAndClassificationForNewFields(nullifyByDefaultData, caseDetails, caseTypeDefinition);
+        }
+
         // update TTL in data
         Map<String, JsonNode> caseDataWithTtl = timeToLiveService.updateCaseDetailsWithTTL(
             caseDetails.getData(), caseEventDefinition, caseTypeDefinition
@@ -141,12 +147,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
             caseDetails.getData(), caseDetails.getDataClassification(), caseEventDefinition, caseTypeDefinition
         );
         caseDetails.setDataClassification(caseDataClassificationWithTtl);
-
-        Map<String, JsonNode> nullifyByDefaultData = caseService
-            .buildJsonFromCaseFieldsWithNullifyByDefault(caseEventDefinition.getCaseFields());
-        if (!nullifyByDefaultData.isEmpty()) {
-            mergeDataAndClassificationForNewFields(nullifyByDefaultData, caseDetails, caseTypeDefinition);
-        }
 
         final String eventToken = eventTokenService.generateToken(uid,
             caseDetails,
