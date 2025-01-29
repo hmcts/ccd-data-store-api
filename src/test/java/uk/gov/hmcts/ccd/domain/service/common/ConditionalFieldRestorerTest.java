@@ -4002,49 +4002,49 @@ class ConditionalFieldRestorerTest {
     void shouldAddMissingSingleCollectionFieldInNestedCollections() {
         final String existingDataString = """
             {
-             	"applicant1Flags": {
-             		"details": [
-             			{
-             				"id": "d84ee6ec",
-             				"value": {
-             					"name": "Removal of things",
-             					"path": [
-             						{
-             							"id": "fcf1d29b",
-             							"value": "Party"
-             						},
-             						{
-             							"id": "be4fcd2e",
-             							"value": "Special measure"
-             						}
-             					],
-             					"status": "Active"
-             				}
-             			}
-             		]
-             	}
+                 "applicant1Flags": {
+                     "details": [
+                         {
+                             "id": "d84ee6ec",
+                             "value": {
+                                 "name": "Removal of things",
+                                 "path": [
+                                     {
+                                         "id": "fcf1d29b",
+                                         "value": "Party"
+                                     },
+                                     {
+                                         "id": "be4fcd2e",
+                                         "value": "Special measure"
+                                     }
+                                 ],
+                                 "status": "Active"
+                             }
+                         }
+                     ]
+                 }
             }
             """;
 
         final String newDataString = """
             {
-             	"applicant1Flags": {
-             		"details": [
-             			{
-             				"id": "d84ee6ec",
-             				"value": {
-             					"name": "Removal of things",
-             					"path": [
-             						{
-             							"id": "be4fcd2e",
-             							"value": "Special measure"
-             						}
-             					],
-             					"status": "Active"
-             				}
-             			}
-             		]
-             	}
+                 "applicant1Flags": {
+                     "details": [
+                         {
+                             "id": "d84ee6ec",
+                             "value": {
+                                 "name": "Removal of things",
+                                 "path": [
+                                     {
+                                         "id": "be4fcd2e",
+                                         "value": "Special measure"
+                                     }
+                                 ],
+                                 "status": "Active"
+                             }
+                         }
+                     ]
+                 }
             }
             """;
 
@@ -4078,44 +4078,44 @@ class ConditionalFieldRestorerTest {
     void shouldAddMissingCollectionFieldsInNestedCollections() {
         final String existingDataString = """
             {
-             	"applicant1Flags": {
-             		"details": [
-             			{
-             				"id": "d84ee6ec",
-             				"value": {
-             					"name": "Removal of things",
-             					"path": [
-             						{
-             							"id": "fcf1d29b",
-             							"value": "Party"
-             						},
-             						{
-             							"id": "be4fcd2e",
-             							"value": "Special measure"
-             						}
-             					],
-             					"status": "Active"
-             				}
-             			}
-             		]
-             	}
+                 "applicant1Flags": {
+                     "details": [
+                         {
+                             "id": "d84ee6ec",
+                             "value": {
+                                 "name": "Removal of things",
+                                 "path": [
+                                     {
+                                         "id": "fcf1d29b",
+                                         "value": "Party"
+                                     },
+                                     {
+                                         "id": "be4fcd2e",
+                                         "value": "Special measure"
+                                     }
+                                 ],
+                                 "status": "Active"
+                             }
+                         }
+                     ]
+                 }
             }
             """;
 
         final String newDataString = """
             {
-             	"applicant1Flags": {
-             		"details": [
-             			{
-             				"id": "d84ee6ec",
-             				"value": {
-             					"name": "Removal of things",
-             					"path": [],
-             					"status": "Active"
-             				}
-             			}
-             		]
-             	}
+                 "applicant1Flags": {
+                     "details": [
+                         {
+                             "id": "d84ee6ec",
+                             "value": {
+                                 "name": "Removal of things",
+                                 "path": [],
+                                 "status": "Active"
+                             }
+                         }
+                     ]
+                 }
             }
             """;
 
@@ -4152,44 +4152,44 @@ class ConditionalFieldRestorerTest {
     void shouldIgnoreMissingCollectionFieldsInNestedCollections() {
         final String existingDataString = """
             {
-             	"applicant1Flags": {
-             		"details": [
-             			{
-             				"id": "d84ee6ec",
-             				"value": {
-             					"name": "Removal of things",
-             					"path": [
-             						{
-             							"id": "fcf1d29b",
-             							"value": "Party"
-             						},
-             						{
-             							"id": "be4fcd2e",
-             							"value": "Special measure"
-             						}
-             					],
-             					"status": "Active"
-             				}
-             			}
-             		]
-             	}
+                 "applicant1Flags": {
+                     "details": [
+                         {
+                             "id": "d84ee6ec",
+                             "value": {
+                                 "name": "Removal of things",
+                                 "path": [
+                                     {
+                                         "id": "fcf1d29b",
+                                         "value": "Party"
+                                     },
+                                     {
+                                         "id": "be4fcd2e",
+                                         "value": "Special measure"
+                                     }
+                                 ],
+                                 "status": "Active"
+                             }
+                         }
+                     ]
+                 }
             }
             """;
 
         final String newDataString = """
             {
-             	"applicant1Flags": {
-             		"details": [
-             			{
-             				"id": "d84ee6ec",
-             				"value": {
-             					"name": "Removal of things",
-             					"path": [],
-             					"status": "Active"
-             				}
-             			}
-             		]
-             	}
+                "applicant1Flags": {
+                    "details": [
+                        {
+                            "id": "d84ee6ec",
+                            "value": {
+                                "name": "Removal of things",
+                                "path": [],
+                                "status": "Active"
+                            }
+                        }
+                    ]
+                }
             }
             """;
 
