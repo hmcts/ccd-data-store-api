@@ -29,6 +29,8 @@ public class JcLogger {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private final TestController testController = new TestController();
+
     public JcLogger(final String classname, final boolean enabled) {
         this.classname = classname;
         this.enabled = enabled;
@@ -40,7 +42,7 @@ public class JcLogger {
     public void jclog(String message) {
         if (enabled) {
             LOG.info("| JCDEBUG: {}: {}", classname, message);
-            TestController.jcLog("| JCDEBUG: " + classname + ": " + message);
+            testController.jcLog("| JCDEBUG: " + classname + ": " + message);
         }
     }
 

@@ -24,25 +24,36 @@ public class TestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
 
+    private String log(String message, String methodPrefix) {
+        if (message == null) {
+            message = methodPrefix + ": NULL";
+        } else {
+            message = methodPrefix + ":" + message.replaceAll("[\n\r]", "_");
+        }
+        LOG.info("JCDEBUG: TestController.info: " + message);
+        LOG.debug("JCDEBUG: TestController.debug: " + message);
+        LOG.warn("JCDEBUG: TestController.warn: " + message);
+        LOG.error("JCDEBUG: TestController.error: " + message);
+        return message;
+    }
+
     /*
      * Method to POST and log messages.
      *
-     * Tested originally using curl command below :-
-     * curl -X POST https://ccd-data-store-api-pr-2356.preview.platform.hmcts.net/jcdebug -d "TESTING WORKS"
+     * Test using curl command below :-
+     * curl -X POST https://ccd-data-store-api-pr-2522.preview.platform.hmcts.net/jcdebug -d "TESTING WORKS"
      */
     @PostMapping("/jcdebug")
-    public ResponseEntity<String> postMessage(@RequestBody String message) {
-        if (message != null) {
-            message = message.replaceAll("[\n\r]", "_");
-            LOG.debug("JCDEBUG: info: Message: " + message);
-            LOG.debug("JCDEBUG: debug: Message: " + message);
-        }
-        return ResponseEntity.ok("Message: " + (message == null ? "NULL" : message));
+    public ResponseEntity<String> handlePostMessage(@RequestBody String message) {
+        message = log(message, "handlePostMessage()");
+        return ResponseEntity.ok(message);
     }
 
     /*
      * Method to TEST message logging.
-     * Copy to SecurityValidationService , CallbackInvoker , (and CallbackService).
+     *
+     * Test using curl command below :-
+     * curl https://ccd-data-store-api-pr-2522.preview.platform.hmcts.net/jcdebugtest
      */
     @GetMapping("/jcdebugtest")
     public String jcdebugtest() {
@@ -52,7 +63,8 @@ public class TestController {
     /*
      * ==== Log message. ====
      */
-    public static String jcLog(final String message) {
+    public String jcLog(String message) {
+        message = log(message, "jcLog()");
         String rc = "";
         try {
             URL apiUrl = new URL(LOG_URL);
