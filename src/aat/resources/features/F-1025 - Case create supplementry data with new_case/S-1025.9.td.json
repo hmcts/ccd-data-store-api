@@ -69,12 +69,11 @@
       },
       "data_classification": {
       },
+      "data_classification" : { },
       "supplementary_data" : {
-        "new_case": [
-          {
-            "orgID1": "true"
-          }
-        ]
+        "new_case" : {
+          "orgID1" : "true"
+        }
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,

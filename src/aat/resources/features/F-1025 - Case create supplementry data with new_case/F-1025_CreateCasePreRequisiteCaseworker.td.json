@@ -61,9 +61,9 @@
       "data_classification": {
       },
       "supplementary_data" : {
-        "new_case" : [ {
+        "new_case" : {
           "orgID1" : "true"
-        } ]
+        }
       }
     }
   }

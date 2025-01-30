@@ -45,14 +45,14 @@
             "OrganisationName": "orgName3"
           }
         },
-        "OrganisationPolicyField2" : {
+        "OrganisationPolicyField5" : {
           "newCase" : "no",
           "Organisation" : {
             "OrganisationID" : "orgID2a",
             "OrganisationName" : "orgName2a"
           }
         },
-        "OrganisationPolicyField1" : {
+        "OrganisationPolicyField4" : {
           "Organisation" : {
             "OrganisationID" : "orgID2",
             "OrganisationName" : "orgName2"
@@ -90,13 +90,13 @@
             "OrganisationName" : "orgName3"
           }
         },
-        "OrganisationPolicyField2" : {
+        "OrganisationPolicyField5" : {
           "Organisation" : {
             "OrganisationID" : "orgID2a",
             "OrganisationName" : "orgName2a"
           }
         },
-        "OrganisationPolicyField1" : {
+        "OrganisationPolicyField4" : {
           "Organisation" : {
             "OrganisationID" : "orgID2",
             "OrganisationName" : "orgName2"

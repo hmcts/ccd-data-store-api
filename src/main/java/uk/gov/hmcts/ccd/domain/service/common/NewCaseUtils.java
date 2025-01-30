@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.stream.Collectors;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,26 +73,21 @@ public class NewCaseUtils {
 
     private static void updateCaseSupplementaryData(CaseDetails caseDetails, List<JsonNode> organizationProfiles) {
 
-        List<JsonNode> orgIdList = new ArrayList<>();
-
+        ObjectNode orgNode = new ObjectMapper().createObjectNode();
         for (JsonNode orgProfile : organizationProfiles) {
-
             String orgIdentifier = orgProfile.get(ORGANISATION)
                 .get(ORGANISATIONID).textValue();
             if (orgIdentifier != null && !orgIdentifier.isEmpty()) {
-                JsonNode orgNode = new ObjectMapper().createObjectNode()
-                    .put(orgIdentifier, Boolean.TRUE.toString());
-                orgIdList.add(orgNode);
+                orgNode.put(orgIdentifier, Boolean.TRUE.toString());
             }
         }
 
-        if (!orgIdList.isEmpty()) {
+        if (!orgNode.isEmpty()) {
             Map<String, JsonNode> supplementaryData = caseDetails.getSupplementaryData();
             if (supplementaryData == null) {
                 supplementaryData = new HashMap<>();
             }
-            JsonNode jsonNode = new ObjectMapper().createArrayNode().addAll(orgIdList);
-            supplementaryData.put(SUPPLEMENTRY_DATA_NEW_CASE, jsonNode);
+            supplementaryData.put(SUPPLEMENTRY_DATA_NEW_CASE, orgNode);
 
             LOG.debug("new_case SupplementaryData ={} .", supplementaryData);
             caseDetails.setSupplementaryData(supplementaryData);
