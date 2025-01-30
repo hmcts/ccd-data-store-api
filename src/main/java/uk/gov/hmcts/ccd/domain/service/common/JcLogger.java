@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.endpoint.std.TestController;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -39,6 +40,7 @@ public class JcLogger {
     public void jclog(String message) {
         if (enabled) {
             LOG.info("| JCDEBUG: {}: {}", classname, message);
+            TestController.jcLog("| JCDEBUG: " + classname + ": " + message);
         }
     }
 
