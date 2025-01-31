@@ -82,23 +82,22 @@ public class TimeToLiveService {
                                                           CaseEventDefinition caseEventDefinition,
                                                           CaseTypeDefinition caseTypeDefinition) {
         Map<String, JsonNode> outputData = data;
+        Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
 
-        if (isCaseTypeUsingTTL(caseTypeDefinition)) {
+        if (isCaseTypeUsingTTL(caseTypeDefinition) && (ttlIncrement != null)) {
+
             // load existing TTL
-            Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
-            if (ttlIncrement != null) {
-                outputData = cloneOrNewJsonMap(data);
-                TTL timeToLive = getTTLFromCaseData(outputData);
+            outputData = cloneOrNewJsonMap(data);
+            TTL timeToLive = getTTLFromCaseData(outputData);
 
-                // if TTL still missing create one
-                if (timeToLive == null) {
-                    timeToLive = TTL.builder().suspended(NO).build();
-                }
-
-                // set system TTL and write TTL field to cloned data
-                timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
-                outputData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
+            // if TTL still missing create one
+            if (timeToLive == null) {
+                timeToLive = TTL.builder().suspended(NO).build();
             }
+
+            // set system TTL and write TTL field to cloned data
+            timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
+            outputData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
         }
 
         return outputData;
@@ -126,7 +125,7 @@ public class TimeToLiveService {
                 // if "before TTL has changed, including callback setting it to null"
                 // or "no-before TTl but callback is trying to add a TTL"
                 if ((beforeTtl != null && !beforeTtl.equals(callbackTtl))
-                    || (beforeTtl == null && callbackTtl != null)) {
+                        || (beforeTtl == null && callbackTtl != null)) {
                     throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
                 }
             }
@@ -200,18 +199,14 @@ public class TimeToLiveService {
     }
 
     private TTL getTTLFromJson(JsonNode ttlJsonNode) {
-        if (isEmptyNode(ttlJsonNode)) {
-            ttlJsonNode = objectMapper.getNodeFactory().nullNode();
+        if (ttlJsonNode != null) {
+            try {
+                return objectMapper.readValue(ttlJsonNode.toString(), TTL.class);
+            } catch (JsonProcessingException e) {
+                throw new ValidationException(FAILED_TO_READ_TTL_FROM_CASE_DATA);
+            }
         }
-        try {
-            return objectMapper.readValue(ttlJsonNode.toString(), TTL.class);
-        } catch (JsonProcessingException e) {
-            throw new ValidationException(FAILED_TO_READ_TTL_FROM_CASE_DATA);
-        }
-    }
-
-    private boolean isEmptyNode(JsonNode ttlJsonNode) {
-        return ttlJsonNode == null || ttlJsonNode.isNull() || ttlJsonNode.isEmpty();
+        return null;
     }
 
     private Map<String, JsonNode> cloneOrNewJsonMap(Map<String, JsonNode> jsonMap) {
