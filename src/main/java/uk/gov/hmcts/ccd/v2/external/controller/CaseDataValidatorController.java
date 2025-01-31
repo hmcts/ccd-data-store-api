@@ -82,7 +82,7 @@ public class CaseDataValidatorController {
          * Next question:
          * Where is CaseDataContent data and eventData derived from ?
          */
-        jcLogger.jclog("validate() caseTypeId = " + caseTypeId + " , pageId = " + pageId + " , [built 30th Jan]");
+        jcLogger.jclog("validate() caseTypeId = " + caseTypeId + " , pageId = " + pageId + " , [built 31st Jan]");
         jcLogger.jclog("validate() caseDataContent", content);
 
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
