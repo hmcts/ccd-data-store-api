@@ -666,7 +666,7 @@ sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java," +
             "**/AppInsightsConfiguration.java," +
-            "**/TestingSupportController.java,**/JcLogger.java,**/TestController.java,**/CaseDataContent.java,**/CaseDetails.java"
+            "**/TestingSupportController.java,**/JcLogger.java,**/CaseDataContent.java,**/CaseDetails.java,**/MidEventCallback.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"

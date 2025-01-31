@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -36,6 +37,8 @@ public class MidEventCallback {
     private final EventTriggerService eventTriggerService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseService caseService;
+
+    final JcLogger jcLogger = new JcLogger("MidEventCallback", true);
 
     @Autowired
     public MidEventCallback(CallbackInvoker callbackInvoker,
@@ -51,11 +54,38 @@ public class MidEventCallback {
         this.caseService = caseService;
     }
 
+    private void logData(final CaseDataContent caseDataContent, final String methodReference) {
+        final String json = jcLogger.getObjectAsString(caseDataContent);
+        if (json.contains("dummy.pdf")) {
+            jcLogger.jclog(methodReference + ": YES , json = " + json);
+        } else {
+            jcLogger.jclog(methodReference + ": NO , json = " + json);
+        }
+    }
+
+    private void logData(final CaseDetails caseDetails, final String methodReference) {
+        final String json = jcLogger.getObjectAsString(caseDetails);
+        if (json.contains("dummy.pdf")) {
+            jcLogger.jclog(methodReference + ": YES , json = " + json);
+        } else {
+            jcLogger.jclog(methodReference + ": NO , json = " + json);
+        }
+    }
+
+    /*
+     * Called directly from CaseDataValidatorController.validate()
+     * Method below references 'caseDetailsBefore' , 'currentOrNewCaseDetails' , 'caseDetails' , and
+     * 'caseDetailsFromMidEventCallback'
+     */
     @Transactional
     public JsonNode invoke(String caseTypeId,
                            CaseDataContent content,
                            String pageId) {
         if (!isBlank(pageId)) {
+
+            // QUESTION: Does 'CaseDataContent content' contain reference to "dummy.pdf" ?
+            logData(content, "invoke #1");
+
             Event event = content.getEvent();
             final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
             final CaseEventDefinition caseEventDefinition = getCaseEvent(event, caseTypeDefinition);
@@ -71,11 +101,27 @@ public class MidEventCallback {
                 CaseDetails caseDetailsBefore = null;
                 CaseDetails currentOrNewCaseDetails;
                 if (StringUtils.isNotEmpty(content.getCaseReference())) {
-                    CaseDetails caseDetails =
+
+                    /*
+                     * LINE 75 (call caseService.getCaseDetails())
+                     */
+                    final CaseDetails caseDetails =
                         caseService.getCaseDetails(caseTypeDefinition.getJurisdictionId(), content.getCaseReference());
+
+                    // QUESTION: Does caseDetails contain reference to "dummy.pdf" ?
+                    logData(caseDetails, "invoke #2");
+
                     caseDetailsBefore = caseService.clone(caseDetails);
+
+                    // QUESTION: Does caseDetailsBefore contain reference to "dummy.pdf" ?
+                    logData(caseDetailsBefore, "invoke #3");
+
                     currentOrNewCaseDetails =
                         caseService.populateCurrentCaseDetailsWithEventFields(content, caseDetails);
+
+                    // QUESTION: Does currentOrNewCaseDetails contain reference to "dummy.pdf" ?
+                    logData(currentOrNewCaseDetails, "invoke #4");
+
                 } else {
                     currentOrNewCaseDetails =
                         caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(),
@@ -84,10 +130,15 @@ public class MidEventCallback {
                 removeNextPageFieldData(currentOrNewCaseDetails, wizardPageOptional.get().getOrder(), caseTypeId,
                     event.getEventId());
 
+                // QUESTION: Does currentOrNewCaseDetails contain reference to "dummy.pdf" ?
+                logData(currentOrNewCaseDetails, "invoke #5");
+
+                /*
+                 * LINE 88 (call callbackInvoker.invokeMidEventCallback())
+                 */
                 CaseDetails caseDetailsFromMidEventCallback =
                     callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
-                    caseTypeDefinition,
-                        caseEventDefinition,
+                    caseTypeDefinition, caseEventDefinition,
                     caseDetailsBefore,
                     currentOrNewCaseDetails,
                     content.getIgnoreWarning());

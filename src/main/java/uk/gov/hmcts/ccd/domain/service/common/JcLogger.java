@@ -12,7 +12,6 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.endpoint.std.TestController;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -29,8 +28,6 @@ public class JcLogger {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final TestController testController = new TestController();
-
     public JcLogger(final String classname, final boolean enabled) {
         this.classname = classname;
         this.enabled = enabled;
@@ -42,7 +39,6 @@ public class JcLogger {
     public void jclog(String message) {
         if (enabled) {
             LOG.info("| JCDEBUG: {}: {}", classname, message);
-            testController.jcLog("| JCDEBUG: " + classname + ": " + message);
         }
     }
 
@@ -101,6 +97,24 @@ public class JcLogger {
     public String getObjectAsString(final Map<String, JsonNode> value) {
         try {
             return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            jclog("JSON ERROR: " + e.getMessage());
+            return "JSON ERROR: " + e.getMessage();
+        }
+    }
+
+    public String getObjectAsString(final CaseDataContent caseDataContent) {
+        try {
+            return objectMapper.writeValueAsString(caseDataContent);
+        } catch (JsonProcessingException e) {
+            jclog("JSON ERROR: " + e.getMessage());
+            return "JSON ERROR: " + e.getMessage();
+        }
+    }
+
+    public String getObjectAsString(final CaseDetails caseDetails) {
+        try {
+            return objectMapper.writeValueAsString(caseDetails);
         } catch (JsonProcessingException e) {
             jclog("JSON ERROR: " + e.getMessage());
             return "JSON ERROR: " + e.getMessage();
