@@ -146,10 +146,7 @@ public class CaseService {
         return data;
     }
 
-    /**
-     * Builds a json representation of the caseFields with a defaultValue present.
-     * Has no knowledge of the collections, hence all ArrayNodes are represented as an ObjectNode.
-     */
+
     public Map<String, JsonNode> buildJsonFromCaseFieldsWithNullifyByDefault(
         List<CaseEventFieldDefinition> caseEventDefinition) {
         Map<String, JsonNode> data = new HashMap<>();

@@ -16,7 +16,7 @@
   "expectedResponse": {
     "body": {
       "case_data": {
-        "TTL" : { }
+        "_extends_": "TTL_Case_Data_NBD"
       },
       "data_classification": {
         "_extends_": "TTL_Classifications_NBD"

@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -43,9 +44,11 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import javax.inject.Inject;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 @Service
 @Qualifier("default")
@@ -162,6 +165,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             EMPTY_DATA_CLASSIFICATION));
         updateCaseState(caseEventDefinition, newCaseDetails);
 
+        updateCaseFieldsWithNullifyByDefault(newCaseDetails, caseEventDefinition.getCaseFields());
         updateCaseDetailsWithTtlIncrement(newCaseDetails, caseTypeDefinition, caseEventDefinition);
 
         newCaseDetails.setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(newCaseDetails.getData()));
@@ -255,5 +259,19 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             caseDetails.setDataClassification(caseDataClassificationWithTtl);
 
         }
+    }
+
+    public void updateCaseFieldsWithNullifyByDefault(CaseDetails newCaseDetails,
+                                                     List<CaseEventFieldDefinition> caseEventDefinition) {
+        Map<String, JsonNode> data = newCaseDetails.getData();
+
+        caseEventDefinition.forEach(
+            caseField -> {
+                Boolean nullifyByDefault = caseField.getNullifyByDefault();
+                if (Boolean.TRUE.equals(nullifyByDefault)) {
+                    data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().nullNode());
+                }
+            });
+        newCaseDetails.setData(data);
     }
 }
