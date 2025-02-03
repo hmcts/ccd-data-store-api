@@ -156,10 +156,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, ignoreWarning);
 
-//        timeToLiveService.verifyTTLContentNotChangedByCallback(caseDataWithTtl, caseDetails.getData());
-
         return buildStartEventTrigger(eventId, eventToken, caseDetails);
-
     }
 
     @Transactional
