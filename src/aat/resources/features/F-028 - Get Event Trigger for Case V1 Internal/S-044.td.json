@@ -1478,7 +1478,7 @@
           "metadata" : false,
           "hint_text" : "Zero to many items, here of type `Text`",
           "field_type" : {
-            "id" : "CollectionPermissionField",
+            "id" : "[[ANYTHING_PRESENT]]",
             "type" : "Collection",
             "min" : null,
             "max" : null,
