@@ -57,18 +57,18 @@ public class MidEventCallback {
     private void logData(final CaseDataContent caseDataContent, final String methodReference) {
         final String json = jcLogger.getObjectAsString(caseDataContent);
         if (json.contains("dummy.pdf")) {
-            jcLogger.jclog(methodReference + ": YES , json = " + json);
+            jcLogger.jclog(methodReference + ": YES , json = " + json.hashCode() + " " + json);
         } else {
-            jcLogger.jclog(methodReference + ": NO , json = " + json);
+            jcLogger.jclog(methodReference + ": NO , json = " + json.hashCode() + " " + json);
         }
     }
 
     private void logData(final CaseDetails caseDetails, final String methodReference) {
         final String json = jcLogger.getObjectAsString(caseDetails);
         if (json.contains("dummy.pdf")) {
-            jcLogger.jclog(methodReference + ": YES , json = " + json);
+            jcLogger.jclog(methodReference + ": YES , json = " + json.hashCode() + " " + json);
         } else {
-            jcLogger.jclog(methodReference + ": NO , json = " + json);
+            jcLogger.jclog(methodReference + ": NO , json = " + json.hashCode() + " " + json);
         }
     }
 
