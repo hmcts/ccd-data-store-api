@@ -16,7 +16,7 @@
   "expectedResponse": {
     "body": {
       "case_data": {
-        "_extends_": "TTL_Case_Data",
+        "_extends_": "TTL_Case_Data_NBD",
         "SearchCriteria" : { }
       },
       "data_classification": {
