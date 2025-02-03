@@ -1469,6 +1469,58 @@
               "delete": true
             }
           ]
+        },
+        {
+          "id" : "CollectionPermissionField",
+          "label" : "A `Collection` of `Text` fields",
+          "hidden" : false,
+          "value" : null,
+          "metadata" : false,
+          "hint_text" : "Zero to many items, here of type `Text`",
+          "field_type" : {
+            "id" : "CollectionPermissionField",
+            "type" : "Collection",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : {
+              "id" : "Text",
+              "type" : "Text",
+              "min" : null,
+              "max" : null,
+              "regular_expression" : null,
+              "fixed_list_items" : [ ],
+              "complex_fields" : [ ],
+              "collection_field_type" : null
+            }
+          },
+          "validation_expr" : null,
+          "security_label" : "PUBLIC",
+          "order" : null,
+          "formatted_value" : null,
+          "display_context" : "OPTIONAL",
+          "display_context_parameter" : "#COLLECTION(allowDelete,allowInsert,allowUpdate)",
+          "show_condition" : null,
+          "show_summary_change_option" : false,
+          "show_summary_content_option" : null,
+          "retain_hidden_value" : null,
+          "publish" : false,
+          "publish_as" : null,
+          "acls" : [ {
+            "create" : true,
+            "read" : false,
+            "update" : true,
+            "delete" : true,
+            "role" : "caseworker-autotest1"
+          }, {
+            "create" : true,
+            "read" : true,
+            "update" : true,
+            "delete" : true,
+            "role" : "caseworker-autotest1-private"
+          } ]
         }
       ],
       "event_token": "[[ANYTHING_PRESENT]]",
