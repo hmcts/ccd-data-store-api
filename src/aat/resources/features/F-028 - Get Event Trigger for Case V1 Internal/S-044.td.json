@@ -1577,6 +1577,12 @@
               "__elementId__": "case_field_id"
             },
             {
+              "case_field_id" : "CollectionPermissionField",
+              "order" : 6,
+              "page_column_no" : null,
+              "complex_field_overrides" : [ ]
+            },
+            {
               "case_field_id": "CollectionField",
               "order": 2,
               "page_column_no": null,
