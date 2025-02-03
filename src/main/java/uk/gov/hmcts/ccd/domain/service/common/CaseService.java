@@ -30,6 +30,8 @@ import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 // partal javadoc attributes added prior to checkstyle implementation in module
 public class CaseService {
 
+    final JcLogger jcLogger = new JcLogger("CaseService", true);
+
     private final CaseDataService caseDataService;
     private final CaseDetailsRepository caseDetailsRepository;
     private final UIDService uidService;
@@ -74,7 +76,22 @@ public class CaseService {
      * @return <code>Optional&lt;CaseDetails&gt;</code> - CaseDetails wrapped in Optional
      */
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
-        content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+        final Map<String, JsonNode> eventData = content.getEventData();
+        Map<String, JsonNode> caseData = caseDetails.getData();
+
+        // LOG eventData
+        eventData.forEach((key, value) -> jcLogger.jclog("eventData: " + key + " = " + value));
+
+        // LOG caseDataBefore
+        caseData.forEach((key, value) -> jcLogger.jclog("caseDataBefore: " + key + " = " + value));
+
+        // Process eventData -> caseData
+        eventData.forEach((key, value) -> caseData.put(key, value));
+        caseDetails.setData(caseData);
+
+        // LOG caseDataAfter
+        caseData.forEach((key, value) -> jcLogger.jclog("caseDataAfter: " + key + " = " + value));
+
         return caseDetails;
     }
 
