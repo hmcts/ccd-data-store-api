@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
+import com.google.common.collect.Sets;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.common.util.set.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +20,16 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsDelete
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -194,10 +198,11 @@ public class CaseAccessOperation {
         );
 
         newUserCounts.forEach((caseReference, orgNewUserCountMap) ->
-            orgNewUserCountMap.forEach((organisationId, newUserCount) ->
+            orgNewUserCountMap.forEach((organisationId, newUserCount) -> {
                 supplementaryDataRepository.incrementSupplementaryData(caseReference,
-                    ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount)
-            )
+                    ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount);
+                //clearUserAssignedNewCase(caseReference, organisationId);
+            })
         );
     }
 
@@ -505,5 +510,26 @@ public class CaseAccessOperation {
             .forEach(currentRole -> caseUserRepository.revokeAccess(caseId,
                 userId,
                 currentRole));
+    }
+
+    private void clearUserAssignedNewCase(String caseReference, String organisationId) {
+        // Set supplementary data new cases for organisationId to false if set to True
+        String orgNewCaseSupDataKey = NewCaseUtils.ORG_POLICY_NEW_CASE + "." + organisationId;
+        try {
+            SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData(caseReference,
+                    Collections.singleton(orgNewCaseSupDataKey));
+
+            if (supplementaryData != null) {
+                Object newCaseOrgIdValue =  supplementaryData.getResponse().getOrDefault(orgNewCaseSupDataKey, null);
+                boolean value = (Boolean) newCaseOrgIdValue;
+                if (value) {
+                    supplementaryDataRepository.setSupplementaryData(caseReference,
+                        NewCaseUtils.ORG_POLICY_NEW_CASE + organisationId, false);
+                }
+            }
+        } catch (ServiceException e) {
+            // do nothing
+        }
+
     }
 }
