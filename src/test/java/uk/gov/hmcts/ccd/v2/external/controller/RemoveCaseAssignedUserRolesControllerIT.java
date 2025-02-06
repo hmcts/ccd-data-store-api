@@ -14,7 +14,6 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResponse
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
-import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
@@ -772,11 +771,6 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         // set a default count for any organisation
         supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2),
             0L);
-
-        // set a default value of null for newcase any organisation
-        //String orgNewCaseSupDataKey = NewCaseUtils.ORG_POLICY_NEW_CASE + "." + ORGANISATION_ID_2;
-        //supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, orgNewCaseSupDataKey,
-        //    null);
 
         addCaseUserRoles(List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1,
             ORGANISATION_ID_2)));
