@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 
 @ToString
 public class CaseDataContent {
-    final JcLogger jcLogger = new JcLogger("CaseDataContent", true);
+    final JcLogger jcLogger = new JcLogger("CCD-6087", "CaseDataContent", true);
 
     private Event event;
     private Map<String, JsonNode> data;

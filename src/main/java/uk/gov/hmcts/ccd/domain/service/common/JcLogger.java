@@ -22,13 +22,16 @@ public class JcLogger {
 
     private static final Logger LOG = LoggerFactory.getLogger(JcLogger.class);
 
+    private final String jiraRef;
+
     private final String classname;
 
     private final boolean enabled;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JcLogger(final String classname, final boolean enabled) {
+    public JcLogger(final String jiraRef, final String classname, final boolean enabled) {
+        this.jiraRef = jiraRef;
         this.classname = classname;
         this.enabled = enabled;
         // Enables serialisation of java.util.Optional and java.time.LocalDateTime
@@ -38,7 +41,7 @@ public class JcLogger {
 
     public void jclog(String message) {
         if (enabled) {
-            LOG.info("| JCDEBUG: {}: {}", classname, message);
+            LOG.info("| JCDEBUG {}: {}: {}", jiraRef, classname, message);
         }
     }
 

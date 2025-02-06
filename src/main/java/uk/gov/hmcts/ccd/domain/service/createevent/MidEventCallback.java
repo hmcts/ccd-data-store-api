@@ -38,7 +38,7 @@ public class MidEventCallback {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseService caseService;
 
-    final JcLogger jcLogger = new JcLogger("MidEventCallback", true);
+    final JcLogger jcLogger = new JcLogger("CCD-6087", "MidEventCallback", true);
 
     @Autowired
     public MidEventCallback(CallbackInvoker callbackInvoker,

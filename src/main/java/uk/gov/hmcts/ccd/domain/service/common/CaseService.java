@@ -30,7 +30,7 @@ import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 // partal javadoc attributes added prior to checkstyle implementation in module
 public class CaseService {
 
-    final JcLogger jcLogger = new JcLogger("CaseService", true);
+    final JcLogger jcLogger = new JcLogger("CCD-6087", "CaseService", true);
 
     private final CaseDataService caseDataService;
     private final CaseDetailsRepository caseDetailsRepository;

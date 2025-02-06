@@ -30,7 +30,7 @@ public class CaseDataValidatorController {
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final MidEventCallback midEventCallback;
 
-    final JcLogger jcLogger = new JcLogger("CaseDataValidatorController", true);
+    final JcLogger jcLogger = new JcLogger("CCD-6087",  "CaseDataValidatorController", true);
 
     @Autowired
     public CaseDataValidatorController(
@@ -82,12 +82,13 @@ public class CaseDataValidatorController {
          * Next question:
          * Where is CaseDataContent data and eventData derived from ?
          */
-        jcLogger.jclog("validate() caseTypeId = " + caseTypeId + " , pageId = " + pageId + " , [built 3rd Feb PM]");
+        jcLogger.jclog("validate() caseTypeId = " + caseTypeId + " , pageId = " + pageId + " , [built 6rd Feb]");
         jcLogger.jclog("validate() caseDataContent", content);
 
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
             content);
 
+        // CCD-6087 calls invoke() which in turn calls populateCurrentCaseDetailsWithEventFields()
         final JsonNode data = midEventCallback.invoke(caseTypeId,
             content,
             pageId);

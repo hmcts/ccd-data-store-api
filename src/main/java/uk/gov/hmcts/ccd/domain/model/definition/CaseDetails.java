@@ -43,7 +43,7 @@ public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     public static final String DRAFT_ID = "DRAFT%s";
 
-    final JcLogger jcLogger = new JcLogger("CaseDetails", true);
+    final JcLogger jcLogger = new JcLogger("CCD-6087", "CaseDetails", true);
 
     private String id;
 

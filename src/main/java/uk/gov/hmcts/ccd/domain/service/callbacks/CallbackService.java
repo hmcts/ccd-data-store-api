@@ -47,7 +47,7 @@ public class CallbackService {
     private static final String WILDCARD = "*";
     public static final String CLIENT_CONTEXT = "Client-Context";
 
-    final JcLogger jcLogger = new JcLogger("CallbackService", false);
+    final JcLogger jcLogger = new JcLogger("CCD-6087", "CallbackService", false);
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
