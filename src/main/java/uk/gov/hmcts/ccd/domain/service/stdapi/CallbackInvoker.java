@@ -222,8 +222,13 @@ public class CallbackInvoker {
         }
         if (callbackResponse.getData() != null) {
             validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
-            if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
-                securityValidationService.setClassificationFromCallbackIfValid(
+
+            if (hasSecurityClassification(callbackResponse)) {
+                securityValidationService.updateSecurityClassificationIfValid(callbackResponse, caseDetails);
+            }
+
+            if (hasDataClassification(callbackResponse)) {
+                securityValidationService.setDataClassificationFromCallbackIfValid(
                     callbackResponse,
                     caseDetails,
                     deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails)
@@ -233,10 +238,12 @@ public class CallbackInvoker {
         return aboutToSubmitCallbackResponse;
     }
 
+    private boolean hasSecurityClassification(CallbackResponse callbackResponse) {
+        return callbackResponse.getSecurityClassification() != null;
+    }
 
-    private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
-        return (callbackResponse.getSecurityClassification() != null
-            && callbackResponse.getDataClassification() != null);
+    private boolean hasDataClassification(CallbackResponse callbackResponse) {
+        return callbackResponse.getDataClassification() != null;
     }
 
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseTypeDefinition caseTypeDefinition,
