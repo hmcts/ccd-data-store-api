@@ -79,7 +79,7 @@ public class CaseDataValidatorController {
          * CaseDataContent DOES contain "dummy.pdf" ,  caseTypeId = "FinancialRemedyMVP2" ,  pageId = "FR_generalEmail1"
          * POST path = "/case-types/FinancialRemedyMVP2/validate"
          */
-        jcLogger.jclog("validate() caseTypeId = " + caseTypeId + " , pageId = " + pageId + " , [built 7th Feb]");
+        jcLogger.jclog("validate() caseTypeId = " + caseTypeId + " , pageId = " + pageId + " , [built 7th Feb PM]");
         jcLogger.jclog("validate() caseDataContent", content);
 
         /*

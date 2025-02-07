@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,8 @@ public class FieldProcessorService {
     private final List<CaseViewFieldProcessor> caseViewFieldProcessors;
     private final UIDefinitionRepository uiDefinitionRepository;
     private final EventTriggerService eventTriggerService;
+
+    final JcLogger jcLogger = new JcLogger("CCD-6096",  "FieldProcessorService", true);
 
     @Autowired
     public FieldProcessorService(final List<CaseDataFieldProcessor> caseDataFieldProcessors,
@@ -67,6 +70,8 @@ public class FieldProcessorService {
     public Map<String, JsonNode> processData(final Map<String, JsonNode> data,
                                              final CaseTypeDefinition caseTypeDefinition,
                                              final CaseEventDefinition caseEventDefinition) {
+        // TODO: In progress
+        jcLogger.jclog("data = ");
         if (MapUtils.isEmpty(data)) {
             return data;
         }

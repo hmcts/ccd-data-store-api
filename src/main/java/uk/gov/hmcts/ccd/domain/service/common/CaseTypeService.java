@@ -58,6 +58,7 @@ public class CaseTypeService {
     }
 
     public void validateData(final ValidationContext validationContext) {
+        // TODO: Add logging here
         final List<ValidationResult> dataValidationResults = caseDataValidator.validate(validationContext);
         if (!dataValidationResults.isEmpty()) {
             final List<CaseFieldValidationError> fieldErrors = dataValidationResults.stream()
