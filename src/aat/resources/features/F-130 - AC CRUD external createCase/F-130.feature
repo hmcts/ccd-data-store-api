@@ -49,7 +49,7 @@ Feature: F-130: Create Case External API CRUD Tests
   @S-130.7
   Scenario: User submits case creation with no CaseType R Access does not return the case after successful case creation
     Given a user with [an active profile in CCD]
-    And a successful call [to create a token for case creation] as in [S-130.1_Get_Event_Trigger]
+    And a successful call [to create a token for case creation] as in [S-130.7_Get_Event_Trigger]
     When a request is prepared with appropriate values,
     And it is submitted to call the [external create case] operation of [CCD Data Store],
     Then a positive response is received
