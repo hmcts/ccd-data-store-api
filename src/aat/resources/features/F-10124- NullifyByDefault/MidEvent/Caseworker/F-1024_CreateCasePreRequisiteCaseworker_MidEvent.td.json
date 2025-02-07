@@ -16,11 +16,11 @@
   "expectedResponse": {
     "body": {
       "case_data": {
-        "_extends_": "TTL_Case_Data_NBD",
+        "_extends_": "TTL_Case_Data_NBD_Empty",
         "SearchCriteria" : { }
       },
       "data_classification": {
-        "_extends_": "TTL_Classifications",
+        "_extends_": "TTL_Classifications_NBD_Empty",
         "SearchCriteria" : {
           "classification" : "PUBLIC",
           "value" : { }

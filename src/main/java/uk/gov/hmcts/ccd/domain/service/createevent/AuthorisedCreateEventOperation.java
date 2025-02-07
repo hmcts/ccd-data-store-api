@@ -99,8 +99,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
-        CaseEventDefinition caseEventDefinition = findCaseEvent(caseTypeDefinition, content.getEvent());
-        updateCaseDetailsWithTtlIncrement(existingCaseDetails, caseTypeDefinition, caseEventDefinition);
+        updateCaseDetailsWithTtlIncrement(existingCaseDetails, caseTypeDefinition, content.getEvent());
 
         verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails,
             caseTypeDefinition, accessProfiles);
@@ -266,9 +265,12 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
     private void updateCaseDetailsWithTtlIncrement(CaseDetails caseDetails,
                                                    CaseTypeDefinition caseTypeDefinition,
-                                                   CaseEventDefinition caseEventDefinition) {
+                                                   Event event) {
+
+        String eventId = event != null ? event.getEventId() : null;
 
         if (timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition)) {
+            CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
             if (caseEventDefinition != null) {
 
                 // update TTL in data
@@ -284,12 +286,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
             } // NB: not throwing exception for missing event ID as there are other checks elsewhere for that.
         }
-    }
-
-    private CaseEventDefinition findCaseEvent(CaseTypeDefinition caseTypeDefinition,
-                                              Event event) {
-        String eventId = event != null ? event.getEventId() : null;
-        return eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
     }
 
 }

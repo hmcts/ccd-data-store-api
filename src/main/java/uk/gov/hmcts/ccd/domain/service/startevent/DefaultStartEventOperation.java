@@ -131,7 +131,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
         }
 
         Map<String, JsonNode> nullifyByDefaultData = caseService
-            .buildJsonFromCaseFieldsWithNullifyByDefault(caseEventDefinition.getCaseFields());
+            .buildJsonFromCaseFieldsWithNullifyByDefault(caseTypeDefinition, caseEventDefinition.getCaseFields());
         if (!nullifyByDefaultData.isEmpty()) {
             mergeDataAndClassificationForNewFields(nullifyByDefaultData, caseDetails, caseTypeDefinition);
         }
@@ -191,7 +191,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
         }
 
         Map<String, JsonNode> nullifyByDefaultData = caseService
-            .buildJsonFromCaseFieldsWithNullifyByDefault(caseEventDefinition.getCaseFields());
+            .buildJsonFromCaseFieldsWithNullifyByDefault(caseTypeDefinition, caseEventDefinition.getCaseFields());
         if (!nullifyByDefaultData.isEmpty()) {
             mergeDataAndClassificationForNewFields(nullifyByDefaultData, caseDetails, caseTypeDefinition);
         }
