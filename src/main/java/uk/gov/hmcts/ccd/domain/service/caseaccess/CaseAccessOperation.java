@@ -44,6 +44,7 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 public class CaseAccessOperation {
 
     public static final String ORGS_ASSIGNED_USERS_PATH = "orgs_assigned_users.";
+    public static final String NEW_CASE_ORG_PATH = NewCaseUtils.ORG_POLICY_NEW_CASE + ".";
 
     private final CaseUserRepository caseUserRepository;
     private final CaseDetailsRepository caseDetailsRepository;
@@ -201,7 +202,7 @@ public class CaseAccessOperation {
             orgNewUserCountMap.forEach((organisationId, newUserCount) -> {
                 supplementaryDataRepository.incrementSupplementaryData(caseReference,
                     ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount);
-                //clearUserAssignedNewCase(caseReference, organisationId);
+                clearUserAssignedNewCase(caseReference, organisationId);
             })
         );
     }
@@ -514,17 +515,17 @@ public class CaseAccessOperation {
 
     private void clearUserAssignedNewCase(String caseReference, String organisationId) {
         // Set supplementary data new cases for organisationId to false if set to True
-        String orgNewCaseSupDataKey = NewCaseUtils.ORG_POLICY_NEW_CASE + "." + organisationId;
+        String orgNewCaseSupDataKey = NEW_CASE_ORG_PATH + organisationId;
         try {
             SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData(caseReference,
                     Collections.singleton(orgNewCaseSupDataKey));
 
             if (supplementaryData != null) {
                 Object newCaseOrgIdValue =  supplementaryData.getResponse().getOrDefault(orgNewCaseSupDataKey, null);
-                boolean value = (Boolean) newCaseOrgIdValue;
+                boolean value = Boolean.valueOf(newCaseOrgIdValue.toString());
                 if (value) {
                     supplementaryDataRepository.setSupplementaryData(caseReference,
-                        NewCaseUtils.ORG_POLICY_NEW_CASE + organisationId, false);
+                        orgNewCaseSupDataKey, false);
                 }
             }
         } catch (ServiceException e) {
