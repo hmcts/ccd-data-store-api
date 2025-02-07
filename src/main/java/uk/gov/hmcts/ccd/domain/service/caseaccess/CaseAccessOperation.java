@@ -520,13 +520,17 @@ public class CaseAccessOperation {
             SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData(caseReference,
                     Collections.singleton(orgNewCaseSupDataKey));
 
-            if (supplementaryData != null) {
-                Object newCaseOrgIdValue =  supplementaryData.getResponse().getOrDefault(orgNewCaseSupDataKey, null);
-                boolean value = Boolean.valueOf(newCaseOrgIdValue.toString());
-                if (value) {
-                    supplementaryDataRepository.setSupplementaryData(caseReference,
-                        orgNewCaseSupDataKey, false);
-                }
+            if (supplementaryData == null) {
+                return;
+            }
+            Object newCaseOrgIdValue = supplementaryData.getResponse().getOrDefault(orgNewCaseSupDataKey, null);
+            if (newCaseOrgIdValue == null) {
+                return;
+            }
+            boolean value = Boolean.valueOf(newCaseOrgIdValue.toString());
+            if (value) {
+                supplementaryDataRepository.setSupplementaryData(caseReference,
+                    orgNewCaseSupDataKey, false);
             }
         } catch (ServiceException e) {
             // do nothing

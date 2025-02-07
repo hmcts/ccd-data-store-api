@@ -1424,6 +1424,7 @@ class CaseAccessOperationTest {
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
             );
+
             // behave as no existing case roles
             mockExistingCaseUserRoles(new ArrayList<>());
 
@@ -1434,7 +1435,8 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, times(1))
-                .findSupplementaryData(CASE_REFERENCE.toString(), Collections.singleton(getOrgUserNewCaseSupDataKey(ORGANISATION)));
+                .findSupplementaryData(CASE_REFERENCE.toString(),
+                    Collections.singleton(getOrgUserNewCaseSupDataKey(ORGANISATION)));
             verify(supplementaryDataRepository, times(1))
                 .setSupplementaryData(CASE_REFERENCE.toString(), getOrgUserNewCaseSupDataKey(ORGANISATION), false);
 
@@ -1448,36 +1450,18 @@ class CaseAccessOperationTest {
             // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
 
-            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                // CASE_REFERENCE/CASE_ID
-                // (2 orgs with 2 users with 2 roles >> 2 org counts incremented by 2)
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE,
-                    ORGANISATION),
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER,
-                    ORGANISATION_OTHER),
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE_OTHER,
-                    ORGANISATION_OTHER),
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = getCaseAssignedUserRoleWithOrganisations();
 
-                // CASE_REFERENCE_OTHER/CASE_ID_OTHER
-                // (2 orgs with 1 user each with multiple roles >> 2 org counts incremented by 1)
-                // (however 2nd org count will not be required as existing relationship added below **)
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE,
-                    ORGANISATION),
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE_OTHER,
-                    ORGANISATION),
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE,
-                    ORGANISATION_OTHER),
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER,
-                    CASE_ROLE_OTHER, ORGANISATION_OTHER)
+            SupplementaryData supplementaryData = new SupplementaryData(getExpectedSupplementaryDataForOrgNewCase());
 
-            );
             // register existing case role
             mockExistingCaseUserRoles(List.of(
                 // ** CASE_REFERENCE_OTHER + USER_ID_OTHER as exiting relationship
                 // (i.e. to check adjusting count still works in multiple)
                 createCaseUserEntity(CASE_ID_OTHER, CASE_ROLE_OTHER, USER_ID_OTHER)
             ));
+
+            mockNewCaseForOrgUser(supplementaryData);
 
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
@@ -2702,6 +2686,40 @@ class CaseAccessOperationTest {
             .thenReturn(secondCallCaseUserRoles);
     }
 
+    private List<CaseAssignedUserRoleWithOrganisation> getCaseAssignedUserRoleWithOrganisations() {
+        return Lists.newArrayList(
+            // CASE_REFERENCE/CASE_ID
+            // (2 orgs with 2 users with 2 roles >> 2 org counts incremented by 2)
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE,
+                ORGANISATION),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER,
+                ORGANISATION_OTHER),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE_OTHER,
+                ORGANISATION_OTHER),
+
+            // CASE_REFERENCE_OTHER/CASE_ID_OTHER
+            // (2 orgs with 1 user each with multiple roles >> 2 org counts incremented by 1)
+            // (however 2nd org count will not be required as existing relationship added below **)
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE,
+                ORGANISATION),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE_OTHER,
+                ORGANISATION),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE,
+                ORGANISATION_OTHER),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER,
+                CASE_ROLE_OTHER, ORGANISATION_OTHER)
+        );
+
+    }
+
+    private Map<String, Object> getExpectedSupplementaryDataForOrgNewCase() {
+        Map<String, Object> expectedSupplementaryData = new HashMap<>();
+        expectedSupplementaryData.put(getOrgUserCountSupDataKey(ORGANISATION), Boolean.TRUE.toString());
+        expectedSupplementaryData.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), Boolean.TRUE.toString());
+        return expectedSupplementaryData;
+    }
+
     private OngoingStubbing<SupplementaryData> mockNewCaseForOrgUser(
         SupplementaryData existingSupplementaryData
     ) {
@@ -2711,5 +2729,5 @@ class CaseAccessOperationTest {
             argThat(arg -> arg.contains(getOrgUserNewCaseSupDataKey(ORGANISATION))
                 || arg.isEmpty()))
         ).thenReturn(existingSupplementaryData);
-        }
+    }
 }
