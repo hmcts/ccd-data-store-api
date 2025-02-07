@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,6 +42,8 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.WAYS_
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     public static final String DRAFT_ID = "DRAFT%s";
+
+    final JcLogger jcLogger = new JcLogger("CCD-6087", "CaseDetails", true);
 
     private String id;
 
@@ -202,7 +205,16 @@ public class CaseDetails implements Cloneable {
         return data;
     }
 
+    private void logData(final Map<String, JsonNode> data, final String methodName) {
+        final String json = jcLogger.getObjectAsString(data);
+        if (json.contains("dummy.pdf") || json.contains("JSON ERROR")) {
+            jcLogger.jclog(methodName + " json = " + json);
+            jcLogger.jclog(methodName + " CALL STACK = " + JcLogger.getStackTraceAsString(new Exception()));
+        }
+    }
+
     public void setData(Map<String, JsonNode> data) {
+        logData(data, "CaseDetails.setData()");
         this.data = data;
     }
 
@@ -235,6 +247,7 @@ public class CaseDetails implements Cloneable {
     }
 
     public void setSupplementaryData(Map<String, JsonNode> supplementaryData) {
+        logData(data, "CaseDetails.setSupplementaryData()");
         this.supplementaryData = supplementaryData;
     }
 
@@ -363,6 +376,7 @@ public class CaseDetails implements Cloneable {
     public Map<String, JsonNode> getCaseEventData(Set<String> caseFieldIds) {
         Map<String, JsonNode> caseEventData = new HashMap<>();
         if (this.data != null) {
+            logData(data, "CaseDetails.getCaseEventData()");
             for (String caseFieldId : caseFieldIds) {
                 JsonNode value = this.data.get(caseFieldId);
                 if (value != null) {
