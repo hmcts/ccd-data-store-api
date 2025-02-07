@@ -297,7 +297,6 @@ class AuthorisedCreateEventOperationTest {
 
         // THEN
         verify(timeToLiveService).isCaseTypeUsingTTL(any());
-        verify(eventTriggerService).findCaseEvent(any(), any());
         verify(timeToLiveService, never()).updateCaseDetailsWithTTL(any(), any(), any());
         verify(timeToLiveService, never()).updateCaseDataClassificationWithTTL(any(), any(), any(), any());
     }
