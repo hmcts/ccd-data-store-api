@@ -226,7 +226,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.retry:spring-retry')
     implementation('org.springframework.boot:spring-boot-starter-cache')
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.6'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
@@ -249,7 +249,7 @@ dependencies {
 
     implementation "io.github.openfeign:feign-httpclient:11.0"
 
-    implementation group: 'net.minidev', name: 'json-smart', version: '2.4.9'
+    implementation group: 'net.minidev', name: 'json-smart', version: '2.4.11'
 
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.2'
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
@@ -324,8 +324,8 @@ dependencies {
     // for sonar analysis
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
     //excluding log4j-core which causes a vulnerability issue
     implementation(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
@@ -337,8 +337,8 @@ dependencies {
     implementation 'org.jooq:jool-java-8:0.9.14'
     implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version:  '7.22.3'
-    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.0.2'
+    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version:  '7.24.2'
+    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.0'
 
     contractTestImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     contractTestImplementation "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
@@ -370,7 +370,7 @@ dependencies {
     contractTestImplementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
     contractTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
     contractTestImplementation 'org.springframework.boot:spring-boot-starter-cache'
-    contractTestImplementation 'com.github.ben-manes.caffeine:caffeine:3.1.6'
+    contractTestImplementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
     aatImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
     aatImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
     aatImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
