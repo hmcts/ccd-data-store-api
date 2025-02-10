@@ -5,10 +5,10 @@
   "request": {
     "body": {
       "data": {
-        "_extends_": "TTL_Case_Data"
+        "_extends_": "TTL_Case_Data_NBD_Empty"
       },
       "data_classification": {
-        "_extends_": "TTL_Classifications"
+        "_extends_": "TTL_Classifications_NBD_Empty"
       }
     }
   },

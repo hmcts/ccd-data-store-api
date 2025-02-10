@@ -26,13 +26,10 @@
         "jurisdiction" : "BEFTA_MASTER",
         "case_type_id" : "FT_MasterCaseType",
         "case_data" : {
-          "TTL" : null
+          "_extends_": "TTL_Case_Data_NBD_Empty"
         },
         "data_classification" : {
-          "TTL" : {
-            "classification" : "PUBLIC",
-            "value" : null
-          }
+          "_extends_": "TTL_Classifications_NBD_Empty"
         }
       },
       "event_id": "createCaseTTLMENotNull"
