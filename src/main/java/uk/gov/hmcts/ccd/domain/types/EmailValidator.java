@@ -70,6 +70,9 @@ public class EmailValidator implements BaseTypeValidator {
     }
 
     private boolean isValidEmailAddress(final String email) {
+        if (email.contains("<") || email.contains(">")) {
+            return false;
+        }
         try {
             new InternetAddress(email).validate();
             return true;

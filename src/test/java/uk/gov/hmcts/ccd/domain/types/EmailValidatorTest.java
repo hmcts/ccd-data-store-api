@@ -66,7 +66,7 @@ class EmailValidatorTest {
         final List<ValidationResult> result03 = validator.validate(FIELD_ID,
                                                                    NODE_FACTORY.textNode("test@test.org"),
             caseFieldDefinition);
-        assertEquals(0, result03.size(), result01.toString());
+        assertEquals(0, result03.size(), result03.toString());
 
         final List<ValidationResult> result04 = validator.validate(FIELD_ID,
                                                                    NODE_FACTORY.textNode("test@test.org.uk"),
@@ -94,12 +94,22 @@ class EmailValidatorTest {
         final List<ValidationResult> result02 = validator.validate(FIELD_ID,
                                                                    NODE_FACTORY.textNode("test.com"),
             caseFieldDefinition);
-        assertEquals(1, result01.size(), result02.toString());
+        assertEquals(1, result02.size(), result02.toString());
 
         final List<ValidationResult> result03 = validator.validate(FIELD_ID,
                                                                    NODE_FACTORY.textNode("test@test@test"),
             caseFieldDefinition);
         assertEquals(1, result03.size(), result03.toString());
+
+        final List<ValidationResult> result04 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("<a@a.a"),
+            caseFieldDefinition);
+        assertEquals(1, result04.size(), result04.toString());
+
+        final List<ValidationResult> result05 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("a@a.a>"),
+            caseFieldDefinition);
+        assertEquals(1, result05.size(), result05.toString());
     }
 
     @Test
