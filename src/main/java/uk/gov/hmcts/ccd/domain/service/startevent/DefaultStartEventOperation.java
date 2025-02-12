@@ -124,17 +124,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                 !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition),
                 caseReference, eventId, caseDetails.getState());
 
-        Map<String, JsonNode> defaultValueData = caseService
-            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
-        if (!defaultValueData.isEmpty()) {
-            mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
-        }
-
-        Map<String, JsonNode> nullifyByDefaultData = caseService
-            .buildJsonFromCaseFieldsWithNullifyByDefault(caseTypeDefinition, caseEventDefinition.getCaseFields());
-        if (!nullifyByDefaultData.isEmpty()) {
-            mergeDataAndClassificationForNewFields(nullifyByDefaultData, caseDetails, caseTypeDefinition);
-        }
+        mergeDefaultValueAndNullifyByDefault(caseEventDefinition, caseDetails, caseTypeDefinition);
 
         // update TTL in data
         Map<String, JsonNode> caseDataWithTtl = timeToLiveService.updateCaseDetailsWithTTL(
@@ -157,6 +147,20 @@ public class DefaultStartEventOperation implements StartEventOperation {
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, ignoreWarning);
 
         return buildStartEventTrigger(eventId, eventToken, caseDetails);
+    }
+
+    private void mergeDefaultValueAndNullifyByDefault(CaseEventDefinition caseEventDefinition, CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
+        Map<String, JsonNode> defaultValueData = caseService
+            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
+        if (!defaultValueData.isEmpty()) {
+            mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
+        }
+
+        Map<String, JsonNode> nullifyByDefaultData = caseService
+            .buildJsonFromCaseFieldsWithNullifyByDefault(caseTypeDefinition, caseEventDefinition.getCaseFields());
+        if (!nullifyByDefaultData.isEmpty()) {
+            mergeDataAndClassificationForNewFields(nullifyByDefaultData, caseDetails, caseTypeDefinition);
+        }
     }
 
     @Transactional
@@ -184,17 +188,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                     final CaseDetails caseDetails) {
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
-        Map<String, JsonNode> defaultValueData = caseService
-            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
-        if (!defaultValueData.isEmpty()) {
-            mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
-        }
-
-        Map<String, JsonNode> nullifyByDefaultData = caseService
-            .buildJsonFromCaseFieldsWithNullifyByDefault(caseTypeDefinition, caseEventDefinition.getCaseFields());
-        if (!nullifyByDefaultData.isEmpty()) {
-            mergeDataAndClassificationForNewFields(nullifyByDefaultData, caseDetails, caseTypeDefinition);
-        }
+        mergeDefaultValueAndNullifyByDefault(caseEventDefinition, caseDetails, caseTypeDefinition);
 
         validateEventTrigger(() ->
                 !eventTriggerService.isPreStateEmpty(caseEventDefinition),
