@@ -59,29 +59,24 @@ class EmailValidatorTest {
         assertEquals(0, result01.size(), result01.toString());
 
         final List<ValidationResult> result02 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("test@test"),
+                                                                   NODE_FACTORY.textNode("test@test.org"),
             caseFieldDefinition);
         assertEquals(0, result02.size(), result02.toString());
 
         final List<ValidationResult> result03 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("test@test.org"),
+                                                                   NODE_FACTORY.textNode("test@test.org.uk"),
             caseFieldDefinition);
         assertEquals(0, result03.size(), result03.toString());
 
         final List<ValidationResult> result04 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("test@test.org.uk"),
+                                                                   NODE_FACTORY.textNode("test.test@test.com"),
             caseFieldDefinition);
         assertEquals(0, result04.size(), result04.toString());
 
         final List<ValidationResult> result05 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("test.test@test.com"),
-            caseFieldDefinition);
-        assertEquals(0, result05.size(), result05.toString());
-
-        final List<ValidationResult> result06 = validator.validate(FIELD_ID,
                                                                    NODE_FACTORY.textNode("test_test@test.xxx"),
             caseFieldDefinition);
-        assertEquals(0, result06.size(), result06.toString());
+        assertEquals(0, result05.size(), result05.toString());
     }
 
     @Test
@@ -102,14 +97,35 @@ class EmailValidatorTest {
         assertEquals(1, result03.size(), result03.toString());
 
         final List<ValidationResult> result04 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("<a@a.a"),
+                                                                   NODE_FACTORY.textNode("test@test"),
             caseFieldDefinition);
         assertEquals(1, result04.size(), result04.toString());
 
         final List<ValidationResult> result05 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("a@a.a>"),
+                                                                   NODE_FACTORY.textNode("<a@a.a"),
             caseFieldDefinition);
         assertEquals(1, result05.size(), result05.toString());
+
+        final List<ValidationResult> result06 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("a@a.a>"),
+            caseFieldDefinition);
+        assertEquals(1, result06.size(), result06.toString());
+
+        // Email address ending in comma
+        final List<ValidationResult> result07 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("a@a.a,"),
+            caseFieldDefinition);
+        assertEquals(1, result07.size(), result07.toString());
+
+        final List<ValidationResult> result08 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("a@a.a and b@b.b"),
+            caseFieldDefinition);
+        assertEquals(1, result08.size(), result08.toString());
+
+        final List<ValidationResult> result09 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("a@a.a AND b@b.b"),
+            caseFieldDefinition);
+        assertEquals(1, result09.size(), result09.toString());
     }
 
     @Test

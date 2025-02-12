@@ -5,8 +5,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,14 +68,6 @@ public class EmailValidator implements BaseTypeValidator {
     }
 
     private boolean isValidEmailAddress(final String email) {
-        if (email.contains("<") || email.contains(">")) {
-            return false;
-        }
-        try {
-            new InternetAddress(email).validate();
-            return true;
-        } catch (AddressException ex) {
-            return false;
-        }
+        return org.apache.commons.validator.routines.EmailValidator.getInstance().isValid(email);
     }
 }
