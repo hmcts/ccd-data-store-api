@@ -30,7 +30,7 @@ public class CaseDataValidatorController {
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final MidEventCallback midEventCallback;
 
-    final JcLogger jcLogger = new JcLogger("CCD-6087/CCD-6096",  "CaseDataValidatorController", true);
+    final JcLogger jcLogger = new JcLogger("CCD-6087",  "CaseDataValidatorController", true);
 
     @Autowired
     public CaseDataValidatorController(
@@ -79,21 +79,16 @@ public class CaseDataValidatorController {
          * CaseDataContent DOES contain "dummy.pdf" ,  caseTypeId = "FinancialRemedyMVP2" ,  pageId = "FR_generalEmail1"
          * POST path = "/case-types/FinancialRemedyMVP2/validate"
          */
-        jcLogger.jclog("validate() caseTypeId = " + caseTypeId + " , pageId = " + pageId + " , [built 7th Feb PM]");
+        jcLogger.jclog("validate() caseTypeId = " + caseTypeId + " , pageId = " + pageId + " , [built 12th Feb]");
         jcLogger.jclog("validate() caseDataContent", content);
 
-        /*
-         * CCD-6096 ("Email Field validation allows illegal emails to be submitted")
-         * CCD-6096 likely failing in either DefaultValidateCaseFieldsOperation  or  CaseTypeService
-         *                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^      ^^^^^^^^^^^^^^^
-         */
-        validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
-            content);
+        validateCaseFieldsOperation.validateCaseDetails(caseTypeId, content);
 
         /*
          * CCD-6087 ("Mid-event callback request contains unexpected data")
          * CCD-6087 calls invoke() which in turn calls CaseService.populateCurrentCaseDetailsWithEventFields()
          *                                             ^^^^^^^^^^^
+         * CCD-6087 -- see "CaseService" , "caseDataAfter"
          */
         final JsonNode data = midEventCallback.invoke(caseTypeId,
             content,
