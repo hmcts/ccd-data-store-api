@@ -11,7 +11,7 @@ properties(
     ]
 )
 
-@Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION")
+@Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION123")
 
 def type = "java"
 def product = "ccd"
