@@ -324,8 +324,8 @@ dependencies {
     // for sonar analysis
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
     //excluding log4j-core which causes a vulnerability issue
     implementation(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
@@ -337,8 +337,8 @@ dependencies {
     implementation 'org.jooq:jool-java-8:0.9.14'
     implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version:  '7.23.0'
-    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.0.2'
+    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version:  '7.24.2'
+    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.0'
 
     contractTestImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     contractTestImplementation "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
