@@ -16,7 +16,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
@@ -167,7 +166,7 @@ public class CaseAccessGroupUtils {
             .filter(Objects::nonNull)
             .filter(node -> node != null && node.get(ORG_POLICY_CASE_ASSIGNED_ROLE) != null
                 && node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equalsIgnoreCase(caseRoleId))
-            .collect(Collectors.toList());
+            .toList();
 
         LOG.debug("Organisations found for CASE_ACCESS_GROUPS={} caseType={} version={} ORGANISATION={},"
                 + "ORGANISATIONID={}, ORG_POLICY_CASE_ASSIGNED_ROLE={} .caseRoleNodes={}.",

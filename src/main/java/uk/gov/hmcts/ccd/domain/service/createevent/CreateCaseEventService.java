@@ -241,8 +241,7 @@ public class CreateCaseEventService {
         // Identify organizations with newCase set to true
         // Update case supplementary data
         // Clear newCase attributes
-        NewCaseUtils newCaseUtils = new NewCaseUtils();
-        newCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
+        NewCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
 
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));

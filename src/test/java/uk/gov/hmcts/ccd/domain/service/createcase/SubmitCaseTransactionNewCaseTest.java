@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -143,7 +145,7 @@ class SubmitCaseTransactionNewCaseTest {
 
     @BeforeEach
     void setup() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
@@ -247,36 +249,36 @@ class SubmitCaseTransactionNewCaseTest {
     }
 
     private Event buildEvent() {
-        final Event event = anEvent().build();
-        event.setEventId(EVENT_ID);
-        event.setDescription(EVENT_DESC);
-        event.setSummary(EVENT_SUMMARY);
-        return event;
+        Event anEvent = anEvent().build();
+        anEvent.setEventId(EVENT_ID);
+        anEvent.setDescription(EVENT_DESC);
+        anEvent.setSummary(EVENT_SUMMARY);
+        return anEvent;
     }
 
     private CaseTypeDefinition buildCaseType() {
         final Version version = new Version();
         version.setNumber(VERSION);
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(CASE_TYPE_ID);
-        caseTypeDefinition.setVersion(version);
-        return caseTypeDefinition;
+        CaseTypeDefinition caseTypeDef = new CaseTypeDefinition();
+        caseTypeDef.setId(CASE_TYPE_ID);
+        caseTypeDef.setVersion(version);
+        return caseTypeDef;
     }
 
     private CaseEventDefinition buildEventTrigger() {
-        final CaseEventDefinition event = new CaseEventDefinition();
-        event.setId(EVENT_ID);
-        event.setName(EVENT_NAME);
-        return event;
+        final CaseEventDefinition evnt = new CaseEventDefinition();
+        evnt.setId(EVENT_ID);
+        evnt.setName(EVENT_NAME);
+        return evnt;
     }
 
     private IdamUser buildIdamUser() {
-        final IdamUser idamUser = new IdamUser();
-        idamUser.setId(IDAM_ID);
-        idamUser.setForename(IDAM_FNAME);
-        idamUser.setSurname(IDAM_LNAME);
-        idamUser.setEmail(IDAM_EMAIL);
-        return idamUser;
+        IdamUser idamUsr = new IdamUser();
+        idamUsr.setId(IDAM_ID);
+        idamUsr.setForename(IDAM_FNAME);
+        idamUsr.setSurname(IDAM_LNAME);
+        idamUsr.setEmail(IDAM_EMAIL);
+        return idamUsr;
     }
 
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
@@ -284,11 +286,8 @@ class SubmitCaseTransactionNewCaseTest {
             SubmitCaseTransactionNewCaseTest.class.getClassLoader()
                 .getResourceAsStream("tests/".concat(fileName));
 
-        HashMap<String, JsonNode> result =
-            new ObjectMapper().readValue(inputStream, new TypeReference<>() {
+        return new ObjectMapper().readValue(inputStream, new TypeReference<>() {
             });
-
-        return result;
     }
 
     @Test
@@ -316,7 +315,7 @@ class SubmitCaseTransactionNewCaseTest {
             IGNORE_WARNING, null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-        assertTrue(caseDetailsWithSupplementryNewCase.getSupplementaryData() == null);
+        assertNull(caseDetailsWithSupplementryNewCase.getSupplementaryData());
     }
 
     @Test
@@ -356,9 +355,6 @@ class SubmitCaseTransactionNewCaseTest {
             .caseAccessGroup(caseAccessGroup)
             .id(uuid).build();
         caseAccessGroupForUIs.add(caseAccessGroupForUI);
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
 
         inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
 
@@ -454,8 +450,8 @@ class SubmitCaseTransactionNewCaseTest {
     }
 
     private void assertCaseDataSupplementry(final CaseDetails caseDetails, String organisationId) {
-        assertTrue(caseDetails.getSupplementaryData() != null);
-;
+        assertNotNull(caseDetails.getSupplementaryData());
+
         JsonNode supplementryDataJsonNode = caseDetails.getSupplementaryData()
             .get(NewCaseUtils.SUPPLEMENTRY_DATA_NEW_CASE);
         List<JsonNode> organizationProfiles = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetails,
