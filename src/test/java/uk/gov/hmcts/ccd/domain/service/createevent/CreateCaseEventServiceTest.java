@@ -39,6 +39,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -153,11 +154,15 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private UserAuthorisation userAuthorisation;
     @Mock
+    private ApplicationParams applicationParams;
+    @Mock
     private UserRepository userRepository;
     @Mock
     private UIDService uidService;
     @Mock
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    @Mock
+    private ConditionalFieldRestorer conditionalFieldRestorer;
 
     @Spy
     private CaseDocumentTimestampService caseDocumentTimestampService =

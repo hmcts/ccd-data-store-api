@@ -1,0 +1,23 @@
+{
+	"_guid_": "F-1023_Test_Data_Base_V2",
+  "_extends_": "Case_Creation_V2_Data_Base",
+
+	"request": {
+    "headers": {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+      "experimental": true
+    },
+		"pathVariables": {
+      "CaseTypeID": "FT_CaseAccessGroups"
+		}
+	},
+
+  "expectedResponse": {
+    "body" : {
+      "_links" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type" : "FT_CaseAccessGroups",
+      "state" : "CaseCreated"
+    }
+  }
+}

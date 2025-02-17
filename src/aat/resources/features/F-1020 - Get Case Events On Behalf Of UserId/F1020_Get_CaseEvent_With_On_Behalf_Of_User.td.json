@@ -16,8 +16,7 @@
       "_extends_": "BeftaCaseworker2Solicitor1"
     },
     "solicitor3": {
-      "username": "befta.caseworker.2.solicitor.3@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+      "_extends_": "BeftaCaseworker2Solicitor3"
     }
   },
 

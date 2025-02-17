@@ -12,6 +12,7 @@ import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import org.apache.http.HttpHeaders;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
@@ -30,8 +31,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -68,8 +67,29 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
     public static final String CASE_01_TYPE = "TestAddressBookCase";
     public static final String CASE_02_TYPE = "TestAddressBookCase";
     public static final String CASE_03_TYPE = "TestAddressBookCase";
-    public static final int NUMBER_OF_CASES = 23;
-
+    public static final int NUMBER_OF_CASES = 25;
+    public static final JSONObject responseJson1 = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "0001",
+                    "task_name": "Task 1 - description 1"
+                },
+                "complete_task": "false"
+            }
+        }
+        """);
+    public static final JSONObject responseJson2 = new JSONObject("""
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "00002",
+                    "task_name": "Task 2 as modified by callback",
+                },
+                "complete_task": "true"
+            }
+        }
+        """);
     private static final String BEARER = "Bearer ";
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     private static final String TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODI2MDAyMzN9"

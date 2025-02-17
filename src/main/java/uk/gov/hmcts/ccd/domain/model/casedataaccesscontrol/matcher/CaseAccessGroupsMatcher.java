@@ -51,7 +51,7 @@ public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
 
     private Optional<List<String>> getCaseAccessGroupIds(CaseDetails caseDetails) {
         JsonNode caseAccessGroups = caseDetails.getData().get(CASE_ACCESS_GROUPS);
-        if (caseAccessGroups != null) {
+        if (caseAccessGroups != null && !caseAccessGroups.isEmpty()) {
             return Optional.ofNullable(getCaseAccessGroupIds(caseAccessGroups));
         }
         return Optional.empty();

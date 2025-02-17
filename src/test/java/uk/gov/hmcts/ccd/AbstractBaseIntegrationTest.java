@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +26,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
@@ -57,6 +60,7 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -78,8 +82,6 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.properties")
-// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
-@SuppressWarnings("checkstyle:OperatorWrap")
 public abstract class AbstractBaseIntegrationTest {
     protected static final ObjectMapper mapper = JacksonUtils.MAPPER;
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
@@ -118,7 +120,7 @@ public abstract class AbstractBaseIntegrationTest {
     @Inject
     private CaseDataIssueLogger caseDataIssueLogger;
     @Inject
-    private CallbackService callbackService;
+    protected CallbackService callbackService;
     @Inject
     private EventTokenService eventTokenService;
     @Inject
@@ -137,11 +139,17 @@ public abstract class AbstractBaseIntegrationTest {
     protected Authentication authentication;
     @Mock
     protected SecurityContext securityContext;
+    @Mock
+    protected HttpServletRequest request;
 
     @Before
     @BeforeEach
     public void initMock() throws IOException {
         MockitoAnnotations.initMocks(this);
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(roleAssignmentRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
@@ -186,11 +194,11 @@ public abstract class AbstractBaseIntegrationTest {
         List<String> sequences = determineSequences(jdbcTemplate);
 
         String truncateTablesQuery =
-            "START TRANSACTION;\n" +
-                tables.stream()
+            "START TRANSACTION;\n"
+                + tables.stream()
                     .map(record -> String.format("TRUNCATE TABLE %s CASCADE;", record))
-                    .collect(Collectors.joining("\n")) +
-                "\nCOMMIT;";
+                    .collect(Collectors.joining("\n"))
+                + "\nCOMMIT;";
         jdbcTemplate.execute(truncateTablesQuery);
 
         sequences.forEach(sequence -> jdbcTemplate.execute("ALTER SEQUENCE " + sequence + " RESTART WITH 1"));
