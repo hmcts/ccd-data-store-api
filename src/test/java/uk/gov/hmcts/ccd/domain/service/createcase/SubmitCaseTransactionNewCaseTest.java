@@ -249,27 +249,27 @@ class SubmitCaseTransactionNewCaseTest {
     }
 
     private Event buildEvent() {
-        Event event = anEvent().build();
-        event.setEventId(EVENT_ID);
-        event.setDescription(EVENT_DESC);
-        event.setSummary(EVENT_SUMMARY);
-        return event;
+        Event anEvent = anEvent().build();
+        anEvent.setEventId(EVENT_ID);
+        anEvent.setDescription(EVENT_DESC);
+        anEvent.setSummary(EVENT_SUMMARY);
+        return anEvent;
     }
 
     private CaseTypeDefinition buildCaseType() {
         final Version version = new Version();
         version.setNumber(VERSION);
-        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(CASE_TYPE_ID);
-        caseTypeDefinition.setVersion(version);
-        return caseTypeDefinition;
+        CaseTypeDefinition caseTypeDef = new CaseTypeDefinition();
+        caseTypeDef.setId(CASE_TYPE_ID);
+        caseTypeDef.setVersion(version);
+        return caseTypeDef;
     }
 
     private CaseEventDefinition buildEventTrigger() {
-        final CaseEventDefinition event = new CaseEventDefinition();
-        event.setId(EVENT_ID);
-        event.setName(EVENT_NAME);
-        return event;
+        final CaseEventDefinition evnt = new CaseEventDefinition();
+        evnt.setId(EVENT_ID);
+        evnt.setName(EVENT_NAME);
+        return evnt;
     }
 
     private IdamUser buildIdamUser() {
