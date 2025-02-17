@@ -141,8 +141,7 @@ public class SubmitCaseTransaction implements AccessControl {
                 caseTypeDefinition);
         }
 
-        NewCaseUtils newCaseUtils = new NewCaseUtils();
-        newCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
+        NewCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
 
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,

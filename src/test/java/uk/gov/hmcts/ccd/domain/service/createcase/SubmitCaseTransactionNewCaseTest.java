@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -143,7 +144,7 @@ class SubmitCaseTransactionNewCaseTest {
 
     @BeforeEach
     void setup() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
@@ -247,7 +248,7 @@ class SubmitCaseTransactionNewCaseTest {
     }
 
     private Event buildEvent() {
-        final Event event = anEvent().build();
+        Event event = anEvent().build();
         event.setEventId(EVENT_ID);
         event.setDescription(EVENT_DESC);
         event.setSummary(EVENT_SUMMARY);
@@ -257,7 +258,7 @@ class SubmitCaseTransactionNewCaseTest {
     private CaseTypeDefinition buildCaseType() {
         final Version version = new Version();
         version.setNumber(VERSION);
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(CASE_TYPE_ID);
         caseTypeDefinition.setVersion(version);
         return caseTypeDefinition;
@@ -271,7 +272,7 @@ class SubmitCaseTransactionNewCaseTest {
     }
 
     private IdamUser buildIdamUser() {
-        final IdamUser idamUser = new IdamUser();
+        IdamUser idamUser = new IdamUser();
         idamUser.setId(IDAM_ID);
         idamUser.setForename(IDAM_FNAME);
         idamUser.setSurname(IDAM_LNAME);
@@ -284,11 +285,8 @@ class SubmitCaseTransactionNewCaseTest {
             SubmitCaseTransactionNewCaseTest.class.getClassLoader()
                 .getResourceAsStream("tests/".concat(fileName));
 
-        HashMap<String, JsonNode> result =
-            new ObjectMapper().readValue(inputStream, new TypeReference<>() {
+        return new ObjectMapper().readValue(inputStream, new TypeReference<>() {
             });
-
-        return result;
     }
 
     @Test
@@ -316,7 +314,7 @@ class SubmitCaseTransactionNewCaseTest {
             IGNORE_WARNING, null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-        assertTrue(caseDetailsWithSupplementryNewCase.getSupplementaryData() == null);
+        assertNull(caseDetailsWithSupplementryNewCase.getSupplementaryData());
     }
 
     @Test
@@ -356,9 +354,6 @@ class SubmitCaseTransactionNewCaseTest {
             .caseAccessGroup(caseAccessGroup)
             .id(uuid).build();
         caseAccessGroupForUIs.add(caseAccessGroupForUI);
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
 
         inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
 

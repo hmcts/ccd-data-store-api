@@ -3,13 +3,11 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.experimental.UtilityClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import java.util.stream.Collectors;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,7 +16,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 
-@Component
+@UtilityClass
 public class NewCaseUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(NewCaseUtils.class);
@@ -29,10 +27,6 @@ public class NewCaseUtils {
     public static final String SUPPLEMENTRY_DATA_NEW_CASE = "new_case";
     public static final String CASE_NEW_YES = "YES";
     public static final String CASE_NEW_NO = "NO";
-
-    @Autowired
-    public NewCaseUtils() {
-    }
 
     public static void setupSupplementryDataWithNewCase(CaseDetails caseDetailsAfterCallbackWithoutHashes) {
         // Identify organizationProfiles with newCase set to (YES) true
@@ -62,7 +56,7 @@ public class NewCaseUtils {
             .filter(Objects::nonNull)
             .filter(node -> node != null && node.get(ORG_POLICY_NEW_CASE) != null
                 && node.get(ORG_POLICY_NEW_CASE).asText().toUpperCase().equals(newCaseValue))
-            .collect(Collectors.toList());
+            .toList();
 
         LOG.debug("Organisation found for  caseType={} version={} ORGANISATION={},"
                 + "ORGANISATIONID={}, ORG_POLICY_CASE_ASSIGNED_ROLE={}.",
