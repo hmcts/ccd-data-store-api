@@ -13,7 +13,7 @@ properties(
 
 @Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION")
 
-def type = "java"
+def type = "java12"
 def product = "ccd"
 def component = "data-store-api"
 def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
