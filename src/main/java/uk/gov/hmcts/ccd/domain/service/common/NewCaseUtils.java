@@ -47,7 +47,7 @@ public class NewCaseUtils {
     public static List<JsonNode> findListOfOrganisationPolicyNodesForNewCase(CaseDetails caseDetails,
                                                                              String newCaseValue) {
         if (caseDetails.getData() == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         List<JsonNode> orgPolicyNewCaseNodes = Optional.ofNullable(caseDetails.getData().values())

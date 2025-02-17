@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -449,8 +450,8 @@ class SubmitCaseTransactionNewCaseTest {
     }
 
     private void assertCaseDataSupplementry(final CaseDetails caseDetails, String organisationId) {
-        assertTrue(caseDetails.getSupplementaryData() != null);
-;
+        assertNotNull(caseDetails.getSupplementaryData());
+
         JsonNode supplementryDataJsonNode = caseDetails.getSupplementaryData()
             .get(NewCaseUtils.SUPPLEMENTRY_DATA_NEW_CASE);
         List<JsonNode> organizationProfiles = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetails,
