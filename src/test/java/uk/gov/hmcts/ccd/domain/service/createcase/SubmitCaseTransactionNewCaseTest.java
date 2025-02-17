@@ -273,12 +273,12 @@ class SubmitCaseTransactionNewCaseTest {
     }
 
     private IdamUser buildIdamUser() {
-        IdamUser idamUser = new IdamUser();
-        idamUser.setId(IDAM_ID);
-        idamUser.setForename(IDAM_FNAME);
-        idamUser.setSurname(IDAM_LNAME);
-        idamUser.setEmail(IDAM_EMAIL);
-        return idamUser;
+        IdamUser idamUsr = new IdamUser();
+        idamUsr.setId(IDAM_ID);
+        idamUsr.setForename(IDAM_FNAME);
+        idamUsr.setSurname(IDAM_LNAME);
+        idamUsr.setEmail(IDAM_EMAIL);
+        return idamUsr;
     }
 
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
