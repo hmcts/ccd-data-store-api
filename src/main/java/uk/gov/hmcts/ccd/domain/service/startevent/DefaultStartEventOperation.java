@@ -149,7 +149,9 @@ public class DefaultStartEventOperation implements StartEventOperation {
         return buildStartEventTrigger(eventId, eventToken, caseDetails);
     }
 
-    private void mergeDefaultValueAndNullifyByDefault(CaseEventDefinition caseEventDefinition, CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
+    private void mergeDefaultValueAndNullifyByDefault(CaseEventDefinition caseEventDefinition,
+                                                      CaseDetails caseDetails,
+                                                      CaseTypeDefinition caseTypeDefinition) {
         Map<String, JsonNode> defaultValueData = caseService
             .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
         if (!defaultValueData.isEmpty()) {
