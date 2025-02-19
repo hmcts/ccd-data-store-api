@@ -48,7 +48,7 @@ Scenario: must return appropriate negative response when request does not provid
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-075 @Ignore # re-write as part of RDM-6847
+@S-075
 Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
 
     Given a user with     [an active profile in CCD],
