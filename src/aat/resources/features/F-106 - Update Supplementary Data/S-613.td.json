@@ -1,0 +1,38 @@
+{
+  "title": "CAA must NOT be able to Update supplementary data of any PRIVATE case that requires explicit access",
+  "_guid_": "S-613",
+  "_extends_": "F-106_Update_Supplementary_Data_Base",
+  "specs": [
+    "a valid PUBLIC profile"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker2Solicitor1"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][S-613_Case_Data_Create_C2_PRIVATE][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "supplementary_data_updates": {
+        "$inc": {
+          "orgs_assigned_users.OrgA": -1
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseAccessException",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Not authorised to update case supplementary data",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

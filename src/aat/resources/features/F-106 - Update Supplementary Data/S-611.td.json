@@ -1,24 +1,35 @@
 {
-	"title": "Must return the updated supplementary data values from Data store internal search elastic search call",
-	"_guid_": "S-608",
-	"_extends_": "F-106_Test_Data_Base",
-	"specs": [
+  "title": "CAA must be able to see updated supplementary data of a case from different jurisdiction",
+  "_guid_": "S-611",
+  "_extends_": "F-106_Test_Data_Base",
+  "specs": [
     "is configured to search for the previously created case by the updated supplementary data value",
-    "a valid profile",
+    "a valid CAA profile",
     "contains the previously created case"
-	],
+  ],
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCaseworker2Solicitor2"
+      "_extends_": "BeftaCaseworkerCaa"
     }
   },
   "request": {
     "queryParams": {
-      "usecase": "workbasket"
+      "usecase": "workbasket",
+      "ctid": "BEFTA_CASETYPE_2_1"
     },
     "body": {
       "query":{
         "bool":{
+          "must": [
+            {
+              "match": {
+                "reference": {
+                  "operator": "and",
+                  "query": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+                }
+              }
+            }
+          ],
           "filter":[
             { "bool":{
               "should": [
