@@ -15,7 +15,7 @@ Store/search cases and provide workbaskets.
 
 ### Prerequisites
 
-- [Open JDK 17](https://openjdk.java.net/)
+- [Open JDK 21](https://openjdk.java.net/)
 - [Docker](https://www.docker.com)
 
 #### Environment variables
@@ -119,7 +119,6 @@ Will run both F-1023 and F-777:
 Will run only S-1023.5:
 
     ./gradlew functional -P tags="@S-1023.5"
-
 
 ## LICENSE
 
