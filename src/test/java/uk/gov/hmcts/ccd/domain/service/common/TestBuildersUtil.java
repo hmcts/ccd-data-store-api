@@ -97,6 +97,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CallbackResponseBuilder withData(Map<String, JsonNode> data) {
+            callbackResponse.setData(data);
+            return this;
+        }
+
         public CallbackResponse build() {
             return callbackResponse;
         }
@@ -891,6 +896,11 @@ public class TestBuildersUtil {
 
         public CaseEventFieldDefinitionBuilder withDefaultValue(String defaultValue) {
             caseField.setDefaultValue(defaultValue);
+            return this;
+        }
+
+        public CaseEventFieldDefinitionBuilder withNullifyByDefault(Boolean nullifyByDefault) {
+            caseField.setNullifyByDefault(nullifyByDefault);
             return this;
         }
 
