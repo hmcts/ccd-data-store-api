@@ -1,0 +1,18 @@
+{
+  "_guid_": "F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Region_123__Location_1",
+  "_extends_": "F-1006_CreateCasePreRequisiteCitizen__FT_GlobalSearch_AC_2__Base",
+
+  "specs": [
+    "to create a case as a citizen: for case type with AccessProfile region and location filter: region = 123, location = 1"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "caseManagementLocation" : {
+          "region" : "123"
+        }
+      }
+    }
+  }
+}
