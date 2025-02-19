@@ -9,14 +9,16 @@
 		"has the 403 return code"
 	],
 
+  "user": {
+    "_extends_": "BeftaCaseworker1"
+  },
+
 	"request": {
-		"headers": {
-			"Authorization": "Dummy_Authorization"
-		},
-		"pathVariables": {
-			"cid": "1234567890"
-		}
-	},
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "[[DEFAULT_AUTO_VALUE]]"
+    }
+  },
 
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",
