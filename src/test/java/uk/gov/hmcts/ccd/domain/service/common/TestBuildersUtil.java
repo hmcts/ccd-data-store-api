@@ -899,6 +899,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseEventFieldDefinitionBuilder withNullifyByDefault(Boolean nullifyByDefault) {
+            caseField.setNullifyByDefault(nullifyByDefault);
+            return this;
+        }
+
         public CaseEventFieldDefinition build() {
             caseField.setCaseEventFieldComplexDefinitions(complexFieldDefinitions);
             return caseField;
