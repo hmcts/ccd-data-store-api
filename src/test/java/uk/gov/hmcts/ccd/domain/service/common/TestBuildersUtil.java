@@ -97,6 +97,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CallbackResponseBuilder withData(Map<String, JsonNode> data) {
+            callbackResponse.setData(data);
+            return this;
+        }
+
         public CallbackResponse build() {
             return callbackResponse;
         }
