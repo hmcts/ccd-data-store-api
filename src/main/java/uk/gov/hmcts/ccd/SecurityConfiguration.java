@@ -17,7 +17,6 @@ import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
-import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
@@ -47,9 +46,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
     private final SecurityLoggingFilter securityLoggingFilter;
     private final ExceptionHandlingFilter exceptionHandlingFilter;
-    private CustomHeadersFilter customHeadersFilter;
-    private JwtAuthenticationConverter jwtAuthenticationConverter;
-    private ApplicationParams applicationParams;
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
     private static final String[] AUTH_WHITELIST = {
         "/v2/**",
@@ -71,10 +68,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                                  final Function<HttpServletRequest, Optional<String>> userIdExtractor,
                                  final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
                                  final SecurityUtils securityUtils,
-                                 final ApplicationParams applicationParams,
                                  @Value("${security.logging.filter.path.regex}") String loggingFilterPathRegex) {
-        this.applicationParams = applicationParams;
-        this.customHeadersFilter = new CustomHeadersFilter(applicationParams);
         this.v1EndpointsPathParamSecurityFilter = new V1EndpointsPathParamSecurityFilter(
             userIdExtractor, authorizedRolesExtractor, securityUtils);
         this.securityLoggingFilter = new SecurityLoggingFilter(securityUtils, loggingFilterPathRegex);
@@ -91,8 +85,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
+        // ExceptionHandlingFilter should be at the top to catch exceptions in the Spring Security filter chain
         http
-            .addFilterBefore(customHeadersFilter, BearerTokenAuthenticationFilter.class)
             .addFilterBefore(exceptionHandlingFilter, BearerTokenAuthenticationFilter.class)
             .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
             .addFilterAfter(securityLoggingFilter, BearerTokenAuthenticationFilter.class)
@@ -118,7 +112,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     JwtDecoder jwtDecoder() {
-        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder)JwtDecoders.fromOidcIssuerLocation(issuerUri);
+        NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
         // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();

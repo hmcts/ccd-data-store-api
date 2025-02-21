@@ -4,7 +4,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
 import javax.servlet.Filter;
@@ -60,13 +59,7 @@ public class CustomHeadersFilter implements Filter {
                 headerValue = ClientContextUtil.removeEnclosingSquareBrackets(headerValue);
             }
 
-            ContentCachingResponseWrapper wrappedResponse = new ContentCachingResponseWrapper(response);
             response.setHeader(context, headerValue);
-            try {
-                wrappedResponse.copyBodyToResponse();
-            } catch (IOException e) {
-                throw new ServiceException("Unable to copy cache to HttpResponse", e);
-            }
         }
     }
 }
