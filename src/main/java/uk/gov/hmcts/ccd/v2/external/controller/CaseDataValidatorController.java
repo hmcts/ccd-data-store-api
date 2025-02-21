@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.V2;
@@ -28,6 +29,8 @@ public class CaseDataValidatorController {
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final MidEventCallback midEventCallback;
+
+    final JcLogger jcLogger = new JcLogger("CCD-6087",  "CaseDataValidatorController", true);
 
     @Autowired
     public CaseDataValidatorController(
@@ -71,9 +74,22 @@ public class CaseDataValidatorController {
     public ResponseEntity<CaseDataResource> validate(@PathVariable("caseTypeId") String caseTypeId,
                                                      @RequestParam(required = false) final String pageId,
                                                      @RequestBody final CaseDataContent content) {
-        validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
-            content);
+        /*
+         * JC note:
+         * CaseDataContent DOES contain "dummy.pdf" ,  caseTypeId = "FinancialRemedyMVP2" ,  pageId = "FR_generalEmail1"
+         * POST path = "/case-types/FinancialRemedyMVP2/validate"
+         */
+        jcLogger.jclog("validate() caseTypeId = " + caseTypeId + " , pageId = " + pageId + " , [built 12th Feb]");
+        jcLogger.jclog("validate() caseDataContent", content);
 
+        validateCaseFieldsOperation.validateCaseDetails(caseTypeId, content);
+
+        /*
+         * CCD-6087 ("Mid-event callback request contains unexpected data")
+         * CCD-6087 calls invoke() which in turn calls CaseService.populateCurrentCaseDetailsWithEventFields()
+         *                                             ^^^^^^^^^^^
+         * CCD-6087 -- see "CaseService" , "caseDataAfter"
+         */
         final JsonNode data = midEventCallback.invoke(caseTypeId,
             content,
             pageId);

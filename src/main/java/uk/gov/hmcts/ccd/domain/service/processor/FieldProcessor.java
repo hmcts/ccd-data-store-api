@@ -35,6 +35,7 @@ public abstract class FieldProcessor {
                             WizardPageField wizardPageField) {
         CaseViewField caseViewField = caseViewFieldBuilder.build(caseField, caseEventField);
 
+        // TODO: Add logging here
         if (caseViewField.isComplexFieldType()) {
             return executeComplex(node, caseField.getFieldTypeDefinition().getComplexFields(), wizardPageField,
                 caseField.getId(), caseViewField);
