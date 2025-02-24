@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +14,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.http.ResponseEntity;
-
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
@@ -387,7 +385,7 @@ class DefaultCreateCaseOperationTest {
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
         given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
         given(caseSanitiser.sanitise(eq(CASE_TYPE), anyMap())).willReturn(data);
-        
+
         // SETUP TTL
         CaseFieldDefinition ttlDefinition = new CaseFieldDefinition();
         ttlDefinition.setId("TTL");
@@ -404,7 +402,7 @@ class DefaultCreateCaseOperationTest {
                 }
             });
         given(applicationParams.getTtlGuard()).willReturn(2);
-    
+
         given(submitCaseTransaction.submitCase(same(event),
             same(CASE_TYPE),
             same(IDAM_USER),
@@ -416,7 +414,7 @@ class DefaultCreateCaseOperationTest {
                 public CaseDetails answer(InvocationOnMock invocation) throws Throwable {
                     CaseDetails caseDetails = (CaseDetails) invocation.getArguments()[4];
                     return caseDetails;
-                }  
+                }
             });
 
         CaseDetails returnedCaseDetails = defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
