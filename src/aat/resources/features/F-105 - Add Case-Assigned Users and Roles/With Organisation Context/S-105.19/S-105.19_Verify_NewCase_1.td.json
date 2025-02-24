@@ -1,0 +1,14 @@
+{
+  "_guid_": "S-105.19_Verify_NewCase_1",
+  "_extends_": "F-105_Check_NewCase_Users_Base",
+
+  "specs": [
+    "to verify newCase assigned to C1 is set to false in the supplementary data"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "supplementary_data": "${[scenarioContext][customValues][new_case_siblingContexts.F-105_Prerequisite_NewCase_Check_Call.childContexts.F-105_Get_Organisation_Identifier_Olawale|siblingContexts.F-105_Prerequisite_NewCase_Check_Call|1]}"
+    }
+  }
+}
