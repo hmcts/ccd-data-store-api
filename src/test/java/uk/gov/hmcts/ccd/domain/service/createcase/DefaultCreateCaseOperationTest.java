@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -426,8 +427,8 @@ class DefaultCreateCaseOperationTest {
     }
 
     @Test
-    @DisplayName("Should updateCaseDetailsWithTtlIncrement")
-    void shouldUpdateCaseDetailsWithTtlIncrement() {
+    @DisplayName("Should updateCaseDetailsWithTtlIncrement_1")
+    void shouldUpdateCaseDetailsWithTtlIncrement_1() {
         final String caseEventStateId = "Some state";
         eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(null).build();
         eventData.setSupplementaryDataRequest(null);
