@@ -202,7 +202,8 @@ public class CaseAccessOperation {
             orgNewUserCountMap.forEach((organisationId, newUserCount) -> {
                 supplementaryDataRepository.incrementSupplementaryData(caseReference,
                     ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount);
-                clearUserAssignedNewCase(caseReference, organisationId);
+                //clearUserAssignedNewCase(caseReference, organisationId);
+                setUserAssignedNewCaseForOrganisationIdToFalse(caseReference, organisationId);
             })
         );
     }
@@ -532,6 +533,18 @@ public class CaseAccessOperation {
                 supplementaryDataRepository.setSupplementaryData(caseReference,
                     orgNewCaseSupDataKey, false);
             }
+        } catch (ServiceException e) {
+            // do nothing
+        }
+
+    }
+
+    private void setUserAssignedNewCaseForOrganisationIdToFalse(String caseReference, String organisationId) {
+        // Set supplementary data new cases for organisationId to false
+        String orgNewCaseSupDataKey = NEW_CASE_ORG_PATH + organisationId;
+        try {
+            supplementaryDataRepository.setSupplementaryData(caseReference,
+                    orgNewCaseSupDataKey, false);
         } catch (ServiceException e) {
             // do nothing
         }

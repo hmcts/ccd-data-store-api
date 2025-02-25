@@ -22,7 +22,9 @@
     },
     "body": {
       "supplementary_data_updates": {
-        "$set": "${[scenarioContext][customValues][new_case_siblingContexts.F-105_Prerequisite_NewCase_Check_Call.childContexts.F-105_Get_Organisation_Identifier_Olawale]}"
+        "$set": {
+          "new_case.orgID1": false
+        }
       }
     }
   },
@@ -34,6 +36,11 @@
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Type": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "supplementary_data" : {
+        "new_case.orgID1" : false
+      }
     }
   }
 }
