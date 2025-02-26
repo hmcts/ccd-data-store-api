@@ -1416,11 +1416,6 @@ class CaseAccessOperationTest {
             // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
 
-            //Map<String, Object> responseExpected = new HashMap<>();
-            //responseExpected.put(getOrgUserNewCaseSupDataKey(ORGANISATION), Boolean.TRUE.toString());
-
-            //SupplementaryData supplementaryData = new SupplementaryData(responseExpected);
-
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
             );
@@ -1428,15 +1423,10 @@ class CaseAccessOperationTest {
             // behave as no existing case roles
             mockExistingCaseUserRoles(new ArrayList<>());
 
-            //mockNewCaseForOrgUser(supplementaryData);
-
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
 
             // ASSERT
-            //verify(supplementaryDataRepository, times(1))
-            //    .findSupplementaryData(CASE_REFERENCE.toString(),
-            //        Collections.singleton(getOrgUserNewCaseSupDataKey(ORGANISATION)));
             verify(supplementaryDataRepository, times(1))
                 .setSupplementaryData(CASE_REFERENCE.toString(), getOrgUserNewCaseSupDataKey(ORGANISATION), false);
 
@@ -1452,8 +1442,6 @@ class CaseAccessOperationTest {
 
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = getCaseAssignedUserRoleWithOrganisations();
 
-            //SupplementaryData supplementaryData = new SupplementaryData(getExpectedSupplementaryDataForOrgNewCase());
-
             // register existing case role
             mockExistingCaseUserRoles(List.of(
                 // ** CASE_REFERENCE_OTHER + USER_ID_OTHER as exiting relationship
@@ -1461,24 +1449,10 @@ class CaseAccessOperationTest {
                 createCaseUserEntity(CASE_ID_OTHER, CASE_ROLE_OTHER, USER_ID_OTHER)
             ));
 
-            //mockNewCaseForOrgUser(supplementaryData);
-
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
 
             // ASSERT
-            // verify CASE_REFERENCE/CASE_ID
-            //verify(supplementaryDataRepository, times(1))
-            //    .findSupplementaryData(CASE_REFERENCE.toString(),
-            //        Collections.singleton(getOrgUserNewCaseSupDataKey(ORGANISATION)));
-            //verify(supplementaryDataRepository, times(1))
-            //    .findSupplementaryData(CASE_REFERENCE.toString(),
-            //        Collections.singleton(getOrgUserNewCaseSupDataKey(ORGANISATION_OTHER)));
-
-            // verify CASE_REFERENCE_OTHER/CASE_ID_OTHER (NB: only 1 user per org: 2nd org has no new relationships)
-            //verify(supplementaryDataRepository, times(1))
-            //    .findSupplementaryData(CASE_REFERENCE_OTHER.toString(),
-            //        Collections.singleton(getOrgUserNewCaseSupDataKey(ORGANISATION)));
             verify(supplementaryDataRepository, never()) // NB: never called as exiting relationship ignored
                 .findSupplementaryData(
                     eq(CASE_REFERENCE_OTHER.toString()),
@@ -2711,23 +2685,5 @@ class CaseAccessOperationTest {
                 CASE_ROLE_OTHER, ORGANISATION_OTHER)
         );
 
-    }
-
-    private Map<String, Object> getExpectedSupplementaryDataForOrgNewCase() {
-        Map<String, Object> expectedSupplementaryData = new HashMap<>();
-        expectedSupplementaryData.put(getOrgUserCountSupDataKey(ORGANISATION), Boolean.TRUE.toString());
-        expectedSupplementaryData.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), Boolean.TRUE.toString());
-        return expectedSupplementaryData;
-    }
-
-    private OngoingStubbing<SupplementaryData> mockNewCaseForOrgUser(
-        SupplementaryData existingSupplementaryData
-    ) {
-        return when(supplementaryDataRepository.findSupplementaryData(
-            argThat(arg -> arg.contains(CASE_REFERENCE.toString())
-                || arg.contains(CASE_REFERENCE_OTHER.toString())),
-            argThat(arg -> arg.contains(getOrgUserNewCaseSupDataKey(ORGANISATION))
-                || arg.isEmpty()))
-        ).thenReturn(existingSupplementaryData);
     }
 }

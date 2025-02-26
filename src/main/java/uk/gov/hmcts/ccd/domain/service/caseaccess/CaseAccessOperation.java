@@ -202,7 +202,6 @@ public class CaseAccessOperation {
             orgNewUserCountMap.forEach((organisationId, newUserCount) -> {
                 supplementaryDataRepository.incrementSupplementaryData(caseReference,
                     ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount);
-                //clearUserAssignedNewCase(caseReference, organisationId);
                 setUserAssignedNewCaseForOrganisationIdToFalse(caseReference, organisationId);
             })
         );
@@ -512,31 +511,6 @@ public class CaseAccessOperation {
             .forEach(currentRole -> caseUserRepository.revokeAccess(caseId,
                 userId,
                 currentRole));
-    }
-
-    private void clearUserAssignedNewCase(String caseReference, String organisationId) {
-        // Set supplementary data new cases for organisationId to false if set to True
-        String orgNewCaseSupDataKey = NEW_CASE_ORG_PATH + organisationId;
-        try {
-            SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData(caseReference,
-                    Collections.singleton(orgNewCaseSupDataKey));
-
-            if (supplementaryData == null) {
-                return;
-            }
-            Object newCaseOrgIdValue = supplementaryData.getResponse().getOrDefault(orgNewCaseSupDataKey, null);
-            if (newCaseOrgIdValue == null) {
-                return;
-            }
-            boolean value = Boolean.valueOf(newCaseOrgIdValue.toString());
-            if (value) {
-                supplementaryDataRepository.setSupplementaryData(caseReference,
-                    orgNewCaseSupDataKey, false);
-            }
-        } catch (ServiceException e) {
-            // do nothing
-        }
-
     }
 
     private void setUserAssignedNewCaseForOrganisationIdToFalse(String caseReference, String organisationId) {
