@@ -309,8 +309,8 @@ Feature: F-105: Add Case-Assigned Users and Roles
     Then a positive response is received,
     And the response has all the details as expected,
     And a call [to verify Olawale's reception of the role CR-1 and CR-2 over the case C1] will get the expected response as in [S-105.19_Verify_Case_Roles_for_Case_NewCase],
-    And a call [to verify newCase assigned to C1 is set to false in the supplementary data] will get the expected response as in [S-105.19_Verify_NewCase_1],
+    And a call [to verify newCase assigned to C1 is not set in the supplementary data] will get the expected response as in [S-105.19_Verify_NewCase_1],
     And a call [to repeat the same request as above] will get the expected response as in [S-105.19_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles],
-    And a call [to verify the count of users assigned to C1 has NOT changed] will get the expected response as in [S-105.19_Verify_Counter_2],
+    And a call [to verify newCase organisationId assigned to C1 is set to false in the supplementary data] will get the expected response as in [S-105.19_Verify_NewCase_2],
     And a call [to repeat the same request as above this time with a different user, Hemanth] will get the expected response as in [S-105.19_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles_Hemanth],
-    And a call [to verify the count of users assigned to a case has increased by 1] will get the expected response as in [S-105.19_Verify_Counter_3].
+    And a call [to verify the new_case of users assigned to a case is set to false in the supplementary data] will get the expected response as in [S-105.19_Verify_NewCase_3].

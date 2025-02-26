@@ -23,7 +23,7 @@
     "body": {
       "supplementary_data_updates": {
         "$set": {
-          "new_case.orgID1": false
+          "new_case.QUK822N": false
         }
       }
     }
@@ -39,7 +39,7 @@
     },
     "body" : {
       "supplementary_data" : {
-        "new_case.orgID1" : false
+        "new_case.QUK822N" : false
       }
     }
   }
