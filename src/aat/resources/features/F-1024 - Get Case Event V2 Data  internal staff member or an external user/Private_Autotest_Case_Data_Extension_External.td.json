@@ -1,0 +1,14 @@
+{
+  "_guid_": "Private_Autotest_Case_Data_Extension_External",
+  "_extends_": "Private_Autotest_Default_Full_Case_Creation_Data_External",
+
+  "specs": [
+    "to create a full case"
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][Private_Autotest_Default_Token_Creation_Data_For_Case_Creation_External][testData][actualResponse][body][token]}"
+    }
+  }
+}
