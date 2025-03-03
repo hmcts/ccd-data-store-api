@@ -35,7 +35,7 @@ ext['spring-security.version'] = '5.7.11'
 ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.16.0'
 ext['beftaFwVersion'] = '9.2.1'
-ext['ccdTestDefinitionVersion'] = '7.26.1'
+ext['ccdTestDefinitionVersion'] = '7.26.0-prerelease-CCD-5329'
 
 configurations {
     compileClasspath {
