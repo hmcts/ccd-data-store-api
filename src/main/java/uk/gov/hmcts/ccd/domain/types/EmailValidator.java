@@ -22,11 +22,11 @@ public class EmailValidator implements BaseTypeValidator {
     private static final Logger LOG = LoggerFactory.getLogger(EmailValidator.class);
 
     private void jclog(final String message) {
-        System.out.println("JCDEBUG: " + message);
-        LOG.debug("JCDEBUG: debug: " + message);
-        LOG.info("JCDEBUG: info: " + message);
-        LOG.warn("JCDEBUG: warn: " + message);
-        LOG.error("JCDEBUG: error: " + message);
+        //System.out.println("JCDEBUG: " + message);
+        LOG.debug("JCDEBUG: debug: {0}", message);
+        LOG.info("JCDEBUG: info: {0}", message);
+        LOG.warn("JCDEBUG: warn: {0}", message);
+        LOG.error("JCDEBUG: error: {0}", message);
     }
 
     @Override
@@ -38,6 +38,8 @@ public class EmailValidator implements BaseTypeValidator {
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
+        jclog("validate()");
+
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
