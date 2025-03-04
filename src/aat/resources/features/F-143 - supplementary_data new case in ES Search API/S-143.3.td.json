@@ -94,7 +94,6 @@
       "cases": [
         {
           "fields": {
-            "FixedListField": "VALUE1",
             "[JURISDICTION]": "BEFTA_MASTER",
             "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
@@ -106,7 +105,6 @@
           },
           "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_F-143_CreateCasePreRequisiteCaseworker]}",
           "fields_formatted": {
-            "FixedListField": "VALUE1",
             "[JURISDICTION]": "BEFTA_MASTER",
             "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
