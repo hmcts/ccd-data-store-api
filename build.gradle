@@ -34,7 +34,7 @@ def versions = [
 ext['spring-security.version'] = '5.7.11'
 ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.16.0'
-ext['beftaFwVersion'] = '9.2.1'
+ext['beftaFwVersion'] = '9.2.3'
 ext['ccdTestDefinitionVersion'] = '7.26.0-prerelease-CCD-5329'
 
 configurations {
@@ -164,6 +164,7 @@ tasks.withType(Test) {
 
 dependencies {
 
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
     implementation('org.springframework.cloud:spring-cloud-starter-bootstrap') {
         version {
             strictly '4.0.5'
@@ -315,7 +316,6 @@ dependencies {
     testImplementation group:'org.mockito', name: 'mockito-junit-jupiter', version:'3.6.0'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testImplementation 'io.github.openfeign:feign-jackson:9.7.0'
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.20.2'
