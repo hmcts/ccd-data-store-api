@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,6 +19,16 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 public class EmailValidator implements BaseTypeValidator {
     static final String TYPE_ID = "Email";
 
+    private static final Logger LOG = LoggerFactory.getLogger(EmailValidator.class);
+
+    private void jclog(final String message) {
+        //System.out.println("JCDEBUG: " + message);
+        LOG.debug("JCDEBUG: debug: {0}", message);
+        LOG.info("JCDEBUG: info: {0}", message);
+        LOG.warn("JCDEBUG: warn: {0}", message);
+        LOG.error("JCDEBUG: error: {0}", message);
+    }
+
     @Override
     public BaseType getType() {
         return BaseType.get(TYPE_ID);
@@ -28,6 +38,8 @@ public class EmailValidator implements BaseTypeValidator {
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
+        jclog("validate()");
+
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
@@ -50,12 +62,15 @@ public class EmailValidator implements BaseTypeValidator {
         }
 
         if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
+            jclog("caseFieldDefinition.getFieldTypeDefinition().getRegularExpression() = "
+                + caseFieldDefinition.getFieldTypeDefinition().getRegularExpression());
             return Collections.singletonList(
                 new ValidationResult(REGEX_GUIDANCE, dataFieldId)
             );
         }
 
         if (!checkRegex(getType().getRegularExpression(), value)) {
+            jclog("getType().getRegularExpression() = " + getType().getRegularExpression());
             return Collections.singletonList(
                 new ValidationResult(REGEX_GUIDANCE, dataFieldId)
             );
@@ -70,11 +85,11 @@ public class EmailValidator implements BaseTypeValidator {
     }
 
     private boolean isValidEmailAddress(final String email) {
-        try {
-            new InternetAddress(email).validate();
-            return true;
-        } catch (AddressException ex) {
+        /*
+        if (email.contains("?")) {
             return false;
         }
+        */
+        return org.apache.commons.validator.routines.EmailValidator.getInstance().isValid(email);
     }
 }
