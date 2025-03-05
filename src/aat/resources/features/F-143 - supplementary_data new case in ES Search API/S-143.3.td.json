@@ -1,124 +1,83 @@
 {
   "_guid_": "S-143.3",
+  "title": "External Elastic Search Endpoint",
   "productName": "CCD Data Store Elastic Search API",
-  "operationName": "Internal Elastic Search Endpoint",
+  "operationName": "External Elastic Search Endpoint",
   "method": "POST",
-  "uri": "/internal/searchCases",
-  "user" : {
-    "_extends_": "BeftaMasterCaseworker"
-  },
+  "uri": "/searchCases",
   "specs": [
     "a valid profile",
     "is configured to search for the previously created case",
+    "requests a subsection of the supplementary data",
     "does not explicitly request supplementary_data",
-    "is using the query parameter use_case=orgcases",
     "contains the previously created case",
+    "contains the specified sub section of supplementary data",
     "contains supplementary data"
   ],
+  "user" : {
+    "_extends_": "BeftaMasterCaseworker"
+  },
   "request": {
     "_extends_": "Common_Request",
     "queryParams": {
-      "ctid": "FT_NewCaseSupplementry",
-      "use_case": "ORGCASES"
+      "ctid": "FT_NewCaseSupplementry"
     },
     "body": {
-      "native_es_query": {
+      "native_es_query" : {
         "query": {
           "match": {
             "reference": "${[scenarioContext][childContexts][F-143_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
           }
         }
-      }
+      },
+      "supplementary_data" : ["new_case.orgID1"]
     }
   },
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
-      "headers": [
-        {
-          "__ordering__": "ordered"
-        },
-        {
-          "metadata": {
-            "jurisdiction": "BEFTA_MASTER",
-            "case_type_id": "FT_NewCaseSupplementry"
-          },
-          "fields": [
-            {
-              "__operator__": "equivalent",
-              "__ordering__": "unordered",
-              "__elementId__": "label"
-            },
-            {
-              "label": "`FixedList` orgcases",
-              "order": 1,
-              "metadata": false,
-              "case_field_id": "FixedListField",
-              "case_field_type": {
-                "id": "FixedList-FixedListType",
-                "type": "FixedList",
-                "min": null,
-                "max": null,
-                "regular_expression": null,
-                "fixed_list_items": [{
-                  "code" : "VALUE4",
-                  "label" : "Value 4",
-                  "order" : null
-                },
-                  {
-                    "code": "VALUE3",
-                    "label": "Value 3",
-                    "order": null
-                  },
-                  {
-                    "code": "VALUE2",
-                    "label": "Value 2",
-                    "order": null
-                  },
-                  {
-                    "code": "VALUE1",
-                    "label": "Value 1",
-                    "order": null
-                  }
-                ],
-                "complex_fields": [],
-                "collection_field_type": null
-              },
-              "display_context_parameter": null
+      "total": 1,
+      "cases": [{
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-143_CreateCasePreRequisiteCaseworker]}",
+        "jurisdiction": "BEFTA_MASTER",
+        "state": "CaseCreated",
+        "version": null,
+        "case_type_id": "FT_NewCaseSupplementry",
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "security_classification": "PUBLIC",
+        "case_data": {
+          "OrganisationPolicyField": {
+            "Organisation": {
+              "OrganisationID": "orgID1",
+              "OrganisationName": "orgName1"
             }
-          ],
-          "cases": "[[ANYTHING_PRESENT]]"
+          }
+        },
+        "supplementary_data": {
+          "new_case":
+          {
+            "orgID1": "true"
+          }
+        },
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "data_classification": "[[ANYTHING_PRESENT]]",
+        "supplementary_data" : {
+          "new_case" : {
+            "orgID1" : true
+          }
         }
-      ],
-      "cases": [
-        {
-          "fields": {
-            "[JURISDICTION]": "BEFTA_MASTER",
-            "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
-            "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_F-143_CreateCasePreRequisiteCaseworker]}",
-            "[STATE]": "CaseCreated",
-            "[SECURITY_CLASSIFICATION]": "PUBLIC",
-            "[CASE_TYPE]": "FT_NewCaseSupplementry",
-            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
-          },
-          "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_F-143_CreateCasePreRequisiteCaseworker]}",
-          "fields_formatted": {
-            "[JURISDICTION]": "BEFTA_MASTER",
-            "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
-            "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_F-143_CreateCasePreRequisiteCaseworker]}",
-            "[STATE]": "CaseCreated",
-            "[SECURITY_CLASSIFICATION]": "PUBLIC",
-            "[CASE_TYPE]": "FT_NewCaseSupplementry",
-            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
-          },
-          "supplementary_data" : null
-        }
-      ],
-      "total": 1
+      }],
+      "case_types_results" : [{
+        "total" : 1,
+        "case_type_id" : "FT_NewCaseSupplementry"
+      }]
     }
-
   }
 }
