@@ -7,8 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
@@ -25,20 +23,6 @@ import static uk.gov.hmcts.ccd.domain.types.BaseTypeValidator.REGEX_GUIDANCE;
 class EmailValidatorTest {
     private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
     private static final String FIELD_ID = "TEST_FIELD_ID";
-
-    private static final Logger LOG = LoggerFactory.getLogger(EmailValidatorTest.class);
-
-    // TEMPORARY
-    private static final String REGEX1 = "^[a-z]\\w*@hmcts.net$";
-    private static final String REGEX2 = "\\\\w*@hmcts.net";
-
-    private void jclog(final String message) {
-        //System.out.println("JCDEBUG: " + message);
-        LOG.debug("JCDEBUG: debug: {}", message);
-        LOG.info("JCDEBUG: info: {}", message);
-        LOG.warn("JCDEBUG: warn: {}", message);
-        LOG.error("JCDEBUG: error: {}", message);
-    }
 
     @Mock
     private BaseType emailBaseType;
@@ -69,7 +53,6 @@ class EmailValidatorTest {
 
     @Test
     void validEmail() {
-        jclog("----------------  validEmail()  ----------------");
         final List<ValidationResult> result01 = validator.validate(FIELD_ID,
                                                                    NODE_FACTORY.textNode("test@test.com"),
             caseFieldDefinition);
@@ -98,7 +81,6 @@ class EmailValidatorTest {
 
     @Test
     void invalidEmail() {
-        jclog("----------------  invalidEmail()  ----------------");
         final List<ValidationResult> result01 = validator.validate(FIELD_ID,
                                                                    NODE_FACTORY.textNode("test.test.com"),
             caseFieldDefinition);
@@ -145,22 +127,29 @@ class EmailValidatorTest {
             caseFieldDefinition);
         assertEquals(1, result09.size(), result09.toString());
 
-        // NOTE: assertEquals should be 1 for invalid Email address
         final List<ValidationResult> result10 = validator.validate(FIELD_ID,
                                                                    NODE_FACTORY.textNode("abc?ca@ae.com"),
             caseFieldDefinition);
-        assertEquals(0, result10.size(), result10.toString());
+        assertEquals(1, result10.size(), result10.toString());
 
-        // NOTE: assertEquals should be 1 for invalid Email address
         final List<ValidationResult> result11 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("abc*ca@ae.com"),
+                                                                   NODE_FACTORY.textNode("abc*abc@ae.com"),
             caseFieldDefinition);
-        assertEquals(0, result11.size(), result11.toString());
+        assertEquals(1, result11.size(), result11.toString());
+
+        final List<ValidationResult> result12 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("abcabc@ae.com_"),
+            caseFieldDefinition);
+        assertEquals(1, result12.size(), result12.toString());
+
+        final List<ValidationResult> result13 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("abcabc@ae.com-"),
+            caseFieldDefinition);
+        assertEquals(1, result13.size(), result13.toString());
     }
 
-    //@Test
+    @Test
     void fieldTypeRegEx() {
-        jclog("----------------  fieldTypeRegEx()  ----------------");
         final CaseFieldDefinition regexCaseFieldDefinition = caseField().withRegExp("^[a-z]\\w*@hmcts.net$").build();
         final JsonNode validValue = NODE_FACTORY.textNode("k9@hmcts.net");
         final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, regexCaseFieldDefinition);
@@ -173,9 +162,8 @@ class EmailValidatorTest {
         assertEquals(REGEX_GUIDANCE, invalidResult.get(0).getErrorMessage());
     }
 
-    //@Test
+    @Test
     void baseTypeRegEx() {
-        jclog("----------------  baseTypeRegEx()  ----------------");
         when(emailBaseType.getRegularExpression()).thenReturn("\\\\w*@hmcts.net");
 
         final List<ValidationResult> result01 =
@@ -184,9 +172,8 @@ class EmailValidatorTest {
         assertEquals(REGEX_GUIDANCE, result01.get(0).getErrorMessage());
     }
 
-    //@Test
+    @Test
     void checkMin() {
-        jclog("----------------  checkMin()  ----------------");
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(new BigDecimal(13)).build();
         final JsonNode validValue = NODE_FACTORY.textNode("k99@hmcts.net");
         final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
@@ -198,9 +185,8 @@ class EmailValidatorTest {
         assertEquals("Email 'k9@hmcts.net' requires minimum length 13", invalidResult.get(0).getErrorMessage());
     }
 
-    //@Test
+    @Test
     void checkMax() {
-        jclog("----------------  checkMax()  ----------------");
         final CaseFieldDefinition caseFieldDefinition = caseField().withMax(new BigDecimal(12)).build();
         final JsonNode validValue = NODE_FACTORY.textNode("k9@hmcts.net");
         final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
@@ -212,15 +198,13 @@ class EmailValidatorTest {
         assertEquals("Email 'k99@hmcts.net' exceeds maximum length 12", invalidResult.get(0).getErrorMessage());
     }
 
-    //@Test
+    @Test
     void nullValue() {
-        jclog("----------------  nullValue()  ----------------");
         assertEquals(0, validator.validate(FIELD_ID, null, caseFieldDefinition).size(), "Did not catch NULL");
     }
 
-    //@Test
+    @Test
     void getType() {
-        jclog("----------------  getType()  ----------------");
         assertEquals(validator.getType(), BaseType.get("Email"), "Type is incorrect");
     }
 
