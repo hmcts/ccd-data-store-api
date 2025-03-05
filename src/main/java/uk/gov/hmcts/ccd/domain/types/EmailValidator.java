@@ -23,10 +23,10 @@ public class EmailValidator implements BaseTypeValidator {
 
     private void jclog(final String message) {
         //System.out.println("JCDEBUG: " + message);
-        LOG.debug("JCDEBUG: debug: {0}", message);
-        LOG.info("JCDEBUG: info: {0}", message);
-        LOG.warn("JCDEBUG: warn: {0}", message);
-        LOG.error("JCDEBUG: error: {0}", message);
+        LOG.debug("JCDEBUG: debug: {}", message);
+        LOG.info("JCDEBUG: info: {}", message);
+        LOG.warn("JCDEBUG: warn: {}", message);
+        LOG.error("JCDEBUG: error: {}", message);
     }
 
     @Override
@@ -61,7 +61,10 @@ public class EmailValidator implements BaseTypeValidator {
                 + "' requires minimum length " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId));
         }
 
-        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
+        final String regex1 = caseFieldDefinition.getFieldTypeDefinition().getRegularExpression();
+        final boolean match1 = value.matches(regex1);
+        jclog(regex1 + "  ,  " + value + "  ,  " + checkRegex(regex1, value) + "  ,  " + match1);
+        if (!checkRegex(regex1, value)) {
             jclog("caseFieldDefinition.getFieldTypeDefinition().getRegularExpression() = "
                 + caseFieldDefinition.getFieldTypeDefinition().getRegularExpression());
             return Collections.singletonList(
@@ -69,7 +72,10 @@ public class EmailValidator implements BaseTypeValidator {
             );
         }
 
-        if (!checkRegex(getType().getRegularExpression(), value)) {
+        final String regex2 = getType().getRegularExpression();
+        final boolean match2 = value.matches(regex1);
+        jclog(regex2 + "  ,  " + value + "  ,  " + checkRegex(regex2, value) + "  ,  " + match2);
+        if (!checkRegex(regex2, value)) {
             jclog("getType().getRegularExpression() = " + getType().getRegularExpression());
             return Collections.singletonList(
                 new ValidationResult(REGEX_GUIDANCE, dataFieldId)
