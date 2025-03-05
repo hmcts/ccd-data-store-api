@@ -1,0 +1,109 @@
+{
+  "_guid_": "F-143a_CreateCasePreRequisiteCaseworker_Multiple_Orgs",
+  "_extends_": "Case_Creation_Data_Base",
+  "specs": [
+    "to create a case",
+    "As a prerequisite"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-143a_GetCreateToken"
+  }
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_NewCaseSupplementry"
+    },
+    "body": {
+      "data": {
+        "OrganisationPolicyField": {
+          "newCase": "Yes",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        },
+        "OrganisationPolicyField3" : {
+          "newCase": "Yes",
+          "Organisation": {
+            "OrganisationID": "orgID3",
+            "OrganisationName": "orgName3"
+          }
+        },
+        "OrganisationPolicyField5" : {
+          "newCase" : "no",
+          "Organisation" : {
+            "OrganisationID" : "orgID2a",
+            "OrganisationName" : "orgName2a"
+          }
+        },
+        "OrganisationPolicyField4" : {
+          "Organisation" : {
+            "OrganisationID" : "orgID2",
+            "OrganisationName" : "orgName2"
+          }
+        }
+      },
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "state" : "CaseCreated",
+      "case_type_id": "FT_NewCaseSupplementry",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "case_data": {
+        "OrganisationPolicyField": {
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        },
+        "OrganisationPolicyField3" : {
+          "Organisation": {
+            "OrganisationID": "orgID3",
+            "OrganisationName": "orgName3"
+          }
+        },
+        "OrganisationPolicyField5" : {
+          "Organisation" : {
+            "OrganisationID" : "orgID2a",
+            "OrganisationName" : "orgName2a"
+          }
+        },
+        "OrganisationPolicyField4" : {
+          "Organisation" : {
+            "OrganisationID" : "orgID2",
+            "OrganisationName" : "orgName2"
+          }
+        }
+      },
+      "data_classification": {
+      },
+      "supplementary_data" : {
+        "new_case" : {
+          "orgID1" : "true",
+          "orgID3" : "true"
+        }
+      }
+    }
+  }
+}

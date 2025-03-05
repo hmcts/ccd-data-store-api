@@ -1,0 +1,97 @@
+{
+  "_guid_": "S-143a.1",
+  "title": "External Elastic Search Endpoint",
+  "productName": "CCD Data Store Elastic Search API",
+  "operationName": "External Elastic Search Endpoint",
+  "method": "POST",
+  "uri": "/searchCases",
+  "specs": [
+    "a valid profile",
+    "is configured to search for the previously created case",
+    "requests a subsection of the supplementary data",
+    "does not explicitly request supplementary_data",
+    "contains the previously created case",
+    "contains the specified sub section of new_case of supplementary data",
+    "contains supplementary data"
+  ],
+  "user" : {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ctid": "FT_NewCaseSupplementry"
+    },
+    "body": {
+      "native_es_query" : {
+        "query": {
+          "match": {
+            "reference": "${[scenarioContext][childContexts][F-143a_CreateCasePreRequisiteCaseworker_Multiple_Orgs][testData][actualResponse][body][id]}"
+          }
+        }
+      },
+      "supplementary_data" : ["new_case.*"]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "total": 1,
+      "cases": [{
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-143a_CreateCasePreRequisiteCaseworker_Multiple_Orgs]}",
+        "jurisdiction": "BEFTA_MASTER",
+        "state": "CaseCreated",
+        "version": null,
+        "case_type_id": "FT_NewCaseSupplementry",
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "security_classification": "PUBLIC",
+        "case_data": {
+          "OrganisationPolicyField" : {
+            "Organisation" : {
+              "OrganisationID" : "orgID1",
+              "OrganisationName" : "orgName1"
+            }
+          },
+          "OrganisationPolicyField5" : {
+            "Organisation" : {
+              "OrganisationID" : "orgID2a",
+              "OrganisationName" : "orgName2a"
+            }
+          },
+          "OrganisationPolicyField4" : {
+            "Organisation" : {
+              "OrganisationID" : "orgID2",
+              "OrganisationName" : "orgName2"
+            }
+          },
+          "OrganisationPolicyField3" : {
+            "Organisation" : {
+              "OrganisationID" : "orgID3",
+              "OrganisationName" : "orgName3"
+            }
+          }
+        },
+        "supplementary_data": {
+          "new_case":
+          {
+            "orgID1" : "true",
+            "orgID3" : "true"
+          }
+        },
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "data_classification": "[[ANYTHING_PRESENT]]"
+      }],
+      "case_types_results" : [{
+        "total" : 1,
+        "case_type_id" : "FT_NewCaseSupplementry"
+      }]
+    }
+  }
+}
