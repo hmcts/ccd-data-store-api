@@ -62,8 +62,12 @@ public class EmailValidator implements BaseTypeValidator {
         }
 
         final String regex1 = caseFieldDefinition.getFieldTypeDefinition().getRegularExpression();
-        final boolean match1 = value.matches(regex1);
-        jclog(regex1 + "  ,  " + value + "  ,  " + checkRegex(regex1, value) + "  ,  " + match1);
+        if (regex1 == null) {
+            jclog(regex1 + "  ,  " + value + "  ,  " + checkRegex(regex1, value) + "  ,  NULL");
+        } else {
+            final boolean match1 = value.matches(regex1);
+            jclog(regex1 + "  ,  " + value + "  ,  " + checkRegex(regex1, value) + "  ,  " + match1);
+        }
         if (!checkRegex(regex1, value)) {
             jclog("caseFieldDefinition.getFieldTypeDefinition().getRegularExpression() = "
                 + caseFieldDefinition.getFieldTypeDefinition().getRegularExpression());
@@ -73,8 +77,12 @@ public class EmailValidator implements BaseTypeValidator {
         }
 
         final String regex2 = getType().getRegularExpression();
-        final boolean match2 = value.matches(regex1);
-        jclog(regex2 + "  ,  " + value + "  ,  " + checkRegex(regex2, value) + "  ,  " + match2);
+        if (regex2 == null) {
+            jclog(regex2 + "  ,  " + value + "  ,  " + checkRegex(regex2, value) + "  ,  NULL");
+        } else {
+            final boolean match2 = value.matches(regex2);
+            jclog(regex2 + "  ,  " + value + "  ,  " + checkRegex(regex2, value) + "  ,  " + match2);
+        }
         if (!checkRegex(regex2, value)) {
             jclog("getType().getRegularExpression() = " + getType().getRegularExpression());
             return Collections.singletonList(
