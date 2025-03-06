@@ -35,10 +35,10 @@ public class NewCaseUtils {
             CASE_NEW_YES);
 
         // Update case supplementary data
-        NewCaseUtils.updateCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizationProfiles);
+        updateCaseNewCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizationProfiles);
 
         // Clear organizationProfiles newCase attributes from case data
-        NewCaseUtils.clearNewCaseAttributes(organizationProfiles);
+        clearNewCaseAttributes(organizationProfiles);
 
         // Clear newCase attributes from case data if case_new set to No (false)
         clearNewCaseAttributesFromCaseDetailsSetToFalse(caseDetailsAfterCallbackWithoutHashes);
@@ -65,14 +65,14 @@ public class NewCaseUtils {
         return orgPolicyNewCaseNodes;
     }
 
-    private static void updateCaseSupplementaryData(CaseDetails caseDetails, List<JsonNode> organizationProfiles) {
+    private static void updateCaseNewCaseSupplementaryData(CaseDetails caseDetails, List<JsonNode> organizationProfiles) {
 
         ObjectNode orgNode = new ObjectMapper().createObjectNode();
         for (JsonNode orgProfile : organizationProfiles) {
             String orgIdentifier = orgProfile.get(ORGANISATION)
                 .get(ORGANISATIONID).textValue();
             if (orgIdentifier != null && !orgIdentifier.isEmpty()) {
-                orgNode.put(orgIdentifier, Boolean.TRUE.toString());
+                orgNode.put(orgIdentifier, Boolean.TRUE);
             }
         }
 

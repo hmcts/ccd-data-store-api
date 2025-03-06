@@ -100,8 +100,8 @@
       },
       "supplementary_data" : {
         "new_case" : {
-          "orgID1" : "true",
-          "orgID3" : "true"
+          "orgID1" : true,
+          "orgID3" : true
         }
       }
     }
