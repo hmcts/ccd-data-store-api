@@ -65,7 +65,8 @@ public class NewCaseUtils {
         return orgPolicyNewCaseNodes;
     }
 
-    private static void updateCaseNewCaseSupplementaryData(CaseDetails caseDetails, List<JsonNode> organizationProfiles) {
+    private static void updateCaseNewCaseSupplementaryData(CaseDetails caseDetails,
+                                                           List<JsonNode> organizationProfiles) {
 
         ObjectNode orgNode = new ObjectMapper().createObjectNode();
         for (JsonNode orgProfile : organizationProfiles) {
