@@ -1,5 +1,5 @@
 @F-143 @elasticsearch
-Feature: F-143 Additional supplementary data property returned by ES Search APIs
+Feature: F-143 Additional new cases supplementary data property returned by ES Search APIs
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
@@ -8,7 +8,7 @@ Feature: F-143 Additional supplementary data property returned by ES Search APIs
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid profile]
 
-  @S-143.1
+  @S-143.1 #AC03
   Scenario: internal search api usecase request does not return supplementary data by default
     Given the request [is configured to search for the previously created case],
     And the request [does not explicitly request supplementary_data]
@@ -19,7 +19,7 @@ Feature: F-143 Additional supplementary data property returned by ES Search APIs
     Then the response [contains supplementary data],
     And the response has all other details as expected.
 
-  @S-143.2
+  @S-143.2 #AC01
   Scenario: internal search api usecase request does return supplementary data when requested in the request
     Given the request [is configured to search for the previously created case],
     And the request [is configured to request supplementary_data]
@@ -30,8 +30,8 @@ Feature: F-143 Additional supplementary data property returned by ES Search APIs
     Then the response [contains supplementary data],
     And the response has all other details as expected.
 
-  @S-143.3
-  Scenario: can request sub selection of supplementary data
+  @S-143.3 #AC04
+  Scenario: external search api can request sub selection of supplementary data
     Given a user with [a valid profile]
     When the request [is configured to search for the previously created case],
     And the request [requests a subsection of the supplementary data]
@@ -41,3 +41,13 @@ Feature: F-143 Additional supplementary data property returned by ES Search APIs
     Then the response [contains the specified sub section of supplementary data],
     And the response has all other details as expected.
 
+  @S-143.4  #AC01
+  Scenario: external search api can request New cases from supplementary data where new case value is true
+    Given a user with [a valid profile]
+    When the request [is configured to search for the previously created case],
+    And the request [requests a subsection of the supplementary data]
+    And a request is prepared with appropriate values,
+    And it is submitted to call the [External Elastic Search Endpoint] operation of [CCD Data Store Elastic Search API],
+    Then the response [contains the previously created case],
+    Then the response [contains the specified sub section of supplementary data],
+    And the response has all other details as expected.

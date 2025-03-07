@@ -1,5 +1,5 @@
 @F-143a @elasticsearch
-Feature: F-143a Additional supplementary data property returned by ES Search APIs
+Feature: F-143a Additional new cases supplementary data property returned by ES Search APIs
 
   Background: Load test data for the scenario
 
@@ -9,13 +9,23 @@ Feature: F-143a Additional supplementary data property returned by ES Search API
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid profile]
 
-  @S-143a.1
+  @S-143a.1 #AC01
   Scenario: external search api returns multiple new case orgs supplementary data by default
     Given the request [is configured to search for the previously created case],
-    And the request [does not explicitly request supplementary_data]
+    And the request [requests a subsection of the supplementary data]
     And a request is prepared with appropriate values,
     When it is submitted to call the [External Elastic Search Endpoint] operation of [CCD Data Store Elastic Search API],
     Then the response [contains the previously created case],
     Then the response [contains supplementary data],
     Then the response [contains the specified sub section of new_case of supplementary data],
+    And the response has all other details as expected.
+
+  @S-143a.2 #AC04
+  Scenario: internal search api returns multiple new case orgs supplementary data by default
+    Given the request [is configured to search for the previously created case],
+    And the request [is configured to request supplementary_data]
+    And a request is prepared with appropriate values,
+    When it is submitted to call the [Internal Elastic Search Endpoint] operation of [CCD Data Store Elastic Search API],
+    Then the response [contains the previously created case],
+    Then the response [contains supplementary data],
     And the response has all other details as expected.
