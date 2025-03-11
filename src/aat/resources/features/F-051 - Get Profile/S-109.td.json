@@ -354,69 +354,7 @@
               "name" : "BEFTA Case Type No Read",
               "jurisdiction": null,
               "events": [],
-              "states": [
-                {
-                  "__ordering__": "unordered",
-                  "__elementId__": "id"
-                },
-                {
-                  "id": "TODO",
-                  "name": "To do",
-                  "description": null,
-                  "order": 1,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-                    },
-                    {
-                      "_extends_": "CaseworkerCaaAccessControlList"
-                    }
-                  ]
-                },
-                {
-                  "id": "IN_PROGRESS",
-                  "name": "In progress",
-                  "description": null,
-                  "order": 2,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-                    },
-                    {
-                      "_extends_": "CaseworkerCaaAccessControlList"
-                    }
-                  ]
-                },
-                {
-                  "id": "DONE",
-                  "name": "Done",
-                  "description": null,
-                  "order": 3,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-                    },
-                    {
-                      "_extends_": "CaseworkerCaaAccessControlList"
-                    }
-                  ]
-                }
-              ],
+              "states": [],
               "searchAliasFields": [],
               "searchParties" : [],
               "searchCriterias" : [],
