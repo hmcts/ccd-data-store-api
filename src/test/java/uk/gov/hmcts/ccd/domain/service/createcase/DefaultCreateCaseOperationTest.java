@@ -388,7 +388,8 @@ class DefaultCreateCaseOperationTest {
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData))).willReturn(data);
+        given(validateCaseFieldsOperation.validateCaseDetails(
+            new OperationContext(CASE_TYPE_ID, eventData))).willReturn(data);
         given(caseSanitiser.sanitise(eq(CASE_TYPE), anyMap())).willReturn(data);
 
         // SETUP TTL
