@@ -315,6 +315,7 @@ dependencies {
     testRuntimeOnly "org.junit.platform:junit-platform-commons:1.8.1"
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
     testImplementation group:'org.mockito', name: 'mockito-junit-jupiter', version:'3.6.0'
+    testImplementation 'org.mockito:mockito-inline:4.11.0'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'

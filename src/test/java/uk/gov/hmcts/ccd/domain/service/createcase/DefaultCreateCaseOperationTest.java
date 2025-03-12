@@ -46,6 +46,7 @@ import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
+import uk.gov.hmcts.ccd.domain.service.validate.OperationContext;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
@@ -169,8 +170,7 @@ class DefaultCreateCaseOperationTest {
                                                                     caseDataService,
                                                                     submitCaseTransaction,
                                                                     caseSanitiser,
-                                                                    caseTypeService,
-                                                                    callbackInvoker,
+            callbackInvoker,
                                                                     validateCaseFieldsOperation,
                                                                     casePostStateService,
                                                                     draftGateway,
@@ -293,7 +293,8 @@ class DefaultCreateCaseOperationTest {
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
+        given(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)))
+            .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
                                                same(IDAM_USER),
@@ -323,7 +324,8 @@ class DefaultCreateCaseOperationTest {
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(savedCaseType.getReferenceAsString()).willReturn("1234567");
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
+        given(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)))
+            .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
             same(CASE_TYPE),
             same(IDAM_USER),
@@ -354,7 +356,8 @@ class DefaultCreateCaseOperationTest {
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
+        given(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)))
+            .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
             same(CASE_TYPE),
             same(IDAM_USER),
@@ -385,9 +388,9 @@ class DefaultCreateCaseOperationTest {
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
+        given(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData))).willReturn(data);
         given(caseSanitiser.sanitise(eq(CASE_TYPE), anyMap())).willReturn(data);
-        
+
         // SETUP TTL
         CaseFieldDefinition ttlDefinition = new CaseFieldDefinition();
         ttlDefinition.setId("TTL");
@@ -404,7 +407,7 @@ class DefaultCreateCaseOperationTest {
                 }
             });
         given(applicationParams.getTtlGuard()).willReturn(2);
-    
+
         given(submitCaseTransaction.submitCase(same(event),
             same(CASE_TYPE),
             same(IDAM_USER),
@@ -416,7 +419,7 @@ class DefaultCreateCaseOperationTest {
                 public CaseDetails answer(InvocationOnMock invocation) throws Throwable {
                     CaseDetails caseDetails = (CaseDetails) invocation.getArguments()[4];
                     return caseDetails;
-                }  
+                }
             });
 
         CaseDetails returnedCaseDetails = defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
@@ -440,7 +443,8 @@ class DefaultCreateCaseOperationTest {
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
+        given(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)))
+            .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
             same(CASE_TYPE),
             same(IDAM_USER),
@@ -465,7 +469,7 @@ class DefaultCreateCaseOperationTest {
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
+        given(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)))
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
             same(CASE_TYPE),
@@ -495,7 +499,8 @@ class DefaultCreateCaseOperationTest {
             () -> assertThat(caseDetails, IsInstanceOf.instanceOf(CaseDetails.class)),
             () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
                 CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
-            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(validateCaseFieldsOperation)
+                .validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)),
             () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
                 same(CASE_TYPE),
@@ -525,7 +530,7 @@ class DefaultCreateCaseOperationTest {
         given(callbackInvoker.invokeSubmittedCallback(eventTrigger, null, savedCaseType))
             .willThrow(new CallbackException("call back exception"));
         given(
-            validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
+            validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)))
             .willReturn(data);
         given(
             submitCaseTransaction.submitCase(
@@ -555,7 +560,8 @@ class DefaultCreateCaseOperationTest {
         assertAll("case details saved when call back fails",
             () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
                 CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
-            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(validateCaseFieldsOperation)
+                .validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)),
             () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
                 same(CASE_TYPE),
@@ -590,7 +596,7 @@ class DefaultCreateCaseOperationTest {
         given(response.getBody()).willReturn(responseBody);
         given(response.getStatusCodeValue()).willReturn(200);
         given(savedCaseType.getCaseTypeId()).willReturn(mockCaseTypeId);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
+        given(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)))
             .willReturn(data);
         given(submitCaseTransaction.submitCase(
             same(event),
@@ -619,7 +625,8 @@ class DefaultCreateCaseOperationTest {
             () -> assertThat(caseDetails.getCaseTypeId(), is(mockCaseTypeId)),
             () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
                 CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
-            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(validateCaseFieldsOperation)
+                .validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)),
             () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
                 same(CASE_TYPE),
@@ -658,7 +665,7 @@ class DefaultCreateCaseOperationTest {
         given(savedCaseType.getCaseTypeId()).willReturn(CASE_TYPE_ID);
         given(savedCaseType.getId()).willReturn(CASE_ID);
         given(savedCaseType.getData()).willReturn(data);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
+        given(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)))
             .willReturn(data);
         given(submitCaseTransaction.submitCase(
             same(event),
@@ -687,7 +694,8 @@ class DefaultCreateCaseOperationTest {
             () -> assertThat(caseDetails.getCaseTypeId(), is(CASE_TYPE_ID)),
             () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
                 CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
-            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(validateCaseFieldsOperation)
+                .validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
                 same(CASE_TYPE),
                 same(IDAM_USER),

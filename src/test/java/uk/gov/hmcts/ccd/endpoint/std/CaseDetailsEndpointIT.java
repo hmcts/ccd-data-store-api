@@ -95,7 +95,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
-import static uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink.builder;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
@@ -3940,19 +3939,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Long expectedCaseId = CASE_22_ID;
 
         List<CaseLink> expectedCaseLinks = List.of(
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_01_ID)
                 .caseTypeId(CASE_01_TYPE)
                 .standardLink(NON_STANDARD_LINK)
                 .build(),
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_02_ID)
                 .caseTypeId(CASE_02_TYPE)
                 .standardLink(NON_STANDARD_LINK)
                 .build(),
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_03_ID) // NB: previously added in "classpath:sql/insert_cases.sql"
                 .caseTypeId(CASE_03_TYPE)
@@ -4000,7 +3999,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Long expectedCaseId = CASE_22_ID;
 
         List<CaseLink> expectedCaseLinks = List.of(
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_01_ID)
                 .caseTypeId(CASE_01_TYPE)
@@ -4383,7 +4382,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200WhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
+        final String caseReference = "1504259907353545";
         final JsonNode DATA = mapper.readTree(exampleData());
 
         final CaseDataContent caseDetailsToValidate = newCaseDataContent()
@@ -4392,6 +4393,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(SHORT_COMMENT)
                 .withDescription(LONG_COMMENT)
                 .build())
+            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
             .withData(JacksonUtils.convertValue(DATA))
             .withIgnoreWarning(Boolean.FALSE)
@@ -4411,7 +4413,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturnWhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
+        final String caseReference = "1504259907353545";
         final JsonNode DATA = mapper.readTree(exampleData());
 
         final CaseDataContent caseDetailsToValidate = newCaseDataContent()
@@ -4420,6 +4424,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(SHORT_COMMENT)
                 .withDescription(LONG_COMMENT)
                 .build())
+            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
             .withData(JacksonUtils.convertValue(DATA))
             .withIgnoreWarning(Boolean.FALSE)
@@ -4470,7 +4475,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200WhenPostValidateCaseDetailsWithValidDataForCitizen() throws Exception {
+        final String caseReference = "1504259907353545";
         final JsonNode DATA = mapper.readTree(exampleData());
 
         final CaseDataContent caseDetailsToValidate = newCaseDataContent()
@@ -4479,6 +4486,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(SHORT_COMMENT)
                 .withDescription(LONG_COMMENT)
                 .build())
+            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
             .withData(JacksonUtils.convertValue(DATA))
             .withIgnoreWarning(Boolean.FALSE)
@@ -5308,7 +5316,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageId() throws Exception {
+        final String caseReference = "1504259907353545";
+
         final JsonNode data = mapper.readTree(exampleCaseData());
         final JsonNode eventData = mapper.readTree(exampleEventData());
         WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK);
@@ -5323,6 +5334,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(summary)
                 .withDescription(description)
                 .build())
+            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE, TEST_EVENT_ID))
             .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
             .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
@@ -5401,7 +5413,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
+        final String caseReference = "1504259907353529";
         final JsonNode data = mapper.readTree(secondPageData());
         final JsonNode eventData = mapper.readTree(exampleEventDataMultiPages());
         WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK_MULTI_PAGE);
@@ -5426,6 +5440,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(summary)
                 .withDescription(description)
                 .build())
+            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE_MULTI_PAGE, TEST_EVENT_ID))
             .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
             .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
@@ -5507,13 +5522,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Long expectedCaseId = 1L;
 
         List<CaseLink> expectedCaseLinks = List.of(
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_999_ID)
                 .caseTypeId(CASE_LINKS_CASE_999_TYPE)
                 .standardLink(NON_STANDARD_LINK)
                 .build(),
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_998_ID)
                 .caseTypeId(CASE_LINKS_CASE_998_TYPE)
@@ -5556,12 +5571,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Long expectedCaseId = 1L;
 
         List<CaseLink> expectedCaseLinks = List.of(
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_999_ID)
                 .caseTypeId(CASE_LINKS_CASE_999_TYPE)
                 .build(),
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_998_ID)
                 .caseTypeId(CASE_LINKS_CASE_998_TYPE)

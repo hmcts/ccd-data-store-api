@@ -27,6 +27,8 @@ import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedC
 
 public final class JacksonUtils {
 
+    public static final String DATA = "data";
+
     private JacksonUtils() {
     }
 
@@ -197,5 +199,11 @@ public final class JacksonUtils {
             return jsonNode.iterator().hasNext() ? jsonNode.iterator().next().textValue() : jsonNode.textValue();
         }
         return returnValue;
+    }
+
+    public static Map<String, JsonNode> convertValueInDataField(Object from) {
+        Map<String, JsonNode> dataNode = new HashMap<>();
+        dataNode.put(DATA, MAPPER.valueToTree(convertValue(from)));
+        return dataNode;
     }
 }
