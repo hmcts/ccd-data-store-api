@@ -9,7 +9,7 @@ maintainers:
 dependencies:
   - name: java
     version: 5.2.2
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    repository: 'oci://hmctspublic.azurecr.io/helm'
   - name: elasticsearch
     version: 7.17.3
     repository: 'https://helm.elastic.co'
