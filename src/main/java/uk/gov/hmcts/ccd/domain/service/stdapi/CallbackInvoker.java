@@ -99,14 +99,11 @@ public class CallbackInvoker {
                 caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         }
 
-        if (callbackResponse.isPresent()) {
-            return validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
+        return callbackResponse.map(response -> validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
                 caseDetails,
                 ignoreWarning,
-                callbackResponse.get());
-        }
+                response)).orElseGet(AboutToSubmitCallbackResponse::new);
 
-        return new AboutToSubmitCallbackResponse();
     }
 
     public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEventDefinition
@@ -225,8 +222,13 @@ public class CallbackInvoker {
         }
         if (callbackResponse.getData() != null) {
             validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
-            if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
-                securityValidationService.setClassificationFromCallbackIfValid(
+
+            if (hasSecurityClassification(callbackResponse)) {
+                securityValidationService.updateSecurityClassificationIfValid(callbackResponse, caseDetails);
+            }
+
+            if (hasDataClassification(callbackResponse)) {
+                securityValidationService.setDataClassificationFromCallbackIfValid(
                     callbackResponse,
                     caseDetails,
                     deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails)
@@ -236,19 +238,19 @@ public class CallbackInvoker {
         return aboutToSubmitCallbackResponse;
     }
 
+    private boolean hasSecurityClassification(CallbackResponse callbackResponse) {
+        return callbackResponse.getSecurityClassification() != null;
+    }
 
-    private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
-        return (callbackResponse.getSecurityClassification() != null
-            && callbackResponse.getDataClassification() != null) ? true : false;
+    private boolean hasDataClassification(CallbackResponse callbackResponse) {
+        return callbackResponse.getDataClassification() != null;
     }
 
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseTypeDefinition caseTypeDefinition,
                                                                                CaseDetails caseDetails) {
-        Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
-            caseTypeDefinition,
-            caseDetails.getData(),
-            EMPTY_DATA_CLASSIFICATION);
-        return defaultSecurityClassifications;
+        return caseDataService.getDefaultSecurityClassifications(caseTypeDefinition,
+                                                                caseDetails.getData(),
+                                                                EMPTY_DATA_CLASSIFICATION);
     }
 
     private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,
