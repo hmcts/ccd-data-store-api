@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
+import io.swagger.annotations.Example;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataCasesUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalResults;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalService;
@@ -47,6 +49,9 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
+import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryCasesDataResource;
+import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryCaseFailDataResource;
+import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryCaseSuccessDataResource;
 import uk.gov.hmcts.ccd.validator.annotation.ValidCaseTypeId;
 
 import java.util.ArrayList;
@@ -417,7 +422,7 @@ public class CaseController {
         @ApiImplicitParam(
             name = "supplementaryDataUpdateRequest",
             dataTypeClass = SupplementaryDataUpdateRequest.class,
-            examples = @io.swagger.annotations.Example(
+            examples = @Example(
                 value = {
                     @ExampleProperty(value = "{\n"
                         + "\t\"$inc\": {\n"
@@ -443,6 +448,101 @@ public class CaseController {
         SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId,
             supplementaryDataUpdateRequest);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
+    }
+
+    @PostMapping(
+        path = "/cases/supplementary-data"
+    )
+    @ApiOperation(
+        value = "Update Cases Supplementary Data"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Cases Updated",
+            response = SupplementaryDataResource.class
+            ),
+        @ApiResponse(
+            code = 400,
+            message = V2.Error.CASE_ID_INVALID
+            ),
+        @ApiResponse(
+            code = 400,
+            message = V2.Error.SUPPLEMENTARY_DATA_CASES_UPDATE_INVALID
+            ),
+        @ApiResponse(
+            code = 400,
+            message = V2.Error.MORE_THAN_ONE_NESTED_LEVEL
+            ),
+        @ApiResponse(
+            code = 404,
+            message = V2.Error.CASE_NOT_FOUND
+            ),
+        @ApiResponse(
+            code = 403,
+            message = V2.Error.NOT_AUTHORISED_UPDATE_CASES_SUPPLEMENTARY_DATA
+            )
+    })
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            name = "supplementaryDataCasesUpdateRequest",
+            dataTypeClass = SupplementaryDataCasesUpdateRequest.class,
+            examples = @Example(
+                value = {
+                    @ExampleProperty(value = "{\n"
+                        + "\t\"cases\": [\n"
+                        + "\t\"caseId value 1\",\n"
+                        + "\t\"caseId value 2\"\n"
+                        + "\t\"],\n"
+                        + "\"supplementary_data_request\": {\n"
+                        + "\t\"$inc\": {\n"
+                        + "\t\t\"orgs_assigned_users.OrgA\": 1,\n"
+                        + "\t\t\"orgs_assigned_users.OrgB\": -1\n"
+                        + "\t},\n"
+                        + "\t\"$set\": {\n"
+                        + "\t\t\"orgs_assigned_users.OrgZ\": 34,\n"
+                        + "\t\t\"processed\": true\n"
+                        + "\t}\n"
+                        + "\t}\n"
+                        + "}", mediaType = "application/json")
+                }))
+    })
+    public ResponseEntity<SupplementaryCasesDataResource> updateCasesSupplementaryData(
+        @RequestBody SupplementaryDataCasesUpdateRequest supplementaryDataCasesUpdateRequest) {
+
+        if (supplementaryDataCasesUpdateRequest == null
+            || supplementaryDataCasesUpdateRequest.getCaseIds() == null) {
+            throw new BadRequestException(V2.Error.SUPPLEMENTARY_DATA_CASES_UPDATE_INVALID);
+        }
+
+        List<String> caseIds = supplementaryDataCasesUpdateRequest.getCaseIds();
+        List<SupplementaryCaseFailDataResource> failures = new ArrayList<>();
+        List<SupplementaryCaseSuccessDataResource> successes = new ArrayList<>();
+
+        SupplementaryDataUpdateRequest supplementaryDataUpdateRequest =
+            new SupplementaryDataUpdateRequest(supplementaryDataCasesUpdateRequest.getSupplementaryDataRequest());
+
+        for (String caseId : caseIds) {
+            this.requestValidator.validate(supplementaryDataUpdateRequest);
+            if (!caseReferenceService.validateUID(caseId)) {
+                throw new BadRequestException(V2.Error.CASE_ID_INVALID);
+            }
+            SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation
+                .updateSupplementaryData(caseId,
+                supplementaryDataUpdateRequest);
+            if (supplementaryDataUpdated == null) {
+                SupplementaryCaseFailDataResource supplementaryCaseFailDataResource
+                    = new SupplementaryCaseFailDataResource(
+                    caseId, V2.Error.CASE_NOT_FOUND);
+                failures.add(supplementaryCaseFailDataResource);
+            } else {
+                SupplementaryCaseSuccessDataResource supplementaryCaseSuccessDataResource
+                    = new SupplementaryCaseSuccessDataResource(
+                    caseId, supplementaryDataUpdated);
+                successes.add(supplementaryCaseSuccessDataResource);
+            }
+        }
+        return status(HttpStatus.OK).body(new SupplementaryCasesDataResource(successes, failures));
     }
 
     private ResponseEntity<CaseResource> createCaseEvent(String caseId, CaseDataContent content) {
