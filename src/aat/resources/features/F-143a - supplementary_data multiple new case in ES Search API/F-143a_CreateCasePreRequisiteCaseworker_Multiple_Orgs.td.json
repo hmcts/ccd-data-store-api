@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-105_CreateCasePreRequisiteCaseworker",
+  "_guid_": "F-143a_CreateCasePreRequisiteCaseworker_Multiple_Orgs",
   "_extends_": "Case_Creation_Data_Base",
   "specs": [
     "to create a case",
@@ -7,7 +7,7 @@
   ],
 
   "prerequisites" : [ {
-    "Token_Creation": "S-105_GetCreateTokenNewCase"
+    "Token_Creation": "S-143a_GetCreateToken"
   }
   ],
 
@@ -28,6 +28,26 @@
           "Organisation": {
             "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
+          }
+        },
+        "OrganisationPolicyField3" : {
+          "newCase": "Yes",
+          "Organisation": {
+            "OrganisationID": "orgID3",
+            "OrganisationName": "orgName3"
+          }
+        },
+        "OrganisationPolicyField5" : {
+          "newCase" : "no",
+          "Organisation" : {
+            "OrganisationID" : "orgID2a",
+            "OrganisationName" : "orgName2a"
+          }
+        },
+        "OrganisationPolicyField4" : {
+          "Organisation" : {
+            "OrganisationID" : "orgID2",
+            "OrganisationName" : "orgName2"
           }
         }
       },
@@ -56,13 +76,32 @@
             "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
           }
+        },
+        "OrganisationPolicyField3" : {
+          "Organisation": {
+            "OrganisationID": "orgID3",
+            "OrganisationName": "orgName3"
+          }
+        },
+        "OrganisationPolicyField5" : {
+          "Organisation" : {
+            "OrganisationID" : "orgID2a",
+            "OrganisationName" : "orgName2a"
+          }
+        },
+        "OrganisationPolicyField4" : {
+          "Organisation" : {
+            "OrganisationID" : "orgID2",
+            "OrganisationName" : "orgName2"
+          }
         }
       },
       "data_classification": {
       },
       "supplementary_data" : {
         "new_case" : {
-          "orgID1" : true
+          "orgID1" : true,
+          "orgID3" : true
         }
       }
     }
