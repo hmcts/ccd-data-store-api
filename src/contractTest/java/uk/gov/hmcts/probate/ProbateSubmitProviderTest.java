@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
 })
 @ActiveProfiles("SECURITY_MOCK")
 @IgnoreNoPactsToVerify
-public class CasesControllerProviderTest extends WireMockBaseTest {
+public class ProbateSubmitProviderTest extends WireMockBaseTest {
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
     private static final String CASEWORKER_PASSWORD = "caseworkerPassword";
@@ -197,6 +197,5 @@ public void submitForCaseworkerGivenSubmitRequested() {
 @State("A Submit for a Citizen given a Submit for a Citizen is requested")
 public void submitForCitizenGivenSubmitRequested() {
 }
-
 
 }
