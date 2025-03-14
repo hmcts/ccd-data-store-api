@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.search.elasticsearch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.Data;
@@ -10,8 +11,10 @@ import lombok.NonNull;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
@@ -41,7 +44,6 @@ public class ElasticsearchRequest {
         for (String metadata : MetaData.CaseField.getColumnNames()) {
             METADATA_FIELDS.add(new TextNode(metadata));
         }
-        METADATA_FIELDS.add(new TextNode(DATA_CLASSIFICATION_COL));
     }
 
     public ElasticsearchRequest(@NonNull JsonNode searchRequest) {
@@ -145,7 +147,33 @@ public class ElasticsearchRequest {
                 .forEach(sd -> sourceFields.add(new TextNode(SUPPLEMENTARY_DATA_PREFIX + sd.asText())));
         }
 
-        return sourceFields;
+        addDataClassificationFields(sourceFields);
+
+        return removeDuplicateFields(sourceFields);
+    }
+
+    private void addDataClassificationFields(ArrayNode sourceFields) {
+        Set<String> classificationFields = new HashSet<>();
+
+        for (JsonNode field : sourceFields) {
+            String fieldText = field.asText();
+            if (fieldText.equals(DATA_COL) || fieldText.startsWith(DATA_COL + ".")) {
+                String classificationField = fieldText.replaceFirst(DATA_COL, DATA_CLASSIFICATION_COL);
+                classificationFields.add(classificationField);
+            }
+        }
+
+        classificationFields.forEach(field -> sourceFields.add(new TextNode(field)));
+    }
+
+    private ArrayNode removeDuplicateFields(ArrayNode sourceFields) {
+        Set<String> uniqueFields = new HashSet<>();
+        sourceFields.forEach(field -> uniqueFields.add(field.asText()));
+
+        ArrayNode cleanedSourceFields = JsonNodeFactory.instance.arrayNode();
+        uniqueFields.forEach(field -> cleanedSourceFields.add(new TextNode(field)));
+
+        return cleanedSourceFields;
     }
 
     private String getFieldId(String fieldSourceName) {
