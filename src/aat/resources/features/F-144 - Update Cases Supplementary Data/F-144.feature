@@ -26,12 +26,11 @@ Feature: F-144: Update Cases Supplementary Data
     Then a positive response is received,
     And the response has all the details as expected.
 
-  @S-144.3 @Ignore
+  @S-144.3
   Scenario: Need to be able to replace an existing property
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - who can create a case],
     And a case [C1, which has just been] created as in [F-144_Case_Data_Create_C1],
-    And a successful call [by Dil to update supplementary_data] as in [F-144_Update_Cases_Supplementary_Data_C1],
     When a request is prepared with appropriate values,
     And the request [replaces the value of an existing supplementary_data property with the provided value],
     And it is submitted to call the [Update Cases Supplementary Data] operation of [CCD Data Store api],

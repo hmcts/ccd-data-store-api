@@ -10,6 +10,9 @@
 	],
   "request": {
     "body": {
+      "cases": [
+        "${[scenarioContext][childContexts][F-144_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+      ],
       "supplementary_data_updates": {
         "$set": {
           "orgs_assigned_users.OrgA": 20
@@ -25,8 +28,14 @@
 			"Content-Encoding": "gzip"
 		},
     "body": {
-      "supplementary_data": {
-        "orgs_assigned_users.OrgA": 20
+      "successes" : [
+        {
+          "caseId": "${[scenarioContext][customValues][caseIdAsStringFrom_F-144_Case_Data_Create_C1]}",
+          "supplementary_data" : {
+          "orgs_assigned_users.OrgA" : 20
+        }
+      }],
+      "failures" : []
       }
     }
 	}
