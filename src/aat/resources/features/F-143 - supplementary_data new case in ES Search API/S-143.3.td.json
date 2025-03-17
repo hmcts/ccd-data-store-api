@@ -59,7 +59,7 @@
         "supplementary_data": {
           "new_case":
           {
-            "orgID1": "true"
+            "orgID1": true
           }
         },
         "after_submit_callback_response": null,

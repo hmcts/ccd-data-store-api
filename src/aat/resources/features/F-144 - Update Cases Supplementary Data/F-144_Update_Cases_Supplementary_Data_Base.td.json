@@ -1,0 +1,27 @@
+{
+	"_guid_": "F-144_Update_Cases_Supplementary_Data_Base",
+	"title": "Update Cases Supplementary Data Base",
+	"productName": "CCD Data Store",
+	"operationName": "Update Cases Supplementary Data",
+	"method": "POST",
+	"uri": "/cases/supplementary-data",
+	"users": {
+		"invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+		}
+	},
+	"request": {
+		"_extends_": "Common_Request",
+    "body": {
+			"cases": ["${[scenarioContext][childContexts][F-144_Case_Data_Create_C1][testData][actualResponse][body][id]}"]
+		}
+	},
+	"expectedResponse": {
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}

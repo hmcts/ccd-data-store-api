@@ -30,8 +30,8 @@ public class SupplementaryDataUpdateRequestValidator {
     public void validate(SupplementaryDataCasesUpdateRequest caseSupplementaryDataUpdateRequest) {
         if (caseSupplementaryDataUpdateRequest == null
             || caseSupplementaryDataUpdateRequest.getCaseIds() == null
-            || caseSupplementaryDataUpdateRequest.getSupplementaryDataRequest() != null
-            || caseSupplementaryDataUpdateRequest.getSupplementaryDataRequest().isEmpty()
+            || caseSupplementaryDataUpdateRequest.getRequestData() != null
+            || caseSupplementaryDataUpdateRequest.getRequestData().isEmpty()
             || caseSupplementaryDataUpdateRequest.getCaseIds().isEmpty()) {
             throw new BadRequestException(SUPPLEMENTARY_DATA_CASES_UPDATE_INVALID);
         }

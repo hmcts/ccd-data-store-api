@@ -18,8 +18,8 @@ public class SupplementaryDataCasesUpdateRequest {
     @JsonProperty("cases")
     private List<String> caseIds;
 
-    @JsonProperty("supplementary_data_request")
-    private Map<String, Map<String, Object>> supplementaryDataRequest;
+    @JsonProperty("supplementary_data_updates")
+    private Map<String, Map<String, Object>> requestData;
 
 }
 

@@ -1,0 +1,44 @@
+{
+	"title": "Must return the updated supplementary data values from Data store",
+	"_guid_": "S-144.1",
+	"productName": "CCD Data Store api",
+	"operationName": "Update Cases Supplementary Data",
+	"_extends_": "F-144_Update_Cases_Supplementary_Data_Base",
+	"specs": [
+		"Dil - who can create a case"
+	],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "body": {
+      "supplementary_data_updates": {
+        "$set": {
+          "new_case.orgID1": false,
+          "new_case.orgID3": false
+        }
+      }
+    }
+  },
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+      "successes" : [
+        {
+          "caseId": "${[scenarioContext][customValues][caseIdAsStringFrom_F-144_Case_Data_Create_C1]}",
+          "supplementary_data": {
+            "new_case.orgID1": false,
+            "new_case.orgID3": false
+          }
+        }],
+      "failures" : [ ]
+		}
+	}
+}

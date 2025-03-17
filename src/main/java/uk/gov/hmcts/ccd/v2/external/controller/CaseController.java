@@ -494,7 +494,7 @@ public class CaseController {
                         + "\t\"caseId value 1\",\n"
                         + "\t\"caseId value 2\"\n"
                         + "\t\"],\n"
-                        + "\"supplementary_data_request\": {\n"
+                        + "\"supplementary_data_updates\": {\n"
                         + "\t\"$inc\": {\n"
                         + "\t\t\"orgs_assigned_users.OrgA\": 1,\n"
                         + "\t\t\"orgs_assigned_users.OrgB\": -1\n"
@@ -520,7 +520,7 @@ public class CaseController {
         List<SupplementaryCaseSuccessDataResource> successes = new ArrayList<>();
 
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest =
-            new SupplementaryDataUpdateRequest(supplementaryDataCasesUpdateRequest.getSupplementaryDataRequest());
+            new SupplementaryDataUpdateRequest(supplementaryDataCasesUpdateRequest.getRequestData());
 
         for (String caseId : caseIds) {
             this.requestValidator.validate(supplementaryDataUpdateRequest);
