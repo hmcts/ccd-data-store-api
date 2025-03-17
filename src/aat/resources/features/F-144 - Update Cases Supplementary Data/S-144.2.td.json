@@ -1,5 +1,5 @@
 {
-	"title": "Need to be able to increment an existing property",
+	"title": "Need to be able to update an existing property for multiple cases",
 	"_guid_": "S-144.2",
 	"productName": "CCD Data Store api",
 	"operationName": "Update Cases Supplementary Data",
@@ -10,26 +10,43 @@
 	],
   "request": {
     "body": {
+      "cases": [
+        "${[scenarioContext][childContexts][F-144_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+        "${[scenarioContext][childContexts][F-144_Case_Data_Create_C2][testData][actualResponse][body][id]}"
+      ],
       "supplementary_data_updates": {
-        "$inc": {
-          "orgs_assigned_users.OrgA": 1,
-          "orgs_assigned_users.OrgB": -1
+        "$set": {
+          "new_case.orgID1": false,
+          "new_case.orgID4": false
         }
       }
     }
   },
-	"expectedResponse": {
-		"_extends_": "Common_200_Response",
-		"headers": {
-			"Content-Length": "[[ANYTHING_PRESENT]]",
-			"Content-Type": "[[ANYTHING_PRESENT]]",
-			"Content-Encoding": "gzip"
-		},
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
     "body": {
-      "supplementary_data": {
-        "orgs_assigned_users.OrgA": 26,
-        "orgs_assigned_users.OrgB": 0
-      }
+      "successes" : [
+        {
+          "caseId": "${[scenarioContext][customValues][caseIdAsStringFrom_F-144_Case_Data_Create_C1]}",
+          "supplementary_data": {
+            "new_case.orgID1": false,
+            "new_case.orgID4": false
+          }
+        },
+        {
+          "caseId": "${[scenarioContext][customValues][caseIdAsStringFrom_F-144_Case_Data_Create_C2]}",
+          "supplementary_data": {
+            "new_case.orgID1": false,
+            "new_case.orgID4": false
+          }
+        }
+      ],
+      "failures" : [ ]
     }
-	}
+  }
 }

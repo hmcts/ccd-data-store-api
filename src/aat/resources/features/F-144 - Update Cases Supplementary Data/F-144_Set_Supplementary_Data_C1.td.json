@@ -7,7 +7,7 @@
 	"request": {
 		"_extends_": "Common_Request",
 		"body": {
-      "cases": "[[${[scenarioContext][siblingContexts][F-144_Case_Data_Create_C1][testData][actualResponse][body][id]}]]",
+      "cases": ["${[scenarioContext][childContexts][F-144_Case_Data_Create_C1][testData][actualResponse][body][id]}"],
       "supplementary_data_updates": {
 			  "$set": {
           "new_case.OrgZ": false

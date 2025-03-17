@@ -14,6 +14,9 @@
   },
   "request": {
     "body": {
+      "cases": [
+        "${[scenarioContext][childContexts][F-144_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+      ],
       "supplementary_data_updates": {
         "$set": {
           "new_case.orgID1": false,

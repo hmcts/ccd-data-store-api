@@ -7,11 +7,13 @@
 	"request": {
     "_extends_": "Common_Request",
     "body": {
-      "cases": "[[${[scenarioContext][siblingContexts][F-144_Case_Data_Create_C1][testData][actualResponse][body][id]}]]",
+      "cases": [
+
+      ],
       "supplementary_data_updates": {
         "$set": {
-          "orgs_assigned_users.OrgA": 25,
-          "orgs_assigned_users.OrgB": 1
+          "new_case.orgID1": false,
+          "new_case.orgID4": false
         }
       }
     }
@@ -25,8 +27,7 @@
     },
     "body": {
       "supplementary_data": {
-        "orgs_assigned_users.OrgA": 25,
-        "orgs_assigned_users.OrgB": 1
+        "new_case.orgID1": false
       }
     }
 	}
