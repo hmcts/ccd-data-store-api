@@ -5,13 +5,11 @@ import java.util.regex.Pattern;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
-import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataCasesUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import static uk.gov.hmcts.ccd.v2.V2.Error.MORE_THAN_ONE_NESTED_LEVEL;
 import static uk.gov.hmcts.ccd.v2.V2.Error.SUPPLEMENTARY_DATA_UPDATE_INVALID;
-import static uk.gov.hmcts.ccd.v2.V2.Error.SUPPLEMENTARY_DATA_CASES_UPDATE_INVALID;
 import static uk.gov.hmcts.ccd.v2.V2.Error.UNKNOWN_SUPPLEMENTARY_UPDATE_OPERATION;
 
 @Named
@@ -25,16 +23,6 @@ public class SupplementaryDataUpdateRequestValidator {
         }
         validateAtMostOneLevelOfNesting(supplementaryDataUpdateRequest);
         validateRequestOperations(supplementaryDataUpdateRequest);
-    }
-
-    public void validate(SupplementaryDataCasesUpdateRequest caseSupplementaryDataUpdateRequest) {
-        if (caseSupplementaryDataUpdateRequest == null
-            || caseSupplementaryDataUpdateRequest.getCaseIds() == null
-            || caseSupplementaryDataUpdateRequest.getRequestData() != null
-            || caseSupplementaryDataUpdateRequest.getRequestData().isEmpty()
-            || caseSupplementaryDataUpdateRequest.getCaseIds().isEmpty()) {
-            throw new BadRequestException(SUPPLEMENTARY_DATA_CASES_UPDATE_INVALID);
-        }
     }
 
     private void validateAtMostOneLevelOfNesting(SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {

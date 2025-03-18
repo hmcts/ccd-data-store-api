@@ -65,6 +65,7 @@ import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.LINKED_CASES_ACCESSED
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
+import static uk.gov.hmcts.ccd.v2.V2.Error.SUPPLEMENTARY_DATA_CASES_UPDATE_INVALID;
 
 @RestController
 @RequestMapping(path = "/")
@@ -515,31 +516,39 @@ public class CaseController {
             throw new BadRequestException(V2.Error.SUPPLEMENTARY_DATA_CASES_UPDATE_INVALID);
         }
 
-        List<String> caseIds = supplementaryDataCasesUpdateRequest.getCaseIds();
         List<SupplementaryCaseFailDataResource> failures = new ArrayList<>();
         List<SupplementaryCaseSuccessDataResource> successes = new ArrayList<>();
+        validate(supplementaryDataCasesUpdateRequest);
 
+        List<String> caseIds = supplementaryDataCasesUpdateRequest.getCaseIds();
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest =
             new SupplementaryDataUpdateRequest(supplementaryDataCasesUpdateRequest.getRequestData());
 
+        this.requestValidator.validate(supplementaryDataUpdateRequest);
+
         for (String caseId : caseIds) {
-            this.requestValidator.validate(supplementaryDataUpdateRequest);
+
             if (!caseReferenceService.validateUID(caseId)) {
-                throw new BadRequestException(V2.Error.CASE_ID_INVALID);
-            }
-            SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation
-                .updateSupplementaryData(caseId,
-                supplementaryDataUpdateRequest);
-            if (supplementaryDataUpdated == null) {
+
                 SupplementaryCaseFailDataResource supplementaryCaseFailDataResource
                     = new SupplementaryCaseFailDataResource(
-                    caseId, V2.Error.CASE_NOT_FOUND);
+                    caseId, V2.Error.CASE_ID_INVALID);
                 failures.add(supplementaryCaseFailDataResource);
             } else {
-                SupplementaryCaseSuccessDataResource supplementaryCaseSuccessDataResource
-                    = new SupplementaryCaseSuccessDataResource(
-                    caseId, supplementaryDataUpdated);
-                successes.add(supplementaryCaseSuccessDataResource);
+                SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation
+                    .updateSupplementaryData(caseId,
+                        supplementaryDataUpdateRequest);
+                if (supplementaryDataUpdated == null) {
+                    SupplementaryCaseFailDataResource supplementaryCaseFailDataResource
+                        = new SupplementaryCaseFailDataResource(
+                        caseId, V2.Error.CASE_NOT_FOUND);
+                    failures.add(supplementaryCaseFailDataResource);
+                } else {
+                    SupplementaryCaseSuccessDataResource supplementaryCaseSuccessDataResource
+                        = new SupplementaryCaseSuccessDataResource(
+                        caseId, supplementaryDataUpdated);
+                    successes.add(supplementaryCaseSuccessDataResource);
+                }
             }
         }
         return status(HttpStatus.OK).body(new SupplementaryCasesDataResource(successes, failures));
@@ -640,4 +649,15 @@ public class CaseController {
         }
         return String.join(CASE_ID_SEPARATOR, caseReferences);
     }
+
+    public void validate(SupplementaryDataCasesUpdateRequest caseSupplementaryDataCasesUpdateRequest) {
+        if (caseSupplementaryDataCasesUpdateRequest == null
+            || caseSupplementaryDataCasesUpdateRequest.getCaseIds() == null
+            || caseSupplementaryDataCasesUpdateRequest.getCaseIds().isEmpty()
+            || caseSupplementaryDataCasesUpdateRequest.getRequestData() == null
+            || caseSupplementaryDataCasesUpdateRequest.getRequestData().isEmpty()) {
+            throw new BadRequestException(SUPPLEMENTARY_DATA_CASES_UPDATE_INVALID);
+        }
+    }
+
 }

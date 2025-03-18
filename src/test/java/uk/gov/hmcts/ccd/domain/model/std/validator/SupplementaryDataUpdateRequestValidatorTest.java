@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataCasesUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
@@ -33,7 +32,7 @@ class SupplementaryDataUpdateRequestValidatorTest {
     @DisplayName("should propagate BadRequestException when Case supplementary data null")
     void shouldThrowBadRequestExceptionWhenSupplementaryDataNull() {
         assertThrows(BadRequestException.class,
-            () -> requestValidator.validate((SupplementaryDataCasesUpdateRequest) null));
+            () -> requestValidator.validate((SupplementaryDataUpdateRequest) null));
     }
 
     @Test

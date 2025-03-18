@@ -87,6 +87,8 @@ class CaseControllerTest {
     private static final Boolean IGNORE_WARNING = true;
     private static final CaseDataContent CASE_DATA_CONTENT = newCaseDataContent().build();
 
+    private static final String INVALID_CASE_REFERENCE = "1234123412341234";
+
     private static final Logger LOG = LoggerFactory.getLogger(CaseControllerTest.class);
 
     @Mock
@@ -658,6 +660,31 @@ class CaseControllerTest {
         }
 
         @Test
+        @DisplayName("should return 200 when supplementary data updated with failures")
+        void shouldUpdateSupplementaryDataWithFails() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
+            SupplementaryCasesDataResource supplementaryCasesDataResource = createResponseDataWithCases();
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+                .thenReturn(new SupplementaryData(new HashMap<>()));
+            Map<String, Object> data = supplementaryCasesDataResource.getSuccesses().getFirst().getResponse();
+
+            SupplementaryData supplementaryData = new SupplementaryData(data);
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+                .thenReturn(supplementaryData);
+
+            final ResponseEntity<SupplementaryCasesDataResource> response =
+                caseController.updateCasesSupplementaryData(createCaseRequestDataOrgAWithCasesFail());
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> assertThat(response.getBody().getFailures().size(), equalTo(1)),
+                () -> assertThat(response.getBody().getSuccesses().size(), equalTo(1)),
+                () -> assertThat(response.getBody().getSuccesses().getFirst().getResponse(), is(data))
+            );
+            validateResponseData(response.getBody().getSuccesses(), "organisationA", FALSE);
+        }
+
+        @Test
         @DisplayName("should propagate BadRequestException when supplementary data not valid")
         void invalidSupplementaryDataUpdateRequest() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
@@ -736,6 +763,21 @@ class CaseControllerTest {
             String jsonRequest = "{\n"
                 + "\t\"cases\": [\n"
                 + "\t\t\"" + CASE_REFERENCE + "\"\n"
+                + "\t],\n"
+                + "\"supplementary_data_updates\": {\n"
+                + "\t\"$set\": {\n"
+                + "\t\t\"new_case.organisationA\": false\n"
+                + "\t}\n"
+                + "\t}\n"
+                + "}";
+            return convertData(jsonRequest);
+        }
+
+        private SupplementaryDataCasesUpdateRequest createCaseRequestDataOrgAWithCasesFail() {
+            String jsonRequest = "{\n"
+                + "\t\"cases\": [\n"
+                + "\t\t\"" + CASE_REFERENCE + "\",\n"
+                + "\t\t\"" + INVALID_CASE_REFERENCE + "\"\n"
                 + "\t],\n"
                 + "\"supplementary_data_updates\": {\n"
                 + "\t\"$set\": {\n"
