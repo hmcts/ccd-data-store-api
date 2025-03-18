@@ -535,19 +535,26 @@ public class CaseController {
                     caseId, V2.Error.CASE_ID_INVALID);
                 failures.add(supplementaryCaseFailDataResource);
             } else {
-                SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation
-                    .updateSupplementaryData(caseId,
-                        supplementaryDataUpdateRequest);
-                if (supplementaryDataUpdated == null) {
+                try {
+                    SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation
+                        .updateSupplementaryData(caseId,
+                            supplementaryDataUpdateRequest);
+                    if (supplementaryDataUpdated == null) {
+                        SupplementaryCaseFailDataResource supplementaryCaseFailDataResource
+                            = new SupplementaryCaseFailDataResource(
+                            caseId, V2.Error.CASE_NOT_FOUND);
+                        failures.add(supplementaryCaseFailDataResource);
+                    } else {
+                        SupplementaryCaseSuccessDataResource supplementaryCaseSuccessDataResource
+                            = new SupplementaryCaseSuccessDataResource(
+                            caseId, supplementaryDataUpdated);
+                        successes.add(supplementaryCaseSuccessDataResource);
+                    }
+                } catch (Exception e) {
                     SupplementaryCaseFailDataResource supplementaryCaseFailDataResource
                         = new SupplementaryCaseFailDataResource(
-                        caseId, V2.Error.CASE_NOT_FOUND);
+                        caseId, e.getMessage());
                     failures.add(supplementaryCaseFailDataResource);
-                } else {
-                    SupplementaryCaseSuccessDataResource supplementaryCaseSuccessDataResource
-                        = new SupplementaryCaseSuccessDataResource(
-                        caseId, supplementaryDataUpdated);
-                    successes.add(supplementaryCaseSuccessDataResource);
                 }
             }
         }
