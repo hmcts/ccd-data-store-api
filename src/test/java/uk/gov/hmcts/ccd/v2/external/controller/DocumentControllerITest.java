@@ -117,7 +117,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
         mapper.registerModule(new Jackson2HalModule());
     }
 
-    @Test
+    @Test(timeout = 10000)
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200WhenGetValidCaseDocuments() throws Exception {
 
