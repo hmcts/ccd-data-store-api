@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -95,6 +96,9 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
 
+    @Mock
+    private CaseAccessService caseAccessService;
+
     private uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation
             authorisedGetCaseHistoryViewOperation;
 
@@ -147,7 +151,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         authorisedGetCaseHistoryViewOperation =
                 new uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation(
                     getCaseHistoryViewOperation, caseDefinitionRepository,
-                    accessControlService, caseDetailsRepository, caseDataAccessControl);
+                    accessControlService, caseDetailsRepository, caseDataAccessControl, caseAccessService);
     }
 
     private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {

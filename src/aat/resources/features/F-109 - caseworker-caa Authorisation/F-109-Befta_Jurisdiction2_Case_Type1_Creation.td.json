@@ -3,8 +3,7 @@
   "_extends_": "Befta_Jurisdiction2_Case_Creation_Base_Data",
   "users": {
     "invokingUser": {
-      "username": "befta.caseworker.2@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_2_PWD]]"
+      "_extends_": "BeftaCaseworker2"
     }
   },
   "request": {
