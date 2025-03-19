@@ -925,9 +925,22 @@ task runProviderPactVerification(type:Test) {
     }
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/reform/**"
+    include "uk/gov/hmcts/ccd/**"
 }
 
 runProviderPactVerification.finalizedBy pactVerify
+
+pact {
+    broker {
+        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:9292'
+    }
+    publish {
+        pactDirectory = 'pacts'
+        version = project.pactVersion
+        tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:9292'
+    }
+}
 
 def timestamp() {
     def date = new Date()

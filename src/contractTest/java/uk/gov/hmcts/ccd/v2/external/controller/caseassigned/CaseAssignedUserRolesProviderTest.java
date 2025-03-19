@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -41,6 +42,7 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = {CaseAssignedUserRolesProviderTestContext.class, TestIdamConfiguration.class})
 @IgnoreNoPactsToVerify
 @ActiveProfiles("CASE_ASSIGNED")
+@ExtendWith(SpringExtension.class)
 public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
 
     @Autowired
