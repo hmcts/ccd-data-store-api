@@ -9,10 +9,12 @@
 		"contains HTTP 403 Forbidden"
 	],
 
-	"request": {
-		"headers" : {
-			"Authorization": "invalidToken"
-		},
+  "user": {
+    "_extends_": "BeftaCaseworker1"
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
 		"pathVariables": {
 			"triggerId": "CREATE"
 		}
