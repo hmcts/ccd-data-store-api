@@ -313,15 +313,14 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     public void toSearchCasesForACitizen(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
         when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class), any()))
-           .thenReturn(new CaseSearchResult(1L, Arrays.asList(caseDetails), null));
+            .thenReturn(new CaseSearchResult(1L, Arrays.asList(caseDetails), null));
     }
 
     @State({"A Search cases for a Citizen is requested"})
     public void toSearchForACitizen(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
         when(authorisedSearchOperation.execute(any(MetaData.class), any(Map.class)))
-           .thenReturn(Arrays.asList(caseDetails));
-
+            .thenReturn(Arrays.asList(caseDetails));
     }
 
     @State({"A Start Event for a Caseworker is  requested"})
@@ -329,7 +328,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         mockCaseDetailsResponse("mock_responses/start_event_caseworker.json");
         CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
         startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
-           caseDetails.getReferenceAsString());
+            caseDetails.getReferenceAsString());
     }
 
     @State({"A Start Event for a Citizen is requested"})
