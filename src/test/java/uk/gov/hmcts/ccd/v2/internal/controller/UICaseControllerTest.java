@@ -12,19 +12,28 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseHistoryViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseMetadataResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
+
+import java.util.List;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @DisplayName("UICaseController")
@@ -40,6 +49,9 @@ class UICaseControllerTest {
 
     @Mock
     private UIDService caseReferenceService;
+
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
     private CaseView caseView;
@@ -62,6 +74,7 @@ class UICaseControllerTest {
         when(caseHistoryView.getEvent()).thenReturn(caseViewEvent);
         when(caseViewEvent.getId()).thenReturn(EVENT_ID);
 
+        when(caseDataAccessControl.generateAccessMetadata(CASE_REFERENCE)).thenReturn(new CaseAccessMetadata());
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
         when(getCaseViewOperation.execute(CASE_REFERENCE)).thenReturn(caseView);
         when(getCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID)).thenReturn(caseHistoryView);
@@ -137,4 +150,43 @@ class UICaseControllerTest {
         }
     }
 
+    @Nested
+    @DisplayName("GET /internal/cases/{caseId}/access-metadata")
+    class GetCaseAccessMetadataForId {
+
+        @Test
+        @DisplayName("should return 200 when metadata found")
+        void accessMetadataFound() {
+            CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+            caseAccessMetadata.setAccessGrants(List.of(GrantType.STANDARD, GrantType.SPECIFIC, GrantType.CHALLENGED));
+            caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
+            doReturn(caseAccessMetadata).when(caseDataAccessControl).generateAccessMetadata(CASE_REFERENCE);
+
+            final ResponseEntity<CaseMetadataResource> response = caseController.getCaseAccessMetadata(CASE_REFERENCE);
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> assertThat(response.getBody().getAccessGrants(), hasItem(GrantType.STANDARD)),
+                () -> assertThat(response.getBody().getAccessProcess(), is(AccessProcess.NONE))
+            );
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when case reference not valid")
+        void caseReferenceNotValid() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+
+            assertThrows(BadRequestException.class,
+                () -> caseController.getCaseAccessMetadata(CASE_REFERENCE));
+        }
+
+        @Test
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            when(caseDataAccessControl.generateAccessMetadata(CASE_REFERENCE)).thenThrow(RuntimeException.class);
+
+            assertThrows(Exception.class,
+                () -> caseController.getCaseAccessMetadata(CASE_REFERENCE));
+        }
+    }
 }
