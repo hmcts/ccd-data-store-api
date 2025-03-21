@@ -24,7 +24,8 @@
 
   "request": {
     "headers": {
-      "_extends_": "Common_Request_Headers"
+      "_extends_": "Common_Request_Headers",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json"
     },
     "pathVariables": {
       "ctid": "FT_MasterCaseType"
