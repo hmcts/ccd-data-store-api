@@ -10,7 +10,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class CaseMetadataResource  {
+public class CaseAccessMetadataResource {
 
     @JsonProperty("accessGrants")
     private List<GrantType> accessGrants;

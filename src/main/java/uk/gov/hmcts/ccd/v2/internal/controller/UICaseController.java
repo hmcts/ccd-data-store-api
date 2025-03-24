@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseHistoryViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.CaseMetadataResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseAccessMetadataResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
@@ -150,7 +150,7 @@ public class UICaseController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = CaseMetadataResource.class
+            response = CaseAccessMetadataResource.class
             ),
         @ApiResponse(
             code = 400,
@@ -163,13 +163,13 @@ public class UICaseController {
     })
     @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
         caseType = "#result.body.caseType.id")
-    public ResponseEntity<CaseMetadataResource> getCaseAccessMetadata(@PathVariable("caseId") String caseId) {
+    public ResponseEntity<CaseAccessMetadataResource> getCaseAccessMetadata(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
 
         final CaseAccessMetadata caseaccessMetadata = caseDataAccessControl.generateAccessMetadata(caseId);
-        CaseMetadataResource caseMetadataResource = new CaseMetadataResource();
+        CaseAccessMetadataResource caseMetadataResource = new CaseAccessMetadataResource();
         caseMetadataResource.setAccessGrants(caseaccessMetadata.getAccessGrants());
         caseMetadataResource.setAccessProcess(caseaccessMetadata.getAccessProcess());
 
