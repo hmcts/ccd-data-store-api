@@ -21,7 +21,6 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseHistoryViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.CaseAccessMetadataResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 
 import java.util.List;
@@ -162,7 +161,7 @@ class UICaseControllerTest {
             caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
             doReturn(caseAccessMetadata).when(caseDataAccessControl).generateAccessMetadata(CASE_REFERENCE);
 
-            final ResponseEntity<CaseAccessMetadataResource> response
+            final ResponseEntity<CaseAccessMetadata> response
                 = caseController.getCaseAccessMetadata(CASE_REFERENCE);
 
             assertAll(
