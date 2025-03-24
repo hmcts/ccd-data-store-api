@@ -1,7 +1,7 @@
 {
   "_guid_": "S-065a.2",
   "_extends_": "F-065a_Test_Data_Access_Metadata_Base",
-  "title": "must return 404 when case reference does NOT exist",
+  "title": "must return null when case reference does NOT exist",
 
   "specs": [
     "an active profile in CCD",

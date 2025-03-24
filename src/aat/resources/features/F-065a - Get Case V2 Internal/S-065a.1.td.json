@@ -25,7 +25,9 @@
     },
     "body": {
       "accessGrants" : [ "STANDARD" ],
-      "accessProcess" : "NONE"
+      "accessProcess" : "NONE",
+      "accessGrantsString" : "STANDARD",
+      "accessProcessString" : "NONE"
     }
   }
 }

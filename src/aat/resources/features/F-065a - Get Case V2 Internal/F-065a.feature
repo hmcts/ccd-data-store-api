@@ -26,7 +26,7 @@ Background: Load test data for the scenario
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     @S-065a.2
-    Scenario: must return 404 when case reference does NOT exist
+    Scenario: must return null when case reference does NOT exist
 
       Given a user with [an active profile in CCD],
 
