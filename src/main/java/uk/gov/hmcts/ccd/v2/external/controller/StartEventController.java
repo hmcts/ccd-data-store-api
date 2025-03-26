@@ -1,8 +1,11 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,7 @@ import uk.gov.hmcts.ccd.v2.external.resource.StartEventResource;
 import static uk.gov.hmcts.ccd.v2.V2.Error.AUTHENTICATION_TOKEN_INVALID;
 import static uk.gov.hmcts.ccd.v2.V2.Error.EVENT_TRIGGER_NOT_FOUND;
 
+@Slf4j
 @RestController
 @RequestMapping(path = "/")
 public class StartEventController {
@@ -133,6 +137,13 @@ public class StartEventController {
                                                                                                  eventId,
                                                                                                  ignoreWarning);
 
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            log.info("StartEventResult: {}", mapper.writeValueAsString(startEventResult));
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to log start event result", e);
+            log.info("StartEventResult in Object: {}", startEventResult);
+        }
         return ResponseEntity.ok(new StartEventResource(startEventResult, ignoreWarning, true));
     }
 

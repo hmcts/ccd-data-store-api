@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -45,6 +49,7 @@ import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
+import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -65,6 +70,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
+@Slf4j
 @Service
 public class CreateCaseEventService {
 
@@ -97,6 +103,7 @@ public class CreateCaseEventService {
     private final CaseDocumentTimestampService caseDocumentTimestampService;
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
+    private final ConditionalFieldRestorer conditionalFieldRestorer;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -116,6 +123,7 @@ public class CreateCaseEventService {
                                   final CallbackInvoker callbackInvoker,
                                   final UIDService uidService,
                                   final SecurityClassificationServiceImpl securityClassificationService,
+                                  @Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER)
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                   final UserAuthorisation userAuthorisation,
                                   final FieldProcessorService fieldProcessorService,
@@ -130,7 +138,8 @@ public class CreateCaseEventService {
                                   final CaseLinkService caseLinkService,
                                   final ApplicationParams applicationParams,
                                   final CaseAccessGroupUtils caseAccessGroupUtils,
-                                  final CaseDocumentTimestampService caseDocumentTimestampService) {
+                                  final CaseDocumentTimestampService caseDocumentTimestampService,
+                                  final ConditionalFieldRestorer conditionalFieldRestorer) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -161,7 +170,7 @@ public class CreateCaseEventService {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-
+        this.conditionalFieldRestorer = conditionalFieldRestorer;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -431,12 +440,32 @@ public class CreateCaseEventService {
 
         return Optional.ofNullable(data)
             .map(nonNullData -> {
-                CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
-
                 final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseTypeDefinition, nonNullData);
                 final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
                     .orElse(emptyMap()));
-                caseData.putAll(sanitisedData);
+
+                ObjectMapper mapper = new ObjectMapper();
+                try {
+                    var logString = mapper.writeValueAsString(sanitisedData);
+                    log.info("sanitisedData data before merge: {}", logString);
+                } catch (JsonProcessingException e) {
+                    log.warn("Error while converting sanitisedData to string", e);
+                }
+
+                final Map<String, JsonNode> filteredData =
+                    conditionalFieldRestorer.restoreConditionalFields(caseTypeDefinition, sanitisedData, caseData,
+                        caseDetails.getReferenceAsString());
+
+                try {
+                    var logString = mapper.writeValueAsString(filteredData);
+                    log.info("filteredData data before merge: {}", logString);
+                } catch (JsonProcessingException e) {
+                    log.warn("Error while converting filteredData to string", e);
+                }
+
+                caseData.putAll(filteredData);
+
+                CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
                 clonedCaseDetails.setData(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
                     caseData));
 
