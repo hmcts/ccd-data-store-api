@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -67,6 +70,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
+@Slf4j
 @Service
 public class CreateCaseEventService {
 
@@ -442,9 +446,24 @@ public class CreateCaseEventService {
                 final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
                     .orElse(emptyMap()));
 
+                ObjectMapper mapper = new ObjectMapper();
+                try {
+                    var logString = mapper.writeValueAsString(sanitisedData);
+                    log.info("sanitisedData data before merge: {}", logString);
+                } catch (JsonProcessingException e) {
+                    log.warn("Error while converting sanitisedData to string", e);
+                }
+
                 final Map<String, JsonNode> filteredData =
                     conditionalFieldRestorer.restoreConditionalFields(caseTypeDefinition, sanitisedData, caseData,
                         caseDetails.getReferenceAsString());
+
+                try {
+                    var logString = mapper.writeValueAsString(filteredData);
+                    log.info("filteredData data before merge: {}", logString);
+                } catch (JsonProcessingException e) {
+                    log.warn("Error while converting filteredData to string", e);
+                }
 
                 caseData.putAll(filteredData);
                 clonedCaseDetails.setData(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,

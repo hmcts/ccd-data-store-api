@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -7,6 +9,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -61,6 +64,7 @@ import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 
+@Slf4j
 @RestController
 @RequestMapping(path = "/")
 @Validated
@@ -248,7 +252,17 @@ public class CaseController {
                                                         + "}"
                                                         + "\n```", required = true)
                                                     @RequestBody final CaseDataContent content) {
-        return createCaseEvent(caseId, content);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String contentString = objectMapper.writeValueAsString(content);
+            log.info("CaseController.createEvent: caseId={}, content={}", caseId, contentString);
+        } catch (JsonProcessingException e) {
+            log.warn("CaseController.createEvent: caseId={}, content=Failed to convert content to JSON", caseId);
+        }
+        var result = createCaseEvent(caseId, content);
+        log.info("CaseController.createEvent: caseId={}, result={}", caseId, result.getBody());
+
+        return result;
     }
 
     @ResponseStatus(code = HttpStatus.CREATED)
