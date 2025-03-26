@@ -440,8 +440,6 @@ public class CreateCaseEventService {
 
         return Optional.ofNullable(data)
             .map(nonNullData -> {
-                CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
-
                 final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseTypeDefinition, nonNullData);
                 final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
                     .orElse(emptyMap()));
@@ -466,6 +464,8 @@ public class CreateCaseEventService {
                 }
 
                 caseData.putAll(filteredData);
+
+                CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
                 clonedCaseDetails.setData(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
                     caseData));
 
