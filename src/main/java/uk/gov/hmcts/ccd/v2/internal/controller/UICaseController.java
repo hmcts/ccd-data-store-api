@@ -167,10 +167,7 @@ public class UICaseController {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
 
-        final CaseAccessMetadata caseaccessMetadata = caseDataAccessControl.generateAccessMetadata(caseId);
-        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
-        caseAccessMetadata.setAccessGrants(caseaccessMetadata.getAccessGrants());
-        caseAccessMetadata.setAccessProcess(caseaccessMetadata.getAccessProcess());
+        final CaseAccessMetadata caseAccessMetadata = caseDataAccessControl.generateAccessMetadata(caseId);
 
         return ResponseEntity.ok(caseAccessMetadata);
     }
