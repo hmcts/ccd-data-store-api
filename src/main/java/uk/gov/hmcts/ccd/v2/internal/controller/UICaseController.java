@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
@@ -34,16 +36,19 @@ public class UICaseController {
     private final GetCaseViewOperation getCaseViewOperation;
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
     private final UIDService caseReferenceService;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     @Autowired
     public UICaseController(
         @Qualifier(AuthorisedGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
         @Qualifier(AuthorisedGetCaseHistoryViewOperation.QUALIFIER) GetCaseHistoryViewOperation getCaseHistoryOperation,
-        UIDService caseReferenceService
+        UIDService caseReferenceService,
+        CaseDataAccessControl caseDataAccessControl
     ) {
         this.getCaseViewOperation = getCaseViewOperation;
         this.getCaseHistoryViewOperation = getCaseHistoryOperation;
         this.caseReferenceService = caseReferenceService;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     @GetMapping(
@@ -125,5 +130,45 @@ public class UICaseController {
         final CaseHistoryView caseHistoryView = getCaseHistoryViewOperation.execute(caseId, Long.valueOf(eventId));
 
         return ResponseEntity.ok(new CaseHistoryViewResource(caseHistoryView, caseId));
+    }
+
+    @GetMapping(
+        path = "/{caseId}/access-metadata",
+        headers = {
+            V2.EXPERIMENTAL_HEADER
+        },
+        produces = {
+            V2.MediaType.UI_CASE_ACCESS_METADATA
+        }
+    )
+    @ApiOperation(
+        value = "Retrieve access metadata for a given case ID",
+        notes = V2.EXPERIMENTAL_WARNING
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Success",
+            response = CaseAccessMetadata.class
+            ),
+        @ApiResponse(
+            code = 400,
+            message = ERROR_CASE_ID_INVALID
+            ),
+        @ApiResponse(
+            code = 404,
+            message = "Case not found"
+            )
+    })
+    @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
+        caseType = "#result.body.caseType.id")
+    public ResponseEntity<CaseAccessMetadata> getCaseAccessMetadata(@PathVariable("caseId") String caseId) {
+        if (!caseReferenceService.validateUID(caseId)) {
+            throw new BadRequestException(ERROR_CASE_ID_INVALID);
+        }
+
+        final CaseAccessMetadata caseAccessMetadata = caseDataAccessControl.generateAccessMetadata(caseId);
+
+        return ResponseEntity.ok(caseAccessMetadata);
     }
 }
