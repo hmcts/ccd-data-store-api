@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.startevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import java.util.function.BooleanSupplier;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,6 +34,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
@@ -124,17 +124,14 @@ public class DefaultStartEventOperation implements StartEventOperation {
                 !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition),
                 caseReference, eventId, caseDetails.getState());
 
-        Map<String, JsonNode> defaultValueData = caseService
-            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
-        if (!defaultValueData.isEmpty()) {
-            mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
-        }
+        mergeDefaultValueAndNullifyByDefault(caseEventDefinition, caseDetails, caseTypeDefinition);
 
         // update TTL in data
         Map<String, JsonNode> caseDataWithTtl = timeToLiveService.updateCaseDetailsWithTTL(
             caseDetails.getData(), caseEventDefinition, caseTypeDefinition
         );
         caseDetails.setData(caseDataWithTtl);
+
         // update TTL in data classification
         Map<String, JsonNode> caseDataClassificationWithTtl = timeToLiveService.updateCaseDataClassificationWithTTL(
             caseDetails.getData(), caseDetails.getDataClassification(), caseEventDefinition, caseTypeDefinition
@@ -149,10 +146,23 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, ignoreWarning);
 
-        timeToLiveService.verifyTTLContentNotChangedByCallback(caseDataWithTtl, caseDetails.getData());
-
         return buildStartEventTrigger(eventId, eventToken, caseDetails);
+    }
 
+    private void mergeDefaultValueAndNullifyByDefault(CaseEventDefinition caseEventDefinition,
+                                                      CaseDetails caseDetails,
+                                                      CaseTypeDefinition caseTypeDefinition) {
+        Map<String, JsonNode> defaultValueData = caseService
+            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
+        if (!defaultValueData.isEmpty()) {
+            mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
+        }
+
+        Map<String, JsonNode> nullifyByDefaultData = caseService
+            .buildJsonFromCaseFieldsWithNullifyByDefault(caseTypeDefinition, caseEventDefinition.getCaseFields());
+        if (!nullifyByDefaultData.isEmpty()) {
+            mergeDataAndClassificationForNewFields(nullifyByDefaultData, caseDetails, caseTypeDefinition);
+        }
     }
 
     @Transactional
@@ -180,11 +190,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                     final CaseDetails caseDetails) {
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
-        Map<String, JsonNode> defaultValueData = caseService
-            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
-        if (!defaultValueData.isEmpty()) {
-            mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
-        }
+        mergeDefaultValueAndNullifyByDefault(caseEventDefinition, caseDetails, caseTypeDefinition);
 
         validateEventTrigger(() ->
                 !eventTriggerService.isPreStateEmpty(caseEventDefinition),

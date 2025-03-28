@@ -5,10 +5,10 @@
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "body" : {
-      "id": "OVERRIDE",
+      "id":"[[ANYTHING_PRESENT]]",
 
-      "jurisdiction": "OVERRIDE",
-      "case_type": "OVERRIDE",
+      "jurisdiction": "[[ANYTHING_PRESENT]]",
+      "case_type": "[[ANYTHING_PRESENT]]",
 
       "state": "[[ANYTHING_PRESENT]]",
       "created_on": "[[ANYTHING_PRESENT]]",
@@ -16,8 +16,8 @@
       "last_state_modified_on": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
 
-      "data": "OVERRIDE",
-      "data_classification": "OVERRIDE",
+      "data": "[[ANYTHING_PRESENT]]",
+      "data_classification": "[[ANYTHING_PRESENT]]",
 
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
