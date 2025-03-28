@@ -161,6 +161,35 @@
           "pre_states": []
         },
         {
+          "id": "createDraft",
+          "name": "Create Draft",
+          "description": "Create Draft",
+          "acls": [
+            {
+              "role": "caseworker-probate-issuer",
+              "create": false,
+              "read": true,
+              "update": false,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": false,
+              "update": false,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-solicitor",
+              "create": false,
+              "read": true,
+              "update": false,
+              "delete": false
+            }
+          ],
+          "pre_states": []
+        },
+        {
           "id": "casePrinted",
           "name": "Mark the case as printed",
           "description": "Mark the case as printed",
