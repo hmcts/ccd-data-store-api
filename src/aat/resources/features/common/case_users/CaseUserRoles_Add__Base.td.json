@@ -1,0 +1,18 @@
+{
+  "_guid_": "CaseUserRoles_Add__Base",
+
+  "title": "Add Case-Assigned Users and Roles",
+
+	"productName": "CCD Data Store Api",
+	"operationName": "Add Case-Assigned Users and Roles",
+
+  "method": "POST",
+  "uri": "/case-users",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_users": []
+    }
+  }
+}
