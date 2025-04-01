@@ -712,7 +712,7 @@ class ConditionalFieldRestorerTest {
     }
 
     @Test
-    void shouldAddMissingValueSubFieldsToComplexTypeWhenCreateWithoutReadPermission() {
+    void shouldKeepNullValueSubFieldsToComplexTypeWhenCreateWithoutReadPermission() {
         final String newDataString = """
             {
                "caseCategory": {
@@ -730,20 +730,22 @@ class ConditionalFieldRestorerTest {
             }
             """;
 
-        String expectedMessage = "Adding missing field 'code' under 'value'.";
-
         Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedCaseCategoryComplexTypeArrayPayload,
             newDataString,
             caseCategoryFieldWithCreateWithoutReadPermission(),
-            Level.INFO, expectedMessage);
+            Level.INFO, "");
 
         assertAll(
             () -> assertTrue(result.containsKey("caseCategory")),
             () -> assertTrue(result.get("caseCategory").has("value")),
-            () -> assertTrue(result.get("caseCategory").get("value").has("code")),
-            () -> assertTrue(result.get("caseCategory").get("value").has("label")),
-            () -> assertEquals("Test", result.get("caseCategory").get("value").get("code").asText()),
-            () -> assertEquals("Test", result.get("caseCategory").get("value").get("label").asText())
+            () -> assertTrue(result.get("caseCategory").get("value").isNull()),
+            () -> assertTrue(result.get("caseCategory").has("list_items")),
+            () -> assertEquals(1, result.get("caseCategory").get("list_items").size()),
+            () -> assertEquals("123456", result.get("caseCategory").get("list_items").get(0).get("id").asText()),
+            () -> assertEquals("Test", result.get("caseCategory").get("list_items").get(0).get("value").get("label")
+                .asText()),
+            () -> assertEquals("Test", result.get("caseCategory").get("list_items").get(0).get("value").get("code")
+                .asText())
         );
     }
 
@@ -845,7 +847,7 @@ class ConditionalFieldRestorerTest {
     }
 
     @Test
-    void shouldDoNothingForNullValueWhenWithoutCreateAndReadPermission() {
+    void shouldKeepNullForNullValueWhenWithoutCreateAndReadPermission() {
         final String newDataString = """
             {
                "caseCategory": {
@@ -863,19 +865,17 @@ class ConditionalFieldRestorerTest {
             }
             """;
 
-        String expectedMessage = "Missing field 'label' under 'value'.";
-
         Map<String, JsonNode> result = assertFilterServiceAndLogging(nestedCaseCategoryComplexTypeArrayPayload,
             newDataString,
             caseCategoryFieldWithoutCreateAndReadPermission(),
-            Level.DEBUG, expectedMessage);
+            Level.DEBUG, "");
 
         assertAll(
             () -> assertTrue(result.containsKey("caseCategory")),
             () -> assertTrue(result.get("caseCategory").has("list_items")),
             () -> assertEquals(1, result.get("caseCategory").get("list_items").size()),
             () -> assertTrue(result.get("caseCategory").has("value")),
-            () -> assertTrue(result.get("caseCategory").get("value").asText().isEmpty())
+            () -> assertTrue(result.get("caseCategory").get("value").isNull())
         );
     }
 
@@ -1089,7 +1089,7 @@ class ConditionalFieldRestorerTest {
     }
 
     @Test
-    void shouldAddNullValueToCollectionTypeWhenWithCreateWithoutReadPermission() {
+    void shouldKeepNullValueToCollectionTypeWhenWithCreateWithoutReadPermission() {
         final String newDataString = """
             {
               "Note": {
@@ -1110,21 +1110,16 @@ class ConditionalFieldRestorerTest {
             }
             """;
 
-        String expectedMessage = "Adding missing field 'Category' under 'Tags'.";
-
         Map<String, JsonNode> result = assertFilterServiceAndLogging(complexTypeArrayPayload, newDataString,
             noteWithCreatePermissionWithoutReadPermission(),
-            Level.INFO, expectedMessage);
+            Level.INFO, "");
 
         assertAll(
             () -> assertTrue(result.containsKey("Note")),
             () -> assertTrue(result.get("Note").has("Tags")),
             () -> assertEquals(2, result.get("Note").get("Tags").size()),
             () -> assertTrue(result.get("Note").get("Tags").get(0).has("value")),
-            () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
-            () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
+            () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").isNull()),
             () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Tag")),
@@ -1559,7 +1554,7 @@ class ConditionalFieldRestorerTest {
     }
 
     @Test
-    void shouldDoNothingWhenValueIsNullWithoutCreateWithoutReadPermission() {
+    void shouldKeepNullWhenValueIsNullWithoutCreateWithoutReadPermission() {
         final String newDataString = """
             {
               "Note": {
@@ -1580,18 +1575,16 @@ class ConditionalFieldRestorerTest {
             }
             """;
 
-        String expectedMessage = "Missing field 'Tag' under 'Tags'.";
-
         Map<String, JsonNode> result = assertFilterServiceAndLogging(complexTypeArrayPayload, newDataString,
             noteWithoutCreateAndReadPermission(),
-            Level.DEBUG, expectedMessage);
+            Level.DEBUG, "");
 
         assertAll(
             () -> assertTrue(result.containsKey("Note")),
             () -> assertTrue(result.get("Note").has("Tags")),
             () -> assertEquals(2, result.get("Note").get("Tags").size()),
             () -> assertTrue(result.get("Note").get("Tags").get(0).has("value")),
-            () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").isEmpty()),
+            () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").isNull()),
             () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertEquals("public",
@@ -2078,7 +2071,7 @@ class ConditionalFieldRestorerTest {
                     ]
                 }
                 """,
-                "Adding missing field 'Tag' under 'Tags'."
+                ""
             ),
             new TestCase(
                 """
@@ -2121,13 +2114,19 @@ class ConditionalFieldRestorerTest {
             () -> assertEquals(2, result.get("Tags").size()),
             () -> assertTrue(result.get("Tags").get(0).has("id")),
             () -> assertEquals("123", result.get("Tags").get(0).get("id").asText()),
-            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText()),
             () -> assertTrue(result.get("Tags").get(1).has("value")),
             () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
             () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
             () -> assertEquals("456", result.get("Tags").get(1).get("id").asText())
         );
+
+        if (testCase.expectedMessage.isEmpty()) {
+            assertTrue(result.get("Tags").get(0).has("value"));
+            assertTrue(result.get("Tags").get(0).get("value").isNull());
+        } else {
+            assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText());
+            assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText());
+        }
     }
 
     private record TestCase(String inputJson, String expectedMessage) {
@@ -2348,7 +2347,7 @@ class ConditionalFieldRestorerTest {
     }
 
     @Test
-    void shouldDoNothingWhenCollectionTypeValueIsNullWithoutCreateWithoutReadPermission() {
+    void shouldKeepNullWhenCollectionTypeValueIsNullWithoutCreateWithoutReadPermission() {
         final String newDataString = """
              {
                 "Tags": [
@@ -2367,15 +2366,13 @@ class ConditionalFieldRestorerTest {
             }
             """;
 
-        String expectedMessage = "Missing field 'Tag' under 'Tags'.";
-
         Map<String, JsonNode> result = assertFilterServiceAndLogging(arrayPayload, newDataString,
-            tagWithoutCreateAndReadPermission(), Level.DEBUG, expectedMessage);
+            tagWithoutCreateAndReadPermission(), Level.DEBUG, "");
 
         assertAll(
             () -> assertTrue(result.containsKey("Tags")),
             () -> assertEquals(2, result.get("Tags").size()),
-            () -> assertTrue(result.get("Tags").get(0).get("value").isEmpty()),
+            () -> assertTrue(result.get("Tags").get(0).get("value").isNull()),
             () -> assertTrue(result.get("Tags").get(0).has("id")),
             () -> assertEquals("123", result.get("Tags").get(0).get("id").asText()),
             () -> assertTrue(result.get("Tags").get(1).has("value")),
@@ -2938,7 +2935,7 @@ class ConditionalFieldRestorerTest {
     }
 
     @Test
-    void shouldAddMissingSubFieldsOfNullComplexFieldInInnerComplexNestedObjectWithCreateAndWithoutReadPermission() {
+    void shouldKeepNullSubFieldsOfNullComplexFieldInInnerComplexNestedObjectWithCreateAndWithoutReadPermission() {
         final String newDataString = """
              {
                "Note": {
@@ -2964,10 +2961,8 @@ class ConditionalFieldRestorerTest {
              }
             """;
 
-        String expectedMessage = "Adding missing field 'noteID' under 'additionalInfo'.";
-
         Map<String, JsonNode> result = assertFilterServiceAndLogging(complexTypePayload, newDataString,
-            noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
+            noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, "");
 
         assertAll(
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
@@ -2977,12 +2972,8 @@ class ConditionalFieldRestorerTest {
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
-            () -> assertEquals("abc123",
-                result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
-            () -> assertEquals("Meeting",
-                result.get("Note").get("content").get("additionalInfo").get("category").asText()),
-            () -> assertEquals("project, timeline, deliverable",
-                result.get("Note").get("content").get("additionalInfo").get("tags").asText()),
+            () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
+            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").isNull()),
             () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
             () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
@@ -3098,7 +3089,7 @@ class ConditionalFieldRestorerTest {
     }
 
     @Test
-    void shouldAddNullParentComplexFieldWithCreateAndWithoutReadPermission() {
+    void shouldKeepNullParentComplexFieldWithCreateAndWithoutReadPermission() {
         final String newDataString = """
               {
                   "Note": {
@@ -3120,10 +3111,8 @@ class ConditionalFieldRestorerTest {
                 }
             """;
 
-        String expectedMessage = "Adding missing field 'additionalInfo' under 'content'.";
-
         Map<String, JsonNode> result = assertFilterServiceAndLogging(complexTypePayload, newDataString,
-            noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
+            noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, "");
 
         assertAll(
             () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
@@ -3137,16 +3126,8 @@ class ConditionalFieldRestorerTest {
             () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
             () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
             () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText()),
-            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
-            () -> assertEquals("Discussion about project timelines and deliverables.",
-                result.get("Note").get("content").get("body").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("noteID")),
-            () -> assertEquals("abc123",
-                result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
-            () -> assertEquals("Meeting",
-                result.get("Note").get("content").get("additionalInfo").get("category").asText()),
-            () -> assertEquals("project, timeline, deliverable",
-                result.get("Note").get("content").get("additionalInfo").get("tags").asText())
+            () -> assertTrue(result.get("Note").has("content")),
+            () -> assertTrue(result.get("Note").get("content").isNull())
         );
     }
 
@@ -3446,7 +3427,7 @@ class ConditionalFieldRestorerTest {
     }
 
     @Test
-    void shouldDoNothingWhenComplexFieldIsNullInInnerComplexNestedObjectWithoutCreateAndReadPermission() {
+    void shouldKeepNullWhenComplexFieldIsNullInInnerComplexNestedObjectWithoutCreateAndReadPermission() {
         final String newDataString = """
              {
                "Note": {
@@ -3472,10 +3453,8 @@ class ConditionalFieldRestorerTest {
              }
             """;
 
-        String expectedMessage = "Missing field 'category' under 'additionalInfo'.";
-
         Map<String, JsonNode> result = assertFilterServiceAndLogging(complexTypePayload, newDataString,
-            noteWithNestedFieldsWithoutCreateAndReadPermission(), Level.DEBUG, expectedMessage);
+            noteWithNestedFieldsWithoutCreateAndReadPermission(), Level.DEBUG, "");
 
         assertAll(
             () -> assertTrue(result.get("Note").has("type")),
@@ -3487,7 +3466,8 @@ class ConditionalFieldRestorerTest {
             () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
             () -> assertEquals("Discussion about project timelines and deliverables.",
                 result.get("Note").get("content").get("body").asText()),
-            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").isObject()),
+            () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
+            () -> assertTrue(result.get("Note").get("content").get("additionalInfo").isNull()),
             () -> assertTrue(result.get("Note").has("location")),
             () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
             () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
@@ -3549,7 +3529,7 @@ class ConditionalFieldRestorerTest {
     }
 
     @Test
-    void shouldDoNothingWhenParentComplexFieldIsNullInObjectWithoutCreateAndReadPermission() {
+    void shouldKeepNullWhenParentComplexFieldIsNullInObjectWithoutCreateAndReadPermission() {
         final String newDataString = """
               {
                   "Note": {
@@ -3571,10 +3551,8 @@ class ConditionalFieldRestorerTest {
                 }
             """;
 
-        String expectedMessage = "Missing field 'additionalInfo' under 'content'.";
-
         Map<String, JsonNode> result = assertFilterServiceAndLogging(complexTypePayload, newDataString,
-            noteWithNestedFieldsWithoutCreateAndReadPermission(), Level.DEBUG, expectedMessage);
+            noteWithNestedFieldsWithoutCreateAndReadPermission(), Level.DEBUG, "");
 
         assertAll(
             () -> assertTrue(result.get("Note").has("type")),
@@ -3585,6 +3563,7 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
             () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
             () -> assertTrue(result.get("Note").has("content")),
+            () -> assertTrue(result.get("Note").get("content").isNull()),
             () -> assertTrue(result.get("Note").has("location")),
             () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("123 Main Street",
@@ -3603,7 +3582,7 @@ class ConditionalFieldRestorerTest {
     }
 
     @Test
-    void shouldDoNothingNullOfRootNoteFieldInComplexNestedObjectWithoutDeletePermission() {
+    void shouldKeepNullOfRootNoteFieldInComplexNestedObjectWithoutDeletePermission() {
         final String newDataString = """
               {
                 "Note": null
@@ -3623,8 +3602,8 @@ class ConditionalFieldRestorerTest {
 
         assertAll(
             () -> assertFalse(result.isEmpty()),
-            () -> assertTrue(result.get("Note").isObject()),
-            () -> assertEquals(4, listAppender.list.size())
+            () -> assertTrue(result.get("Note").isNull()),
+            () -> assertEquals(0, listAppender.list.size())
         );
     }
 
@@ -3960,12 +3939,16 @@ class ConditionalFieldRestorerTest {
             "123");
 
         loggingEventList = listAppender.list;
+        if (!expectedLogMessage.isEmpty()) {
 
-        assertAll(
-            () -> assertTrue(loggingEventList.stream().anyMatch(log -> log.getLevel() == expectedLogLevel
-                    && log.getFormattedMessage().equals(expectedLogMessage)),
-                "Expected log message not found: " + expectedLogMessage)
-        );
+            assertAll(
+                () -> assertTrue(loggingEventList.stream().anyMatch(log -> log.getLevel() == expectedLogLevel
+                        && log.getFormattedMessage().equals(expectedLogMessage)),
+                    "Expected log message not found: " + expectedLogMessage)
+            );
+        } else {
+            assertEquals(0, loggingEventList.size());
+        }
 
         return result;
     }

@@ -95,7 +95,9 @@ public class ConditionalFieldRestorer {
                                                  JsonNode sanitizedNode,
                                                  JsonNode existingNode,
                                                  Set<String> accessProfileNames) {
-        if (existingNode == null) {
+        // Preserve explicit null assignments: If a field is set to null, keep it as null
+        // instead of treating it as missing and potentially restoring the existing value.
+        if (existingNode == null || isNullNode(sanitizedNode)) {
             return sanitizedNode;
         }
 
@@ -248,6 +250,10 @@ public class ConditionalFieldRestorer {
         return newItem.get(ID) == null
             || newItem.get(ID).equals(NullNode.getInstance())
             || "null".equalsIgnoreCase(newItem.get(ID).asText());
+    }
+
+    private boolean isNullNode(JsonNode node) {
+        return node != null && node.isNull();
     }
 
     private boolean isCreateWithoutReadAllowed(List<AccessControlList> fieldAccessControlLists,
