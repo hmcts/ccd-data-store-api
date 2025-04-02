@@ -12,6 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -110,7 +111,7 @@ class DefaultUserRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         initSecurityContext();
 
@@ -258,12 +259,12 @@ class DefaultUserRepositoryTest {
         });
     }
 
-    private HttpClientErrorException createErrorResponse(HttpStatus status, String message) {
+    private HttpClientErrorException createErrorResponse(HttpStatusCode status, String message) {
         HttpClientErrorException response = mock(HttpClientErrorException.class);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Message", message);
         when(response.getResponseHeaders()).thenReturn(headers);
-        when(response.getRawStatusCode()).thenReturn(status.value());
+        when(response.getStatusCode()).thenReturn(status);
         return response;
     }
 

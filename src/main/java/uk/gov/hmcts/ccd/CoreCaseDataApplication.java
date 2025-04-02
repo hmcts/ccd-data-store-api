@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
@@ -13,7 +14,13 @@ import java.time.Clock;
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableRetry
-@ComponentScan({ "uk.gov.hmcts.ccd" })
+@ComponentScan({ 
+    "uk.gov.hmcts.ccd"
+})
+@EnableFeignClients(basePackages = {
+    "uk.gov.hmcts.reform.idam",
+    "uk.gov.hmcts.reform.ccd.document.am.feign"
+})
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 public class CoreCaseDataApplication {
 
