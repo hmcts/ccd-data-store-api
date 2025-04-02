@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
@@ -58,25 +59,25 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
 
         final RequestEntity<String>
             request =
-            new RequestEntity<>(PUT, URI.create("http://localhost:" + wiremockPort + URL));
+            new RequestEntity<>(PUT, URI.create(hostUrl + URL));
 
         final ResponseEntity<JsonNode> response = restTemplate.exchange(request, JsonNode.class);
         assertResponse(response);
     }
 
-    @Test(expected = ResourceAccessException.class)
+    @Test
     public void shouldTimeOut() {
         assertNotNull(restTemplate);
         stubFor(get(urlEqualTo(URL)).willReturn(aResponse().withStatus(SC_OK).withFixedDelay(2000)));
 
         final RequestEntity<String>
             request =
-            new RequestEntity<>(GET, URI.create("http://localhost:" + wiremockPort + URL));
+            new RequestEntity<>(GET, URI.create(hostUrl + URL));
 
-        restTemplate.exchange(request, String.class);
+        assertThrows(ResourceAccessException.class, () -> restTemplate.exchange(request, String.class));
     }
 
-    @Ignore("for local dev only")
+    @Disabled("for local dev only")
     @Test
     public void shouldBeAbleToUseMultipleTimes() throws Exception {
         stubResponse();
@@ -88,7 +89,7 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
             futures.add(executorService.submit(() -> {
                 final RequestEntity<String>
                     request =
-                    new RequestEntity<>(PUT, URI.create("http://localhost:" + wiremockPort + URL));
+                    new RequestEntity<>(PUT, URI.create(hostUrl + URL));
                 final ResponseEntity<JsonNode> response = restTemplate.exchange(request, JsonNode.class);
                 assertResponse(response);
                 return response.getStatusCode().value();

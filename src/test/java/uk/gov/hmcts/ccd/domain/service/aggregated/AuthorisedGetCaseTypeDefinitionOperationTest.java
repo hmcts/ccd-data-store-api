@@ -264,7 +264,7 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
 
         Set<AccessProfile> accessProfiles = createAccessProfiles(USER_ROLES);
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(accessProfiles);;
+            .thenReturn(accessProfiles);
 
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1,
             accessProfiles,

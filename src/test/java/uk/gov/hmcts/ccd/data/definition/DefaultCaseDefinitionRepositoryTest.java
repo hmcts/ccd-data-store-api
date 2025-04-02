@@ -21,9 +21,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpHeaders;
@@ -31,7 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-@Ignore("for now")
+@Disabled("for now")
 public class DefaultCaseDefinitionRepositoryTest {
     private static final String JURISDICTION_ID = "Some Jurisdiction";
 
@@ -49,7 +50,7 @@ public class DefaultCaseDefinitionRepositoryTest {
 
     private CaseDefinitionRepository caseDefinitionRepository;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
@@ -58,11 +59,13 @@ public class DefaultCaseDefinitionRepositoryTest {
         caseDefinitionRepository = new DefaultCaseDefinitionRepository(applicationParams, definitionStoreClient);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test
     public void shouldThrowResourceNotFoundExceptionWhenGetCaseTypesForJurisdictionIsCalledAndResourceIsNotFound() {
         HttpClientErrorException exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(exception).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
-        caseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
+        assertThrows(ResourceNotFoundException.class, () ->  
+            caseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID)
+        );
     }
 
     @Test
@@ -88,11 +91,11 @@ public class DefaultCaseDefinitionRepositoryTest {
     }
 
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test
     public void shouldThrowResourceNotFoundExceptionWhenGetBaseTypesIsCalledAndResourceIsNotFound() {
         HttpClientErrorException exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(exception).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
-        caseDefinitionRepository.getBaseTypes();
+        Assert.assertThrows(ResourceNotFoundException.class, () ->  caseDefinitionRepository.getBaseTypes());
     }
 
     @Test
@@ -117,12 +120,11 @@ public class DefaultCaseDefinitionRepositoryTest {
             + " because of"));
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test
     public void shouldReturnFieldTypeListWhenGetBaseTypesIsCalled() {
         FieldTypeDefinition[] fieldTypeDefinitionArr = {new FieldTypeDefinition(), new FieldTypeDefinition()};
         doReturn(fieldTypeDefinitionArr).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
-        List<FieldTypeDefinition> fieldTypeDefinitions = caseDefinitionRepository.getBaseTypes();
-        assertEquals(2, fieldTypeDefinitions.size());
+        Assert.assertThrows(ResourceNotFoundException.class, () ->  caseDefinitionRepository.getBaseTypes());
     }
 
     @Test

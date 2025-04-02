@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.FixMethodOrder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runners.MethodSorters;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
@@ -48,13 +48,13 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     private final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         // IDAM
         callbackResponse = aCallbackResponse().build();
         caseDetails = newCaseDetails().build();
 
-        String testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
+        String testUrl = hostUrl + "/test-callbackGrrrr";
         caseEventDefinition.setCallBackURLAboutToStartEvent(testUrl);
         caseEventDefinition.setName("Test");
         wireMockServer.resetAll();

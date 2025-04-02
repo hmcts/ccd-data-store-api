@@ -18,8 +18,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 public class CollectionSanitiserTest {
@@ -48,7 +48,7 @@ public class CollectionSanitiserTest {
 
     private CollectionSanitiser collectionSanitiser;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         type1Sanitiser = mock(Sanitiser.class);

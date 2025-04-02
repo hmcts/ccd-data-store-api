@@ -7,17 +7,17 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -159,12 +159,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     private JdbcTemplate template;
 
-    @SpyBean
+    @MockitoSpyBean
     private AuditRepository auditRepository;
 
     private static final String REFERENCE_2 = "1504259907353545";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
@@ -394,7 +394,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  },\n" +
                 "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
                 "  \"D8Document\":{" +
-                "    \"document_url\": \"http://localhost:" + getPort()
+                "    \"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
                 + "  \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}" +
@@ -410,7 +410,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  },\n" +
                 "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
                 "  \"D8Document\":{\n" +
-                "    \"document_url\": \"http://localhost:" + getPort()
+                "    \"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
                 "    \"document_binary_url\": \"http://localhost:[port]/documents/"
                 + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
@@ -897,7 +897,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort()
+                + "\"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
                 + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}"
@@ -912,7 +912,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "  \"D8Document\":{\n"
-                + "    \"document_url\": \"http://localhost:" + getPort()
+                + "    \"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
                 + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
                 + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
@@ -1017,10 +1017,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         GlobalSearchTestFixture.assertGlobalSearchData(actualData.getData());
     }
 
-    private int getPort() {
-        return super.wiremockPort;
-    }
-
     @Test
     public void shouldReturn422WhenPostCreateCaseWithMissingDocumentBinaryLinkForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
@@ -1033,7 +1029,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort()
+                + "\"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\",\n"
                 + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}"
@@ -1072,7 +1068,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort()
+                + "\"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\",\n"
                 + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}"
@@ -4236,7 +4232,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"," +
             "\"D8Document\":{" +
-            "    \"document_url\": \"http://localhost:" + getPort()
+            "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
             "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
             + "/binary\","
@@ -5273,7 +5269,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"PersonLastName\":\"_ Roof\","
             + "\"PersonFirstName\":\"_ George\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort()
+            + "\"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "}"
@@ -5291,7 +5287,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"PersonLastName\":\"_ Roof\","
             + "\"PersonFirstName\":\"_ George\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort()
+            + "\"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "}"
@@ -5621,7 +5617,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "      \"PersonFirstName\" : \"_ George\",\n"
             + "      \"TelephoneNumber\" : \"_ 07865645667\",\n"
             + "      \"D8Document\" : {\n"
-            + "        \"document_url\" : \"http://localhost:" + this.getPort()
+            + "        \"document_url\" : \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "        \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "      }\n"
@@ -5645,7 +5641,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null,"
             + "\"last_state_modified_date\":null,\"security_classification\":null,"
             + "\"case_data\":{\"PersonLastName\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
-            + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort()
+            + "\"D8Document\":{\"document_url\":\"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\"}},"
             + "\"data_classification\":null,\"supplementary_data\":null,\"after_submit_callback_response\":null,"
@@ -5684,7 +5680,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .withOrder(pageOrder)
             .withField(caseViewField1)
             .withField(caseViewField2)
-            .withCallBackURLMidEvent("http://localhost:" + getPort() + eventCallBackURI)
+            .withCallBackURLMidEvent(hostUrl + eventCallBackURI)
             .build();
     }
 
@@ -5729,7 +5725,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseNumber\":\"_ 1234567\","
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5745,7 +5741,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseField41\":\"_ Test987\","
             + "\"CaseField42\":\"_ Test567\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5755,7 +5751,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"PersonLastName\":\"Roof\","
             + "\"PersonFirstName\":\"George\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5767,7 +5763,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseNumber\":\"_ 1234567\","
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5779,7 +5775,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseNumber\":\"_ 1234567\","
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "},"
             + "\"TTL\":{"
             + "\"Suspended\": \"No\","

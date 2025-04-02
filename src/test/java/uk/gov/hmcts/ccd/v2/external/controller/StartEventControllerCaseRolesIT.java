@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -62,7 +62,7 @@ public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
     public StartEventControllerCaseRolesIT() throws IOException {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
 
         CALLBACK_DATA = mapper.readTree(CALLBACK_DATA_JSON_STRING);

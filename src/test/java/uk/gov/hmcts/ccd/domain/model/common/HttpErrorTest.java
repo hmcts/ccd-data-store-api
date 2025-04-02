@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.common;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriUtils;
@@ -26,7 +26,7 @@ public class HttpErrorTest {
 
     private HttpServletRequest request;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         request = mock(HttpServletRequest.class);
         doReturn(PATH).when(request).getRequestURI();

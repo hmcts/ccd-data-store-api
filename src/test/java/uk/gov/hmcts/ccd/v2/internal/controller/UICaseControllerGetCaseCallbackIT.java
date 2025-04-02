@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -49,7 +49,7 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
 
     HttpHeaders headers = new HttpHeaders();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         MockUtils.setSecurityAuthorities(RandomStringUtils.randomAlphanumeric(10), authentication,
             MockUtils.ROLE_CASEWORKER_PUBLIC);

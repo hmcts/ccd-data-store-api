@@ -2,9 +2,9 @@ package uk.gov.hmcts.ccd.endpoint.ui;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -167,7 +167,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     private JdbcTemplate template;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
@@ -677,7 +677,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Ignore // this should default to Search view,
+    @Disabled // this should default to Search view,
     public void missingViewParam() throws Exception {
         mockMvc.perform(get(GET_CASES)
                             .contentType(JSON_CONTENT_TYPE)

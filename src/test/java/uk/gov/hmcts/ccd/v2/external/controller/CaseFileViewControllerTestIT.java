@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -74,7 +76,7 @@ class CaseFileViewControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
-                .header(CUSTOM_CONTEXT, responseJson1.toString())
+                .header(CUSTOM_CONTEXT, new JSONObject(responseJson1).toString())
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);

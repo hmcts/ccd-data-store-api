@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.data.user;
 
 import com.google.common.collect.Lists;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper;
@@ -46,7 +46,7 @@ public class UserServiceTest {
     private JurisdictionDefinition unknownJurisdictionDefinition;
     private uk.gov.hmcts.ccd.data.user.UserService userService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
         userService = new uk.gov.hmcts.ccd.data.user.UserService(userRepoMock, caseDefinitionRepoMock,

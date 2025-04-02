@@ -7,7 +7,6 @@ import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import org.apache.http.HttpHeaders;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +28,14 @@ public abstract class WireMockBaseContractTest {
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;
 
+    public String hostUrl;
+
     @Inject
     protected ApplicationParams applicationParams;
 
-    @Before
     @BeforeEach
     public void initMock() throws IOException {
-        final String hostUrl = "http://localhost:" + wiremockPort;
+        hostUrl = "http://localhost:" + wiremockPort;
 
         LOG.info("Wire mock test, host url is {}", hostUrl);
 

@@ -5,8 +5,8 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import java.util.Arrays;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
@@ -55,7 +55,7 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
 
     private JdbcTemplate template;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         if (applicationParams.getEnableAttributeBasedAccessControl()) {

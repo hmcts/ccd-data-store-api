@@ -8,8 +8,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.hamcrest.MatcherAssert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.TestFixtures;
@@ -52,7 +52,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     @Mock
     private TextCaseReferenceCaseLinkValidator textCaseReferenceCaseLinkValidator;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws IOException {
         caseFields = TestFixtures.getCaseFieldsFromJson(CASE_FIELD_JSON);
         dynamicCaseFields = TestFixtures.getCaseFieldsFromJson(CASE_FIELD_DYNAMIC_JSON);

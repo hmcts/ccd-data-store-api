@@ -5,14 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xebialabs.restito.semantics.Action;
-import com.xebialabs.restito.support.junit.NeedsServer;
+import com.xebialabs.restito.server.StubServer;
 import org.glassfish.grizzly.http.Method;
 import org.glassfish.grizzly.http.util.HttpStatus;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -44,9 +44,10 @@ import static com.xebialabs.restito.semantics.Condition.withHeader;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DocumentManagementRestClientTest extends StubServerDependent {
 
     private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
@@ -86,8 +87,9 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         DOCUMENT_VALUE_SANITISED.put("document_filename", FILENAME);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
+        server = new StubServer().run();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", BEARER_TEST_JWT);
         headers.add("ServiceAuthorization", SERVICE_JWT);
@@ -110,7 +112,6 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
     }
 
     @Test
-    @NeedsServer
     public void shouldGetDocument() throws Exception {
         // Document retrieval needs to work, regardless of the Content-Type header sent in Document Management's
         // response (it's different from the expected type of "application/json"). Therefore, the test mimics the server
@@ -134,8 +135,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
                 withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
     }
 
-    @Test(expected = ApiException.class)
-    @NeedsServer
+    @Test
     public void shouldFailToSanitizeIfUnauthorized() throws Exception {
 
         whenHttp(server)
@@ -145,12 +145,10 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
                 withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE))
             .then(unauthorized());
 
-        subject.getDocument(DOCUMENT_FIELD_TYPE, formatURL(DOCUMENT_URL));
-
+        assertThrows(ApiException.class, () -> subject.getDocument(DOCUMENT_FIELD_TYPE, formatURL(DOCUMENT_URL)));
     }
 
-    @Test(expected = ApiException.class)
-    @NeedsServer
+    @Test
     public void shouldFailToSanitizeIfServiceUnavailable() throws Exception {
 
         whenHttp(server)
@@ -163,11 +161,10 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
                 return r;
             });
 
-        subject.getDocument(DOCUMENT_FIELD_TYPE, formatURL(DOCUMENT_URL));
+        assertThrows(ApiException.class, () -> subject.getDocument(DOCUMENT_FIELD_TYPE, formatURL(DOCUMENT_URL)));
     }
 
-    @Test(expected = ApiException.class)
-    @NeedsServer
+    @Test
     public void shouldFailToSanitizeIfBadGateway() throws Exception {
 
         whenHttp(server)
@@ -180,11 +177,10 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
                 return r;
             });
 
-        subject.getDocument(DOCUMENT_FIELD_TYPE, formatURL(DOCUMENT_URL));
+        assertThrows(ApiException.class, () -> subject.getDocument(DOCUMENT_FIELD_TYPE, formatURL(DOCUMENT_URL)));
     }
 
-    @Test(expected = ApiException.class)
-    @NeedsServer
+    @Test
     public void shouldFailToSanitizeIfInternalServerError() throws Exception {
 
         whenHttp(server)
@@ -196,8 +192,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
                 r.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
                 return r;
             });
-
-        subject.getDocument(DOCUMENT_FIELD_TYPE, formatURL(DOCUMENT_URL));
+        assertThrows(ApiException.class, () -> subject.getDocument(DOCUMENT_FIELD_TYPE, formatURL(DOCUMENT_URL)));
     }
 
 

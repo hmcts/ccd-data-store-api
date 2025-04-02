@@ -7,13 +7,13 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.sonarqube' version '6.0.1.5171'
-    id("com.github.kt3k.coveralls") version "2.12.2"
+    id 'com.github.kt3k.coveralls' version '2.12.2'
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
-    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.9"
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1.9'
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'uk.gov.hmcts.java' version '0.12.63'
     id 'au.com.dius.pact' version '4.6.16'
-    id 'org.jsonschema2pojo' version "1.2.2"
+    id 'org.jsonschema2pojo' version '1.2.2'
     id 'org.owasp.dependencycheck' version '11.1.1'
 }
 
@@ -24,16 +24,18 @@ ext {
     set('spring-framework.version', '6.2.1')
     set('spring-security.version', '6.4.2')
     set('log4j2.version', '2.24.3')
-    set('jackson.version', '2.18.2')
-    set('snakeyaml.version', '2.3')
-    junitJupiterVersion = '5.11.4'
-    junitVintageVersion = '5.11.4'
+    set('jackson.version', '2.17.0')
+    set('snakeyaml.version', '2.2')
+    junit = '5.11.4'
+    junitPlatform = '1.11.4'
     appInsightsVersion = '2.6.4'
     pactProviderVersion = '4.6.16'
     lombokVersion = '1.18.36'
     lombokBindingVersion = '0.2.0'
+    mockito = '5.15.2'
     elasticVersion = '8.16.2'
     testContainersVersion = '1.20.4'
+    cucumber = '6.6.1'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -119,6 +121,7 @@ bootJar {
 configurations {
     providedRuntime
     annotationProcessor
+    mockitoAgent
 
     aatImplementation.extendsFrom(testImplementation)
     aatRuntimeOnly.extendsFrom(testRuntimeOnly)
@@ -127,6 +130,7 @@ configurations {
     contractTestRuntimeOnly.extendsFrom(testRuntimeOnly)
     contractTestAnnotationProcessor.extendsFrom(annotationProcessor)
     cucumberRuntime.extendsFrom(functionalRuntime)
+    cucumberImplementation.extendsFrom(functionalImplementation)
 
     all.collect { configuration ->
         configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
@@ -147,6 +151,17 @@ tasks.withType(Test) {
         exceptionFormat = 'full'
     }
 }
+
+ext.libraries = [
+  junit5: [
+    "org.junit.jupiter:junit-jupiter-api:${junit}",
+    "org.junit.jupiter:junit-jupiter-engine:${junit}",
+    "org.junit.jupiter:junit-jupiter-params:${junit}",
+    "org.junit.platform:junit-platform-commons:${junitPlatform}",
+    "org.junit.platform:junit-platform-engine:${junitPlatform}",
+    "org.apiguardian:apiguardian-api:1.1.2"
+  ]
+]
 
 dependencies {
 
@@ -176,18 +191,9 @@ dependencies {
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.0'             // ccd-test-definitions
     testImplementation group: 'org.json', name: 'json', version: '20250107'                         // ccd-test-definitions
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.2'                // spring-cloud-starter-contract-stub-runner
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.15.2'                // spring-cloud-starter-contract-stub-runner
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.15.2'       // spring-boot-starter-test
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: mockito                 // spring-cloud-starter-contract-stub-runner
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: mockito        // spring-boot-starter-test
     
-
-    configurations.all {
-        exclude group: 'com.vaadin.external.google', module: 'android-json'
-
-        // Group versions
-        resolutionStrategy.eachDependency {
-            // if (requested.group == 'org.apache.lucene') useVersion '10.1.0'
-        }
-    }
     // end::CVE Vulnerability dependency overrides
 
     // Lombok
@@ -251,29 +257,33 @@ dependencies {
     runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.5.6'
 
     // TEST DEPENDENCIES
+    testImplementation libraries.junit5
+    testImplementation libs.mockito
+    mockitoAgent(libs.mockito) {
+        transitive = false;
+    }
     testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.0'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.3'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
-    testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: junitVintageVersion
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.1.4'
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testContainersVersion
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: testContainersVersion
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: testContainersVersion
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: testContainersVersion
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0' // for sonar analysis
-    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version:  '7.25.0'
+    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version:  '7.24.2'
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.1'
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.6'
 
-    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: pactProviderVersion, {
-        exclude group: 'org.codehaus.groovy', module: 'groovy'
-    }
+    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: pactProviderVersion
     contractTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     aatAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+
+    cucumberRuntime group: 'io.cucumber', name: 'cucumber-java', version: cucumber
+    cucumberRuntime group: 'io.cucumber', name: 'cucumber-junit', version: cucumber
+    cucumberRuntime group: 'io.cucumber', name: 'cucumber-junit-platform-engine', version: cucumber
 }
 // end::dependencies[]
 
@@ -628,9 +638,11 @@ test {
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false
-    systemProperty 'java.locale.providers', 'COMPAT'
+    systemProperty 'java.locale.providers', 'CLDR'
 
     useJUnitPlatform()
+
+    jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 
     testLogging {
         // set options for log level LIFECYCLE

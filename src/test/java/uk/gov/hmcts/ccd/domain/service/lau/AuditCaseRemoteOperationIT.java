@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -117,7 +117,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private static final ZonedDateTime LOG_TIMESTAMP =
         ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
 
@@ -129,7 +129,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             auditCaseRemoteConfiguration, auditCaseRemoteOperation);
     }
 
-    @After
+    @AfterEach
     public void after() throws IOException {
         WireMock.reset();
     }
@@ -212,7 +212,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
     }
 
-    @Test(expected = Test.None.class)
+    @Test
     public void shouldNotThrowExceptionInAuditServiceIfLauIsDown()
         throws JsonProcessingException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()

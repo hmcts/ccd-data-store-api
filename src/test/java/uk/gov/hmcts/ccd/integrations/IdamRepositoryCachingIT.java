@@ -1,20 +1,18 @@
 package uk.gov.hmcts.ccd.integrations;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.context.junit4.SpringRunner;
+
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
@@ -27,11 +25,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureWireMock(port = 0)
-@TestPropertySource(locations = "classpath:test.properties")
-public class IdamRepositoryCachingIT {
+@DirtiesContext
+public class IdamRepositoryCachingIT extends WireMockBaseTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(IdamRepositoryCachingIT.class);
 
@@ -54,7 +49,7 @@ public class IdamRepositoryCachingIT {
 
     private AutoCloseable autoCloseable;
 
-    @Before
+    @BeforeEach
     public void openMocks() {
         autoCloseable = MockitoAnnotations.openMocks(this);
     }
@@ -116,7 +111,7 @@ public class IdamRepositoryCachingIT {
         assertEquals("Unexpected Access Token value", expectedAccessToken, actualAccessToken);
     }
 
-    @After
+    @AfterEach
     public void releaseMocks() throws Exception {
         autoCloseable.close();
     }

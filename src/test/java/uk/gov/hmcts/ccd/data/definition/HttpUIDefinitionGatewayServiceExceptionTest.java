@@ -1,14 +1,15 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import jakarta.inject.Inject;
 import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HttpUIDefinitionGatewayServiceExceptionTest extends WireMockBaseTest {
 
@@ -17,35 +18,44 @@ public class HttpUIDefinitionGatewayServiceExceptionTest extends WireMockBaseTes
     @Inject
     private HttpUIDefinitionGateway httpUIDefinitionGateway;
 
-
-    @Before
+    @BeforeEach
     public void setUp() {
         ReflectionTestUtils.setField(applicationParams, "uiDefinitionHost", "http://localhost:6666");
     }
 
-    @Test(expected = ServiceException.class)
+    @Test
     public void shouldGetServiceExceptionWhenGettingWorkbasketInputDefinitions() {
-        httpUIDefinitionGateway.getWorkbasketInputFieldsDefinitions(VERSION, "TestAddressBookCase");
+        assertThrows(ServiceException.class, () -> {
+            httpUIDefinitionGateway.getWorkbasketInputFieldsDefinitions(VERSION, "TestAddressBookCase");
+        });
     }
 
-    @Test(expected = ServiceException.class)
+    @Test
     public void shouldGetServiceExceptionWhenGettingWorkbasketResults() {
-        httpUIDefinitionGateway.getWorkBasketResult(VERSION, "TestAddressBookCase");
+        assertThrows(ServiceException.class, () -> {
+            httpUIDefinitionGateway.getWorkBasketResult(VERSION, "TestAddressBookCase");
+        });
     }
 
-    @Test(expected = ServiceException.class)
+    @Test
     public void shouldGetServiceExceptionWhenGettingSearchInputs() {
-        httpUIDefinitionGateway.getWorkbasketInputFieldsDefinitions(VERSION, "TestAddressBookCase");
+        assertThrows(ServiceException.class, () -> {
+            httpUIDefinitionGateway.getWorkbasketInputFieldsDefinitions(VERSION, "TestAddressBookCase");
+        });
     }
 
-    @Test(expected = ServiceException.class)
+    @Test
     public void shouldGetServiceExceptionWhenGettingSearchResults() {
-        httpUIDefinitionGateway.getSearchResult(VERSION, "TestAddressBookCase");
+        assertThrows(ServiceException.class, () -> {
+            httpUIDefinitionGateway.getSearchResult(VERSION, "TestAddressBookCase");
+        });
     }
 
-    @Test(expected = ServiceException.class)
+    @Test
     public void shouldGetServiceExceptionWhenGettinBanners() {
         List<String> jurisdictionIds = Lists.newArrayList("PROBATE", "DIVORCE");
-        httpUIDefinitionGateway.getBanners(jurisdictionIds);
+        assertThrows(ServiceException.class, () -> {
+            httpUIDefinitionGateway.getBanners(jurisdictionIds);
+        });
     }
 }

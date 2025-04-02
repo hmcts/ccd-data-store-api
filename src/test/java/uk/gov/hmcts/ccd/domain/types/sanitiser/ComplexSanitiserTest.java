@@ -16,8 +16,8 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPL
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
@@ -60,7 +60,7 @@ public class ComplexSanitiserTest {
 
     private ComplexSanitiser complexSanitiser;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         type1Sanitiser = mock(Sanitiser.class);
         doReturn(TYPE_1).when(type1Sanitiser).getType();

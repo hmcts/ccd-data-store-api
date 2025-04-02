@@ -4,9 +4,9 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class DataStoreHttpStatusRequestRejectedHandlerTest {
     private Logger handlerLogger;
     private ListAppender<ILoggingEvent> handlerLoggerListAppender;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
 
@@ -63,7 +63,7 @@ public class DataStoreHttpStatusRequestRejectedHandlerTest {
         handlerLogger.addAppender(handlerLoggerListAppender);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         autoCloseable.close();
         handlerLogger.detachAndStopAllAppenders();

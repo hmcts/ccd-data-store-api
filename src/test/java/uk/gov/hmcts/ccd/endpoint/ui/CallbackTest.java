@@ -6,8 +6,8 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.assertj.core.util.Lists;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -108,7 +108,7 @@ public class CallbackTest extends WireMockBaseTest {
     public CallbackTest() throws IOException {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws JsonProcessingException {
 
         CALLBACK_DATA = mapper.readTree(CALLBACK_DATA_JSON_STRING);

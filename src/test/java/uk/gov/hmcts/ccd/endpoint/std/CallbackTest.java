@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -190,7 +190,7 @@ public class CallbackTest extends WireMockBaseTest {
     public CallbackTest() throws IOException {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
 
         DATA = mapper.readTree(DATA_JSON_STRING);
@@ -209,7 +209,7 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "    \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "  }\n"
@@ -222,7 +222,7 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
             + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
@@ -239,7 +239,7 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
             + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
@@ -255,7 +255,7 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\",\n"
             + "    \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "  }\n"

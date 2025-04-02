@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -56,7 +56,7 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
     @Autowired
     private DefaultCaseUserRepository repository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         template = new JdbcTemplate(db);
     }
