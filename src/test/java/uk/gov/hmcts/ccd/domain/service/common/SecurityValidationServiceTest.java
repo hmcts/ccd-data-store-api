@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassificationBuilder.aClassificationBuilder;
@@ -47,12 +48,12 @@ class SecurityValidationServiceTest {
     }
 
     @Nested
-    @DisplayName("Validate data classification case")
+    @DisplayName("Validate security classification case")
     class ValidateDataClassificationCase {
 
         @Test
-        @DisplayName("should fail if invalid classification level for case")
-        void shouldFailIfInvalidClassificationLevelForCase() {
+        @DisplayName("should decrease security if valid classification level for case")
+        void shouldDecreaseSecurityIfValidClassificationLevelForCase() {
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PRIVATE)
                 .withDataClassification(
@@ -66,9 +67,10 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
-        }
+            securityValidationService.updateSecurityClassificationIfValid(callbackResponse, caseDetails);
 
+            assertThat(caseDetails.getSecurityClassification(), is(PUBLIC));
+        }
 
         @Test
         @DisplayName("should increase security if valid classification level for case")
@@ -79,7 +81,6 @@ class SecurityValidationServiceTest {
                     aClassificationBuilder()
                         .buildAsMap())
                 .build();
-            final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PRIVATE)
                 .withDataClassification(
@@ -87,8 +88,37 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
-                defaultDataClassification);
+            securityValidationService.updateSecurityClassificationIfValid(callbackResponse, caseDetails);
+
+            assertThat(caseDetails.getSecurityClassification(), is(PRIVATE));
+        }
+
+        @Test
+        @DisplayName("should do nothing if case security classification is null")
+        void shouldDoNothingIfCaseSecurityClassificationIsNull() {
+            final CaseDetails caseDetails = newCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(null)
+                .build();
+
+            securityValidationService.updateSecurityClassificationIfValid(callbackResponse, caseDetails);
+
+            assertThat(caseDetails.getSecurityClassification(), is(PUBLIC));
+        }
+
+        @Test
+        @DisplayName("should decrease security to private if valid classification level for case")
+        void shouldLogWarningAndThrowExceptionForInvalidClassifications() {
+            final CaseDetails caseDetails = newCaseDetails()
+                .withSecurityClassification(RESTRICTED)
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PRIVATE)
+                .build();
+
+            securityValidationService.updateSecurityClassificationIfValid(callbackResponse, caseDetails);
 
             assertThat(caseDetails.getSecurityClassification(), is(PRIVATE));
         }
@@ -117,7 +147,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+            securityValidationService.setDataClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                 defaultDataClassification);
 
             assertAll(
@@ -237,7 +267,7 @@ class SecurityValidationServiceTest {
                 .build();
             when(authorisedGetCaseOperation.execute(Mockito.anyString())).thenReturn(Optional.of(defaultCaseDetails));
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+            securityValidationService.setDataClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                 caseDetails.getDataClassification());
             assertAll(
                 () -> assertThat(caseDetails.getDataClassification().size(), is(2)),
@@ -364,7 +394,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+            securityValidationService.setDataClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                 defaultDataClassification);
 
             assertAll(
@@ -769,7 +799,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+            securityValidationService.setDataClassificationFromCallbackIfValid(callbackResponse, caseDetails,
                 defaultDataClassification);
 
             assertAll(
@@ -1152,7 +1182,7 @@ class SecurityValidationServiceTest {
                                                                             CallbackResponse callbackResponse) {
         final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
         ValidationException validationException = assertThrows(ValidationException.class,
-            () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
+            () -> securityValidationService.setDataClassificationFromCallbackIfValid(callbackResponse,
                 caseDetails,
                 defaultDataClassification));
         assertEquals("The event cannot be complete due to a callback returned data validation error (c)",

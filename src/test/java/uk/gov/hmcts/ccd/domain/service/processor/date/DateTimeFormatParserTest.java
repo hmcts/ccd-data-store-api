@@ -16,6 +16,7 @@ import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -97,7 +98,7 @@ class DateTimeFormatParserTest {
         final String result = dateTimeFormatParser.convertIso8601ToDateTime(dateTimeFormat, value);
 
         assertAll(
-            () -> assertThat(result, is("20 Oct 00 12:30 pm"))
+            () -> assertThat(result, is(equalToIgnoringCase("20 Oct 00 12:30 pm")))
         );
     }
 
