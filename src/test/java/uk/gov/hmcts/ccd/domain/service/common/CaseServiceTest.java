@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,8 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -35,9 +38,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 class CaseServiceTest {
@@ -331,6 +337,155 @@ class CaseServiceTest {
                                  is("[Claimant]")),
                 () -> assertTrue(result.containsKey("TextField0")),
                 () -> assertThat(result.get("TextField0").asText(), is("Default text"))
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("buildJsonFromCaseFieldsWithDefaultValueNullifyByDefault()")
+    class BuildJsonFromCaseFieldsWithDefaultValueNullifyByDefault {
+        @Test
+        @DisplayName("builds a Json representation from CaseEventDefinition caseFields nullify by default")
+        void buildsJsonRepresentationFromEventCaseFields() throws Exception {
+
+            final List<CaseEventFieldDefinition> caseFields = Arrays.asList(
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("ChangeOrganisationRequestField")
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("Reason")
+                        .defaultValue("SomeReasonX")
+                        .build())
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("CaseRoleId")
+                        .defaultValue(null)
+                        .build())
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("OrganisationToAdd.OrganisationID")
+                        .defaultValue("Solicitor firm 1")
+                        .build())
+                    .build(),
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("OrganisationPolicyField")
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("OrgPolicyCaseAssignedRole")
+                        .defaultValue("[Claimant]")
+                        .build())
+                    .build(),
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("TextField0")
+                    .withDefaultValue(null)
+                    .withNullifyByDefault(true)
+                    .build()
+            );
+            CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
+            CaseFieldDefinition caseFieldDefinition = mock(CaseFieldDefinition.class);
+            when(caseTypeDefinition.getCaseField(anyString())).thenReturn(Optional.of(caseFieldDefinition));
+            when(caseFieldDefinition.isCollectionFieldType()).thenReturn(false);
+            when(caseFieldDefinition.isComplexFieldType()).thenReturn(true);
+
+            Map<String, JsonNode> result = caseService
+                .buildJsonFromCaseFieldsWithNullifyByDefault(caseTypeDefinition, caseFields);
+
+            assertAll(
+                () -> assertThat(result.size(), is(1)),
+                () -> assertTrue(result.containsKey("TextField0")),
+                () -> assertThat(result.get("TextField0").asText(), is(""))
+            );
+        }
+
+        @Test
+        @DisplayName("builds a Json representation from CaseEventDefinition "
+            + "caseFields nullify by default for collection field")
+        void buildsJsonRepresentationFromEventCaseFieldsForCollection() throws Exception {
+
+            final List<CaseEventFieldDefinition> caseFields = Arrays.asList(
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("ChangeOrganisationRequestField")
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("Reason")
+                        .defaultValue("SomeReasonX")
+                        .build())
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("CaseRoleId")
+                        .defaultValue(null)
+                        .build())
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("OrganisationToAdd.OrganisationID")
+                        .defaultValue("Solicitor firm 1")
+                        .build())
+                    .build(),
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("OrganisationPolicyField")
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("OrgPolicyCaseAssignedRole")
+                        .defaultValue("[Claimant]")
+                        .build())
+                    .build(),
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("TextField0")
+                    .withDefaultValue(null)
+                    .withNullifyByDefault(true)
+                    .build()
+            );
+            CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
+            CaseFieldDefinition caseFieldDefinition = mock(CaseFieldDefinition.class);
+            when(caseTypeDefinition.getCaseField(anyString())).thenReturn(Optional.of(caseFieldDefinition));
+            when(caseFieldDefinition.isCollectionFieldType()).thenReturn(true);
+            when(caseFieldDefinition.isComplexFieldType()).thenReturn(false);
+
+            Map<String, JsonNode> result = caseService
+                .buildJsonFromCaseFieldsWithNullifyByDefault(caseTypeDefinition, caseFields);
+
+            assertAll(
+                () -> assertThat(result.size(), is(1)),
+                () -> assertTrue(result.containsKey("TextField0")),
+                () -> assertTrue(result.get("TextField0") instanceof ArrayNode),
+                () -> assertThat(result.get("TextField0").asText(), is(""))
+            );
+        }
+
+        @Test
+        @DisplayName("builds a Json representation from CaseEventDefinition "
+            + "caseFields nullify by default for no case field")
+        void buildsJsonRepresentationFromEventCaseFieldsWhenCaseTypeDefinitionHasNoCaseField() throws Exception {
+
+            final List<CaseEventFieldDefinition> caseFields = Arrays.asList(
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("ChangeOrganisationRequestField")
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("Reason")
+                        .defaultValue("SomeReasonX")
+                        .build())
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("CaseRoleId")
+                        .defaultValue(null)
+                        .build())
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("OrganisationToAdd.OrganisationID")
+                        .defaultValue("Solicitor firm 1")
+                        .build())
+                    .build(),
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("OrganisationPolicyField")
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                        .reference("OrgPolicyCaseAssignedRole")
+                        .defaultValue("[Claimant]")
+                        .build())
+                    .build(),
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("TextField0")
+                    .withDefaultValue(null)
+                    .withNullifyByDefault(true)
+                    .build()
+            );
+            CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
+            when(caseTypeDefinition.getCaseField(anyString())).thenReturn(Optional.empty());
+
+            Map<String, JsonNode> result = caseService
+                .buildJsonFromCaseFieldsWithNullifyByDefault(caseTypeDefinition, caseFields);
+
+            assertAll(
+                () -> assertThat(result.size(), is(0))
             );
         }
     }
