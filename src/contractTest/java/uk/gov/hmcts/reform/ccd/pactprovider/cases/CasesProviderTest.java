@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.reform.ccd.pactprovider.cases.controller.CasesRestController;
+
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -37,9 +38,8 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 
 @Provider("ccd_data_store_api_cases")
-@PactBroker(
-    url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
-    consumerVersionSelectors = {@VersionSelector(tag = "master")})
+@PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
+    consumerVersionSelectors = {@VersionSelector(tag = "Dev")})
 @IgnoreNoPactsToVerify
 @ExtendWith(SpringExtension.class)
 public class CasesProviderTest {
