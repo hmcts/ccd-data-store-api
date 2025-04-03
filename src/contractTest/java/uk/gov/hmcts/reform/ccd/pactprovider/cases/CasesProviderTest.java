@@ -37,9 +37,7 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 
 @Provider("ccd_data_store_api_cases")
-@PactBroker(
-    host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:9292}",
+@PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:80}", 
     consumerVersionSelectors = {@VersionSelector(tag = "master")})
 @IgnoreNoPactsToVerify
 @ExtendWith(SpringExtension.class)
