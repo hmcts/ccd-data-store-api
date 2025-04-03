@@ -48,8 +48,8 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
         + "       and cle.standardLink=:standardLink)"
         + " order by cd.createdDate asc"
     )
-    List<Long> findCaseReferencesByLinkedCaseReferenceAndStandardLink(
-        @Param("linkedCaseReference") Long linkedCaseReference,
+    List<String> findCaseReferencesByLinkedCaseReferenceAndStandardLink(
+        @Param("linkedCaseReference") String linkedCaseReference,
         @Param("standardLink") Boolean standardLink
     );
 

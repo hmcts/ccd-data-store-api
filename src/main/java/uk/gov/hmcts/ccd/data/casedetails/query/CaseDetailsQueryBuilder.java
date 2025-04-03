@@ -69,13 +69,13 @@ public abstract class CaseDetailsQueryBuilder<T> {
         return this;
     }
 
-    public CaseDetailsQueryBuilder whereId(Long id) {
+    public CaseDetailsQueryBuilder whereId(String id) {
         predicates.add(cb.equal(root.get("id"), id));
 
         return this;
     }
 
-    public CaseDetailsQueryBuilder whereIdsAreIn(List<Long> ids) {
+    public CaseDetailsQueryBuilder whereIdsAreIn(List<String> ids) {
         predicates.add(cb.in(root.get("id")).value(ids));
 
         return this;

@@ -191,7 +191,7 @@ class CaseDetailsQueryBuilderFactoryTest {
         @Test
         @DisplayName("should selectByReferenceSecured query")
         void shouldSecureSelectByReferenceQuery() {
-            CaseDetailsQueryBuilder<Long> queryBuilder = factory.selectByReferenceSecured(em);
+            CaseDetailsQueryBuilder<String> queryBuilder = factory.selectByReferenceSecured(em);
             assertAll(
                 () -> assertThat(queryBuilder, is(notNullValue())),
                 () -> verify(userAuthorisationSecurity).secure(queryBuilder, null),
@@ -206,7 +206,7 @@ class CaseDetailsQueryBuilderFactoryTest {
             MetaData metaData = new MetaData("caseType", "jurisdiction");
             metaData.setSortDirection(Optional.of(sortDirection));
 
-            CaseDetailsQueryBuilder<Long> queryBuilder = factory.selectByReferenceSecured(em);
+            CaseDetailsQueryBuilder<String> queryBuilder = factory.selectByReferenceSecured(em);
             queryBuilder.orderBy(metaData);
 
             assertAll(

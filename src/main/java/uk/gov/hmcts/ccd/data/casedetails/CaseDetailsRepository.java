@@ -12,23 +12,21 @@ import java.util.Optional;
 public interface CaseDetailsRepository {
     CaseDetails set(CaseDetails caseDetails);
 
-    Optional<CaseDetails> findById(String jurisdiction, Long id);
+    Optional<CaseDetails> findById(String jurisdiction, String id);
 
     /**
      * Find by identifier.
      *
      * @param id Internal case ID
      * @return Case details
-     * @deprecated Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
+     * @deprecated Use {@link CaseDetailsRepository#findByReference(String, String)} instead.
      */
     @Deprecated
-    CaseDetails findById(Long id);
+    CaseDetails findById(String id);
 
-    List<Long> findCaseReferencesByIds(List<Long> ids);
+    List<String> findCaseReferencesByIds(List<String> ids);
 
     Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference);
-
-    Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference);
 
     Optional<CaseDetails> findByReference(String jurisdiction, String reference);
 
@@ -39,11 +37,8 @@ public interface CaseDetailsRepository {
      *
      * @param caseReference Public case reference
      * @return Case details
-     * @deprecated Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
+     * @deprecated Use {@link CaseDetailsRepository#findByReference(String, String)} instead.
      */
-    @Deprecated
-    CaseDetails findByReference(Long caseReference);
-
     /**
      * Find unique case.
      *

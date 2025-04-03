@@ -32,7 +32,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     private static final String META_AND_FIELD_DATA_HASH_FORMAT = "%s%s";
 
     private final CaseDetailsRepository caseDetailsRepository;
-    private final Map<Long, Optional<CaseDetails>> idToCaseDetails = newHashMap();
+    private final Map<String, Optional<CaseDetails>> idToCaseDetails = newHashMap();
     private final Map<String, Optional<CaseDetails>> referenceToCaseDetails = newHashMap();
     private final Map<String, CaseDetails> findHashToCaseDetails = newHashMap();
     private final Map<String, List<CaseDetails>> metaAndFieldDataHashToCaseDetails = newHashMap();
@@ -50,30 +50,30 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public Optional<CaseDetails> findById(String jurisdiction, Long id) {
+    public Optional<CaseDetails> findById(String jurisdiction, String id) {
         return idToCaseDetails.computeIfAbsent(id, key -> caseDetailsRepository.findById(jurisdiction, id));
     }
 
     @Override
-    public CaseDetails findById(final Long id) {
+    public CaseDetails findById(final String id) {
         return idToCaseDetails.computeIfAbsent(id, key -> ofNullable(caseDetailsRepository.findById(id))).orElse(null);
     }
 
     @Override
-    public List<Long> findCaseReferencesByIds(final List<Long> ids) {
+    public List<String> findCaseReferencesByIds(final List<String> ids) {
         return caseDetailsRepository.findCaseReferencesByIds(ids);
     }
 
     @Override
-    public CaseDetails findByReference(final Long caseReference) {
+    public CaseDetails findByReference(final String caseReference) {
         final Function<String, Optional<CaseDetails>> findFunction = key ->
             ofNullable(caseDetailsRepository.findByReference(caseReference));
-        return referenceToCaseDetails.computeIfAbsent(caseReference.toString(), findFunction).orElse(null);
+        return referenceToCaseDetails.computeIfAbsent(caseReference, findFunction).orElse(null);
     }
 
     @Override
-    public Optional<CaseDetails> findByReference(String jurisdiction, Long reference) {
-        return findByReference(jurisdiction, reference.toString());
+    public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
+        return findByReference(jurisdiction, reference);
     }
 
     @Override

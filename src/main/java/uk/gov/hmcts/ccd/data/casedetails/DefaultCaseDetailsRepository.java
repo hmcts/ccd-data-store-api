@@ -95,29 +95,28 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public Optional<CaseDetails> findById(String jurisdiction, Long id) {
+    public Optional<CaseDetails> findById(String jurisdiction, String id) {
         return find(jurisdiction, id, null).map(this.caseDetailsMapper::entityToModel);
     }
 
     /**
      * @param id Internal case ID
      * @return Case details if found; null otherwise
-     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
+     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, String)} instead
      */
     @Override
     @Deprecated
-    public CaseDetails findById(final Long id) {
+    public CaseDetails findById(final String id) {
         return findById(null, id).orElse(null);
     }
 
     @Override
-    public List<Long> findCaseReferencesByIds(final List<Long> ids) {
+    public List<String> findCaseReferencesByIds(final List<String> ids) {
         return findReferencesByIds(ids);
     }
 
-    @Override
-    public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
-        return findByReference(jurisdiction, caseReference.toString());
+    public Optional<CaseDetails> findByReference(String jurisdiction, String caseReference) {
+        return findByReference(jurisdiction, caseReference);
     }
 
     @Override
@@ -125,22 +124,11 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return find(jurisdiction, null, reference).map(this.caseDetailsMapper::entityToModel);
     }
 
-    @Override
-    public Optional<CaseDetails> findByReference(String caseReference) {
-        return findByReference(null, caseReference);
-    }
-
     /**
      * @param caseReference Public case reference
      * @return Case details if found; null otherwise.
-     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
+     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, String)} instead
      */
-    @Override
-    @Deprecated
-    public CaseDetails findByReference(final Long caseReference) {
-        return findByReference(null, caseReference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
-    }
-
     /**
      * @param jurisdiction Jurisdiction's ID
      * @param caseTypeId   Case's type ID
@@ -196,7 +184,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
     // be annotated with @NotNull
-    private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
+    private Optional<CaseDetailsEntity> find(String jurisdiction, String id, String reference) {
         final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectSecured(em);
 
         if (null != jurisdiction) {
@@ -206,8 +194,8 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return getCaseDetailsEntity(id, reference, qb);
     }
 
-    private List<Long> findReferencesByIds(List<Long> ids) {
-        final CaseDetailsQueryBuilder<Long> qb = queryBuilderFactory.selectByReferenceSecured(em);
+    private List<String> findReferencesByIds(List<String> ids) {
+        final CaseDetailsQueryBuilder<String> qb = queryBuilderFactory.selectByReferenceSecured(em);
         qb.whereIdsAreIn(ids);
 
         return qb.build().getResultList();
@@ -215,7 +203,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     /**
      * Finds a case using a query builder that doesn't secure the query.
-     * Required in some corner cases but {@link CaseDetailsRepository#findByReference(String, Long)}
+     * Required in some corner cases but {@link CaseDetailsRepository#findByReference(String, String)}
      * should be used most of the times
      */
     @Override
@@ -225,7 +213,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return qb.getSingleResult().map(this.caseDetailsMapper::entityToModel);
     }
 
-    private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id,
+    private Optional<CaseDetailsEntity> getCaseDetailsEntity(String id,
                                                              String reference,
                                                              CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
         if (null != reference) {

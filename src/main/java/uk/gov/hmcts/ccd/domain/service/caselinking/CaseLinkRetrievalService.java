@@ -38,8 +38,8 @@ public class CaseLinkRetrievalService {
                                                            int maxNumRecords) {
         boolean hasMoreResults = false; // default response
 
-        final List<Long> linkedStandardCases
-            = caseLinkRepository.findCaseReferencesByLinkedCaseReferenceAndStandardLink(parseLong(caseReference),
+        final List<String> linkedStandardCases
+            = caseLinkRepository.findCaseReferencesByLinkedCaseReferenceAndStandardLink(caseReference,
                                                                                         CaseLinkEntity.STANDARD_LINK);
 
         // add a buffer to the max limit to account for possible cases filtered by AccessControl rules
@@ -49,7 +49,7 @@ public class CaseLinkRetrievalService {
             hasMoreResults = true; // i.e. more results left in full list of case references
         }
 
-        final List<Long> paginatedLinkedStandardCases = applyOptionalLimit(adjustedLimit,
+        final List<String> paginatedLinkedStandardCases = applyOptionalLimit(adjustedLimit,
             linkedStandardCases.stream().skip(startRecordNumber - 1L)
         );
 

@@ -19,11 +19,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -85,7 +81,7 @@ public class CaseAccessService {
             .orElse(AccessLevel.ALL);
     }
 
-    public Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles(CaseTypeDefinition caseTypeDefinition) {
+    public Optional<List<String>> getGrantedCaseReferencesForRestrictedRoles(CaseTypeDefinition caseTypeDefinition) {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             return getGrantedCaseReferences(caseTypeDefinition);
         } else {
@@ -93,15 +89,14 @@ public class CaseAccessService {
         }
     }
 
-    private Optional<List<Long>> getGrantedCaseReferences(CaseTypeDefinition caseTypeDefinition) {
-        final List<Long> caseReferences =
-            roleAssignmentService
-                .getCaseReferencesForAGivenUser(userRepository.getUserId(), caseTypeDefinition)
-                .stream().map(Long::parseLong).collect(Collectors.toList());
+    private Optional<List<String>> getGrantedCaseReferences(CaseTypeDefinition caseTypeDefinition) {
+        final List<String> caseReferences =
+                new ArrayList<>(roleAssignmentService
+                        .getCaseReferencesForAGivenUser(userRepository.getUserId(), caseTypeDefinition));
         return Optional.of(caseReferences);
     }
 
-    private Optional<List<Long>> getGrantedCaseReferences() {
+    private Optional<List<String>> getGrantedCaseReferences() {
         if (userCanOnlyAccessExplicitlyGrantedCases()) {
             final var ids = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
             final var caseReferences = caseDetailsRepository.findCaseReferencesByIds(ids);
@@ -111,7 +106,7 @@ public class CaseAccessService {
     }
 
     public Set<String> getCaseRoles(String caseId) {
-        return new HashSet<>(caseUserRepository.findCaseRoles(Long.valueOf(caseId), userRepository.getUserId()));
+        return new HashSet<>(caseUserRepository.findCaseRoles(caseId, userRepository.getUserId()));
     }
 
     public Set<AccessProfile> getAccessProfilesByCaseReference(String caseReference) {
@@ -154,9 +149,9 @@ public class CaseAccessService {
 
 
     public Boolean isExplicitAccessGranted(CaseDetails caseDetails) {
-        final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
+        final List<String> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
 
-        if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
+        if (null != grantedCases && grantedCases.contains(caseDetails.getId())) {
             return Boolean.TRUE;
         }
 

@@ -149,8 +149,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     // data values as per: classpath:sql/insert_cases_case_links.sql
     private static final String CASE_LINKS_CASE_998_REFERENCE = "1504259907353545";
     private static final String CASE_LINKS_CASE_999_REFERENCE = "1504259907353537";
-    private static final Long CASE_LINKS_CASE_998_ID = 998L;
-    private static final Long CASE_LINKS_CASE_999_ID = 999L;
+    private static final String CASE_LINKS_CASE_998_ID = "998";
+    private static final String CASE_LINKS_CASE_999_ID = "999";
     private static final String CASE_LINKS_CASE_998_TYPE = "TestAddressBookCase1";
     private static final String CASE_LINKS_CASE_999_TYPE = "TestAddressBookCase2";
 
@@ -3929,7 +3929,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(201))
             .andReturn();
 
-        Long expectedCaseId = CASE_22_ID;
+        String expectedCaseId = CASE_22_ID;
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
@@ -3989,7 +3989,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(201))
             .andReturn();
 
-        Long expectedCaseId = CASE_22_ID;
+        String expectedCaseId = CASE_22_ID;
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
@@ -5496,7 +5496,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases: case with case links should be created", 4, caseDetailsList.size());
 
-        Long expectedCaseId = 1L;
+        String expectedCaseId = "1";
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
@@ -5545,7 +5545,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases: No case should be created", 3, caseDetailsList.size());
 
-        Long expectedCaseId = 1L;
+        String expectedCaseId = "1";
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
@@ -5591,12 +5591,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases: No case should be created", 4, caseDetailsList.size());
 
-        Long expectedCaseId = 1L;
+        String expectedCaseId = "1";
 
         assertCaseLinks(expectedCaseId, Collections.emptyList());
     }
 
-    private void assertCaseLinks(Long expectedCaseId, List<CaseLink> expectedCaseLinks) {
+    private void assertCaseLinks(String expectedCaseId, List<CaseLink> expectedCaseLinks) {
         List<CaseLink> caseLinks = template.query(
             String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
             new BeanPropertyRowMapper<>(CaseLink.class));

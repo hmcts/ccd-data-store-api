@@ -70,13 +70,13 @@ class CaseAccessOperationTest {
     private static final String JURISDICTION = "CMC";
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final String CASE_TYPE_ID = "Application";
-    private static final Long CASE_REFERENCE = 1234123412341236L;
-    private static final Long CASE_REFERENCE_OTHER = 1111222233334444L;
+    private static final String CASE_REFERENCE = "1234123412341236";
+    private static final String CASE_REFERENCE_OTHER = "1111222233334444";
     private static final String USER_ID = "123";
     private static final String USER_ID_OTHER = "USER_ID_OTHER";
-    private static final Long CASE_ID = 456L;
-    private static final Long CASE_ID_OTHER = 1234L;
-    private static final Long CASE_NOT_FOUND = 9999999999999999L;
+    private static final String CASE_ID = "456";
+    private static final String CASE_ID_OTHER = "1234";
+    private static final String CASE_NOT_FOUND = "9999999999999999";
     private static final String NOT_CASE_ROLE = "NotACaseRole";
     private static final String CASE_ROLE = "[DEFENDANT]";
     private static final String CASE_ROLE_OTHER = "[OTHER]";
@@ -140,7 +140,7 @@ class CaseAccessOperationTest {
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
 
             // ACT
-            caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
+            caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE, USER_ID);
 
             // ASSERT
             assertAll(
@@ -159,7 +159,7 @@ class CaseAccessOperationTest {
             when(roleAssignmentService.findRoleAssignmentsByCasesAndUsers(any(), any())).thenReturn(new ArrayList<>());
 
             // ACT
-            caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
+            caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE, USER_ID);
 
             // ASSERT
             assertAll(
@@ -173,7 +173,7 @@ class CaseAccessOperationTest {
                     assertAll(
                         () -> assertEquals(1, caseReferences.size()),
                         () -> assertEquals(1, userIds.size()),
-                        () -> assertEquals(CASE_REFERENCE.toString(), caseReferences.get(0)),
+                        () -> assertEquals(CASE_REFERENCE, caseReferences.get(0)),
                         () -> assertEquals(USER_ID, userIds.get(0))
                     );
                 },
@@ -187,7 +187,7 @@ class CaseAccessOperationTest {
 
                     CaseDetails caseDetails = caseDetailsCaptor.getValue();
                     assertAll(
-                        () -> assertEquals(CASE_ID.toString(), caseDetails.getId()),
+                        () -> assertEquals(CASE_ID, caseDetails.getId()),
                         () -> assertEquals(CASE_REFERENCE, caseDetails.getReference())
                     );
 
@@ -340,7 +340,7 @@ class CaseAccessOperationTest {
                 CASE_ROLE_GRANTED));
 
             caseDetails = new CaseDetails();
-            caseDetails.setId(CASE_ID.toString());
+            caseDetails.setId(CASE_ID);
             caseDetails.setReference(CASE_REFERENCE);
             caseDetails.setCaseTypeId(CASE_TYPE_ID);
         }
@@ -631,7 +631,7 @@ class CaseAccessOperationTest {
     @DisplayName("findCasesUserIdHasAccessTo(userId)")
     class FindCasesUserIdHasAccessTo {
 
-        private final List<Long> ids = Collections.singletonList(1L);
+        private final List<String> ids = Collections.singletonList("1");
 
         @Test
         @DisplayName("should return cases that the user has access to")
@@ -646,7 +646,7 @@ class CaseAccessOperationTest {
 
             assertAll(
                 () -> assertEquals(1, usersCases.size()),
-                () -> assertEquals(String.valueOf(1L), usersCases.get(0)),
+                () -> assertEquals("1", usersCases.get(0)),
                 () -> verify(caseDetailsRepository, times(1)).findCaseReferencesByIds(ids)
             );
         }
@@ -958,7 +958,7 @@ class CaseAccessOperationTest {
                 () -> assertEquals(2, caseDetailsList.size()),
                 () -> assertEquals(2, rolesList.size())
             );
-            Map<Long, Integer> captorValueMap = new HashMap<>();
+            Map<String, Integer> captorValueMap = new HashMap<>();
             captorValueMap.put(caseDetailsList.get(0).getReference(), 0);
             captorValueMap.put(caseDetailsList.get(1).getReference(), 1);
 
@@ -2431,7 +2431,7 @@ class CaseAccessOperationTest {
                 createCaseUserEntity(CASE_ID, CASE_ROLE_CREATOR, USER_ID)
             ));
 
-            List<Long> caseReferences = Lists.newArrayList(CASE_REFERENCE);
+            List<String> caseReferences = Lists.newArrayList(CASE_REFERENCE);
             final List<String> userIds = Lists.newArrayList();
 
             // ACT
@@ -2528,7 +2528,7 @@ class CaseAccessOperationTest {
             .findByReference(WRONG_JURISDICTION, CASE_REFERENCE);
     }
 
-    private CaseUserEntity createCaseUserEntity(Long caseDataId, String caseRole, String userId) {
+    private CaseUserEntity createCaseUserEntity(String caseDataId, String caseRole, String userId) {
         CaseUserEntity.CasePrimaryKey primaryKey = new CaseUserEntity.CasePrimaryKey();
         primaryKey.setCaseDataId(caseDataId);
         primaryKey.setCaseRole(caseRole);

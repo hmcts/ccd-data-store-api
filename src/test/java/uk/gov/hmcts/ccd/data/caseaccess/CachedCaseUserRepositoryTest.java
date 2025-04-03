@@ -26,7 +26,7 @@ class CachedCaseUserRepositoryTest {
     @Mock
     private CaseUserRepository caseUserRepository;
 
-    private final Long caseId = 12345L;
+    private final String caseId = "12345";
     private final String userId = "USERID1";
     private final List<String> caseUserRoles = Lists.newArrayList("[CREATOR]", "[LASOLICITOR]");
     private final List<Long> caseIds = Lists.newArrayList(12345L, 12346L);
@@ -66,13 +66,13 @@ class CachedCaseUserRepositoryTest {
     @Test
     @DisplayName("should initially retrieve case ids user has access")
     void shouldGetCaseIdsUserHasAccess() {
-        List<Long> returned = classUnderTest.findCasesUserIdHasAccessTo(userId);
+        List<String> returned = classUnderTest.findCasesUserIdHasAccessTo(userId);
 
         assertAll(
             () -> assertThat(returned, is(caseIds)),
             () -> verify(caseUserRepository, times(1)).findCasesUserIdHasAccessTo(userId)
         );
-        List<Long> returned2 = classUnderTest.findCasesUserIdHasAccessTo(userId);
+        List<String> returned2 = classUnderTest.findCasesUserIdHasAccessTo(userId);
 
         assertAll(
             () -> assertThat(returned2, is(caseIds)),
@@ -83,16 +83,16 @@ class CachedCaseUserRepositoryTest {
     @Test
     @DisplayName("should initially retrieve case ids user has access")
     void shouldGetCaseUserRolesFromDefaultRepository() {
-        List<Long> caseIds = new ArrayList<>();
-        caseIds.add(1234L);
-        caseIds.add(1235L);
+        List<String> caseIds = new ArrayList<>();
+        caseIds.add("1234");
+        caseIds.add("1235");
 
         List<String> userIds = new ArrayList<>();
         userIds.add("123456");
         userIds.add("123457");
         List<CaseUserEntity> caseUserEntities = new ArrayList<>();
-        caseUserEntities.add(new CaseUserEntity(1234L, "123456", "[CREATOR]", null));
-        caseUserEntities.add(new CaseUserEntity(1235L, "123457", "[SOLICITOR]", null));
+        caseUserEntities.add(new CaseUserEntity("1234", "123456", "[CREATOR]", null));
+        caseUserEntities.add(new CaseUserEntity("1235", "123457", "[SOLICITOR]", null));
         doReturn(caseUserEntities).when(caseUserRepository).findCaseUserRoles(anyList(), anyList());
 
         List<CaseUserEntity> returned = classUnderTest.findCaseUserRoles(caseIds, userIds);

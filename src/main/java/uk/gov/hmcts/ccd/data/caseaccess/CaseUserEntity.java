@@ -37,17 +37,17 @@ public class CaseUserEntity implements Serializable {
 
     public static class CasePrimaryKey implements Serializable {
         @Column(name = "case_data_id")
-        private Long caseDataId;
+        private String caseDataId;
         @Column(name = "user_id")
         private String userId;
         @Column(name = "case_role")
         private String caseRole;
 
-        public Long getCaseDataId() {
+        public String getCaseDataId() {
             return caseDataId;
         }
 
-        public void setCaseDataId(Long caseDataId) {
+        public void setCaseDataId(String caseDataId) {
             this.caseDataId = caseDataId;
         }
 
@@ -80,11 +80,11 @@ public class CaseUserEntity implements Serializable {
         // needed for hibernate
     }
 
-    CaseUserEntity(Long caseDataId, String userId) {
+    CaseUserEntity(String caseDataId, String userId) {
         this(caseDataId, userId, GlobalCaseRole.CREATOR.getRole(), null);
     }
 
-    CaseUserEntity(Long caseDataId, String userId, String caseRole, String roleCategory) {
+    CaseUserEntity(String caseDataId, String userId, String caseRole, String roleCategory) {
         CasePrimaryKey casePrimaryKey = new CasePrimaryKey();
         casePrimaryKey.caseDataId = caseDataId;
         casePrimaryKey.userId = userId;
