@@ -651,7 +651,43 @@
                       "retain_hidden_value" : null,
                       "formatted_value" : null,
                       "category_id" : null
-                    } ],
+                    },
+                      {
+                        "id" : "UPRN",
+                        "label" : "UPRN",
+                        "hidden" : null,
+                        "order" : null,
+                        "metadata" : false,
+                        "case_type_id" : null,
+                        "hint_text" : null,
+                        "field_type" : {
+                          "id" : "Text",
+                          "type" : "Text",
+                          "min" : null,
+                          "max" : null,
+                          "regular_expression" : null,
+                          "fixed_list_items" : [ ],
+                          "complex_fields" : [ ],
+                          "collection_field_type" : null
+                        },
+                        "security_classification" : "PUBLIC",
+                        "live_from" : null,
+                        "live_until" : null,
+                        "show_condition" : null,
+                        "acls" : [ {
+                          "create" : true,
+                          "read" : true,
+                          "update" : true,
+                          "delete" : true,
+                          "role" : "caseworker-befta_master"
+                        } ],
+                        "complexACLs" : [ ],
+                        "display_context" : null,
+                        "display_context_parameter" : null,
+                        "retain_hidden_value" : null,
+                        "formatted_value" : null,
+                        "category_id" : null
+                      }],
                     "collection_field_type" : null
                   },
                   "security_classification" : "PUBLIC",
@@ -1276,7 +1312,43 @@
                 "retain_hidden_value" : null,
                 "formatted_value" : null,
                 "category_id" : null
-              } ],
+              },
+                {
+                  "id" : "UPRN",
+                  "label" : "UPRN",
+                  "hidden" : null,
+                  "order" : null,
+                  "metadata" : false,
+                  "case_type_id" : null,
+                  "hint_text" : null,
+                  "field_type" : {
+                    "id" : "Text",
+                    "type" : "Text",
+                    "min" : null,
+                    "max" : null,
+                    "regular_expression" : null,
+                    "fixed_list_items" : [ ],
+                    "complex_fields" : [ ],
+                    "collection_field_type" : null
+                  },
+                  "security_classification" : "PUBLIC",
+                  "live_from" : null,
+                  "live_until" : null,
+                  "show_condition" : null,
+                  "acls" : [ {
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : true,
+                    "role" : "caseworker-befta_master"
+                  } ],
+                  "complexACLs" : [ ],
+                  "display_context" : null,
+                  "display_context_parameter" : null,
+                  "retain_hidden_value" : null,
+                  "formatted_value" : null,
+                  "category_id" : null
+                }],
               "collection_field_type" : null
             },
             "security_classification" : "PUBLIC",
