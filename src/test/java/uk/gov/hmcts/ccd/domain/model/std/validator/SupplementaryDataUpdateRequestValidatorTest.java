@@ -18,7 +18,7 @@ class SupplementaryDataUpdateRequestValidatorTest {
     @DisplayName("should propagate BadRequestException when supplementary data is null")
     void validate() {
         assertThrows(BadRequestException.class,
-            () -> requestValidator.validate(null));
+            () -> requestValidator.validate((SupplementaryDataUpdateRequest) null));
     }
 
     @Test
@@ -29,10 +29,10 @@ class SupplementaryDataUpdateRequestValidatorTest {
     }
 
     @Test
-    @DisplayName("should propagate BadRequestException when supplementary data null")
+    @DisplayName("should propagate BadRequestException when Case supplementary data null")
     void shouldThrowBadRequestExceptionWhenSupplementaryDataNull() {
         assertThrows(BadRequestException.class,
-            () -> requestValidator.validate(null));
+            () -> requestValidator.validate((SupplementaryDataUpdateRequest) null));
     }
 
     @Test
