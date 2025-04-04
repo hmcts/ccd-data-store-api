@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_CLASSIFICATION_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
@@ -31,7 +32,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 
 class ElasticsearchRequestTest {
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Test
     void hasSourceFieldsShouldReturnFalseWhenSourceIsMissing() throws JsonProcessingException {
@@ -98,7 +99,7 @@ class ElasticsearchRequestTest {
 
         assertAll(
             () -> assertThat(requestedFields.size(), is(4)),
-            () -> assertThat(requestedFields.get(0), is("CaseDataField")),
+            () -> assertThat(requestedFields.getFirst(), is("CaseDataField")),
             () -> assertThat(requestedFields.get(1), is("[CASE_REFERENCE]")),
             () -> assertThat(requestedFields.get(2), is("[STATE]")),
             () -> assertThat(requestedFields.get(3), is("OtherCaseDataField"))
@@ -116,7 +117,7 @@ class ElasticsearchRequestTest {
 
         assertAll(
             () -> assertThat(requestedFields.size(), is(1)),
-            () -> assertThat(requestedFields.get(0), is("[CASE_REFERENCE]"))
+            () -> assertThat(requestedFields.getFirst(), is("[CASE_REFERENCE]"))
         );
     }
 
@@ -190,7 +191,7 @@ class ElasticsearchRequestTest {
         List<String> resultAsList =
                 new ObjectMapper().readValue(result.traverse(), new TypeReference<ArrayList<String>>(){});
         assertAll(
-            () -> assertThat(result.size(), is(9)),
+            () -> assertThat(result.size(), is(8)),
             () -> assertThat(resultAsList, hasItem(CASE_REFERENCE.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(CREATED_DATE.getDbColumnName())),
@@ -198,8 +199,7 @@ class ElasticsearchRequestTest {
             () -> assertThat(resultAsList, hasItem(JURISDICTION.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
-            () -> assertThat(resultAsList, hasItem(STATE.getDbColumnName())),
-            () -> assertThat(resultAsList, hasItem(DATA_CLASSIFICATION_COL))
+            () -> assertThat(resultAsList, hasItem(STATE.getDbColumnName()))
         );
     }
 
@@ -221,6 +221,7 @@ class ElasticsearchRequestTest {
             assertAll(
                 () -> assertThat(sourceFields.size(), is(10)),
                 () -> assertThat(sourceFields, hasItem("data.name")),
+                () -> assertThat(sourceFields, hasItem("data_classification.name")),
                 () -> assertThat(sourceFields, hasItem(CASE_REFERENCE.getDbColumnName())),
                 () -> assertThat(sourceFields, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
                 () -> assertThat(sourceFields, hasItem(CREATED_DATE.getDbColumnName())),
@@ -228,10 +229,147 @@ class ElasticsearchRequestTest {
                 () -> assertThat(sourceFields, hasItem(JURISDICTION.getDbColumnName())),
                 () -> assertThat(sourceFields, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
                 () -> assertThat(sourceFields, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
-                () -> assertThat(sourceFields, hasItem(STATE.getDbColumnName())),
-                () -> assertThat(sourceFields, hasItem(DATA_CLASSIFICATION_COL))
+                () -> assertThat(sourceFields, hasItem(STATE.getDbColumnName()))
             );
         }
+
+        @Test
+        void shouldSetSourceFieldsWhenSourceIsProvidedInRequestWithMultipleDataFields() throws Exception {
+            String queryNode = """
+                {
+                  "_source": [
+                    "data.name",
+                    "data.surname",
+                    "data.city",
+                    "data.country"
+                  ],
+                  "query": {}
+                }""";
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryAsJsonNode(queryNode));
+
+            String result = elasticsearchRequest.toFinalRequest();
+
+            JsonNode jsonResult = mapper.readTree(result);
+            JsonNode sourceNode = jsonResult.get("_source");
+            List<String> sourceFields =
+                new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+
+            assertAll(
+                () -> assertThat(sourceFields.size(), is(16)),
+                () -> assertThat(sourceFields, hasItem("data.name")),
+                () -> assertThat(sourceFields, hasItem("data_classification.name")),
+                () -> assertThat(sourceFields, hasItem("data.surname")),
+                () -> assertThat(sourceFields, hasItem("data_classification.surname")),
+                () -> assertThat(sourceFields, hasItem("data.city")),
+                () -> assertThat(sourceFields, hasItem("data_classification.city")),
+                () -> assertThat(sourceFields, hasItem("data.country")),
+                () -> assertThat(sourceFields, hasItem("data_classification.country")),
+                () -> assertThat(sourceFields, hasItem(CASE_REFERENCE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CREATED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CASE_TYPE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(JURISDICTION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(STATE.getDbColumnName()))
+            );
+        }
+
+        @Test
+        void shouldSetSourceFieldsWhenSourceIsProvidedInRequestWithDataAsterisk() throws Exception {
+            String queryNode = """
+                {
+                  "_source": [
+                    "data.*"
+                  ],
+                  "query": {}
+                }""";
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryAsJsonNode(queryNode));
+
+            String result = elasticsearchRequest.toFinalRequest();
+
+            JsonNode jsonResult = mapper.readTree(result);
+            JsonNode sourceNode = jsonResult.get("_source");
+            List<String> sourceFields =
+                new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+
+            assertAll(
+                () -> assertThat(sourceFields.size(), is(10)),
+                () -> assertThat(sourceFields, hasItem("data.*")),
+                () -> assertThat(sourceFields, hasItem("data_classification.*")),
+                () -> assertThat(sourceFields, hasItem(CASE_REFERENCE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CREATED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CASE_TYPE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(JURISDICTION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(STATE.getDbColumnName()))
+            );
+        }
+
+        @Test
+        void shouldSetSourceFieldsWhenSourceIsProvidedInRequestWithEmptySource() throws Exception {
+            String queryNode = """
+                {
+                  "_source": [],
+                  "query": {}
+                }""";
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryAsJsonNode(queryNode));
+
+            String result = elasticsearchRequest.toFinalRequest();
+
+            JsonNode jsonResult = mapper.readTree(result);
+            JsonNode sourceNode = jsonResult.get("_source");
+            List<String> sourceFields =
+                new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+
+            assertAll(
+                () -> assertThat(sourceFields.size(), is(10)),
+                () -> assertThat(sourceFields, hasItem(DATA_COL)),
+                () -> assertThat(sourceFields, hasItem(DATA_CLASSIFICATION_COL)),
+                () -> assertThat(sourceFields, hasItem(CASE_REFERENCE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CREATED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CASE_TYPE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(JURISDICTION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(STATE.getDbColumnName()))
+            );
+        }
+
+        @Test
+        void shouldSetSourceFieldsWhenSourceIsProvidedInRequestWithoutDataAndNonEmptySource() throws Exception {
+            String queryNode = """
+                {
+                  "_source": ["reference"],
+                  "query": {}
+                }""";
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryAsJsonNode(queryNode));
+
+            String result = elasticsearchRequest.toFinalRequest();
+
+            JsonNode jsonResult = mapper.readTree(result);
+            JsonNode sourceNode = jsonResult.get("_source");
+            List<String> sourceFields =
+                new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+
+            assertAll(
+                () -> assertThat(sourceFields.size(), is(8)),
+                () -> assertThat(sourceFields, not(hasItem(DATA_COL))),
+                () -> assertThat(sourceFields, not(hasItem(DATA_CLASSIFICATION_COL))),
+                () -> assertThat(sourceFields, hasItem(CASE_REFERENCE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CREATED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CASE_TYPE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(JURISDICTION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(STATE.getDbColumnName()))
+            );
+        }
+
 
         @Test
         void shouldSetSourceFieldsWhenSourceIsNotProvidedInRequest() throws Exception {
