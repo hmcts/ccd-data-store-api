@@ -15,11 +15,12 @@ import java.time.Clock;
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableRetry
 @ComponentScan({ 
-    "uk.gov.hmcts.ccd"
+    "uk.gov.hmcts.ccd",
+    "uk.gov.hmcts.reform.ccd.document.am"
 })
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.idam",
-    "uk.gov.hmcts.reform.ccd.document.am.feign"
+    "uk.gov.hmcts.reform.ccd.document.am"
 })
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 public class CoreCaseDataApplication {
