@@ -25,9 +25,6 @@
 
   "expectedResponse": {
     "_extends_": "Common_404_Response",
-    "body": {
-      "message": "No message available",
-      "path": "/getLinkedCases/"
-    }
+    "body": ""
   }
 }
