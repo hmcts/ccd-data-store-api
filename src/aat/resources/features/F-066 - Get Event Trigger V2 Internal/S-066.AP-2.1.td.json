@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-066.AP.2.1",
+  "_extends_": "F-066_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 2.1 - CHALLENGED Access Process (unmatched region filter on STANDARD RoleToAccessProfile for case-type)",
+
+  "specs": [
+    "a caseworker with no role assignments",
+    "uses the case-reference of the case just created",
+    "contains details of the case just created, along with an HTTP-200 OK",
+    "contains `Access Process` set to `CHALLENGED`"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker_RegionalStaff"
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][CreateCase_FT_GlobalSearch_AC_2_PreRequisiteCitizen__Region_3][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "access_granted": "[[ANYTHING_PRESENT]]",
+
+      "access_process": "CHALLENGED"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-066.AG-4",
+  "_extends_": "F-066_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 4 - User's assignments: Role1/BASIC + Role2/SPECIFIC (granted for a different case), R2AP mappings: Role1 + Role2 -> AP1 + AP2, Authorised Case/State: AP1 + AP2 will return Access Granted: `BASIC`",
+
+  "specs": [
+    "a caseworker with RA1: BASIC role assignment",
+    "uses the case-reference of the first case created above",
+    "contains `Access Granted` set to `BASIC` [Due to Role2 not passing filtering]"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker_Role1Basic"
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][CreateCase_FT_CaseAccess_2Roles_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "access_granted": "BASIC",
+
+      "access_process": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

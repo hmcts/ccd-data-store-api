@@ -1,0 +1,29 @@
+{
+  "_guid_": "GrantAccess_FT_CaseAccess_1Role_Caseworker_SPECIFIC",
+  "_extends_": "CaseUserRoles_Add__PositiveResponse_Base",
+
+  "specs": [
+    "to grant SPECIFIC access to the caseworker"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+    },
+    "caseworker": {
+      "_extends_": "BeftaMasterCaseworker_Role1Basic"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][siblingContexts][CreateCase_FT_CaseAccess_1Role_PreRequisiteCitizen][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][caseworker][id]}",
+          "case_role": "[SPECIFICACCESSPROFILE]"
+        }
+      ]
+    }
+  }
+}
