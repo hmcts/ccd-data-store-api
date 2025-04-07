@@ -26,7 +26,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.WireMockBaseContractTest;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
@@ -141,41 +140,29 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
     CaseDataService caseDataService;
     @MockitoBean
     MessageService messageService;
-
     @MockitoBean
     CaseTypeService caseTypeService;
-
     @MockitoBean
     CaseAuditEventRepository caseAuditEventRepository;
-
     @MockitoBean
     CaseDocumentAmApiClient caseDocumentAmApiClient;
-
     @MockitoBean
     ValidateCaseFieldsOperation validateCaseFieldsOperation;
-
     @MockitoBean
     SubmitCaseTransaction submitCaseTransaction;
-
     @MockitoBean
     TimeToLiveService timeToLiveService;
-
     @MockitoBean
     CasePostStateService casePostStateService;
-
     @MockitoBean
     CaseLinkService caseLinkService;
-
     @MockitoBean
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
-    CaseDetailsRepository caseDetailsRepository;
-
+    DefaultCaseDetailsRepository caseDetailsRepository;
     @MockitoBean
     UIDService uidService;
-
     @MockitoBean
     EventTriggerService eventTriggerService;
-
     @MockitoBean
     SecurityClassificationServiceImpl securityClassificationService;
 
