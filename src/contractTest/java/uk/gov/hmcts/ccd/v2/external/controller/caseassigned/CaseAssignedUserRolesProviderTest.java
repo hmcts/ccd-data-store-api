@@ -41,22 +41,22 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(locations = "/application.properties")
 @WebMvcTest({CaseAssignedUserRolesController.class})
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("CASE_ASSIGNED")
 @ContextConfiguration(classes = {CaseAssignedUserRolesProviderTestContext.class, TestIdamConfiguration.class})
 @IgnoreNoPactsToVerify
-@ActiveProfiles("CASE_ASSIGNED")
 @ExtendWith(SpringExtension.class)
 public class CaseAssignedUserRolesProviderTest extends WireMockBaseContractTest {
 
     @MockitoBean
     ApplicationParams applicationParams;
 
-    @Autowired
+    @MockitoBean
     SecurityUtils securityUtils;
 
     @Autowired
     CaseAssignedUserRolesController caseAssignedUserRolesController;
 
-    @Autowired
+    @MockitoBean
     CaseAccessOperation caseAccessOperation;
 
     @TestTemplate
