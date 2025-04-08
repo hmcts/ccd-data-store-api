@@ -17,7 +17,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.WireMockBaseContractTest;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
@@ -43,6 +46,9 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("CASE_ASSIGNED")
 @ExtendWith(SpringExtension.class)
 public class CaseAssignedUserRolesProviderTest extends WireMockBaseContractTest {
+
+    @MockitoBean
+    ApplicationParams applicationParams;
 
     @Autowired
     SecurityUtils securityUtils;
