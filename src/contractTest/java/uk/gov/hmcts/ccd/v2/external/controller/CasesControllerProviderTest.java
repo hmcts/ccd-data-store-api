@@ -373,15 +373,15 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
     }
 
     private CaseDetails mockCaseDetails(String fileName) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            InputStream inputStream = CasesControllerProviderTest.class.getClassLoader()
-                .getResourceAsStream(fileName);
-            CaseDetails caseDetails = objectMapper.readValue(inputStream, CaseDetails.class);
-            return caseDetails;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
+            if (inputStream == null) {
+                log.error("File not found: {}", fileName);
+                return null;
+            }
+            return new ObjectMapper().readValue(inputStream, CaseDetails.class);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error("Error reading file {}: {}", fileName, e.getMessage());
+            return null;
         }
-        return null;
     }
 }
