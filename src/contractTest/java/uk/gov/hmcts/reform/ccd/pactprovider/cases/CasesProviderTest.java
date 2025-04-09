@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 
 @Provider("ccd_data_store_api_cases")
 @PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
-    consumerVersionSelectors = {@VersionSelector(tag = "Dev")})
+    consumerVersionSelectors = {@VersionSelector(tag = "master")})
 @IgnoreNoPactsToVerify
 @ExtendWith(SpringExtension.class)
 public class CasesProviderTest {

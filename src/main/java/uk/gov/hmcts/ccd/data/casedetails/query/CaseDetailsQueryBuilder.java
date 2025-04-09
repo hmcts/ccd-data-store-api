@@ -41,7 +41,7 @@ public abstract class CaseDetailsQueryBuilder<T> {
 
     }
 
-    public CaseDetailsQueryBuilder whereGrantedAccessOnly(String userId) {
+        public CaseDetailsQueryBuilder whereGrantedAccessOnly(String userId) {
         final Subquery<CaseUserEntity> cuQuery = query.subquery(CaseUserEntity.class);
         final Root<CaseUserEntity> cu = cuQuery.from(CaseUserEntity.class);
         cuQuery.select(cu.get("casePrimaryKey").get("caseDataId"))
