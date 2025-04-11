@@ -446,7 +446,7 @@ public class CaseController {
     }
 
     @GetMapping(
-        path = "getLinkedCases/{caseReference}",
+        path = {"getLinkedCases/{caseReference}","getLinkedCases"},
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Operation(summary = "Retrieve Linked Cases")
