@@ -80,6 +80,35 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
+  /caseworkers/{uid}/jurisdiction/{jid}/case-types/{ctid}/cases:
+    get:
+      summary: Get case data for a given case type
+      parameters:
+        - name: uid
+          in: path
+          description: User ID from IdAM
+          required: true
+          type: string
+        - name: jid
+          in: path
+          description: Juristiction ID
+          required: true
+          type: string
+        - name: ctid
+          in: path
+          description: Case Type ID
+          required: true
+          type: string
+      responses:
+        200:
+          description: List of case data for the given search criteria
+          schema:
+            $ref: "#/definitions/CaseDetails"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+            
   /caseworkers/{uid}/jurisdiction/{jid}/case-types/{ctid}/cases/{cid}:
     get:
       summary: Get a specific case
