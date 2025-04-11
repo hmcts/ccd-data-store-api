@@ -1,0 +1,46 @@
+{
+  "title": "Check new_case_users in supplementry data",
+
+  "_guid_": "F-105_Check_NewCase_Users_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "New Case in Supplementary Data",
+
+  "method": "POST",
+  "uri": "/cases/{cid}/supplementary-data",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-105_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "supplementary_data_updates": {
+        "$set": {
+          "new_case.QUK822N": false
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "supplementary_data" : {
+        "new_case.QUK822N" : false
+      }
+    }
+  }
+}
