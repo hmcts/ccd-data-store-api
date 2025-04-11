@@ -33,11 +33,11 @@
     },
     "body": {
       "status": 404,
-      "type": "",
-      "title": "",
-      "detail": "",
-      "instance": "",
-      "properties": ""
+      "type": "[[ANYTHING_PRESENT]]",
+      "title": "Not Found",
+      "detail": "[[ANYTHING_PRESENT]]",
+      "instance": "[[ANYTHING_PRESENT]]",
+      "properties": "[[ANY_STRING_NULLABLE]]"
     }
   }
 }
