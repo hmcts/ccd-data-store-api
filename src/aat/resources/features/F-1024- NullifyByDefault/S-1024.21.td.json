@@ -1,0 +1,59 @@
+{
+  "_guid_": "S-1024.21",
+  "_extends_": "SubmitEvent_v2Ext__PositiveResponse_Base",
+
+  "title": "During Submit case creation adjust any validation on TTL for v2_external#/case-controller/createCaseUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details for case C1",
+    "contains TTL value is not null",
+    "is configured to trigger an About to submit callback that has changed the value of TTL and it is still null",
+    "has the 200 OK code",
+    "contains the TTL set to null"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1024_GetUpdateCaseTokenCitizen"
+  } ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCitizen_AboutToSubmit][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "event": {
+        "id": "updateCaseTTLASEvent"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseUpdated",
+      "case_type": "FT_MasterCaseType",
+
+      "data": {
+        "TTL" : { }
+      },
+      "data_classification": {
+        "TTL" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        }
+      }
+    }
+  }
+}

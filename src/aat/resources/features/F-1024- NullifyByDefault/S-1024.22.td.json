@@ -1,0 +1,45 @@
+{
+  "_guid_": "S-1024.22",
+  "_extends_": "SubmitEvent_v1Ext_Caseworker__Base",
+
+  "title": "During Submit case creation About to submit callback updates TTL value for v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details for case C1",
+    "contains TTL value is not null",
+    "is configured to trigger an About to submit callback that has changed the value of TTL and it is not null",
+    "has the 400 OK code"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1024_GetUpdateCaseTokenCaseworker_NotNull"
+  } ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1024_CreateCasePreRequisiteCaseworker_AboutToSubmit_NotNull][testData][actualResponse][body][id]}",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+    },
+    "body": {
+      "event": {
+        "id": "updateCaseTTLASNotNull"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}
