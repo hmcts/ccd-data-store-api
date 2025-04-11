@@ -1,0 +1,20 @@
+{
+  "_guid_": "CaseUserRoles_Add__PositiveResponse_Base",
+  "_extends_": "CaseUserRoles_Add__Base",
+
+  "s2sClientId": "aac_manage_case_assignment",
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+
+    "body": {
+      "status_message": "Case-User-Role assignments created successfully"
+    }
+  }
+}

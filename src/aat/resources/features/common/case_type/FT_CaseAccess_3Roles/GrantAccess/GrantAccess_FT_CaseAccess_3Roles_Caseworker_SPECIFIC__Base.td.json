@@ -1,0 +1,17 @@
+{
+  "_guid_": "GrantAccess_FT_CaseAccess_3Roles_Caseworker_SPECIFIC__Base",
+  "_extends_": "CaseUserRoles_Add__PositiveResponse_Base",
+
+  "specs": [
+    "to grant SPECIFIC access to the caseworker"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+    },
+    "caseworker": {
+      "_extends_": "BeftaMasterCaseworker_Role1Basic_Role3Challenged_Region123"
+    }
+  }
+}
