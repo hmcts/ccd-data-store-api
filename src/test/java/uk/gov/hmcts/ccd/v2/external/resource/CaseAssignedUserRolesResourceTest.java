@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CaseAssignedUserRolesResourceTest {

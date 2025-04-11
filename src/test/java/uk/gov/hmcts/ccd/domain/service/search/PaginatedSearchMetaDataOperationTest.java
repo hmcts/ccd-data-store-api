@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 
@@ -33,7 +33,7 @@ class PaginatedSearchMetaDataOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         paginatedSearchMetadata.setTotalResultsCount(60);
         paginatedSearchMetadata.setTotalPagesCount(3);
         paginatedSearchMetaDataOperation = new PaginatedSearchMetaDataOperation(caseDetailsRepository);
