@@ -16,7 +16,7 @@ properties(
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
-def branchesToSync = ['demo', 'perftest', 'develop']
+def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
 
 // Variables to switch pipeline logic and wiring per type of build
 
