@@ -32,6 +32,7 @@
       "_extends_": "Common_404_Response_Headers"
     },
     "body": {
+      "status": 404,
       "type": "",
       "title": "",
       "detail": "",

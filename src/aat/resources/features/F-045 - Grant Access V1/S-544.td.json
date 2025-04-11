@@ -30,6 +30,7 @@
       "Vary": "Accept-Encoding"
     },
     "body": {
+	  "status": 400,
       "type": "[[ANYTHING_PRESENT]]",
       "title": "Bad Request",
       "detail": "Failed to read request",
