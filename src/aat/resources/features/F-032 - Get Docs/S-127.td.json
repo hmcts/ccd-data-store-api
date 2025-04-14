@@ -1,12 +1,12 @@
 {
-	"title": "must return 404 for non-existing case type id",
+	"title": "must return 404 for non-existing jurisdiction id",
 
 	"_guid_": "S-127",
 	"_extends_": "F-032_Base_Test_Data",
 
 	"specs": [
 		"an active profile in CCD",
-		"contains a non-existing case type id",
+		"contains a non-existing jurisdiction id",
 		"contains a HTTP 404 Not Found"
 	],
 
