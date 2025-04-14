@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-068.5",
+  "operationName": "Save draft as a caseworker",
+  "_extends_": "F-068_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "Save draft as a caseworker",
+    "contains an invalid user authentication token",
+    "contains a HTTP 401 Unauthorised"
+  ],
+  "method": "POST",
+  "uri": "/internal/case-types/{ctid}/drafts",
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Authorization": "Bearer abc"
+    },
+    "pathVariables": {
+      "ctid": "FT_CRUD"
+    },
+    "body": {
+      "data": {
+        "TextField": "field1",
+        "TextField2": "field2"
+      },
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][F-068_Get_Event_Token][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_401_Response",
+    "body" : null
+  }
+}
