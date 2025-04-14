@@ -367,8 +367,8 @@ pitest {
     detectInlinedCode = true
 
 }
-project.tasks['pitest'].group = "Verification"
 
+project.tasks['pitest'].group = "Verification"
 
 task projectVersion {
     description 'Prints the version of this project; used for publishing JAR file'
