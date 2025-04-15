@@ -149,7 +149,7 @@ class CallbackInvokerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setCallBackURLAboutToStartEvent(URL_ABOUT_TO_START);

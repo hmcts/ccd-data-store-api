@@ -3,14 +3,13 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.boot.context.properties.bind.ConstructorBinding;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.List;
 
-@ConstructorBinding
 @ConfigurationProperties("elasticsearch")
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor = @__({@ConstructorBinding}))
 @Getter
 public class ElasticsearchMappings {
 

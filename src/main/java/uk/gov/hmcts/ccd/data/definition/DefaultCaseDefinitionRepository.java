@@ -63,7 +63,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving base type", e);
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                    && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case types for Jurisdiction:"
                         + jurisdictionId + " because of " + e.getMessage());
             } else {
@@ -95,7 +95,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type", e);
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                    && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case type definition for "
                         + caseTypeId + " because of " + e.getMessage());
             } else {
@@ -119,7 +119,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving base types", e);
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(
                     "Problem getting base types definition from definition store because of " + e.getMessage());
             } else {
@@ -139,7 +139,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 UserRole.class, queryParams).getBody();
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 LOG.debug("No classification found for user role {} because of ", userRole, e);
                 return null;
             } else {
@@ -186,7 +186,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type version", e);
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                    && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(
                         "Error when getting case type version. Unknown case type '" + caseTypeId + "'.", e);
             } else {
@@ -257,7 +257,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
                     jurisdictionIds.orElse(Collections.emptyList()));
                 return new ArrayList<>();
