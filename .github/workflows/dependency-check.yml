@@ -31,7 +31,15 @@ jobs:
           java-version: 21
           distribution: 'temurin'
       - name: Run dependencyCheck
-        run: ./gradlew dependencyCheckAggregate
+        run: ./gradlew --no-daemon \
+              -DdependencyCheck.failBuild=true \
+              -Dnvd.api.check.validforhours=24 \
+              -Danalyzer.central.enabled=true \
+              -Danalyzer.retirejs.enabled=false \
+              -Danalyzer.ossindex.enabled=false \
+              -Dnvd.api.key=197b3e12-176d-43b2-bea8-453e3c975607 \
+              -Dnvd.api.delay=6000 \
+              dependencyCheckAggregate;
         continue-on-error: true
       - name: Run suppressCves
         run: ./gradlew suppressCves
