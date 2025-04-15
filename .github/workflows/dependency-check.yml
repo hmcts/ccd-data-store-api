@@ -39,7 +39,12 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run OWASP Dependency Check
+        env:
+          org_owasp_dependencycheck_data_nvd_apiKey: ${{ secrets.NVD_API_KEY }}
         run: ./gradlew dependencyCheckAggregate
+
+      #- name: Run OWASP Dependency Check
+      #  run: ./gradlew dependencyCheckAggregate
         
       - name: Run suppressCves
         run: ./gradlew suppressCves
