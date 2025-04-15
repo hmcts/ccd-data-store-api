@@ -30,9 +30,17 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
-      - name: Run dependencyCheck
-        run: ./gradlew --no-daemon -DdependencyCheck.failBuild=true -Dnvd.api.check.validforhours=24 -Danalyzer.central.enabled=true -Danalyzer.retirejs.enabled=false -Danalyzer.ossindex.enabled=false -Dnvd.api.key=a60069c6-d851-41cd-a6fc-d28335b33ccb -Dnvd.api.delay=6000 dependencyCheckAggregate;
-        continue-on-error: true
+          
+      #- name: Run dependencyCheck
+      #  run: ./gradlew --no-daemon -DdependencyCheck.failBuild=true -Dnvd.api.check.validforhours=24 -Danalyzer.central.enabled=true -Danalyzer.retirejs.enabled=false -Danalyzer.ossindex.enabled=false -Dnvd.api.key=a60069c6-d851-41cd-a6fc-d28335b33ccb -Dnvd.api.delay=6000 dependencyCheckAggregate;
+      #  continue-on-error: true
+        
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run OWASP Dependency Check
+        run: ./gradlew dependencyCheckAggregate
+        
       - name: Run suppressCves
         run: ./gradlew suppressCves
       - name: Run cleanSuppressions
