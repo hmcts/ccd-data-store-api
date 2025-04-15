@@ -1,11 +1,11 @@
 name: Suppressions
 
 on:
-  schedule:
-    # At 12 midnight and every 3rd hour from 10am through 11pm
-    - cron: "0 0,10-23/3 * * *"
+  push:
+    branches:
+      - test-fix-workflow-suppression
   workflow_dispatch:
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest
