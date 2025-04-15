@@ -1,11 +1,11 @@
 name: Suppressions
 
 on:
-  schedule:
-    # At 12 midnight and every 3rd hour from 10am through 11pm
-    - cron: "0 0,10-23/3 * * *"
+  push:
+    branches:
+      - test-fix-workflow-suppression
   workflow_dispatch:
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,9 +30,23 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
-      - name: Run dependencyCheck
-        run: ./gradlew dependencyCheckAggregate
-        continue-on-error: true
+          
+      #- name: Run dependencyCheck
+      #  run: ./gradlew --no-daemon -DdependencyCheck.failBuild=true -Dnvd.api.check.validforhours=24 -Danalyzer.central.enabled=true -Danalyzer.retirejs.enabled=false -Danalyzer.ossindex.enabled=false -Dnvd.api.key=a60069c6-d851-41cd-a6fc-d28335b33ccb -Dnvd.api.delay=6000 dependencyCheckAggregate;
+      #  continue-on-error: true
+        
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run OWASP Dependency Check
+        env:
+          org_owasp_dependencycheck_data_nvd_apiKey: ${{ secrets.NVD_API_KEY }}
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: ./gradlew dependencyCheckAggregate -Dnvd.api.key=${{ secrets.NVD_API_KEY }}
+
+      #- name: Run OWASP Dependency Check
+      #  run: ./gradlew dependencyCheckAggregate
+        
       - name: Run suppressCves
         run: ./gradlew suppressCves
       - name: Run cleanSuppressions
