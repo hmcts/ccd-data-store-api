@@ -1,0 +1,39 @@
+{
+  "_guid_": "S-027.AG-7",
+  "_extends_": "F-027_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 7 - User with IDAM role authorised to access case type, R2AP mappings: IdamRole -> AP1, Authorised Case/State: AP1 will return Access Granted: `STANDARD`",
+
+  "specs": [
+    "a caseworker with no role assignments",
+    "uses the case-reference of the case just created",
+    "contains `Access Granted` set to `STANDARD`"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CaseAccess_IdamRole",
+      "cid": "${[scenarioContext][childContexts][CreateCase_FT_CaseAccess_IdamRole_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "metadataFields": [
+        {
+          "_extends_": "MetadataField", 
+
+          "id": "[ACCESS_GRANTED]",
+          "label": "Access Granted",
+          "value": "STANDARD"
+        },
+        { "_extends_": "MetadataField", "id": "[ACCESS_PROCESS]" }
+      ]
+    }
+  }
+}
