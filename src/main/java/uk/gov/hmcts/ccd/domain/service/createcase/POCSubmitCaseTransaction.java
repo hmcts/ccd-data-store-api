@@ -46,6 +46,7 @@ public class POCSubmitCaseTransaction {
                 caseTypeService.findState(caseTypeDefinition, newCaseDetails.getState());
 
         POCEventDetails.POCEventDetailsBuilder eventDetails = POCEventDetails.builder()
+                .caseType(caseTypeDefinition.getId())
                 .eventId(event.getEventId())
                 .eventName(caseEventDefinition.getName())
                 .summary(event.getSummary())

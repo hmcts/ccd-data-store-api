@@ -52,6 +52,7 @@ public class POCCreateCaseEventService {
                 caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
 
         POCEventDetails.POCEventDetailsBuilder eventDetails = POCEventDetails.builder()
+                .caseType(caseTypeDefinition.getId())
                 .eventId(event.getEventId())
                 .eventName(caseEventDefinition.getName())
                 .summary(event.getSummary())

@@ -8,6 +8,8 @@ import lombok.Data;
 @Builder
 public class POCEventDetails {
 
+    @JsonProperty("case_type")
+    private String caseType;
     @JsonProperty("event_id")
     private String eventId;
     @JsonProperty("event_name")
