@@ -3,6 +3,10 @@ package uk.gov.hmcts.ccd.customheaders;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 
 public class UserAuthHeadersInterceptor implements RequestInterceptor {
@@ -25,5 +29,9 @@ public class UserAuthHeadersInterceptor implements RequestInterceptor {
         }
         // TODO: will be removed once ccd cleaned in their end
         template.header(EXPERIMENTAL, "true");
+
+        var requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        var request = requestAttributes.getRequest();
+        template.header(HttpHeaders.REFERER, request.getHeader(HttpHeaders.REFERER));
     }
 }
