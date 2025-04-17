@@ -7,7 +7,6 @@ import uk.gov.hmcts.ccd.clients.PocApiClient;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.POCCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.POCEventDetails;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -65,8 +64,7 @@ public class POCSubmitCaseTransaction {
 
 
         try {
-            RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(idamUser.getId());
-            CaseDetails caseDetails = pocApiClient.createEvent(pocCaseEvent, roleAssignments);
+            CaseDetails caseDetails = pocApiClient.createEvent(pocCaseEvent);
             log.info("pocCaseDetails: {}", caseDetails);
             log.info("pocCaseDetails id: {}", caseDetails.getId());
             log.info("pocCaseDetails reference before: {}", caseDetails.getReference());
