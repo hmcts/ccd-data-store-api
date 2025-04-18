@@ -26,7 +26,7 @@ jobs:
 
       - name: Run tests
         id: run_tests
-        continue-on-error: true # IMPORTANT: Allow workflow to continue even if tests fail
+        # continue-on-error: true # IMPORTANT: Allow workflow to continue even if tests fail
         run: ./gradlew -i test
 
       - name: Archive JUnit results
