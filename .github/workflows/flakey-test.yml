@@ -2,7 +2,6 @@ name: Flaky Test Hunter
 
 on:
   push:
-    branches: [ master ] # Only trigger on pushes to the master branch
   pull_request:
     branches: [ master ] # Only trigger on pull requests targeting the master branch
   workflow_dispatch: # Allows manual triggering of the workflow
