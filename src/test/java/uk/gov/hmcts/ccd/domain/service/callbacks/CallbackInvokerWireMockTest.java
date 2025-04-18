@@ -75,6 +75,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .inScenario("CallbackRetry")
             .whenScenarioStateIs("SecondFailedAttempt")
+            // TODO: this is a cause of flakeyness - this can easily tip over 500ms still and cause a failure.
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(490))
             .willSetStateTo("SuccessfulAttempt"));
 
