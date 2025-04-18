@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.run_number }}
-          path: build/test-results/test 
+          path: build/reports/jacoco/html
 
       - name: Print run number (for debugging)
         run: echo "This is run number ${{ matrix.run_number }}"
