@@ -28,6 +28,7 @@ jobs:
 
       - name: Run tests
         id: run_tests 
+        continue-on-error: true
         run: ./gradlew -i test
 
       - name: Archive test results
