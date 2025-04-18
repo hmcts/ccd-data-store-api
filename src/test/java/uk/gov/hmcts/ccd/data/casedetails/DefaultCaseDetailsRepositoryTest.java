@@ -109,6 +109,9 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
 
+    @MockBean
+    private POCCaseDetailsRepository pocCaseDetailsRepository;
+
     @Inject
     private ApplicationParams applicationParams;
 
@@ -140,7 +143,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         DefaultCaseDetailsRepository defaultCaseDetailsRepository =
             new DefaultCaseDetailsRepository(caseDetailsMapper, null, null,
-                applicationParams);
+                applicationParams, pocCaseDetailsRepository);
 
         Field emField = DefaultCaseDetailsRepository.class.getDeclaredField("em");
         emField.setAccessible(true);
