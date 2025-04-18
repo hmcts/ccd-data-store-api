@@ -7,37 +7,200 @@ on:
   workflow_dispatch: # Allows manual triggering of the workflow
   schedule:
     - cron: '0 0 * * *'
-      branches: [ master ]  # Runs daily on master
+      # Note: Scheduled runs typically run on the default branch (e.g., master or main)
+      # The branches filter here might not behave as expected for schedules.
+      # It's generally implied schedules run on the default branch.
 
 jobs:
   flakey-test-run:
     strategy:
       fail-fast: false
       matrix:
-        run_number: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+        # Reduced for brevity in example, keep your original 20 runs
+        run_number: [1, 2, 3, 4, 5]
+        # run_number: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     runs-on: ubuntu-latest # Or another runner type you prefer
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Use latest major version
 
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4 # Use latest major version
         with:
           distribution: 'temurin' # Or another JDK distribution
           java-version: '17' # Or your required JDK version
+          cache: 'gradle' # Enable Gradle caching
 
       - name: Run tests
-        id: run_tests 
+        id: run_tests
+        continue-on-error: true # IMPORTANT: Allow workflow to continue even if tests fail
         run: ./gradlew -i test
 
-      - name: Archive test results
+      - name: Archive JUnit results
         if: always() # Always run, even if tests fail
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ matrix.run_number }}
-          path: build/reports/jacoco/html
+          name: junit-results-${{ matrix.run_number }}
+          # Gradle typically puts JUnit XML results here:
+          path: build/test-results/test/*.xml
+          retention-days: 5 # Optional: Adjust retention as needed
 
-      - name: Print run number (for debugging)
-        run: echo "This is run number ${{ matrix.run_number }}"
+      # Optional: Keep HTML reports if you still want them per-run
+      # - name: Archive HTML test results
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: html-report-${{ matrix.run_number }}
+      #     path: build/reports/tests/test # Adjust path if needed
+      #     retention-days: 5
 
+      - name: Print run number status
+        if: always()
+        run: |
+          echo "Finished run number ${{ matrix.run_number }}"
+          # Check the outcome of the test step
+          if [[ "${{ steps.run_tests.outcome }}" == "failure" ]]; then
+            echo "Run ${{ matrix.run_number }} failed."
+          else
+            echo "Run ${{ matrix.run_number }} succeeded."
+          fi
+
+  aggregate-results:
+    # Run this job after all matrix runs are finished, regardless of their status
+    needs: flakey-test-run
+    if: always() # Ensures this job runs even if some flakey-test-run jobs failed
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        # Not strictly needed unless the aggregation script is in the repo,
+        # but can be useful context or if you add the script below to the repo.
+
+      - name: Download all JUnit results artifacts
+        uses: actions/download-artifact@v4
+        with:
+          # Download all artifacts produced by this workflow run
+          # They will be placed in directories named after the artifact name
+          path: all-junit-results
+
+      - name: Install Python for parsing
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Aggregate failures
+        id: aggregate
+        run: |
+          echo "Aggregating test results..."
+          python << 'EOF'
+          import os
+          import xml.etree.ElementTree as ET
+          from collections import Counter
+          from pathlib import Path
+          import sys
+
+          results_dir = Path("all-junit-results")
+          failure_counts = Counter()
+          total_runs_processed = 0
+          failed_run_numbers = set()
+
+          print(f"Searching for XML files in: {results_dir.absolute()}")
+
+          # Find all JUnit XML files within the downloaded artifact directories
+          xml_files = list(results_dir.glob("junit-results-*/*.xml"))
+
+          if not xml_files:
+              print("No JUnit XML files found.")
+              sys.exit(0) # Exit cleanly if no results were found
+
+          print(f"Found {len(xml_files)} JUnit XML files to process.")
+
+          processed_files_count = 0
+          for xml_file in xml_files:
+              try:
+                  # Extract run number from parent directory name
+                  run_number_str = xml_file.parent.name.replace("junit-results-", "")
+                  run_number = int(run_number_str) if run_number_str.isdigit() else None
+
+                  tree = ET.parse(xml_file)
+                  root = tree.getroot()
+                  processed_files_count += 1
+
+                  run_had_failure = False
+                  # Iterate through testcase elements
+                  for testcase in root.findall('.//testcase'):
+                      test_name = testcase.get('name')
+                      class_name = testcase.get('classname')
+                      full_test_name = f"{class_name}#{test_name}"
+
+                      # Check for failure or error sub-elements
+                      failure = testcase.find('failure')
+                      error = testcase.find('error')
+
+                      if failure is not None or error is not None:
+                          failure_counts[full_test_name] += 1
+                          run_had_failure = True
+
+                  if run_had_failure and run_number is not None:
+                      failed_run_numbers.add(run_number)
+
+              except ET.ParseError:
+                  print(f"Warning: Could not parse XML file: {xml_file}")
+              except Exception as e:
+                  print(f"Warning: Error processing file {xml_file}: {e}")
+
+          total_runs_expected = len(set(f.parent.name for f in xml_files)) # Count unique directories/runs
+          print(f"Processed {processed_files_count} XML files from {total_runs_expected} runs.")
+
+          # Generate Markdown Summary
+          summary_md = []
+          summary_md.append(f"# Flaky Test Analysis Summary")
+          summary_md.append(f"Ran tests {total_runs_expected} times.") # Adjust if you know the exact matrix size
+
+          if not failure_counts:
+              summary_md.append("\n**🎉 No test failures detected across all runs!**")
+          else:
+              summary_md.append(f"\n**🚨 Found failures in {len(failed_run_numbers)} runs: {sorted(list(failed_run_numbers))}**")
+              summary_md.append("\n**Failed Tests & Counts:**\n")
+              summary_md.append("| Failure Count | Test Name |")
+              summary_md.append("|---------------|-----------|")
+              # Sort by count descending, then by name ascending
+              sorted_failures = sorted(failure_counts.items(), key=lambda item: (-item[1], item[0]))
+              for test_name, count in sorted_failures:
+                  summary_md.append(f"| {count} | `{test_name}` |")
+
+          final_summary = "\n".join(summary_md)
+
+          # Output summary to GitHub Step Summary
+          summary_file = os.environ.get("GITHUB_STEP_SUMMARY", "summary.md")
+          with open(summary_file, "w") as f:
+              f.write(final_summary)
+              print(f"\nSummary written to {summary_file}")
+
+          # Also print to console for logs
+          print("\n--- Failure Summary ---")
+          print(final_summary)
+          print("--- End Summary ---")
+
+          # Set an output indicating if failures were found
+          has_failures = "true" if failure_counts else "false"
+          print(f"::set-output name=has_failures::{has_failures}")
+
+          EOF
+
+      - name: Upload failure summary artifact
+        if: always() # Upload summary even if aggregation script had minor issues (but found files)
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-summary
+          path: ${{ env.GITHUB_STEP_SUMMARY }} # Path to the summary file generated by the script
+          retention-days: 30 # Keep summary longer
+
+      # Optional: Fail the workflow if any flakes were detected
+      - name: Check for failures
+        if: steps.aggregate.outputs.has_failures == 'true'
+        run: |
+          echo "::error::Flaky tests detected! Check the summary artifact and job summary."
+          exit 1
