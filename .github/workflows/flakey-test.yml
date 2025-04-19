@@ -37,6 +37,7 @@ jobs:
           path: build/test-results/test/*.xml
 
       - name: Archive HTML test results 
+        if: always() # Always run, even if tests fail
         uses: actions/upload-artifact@v4
         with:
           name: html-results-${{ matrix.run_number }}
