@@ -9,6 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+      
     steps:
       - uses: tibdex/github-app-token@v1
         id: generate-token
@@ -53,8 +57,6 @@ jobs:
       #- name: Run OWASP Dependency Check
       #  run: ./gradlew dependencyCheckAggregate
 
-        env:
-          NVD_API_KEY: 2c64fbb7-0044-4968-addd-e759dc4fe01c
         run: ./gradlew dependencyCheckAggregate
       
       - name: Run suppressCves
