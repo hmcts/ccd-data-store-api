@@ -227,35 +227,6 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         when(validateCaseFieldsOperation.validateCaseDetails(any(), any())).thenReturn(new HashMap<>());
     }
 
-    private void mockCaseDetailsResponse(String fileName) {
-        CaseDetails caseDetails = mockCaseDetails(fileName);
-        when(submitCaseTransaction.submitCase(any(),
-            any(),
-            any(),
-            any(),
-            any(),
-            any(),
-            any())).thenReturn(caseDetails);
-        when(casePostStateService.evaluateCaseState(any(), any())).thenReturn("");
-        when(timeToLiveService.isCaseTypeUsingTTL(any())).thenReturn(false);
-        when(timeToLiveService.getUpdatedResolvedTTL(any())).thenReturn(LocalDate.now());
-        when(timeToLiveService.updateCaseDetailsWithTTL(any(), any(), any())).thenReturn(caseDetails.getData());
-        doNothing().when(caseLinkService).updateCaseLinks(any(), any());
-        when(uidService.validateUID(anyString())).thenReturn(true);
-        when(caseDetailsRepository.findUniqueCase(any(), any(), any())).thenReturn(caseDetails);
-        when(caseDetailsRepository.findByReference(anyString())).thenReturn(Optional.of(caseDetails));
-        when(caseDetailsRepository.set(any())).thenReturn(caseDetails);
-        when(eventTriggerService.isPreStateValid(any(), any())).thenReturn(true);
-        CaseEventDefinition caseEventDefinition = mock(CaseEventDefinition.class);
-        when(eventTriggerService.findCaseEvent(any(), any())).thenReturn(caseEventDefinition);
-        when(eventTriggerService.isPreStateEmpty(any())).thenReturn(true);
-        when(securityClassificationService.getClassificationForEvent(any(), any()))
-            .thenReturn(SecurityClassification.PUBLIC);
-        CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
-        when(caseStateDefinition.getName()).thenReturn("Created");
-        when(caseTypeService.findState(any(), any())).thenReturn(caseStateDefinition);
-    }
-
     @State("adoption-web makes request to get cases")
     public void adoptionWebToGetCases(Map<String, Object> dataMap) {
     }
@@ -294,13 +265,11 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     public void toGetACase(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
         getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
-
     }
 
     @State({"A Read for a Citizen is requested"})
     public void toReadForACitizen(Map<String, Object> dataMap) {
         toGetACase(dataMap);
-
     }
 
     @State({"A Read for a Caseworker is requested"})
@@ -331,19 +300,9 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
             caseDetails.getReferenceAsString());
     }
 
-    @State({"A Start Event for a Citizen is requested"})
-    public void toStartEventForACitizen(Map<String, Object> dataMap) {
-        toStartEventForACaseworker(dataMap);
-    }
-
     @State({"A Start for a Caseworker is requested"})
     public void toStartForACaseworker(Map<String, Object> dataMap) {
         mockCaseDetailsResponse("mock_responses/read_caseworker.json");
-        setUpSecurityContextForEvent(dataMap);
-    }
-
-    @State({"A Start for a Citizen is requested"})
-    public void toStartForACitizen(Map<String, Object> dataMap) {
         setUpSecurityContextForEvent(dataMap);
     }
 
@@ -354,19 +313,9 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
-    @State({"A Submit Event for a Citizen is requested"})
-    public void toSubmitEventForACitizen(Map<String, Object> dataMap) {
-        toSubmitEventForACaseworker(dataMap);
-    }
-
     @State({"A Submit for a Caseworker is requested"})
     public void toSubmitForACaseworker(Map<String, Object> dataMap) {
-        mockCaseDetailsResponse("mock_responses/read_caseworker.json");
-        setUpSecurityContextForEvent(dataMap);
-    }
-
-    @State({"A Submit for a Citizen is requested"})
-    public void toSubmitForACitizen(Map<String, Object> dataMap) {
+        mockCaseDetailsResponse("mock_responses/submit_for_caseworker.json");
         setUpSecurityContextForEvent(dataMap);
     }
 
@@ -382,6 +331,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         securityUtils.setSecurityContextUserAsCaseworkerByEvent(caseDataContent.getEventId(), caseworkerUsername,
             caseworkerPassword);
         return contractTestCreateCaseOperation.createCaseDetails(caseType, caseDataContent, true);
+
     }
 
     private CaseDetails setUpCaseDetailsFromStateMapForEvent(Map<String, Object> dataMap) {
@@ -391,6 +341,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         CaseDataContent caseDataContent = objectMapper.convertValue(contentDataMap, CaseDataContent.class);
 
         return contractTestCreateCaseOperation.createCaseDetails(caseType, caseDataContent, true);
+
     }
 
     private void setUpSecurityContextForEvent(Map<String, Object> dataMap) {
@@ -413,5 +364,34 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
             log.error("Error reading file {}: {}", fileName, e.getMessage());
             return null;
         }
+    }
+
+    private void mockCaseDetailsResponse(String fileName) {
+        CaseDetails caseDetails = mockCaseDetails(fileName);
+        when(submitCaseTransaction.submitCase(any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any())).thenReturn(caseDetails);
+        when(casePostStateService.evaluateCaseState(any(), any())).thenReturn("");
+        when(timeToLiveService.isCaseTypeUsingTTL(any())).thenReturn(false);
+        when(timeToLiveService.getUpdatedResolvedTTL(any())).thenReturn(LocalDate.now());
+        when(timeToLiveService.updateCaseDetailsWithTTL(any(), any(), any())).thenReturn(caseDetails.getData());
+        doNothing().when(caseLinkService).updateCaseLinks(any(), any());
+        when(uidService.validateUID(anyString())).thenReturn(true);
+        when(caseDetailsRepository.findUniqueCase(any(), any(), any())).thenReturn(caseDetails);
+        when(caseDetailsRepository.findByReference(anyString())).thenReturn(Optional.of(caseDetails));
+        when(caseDetailsRepository.set(any())).thenReturn(caseDetails);
+        when(eventTriggerService.isPreStateValid(any(), any())).thenReturn(true);
+        CaseEventDefinition caseEventDefinition = mock(CaseEventDefinition.class);
+        when(eventTriggerService.findCaseEvent(any(), any())).thenReturn(caseEventDefinition);
+        when(eventTriggerService.isPreStateEmpty(any())).thenReturn(true);
+        when(securityClassificationService.getClassificationForEvent(any(), any()))
+            .thenReturn(SecurityClassification.PUBLIC);
+        CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
+        when(caseStateDefinition.getName()).thenReturn("Created");
+        when(caseTypeService.findState(any(), any())).thenReturn(caseStateDefinition);
     }
 }
