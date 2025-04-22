@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 
 @Named
 @Singleton

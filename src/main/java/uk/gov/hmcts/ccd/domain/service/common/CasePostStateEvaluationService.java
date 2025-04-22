@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionParser;
 import uk.gov.hmcts.ccd.domain.model.definition.EventPostStateDefinition;
