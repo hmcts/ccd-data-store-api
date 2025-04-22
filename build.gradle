@@ -23,7 +23,8 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.57'
     id 'au.com.dius.pact' version '4.3.12'
     id "org.jsonschema2pojo" version "1.2.1"
-    id "org.owasp.dependencycheck" version "12.1.1" // or latest
+    //id "org.owasp.dependencycheck" version "12.1.1" // or latest
+    id "org.owasp.dependencycheck" version "8.4.0"
 }
 
 apply from: './gradle/suppress.gradle'
