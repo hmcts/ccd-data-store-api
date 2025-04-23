@@ -81,7 +81,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @Provider("ccdDataStoreAPI_Cases")
 @PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
-    consumerVersionSelectors = {@VersionSelector(tag = "Dev")})
+    consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
     "ccd.document.url.pattern=${CCD_DOCUMENT_URL_PATTERN:https?://(((?:api-gateway.preprod.dm.reform.hmcts.net|"
@@ -403,15 +403,15 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     }
 
     private CaseDetails mockCaseDetails(String fileName) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            InputStream inputStream = CasesControllerProviderTest.class.getClassLoader()
-                .getResourceAsStream(fileName);
-            CaseDetails caseDetails = objectMapper.readValue(inputStream, CaseDetails.class);
-            return caseDetails;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
+            if (inputStream == null) {
+                log.error("File not found: {}", fileName);
+                return null;
+            }
+            return new ObjectMapper().readValue(inputStream, CaseDetails.class);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error("Error reading file {}: {}", fileName, e.getMessage());
+            return null;
         }
-        return null;
     }
 }
