@@ -21,7 +21,7 @@ public class POCCaseAuditEventRepository {
     public List<AuditEvent> findByCase(final CaseDetails caseDetails) {
 
         Long reference = caseDetails.getReference();
-        return pocApiClient.getEvents(reference.toString());
+        return pocApiClient.getCaseHistory(reference.toString());
     }
 
 }

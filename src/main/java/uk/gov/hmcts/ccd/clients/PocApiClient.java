@@ -23,5 +23,5 @@ public interface PocApiClient {
     CaseDetails createEvent(@RequestBody POCCaseEvent caseEvent);
 
     @GetMapping(value = "/ccd/cases/{case-ref}/history")
-    List<AuditEvent> getEvents(@PathVariable("case-ref") String caseReference);
+    List<AuditEvent> getCaseHistory(@PathVariable("case-ref") String caseReference);
 }
