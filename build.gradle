@@ -154,7 +154,7 @@ tasks.withType(Checkstyle) {
 }
 
 tasks.withType(Test) {
-    maxParallelForks = System.getenv('MAX_NUM_PARALLEL_THREADS') ?: 6 as int
+//    maxParallelForks = System.getenv('MAX_NUM_PARALLEL_THREADS') ?: 6 as int
     maxHeapSize = "2048m"
     // Cached contexts & threadpools exhaust postgres' max connections.
     systemProperties['spring.test.context.cache.maxSize'] = 5
