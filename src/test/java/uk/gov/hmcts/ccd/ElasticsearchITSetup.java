@@ -138,7 +138,7 @@ public class ElasticsearchITSetup {
             .map((jsonNodes) -> jsonNodes.replace('\n', ' ').replace('\r', ' '))
             .collect(joining("\n")) + "\n";
 
-        performBulkRequest(url("/_bulk"), bulkRequestBody);
+        performBulkRequest(url("/_bulk?refresh=true"), bulkRequestBody);
     }
 
     private String indexMetadataJson(String indexName, String indexType, String id, String routing) {
