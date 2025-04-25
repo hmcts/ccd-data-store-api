@@ -119,7 +119,8 @@ withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
         enablePactAs([
-            AppPipelineDsl.PactRoles.PROVIDER
+          AppPipelineDsl.PactRoles.CONSUMER,
+          AppPipelineDsl.PactRoles.PROVIDER
         ])
     }
     if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
@@ -132,7 +133,8 @@ withPipeline(type, product, component) {
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
         enablePactAs([
-            AppPipelineDsl.PactRoles.PROVIDER
+          AppPipelineDsl.PactRoles.CONSUMER,
+          AppPipelineDsl.PactRoles.PROVIDER
         ])
     }
 
