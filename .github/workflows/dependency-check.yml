@@ -9,10 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    env:
-      NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-      
     steps:
       - uses: tibdex/github-app-token@v1
         id: generate-token
@@ -34,31 +30,13 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
-          
-      #- name: Run dependencyCheck
-      #  run: ./gradlew --no-daemon -DdependencyCheck.failBuild=true -Dnvd.api.check.validforhours=24 -Danalyzer.central.enabled=true -Danalyzer.retirejs.enabled=false -Danalyzer.ossindex.enabled=false -Dnvd.api.key=a60069c6-d851-41cd-a6fc-d28335b33ccb -Dnvd.api.delay=6000 dependencyCheckAggregate;
-      #  continue-on-error: true
-        
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
       - name: Run OWASP Dependency Check
-        #env:
-        #  NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        #  org_owasp_dependencycheck_data_nvd_apiKey: ${{ secrets.NVD_API_KEY }}
-        #run: ./gradlew dependencyCheckAggregate
-        #run: ./gradlew -DskipTests -DnvdApiKey=${{secrets.NVD_API_KEY}} -DskipITs -Dmax.cvss.score=8 dependencyCheckAggregate
-
-        #env:
-        #  org_owasp_dependencycheck_data_directory: ~/.gradle/dependency-check-data
-        #  org_owasp_dependencycheck_data_nvd_apiKey: ${{ secrets.NVD_API_KEY }}
-        #run: ./gradlew dependencyCheckAggregate
-      
-      #- name: Run OWASP Dependency Check
-      #  run: ./gradlew dependencyCheckAggregate
-
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: ./gradlew dependencyCheckAggregate
-      
+        continue-on-error: true
       - name: Run suppressCves
         run: ./gradlew suppressCves
       - name: Run cleanSuppressions
