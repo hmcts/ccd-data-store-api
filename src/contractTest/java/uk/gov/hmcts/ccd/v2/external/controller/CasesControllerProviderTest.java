@@ -36,6 +36,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
@@ -53,7 +54,8 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
-import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
+import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
+import uk.gov.hmcts.ccd.domain.service.validate.OperationContext;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -169,7 +171,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     CaseDocumentAmApiClient caseDocumentAmApiClient;
 
     @MockBean
-    ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    DefaultValidateCaseFieldsOperation validateCaseFieldsOperation;
 
     @MockBean
     SubmitCaseTransaction submitCaseTransaction;
@@ -224,7 +226,18 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
         stubFor(WireMock.post(urlMatching("/oauth2/token"))
             .willReturn(okJson(objectMapper.writeValueAsString(tokenExchangeResponse)).withStatus(200)));
-        when(validateCaseFieldsOperation.validateCaseDetails(any(), any())).thenReturn(new HashMap<>());
+
+        OperationContext mockOperationContext = mock(OperationContext.class);
+        CaseDataContent mockContent = new CaseDataContent();
+
+        mockContent.setEvent(new Event());
+        mockContent.setData(new HashMap<>());
+
+        when(mockOperationContext.content()).thenReturn(mockContent);
+        when(mockOperationContext.caseTypeId()).thenReturn("TestCaseType");
+
+        when(validateCaseFieldsOperation.validateCaseDetails(mockOperationContext))
+            .thenReturn(mockContent.getData());
     }
 
     private void mockCaseDetailsResponse(String fileName) {

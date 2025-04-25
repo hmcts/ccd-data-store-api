@@ -38,7 +38,6 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -87,13 +86,11 @@ class ClassifiedValidateCaseFieldsOperationTest {
     @Test
     @DisplayName("should Return Empty CaseDetails with Existing Case")
     void shouldReturnEmptyCaseDetailsWithExistingCase() {
-        OperationContext operationContext = mock(OperationContext.class);
         CaseDataContent content = new CaseDataContent();
         content.setCaseReference(CASE_REFERENCE);
         content.setData(JacksonUtils.convertValueInDataField(new ObjectNode(null)));
-        when(operationContext.content()).thenReturn(content);
-        when(operationContext.caseTypeId()).thenReturn(CASE_TYPE_ID);
-        when(operationContext.pageId()).thenReturn(PAGE_ID);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
         when(midEventCallback.invoke(anyString(), any(), any())).thenReturn(Collections.emptyMap());
         when(caseService.getCaseDetails(anyString(), anyString())).thenReturn(EMPTY_CASE_DETAILS);
@@ -122,12 +119,10 @@ class ClassifiedValidateCaseFieldsOperationTest {
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setData(Collections.emptyMap());
         caseDetails.setDataClassification(Collections.emptyMap());
-        OperationContext operationContext = mock(OperationContext.class);
         CaseDataContent content = new CaseDataContent();
         content.setData(JacksonUtils.convertValueInDataField(new ObjectNode(null)));
-        when(operationContext.content()).thenReturn(content);
-        when(operationContext.caseTypeId()).thenReturn(CASE_TYPE_ID);
-        when(operationContext.pageId()).thenReturn(PAGE_ID);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
         when(midEventCallback.invoke(anyString(), any(), any())).thenReturn(Collections.emptyMap());
         when(caseDataService.getDefaultSecurityClassifications(any(), anyMap(), anyMap()))
@@ -155,11 +150,9 @@ class ClassifiedValidateCaseFieldsOperationTest {
     @Test
     void shouldGetCaseDefinitionTypeThrowsException() {
         when(caseDefinitionRepository.getCaseType(anyString())).thenReturn(null);
-
-        OperationContext operationContext = mock(OperationContext.class);
         CaseDataContent content = new CaseDataContent();
-        when(operationContext.content()).thenReturn(content);
-        when(operationContext.caseTypeId()).thenReturn(CASE_TYPE_ID);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
         assertThrows(ValidationException.class,
             () -> classifiedValidateCaseFieldsOperation.validateCaseDetails(operationContext));

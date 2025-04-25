@@ -5299,6 +5299,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private String exampleData() {
         return "{"
+            + "\"PersonFirstName\":\"_ George\","
             + "\"PersonAddress\":{"
             + "\"Country\":\"_ Wales\","
             + "\"Postcode\":\"W11 5DF\","
@@ -5306,7 +5307,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"AddressLine2\":\"_ 2 Hubble Avenue\","
             + "\"AddressLine3\":\"_ ButtonVillie\"},"
             + "\"PersonLastName\":\"_ Roof\","
-            + "\"PersonFirstName\":\"_ George\","
             + "\"D8Document\":{"
             + "\"document_url\": \"http://localhost:" + getPort()
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
@@ -6146,12 +6146,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private String expectedCaseDataMultiPage() {
-        return "{\n"
-            + "\t\"PersonLastName\": \"Roof\",\n"
-            + "\t\"CaseNumber\": \"1234567\",\n"
-            + "\t\"PersonFirstName\": \"George\",\n"
-            + "\t\"TelephoneNumber\": \"07865645667\"\n"
-            + "}";
+        return """
+            {
+            "CaseNumber": "1234567",
+            "PersonFirstName": "George",
+            "PersonLastName": "Roof",
+            "TelephoneNumber": "07865645667"
+            }""";
     }
 
     private String secondPageData() {

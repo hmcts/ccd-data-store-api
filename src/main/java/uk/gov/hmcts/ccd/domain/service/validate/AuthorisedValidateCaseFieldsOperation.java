@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Map;
@@ -31,17 +32,20 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAccessService caseAccessService;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    private final ConditionalFieldRestorer conditionalFieldRestorer;
 
     public AuthorisedValidateCaseFieldsOperation(AccessControlService accessControlService,
                                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                                  CaseDefinitionRepository caseDefinitionRepository,
                                                  CaseAccessService caseAccessService,
                                                  @Qualifier(ClassifiedValidateCaseFieldsOperation.QUALIFIER)
-                                                 ValidateCaseFieldsOperation validateCaseFieldsOperation) {
+                                                 ValidateCaseFieldsOperation validateCaseFieldsOperation,
+                                                 ConditionalFieldRestorer conditionalFieldRestorer) {
         this.accessControlService = accessControlService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseAccessService = caseAccessService;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
+        this.conditionalFieldRestorer = conditionalFieldRestorer;
     }
 
     @Override
@@ -51,14 +55,48 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         CaseDataContent content = operationContext.content();
         String caseTypeId = operationContext.caseTypeId();
 
-        String caseReference = content.getCaseReference();
-        Set<AccessProfile> accessProfiles = StringUtils.isNotEmpty(caseReference)
-            ? caseAccessService.getAccessProfilesByCaseReference(caseReference) :
-            caseAccessService.getCaseCreationRoles(caseTypeId);
+        Set<AccessProfile> accessProfiles = determineAccessProfiles(caseTypeId, content);
+        Map<String, JsonNode> classifiedData = createClassifiedData(content);
 
-        verifyReadAccess(caseTypeId, content, accessProfiles);
+        CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(caseTypeId);
+        verifyReadAccess(caseTypeDefinition, content, accessProfiles);
 
+        Map<String, JsonNode> restoredData = restoreConditionalFieldsData(
+            caseTypeDefinition,
+            content.getData(),
+            classifiedData,
+            content.getCaseReference()
+        );
+
+        content.setData(JacksonUtils.convertValueInDataField(restoredData));
         return content.getData();
+    }
+
+    private Set<AccessProfile> determineAccessProfiles(String caseTypeId, CaseDataContent content) {
+        String caseReference = content.getCaseReference();
+        return StringUtils.isNotEmpty(caseReference)
+            ? caseAccessService.getAccessProfilesByCaseReference(caseReference)
+            : caseAccessService.getCaseCreationRoles(caseTypeId);
+    }
+
+    private Map<String, JsonNode> createClassifiedData(CaseDataContent content) {
+        return JacksonUtils.convertValue(
+            JacksonUtils.convertValueJsonNode(content.getData())
+        );
+    }
+
+    private Map<String, JsonNode> restoreConditionalFieldsData(
+        CaseTypeDefinition caseTypeDefinition,
+        Map<String, JsonNode> contentData,
+        Map<String, JsonNode> classifiedData,
+        String caseReference
+    ) {
+        return conditionalFieldRestorer.restoreConditionalFields(
+            caseTypeDefinition,
+            contentData,
+            classifiedData,
+            caseReference
+        );
     }
 
     @Override
@@ -67,9 +105,8 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         validateCaseFieldsOperation.validateData(data, caseTypeDefinition, content);
     }
 
-    private void verifyReadAccess(final String caseTypeId, CaseDataContent content, Set<AccessProfile> accessProfiles) {
-        final CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(caseTypeId);
-
+    private void verifyReadAccess(CaseTypeDefinition caseTypeDefinition, CaseDataContent content,
+                                  Set<AccessProfile> accessProfiles) {
         if (content.getData() == null) {
             content.setData(newHashMap());
             return;
@@ -83,7 +120,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
             return;
         }
 
-        content.setData(JacksonUtils.convertValueInDataField(
+        content.setData(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 JacksonUtils.convertValueJsonNode(content.getData()),
                 caseTypeDefinition.getCaseFieldDefinitions(),

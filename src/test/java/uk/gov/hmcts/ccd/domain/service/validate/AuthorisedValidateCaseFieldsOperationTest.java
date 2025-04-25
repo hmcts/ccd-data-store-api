@@ -9,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -18,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.HashMap;
@@ -36,14 +36,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.DATA;
 
-
 class AuthorisedValidateCaseFieldsOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String PAGE_ID = "1";
     private static final String USER_ROLE_1 = "user-role-1";
     private static final String CASE_REFERENCE = "1234123412341234";
-
 
     @Mock
     private AccessControlService accessControlService;
@@ -56,6 +54,9 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
     @Mock
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
+
+    @Mock
+    private ConditionalFieldRestorer conditionalFieldRestorer;
 
     @InjectMocks
     private AuthorisedValidateCaseFieldsOperation authorisedValidateCaseFieldsOperation;
@@ -73,15 +74,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
     @Test
     @DisplayName("should Return Empty CaseDetails With No Access Profile")
     void shouldReturnEmptyCaseDetailsWithNoAccessProfile() {
-        OperationContext operationContext = Mockito.mock(OperationContext.class);
         CaseDataContent content = new CaseDataContent();
         content.setCaseReference(CASE_REFERENCE);
         content.setData(JacksonUtils.convertValueInDataField(new ObjectNode(null)));
-        when(operationContext.content()).thenReturn(content);
-        when(operationContext.caseTypeId()).thenReturn(CASE_TYPE_ID);
-        when(operationContext.pageId()).thenReturn(PAGE_ID);
 
-        when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(Set.of());
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(Set.of());
 
@@ -92,26 +89,20 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
             () -> verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> assertNotNull(result),
-            () -> assertTrue(result.isEmpty())
+            () -> assertTrue(result.containsKey(DATA))
         );
     }
 
     @Test
     @DisplayName("should Return CaseDetails With Access Profile")
     void shouldReturnCaseDetailsWithAccessProfile() {
-        OperationContext operationContext = Mockito.mock(OperationContext.class);
         CaseDataContent content = new CaseDataContent();
         content.setCaseReference(CASE_REFERENCE);
 
         content.setData(JacksonUtils.convertValue(new ObjectNode(null)));
-        when(operationContext.content()).thenReturn(content);
-        when(operationContext.caseTypeId()).thenReturn(CASE_TYPE_ID);
-        when(operationContext.pageId()).thenReturn(PAGE_ID);
 
-        when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(Set.of());
-
-        Set<AccessProfile> accessProfiles = Set.of(AccessProfile.builder().accessProfile(USER_ROLE_1).build());
-        when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(accessProfiles);
+        when(caseAccessService.getAccessProfilesByCaseReference(anyString()))
+            .thenReturn(Set.of(AccessProfile.builder().accessProfile(USER_ROLE_1).build()));
 
         when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), any()))
             .thenReturn(true);
@@ -121,6 +112,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
         filteredData.put("filtered_field2", "filtered_value2");
         when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
             .thenReturn(filteredData);
+
+        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
+            .thenReturn(JacksonUtils.convertValue(filteredData));
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
         Map<String, JsonNode> result = authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
 
@@ -137,13 +133,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
     @Test
     @DisplayName("should Apply CaseCreationRoles When Case Not Found")
     void shouldApplyCaseCreationRolesWhenCaseNotFound() {
-        OperationContext operationContext = Mockito.mock(OperationContext.class);
         CaseDataContent content = new CaseDataContent();
         content.setCaseReference("");
         content.setData(JacksonUtils.convertValueInDataField(new ObjectNode(null)));
-        when(operationContext.content()).thenReturn(content);
-        when(operationContext.caseTypeId()).thenReturn(CASE_TYPE_ID);
-        when(operationContext.pageId()).thenReturn(PAGE_ID);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(Set.of());
 
@@ -160,10 +154,8 @@ class AuthorisedValidateCaseFieldsOperationTest {
     void shouldGetCaseDefinitionTypeThrowsException() {
         when(caseDefinitionRepository.getCaseType(anyString())).thenReturn(null);
 
-        OperationContext operationContext = Mockito.mock(OperationContext.class);
         CaseDataContent content = new CaseDataContent();
-        when(operationContext.content()).thenReturn(content);
-        when(operationContext.caseTypeId()).thenReturn(CASE_TYPE_ID);
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
         assertThrows(ValidationException.class,
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));

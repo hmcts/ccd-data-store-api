@@ -8,5 +8,8 @@
     <cve>CVE-2024-45772</cve>
     <cve>CVE-2024-38820</cve>
     <cve>CVE-2025-24813</cve>
+    <cve>CVE-2025-31650</cve>
+    <cve>CVE-2025-31651</cve>
+    <cve>CVE-2024-52316</cve>
   </suppress>
 </suppressions>
