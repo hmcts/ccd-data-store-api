@@ -53,7 +53,7 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
-import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
+import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -169,7 +169,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     CaseDocumentAmApiClient caseDocumentAmApiClient;
 
     @MockBean
-    ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    DefaultValidateCaseFieldsOperation validateCaseFieldsOperation;
 
     @MockBean
     SubmitCaseTransaction submitCaseTransaction;
@@ -224,7 +224,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
         stubFor(WireMock.post(urlMatching("/oauth2/token"))
             .willReturn(okJson(objectMapper.writeValueAsString(tokenExchangeResponse)).withStatus(200)));
-        when(validateCaseFieldsOperation.validateCaseDetails(any(), any())).thenReturn(new HashMap<>());
+        when(validateCaseFieldsOperation.validateCaseDetails(any())).thenReturn(new HashMap<>());
     }
 
     private void mockCaseDetailsResponse(String fileName) {
