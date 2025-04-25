@@ -40,7 +40,7 @@ jobs:
       - name: Run OWASP Dependency Check
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        run: ./gradlew dependencyCheckAggregate --nvdApiKey ${{ secrets.NVD_API_KEY }}
+        run: ./gradlew dependencyCheckAggregate -DENV_NVD_API_KEY=${{ secrets.NVD_API_KEY }}
         continue-on-error: true
       - name: Run suppressCves
         run: ./gradlew suppressCves
