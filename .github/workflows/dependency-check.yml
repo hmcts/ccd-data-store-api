@@ -32,16 +32,16 @@ jobs:
           distribution: 'temurin'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Run Dependency-Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          args: --nvdApiKey ${{ secrets.NVD_API_KEY }}
-        continue-on-error: true
-      #- name: Run OWASP Dependency Check
-      #  env:
-      #    NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-      #  run: ./gradlew dependencyCheckAggregate
+      #- name: Run Dependency-Check
+      #  with:
+      #  uses: dependency-check/Dependency-Check_Action@main
+      #    args: --nvdApiKey ${{ secrets.NVD_API_KEY }}
       #  continue-on-error: true
+      - name: Run OWASP Dependency Check
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: ./gradlew dependencyCheckAggregate --nvdApiKey ${{ secrets.NVD_API_KEY }}
+        continue-on-error: true
       - name: Run suppressCves
         run: ./gradlew suppressCves
       - name: Run cleanSuppressions
