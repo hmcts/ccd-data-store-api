@@ -39,6 +39,7 @@ jobs:
       #  continue-on-error: true
       - name: Run OWASP Dependency Check
         env:
+          DELAY: 20000
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: ./gradlew dependencyCheckAggregate -Dnvd.api.key=${{ secrets.NVD_API_KEY }} -DNVD_API_KEY=${{ secrets.NVD_API_KEY }}
         continue-on-error: true
