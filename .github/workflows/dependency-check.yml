@@ -40,6 +40,9 @@ jobs:
           key: dependency-check-data-${{ runner.os }}
           restore-keys: |
             dependency-check-data-
+            
+      - name: Print NVD_API_KEY
+        run: echo "NVD_API_KEY=${NVD_API_KEY}"
       
       - name: Grant execute permissions to Gradle wrapper
         run: chmod +x ./gradlew
