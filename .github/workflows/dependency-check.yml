@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
     steps:
       - uses: tibdex/github-app-token@v1
         id: generate-token
@@ -30,6 +32,7 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
+          
       - name: Grant execute permissions to Gradle wrapper
         run: chmod +x ./gradlew
 
