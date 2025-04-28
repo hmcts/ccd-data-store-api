@@ -61,6 +61,7 @@ dependencyUpdates.resolutionStrategy = {
 }
 
 dependencyCheck {
+    nvdApiKey = System.getenv('NVD_API_KEY')
     suppressionFile = 'dependency-check-suppressions.xml'
 }
 
