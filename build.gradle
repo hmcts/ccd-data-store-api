@@ -24,7 +24,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.57'
     id 'au.com.dius.pact' version '4.3.12'
     id "org.jsonschema2pojo" version "1.2.1"
-    id("org.owasp.dependencycheck") version "12.1.1"
+    id "org.owasp.dependencycheck" version "8.2.1" // or newer
 }
 
 apply from: './gradle/suppress.gradle'
@@ -61,7 +61,11 @@ dependencyUpdates.resolutionStrategy = {
 }
 
 dependencyCheck {
-    nvdApiKey = System.getenv('NVD_API_KEY')
+    failBuildOnCVSS = 7.0
+
+    nvd {
+        apiKey = System.getenv('NVD_API_KEY')
+    }
     suppressionFile = 'dependency-check-suppressions.xml'
 }
 
