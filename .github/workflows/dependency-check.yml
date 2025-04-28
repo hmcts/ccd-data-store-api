@@ -32,7 +32,15 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
-          
+
+      - name: Cache Dependency-Check Data
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/dependency-check-data
+          key: dependency-check-data-${{ runner.os }}
+          restore-keys: |
+            dependency-check-data-
+      
       - name: Grant execute permissions to Gradle wrapper
         run: chmod +x ./gradlew
 
