@@ -47,15 +47,15 @@ jobs:
       - name: Grant execute permissions to Gradle wrapper
         run: chmod +x ./gradlew
 
-      - name: Run Dependency Check
-        run: ./gradlew dependencyCheckAggregate
+      #- name: Run Dependency Check
+      #  run: ./gradlew dependencyCheckAggregate
     
-      #- name: Run OWASP Dependency Check
-      #  env:
-      #    DELAY: 20000
-      #    NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-      #  run: ./gradlew dependencyCheckAggregate -Dnvd.api.delay=20000 -Dnvd.api.key=${{ secrets.NVD_API_KEY }} -DNVD_API_KEY=${{ secrets.NVD_API_KEY }}
-      #  continue-on-error: true
+      - name: Run OWASP Dependency Check
+        env:
+          DELAY: 20000
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: ./gradlew dependencyCheckAggregate -Dnvd.api.delay=20000 -Dnvd.api.key=${{ secrets.NVD_API_KEY }} -DNVD_API_KEY=${{ secrets.NVD_API_KEY }}
+          continue-on-error: true
         
       - name: Run suppressCves
         run: ./gradlew suppressCves
