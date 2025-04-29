@@ -9,8 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+    #env:
+    #  NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
     steps:
       - uses: tibdex/github-app-token@v1
         id: generate-token
@@ -48,14 +48,14 @@ jobs:
       - name: Grant execute permissions to Gradle wrapper
         run: chmod +x ./gradlew
 
-      #- name: Run Dependency Check
-      #  run: ./gradlew dependencyCheckAggregate
+      - name: Run Dependency Check
+        run: ./gradlew dependencyCheckAggregate
     
-      - name: Run OWASP Dependency Check
-        env:
-          DELAY: 20000
-          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        run: ./gradlew dependencyCheckAggregate -Dnvd.api.delay=20000 -Dnvd.api.key=${{ secrets.NVD_API_KEY }} -DNVD_API_KEY=${{ secrets.NVD_API_KEY }}
+      #- name: Run OWASP Dependency Check
+      #  env:
+      #    DELAY: 20000
+      #  run: ./gradlew dependencyCheckAggregate -Dnvd.api.delay=20000 -Dnvd.api.key=${{ secrets.NVD_API_KEY }} -DNVD_API_KEY=${{ secrets.NVD_API_KEY }}
+      #    NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         continue-on-error: true
         
       - name: Run suppressCves
