@@ -154,7 +154,11 @@ tasks.withType(Checkstyle) {
 }
 
 tasks.withType(Test) {
-    maxParallelForks = System.getenv('MAX_NUM_PARALLEL_THREADS') ?: 6 as int
+    // Default heap is 500M and too small for our tests which cache many spring contexts.
+    maxHeapSize = "3g"
+    // Spring contexts maintain database connection pools.
+    // If we have too many we exhaust postgres' ability to create new connections.
+    systemProperty 'spring.test.context.cache.maxSize', '5'
 
     useJUnitPlatform()
 
