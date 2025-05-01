@@ -395,13 +395,14 @@ class SubmitCaseTransactionNewCaseTest {
         CaseDetails caseDetailsWithSupplementryNewCase = submitCaseTransaction.submitCase(event, caseTypeDefinition,
             idamUser, caseEventDefinition, inputCaseDetails, IGNORE_WARNING, null);
 
+        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+
         organisationPolicyMultipleCaseDataNewCaseUpdate(caseDetailsWithSupplementryNewCase);
         CaseDetails caseDetailsWithSupplementryNewCaseUpdate =
             submitCaseTransaction.submitCase(event, caseTypeDefinition,
             idamUser, caseEventDefinition, caseDetailsWithSupplementryNewCase, IGNORE_WARNING, null);
 
-        //verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-        assertCaseDataSupplementry(caseDetailsWithSupplementryNewCase, "\"550e8400-e29b-41d4-a716-446655440000\"");
+        assertCaseDataSupplementry(caseDetailsWithSupplementryNewCaseUpdate, "\"550e8400-e29b-41d4-a716-446655440000\"");
     }
 
     private Map<String, JsonNode> organisationPolicyCaseDataNewCase(String orgPolicyField, String role,

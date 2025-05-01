@@ -83,13 +83,13 @@ public class NewCaseUtils {
                 supplementaryData = new HashMap<>();
             } else {
                 // Remove any other `new_case` keys from the supplementary data
-                supplementaryData.keySet().removeIf(key -> key.equalsIgnoreCase("new_case"));
+                supplementaryData.keySet().removeIf(key -> key.equalsIgnoreCase(SUPPLEMENTRY_DATA_NEW_CASE));
             }
             supplementaryData.put(SUPPLEMENTRY_DATA_NEW_CASE, orgNode);
         } else {
             if (supplementaryData != null) {
                 // Remove any other `new_case` keys from the supplementary data
-                supplementaryData.keySet().removeIf(key -> key.equalsIgnoreCase("new_case"));
+                supplementaryData.keySet().removeIf(key -> key.equalsIgnoreCase(SUPPLEMENTRY_DATA_NEW_CASE));
             }
         }
         LOG.debug("new_case SupplementaryData ={} .", supplementaryData);
