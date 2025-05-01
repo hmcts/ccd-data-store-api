@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefinitionStoreClient;
 
@@ -17,4 +18,11 @@ public class ContractTestCaseDefinitionRepository extends DefaultCaseDefinitionR
                                                 DefinitionStoreClient definitionStoreClient) {
         super(applicationParams, definitionStoreClient);
     }
+
+    public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
+        CaseTypeDefinitionVersion definitionVersion = new CaseTypeDefinitionVersion();
+        definitionVersion.setVersion(0);
+        return definitionVersion;
+    }
+
 }
