@@ -402,7 +402,8 @@ class SubmitCaseTransactionNewCaseTest {
             submitCaseTransaction.submitCase(event, caseTypeDefinition,
             idamUser, caseEventDefinition, caseDetailsWithSupplementryNewCase, IGNORE_WARNING, null);
 
-        assertCaseDataSupplementry(caseDetailsWithSupplementryNewCaseUpdate, "\"550e8400-e29b-41d4-a716-446655440000\"");
+        assertCaseDataSupplementry(caseDetailsWithSupplementryNewCaseUpdate,
+            "\"550e8400-e29b-41d4-a716-446655440000\"");
     }
 
     private Map<String, JsonNode> organisationPolicyCaseDataNewCase(String orgPolicyField, String role,
