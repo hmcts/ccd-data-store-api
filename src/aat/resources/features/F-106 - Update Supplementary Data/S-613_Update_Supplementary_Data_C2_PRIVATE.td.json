@@ -1,0 +1,44 @@
+{
+  "_guid_": "S-613_Update_Supplementary_Data_C2_PRIVATE",
+  "title": "Update Supplementary Data Base",
+  "productName": "CCD Data Store",
+  "operationName": "Update Supplementary Data",
+  "method": "POST",
+  "uri": "/cases/{caseId}/supplementary-data",
+  "specs": [
+    "by CaseworkerPRIVATE to update supplementary_data"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "PrivateCaseworker"
+    }
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][siblingContexts][S-613_Case_Data_Create_C2_PRIVATE][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "supplementary_data_updates": {
+        "$set": {
+          "orgs_assigned_users.OrgA": 25,
+          "orgs_assigned_users.OrgB": 1
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "supplementary_data": {
+        "orgs_assigned_users.OrgA": 25,
+        "orgs_assigned_users.OrgB": 1
+      }
+    }
+  }
+}
