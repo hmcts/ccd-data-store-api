@@ -9,6 +9,17 @@
 		"contains HTTP 422 Unprocessable Entity"
 	],
 
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": "true"
+    },
+    "pathVariables": {
+      "caseId": "123912391239x",
+      "triggerId": "START_PROGRESS"
+    }
+  },
+
 	"expectedResponse": {
 		"_extends_": "Common_422_Response",
 		"headers" : {
