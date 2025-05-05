@@ -85,7 +85,7 @@ Scenario: must return negative response when request body doesn't provide a mand
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-545 @Ignore
+@S-545
 Scenario: must return negative response when case id contains some non-numeric characters
 
     Given a user with [an active profile in CCD],
