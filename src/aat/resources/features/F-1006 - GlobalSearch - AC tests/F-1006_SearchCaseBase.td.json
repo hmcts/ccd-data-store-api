@@ -1,17 +1,13 @@
 {
   "_guid_": "F-1006_SearchCaseBase",
-  "productName": "CCD Data Store",
-  "operationName": "Global Search",
-  "method": "POST",
-  "uri": "/globalSearch",
+  "_extends_": "GlobalSearch__Base",
+
   "specs": [
     "to search a full case",
     "contains relevant jurisdictions and case types"
   ],
+
   "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
     "body": {
       "searchCriteria": {
         "CCDCaseTypeIds": [
@@ -39,13 +35,6 @@
       ],
       "maxReturnRecordCount": 500,
       "startRecordNumber": 1
-    }
-  },
-  "expectedResponse": {
-    "headers": {
-      "Content-Encoding": "gzip",
-      "vary": "accept-encoding",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
     }
   }
 }
