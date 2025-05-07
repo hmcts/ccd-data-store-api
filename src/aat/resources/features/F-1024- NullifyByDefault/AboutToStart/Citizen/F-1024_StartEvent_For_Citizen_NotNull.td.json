@@ -1,0 +1,30 @@
+{
+  "_guid_": "F-1024_StartEventForCitizen_NotNull",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Citizen",
+
+  "method": "GET",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+
+  "specs": [
+    "to create a token for case creation"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "etid": "createCaseTTLNBDNotNull"
+    }
+  }
+}
+
