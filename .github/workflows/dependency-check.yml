@@ -45,10 +45,9 @@ jobs:
       
       - name: Run OWASP Dependency Check Aggregate
         #run: ./gradlew -no-daemon -Dnvd.api.key=${{ secrets.NVD_API_KEY }} -Dnvd.api.delay=6000 dependencyCheckAggregate --info
-        run: ./gradlew dependencyCheckAggregate \
-          -Pnvd.api.key=${{ secrets.NVD_API_KEY }} \
+        run: ./gradlew  -Pnvd.api.key=${{ secrets.NVD_API_KEY }} \
           -Pnvd.api.delay=2000 \
-          --info
+          dependencyCheckAggregate --info
 
 
       - name: Run suppressCves
