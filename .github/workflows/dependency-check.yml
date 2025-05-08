@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    #env:
-    #  NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
     steps:
       - uses: tibdex/github-app-token@v1
         id: generate-token
@@ -33,30 +31,15 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
-
-      - name: Cache Dependency-Check Data
-        uses: actions/cache@v4
-        with:
-          path: ~/.gradle/dependency-check-data
-          key: dependency-check-data-${{ runner.os }}
-          restore-keys: |
-            dependency-check-data-
             
-      - name: Print NVD_API_KEY
-        run: echo "NVD_API_KEY=${NVD_API_KEY}"
+      - name: Inject NVD API key into gradle.properties
+        run: echo "nvd.api.key=${{ secrets.NVD_API_KEY }}" >> gradle.properties
       
-      - name: Grant execute permissions to Gradle wrapper
+      - name: Grant execute permission to Gradle wrapper
         run: chmod +x ./gradlew
 
-      - name: Run Dependency Check
-        run: ./gradlew dependencyCheckAggregate
-    
-      #- name: Run OWASP Dependency Check
-      #  env:
-      #    DELAY: 20000
-      #  run: ./gradlew dependencyCheckAggregate -Dnvd.api.delay=20000 -Dnvd.api.key=${{ secrets.NVD_API_KEY }} -DNVD_API_KEY=${{ secrets.NVD_API_KEY }}
-      #    NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        continue-on-error: true
+      - name: Run OWASP Dependency Check Aggregate
+        run: ./gradlew dependencyCheckAggregate --info
         
       - name: Run suppressCves
         run: ./gradlew suppressCves
