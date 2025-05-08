@@ -30,15 +30,16 @@ public class NewCaseUtils {
 
     public static void setupSupplementryDataWithNewCase(CaseDetails caseDetailsAfterCallbackWithoutHashes) {
         // Identify organizationProfiles with newCase set to (YES) true
-        List<JsonNode> organizationProfiles
+        List<JsonNode> organizationProfilesYes
             = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetailsAfterCallbackWithoutHashes,
             CASE_NEW_YES);
 
         // Update case supplementary data
-        updateCaseNewCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizationProfiles);
+
+        NewCaseUtils.updateCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizationProfilesYes);
 
         // Clear organizationProfiles newCase attributes from case data
-        clearNewCaseAttributes(organizationProfiles);
+        NewCaseUtils.clearNewCaseAttributes(organizationProfilesYes);
 
         // Clear newCase attributes from case data if case_new set to No (false)
         clearNewCaseAttributesFromCaseDetailsSetToFalse(caseDetailsAfterCallbackWithoutHashes);
@@ -77,16 +78,24 @@ public class NewCaseUtils {
             }
         }
 
+        Map<String, JsonNode> supplementaryData = caseDetails.getSupplementaryData();
+
         if (!orgNode.isEmpty()) {
-            Map<String, JsonNode> supplementaryData = caseDetails.getSupplementaryData();
             if (supplementaryData == null) {
                 supplementaryData = new HashMap<>();
+            } else {
+                // Remove any other `new_case` keys from the supplementary data
+                supplementaryData.keySet().removeIf(key -> key.equalsIgnoreCase(SUPPLEMENTRY_DATA_NEW_CASE));
             }
             supplementaryData.put(SUPPLEMENTRY_DATA_NEW_CASE, orgNode);
-
-            LOG.debug("new_case SupplementaryData ={} .", supplementaryData);
-            caseDetails.setSupplementaryData(supplementaryData);
+        } else {
+            if (supplementaryData != null) {
+                // Remove any other `new_case` keys from the supplementary data
+                supplementaryData.keySet().removeIf(key -> key.equalsIgnoreCase(SUPPLEMENTRY_DATA_NEW_CASE));
+            }
         }
+        LOG.debug("new_case SupplementaryData ={} .", supplementaryData);
+        caseDetails.setSupplementaryData(supplementaryData);
 
     }
 
