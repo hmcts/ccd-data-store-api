@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.stdapi;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -28,6 +29,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+@DirtiesContext
 public class DocumentsOperationTest extends WireMockBaseTest {
     private CaseDetails caseDetails = new CaseDetails();
     private Optional<CaseDetails> caseDetailsOptional = Optional.of(caseDetails);
