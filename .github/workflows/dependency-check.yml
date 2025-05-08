@@ -31,16 +31,18 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
-            
-      - name: Inject NVD API key into gradle.properties
-        run: echo "nvd.api.key=${{ secrets.NVD_API_KEY }}" >> gradle.properties
       
-      - name: Grant execute permission to Gradle wrapper
-        run: chmod +x ./gradlew
+      - name: Create gradle.properties with NVD API key
+        run: |
+          mkdir -p ~/.gradle
+          echo "nvd.api.key=${{ secrets.NVD_API_KEY }}" > ~/.gradle/gradle.properties
+
+      - name: Clear Dependency Check Cache
+        run: rm -rf ~/.gradle/dependency-check-data
 
       - name: Run OWASP Dependency Check Aggregate
-        run: ./gradlew dependencyCheckAggregate --info
-        
+        run: ./gradlew dependencyCheckAggregate --debug
+
       - name: Run suppressCves
         run: ./gradlew suppressCves
       - name: Run cleanSuppressions
