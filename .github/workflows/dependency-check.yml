@@ -32,16 +32,20 @@ jobs:
           java-version: 21
           distribution: 'temurin'
       
-      - name: Create gradle.properties with NVD API key
-        run: |
-          mkdir -p ~/.gradle
-          echo "nvd.api.key=${{ secrets.NVD_API_KEY }}" > ~/.gradle/gradle.properties
+      #- name: Create gradle.properties with NVD API key
+      #  run: |
+      #    mkdir -p ~/.gradle
+      #    echo "nvd.api.key=${{ secrets.NVD_API_KEY }}" > ~/.gradle/gradle.properties
 
       - name: Clear old Dependency Check data
         run: rm -rf ~/.gradle/dependency-check-data
 
+      #- name: Run OWASP Dependency Check Aggregate
+      #  run: ./gradlew dependencyCheckAggregate --info
+      
       - name: Run OWASP Dependency Check Aggregate
-        run: ./gradlew dependencyCheckAggregate --info
+        run: ./gradlew dependencyCheckAggregate -Pnvd.api.key=${{ secrets.NVD_API_KEY }} --info
+
 
       - name: Run suppressCves
         run: ./gradlew suppressCves
