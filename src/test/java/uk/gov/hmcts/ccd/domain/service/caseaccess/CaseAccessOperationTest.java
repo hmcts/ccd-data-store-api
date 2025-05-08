@@ -1454,8 +1454,8 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, never()) // NB: never called as exiting relationship ignored
                 .findSupplementaryData(
-                    eq(CASE_REFERENCE_OTHER.toString()),
-                    eq(Collections.singleton(getOrgUserNewCaseSupDataKey(ORGANISATION_OTHER)))
+                    CASE_REFERENCE_OTHER.toString(),
+                    Collections.singleton(getOrgUserNewCaseSupDataKey(ORGANISATION_OTHER))
                 );
 
             verifyNoInteractions(roleAssignmentService);
