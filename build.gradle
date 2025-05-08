@@ -63,7 +63,7 @@ dependencyCheck {
     failBuildOnCVSS = 7.0
 
     nvd {
-        apiKey = project.findProperty('nvd.api.key')
+        apiKey = project.hasProperty('nvd.api.key') ? project.getProperty('nvd.api.key') : null
     }
     suppressionFile = 'dependency-check-suppressions.xml'
 }

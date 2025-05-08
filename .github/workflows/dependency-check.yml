@@ -37,11 +37,11 @@ jobs:
           mkdir -p ~/.gradle
           echo "nvd.api.key=${{ secrets.NVD_API_KEY }}" > ~/.gradle/gradle.properties
 
-      - name: Clear Dependency Check Cache
+      - name: Clear old Dependency Check data
         run: rm -rf ~/.gradle/dependency-check-data
 
       - name: Run OWASP Dependency Check Aggregate
-        run: ./gradlew dependencyCheckAggregate --debug
+        run: ./gradlew dependencyCheckAggregate --info
 
       - name: Run suppressCves
         run: ./gradlew suppressCves
