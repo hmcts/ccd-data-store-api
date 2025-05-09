@@ -46,7 +46,7 @@ Scenario: should retrieve case view with response code HTTP 200 when the case re
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@S-1025.3 @Ignore # AC02B
+@S-1025.3 # AC02B
 Scenario: must return negative response for unauthorised access by Internal Parties
 
     Given a user with [an active profile in CCD],
