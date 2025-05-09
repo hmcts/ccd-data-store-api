@@ -336,38 +336,54 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State("A Submit for a Citizen is requested")
     public void probateSubmitForCitizen(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = mockCaseDetailsResponse("mock_responses/submit_for_citizen.json", dataMap);
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap, "submit_for_citizen.json"), dataMap);
         createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
     @State({"A Get Case is requested"})
     public void toGetACase(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = mockCaseDetailsResponse("mock_responses/read_caseworker.json", dataMap);
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap, "read_caseworker.json"), dataMap);
         getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
         setUpSecurityContextForEvent(dataMap);
     }
 
     @State({"A Read for a Citizen is requested"})
     public void toReadForACitizen(Map<String, Object> dataMap) {
-        toGetACase(dataMap);
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap,"read_citizen.json"), dataMap);
+        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        setUpSecurityContextForEvent(dataMap);
     }
 
     @State({"A Read for a Caseworker is requested"})
     public void toReadForCaseworker(Map<String, Object> dataMap) {
-        mockCaseDetailsResponse("mock_responses/read_caseworker.json", dataMap);
-        toGetACase(dataMap);
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap,"read_caseworker.json"), dataMap);
+        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        setUpSecurityContextForEvent(dataMap);
     }
 
     @State({"A Search for cases is requested"})
     public void toSearchCasesForACitizen(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class), any()))
-            .thenReturn(new CaseSearchResult(1L, Arrays.asList(caseDetails), null));
+        CaseDetails caseDetails;
+        long total = 1L;
+        if (isDivorce(dataMap)) {
+            caseDetails  = mockCaseDetailsResponse(getFileName(dataMap, "search_for_cases.json"), dataMap);
+            total = 123L;
+        } else {
+            caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        }
+        when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean()))
+            .thenReturn(new CaseSearchResult(total, Arrays.asList(caseDetails), null));
     }
 
     @State({"A Search cases for a Citizen is requested"})
     public void toSearchForACitizen(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        CaseDetails caseDetails;
+        if (isDivorce(dataMap)) {
+            caseDetails  = mockCaseDetailsResponse(getFileName(dataMap, "search_cases_citizen.json"), dataMap);
+        } else {
+            caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        }
+
         when(authorisedSearchOperation.execute(any(MetaData.class), any(Map.class)))
             .thenReturn(Arrays.asList(caseDetails));
     }
@@ -381,6 +397,15 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
             caseDetails.getReferenceAsString());
     }
 
+    @State({"A Start Event for a Citizen is requested"})
+    public void toStartEventForACitizen(Map<String, Object> dataMap) {
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap,
+            "start_event_citizen.json"), dataMap);
+        setUpCaseDetailsFromStateMapForEvent(dataMap);
+        startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
+            caseDetails.getReferenceAsString());
+    }
+
     @State({"A Start for a Caseworker is requested"})
     public void toStartForACaseworker(Map<String, Object> dataMap) {
         mockCaseDetailsResponse(getFileName(dataMap,"read_caseworker.json"), dataMap);
@@ -389,7 +414,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Start for a Citizen is requested"})
     public void startForCitizen(Map<String, Object> dataMap) {
-        mockCaseDetailsResponse("mock_responses/start_citizen.json", dataMap);
+        mockCaseDetailsResponse(getFileName(dataMap, "start_citizen.json"), dataMap);
         setUpSecurityContextForEvent(dataMap);
     }
 
@@ -402,7 +427,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Submit Event for a Citizen is requested"})
     public void toSubmitEventForACitizen(Map<String, Object> dataMap) {
-        mockCaseDetailsResponse("mock_responses/submit_event_citizen.json", dataMap);
+        mockCaseDetailsResponse(getFileName(dataMap,"submit_event_citizen.json"), dataMap);
         CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
         createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
@@ -456,6 +481,8 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         String newFileName = fileName;
         if (isIA(dataMap)) {
             newFileName = "ia_" + fileName;
+        } else if (isDivorce(dataMap)) {
+            newFileName = "divorce_" + fileName;
         }
         return "mock_responses/" + newFileName;
     }
@@ -463,6 +490,11 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     private static boolean isIA(Map<String, Object> dataMap) {
         String jurisdiction =  StringUtils.defaultString((String) dataMap.get(JURISDICTION_ID), "");
         return jurisdiction.equalsIgnoreCase("IA");
+    }
+
+    private static boolean isDivorce(Map<String, Object> dataMap) {
+        String jurisdiction =  StringUtils.defaultString((String) dataMap.get(JURISDICTION_ID), "");
+        return jurisdiction.equalsIgnoreCase("DIVORCE");
     }
 
     private void setUpSecurityContextForEvent(Map<String, Object> dataMap) {
@@ -515,7 +547,11 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         when(securityClassificationService.getClassificationForEvent(any(), any()))
             .thenReturn(SecurityClassification.PUBLIC);
         CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
-        when(caseStateDefinition.getName()).thenReturn("Created");
+        if (isDivorce(dataMap)) {
+            when(caseStateDefinition.getName()).thenReturn(caseDetails.getState());
+        } else {
+            when(caseStateDefinition.getName()).thenReturn("Created");
+        }
         when(caseTypeService.findState(any(), any())).thenReturn(caseStateDefinition);
 
         CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
