@@ -342,7 +342,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Get Case is requested"})
     public void toGetACase(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = mockCaseDetailsResponse("mock_responses/probate_get_case_requested.json", dataMap);
+        CaseDetails caseDetails = mockCaseDetailsResponse("mock_responses/read_caseworker.json", dataMap);
         getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
         setUpSecurityContextForEvent(dataMap);
     }
@@ -374,8 +374,8 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Start Event for a Caseworker is  requested"})
     public void toStartEventForACaseworker(Map<String, Object> dataMap) {
-        String fileName = getFileName(dataMap, "start_event_caseworker.json");
-        CaseDetails caseDetails = mockCaseDetailsResponse("mock_responses/" + fileName, dataMap);
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap,
+            "start_event_caseworker.json"), dataMap);
         setUpCaseDetailsFromStateMapForEvent(dataMap);
         startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
             caseDetails.getReferenceAsString());
@@ -383,7 +383,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Start for a Caseworker is requested"})
     public void toStartForACaseworker(Map<String, Object> dataMap) {
-        mockCaseDetailsResponse("mock_responses/read_caseworker.json", dataMap);
+        mockCaseDetailsResponse(getFileName(dataMap,"read_caseworker.json"), dataMap);
         setUpSecurityContextForEvent(dataMap);
     }
 
@@ -395,8 +395,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Submit Event for a Caseworker is requested"})
     public void toSubmitEventForACaseworker(Map<String, Object> dataMap) {
-        String fileName = getFileName(dataMap, "submit_event_caseworker.json");
-        mockCaseDetailsResponse("mock_responses/" + fileName, dataMap);
+        mockCaseDetailsResponse(getFileName(dataMap, "submit_event_caseworker.json"), dataMap);
         CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
         createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
@@ -410,7 +409,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State({"A Submit for a Caseworker is requested"})
     public void toSubmitForACaseworker(Map<String, Object> dataMap) {
-        mockCaseDetailsResponse("mock_responses/submit_for_caseworker.json", dataMap);
+        mockCaseDetailsResponse(getFileName(dataMap,"submit_for_caseworker.json"), dataMap);
         setUpSecurityContextForEvent(dataMap);
     }
 
@@ -454,10 +453,11 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     }
 
     private String getFileName(Map<String, Object> dataMap, String fileName) {
+        String newFileName = fileName;
         if (isIA(dataMap)) {
-            return "ia_" + fileName;
+            newFileName = "ia_" + fileName;
         }
-        return fileName;
+        return "mock_responses/" + newFileName;
     }
 
     private static boolean isIA(Map<String, Object> dataMap) {
@@ -474,7 +474,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         securityUtils.setSecurityContextUserAsCaseworkerByCaseType(caseTypeId, caseworkerUsername, caseworkerPassword);
     }
 
-    private CaseDetails mockCaseDetails(String fileName) {
+    private CaseDetails convertToCaseDetails(String fileName) {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
             if (inputStream == null) {
                 log.error("File not found: {}", fileName);
@@ -489,7 +489,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     private CaseDetails mockCaseDetailsResponse(String fileName,
                                          Map<String, Object> dataMap) {
-        CaseDetails caseDetails = mockCaseDetails(fileName);
+        CaseDetails caseDetails = convertToCaseDetails(fileName);
         when(submitCaseTransaction.submitCase(any(),
             any(),
             any(),
