@@ -1657,11 +1657,6 @@
               "order": 4,
               "page_column_no": null,
               "complex_field_overrides": []
-            }, {
-              "case_field_id" : "AddressForeignField",
-              "order" : 5,
-              "page_column_no" : null,
-              "complex_field_overrides" : [ ]
             }
           ],
           "show_condition": null,
