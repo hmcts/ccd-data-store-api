@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.helpers.MessageFormatter;
-
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
@@ -896,6 +895,11 @@ public class TestBuildersUtil {
 
         public CaseEventFieldDefinitionBuilder withDefaultValue(String defaultValue) {
             caseField.setDefaultValue(defaultValue);
+            return this;
+        }
+
+        public CaseEventFieldDefinitionBuilder withNullifyByDefault(Boolean nullifyByDefault) {
+            caseField.setNullifyByDefault(nullifyByDefault);
             return this;
         }
 
