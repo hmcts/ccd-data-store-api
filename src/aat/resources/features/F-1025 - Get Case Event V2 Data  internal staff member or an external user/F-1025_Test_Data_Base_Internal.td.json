@@ -1,5 +1,5 @@
 {
-	"_guid_": "F-1024_Test_Data_Base_NoRead_Internal",
+	"_guid_": "F-1025_Test_Data_Base_Internal",
 
 	"productName": "CCD Data Store",
 	"operationName": "Retrieve a CaseView Event by case and event id for access to Internal Parties",
@@ -20,12 +20,9 @@
 			"Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
 		},
 		"pathVariables": {
-			"cid": "${[scenarioContext][childContexts][Befta_Case_Data_Extension_NoRead_Internal][testData][actualResponse][body][id]}"
-		},
-    "body": {
-      "data": {
-      }
-    }
+			"cid": "${[scenarioContext][childContexts][Befta_Case_Data_Extension_Internal][testData][actualResponse][body][id]}",
+			"eventId": "${[scenarioContext][childContexts][S-1025_Get_Case_Data_Internal][testData][actualResponse][body][events][0][id]}"
+		}
 	},
 
 	"expectedResponse": {
@@ -34,5 +31,5 @@
 			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Content-Type": "[[ANYTHING_PRESENT]]"
 		}
-  }
+	}
 }

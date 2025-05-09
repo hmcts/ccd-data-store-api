@@ -1,16 +1,16 @@
 {
-  "_guid_": "S-1025.4",
-  "_extends_": "F-1025_Test_Data_Base",
-  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST where case_data has organisationProfile with newCase set to YES",
+  "_guid_": "S-1026.2",
+  "_extends_": "F-1026_Test_Data_Base",
+  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST has organisationProfile with newCase set to No",
 
   "prerequisites" : [ {
-      "Token_Creation": "S-1025_GetCreateToken"
-    }
+    "Token_Creation": "S-1026_GetCreateToken"
+  }
   ],
   "specs": [
     "an active profile in CCD",
     "contains some OrganisationPolicy fields with all correct values",
-    "is of caseType where case_data case data has Organisation.OrganisationID and organisationProfile with newCase set to Yes",
+    "is of caseType where case_data has organisationProfile with newCase set to No",
     "Submit case creation as Case worker",
     "contains correctly configured values",
     "contains updated values for case_data and data_classification"
@@ -20,7 +20,7 @@
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "newCase": "yes",
+          "newCase": "No",
           "Organisation": {
             "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
@@ -30,9 +30,7 @@
       "event": {
         "id": "createCase"
       },
-      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "event_data": {
-      }
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
   "expectedResponse": {
@@ -51,25 +49,21 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "OrganisationPolicyField": {
-          "Organisation": {
-            "OrganisationID": "orgID1",
-            "OrganisationName": "orgName1"
+        "OrganisationPolicyField" : {
+          "Organisation" : {
+            "OrganisationID" : "orgID1",
+            "OrganisationName" : "orgName1"
           }
         }
       },
-      "data_classification": {},
-      "supplementary_data": {
-        "new_case":
-          {
-            "orgID1": true
-          }
-      },
-      "after_submit_callback_response": null,
-      "callback_response_status_code": null,
-      "callback_response_status": null,
-      "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null
-    }
+      "data_classification" : {
+      }
+    },
+    "supplementary_data" : null,
+    "after_submit_callback_response": null,
+    "callback_response_status_code": null,
+    "callback_response_status": null,
+    "delete_draft_response_status_code": null,
+    "delete_draft_response_status": null
   }
 }

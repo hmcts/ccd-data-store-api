@@ -1,10 +1,17 @@
 {
-	"_guid_": "F-1025_Test_Data_Event_Caseworker",
-  "_extends_": "Event_Creation_Caseworker_Base",
+  "_guid_": "F-1026_Test_Data_Base",
+  "_extends_": "Case_Creation_Base",
 
   "users": {
     "invokingUser": {
       "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_NewCaseSupplementry"
     }
   },
 
@@ -14,11 +21,11 @@
       "_extends_": "Common_Response_Headers"
     },
     "body" : {
-      "id" : "OVERRIDE",
+      "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "BEFTA_MASTER",
+      "state" : "CaseCreated",
       "case_type_id" : "FT_NewCaseSupplementry",
-      "state" : "CaseUpdated",
-      "version" : 1,
+      "version" : 0,
       "created_date" : "[[ANY_STRING_NOT_NULLABLE]]",
       "last_modified" : "[[ANY_STRING_NOT_NULLABLE]]",
       "last_state_modified_date" : "[[ANY_STRING_NOT_NULLABLE]]",
@@ -28,12 +35,7 @@
       "callback_response_status_code" : null,
       "callback_response_status" : null,
       "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
-
-      "case_data" : {
-      },
-      "data_classification": {
-      }
+      "delete_draft_response_status" : null
     }
   }
 }

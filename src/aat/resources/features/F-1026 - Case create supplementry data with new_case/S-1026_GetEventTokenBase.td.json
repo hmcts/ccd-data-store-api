@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1025_GetEventTokenBase",
+  "_guid_": "S-1026_GetEventTokenBase",
   "_extends_": "StartEvent_v2Ext__PositiveResponse_Base",
 
   "specs": [
