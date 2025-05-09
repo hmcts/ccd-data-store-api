@@ -2,7 +2,6 @@ package uk.gov.hmcts.rd;
 
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.annotations.PactFolder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -15,10 +14,8 @@ import uk.gov.hmcts.ccd.CoreCaseDataApplication;
 
 @ExtendWith(PactConsumerTestExt.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@PactTestFor(providerName = "referenceData_location", port = "5555")
-@SpringBootTest({
-    "reference.data.api.url=http://localhost:5555",
-})
+@PactTestFor(providerName = "referenceData_location", port = "8090")
+@SpringBootTest
 @ContextConfiguration(classes = {CoreCaseDataApplication.class})
 @TestPropertySource(locations = {"/application.properties"})
 public abstract class AbstractCcdConsumerTest {

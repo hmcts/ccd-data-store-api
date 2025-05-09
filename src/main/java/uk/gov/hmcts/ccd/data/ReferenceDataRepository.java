@@ -7,6 +7,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -61,6 +62,10 @@ public class ReferenceDataRepository {
         return getReferenceData(BUILDING_LOCATIONS_PATH, BuildingLocation[].class);
     }
 
+    public List<BuildingLocation> getBuildingLocations2() {
+        return getReferenceData3(BUILDING_LOCATIONS_PATH, BuildingLocation[].class);
+    }
+
     @Cacheable(
         cacheNames = SERVICES_CACHE,
         key = "T(uk.gov.hmcts.ccd.data.ReferenceDataRepository).SERVICES_CACHE_KEY",
@@ -77,6 +82,50 @@ public class ReferenceDataRepository {
 
             final T[] result = restTemplate.exchange(
                     applicationParams.getReferenceDataApiUrl() + path,
+                    HttpMethod.GET,
+                    new HttpEntity<>(securityUtils.authorizationHeadersForDataStoreSystemUser()),
+                    responseType)
+                .getBody();
+
+            return Optional.ofNullable(result)
+                .map(Arrays::asList)
+                .orElse(Collections.emptyList());
+        } catch (RestClientException e) {
+            log.error("Error fetching reference data: ", e);
+            return Collections.emptyList();
+        }
+    }
+
+    public List<ServiceReferenceData> getServices2() {
+        return getReferenceData2(SERVICES_PATH, ServiceReferenceData[].class);
+    }
+
+    private <T> List<T> getReferenceData2(final String path, final Class<T[]> responseType) {
+        try {
+
+            log.debug("getReferenceData: " + path);
+            final T[] result = restTemplate.exchange(
+                    applicationParams.getReferenceDataApiUrlPact() + path,
+                    HttpMethod.GET,
+                    new HttpEntity<>(securityUtils.authorizationHeadersForDataStoreSystemUser()),
+                    responseType)
+                .getBody();
+
+            return Optional.ofNullable(result)
+                .map(Arrays::asList)
+                .orElse(Collections.emptyList());
+        } catch (RestClientException e) {
+            log.error("Error fetching reference data: ", e);
+            return Collections.emptyList();
+        }
+    }
+
+    private <T> List<T> getReferenceData3(final String path, final Class<T[]> responseType) {
+        try {
+
+            log.debug("getReferenceData: " + path);
+            final T[] result = restTemplate.exchange(
+                    applicationParams.getReferenceDataApiUrlPact() + path,
                     HttpMethod.GET,
                     new HttpEntity<>(securityUtils.authorizationHeadersForDataStoreSystemUser()),
                     responseType)

@@ -4,6 +4,7 @@ import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,11 +16,10 @@ import java.time.LocalDate;
 import java.util.List;
 import javax.inject.Inject;
 
-import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArrayMinLike;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@Tag("pact")
 public class BuildingLocationDetailsConsumerTest extends AbstractCcdConsumerTest {
 
     @Inject
@@ -87,8 +87,7 @@ public class BuildingLocationDetailsConsumerTest extends AbstractCcdConsumerTest
     @Test
     @PactTestFor(pactMethod = "buildingLocationDetailsFragment")
     void verifyBuildingLocationDetailsPact() {
-
-        List<BuildingLocation> buildingLocations = referenceDataRepository.getBuildingLocations();
+        List<BuildingLocation> buildingLocations = referenceDataRepository.getBuildingLocations2();
         assertNotNull(buildingLocations, "Building locations list should not be null");
 
         BuildingLocation location = buildingLocations.get(0);
