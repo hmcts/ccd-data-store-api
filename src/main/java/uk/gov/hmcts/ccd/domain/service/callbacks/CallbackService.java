@@ -16,7 +16,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryContext;
