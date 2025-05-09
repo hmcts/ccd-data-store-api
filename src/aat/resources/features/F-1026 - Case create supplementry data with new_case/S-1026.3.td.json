@@ -1,19 +1,20 @@
 {
-  "_guid_": "S-1025.7",
-  "_extends_": "F-1025_Test_Data_Base_V2",
-  "title": "Invoke  v2_external#/case-controller/createCaseUsingPOST  has organisationProfile with newCase set to Yes",
+  "_guid_": "S-1026.3",
+  "_extends_": "F-1026_Test_Data_Base",
+  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST when OrganisationID is empty",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1025_GetCreateToken"
-  }
+      "Token_Creation": "S-1026_GetCreateToken"
+    }
   ],
   "specs": [
     "an active profile in CCD",
     "contains some OrganisationPolicy fields with all correct values",
-    "is of caseType where case_data has organisationProfile with newCase set to YES",
-    "Submit case creation as Case worker (V2)",
+    "is of caseType where case_data has organisationProfile with newCase set to Yes",
+    "caseData Organisation.OrganisationID value is empty value",
+    "Submit case creation as Case worker",
     "contains correctly configured values",
-    "contains updated values for data and data_classification"
+    "contains updated values for case_data and data_classification"
 
   ],
   "request": {
@@ -22,7 +23,7 @@
         "OrganisationPolicyField": {
           "newCase": "Yes",
           "Organisation": {
-            "OrganisationID": "orgID1",
+            "OrganisationID": "",
             "OrganisationName": "orgName1"
           }
         }
@@ -41,31 +42,24 @@
       "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "_links" : "[[ANYTHING_PRESENT]]",
       "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_MASTER",
-      "created_on": "[[ANYTHING_PRESENT]]",
-      "last_modified_on": "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "case_type_id": "FT_NewCaseSupplementry",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
-      "data": {
-        "OrganisationPolicyField" : {
-          "Organisation" : {
-            "OrganisationID" : "orgID1",
-            "OrganisationName" : "orgName1"
+      "case_data": {
+        "OrganisationPolicyField": {
+          "Organisation": {
+            "OrganisationID": "",
+            "OrganisationName": "orgName1"
           }
         }
       },
-      "data_classification" : {
-      }
+      "data_classification" : {}
     },
-    "supplementary_data": {
-      "new_case": [
-        {
-          "orgID1" : "true"
-        }
-      ]
-    },
+    "supplementary_data" : null,
     "after_submit_callback_response": null,
     "callback_response_status_code": null,
     "callback_response_status": null,

@@ -1,6 +1,6 @@
 #==================================================================================
-@F-1024
-Feature: F-1024: Is CaseHistory event accessible to internal staff member and not accessible by external user
+@F-1025
+Feature: F-1025: Is CaseHistory event accessible to internal staff member and not accessible by external user
 #==================================================================================
 
 Background:
@@ -8,14 +8,14 @@ Background:
 
   #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  @S-1024.1 # AC01
+  @S-1025.1 # AC01
   Scenario: must return negative response for CaseView Event Data for authorised access by External Parties
 
     Given a user with [an active profile in CCD],
 
     And a successful call [to create a token for case creation] as in [Private_Autotest_Default_Token_Creation_Data_For_Case_Creation_External],
     And another successful call [to create a full case] as in [Private_Autotest_Case_Data_Extension_External],
-    And another successful call [to get the details about case event for the case just created] as in [S-1024_Get_Private_Autotest_Case_Data_External],
+    And another successful call [to get the details about case event for the case just created] as in [S-1025_Get_Private_Autotest_Case_Data_External],
 
     When a request is prepared with appropriate values,
     And the request [contains the reference of the case just created and the event id valid for that case],
@@ -27,14 +27,14 @@ Background:
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-1024.2 # AC02
+@S-1025.2 # AC02
 Scenario: should retrieve case view with response code HTTP 200 when the case reference and case event exists response for authorised access by Internal Parties
 
     Given a user with [an active profile in CCD],
 
       And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation],
       And another successful call [to create a full case] as in [Befta_Case_Data_Extension_Internal],
-      And another successful call [to get the details about case event for the case just created] as in [S-1024_Get_Case_Data_Internal],
+      And another successful call [to get the details about case event for the case just created] as in [S-1025_Get_Case_Data_Internal],
 
     When a request is prepared with appropriate values,
       And the request [contains the reference of the case just created and the event id valid for that case],
@@ -46,14 +46,14 @@ Scenario: should retrieve case view with response code HTTP 200 when the case re
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@S-1024.3 # AC02B
+@S-1025.3 # AC02B
 Scenario: must return negative response for unauthorised access by Internal Parties
 
     Given a user with [an active profile in CCD],
 
       And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation_NoRead],
       And another successful call [to create a full case] as in [Befta_Case_Data_Extension_NoRead_Internal],
-      And another successful call [to get the details about case event for the case just created] as in [S-1024_Get_Case_Data_NoRead_Internal],
+      And another successful call [to get the details about case event for the case just created] as in [S-1025_Get_Case_Data_NoRead_Internal],
 
       When a request is prepared with appropriate values,
       And the request [contains the reference of the case just created and the response will not contain event history case data]
