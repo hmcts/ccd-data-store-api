@@ -4,22 +4,25 @@ import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.CourtVenue;
 
+import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.List;
-import javax.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@Tag("pact")
+@PactTestFor(providerName = "referenceData_location", port = "8090")
+@SpringBootTest({
+    "reference.data.api.url:http://localhost:8090"
+})
 public class BuildingLocationDetailsConsumerTest extends AbstractCcdConsumerTest {
 
     @Inject
@@ -87,7 +90,8 @@ public class BuildingLocationDetailsConsumerTest extends AbstractCcdConsumerTest
     @Test
     @PactTestFor(pactMethod = "buildingLocationDetailsFragment")
     void verifyBuildingLocationDetailsPact() {
-        List<BuildingLocation> buildingLocations = referenceDataRepository.getBuildingLocations2();
+
+        List<BuildingLocation> buildingLocations = referenceDataRepository.getBuildingLocations();
         assertNotNull(buildingLocations, "Building locations list should not be null");
 
         BuildingLocation location = buildingLocations.get(0);

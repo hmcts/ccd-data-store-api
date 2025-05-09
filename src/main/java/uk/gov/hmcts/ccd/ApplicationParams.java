@@ -220,12 +220,6 @@ public class ApplicationParams {
     @Value("${reference.data.api.url}")
     private String referenceDataApiUrl;
 
-    @Value("${reference.data.api.url.pact}")
-    private String referenceDataApiUrlPact;
-
-    @Value("${reference.data.api.url.pact2}")
-    private String referenceDataApiUrlPact2;
-
     @Value("${reference.data.cache.ttl.in.days}")
     private String referenceDataCacheTtlInDays;
 
@@ -586,14 +580,6 @@ public class ApplicationParams {
 
     public String getReferenceDataApiUrl() {
         return referenceDataApiUrl;
-    }
-
-    public String getReferenceDataApiUrlPact() {
-        return referenceDataApiUrlPact;
-    }
-
-    public String getReferenceDataApiUrlPact2() {
-        return referenceDataApiUrlPact2;
     }
 
     public int getRefDataCacheTtlInSec() {

@@ -923,7 +923,19 @@ task runAndPublishConsumerPactTests(type: Test){
     systemProperty 'pact.rootDir', "pacts"
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
+    include "uk/gov/hmcts/reform/**"
+    include "uk/gov/hmcts/rd/**"
+}
 
+pact {
+    broker {
+        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    }
+    publish {
+        pactDirectory = 'pacts'
+        tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
+        version = project.pactVersion
+    }
 }
 
 runAndPublishConsumerPactTests.finalizedBy pactPublish

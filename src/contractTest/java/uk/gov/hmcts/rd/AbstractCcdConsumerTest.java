@@ -1,23 +1,23 @@
 package uk.gov.hmcts.rd;
 
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
-import au.com.dius.pact.consumer.junit5.PactTestFor;
+import au.com.dius.pact.core.model.annotations.PactFolder;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.CoreCaseDataApplication;
 
-@ExtendWith(PactConsumerTestExt.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@PactTestFor(providerName = "referenceData_location", port = "8090")
-@SpringBootTest
+@Slf4j
 @ContextConfiguration(classes = {CoreCaseDataApplication.class})
-@TestPropertySource(locations = {"/application.properties"})
+@PactFolder("pacts")
+@ExtendWith(PactConsumerTestExt.class)
+@ExtendWith(SpringExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractCcdConsumerTest {
 
     @Autowired

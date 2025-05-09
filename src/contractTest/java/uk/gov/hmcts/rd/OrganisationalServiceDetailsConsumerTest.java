@@ -5,23 +5,25 @@ import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
 
+import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.List;
-import javax.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@Tag("pact")
+@PactTestFor(providerName = "referenceData_location", port = "8091")
+@SpringBootTest({
+    "reference.data.api.url:http://localhost:8091"
+})
 public class OrganisationalServiceDetailsConsumerTest extends AbstractCcdConsumerTest {
 
     @Inject
@@ -63,7 +65,7 @@ public class OrganisationalServiceDetailsConsumerTest extends AbstractCcdConsume
     @Test
     @PactTestFor(pactMethod = "organisationalServiceDetailsFragment")
     void verifyOrganisationalServiceDetailsPact() {
-        List<ServiceReferenceData> services = referenceDataRepository.getServices2();
+        List<ServiceReferenceData> services = referenceDataRepository.getServices();
 
         assertNotNull(services, "Services list should not be null");
         assertFalse(services.isEmpty(), "Services list should not be empty");
