@@ -22,7 +22,7 @@ def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
 
 def definitionStoreDevelopPr = "PR-1536"  // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-2549" // This doesn't change frequently, but when it does, only change this value.
-def prsToUseAat              = "PR-1793,PR-1888" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+def prsToUseAat              = "" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 def secrets = [
     'ccd-${env}': [
