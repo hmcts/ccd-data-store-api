@@ -439,7 +439,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     }
 
     @State({"A case has been submitted"})
-    public void aCaseHasBeenSubmitted(Map<String, Object> dataMap) {
+    public void caseHasBeenSubmitted(Map<String, Object> dataMap) {
         CaseDetails caseDetails = mockCaseDetailsResponse("mock_responses/ia_case_has_submitted.json", dataMap);
         getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
         setUpSecurityContextForEvent(dataMap);
