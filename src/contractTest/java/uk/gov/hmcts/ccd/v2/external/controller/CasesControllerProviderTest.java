@@ -448,7 +448,8 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     @State({"user roles are requested"})
     public void userRoleRequested(Map<String, Object> dataMap) {
         CaseAssignedUserRole assignedUserRole = new CaseAssignedUserRole("1", "1234", "role");
-        when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList())).thenReturn(List.of(assignedUserRole));
+        when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList()))
+            .thenReturn(List.of(assignedUserRole));
         when(uidService.validateUID(anyString())).thenReturn(true);
     }
 
