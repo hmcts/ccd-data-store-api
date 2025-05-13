@@ -82,7 +82,7 @@ public class CaseAccessOperation {
             }
         }
         if (applicationParams.getEnableCaseUsersDbSync()) {
-            caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
+            caseUserRepository.grantAccess(caseDetails.getId(), userId, CREATOR.getRole());
         }
     }
 
@@ -101,7 +101,7 @@ public class CaseAccessOperation {
             roleAssignmentService.deleteRoleAssignments(List.of(deleteRequest));
         }
         if (applicationParams.getEnableCaseUsersDbSync()) {
-            caseUserRepository.revokeAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
+            caseUserRepository.revokeAccess(caseDetails.getId(), userId, CREATOR.getRole());
         }
     }
 
@@ -139,7 +139,7 @@ public class CaseAccessOperation {
             roleAssignmentService.createCaseRoleAssignments(caseDetails, userId, targetCaseRoles, true);
         }
         if (applicationParams.getEnableCaseUsersDbSync()) {
-            final var caseId = Long.valueOf(caseDetails.getId());
+            final var caseId = caseDetails.getId();
             final List<String> currentCaseRoles = caseUserRepository.findCaseRoles(caseId, userId);
 
             grantAddedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
@@ -185,7 +185,7 @@ public class CaseAccessOperation {
                     );
                 }
                 if (applicationParams.getEnableCaseUsersDbSync()) {
-                    Long caseId = Long.parseLong(caseDetails.getId());
+                    String caseId = caseDetails.getId();
                     caseRolesByUserIdAndCase.forEach((userId, caseRoles) ->
                         caseRoles.forEach(caseRole ->
                             caseUserRepository.grantAccess(caseId, userId, caseRole)));
@@ -243,7 +243,7 @@ public class CaseAccessOperation {
         }
         if (applicationParams.getEnableCaseUsersDbSync()) {
             filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
-                    Long caseId = Long.parseLong(caseDetails.getId());
+                    String caseId = caseDetails.getId();
                     requestedAssignments.forEach(requestedAssignment ->
                         caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(),
                             requestedAssignment.getCaseRole())
@@ -298,11 +298,10 @@ public class CaseAccessOperation {
             .collect(Collectors.toList());
     }
 
-    private List<Long> getCaseIdsFromCaseDetailsList(List<CaseDetails> caseDetailsList) {
+    private List<String> getCaseIdsFromCaseDetailsList(List<CaseDetails> caseDetailsList) {
         return caseDetailsList.stream()
             .map(CaseDetails::getId)
             .distinct()
-            .map(Long::parseLong)
             .collect(Collectors.toList());
     }
 
@@ -431,7 +430,7 @@ public class CaseAccessOperation {
                 return Lists.newArrayList();
             }
 
-            List<Long> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
+            List<String> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
             List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
             return getCaseAssignedUserRolesFromCaseUserEntities(caseUserEntities, caseDetailsList);
         }
@@ -448,7 +447,7 @@ public class CaseAccessOperation {
                 .map(CaseDetails::getReferenceAsString).collect(Collectors.toList());
             return roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
         } else {
-            List<Long> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
+            List<String> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
             List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
             return getCaseAssignedUserRolesFromCaseUserEntities(caseUserEntities, caseDetailsList);
         }
@@ -488,7 +487,7 @@ public class CaseAccessOperation {
     }
 
     private void grantAddedCaseRoles(String userId,
-                                     Long caseId,
+                                     String caseId,
                                      List<String> currentCaseRoles,
                                      Set<String> targetCaseRoles) {
         targetCaseRoles.stream()
@@ -497,7 +496,7 @@ public class CaseAccessOperation {
     }
 
     private void revokeRemovedCaseRoles(String userId,
-                                        Long caseId,
+                                        String caseId,
                                         List<String> currentCaseRoles,
                                         Set<String> targetCaseRoles) {
         currentCaseRoles.stream()

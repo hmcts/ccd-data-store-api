@@ -19,15 +19,15 @@ public class CaseLinkEntity {
     @EqualsAndHashCode
     public static class CaseLinkPrimaryKey implements Serializable {
         @Column(name = "case_id", nullable = false)
-        private Long caseId;
+        private String caseId;
         @Column(name = "linked_case_id", nullable = false)
         private Long linkedCaseId;
 
-        public Long getCaseId() {
+        public String getCaseId() {
             return caseId;
         }
 
-        public void setCaseId(long caseId) {
+        public void setCaseId(String caseId) {
             this.caseId = caseId;
         }
 
@@ -53,7 +53,7 @@ public class CaseLinkEntity {
 
     }
 
-    public CaseLinkEntity(Long caseId, Long linkedCaseId, String caseTypeId, Boolean standardLink) {
+    public CaseLinkEntity(String caseId, Long linkedCaseId, String caseTypeId, Boolean standardLink) {
         caseLinkPrimaryKey = new CaseLinkPrimaryKey();
         caseLinkPrimaryKey.setCaseId(caseId);
         caseLinkPrimaryKey.setLinkedCaseId(linkedCaseId);
