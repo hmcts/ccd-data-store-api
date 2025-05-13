@@ -1,7 +1,7 @@
 -- -Assumptions:
 -- 1. General data-store cleanup performed (removing all case_types older than X months)
 -- 1. Deletion of all ES indexes performed
--- 2. ES re-indexing triggered via ccd-admin-web (creates the statix indexes)
+-- 2. ES re-indexing triggered via ccd-admin-web (creates the static indexes)
 
 -- 3. Script below will loop through each Jurisdiction starting with the most cases 
 --    and update the marked_by_logstash field to false in batches of 1000
