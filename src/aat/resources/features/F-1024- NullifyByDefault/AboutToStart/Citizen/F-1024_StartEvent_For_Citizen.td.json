@@ -1,0 +1,23 @@
+{
+  "_guid_": "F-1024_StartEventForCitizen",
+  "_extends_": "Citizen_Token_Creation_Data_For_Case_Creation",
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "etid": "createCaseTTLNullifyByDefault"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "case_details" : {
+        "jurisdiction" : "BEFTA_MASTER",
+        "case_type_id" : "FT_MasterCaseType"
+      },
+      "event_id": "createCaseTTLNullifyByDefault"
+    }
+  }
+}
+
