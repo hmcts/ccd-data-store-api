@@ -21,7 +21,7 @@ public class CaseLinkEntity {
         @Column(name = "case_id", nullable = false)
         private String caseId;
         @Column(name = "linked_case_id", nullable = false)
-        private Long linkedCaseId;
+        private String linkedCaseId;
 
         public String getCaseId() {
             return caseId;
@@ -31,11 +31,11 @@ public class CaseLinkEntity {
             this.caseId = caseId;
         }
 
-        public Long getLinkedCaseId() {
+        public String getLinkedCaseId() {
             return linkedCaseId;
         }
 
-        public void setLinkedCaseId(long linkedCaseId) {
+        public void setLinkedCaseId(String linkedCaseId) {
             this.linkedCaseId = linkedCaseId;
         }
     }
@@ -53,7 +53,7 @@ public class CaseLinkEntity {
 
     }
 
-    public CaseLinkEntity(String caseId, Long linkedCaseId, String caseTypeId, Boolean standardLink) {
+    public CaseLinkEntity(String caseId, String linkedCaseId, String caseTypeId, Boolean standardLink) {
         caseLinkPrimaryKey = new CaseLinkPrimaryKey();
         caseLinkPrimaryKey.setCaseId(caseId);
         caseLinkPrimaryKey.setLinkedCaseId(linkedCaseId);

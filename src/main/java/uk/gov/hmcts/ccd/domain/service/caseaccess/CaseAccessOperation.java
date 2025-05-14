@@ -111,7 +111,7 @@ public class CaseAccessOperation {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             return roleAssignmentService.getCaseReferencesForAGivenUser(userId);
         } else {
-            List<Long> usersCases = caseUserRepository.findCasesUserIdHasAccessTo(userId);
+            List<String> usersCases = caseUserRepository.findCasesUserIdHasAccessTo(userId);
             if (usersCases.isEmpty()) {
                 return List.of();
             } else {

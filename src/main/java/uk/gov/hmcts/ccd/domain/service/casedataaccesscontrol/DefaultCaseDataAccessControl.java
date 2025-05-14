@@ -223,7 +223,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             roleAssignmentService.createCaseRoleAssignments(caseDetails, idamUserId, Set.of(CREATOR.getRole()), false);
             if (applicationParams.getEnableCaseUsersDbSync()) {
-                caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), idamUserId, CREATOR.getRole());
+                caseUserRepository.grantAccess(caseDetails.getId(), idamUserId, CREATOR.getRole());
             }
         }
     }

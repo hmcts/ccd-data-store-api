@@ -21,7 +21,7 @@ public class CaseLink {
     @JsonIgnore
     private String caseId;
     @JsonIgnore
-    private Long linkedCaseId;
+    private String linkedCaseId;
     private String caseTypeId;
 
     private Boolean standardLink;
