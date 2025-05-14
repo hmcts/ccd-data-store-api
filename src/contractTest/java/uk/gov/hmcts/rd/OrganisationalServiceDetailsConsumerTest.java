@@ -64,7 +64,7 @@ public class OrganisationalServiceDetailsConsumerTest extends AbstractCcdConsume
         assertEquals("AAA1", service.getServiceCode());
         assertEquals("Civil Enforcement", service.getServiceShortDescription());
         assertEquals("CCDSERVICENAME", service.getCcdServiceName());
-        assertEquals( LocalDateTime.parse("2023-10-05T12:00:00"), service.getLastUpdate());
+        assertEquals(LocalDateTime.parse("2023-10-05T12:00:00"), service.getLastUpdate());
         assertEquals("CCDCASETYPE1", service.getCcdCaseTypes().get(0));
     }
 
