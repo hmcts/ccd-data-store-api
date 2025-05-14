@@ -31,13 +31,13 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         this.roleAssignmentCategoryService = roleAssignmentCategoryService;
     }
 
-    public void grantAccess(Long caseId, String userId, String caseRole) {
+    public void grantAccess(String caseId, String userId, String caseRole) {
         em.merge(new CaseUserEntity(caseId, userId, caseRole,
             roleAssignmentCategoryService.getRoleCategory(userId).name()));
         auditRepo.auditGrant(caseId, userId, caseRole);
     }
 
-    public void revokeAccess(Long caseId, String userId, String caseRole) {
+    public void revokeAccess(String caseId, String userId, String caseRole) {
         CaseUserEntity primaryKey = new CaseUserEntity(caseId, userId, caseRole, null);
         CaseUserEntity caseUser = em.find(CaseUserEntity.class, primaryKey.getCasePrimaryKey());
 
@@ -54,7 +54,7 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         return namedQuery.getResultList();
     }
 
-    public List<String> findCaseRoles(final Long caseId, final String userId) {
+    public List<String> findCaseRoles(final String caseId, final String userId) {
         TypedQuery<String> namedQuery =
             em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_USER_HAS_ACCESS_FOR_A_CASE, String.class);
         namedQuery.setParameter("userId", userId);
@@ -63,7 +63,7 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         return namedQuery.getResultList();
     }
 
-    public List<CaseUserEntity> findCaseUserRoles(final List<Long> caseIds, final List<String> userIds) {
+    public List<CaseUserEntity> findCaseUserRoles(final List<String> caseIds, final List<String> userIds) {
         TypedQuery<CaseUserEntity> namedQuery = null;
         if (userIds.size() == 0) {
             namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_BY_CASE_IDS, CaseUserEntity.class);
