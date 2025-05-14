@@ -34,6 +34,7 @@ def versions = [
 ext['spring-security.version'] = '5.7.11'
 ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.16.0'
+//overriding for easy access to the version for FT testing
 ext['beftaFwVersion'] = '9.2.3'
 ext['ccdTestDefinitionVersion'] = '7.26.2-prerelease-CCD-5329'
 
