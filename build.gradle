@@ -690,14 +690,6 @@ compileTestJava {
     options.annotationProcessorPath = configurations.annotationProcessor
 }
 
-idea.project.settings {
-    compiler {
-        javac {
-            javacAdditionalOptions "-parameters"
-        }
-    }
-}
-
 // adopted from
 // https://github.com/springfox/springfox/blob/fb780ee1f14627b239fba95730a69900b9b2313a/gradle/coverage.gradle
 jacocoTestReport {
@@ -979,11 +971,11 @@ task runRemoteAAT(type: JavaExec) {
     }
 }
 
-rootProject.tasks.named("processAatResources") {
+tasks.named("processAatResources") {
     duplicatesStrategy = 'include'
 }
 
-rootProject.tasks.named("processContractTestResources") {
+tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
 }
 
