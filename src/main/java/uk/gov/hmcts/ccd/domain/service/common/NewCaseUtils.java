@@ -36,7 +36,6 @@ public class NewCaseUtils {
 
         // Update case supplementary data
         updateCaseNewCaseSupplementaryData(caseDetailsAfterCallbackWithoutHashes, organizationProfilesYes);
-
         // Clear organizationProfiles newCase attributes from case data
         NewCaseUtils.clearNewCaseAttributes(organizationProfilesYes);
 
