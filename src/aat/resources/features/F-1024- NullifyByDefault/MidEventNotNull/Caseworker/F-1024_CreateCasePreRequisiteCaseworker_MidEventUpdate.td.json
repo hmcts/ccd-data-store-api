@@ -1,0 +1,32 @@
+{
+  "_guid_": "F-1024_CreateCasePreRequisiteCaseworker_MidEventUpdate",
+  "_extends_": "F-1024_CreateCasePreRequisiteCaseworker_MidEventUpdate_Base",
+
+  "request": {
+    "body": {
+      "data": {
+        "_extends_": "TTL_Case_Data_NBD_Empty"
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications_NBD_Empty"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "_extends_": "TTL_Case_Data_NBD_Empty",
+        "SearchCriteria" : { }
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications_NBD_Empty",
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        }
+      }
+    }
+  }
+}
+
