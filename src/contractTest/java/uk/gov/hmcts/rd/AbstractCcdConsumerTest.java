@@ -13,11 +13,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.CoreCaseDataApplication;
 
 @Slf4j
-@ContextConfiguration(classes = {CoreCaseDataApplication.class})
 @PactFolder("pacts")
 @ExtendWith(PactConsumerTestExt.class)
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ContextConfiguration(classes = {CoreCaseDataApplication.class})
 public abstract class AbstractCcdConsumerTest {
 
     @Autowired

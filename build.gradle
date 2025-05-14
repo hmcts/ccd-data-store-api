@@ -933,8 +933,8 @@ pact {
     }
     publish {
         pactDirectory = 'pacts'
-        tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
-        version = project.pactVersion
+        tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+        version = System.getenv("GIT_COMMIT") ?: "local-${System.currentTimeMillis()}"
     }
 }
 

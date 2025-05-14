@@ -12,9 +12,9 @@ import org.springframework.http.MediaType;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
 
-import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,23 +42,7 @@ public class OrganisationalServiceDetailsConsumerTest extends AbstractCcdConsume
             .willRespondWith()
             .status(200)
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body("""
-            [
-                {
-                    "service_id": 1,
-                    "org_unit": "orgUnit",
-                    "business_area": "BusinessArea",
-                    "sub_business_area": "OrgSubBusinessArea",
-                    "jurisdiction": "Jurisdiction",
-                    "service_description": "Civil Enforcement",
-                    "service_code": "AAA1",
-                    "service_short_description": "Civil Enforcement",
-                    "ccd_service_name": "CCDSERVICENAME",
-                    "last_update": "2023-10-05T12:00:00",
-                    "ccd_case_types": ["CCDCASETYPE1"]
-                }
-            ]
-            """, "application/json")
+            .body(getOrganisationalServiceDetailsResponseBody())
             .toPact(V4Pact.class);
     }
 
@@ -82,6 +66,26 @@ public class OrganisationalServiceDetailsConsumerTest extends AbstractCcdConsume
         assertEquals("CCDSERVICENAME", service.getCcdServiceName());
         assertEquals( LocalDateTime.parse("2023-10-05T12:00:00"), service.getLastUpdate());
         assertEquals("CCDCASETYPE1", service.getCcdCaseTypes().get(0));
+    }
+
+    protected String getOrganisationalServiceDetailsResponseBody() {
+        return """
+            [
+                {
+                    "service_id": 1,
+                    "org_unit": "orgUnit",
+                    "business_area": "BusinessArea",
+                    "sub_business_area": "OrgSubBusinessArea",
+                    "jurisdiction": "Jurisdiction",
+                    "service_description": "Civil Enforcement",
+                    "service_code": "AAA1",
+                    "service_short_description": "Civil Enforcement",
+                    "ccd_service_name": "CCDSERVICENAME",
+                    "last_update": "2023-10-05T12:00:00",
+                    "ccd_case_types": ["CCDCASETYPE1"]
+                }
+            ]
+            """;
     }
 }
 
