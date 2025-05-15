@@ -25,7 +25,7 @@ BEGIN
         SELECT jurisdiction
         FROM (
             SELECT jurisdiction, COUNT(*) AS count
-            FROM case_data WHERE jurisdiction = 'DIVORCE'
+            FROM case_data
             GROUP BY jurisdiction
             ORDER BY count DESC
         ) sub;
