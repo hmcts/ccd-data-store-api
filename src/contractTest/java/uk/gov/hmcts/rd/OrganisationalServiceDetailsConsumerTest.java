@@ -6,15 +6,17 @@ import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
+import uk.gov.hmcts.ccd.v2.external.controller.ContractTestSecurityUtils;
 
+import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.List;
-import javax.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -25,6 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
     "reference.data.api.url:http://localhost:8091"
 })
 public class OrganisationalServiceDetailsConsumerTest extends AbstractCcdConsumerTest {
+
+    @Autowired
+    ContractTestSecurityUtils securityUtils;
 
     @Inject
     private ReferenceDataRepository referenceDataRepository;

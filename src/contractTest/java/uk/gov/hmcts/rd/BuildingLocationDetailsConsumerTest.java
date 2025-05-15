@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.CourtVenue;
@@ -23,10 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @PactTestFor(providerName = "referenceData_location", port = "8090")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
+@SpringBootTest({
     "reference.data.api.url:http://localhost:8090"
 })
-@ActiveProfiles("SECURITY_MOCK")
 public class BuildingLocationDetailsConsumerTest extends AbstractCcdConsumerTest {
 
     @Autowired
