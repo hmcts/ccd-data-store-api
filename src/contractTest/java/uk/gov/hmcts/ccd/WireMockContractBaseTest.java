@@ -22,9 +22,9 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 @AutoConfigureWireMock(port = 0)
-public abstract class WireMockBaseTest {
+public abstract class WireMockContractBaseTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WireMockContractBaseTest.class);
 
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;
