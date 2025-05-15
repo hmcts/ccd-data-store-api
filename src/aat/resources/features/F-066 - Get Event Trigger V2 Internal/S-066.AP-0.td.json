@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-066.AP.0",
+  "_extends_": "F-066_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 1.1 - NONE Access Process (no RoleToAccessProfiles on case-type)",
+
+  "specs": [
+    "a caseworker with no role assignments",
+    "uses the case-reference of the case just created",
+    "contains details of the case just created, along with an HTTP-200 OK",
+    "contains `Access Process` set to `NONE`"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][CreateCase_FT_GlobalSearch_PreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "access_granted": "[[ANYTHING_PRESENT]]",
+
+      "access_process": "NONE"
+    }
+  }
+}

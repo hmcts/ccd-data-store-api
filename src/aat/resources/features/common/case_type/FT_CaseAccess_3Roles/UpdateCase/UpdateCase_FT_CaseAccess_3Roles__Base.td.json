@@ -1,0 +1,56 @@
+{
+  "_guid_": "UpdateCase_FT_CaseAccess_3Roles__Base",
+  "_extends_": "SubmitEvent_v2Ext__PositiveResponse_Base",
+
+  "specs": [
+    "to update the case"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen3"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid" : "OVERRIDE"
+    },
+    "body": {
+      "data": {
+        "TextField": "Updated"
+      },
+      "event": {
+        "id": "UPDATE"
+      },
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id" : "[[ANYTHING_PRESENT]]",
+
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type" : "FT_CaseAccess_3Roles",
+
+      "state" : "CaseUpdated",
+
+      "data" : {
+        "TextField" : "Updated",
+        "caseManagementLocation" : {
+          "region" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "data_classification": {
+        "TextField": "PUBLIC",
+        "caseManagementLocation": {
+          "classification": "PUBLIC",
+          "value": {
+            "region": "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}
