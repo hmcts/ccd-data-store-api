@@ -114,7 +114,6 @@ env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 // Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
 env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
-env.TEST_STUB_SERVICE_BASE_URL = BEFTA_TEST_STUB_SERVICE_BASE_URL
 
 withPipeline(type, product, component) {
     onMaster {
