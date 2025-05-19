@@ -1,0 +1,67 @@
+{
+  "_guid_": "S-1024.2",
+  "_extends_": "F-1024_StartEventForCitizen",
+
+  "title": "Applying NullifyByDefault at start of case creation for v1_external#/case-details-endpoint/startCaseForCitizenUsingGET",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "is configured to trigger an About To Start callback that does not change any of the TTL values it is still null",
+    "has the 200 OK code",
+    "contains the TTL set to null"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "etid": "createCaseTTLNullifyByDefault"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+    },
+    "body": {
+      "token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "case_details": {
+        "id": null,
+        "jurisdiction" : "BEFTA_MASTER",
+        "state": null,
+        "version": null,
+        "case_type_id" : "FT_MasterCaseType",
+        "created_date": null,
+        "last_modified": null,
+        "last_state_modified_date": null,
+        "security_classification": null,
+        "case_data" : {
+          "TTL" : { }
+        },
+        "data_classification" : {
+          "TTL" : {
+            "classification" : "PUBLIC",
+            "value" : { }
+          }
+        },
+        "supplementary_data": null,
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null
+      },
+      "event_id": "createCaseTTLNullifyByDefault"
+    }
+  }
+}

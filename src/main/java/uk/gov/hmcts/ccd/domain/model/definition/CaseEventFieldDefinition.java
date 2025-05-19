@@ -28,6 +28,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel, C
     private String publishAs;
     private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
     private String defaultValue;
+    private Boolean nullifyByDefault;
 
     @ApiModelProperty(required = true, value = "Foreign key to CaseField.id")
     @JsonProperty("case_field_id")
@@ -172,6 +173,16 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel, C
         this.defaultValue = defaultValue;
     }
 
+    @ApiModelProperty(value = "Nullify By Default value for the case field")
+    @JsonProperty("nullify_by_default")
+    public Boolean getNullifyByDefault() {
+        return nullifyByDefault;
+    }
+
+    public void setNullifyByDefault(Boolean nullifyByDefault) {
+        this.nullifyByDefault = nullifyByDefault;
+    }
+
     @JsonIgnore
     @Override
     public CaseEventFieldDefinition createCopy() {
@@ -189,6 +200,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel, C
         copy.setPublishAs(this.getPublishAs());
         copy.setCaseEventFieldComplexDefinitions(createCopyList(this.getCaseEventFieldComplexDefinitions()));
         copy.setDefaultValue(this.getDefaultValue());
+        copy.setNullifyByDefault(this.getNullifyByDefault());
 
         return copy;
     }
