@@ -91,7 +91,7 @@ public class BuildingLocationDetailsConsumerTest extends AbstractCcdConsumerTest
         assertEquals("12345", courtVenue.getCourtLocationCode());
         assertEquals("DX 123456", courtVenue.getDxAddress());
         assertEquals("Canolfan Wrandawiad Abertawe 1", courtVenue.getWelshSiteName());
-        assertEquals("1 Stryd y Tribiwnlys", courtVenue.getWelshCourtAddress());
+        assertEquals("Tribiwnlys", courtVenue.getWelshCourtAddress());
         assertEquals("Open", courtVenue.getCourtStatus());
         assertEquals(LocalDate.parse("2020-01-01"), courtVenue.getCourtOpenDate());
         assertEquals("Aberdeen Tribunal Hearing Centre", courtVenue.getCourtName());
