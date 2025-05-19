@@ -46,7 +46,7 @@ public class BuildingLocationDetailsConsumerTest extends AbstractCcdConsumerTest
             .willRespondWith()
             .status(200)
             .matchHeader(HttpHeaders.CONTENT_TYPE, "application\\/json", MediaType.APPLICATION_JSON_VALUE)
-            .body(getBuildingLocationDetailsResponseBody())
+            .body(loadFile("refdata/building_locations.json"))
             .toPact(V4Pact.class);
     }
 
@@ -95,51 +95,5 @@ public class BuildingLocationDetailsConsumerTest extends AbstractCcdConsumerTest
         assertEquals("Open", courtVenue.getCourtStatus());
         assertEquals(LocalDate.parse("2020-01-01"), courtVenue.getCourtOpenDate());
         assertEquals("Aberdeen Tribunal Hearing Centre", courtVenue.getCourtName());
-    }
-
-    protected String getBuildingLocationDetailsResponseBody() {
-        return """
-            [
-                {
-                    "building_location_id": "BL-ID",
-                    "building_location_name": "54 TEST ROAD",
-                    "epimms_id": "123",
-                    "building_location_status": "LIVE",
-                    "area": "North",
-                    "region": "Midlands",
-                    "region_id": "1",
-                    "cluster_name": "NBC",
-                    "cluster_id": "1",
-                    "court_finder_url": "https://testUrl.com",
-                    "postcode": "T33ST",
-                    "address": "TEST ROAD",
-                    "court_venues": [
-                              {
-                                "court_venue_id": "CV-ID-1",
-                                "epimms_id": "123",
-                                "site_name": "Aberdeen Tribunal Hearing Centre 1",
-                                "region_id": "1",
-                                "region": "Midlands",
-                                "court_type": "Tribunal",
-                                "court_type_id": "10",
-                                "cluster_id": "1",
-                                "cluster_name": "NBC",
-                                "open_for_public": "Yes",
-                                "court_address": "1 Tribunal Street",
-                                "postcode": "AB11 6LT",
-                                "phone_number": "01234 567890",
-                                "closed_date": "2021-01-01",
-                                "court_location_code": "12345",
-                                "dx_address": "DX 123456",
-                                "welsh_site_name": "Canolfan Wrandawiad Abertawe 1",
-                                "welsh_court_address": "1 Stryd y Tribiwnlys",
-                                "court_status": "Open",
-                                "court_open_date": "2020-01-01",
-                                "court_name": "Aberdeen Tribunal Hearing Centre"
-                              }
-                        ]
-                }
-            ]
-            """;
     }
 }
