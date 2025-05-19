@@ -228,7 +228,9 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
             .willReturn(okJson(objectMapper.writeValueAsString(tokenExchangeResponse)).withStatus(200)));
 
         CaseDataContent mockContent = new CaseDataContent();
-        mockContent.setEvent(new Event());
+        Event event = new Event();
+        event.setEventId("TestEventId");
+        mockContent.setEvent(event);
         mockContent.setData(new HashMap<>());
         OperationContext mockOperationContext = new OperationContext("TestCaseType", mockContent, "TestPageId");
         when(validateCaseFieldsOperation.validateCaseDetails(mockOperationContext))
