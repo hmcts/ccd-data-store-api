@@ -227,15 +227,10 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         stubFor(WireMock.post(urlMatching("/oauth2/token"))
             .willReturn(okJson(objectMapper.writeValueAsString(tokenExchangeResponse)).withStatus(200)));
 
-        OperationContext mockOperationContext = mock(OperationContext.class);
         CaseDataContent mockContent = new CaseDataContent();
-
         mockContent.setEvent(new Event());
         mockContent.setData(new HashMap<>());
-
-        when(mockOperationContext.content()).thenReturn(mockContent);
-        when(mockOperationContext.caseTypeId()).thenReturn("TestCaseType");
-
+        OperationContext mockOperationContext = new OperationContext("TestCaseType", mockContent, "TestPageId");
         when(validateCaseFieldsOperation.validateCaseDetails(mockOperationContext))
             .thenReturn(mockContent.getData());
     }
