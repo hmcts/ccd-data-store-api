@@ -46,7 +46,7 @@ public class OrganisationalServiceDetailsConsumerTest extends AbstractCcdConsume
             .matchHeader("ServiceAuthorization", "Bearer .*", "ServiceToken")
             .willRespondWith()
             .status(200)
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .matchHeader(HttpHeaders.CONTENT_TYPE, "application\\/json", MediaType.APPLICATION_JSON_VALUE)
             .body(getOrganisationalServiceDetailsResponseBody())
             .toPact(V4Pact.class);
     }
