@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
@@ -29,8 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
@@ -135,10 +132,6 @@ class ConditionalFieldRestorerTest {
         }
         """;
 
-
-    @Mock
-    private CaseAccessService caseAccessService;
-
     private Logger logger;
     private ListAppender<ILoggingEvent> listAppender;
     private List<ILoggingEvent> loggingEventList;
@@ -148,9 +141,7 @@ class ConditionalFieldRestorerTest {
     @BeforeEach
     void setUp() {
         openMocks = MockitoAnnotations.openMocks(this);
-
-        service = new ConditionalFieldRestorer(caseAccessService);
-        when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(ACCESS_PROFILES);
+        service = new ConditionalFieldRestorer();
     }
 
     private CaseFieldDefinition noteWithoutCreateAndReadPermission() {
@@ -664,7 +655,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> existingData = getJsonMapNode(nestedComplexTypeArrayPayload);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
         Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition, newData,
-            existingData, "123");
+            existingData, ACCESS_PROFILES);
 
         assertAll(
             () -> assertEquals("Test", filteredFields.get("caseCategory").get("value").get("label").asText()),
@@ -1025,7 +1016,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
-            "123");
+            ACCESS_PROFILES);
 
         assertAll(
             () -> assertEquals("private",
@@ -2163,7 +2154,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition, newData,
-            existingData, "123");
+            existingData, ACCESS_PROFILES);
         assertEquals(existingData, filteredFields);
 
         assertEquals(0, listAppender.list.size());
@@ -2461,7 +2452,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition, newData,
-            existingData, "123");
+            existingData, ACCESS_PROFILES);
         assertEquals(existingData, filteredFields);
 
         assertEquals(0, listAppender.list.size());
@@ -2534,7 +2525,7 @@ class ConditionalFieldRestorerTest {
             newCaseType().withField(caseFieldDefinition).build();
 
         Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition, newData,
-            existingData, "123");
+            existingData, ACCESS_PROFILES);
 
         assertAll(
             () -> assertTrue(filteredFields.containsKey("Documents")),
@@ -2651,7 +2642,7 @@ class ConditionalFieldRestorerTest {
             newCaseType().withField(caseFieldDefinition).build();
 
         Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition, newData,
-            existingData, "123");
+            existingData, ACCESS_PROFILES);
         assertAll(
             () -> assertTrue(filteredFields.containsKey("Documents")),
             () -> assertTrue(filteredFields.get("Documents").isArray()),
@@ -2723,7 +2714,7 @@ class ConditionalFieldRestorerTest {
             newCaseType().withField(noteWithNestedFieldsWithoutCreateAndReadPermission()).build();
         var newDataNode = getJsonMapNode(newDataString);
         Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition,
-            newDataNode, getJsonMapNode(complexTypePayload), "123");
+            newDataNode, getJsonMapNode(complexTypePayload), ACCESS_PROFILES);
 
         assertEquals(newDataNode, filteredFields);
     }
@@ -2929,7 +2920,7 @@ class ConditionalFieldRestorerTest {
             newCaseType().withField(noteWithNestedFieldsWithCreateAndWithoutReadPermission()).build();
         Map<String, JsonNode> newDataNode = getJsonMapNode(newDataString);
         Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition,
-            newDataNode, getJsonMapNode(complexTypePayload), "123");
+            newDataNode, getJsonMapNode(complexTypePayload), ACCESS_PROFILES);
 
         assertEquals(newDataNode, filteredFields);
     }
@@ -3227,7 +3218,7 @@ class ConditionalFieldRestorerTest {
             newCaseType().withField(noteWithNestedFieldsWithoutCreateAndReadPermission()).build();
         Map<String, JsonNode> newDataNode = getJsonMapNode(newDataString);
         Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition,
-            newDataNode, getJsonMapNode(complexTypePayload), "123");
+            newDataNode, getJsonMapNode(complexTypePayload), ACCESS_PROFILES);
 
         assertEquals(newDataNode, filteredFields);
     }
@@ -3421,7 +3412,7 @@ class ConditionalFieldRestorerTest {
             newCaseType().withField(noteWithNestedFieldsWithoutCreateAndReadPermission()).build();
         Map<String, JsonNode> newDataNode = getJsonMapNode(newDataString);
         Map<String, JsonNode> filteredFields = service.restoreConditionalFields(caseTypeDefinition,
-            newDataNode, getJsonMapNode(complexTypePayload), "123");
+            newDataNode, getJsonMapNode(complexTypePayload), ACCESS_PROFILES);
 
         assertEquals(newDataNode, filteredFields);
     }
@@ -3598,7 +3589,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
-            "123");
+            ACCESS_PROFILES);
 
         assertAll(
             () -> assertFalse(result.isEmpty()),
@@ -3630,7 +3621,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> existingData = getJsonMapNode(existingDataString);
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
-        service.restoreConditionalFields(caseTypeDefinition, newData, existingData, "123");
+        service.restoreConditionalFields(caseTypeDefinition, newData, existingData, ACCESS_PROFILES);
 
         assertEquals(0, listAppender.list.size());
     }
@@ -3660,7 +3651,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
-            "123");
+            ACCESS_PROFILES);
 
         assertEquals(0, listAppender.list.size());
     }
@@ -3689,7 +3680,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
-            "123");
+            ACCESS_PROFILES);
 
         assertEquals(0, listAppender.list.size());
     }
@@ -3719,7 +3710,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
-            "123");
+            ACCESS_PROFILES);
 
         assertAll(
             () -> assertTrue(result.get("Note").has("type")),
@@ -3755,7 +3746,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
-            "123");
+            ACCESS_PROFILES);
 
         assertEquals("Missing field 'type' under 'Note'.", listAppender.list.getFirst().getFormattedMessage());
     }
@@ -3936,7 +3927,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
-            "123");
+            ACCESS_PROFILES);
 
         loggingEventList = listAppender.list;
         if (!expectedLogMessage.isEmpty()) {
@@ -4039,7 +4030,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
-            "123");
+            ACCESS_PROFILES);
 
         assertAll(
             () -> assertTrue(result.containsKey("applicant1Flags")),
@@ -4110,7 +4101,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
-            "123");
+            ACCESS_PROFILES);
 
         assertAll(
             () -> assertTrue(result.containsKey("applicant1Flags")),
@@ -4183,7 +4174,7 @@ class ConditionalFieldRestorerTest {
         Map<String, JsonNode> newData = getJsonMapNode(newDataString);
 
         Map<String, JsonNode> result = service.restoreConditionalFields(caseTypeDefinition, newData, existingData,
-            "123");
+            ACCESS_PROFILES);
 
         assertAll(
             () -> assertTrue(result.containsKey("applicant1Flags")),

@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.DATA;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
@@ -408,31 +409,18 @@ class JacksonUtilsTest {
     }
 
     @Test
-    void testConvertValueInDataField() throws JsonProcessingException {
-        JsonNode jsonNode = MAPPER.readTree("""
-            {
-              "Name": "Name_1",
-              "Class": [
-                {
-                  "id": "6da7a0cf-8186-49d4-813d-c299d8f3491b",
-                  "value": {
-                    "ClassName": "Class_1"
-                  }
-                },
-                {
-                  "id": "b7662626-b640-48bb-8afa-9fa78dcbd2ec",
-                  "value": {
-                    "ClassName": "Class_2"
-                  }
-                }
-              ],
-              "Number": null
-            }
-            """);
+    void testConvertValueInDataFieldFromMap() {
+        Map<String, JsonNode> inputMap = new HashMap<>();
+        inputMap.put("data1", MAPPER.getNodeFactory().textNode("Name_1"));
+        inputMap.put("data2", MAPPER.getNodeFactory().numberNode(42));
 
-        Map<String, JsonNode> result = JacksonUtils.convertValueInDataField(jsonNode);
+        Map<String, JsonNode> result = JacksonUtils.convertValueInDataField(inputMap);
 
         assertEquals(1, result.size());
-        assertEquals(jsonNode, result.get(DATA));
+        assertTrue(result.containsKey(DATA));
+
+        JsonNode dataNode = result.get(DATA);
+        assertEquals("Name_1", dataNode.get("data1").asText());
+        assertEquals(42, dataNode.get("data2").asInt());
     }
 }

@@ -104,7 +104,7 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.caseTypeRoleAssignment
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponseJson;
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
-@SuppressWarnings("checkstyle:OperatorWrap")
+@SuppressWarnings({"checkstyle:OperatorWrap", "checkstyle:FileTabCharacter"})
 public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String UPLOAD_TIMESTAMP = "2000-02-29T00:00:00.000000000";
@@ -113,6 +113,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String CASE_TYPE_FILTERED = "TestAddressBookCaseFiltered";
     private static final String CASE_TYPE_VALIDATE = "TestAddressBookCaseValidate";
     private static final String CASE_TYPE_VALIDATE_MULTI_PAGE = "TestAddressBookCaseValidateMultiPage";
+    private static final String CASE_TYPE_VALIDATE_FIELD_RESTORE = "TestAddressBookCaseValidateFieldRestore";
+    private static final String CASE_TYPE_VALIDATE_FIELD_SKIP_RESTORE = "TestAddressBookCaseValidateFieldSkipRestore";
     private static final String CASE_TYPE_NO_CREATE_CASE_ACCESS = "TestAddressBookCaseNoCreateCaseAccess";
     private static final String CASE_TYPE_NO_UPDATE_CASE_ACCESS = "TestAddressBookCaseNoUpdateCaseAccess";
     private static final String CASE_TYPE_NO_CREATE_EVENT_ACCESS = "TestAddressBookCaseNoCreateEventAccess";
@@ -150,6 +152,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private static final String MID_EVENT_CALL_BACK = "/event-callback/mid-event";
     private static final String MID_EVENT_CALL_BACK_MULTI_PAGE = "/event-callback/multi-page-mid-event";
+    private static final String MID_EVENT_CALL_BACK_FIELD_RESTORE = "/event-callback/field-restore-mid-event";
     public static final int EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED = 5;
     public static final int EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED = 6;
 
@@ -5414,6 +5417,114 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldFilterRestoreCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
+        final String caseReference = "1504259907353529";
+        final JsonNode data = mapper.readTree(secondPageData());
+        final JsonNode eventData = mapper.readTree(exampleEventDataFieldRestore());
+        WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK_FIELD_RESTORE);
+
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseThirdPage",
+                "CaseField31",
+                "CaseField32", 3, MID_EVENT_CALL_BACK_FIELD_RESTORE));
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseFourthPage",
+                "CaseField41",
+                "CaseField42", 4, MID_EVENT_CALL_BACK_FIELD_RESTORE));
+
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+            .willReturn(okJson(mapper.writeValueAsString(wizardPageCollection)).withStatus(200)));
+
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(summary)
+                .withDescription(description)
+                .build())
+            .withCaseReference(caseReference)
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE_FIELD_RESTORE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/"
+            + JURISDICTION + "/case-types/"
+            + CASE_TYPE_VALIDATE_FIELD_RESTORE
+            + "/validate?pageId=createCaseNextPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(200)).andReturn();
+
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_FIELD_RESTORE)));
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseDataFieldRestore() + "}");
+        final String expectedResponseValue = mapper.writeValueAsString(expectedResponse);
+        assertEquals("Incorrect Response Content",
+            expectedResponseValue,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldFilterSkipRestoreCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages()
+        throws Exception {
+        final String caseReference = "1504259907353529";
+        final JsonNode data = mapper.readTree(secondPageData());
+        final JsonNode eventData = mapper.readTree(exampleEventDataFieldRestore());
+        WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK_FIELD_RESTORE);
+
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseThirdPage",
+                "CaseField31",
+                "CaseField32", 3, MID_EVENT_CALL_BACK_FIELD_RESTORE));
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseFourthPage",
+                "CaseField41",
+                "CaseField42", 4, MID_EVENT_CALL_BACK_FIELD_RESTORE));
+
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+            .willReturn(okJson(mapper.writeValueAsString(wizardPageCollection)).withStatus(200)));
+
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(summary)
+                .withDescription(description)
+                .build())
+            .withCaseReference(caseReference)
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE_FIELD_SKIP_RESTORE,
+                TEST_EVENT_ID))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/"
+            + JURISDICTION + "/case-types/"
+            + CASE_TYPE_VALIDATE_FIELD_SKIP_RESTORE
+            + "/validate?pageId=createCaseNextPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(200)).andReturn();
+
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_FIELD_RESTORE)));
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseDataFieldSkipRestore() + "}");
+        final String expectedResponseValue = mapper.writeValueAsString(expectedResponse);
+        assertEquals("Incorrect Response Content",
+            expectedResponseValue,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
         final String caseReference = "1504259907353529";
         final JsonNode data = mapper.readTree(secondPageData());
@@ -6155,6 +6266,35 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             }""";
     }
 
+    private String expectedCaseDataFieldRestore() {
+        return """
+            {
+              	"CaseNumber": "1234567",
+              	"PersonFirstName": "George",
+              	"PersonLastName": "Roof",
+              	"PersonAddress": {
+              		"AddressLine2": "Fake Street",
+              		"AddressLine3": "Hexton",
+              		"AddressLine1": "123"
+              	},
+              	"TelephoneNumber": "07865645667"
+              }""";
+    }
+
+    private String expectedCaseDataFieldSkipRestore() {
+        return """
+            {
+              	"CaseNumber": "1234567",
+              	"PersonFirstName": "George",
+              	"PersonLastName": "Roof",
+              	"PersonAddress": {
+              		"AddressLine2": "Fake Street",
+              		"AddressLine3": "Hexton"
+              	},
+              	"TelephoneNumber": "07865645667"
+              }""";
+    }
+
     private String secondPageData() {
         return "{"
             + "\"CaseNumber\":\"_ 1234567\","
@@ -6175,6 +6315,27 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseField32\":\"_ Test765\","
             + "\"CaseField41\":\"_ Test987\","
             + "\"CaseField42\":\"_ Test567\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
+    }
+
+    private String exampleEventDataFieldRestore() {
+        return "{"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"CaseNumber\":\"_ 1234567\","
+            + "\"TelephoneNumber\":\"_ 07865645667\","
+            + "\"CaseField31\":\"_ Test123\","
+            + "\"CaseField32\":\"_ Test765\","
+            + "\"CaseField41\":\"_ Test987\","
+            + "\"CaseField42\":\"_ Test567\","
+            + "\"PersonAddress\":{"
+            +     "\"AddressLine1\":\"123\","
+            +     "\"AddressLine2\":\"Fake Street\","
+            +     "\"AddressLine3\":\"Hexton\""
+            + "},"
             + "\"D8Document\":{"
             + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"

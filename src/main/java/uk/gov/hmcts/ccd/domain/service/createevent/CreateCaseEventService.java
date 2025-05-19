@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -62,6 +64,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
@@ -100,6 +103,7 @@ public class CreateCaseEventService {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final ConditionalFieldRestorer conditionalFieldRestorer;
+    private final CaseAccessService caseAccessService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -135,7 +139,8 @@ public class CreateCaseEventService {
                                   final ApplicationParams applicationParams,
                                   final CaseAccessGroupUtils caseAccessGroupUtils,
                                   final CaseDocumentTimestampService caseDocumentTimestampService,
-                                  final ConditionalFieldRestorer conditionalFieldRestorer) {
+                                  final ConditionalFieldRestorer conditionalFieldRestorer,
+                                  final CaseAccessService caseAccessService) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -167,6 +172,7 @@ public class CreateCaseEventService {
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
         this.conditionalFieldRestorer = conditionalFieldRestorer;
+        this.caseAccessService = caseAccessService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -201,8 +207,8 @@ public class CreateCaseEventService {
             content.getData(),
             caseDetails,
             caseEventDefinition,
-            caseTypeDefinition
-        );
+            caseTypeDefinition,
+            caseReference);
 
         timeToLiveService.validateTTLChangeAgainstTTLGuard(content.getData(), caseDetailsInDatabase.getData());
 
@@ -432,7 +438,8 @@ public class CreateCaseEventService {
     CaseDetails mergeUpdatedFieldsToCaseDetails(final Map<String, JsonNode> data,
                                                 final CaseDetails caseDetails,
                                                 final CaseEventDefinition caseEventDefinition,
-                                                final CaseTypeDefinition caseTypeDefinition) {
+                                                final CaseTypeDefinition caseTypeDefinition,
+                                                final String caseReference) {
 
         return Optional.ofNullable(data)
             .map(nonNullData -> {
@@ -442,9 +449,10 @@ public class CreateCaseEventService {
                 final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
                     .orElse(emptyMap()));
 
+                Set<AccessProfile> accessProfiles = caseAccessService.getAccessProfilesByCaseReference(caseReference);
                 final Map<String, JsonNode> filteredData =
                     conditionalFieldRestorer.restoreConditionalFields(caseTypeDefinition, sanitisedData, caseData,
-                        caseDetails.getReferenceAsString());
+                        accessProfiles);
 
                 caseData.putAll(filteredData);
                 clonedCaseDetails.setData(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,

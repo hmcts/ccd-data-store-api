@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +11,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -24,11 +22,11 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -48,8 +46,8 @@ class ClassifiedValidateCaseFieldsOperationTest {
     private static final String CASE_REFERENCE = "1234123412341234";
     private static final String JURISDICTION_ID = "Probate";
     private static final CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition();
-    private static final Map<String, JsonNode> EMPTY_CASE_DATA = Collections.emptyMap();
-    private static final Map<String, JsonNode> EMPTY_CASE_DATA_CLASSIFICATION = Collections.emptyMap();
+    private static final Map<String, JsonNode> EMPTY_CASE_DATA = emptyMap();
+    private static final Map<String, JsonNode> EMPTY_CASE_DATA_CLASSIFICATION = emptyMap();
     private static final CaseDetails EMPTY_CASE_DETAILS = new CaseDetails();
 
     @Mock
@@ -88,14 +86,14 @@ class ClassifiedValidateCaseFieldsOperationTest {
     void shouldReturnEmptyCaseDetailsWithExistingCase() {
         CaseDataContent content = new CaseDataContent();
         content.setCaseReference(CASE_REFERENCE);
-        content.setData(JacksonUtils.convertValueInDataField(new ObjectNode(null)));
+        content.setData(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
-        when(midEventCallback.invoke(anyString(), any(), any())).thenReturn(Collections.emptyMap());
+        when(midEventCallback.invoke(anyString(), any(), any())).thenReturn(emptyMap());
         when(caseService.getCaseDetails(anyString(), anyString())).thenReturn(EMPTY_CASE_DETAILS);
         when(caseDataService.getDefaultSecurityClassifications(any(), anyMap(), anyMap()))
-            .thenReturn(Collections.emptyMap());
+            .thenReturn(emptyMap());
         when(classificationService.applyClassification(any(), anyBoolean())).thenReturn(Optional.empty());
 
         Map<String, JsonNode> result = classifiedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
@@ -117,16 +115,16 @@ class ClassifiedValidateCaseFieldsOperationTest {
     void shouldReturnEmptyCaseDetailsWithCreateCase() {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setData(Collections.emptyMap());
-        caseDetails.setDataClassification(Collections.emptyMap());
+        caseDetails.setData(emptyMap());
+        caseDetails.setDataClassification(emptyMap());
         CaseDataContent content = new CaseDataContent();
-        content.setData(JacksonUtils.convertValueInDataField(new ObjectNode(null)));
+        content.setData(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
-        when(midEventCallback.invoke(anyString(), any(), any())).thenReturn(Collections.emptyMap());
+        when(midEventCallback.invoke(anyString(), any(), any())).thenReturn(emptyMap());
         when(caseDataService.getDefaultSecurityClassifications(any(), anyMap(), anyMap()))
-            .thenReturn(Collections.emptyMap());
+            .thenReturn(emptyMap());
         when(classificationService.applyClassification(any(), anyBoolean())).thenReturn(Optional.empty());
 
         Map<String, JsonNode> result = classifiedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
