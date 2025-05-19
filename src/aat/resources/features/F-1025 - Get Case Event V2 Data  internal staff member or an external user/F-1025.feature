@@ -53,6 +53,7 @@ Scenario: must return negative response for unauthorised access by Internal Part
 
       And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation_NoRead],
       And another successful call [to create a full case] as in [Befta_Case_Data_Extension_NoRead_Internal],
+      And a wait time of [5] seconds [to allow for Logstash to index the case just created]
       And another successful call [to get the details about case event for the case just created] as in [S-1025_Get_Case_Data_NoRead_Internal],
 
       When a request is prepared with appropriate values,
