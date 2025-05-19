@@ -65,7 +65,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
             caseTypeDefinition,
             content.getData(),
             classifiedData,
-            content.getCaseReference()
+            accessProfiles
         );
 
         content.setData(JacksonUtils.convertValueInDataField(restoredData));
@@ -89,13 +89,13 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         CaseTypeDefinition caseTypeDefinition,
         Map<String, JsonNode> contentData,
         Map<String, JsonNode> classifiedData,
-        String caseReference
+        Set<AccessProfile> accessProfiles
     ) {
         return conditionalFieldRestorer.restoreConditionalFields(
             caseTypeDefinition,
             contentData,
             classifiedData,
-            caseReference
+            accessProfiles
         );
     }
 

@@ -47,19 +47,12 @@ public class ConditionalFieldRestorer {
     private static final String VALUE = "value";
     private static final String ID = "id";
 
-    private final CaseAccessService caseAccessService;
-
-    public ConditionalFieldRestorer(CaseAccessService caseAccessService) {
-        this.caseAccessService = caseAccessService;
-    }
-
     public Map<String, JsonNode> restoreConditionalFields(final CaseTypeDefinition caseTypeDefinition,
                                                           final Map<String, JsonNode> sanitisedData,
                                                           final Map<String, JsonNode> existingData,
-                                                          final String caseReference) {
-        Set<AccessProfile> accessProfiles = caseAccessService.getAccessProfilesByCaseReference(caseReference);
+                                                          final Set<AccessProfile> accessProfiles) {
         if (accessProfiles == null || accessProfiles.isEmpty()) {
-            throw new ValidationException("Cannot find user roles for the user");
+            throw new ValidationException("Access profiles cannot be null or empty.");
         }
 
         final Set<String> accessProfileNames = extractAccessProfileNames(accessProfiles);

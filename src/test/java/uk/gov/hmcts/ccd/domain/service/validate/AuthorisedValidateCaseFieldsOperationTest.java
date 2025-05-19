@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -76,7 +77,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
     void shouldReturnEmptyCaseDetailsWithNoAccessProfile() {
         CaseDataContent content = new CaseDataContent();
         content.setCaseReference(CASE_REFERENCE);
-        content.setData(JacksonUtils.convertValueInDataField(new ObjectNode(null)));
+        content.setData(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -131,11 +132,55 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
+    @DisplayName("should Return CaseDetails With Restored Missing Field")
+    void shouldReturnCaseDetailsWithRestoredMissingField() {
+        CaseDataContent content = new CaseDataContent();
+        content.setCaseReference(CASE_REFERENCE);
+        content.setData(emptyMap());
+
+        when(caseAccessService.getAccessProfilesByCaseReference(anyString()))
+            .thenReturn(Set.of(AccessProfile.builder().accessProfile(USER_ROLE_1).build()));
+
+        when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), any()))
+            .thenReturn(true);
+
+        ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
+        filteredData.put("filtered_field1", "filtered_value1");
+        filteredData.put("filtered_field2", "filtered_value2");
+
+        when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
+            .thenReturn(filteredData);
+
+        // Simulate restoring fields (new field is restored here)
+        ObjectNode restoredData = new ObjectNode(JSON_NODE_FACTORY);
+        restoredData.put("filtered_field1", "filtered_value1");
+        restoredData.put("filtered_field2", "filtered_value2");
+        restoredData.put("restored_field", "restored_value");
+
+        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
+            .thenReturn(JacksonUtils.convertValue(restoredData));
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        Map<String, JsonNode> result = authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        assertAll(
+            () -> verify(validateCaseFieldsOperation).validateCaseDetails(operationContext),
+            () -> verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
+            () -> verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
+            () -> assertNotNull(result),
+            () -> assertTrue(result.containsKey(DATA)),
+            () -> assertEquals(3, result.get(DATA).size()),
+            () -> assertEquals("restored_value", result.get(DATA).get("restored_field").asText())
+        );
+    }
+
+    @Test
     @DisplayName("should Apply CaseCreationRoles When Case Not Found")
     void shouldApplyCaseCreationRolesWhenCaseNotFound() {
         CaseDataContent content = new CaseDataContent();
         content.setCaseReference("");
-        content.setData(JacksonUtils.convertValueInDataField(new ObjectNode(null)));
+        content.setData(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
