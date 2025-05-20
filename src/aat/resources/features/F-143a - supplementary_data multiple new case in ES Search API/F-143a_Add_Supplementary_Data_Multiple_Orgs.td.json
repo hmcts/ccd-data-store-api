@@ -1,0 +1,37 @@
+{
+  "_guid_": "F-143a_Add_Supplementary_Data_Multiple_Orgs",
+  "title": "Update Supplementary Data Base",
+  "productName": "CCD Data Store",
+  "operationName": "Update Supplementary Data",
+  "method": "POST",
+  "uri": "/cases/{caseId}/supplementary-data",
+  "specs": ["to add supplementary data for the case"],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+    }
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][childContexts][F-143a_CreateCasePreRequisiteCaseworker_Multiple_Orgs][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "supplementary_data_updates": {
+        "$set": {
+          "new_case.orgID1": true,
+          "new_case.orgID3": true
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "supplementary_data": {
+        "new_case.orgID1": true,
+        "new_case.orgID3": true
+      }
+    }
+  }
+}

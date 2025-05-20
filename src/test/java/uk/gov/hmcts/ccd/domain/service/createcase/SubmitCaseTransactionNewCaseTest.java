@@ -35,6 +35,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
@@ -54,6 +55,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -62,12 +67,8 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
-class SubmitCaseTransactionCaseAccessGroupTest {
+class SubmitCaseTransactionNewCaseTest {
 
     private static final String EVENT_ID = "SomeEvent";
     private static final String EVENT_NAME = "Some event";
@@ -90,8 +91,6 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
-
-    private static final String CaseAccessGroups = CaseAccessGroupUtils.CASE_ACCESS_GROUPS;
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -146,7 +145,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
     @BeforeEach
     void setup() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
@@ -224,8 +223,9 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
         inputCaseDetails.setData(dataMap);
 
-        Map<String, JsonNode> dataOrganisation = organisationPolicyCaseData("caseAssignedField",
-            "\"550e8400-e29b-41d4-a716-446655440000\"");
+        Map<String, JsonNode> dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField", "caseAssignedField",
+            "\"550e8400-e29b-41d4-a716-446655440000\"",true, true);
 
         JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
@@ -249,42 +249,41 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     }
 
     private Event buildEvent() {
-        Event event = anEvent().build();
-        event.setEventId(EVENT_ID);
-        event.setDescription(EVENT_DESC);
-        event.setSummary(EVENT_SUMMARY);
-        return event;
+        Event anEvent = anEvent().build();
+        anEvent.setEventId(EVENT_ID);
+        anEvent.setDescription(EVENT_DESC);
+        anEvent.setSummary(EVENT_SUMMARY);
+        return anEvent;
     }
 
     private CaseTypeDefinition buildCaseType() {
         final Version version = new Version();
         version.setNumber(VERSION);
-        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(CASE_TYPE_ID);
-        caseTypeDefinition.setVersion(version);
-        return caseTypeDefinition;
+        CaseTypeDefinition caseTypeDef = new CaseTypeDefinition();
+        caseTypeDef.setId(CASE_TYPE_ID);
+        caseTypeDef.setVersion(version);
+        return caseTypeDef;
     }
 
     private CaseEventDefinition buildEventTrigger() {
-        final CaseEventDefinition event = new CaseEventDefinition();
-        event.setId(EVENT_ID);
-        event.setName(EVENT_NAME);
-        return event;
+        final CaseEventDefinition evnt = new CaseEventDefinition();
+        evnt.setId(EVENT_ID);
+        evnt.setName(EVENT_NAME);
+        return evnt;
     }
 
-
     private IdamUser buildIdamUser() {
-        final IdamUser idamUser = new IdamUser();
-        idamUser.setId(IDAM_ID);
-        idamUser.setForename(IDAM_FNAME);
-        idamUser.setSurname(IDAM_LNAME);
-        idamUser.setEmail(IDAM_EMAIL);
-        return idamUser;
+        IdamUser idamUsr = new IdamUser();
+        idamUsr.setId(IDAM_ID);
+        idamUsr.setForename(IDAM_FNAME);
+        idamUsr.setSurname(IDAM_LNAME);
+        idamUsr.setEmail(IDAM_EMAIL);
+        return idamUsr;
     }
 
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
         InputStream inputStream =
-            SubmitCaseTransactionCaseAccessGroupTest.class.getClassLoader()
+            SubmitCaseTransactionNewCaseTest.class.getClassLoader()
                 .getResourceAsStream("tests/".concat(fileName));
 
         return new ObjectMapper().readValue(inputStream, new TypeReference<>() {
@@ -292,13 +291,15 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     }
 
     @Test
-    @DisplayName("should create a case With OrganisationID and No CaseAccessGroup")
-    void shouldPersistCreateCaseEventWithOrganisationIDNoCaseAccessGroup() {
+    @DisplayName("should create a case With Organisations for new case false")
+    void shouldPersistCreateCaseEventWithOrganisationNewCaseFalse() throws JsonProcessingException {
+        Map<String, JsonNode> dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField","caseAssignedField",
+            "\"550e8400-e29b-41d4-a716-446655440000\"", true,false);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
 
         inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
-
-        Map<String, JsonNode> dataCaseAccessGroup = new HashMap<>();
-        dataCaseAccessGroup.put(CaseAccessGroups, inputCaseDetails.getData().get(CaseAccessGroups));
 
         Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
             caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(caseDetails, caseTypeDefinition);
@@ -309,241 +310,212 @@ class SubmitCaseTransactionCaseAccessGroupTest {
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
         doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
 
-        submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser, caseEventDefinition, inputCaseDetails,
+        CaseDetails caseDetailsWithSupplementryNewCase = submitCaseTransaction.submitCase(event, caseTypeDefinition,
+            idamUser, caseEventDefinition, inputCaseDetails,
             IGNORE_WARNING, null);
 
         verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+        assertNull(caseDetailsWithSupplementryNewCase.getSupplementaryData());
     }
 
     @Test
-    @DisplayName("should create a case With OrganisationID, CaseAccessGroup and update CaseAccessGroup")
-    void shouldPersistCreateCaseEventWithOrganisationIDCaseAccessGroupUpdateCaseAccessGroup() {
-
-        String caseAccessGroupType = "CCD:all-cases-access";
-        String caseAccessGroupID = "SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
-            + " 550e8400-e29b-41d4-a716-446655440000";
-        Map<String, JsonNode> dataCaseAccessGroup = caseAccessGroupCaseData(caseAccessGroupType, caseAccessGroupID);
-
-        JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
-
-        inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
-        dataCaseAccessGroup.put(CaseAccessGroups, inputCaseDetails.getData().get(CaseAccessGroups));
-
-        Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
-            caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(caseDetails, caseTypeDefinition);
-
-        inputCaseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
-
-        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
-        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
-        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
-        CaseDetails caseDetailsWithCaseAccessGroup = submitCaseTransaction.submitCase(event, caseTypeDefinition,
-            idamUser, caseEventDefinition, inputCaseDetails, IGNORE_WARNING, null);
-
-        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup, 2, caseAccessGroupType);
-    }
-
-    @Test
-    @DisplayName("should create a case With OrganisationID and any caseAccesstype in CaseAccessGroup")
-    void shouldCreateCaseEventWithOrganisationID() {
-
-        String caseAccessGroupType = "Any String";
-        String caseAccessGroupID = "SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
-            + " 550e8400-e29b-41d4-a716-446655440000";
-
-        List<CaseAccessGroupWithId> caseAccessGroupForUIs = new ArrayList<>();
-
-        CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseAccessGroupID)
-            .caseAccessGroupType(caseAccessGroupType).build();
-
-        String uuid = UUID.randomUUID().toString();
-
-        CaseAccessGroupWithId caseAccessGroupForUI = CaseAccessGroupWithId.builder()
-            .caseAccessGroup(caseAccessGroup)
-            .id(uuid).build();
-        caseAccessGroupForUIs.add(caseAccessGroupForUI);
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
-        Map<String, JsonNode> dataCaseAccessGroup = new HashMap<>();
-        dataCaseAccessGroup.put(CaseAccessGroups, data);
-        JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
-
-        inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
-
-        Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
-            caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(caseDetails, caseTypeDefinition);
-
-        inputCaseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
-
-        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
-        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
-        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
-        CaseDetails caseDetailsWithCaseAccessGroup = submitCaseTransaction.submitCase(event, caseTypeDefinition,
-            idamUser, caseEventDefinition, inputCaseDetails, IGNORE_WARNING, null);
-
-        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup, 3, caseAccessGroupType);
-
-    }
-
-    @Test
-    @DisplayName("should create a case With OrganisationID, CaseAccessGroup caseAccesstype is CCD:all-cases-access")
-    void shouldPersistCreateCaseEventWithOrganisationIDUpdateCaseAccessGroup() {
-
-        String caseAccessGroupType = "CCD:all-cases-access";
-        String caseAccessGroupID = "SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
-            + " 550e8400-e29b-41d4-a716-446655440000";
-
-        List<CaseAccessGroupWithId> caseAccessGroupForUIs = new ArrayList<>();
-
-        CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseAccessGroupID)
-            .caseAccessGroupType(caseAccessGroupType).build();
-
-        String uuid = UUID.randomUUID().toString();
-        CaseAccessGroupWithId caseAccessGroupForUI = CaseAccessGroupWithId.builder()
-            .caseAccessGroup(caseAccessGroup)
-            .id(uuid).build();
-        caseAccessGroupForUIs.add(caseAccessGroupForUI);
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
-        Map<String, JsonNode> dataCaseAccessGroup = new HashMap<>();
-        dataCaseAccessGroup.put(CaseAccessGroups, data);
-
-        JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
-
-        inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
-
-        dataCaseAccessGroup.put(CaseAccessGroups, inputCaseDetails.getData().get(CaseAccessGroups));
-
-        Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
-            caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(
-                caseDetails, caseTypeDefinition);
-
-        inputCaseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
-
-        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
-        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
-        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
-        CaseDetails caseDetailsWithCaseAccessGroup = submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
-            idamUser,
-            caseEventDefinition,
-            inputCaseDetails,
-            IGNORE_WARNING,
-            null);
-
-        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup, 2, caseAccessGroupType);
-
-    }
-
-    @Test
-    @DisplayName("should create a case With OrganisationID, CaseAccessGroup caseAccesstype"
-        + " has CCD:all-cases-access and any string")
-    void shouldPersistCreateCaseEventWithOrganisationIDMergeCaseAccessGroup() {
-
-        String caseAccessGroupType = "Any String";
-        String caseAccessGroupID = "SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
-            + " 550e8400-e29b-41d4-a716-446655440000";
-
-        List<CaseAccessGroupWithId> caseAccessGroupForUIs = new ArrayList<>();
-
-        CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseAccessGroupID)
-            .caseAccessGroupType(caseAccessGroupType).build();
-        String uuid = UUID.randomUUID().toString();
-
-        CaseAccessGroupWithId caseAccessGroupForUI = CaseAccessGroupWithId.builder()
-            .caseAccessGroup(caseAccessGroup)
-            .id(uuid).build();
-        caseAccessGroupForUIs.add(caseAccessGroupForUI);
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
-        Map<String, JsonNode> dataCaseAccessGroup = new HashMap<>();
-        dataCaseAccessGroup.put(CaseAccessGroups, data);
-
-        JacksonUtils.merge(JacksonUtils.convertValue(dataCaseAccessGroup), inputCaseDetails.getData());
-        inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
-
-        Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
-            caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(caseDetails, caseTypeDefinition);
-
-        inputCaseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
-
-        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
-        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
-        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-
-        CaseDetails caseDetailsWithCaseAccessGroup = submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
-            idamUser,
-            caseEventDefinition,
-            inputCaseDetails,
-            IGNORE_WARNING,
-            null);
-
-        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
-        assertCaseDataCaseAccessGroup(caseDetailsWithCaseAccessGroup, 3, caseAccessGroupType);
-    }
-
-    private Map<String, JsonNode> organisationPolicyCaseData(String role, String organisationId)
+    @DisplayName("should create a case With OrganisationID, multiple organisationProfileField for "
+        + "new case false and true")
+    void shouldPersistCreateCaseEventWithOrganisationIDCaseMultipleOrganisationProfileFieldNewCase()
         throws JsonProcessingException {
 
-        JsonNode data = MAPPER.readTree(""
-            + "{"
-            + "  \"Organisation\": {"
-            + "    \"OrganisationID\": " + organisationId + ","
-            + "    \"OrganisationName\": \"OrganisationName1\""
-            + "  },"
-            + "  \"OrgPolicyReference\": null,"
-            + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\""
-            + "}");
+        organisationPolicyMultipleCaseDataNewCase(inputCaseDetails);
 
-        Map<String, JsonNode> result = new HashMap<>();
-        result.put("OrganisationPolicyField", data);
-        return result;
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
+        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+
+        CaseDetails caseDetailsWithSupplementryNewCase = submitCaseTransaction.submitCase(event, caseTypeDefinition,
+            idamUser, caseEventDefinition, inputCaseDetails, IGNORE_WARNING, null);
+
+        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+        assertCaseDataSupplementry(caseDetailsWithSupplementryNewCase, "\"550e8400-e29b-41d4-a716-446655440000\"");
     }
 
-    private Map<String, JsonNode> caseAccessGroupCaseData(String caseAccessGroupType, String caseAccessGroupID) {
+    @Test
+    @DisplayName("should create a case With OrganisationProfileField with new case true")
+    void shouldPersistCreateCaseEvenWithOrganisationNewCaseTrue() {
+
+        String caseAccessGroupType = "Any String";
+        String caseAccessGroupID = "SomeJurisdiction:CIVIL:bulk: [RESPONDENT01SOLICITOR]:"
+            + " 550e8400-e29b-41d4-a716-446655440000";
+
+        List<CaseAccessGroupWithId> caseAccessGroupForUIs = new ArrayList<>();
 
         CaseAccessGroup caseAccessGroup = CaseAccessGroup.builder().caseAccessGroupId(caseAccessGroupID)
             .caseAccessGroupType(caseAccessGroupType).build();
+        String uuid = UUID.randomUUID().toString();
 
         CaseAccessGroupWithId caseAccessGroupForUI = CaseAccessGroupWithId.builder()
             .caseAccessGroup(caseAccessGroup)
-            .id(UUID.randomUUID().toString()).build();
-
-        List<CaseAccessGroupWithId> caseAccessGroupForUIs = new ArrayList<>();
+            .id(uuid).build();
         caseAccessGroupForUIs.add(caseAccessGroupForUI);
 
-        CaseAccessGroup caseAccessGroup1 = CaseAccessGroup.builder()
-            .caseAccessGroupId("SomeJurisdictionCIVIL:bulk: [RESPONDENT02SOLICITOR]:$ORG$")
-            .caseAccessGroupType("CCD:all-cases-access").build();
+        inputCaseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
 
-        CaseAccessGroupWithId caseAccessGroupForUI1 = CaseAccessGroupWithId.builder()
-            .caseAccessGroup(caseAccessGroup1)
-            .id(UUID.randomUUID().toString()).build();
+        Map<String, JsonNode> caseDataClassificationWithCaseAccessGroup =
+            caseAccessGroupUtils.updateCaseDataClassificationWithCaseGroupAccess(caseDetails, caseTypeDefinition);
 
-        caseAccessGroupForUIs.add(caseAccessGroupForUI1);
+        inputCaseDetails.setDataClassification(caseDataClassificationWithCaseAccessGroup);
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
+        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+
+        CaseDetails caseDetailsWithSupplementryNewCase = submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            inputCaseDetails,
+            IGNORE_WARNING,
+            null);
+
+        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+        assertCaseDataSupplementry(caseDetailsWithSupplementryNewCase, "\"550e8400-e29b-41d4-a716-446655440000\"");
+
+    }
+
+    @Test
+    @DisplayName("should create a case With OrganisationID, multiple organisationProfileField for "
+        + "new case false and true and update  when new case NO for organisationProfileField")
+    void shouldPersistCreateCaseEventWithOrganisationIDCaseMultipleOrganisationProfileFieldNewCaseUpdate()
+        throws JsonProcessingException {
+
+        organisationPolicyMultipleCaseDataNewCase(inputCaseDetails);
+
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
+        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+
+        CaseDetails caseDetailsWithSupplementryNewCase = submitCaseTransaction.submitCase(event, caseTypeDefinition,
+            idamUser, caseEventDefinition, inputCaseDetails, IGNORE_WARNING, null);
+
+        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+
+        organisationPolicyMultipleCaseDataNewCaseUpdate(caseDetailsWithSupplementryNewCase);
+        CaseDetails caseDetailsWithSupplementryNewCaseUpdate =
+            submitCaseTransaction.submitCase(event, caseTypeDefinition,
+            idamUser, caseEventDefinition, caseDetailsWithSupplementryNewCase, IGNORE_WARNING, null);
+
+        assertCaseDataSupplementry(caseDetailsWithSupplementryNewCaseUpdate,
+            "\"550e8400-e29b-41d4-a716-446655440000\"");
+    }
+
+    private Map<String, JsonNode> organisationPolicyCaseDataNewCase(String orgPolicyField, String role,
+                                                                    String organisationId, boolean includeNewCase,
+                                                                    boolean newCase)
+        throws JsonProcessingException {
+        JsonNode data;
+        String yesOrNo = "No";
+        if (newCase) {
+            yesOrNo = "Yes";
+        }
+
+        if (includeNewCase) {
+
+            data = MAPPER.readTree(""
+                + "{"
+                + "  \"Organisation\": {"
+                + "    \"OrganisationID\": " + organisationId + ","
+                + "    \"OrganisationName\": \"OrganisationName1\""
+                + "  },"
+                + "  \"OrgPolicyReference\": null,"
+                + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\","
+                + "  \"newCase\": \"" + yesOrNo + "\""
+                + "}");
+        } else {
+            data = MAPPER.readTree(""
+                + "{"
+                + "  \"Organisation\": {"
+                + "    \"OrganisationID\": " + organisationId + ","
+                + "    \"OrganisationName\": \"OrganisationName1\""
+                + "  },"
+                + "  \"OrgPolicyReference\": null,"
+                + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\""
+                + "}");
+        }
+
         Map<String, JsonNode> result = new HashMap<>();
-        result.put(CaseAccessGroups, data);
+        result.put(orgPolicyField, data);
         return result;
     }
 
-    private void assertCaseDataCaseAccessGroup(final CaseDetails caseDetails, int size, String caseAccessGroupType) {
-        JsonNode caseAccessGroupsJsonNode = caseDetails.getData().get(CaseAccessGroups);
-        assertAll("Assert Casedetails, Data, CaseAccessGroups",
-            () -> assertEquals(size, caseAccessGroupsJsonNode.size()),
-            () -> assertTrue((caseAccessGroupsJsonNode.toString().contains(caseAccessGroupType)))
+    private void organisationPolicyMultipleCaseDataNewCase(CaseDetails inputCaseDetails)
+        throws JsonProcessingException {
+
+        Map<String, JsonNode> dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField","caseAssignedField",
+            "\"550e8400-e29b-41d4-a716-446655440000\"", true,true);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+        dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField1","caseAssignedField",
+            "\"organisationA\"", false,false);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+        dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField2","caseAssignedField",
+            "\"organisationB\"", true,false);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+        dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField3","caseAssignedField",
+            "\"organisationC\"", true,true);
+
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+    }
+
+    private void organisationPolicyMultipleCaseDataNewCaseUpdate(CaseDetails inputCaseDetails)
+        throws JsonProcessingException {
+
+        Map<String, JsonNode> dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField","caseAssignedField",
+                "\"550e8400-e29b-41d4-a716-446655440000\"", true,true);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+        dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField1","caseAssignedField",
+                "\"organisationA\"", false,false);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+        dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField2","caseAssignedField",
+                "\"organisationB\"", true,false);
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+        dataOrganisation =
+            organisationPolicyCaseDataNewCase("OrganisationPolicyField3","caseAssignedField",
+                "\"organisationC\"", true,false);
+
+
+        JacksonUtils.merge(JacksonUtils.convertValue(dataOrganisation), inputCaseDetails.getData());
+
+    }
+
+    private void assertCaseDataSupplementry(final CaseDetails caseDetails, String organisationId) {
+        assertNotNull(caseDetails.getSupplementaryData());
+
+        JsonNode supplementryDataJsonNode = caseDetails.getSupplementaryData()
+            .get(NewCaseUtils.SUPPLEMENTRY_DATA_NEW_CASE);
+        List<JsonNode> organizationProfiles = NewCaseUtils.findListOfOrganisationPolicyNodesForNewCase(caseDetails,
+            NewCaseUtils.CASE_NEW_YES);
+
+        assertAll("Assert CaseDetails, Data, organisationId",
+            () -> assertTrue((supplementryDataJsonNode.toString().contains(organisationId))),
+            () -> assertTrue(organizationProfiles.isEmpty())
         );
     }
 
