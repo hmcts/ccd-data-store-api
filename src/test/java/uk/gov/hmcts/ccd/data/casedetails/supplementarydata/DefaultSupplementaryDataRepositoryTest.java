@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
-    private static final int NUMBER_OF_CASES = 6;
+    private static final int NUMBER_OF_CASES = 7;
     private JdbcTemplate template;
 
     private final SupplementaryDataRepository supplementaryDataRepository;

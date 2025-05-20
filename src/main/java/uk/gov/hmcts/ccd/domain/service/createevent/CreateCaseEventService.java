@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DelegatingCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -33,7 +34,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -80,6 +81,7 @@ public class CreateCaseEventService {
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseDetailsRepository delegatingCaseDetailsRepository;
+    private final CaseDetailsRepository defaultCaseDetailsRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final EventTriggerService eventTriggerService;
@@ -266,6 +268,11 @@ public class CreateCaseEventService {
             caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetailsAfterCallbackWithoutHashes,
                 caseTypeDefinition);
         }
+
+        // Identify organizations with newCase set to true
+        // Update case supplementary data
+        // Clear newCase attributes
+        NewCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
 
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
