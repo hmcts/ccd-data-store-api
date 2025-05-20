@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
 import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
@@ -71,21 +72,17 @@ public class SubmitCaseTransaction implements AccessControl {
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                      final CaseDetailsRepository caseDetailsRepository,
-                                 final CaseAuditEventRepository caseAuditEventRepository,
-                                 final CaseTypeService caseTypeService,
-                                 final CallbackInvoker callbackInvoker,
-                                 final UIDService uidService,
-                                 final SecurityClassificationService securityClassificationService,
-                                 final CaseDataAccessControl caseDataAccessControl,
-                                 final @Qualifier("caseEventMessageService") MessageService messageService,
-                                 final CaseDocumentService caseDocumentService,
-                                 final ApplicationParams applicationParams,
-                                 final CaseAccessGroupUtils caseAccessGroupUtils,
-                                 final CaseDocumentTimestampService caseDocumentTimestampService,
-                                 final DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction,
-                                 final PersistenceStrategyResolver resolver,
-                                 final CasePointerRepository casePointerRepository,
-                                 final SynchronisedCaseProcessor synchronisedCaseProcessor
+                                    final CaseAuditEventRepository caseAuditEventRepository,
+                                    final CaseTypeService caseTypeService,
+                                    final CallbackInvoker callbackInvoker,
+                                    final UIDService uidService,
+                                    final SecurityClassificationService securityClassificationService,
+                                    final CaseDataAccessControl caseDataAccessControl,
+                                    final @Qualifier("caseEventMessageService") MessageService messageService,
+                                    final CaseDocumentService caseDocumentService,
+                                    final ApplicationParams applicationParams,
+                                    final CaseAccessGroupUtils caseAccessGroupUtils,
+                                    final CaseDocumentTimestampService caseDocumentTimestampService
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -99,10 +96,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-        this.decentralisedSubmitCaseTransaction = decentralisedSubmitCaseTransaction;
-        this.resolver = resolver;
-        this.casePointerRepository = casePointerRepository;
-        this.synchronisedCaseProcessor = synchronisedCaseProcessor;
+
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -161,6 +155,8 @@ public class SubmitCaseTransaction implements AccessControl {
             caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetailsAfterCallbackWithoutHashes,
                 caseTypeDefinition);
         }
+
+        NewCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
 
         CaseDetails savedCaseDetails;
         if (resolver.isDecentralised(caseDetailsAfterCallbackWithoutHashes)) {
