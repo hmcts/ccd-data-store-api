@@ -773,7 +773,7 @@ task functional(type: JavaExec) {
         '--tags',"${tags}",
         '--glue', 'uk.gov.hmcts.befta.player',
         '--glue', 'uk.gov.hmcts.ccd.datastore.befta',
-        'src/aat/resources/features/F-065.feature'
+        'src/aat/resources/features/F-065 - Get Case V2 Internal/F-065.feature'
     ]
     // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
     jvmArgs '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED'
