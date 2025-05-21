@@ -1,7 +1,7 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  devmemoryRequests: 2048Mi
+  devmemoryRequests: 4096Mi
   devcpuRequests: 2000m
   devmemoryLimits: 4096Mi
   devcpuLimits: 4000m
