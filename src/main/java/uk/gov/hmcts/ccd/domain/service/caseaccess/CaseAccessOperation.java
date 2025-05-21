@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
-import com.google.common.collect.Sets;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.common.util.set.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
