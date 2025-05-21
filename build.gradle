@@ -8,7 +8,6 @@ buildscript {
 }
 
 plugins {
-    id 'maven-publish'
     id 'application'
     id 'jacoco'
     id 'idea'
@@ -96,7 +95,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1'
+        url 'https://jitpack.io'
     }
 }
 
@@ -414,19 +413,6 @@ dependencyManagement {
             entry 'groovy'
             entry 'groovy-xml'
             entry 'groovy-json'
-        }
-    }
-}
-
-publishing {
-    repositories {
-        maven {
-            name = "AzureArtifacts"
-            url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
-            credentials {
-                username = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
-                password = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
-            }
         }
     }
 }
