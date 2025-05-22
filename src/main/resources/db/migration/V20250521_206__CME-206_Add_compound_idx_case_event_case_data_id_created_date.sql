@@ -1,1 +1,1 @@
-CREATE INDEX IF NOT EXISTS idx_case_event_case_data_id_created_date ON public.case_event(case_data_id, created_date DESC);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_event_case_data_id_created_date ON public.case_event(case_data_id, created_date DESC);
