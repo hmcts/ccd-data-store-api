@@ -1,0 +1,35 @@
+{
+  "_guid_": "S-027.AG-6.2_before_case_update",
+  "_extends_": "F-027_Test_Data_Base__AccessMetadata",
+
+  "specs": [
+    "to get case before case is updated to check `Access Granted` set to `BASIC,CHALLENGED,SPECIFIC`"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker_Role1Basic_Role3Challenged_Region123"
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CaseAccess_3Roles",
+      "cid": "${[scenarioContext][siblingContexts][CreateCase_FT_CaseAccess_3Roles_PreRequisiteCitizen__Region_123][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "metadataFields": [
+        {
+          "_extends_": "MetadataField", 
+
+          "id": "[ACCESS_GRANTED]",
+          "label": "Access Granted",
+          "value": "BASIC,CHALLENGED,SPECIFIC"
+        },
+        { "_extends_": "MetadataField", "id": "[ACCESS_PROCESS]" }
+      ]
+    }
+  }
+}
