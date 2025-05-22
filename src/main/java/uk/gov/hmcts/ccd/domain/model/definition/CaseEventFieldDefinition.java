@@ -1,15 +1,15 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.ToString;
 
 @ToString
 @Schema
@@ -28,6 +28,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel, C
     private String publishAs;
     private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
     private String defaultValue;
+    private Boolean nullifyByDefault;
 
     @Schema(required = true, description = "Foreign key to CaseField.id")
     @JsonProperty("case_field_id")
@@ -172,6 +173,16 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel, C
         this.defaultValue = defaultValue;
     }
 
+    @Schema(description = "Nullify By Default value for the case field")
+    @JsonProperty("nullify_by_default")
+    public Boolean getNullifyByDefault() {
+        return nullifyByDefault;
+    }
+
+    public void setNullifyByDefault(Boolean nullifyByDefault) {
+        this.nullifyByDefault = nullifyByDefault;
+    }
+
     @JsonIgnore
     @Override
     public CaseEventFieldDefinition createCopy() {
@@ -189,6 +200,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel, C
         copy.setPublishAs(this.getPublishAs());
         copy.setCaseEventFieldComplexDefinitions(createCopyList(this.getCaseEventFieldComplexDefinitions()));
         copy.setDefaultValue(this.getDefaultValue());
+        copy.setNullifyByDefault(this.getNullifyByDefault());
 
         return copy;
     }
