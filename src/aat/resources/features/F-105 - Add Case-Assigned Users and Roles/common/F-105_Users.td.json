@@ -12,5 +12,8 @@
   },
   "userHemanth": {
     "_extends_": "F-105_User_Hemanth"
+  },
+  "userMaster": {
+    "_extends_": "F-105_User_BeftaMasterCaseworker"
   }
 }
