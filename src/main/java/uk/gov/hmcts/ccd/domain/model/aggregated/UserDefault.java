@@ -6,22 +6,23 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 
 public class UserDefault {
     private String id;
     private List<JurisdictionDefinition> jurisdictionDefinitions;
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("work_basket_default_jurisdiction")
     private String workBasketDefaultJurisdiction;
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("work_basket_default_case_type")
     private String workBasketDefaultCaseType;
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("work_basket_default_state")
 
     private String workBasketDefaultState;

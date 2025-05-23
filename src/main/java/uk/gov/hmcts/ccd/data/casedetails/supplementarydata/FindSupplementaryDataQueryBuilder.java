@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
-import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ public class FindSupplementaryDataQueryBuilder implements SupplementaryDataQuery
         Query selectQuery = entityManager.createNativeQuery(SUPPLEMENTARY_DATA_QUERY);
         selectQuery.setParameter("reference", caseReference);
         selectQuery.unwrap(org.hibernate.query.NativeQuery.class)
-            .addScalar("supplementary_data", JsonNodeBinaryType.INSTANCE);
+            .addScalar("supplementary_data", SupplementaryDataUserType.CUSTOM_TYPE);
         return selectQuery;
     }
 

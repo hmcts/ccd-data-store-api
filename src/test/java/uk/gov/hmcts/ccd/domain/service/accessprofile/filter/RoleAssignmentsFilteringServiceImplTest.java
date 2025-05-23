@@ -8,8 +8,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -60,7 +60,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         List<RoleAttributeMatcher> roleAttributeMatchers = Lists.newArrayList(new BeginDateEndDateMatcher(),
             new CaseIdMatcher(),
             new CaseTypeMatcher(),
@@ -109,7 +109,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         assertEquals(2, filteredRoleAssignments.size());
     }
 
-    @Ignore // Test returns 0 neew to investigate
+    @Disabled // Test returns 0 neew to investigate
     //@Test
     void shouldFilterBasedOnSecurityClassificationWhenCaseAccessGroupCaseClassificationIsMore() {
         RoleAssignments roleAssignments = mockRoleAssignmentsCaseAccessGroupMatching(SecurityClassification.PRIVATE,
@@ -130,7 +130,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         assertEquals(1, filteredRoleAssignments.size());
     }
 
-    @Ignore // Test returns 0
+    @Disabled // Test returns 0
     //@Test
     void shouldFilterBasedOnSecurityClassificationWhenCaseAccessGroupCaseClassificationIsRestricted() {
         RoleAssignments roleAssignments = mockRoleAssignmentsCaseAccessGroupMatching(SecurityClassification.PRIVATE,
