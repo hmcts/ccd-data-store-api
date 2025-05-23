@@ -111,7 +111,7 @@ public class CaseAccessService {
     }
 
     public Set<String> getCaseRoles(String caseId) {
-        return new HashSet<>(caseUserRepository.findCaseRoles(Long.valueOf(caseId), userRepository.getUserId()));
+        return new HashSet<>(caseUserRepository.findCaseRoles(caseId, userRepository.getUserId()));
     }
 
     public Set<AccessProfile> getAccessProfilesByCaseReference(String caseReference) {

@@ -71,7 +71,7 @@ public class RoleBasedCaseDataAccessControl implements NoCacheCaseDataAccessCont
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
         Set<String> roles = Sets.union(userRepository.getUserRoles(),
             Sets.newHashSet(caseUserRepository
-                .findCaseRoles(Long.valueOf(getCaseId(caseReference)), userRepository.getUserId())));
+                .findCaseRoles(getCaseId(caseReference), userRepository.getUserId())));
         return userRoleToAccessProfiles(roles);
     }
 
@@ -79,14 +79,14 @@ public class RoleBasedCaseDataAccessControl implements NoCacheCaseDataAccessCont
     public Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails) {
         Set<String> roles = Sets.union(userRepository.getUserRoles(),
             Sets.newHashSet(caseUserRepository
-                .findCaseRoles(Long.valueOf(caseDetails.getId()), userRepository.getUserId())));
+                .findCaseRoles(caseDetails.getId(), userRepository.getUserId())));
         return userRoleToAccessProfiles(roles);
     }
 
     @Override
     public void grantAccess(CaseDetails caseDetails, String idamUserId) {
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), idamUserId, CREATOR.getRole());
+            caseUserRepository.grantAccess(caseDetails.getId(), idamUserId, CREATOR.getRole());
         }
     }
 

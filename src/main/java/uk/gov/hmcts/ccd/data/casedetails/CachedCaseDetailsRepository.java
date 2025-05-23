@@ -50,17 +50,17 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public Optional<CaseDetails> findById(String jurisdiction, Long id) {
-        return idToCaseDetails.computeIfAbsent(id, key -> caseDetailsRepository.findById(jurisdiction, id));
+    public Optional<CaseDetails> findById(String jurisdiction, String id) {
+        return idToCaseDetails.computeIfAbsent(Long.valueOf(id), key -> caseDetailsRepository.findById(jurisdiction, id));
     }
 
     @Override
-    public CaseDetails findById(final Long id) {
-        return idToCaseDetails.computeIfAbsent(id, key -> ofNullable(caseDetailsRepository.findById(id))).orElse(null);
+    public CaseDetails findById(final String id) {
+        return idToCaseDetails.computeIfAbsent(Long.valueOf(id), key -> ofNullable(caseDetailsRepository.findById(id))).orElse(null);
     }
 
     @Override
-    public List<Long> findCaseReferencesByIds(final List<Long> ids) {
+    public List<Long> findCaseReferencesByIds(final List<String> ids) {
         return caseDetailsRepository.findCaseReferencesByIds(ids);
     }
 
