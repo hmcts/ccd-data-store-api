@@ -8,6 +8,7 @@ buildscript {
 }
 
 plugins {
+    id 'maven-publish'
     id 'application'
     id 'jacoco'
     id 'idea'
@@ -36,7 +37,7 @@ ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.16.0'
 //overriding for easy access to the version for FT testing
 ext['beftaFwVersion'] = '9.2.3'
-ext['ccdTestDefinitionVersion'] = '7.25.2'
+ext['ccdTestDefinitionVersion'] = '7.26.2-prerelease-CCD-5329'
 
 configurations {
     compileClasspath {
@@ -95,7 +96,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url 'https://jitpack.io'
+        url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1'
     }
 }
 
@@ -413,6 +414,19 @@ dependencyManagement {
             entry 'groovy'
             entry 'groovy-xml'
             entry 'groovy-json'
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "AzureArtifacts"
+            url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+            credentials {
+                username = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
+                password = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
+            }
         }
     }
 }
