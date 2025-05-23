@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -32,7 +33,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
-import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
@@ -41,6 +41,8 @@ import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
+import uk.gov.hmcts.ccd.domain.service.validate.AuthorisedValidateCaseFieldsOperation;
+import uk.gov.hmcts.ccd.domain.service.validate.OperationContext;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -82,7 +84,6 @@ public class CaseDetailsEndpoint {
     private final AppInsights appInsights;
     private final FieldMapSanitizeOperation fieldMapSanitizeOperation;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
-    private final MidEventCallback midEventCallback;
 
     @Autowired
     public CaseDetailsEndpoint(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
@@ -91,10 +92,10 @@ public class CaseDetailsEndpoint {
                                @Qualifier("authorised") final StartEventOperation startEventOperation,
                                @Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                                final FieldMapSanitizeOperation fieldMapSanitizeOperation,
+                               @Qualifier(AuthorisedValidateCaseFieldsOperation.QUALIFIER)
                                final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                final DocumentsOperation documentsOperation,
                                final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation,
-                               final MidEventCallback midEventCallback,
                                final AppInsights appinsights) {
         this.getCaseOperation = getCaseOperation;
         this.createCaseOperation = createCaseOperation;
@@ -105,7 +106,6 @@ public class CaseDetailsEndpoint {
         this.documentsOperation = documentsOperation;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.paginatedSearchMetaDataOperation = paginatedSearchMetaDataOperation;
-        this.midEventCallback = midEventCallback;
         this.appInsights = appinsights;
     }
 
@@ -333,12 +333,8 @@ public class CaseDetailsEndpoint {
         @RequestParam(required = false) final String pageId,
         @RequestBody final CaseDataContent content) {
 
-        validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
-                                                        content);
-
-        return midEventCallback.invoke(caseTypeId,
-                                       content,
-                                       pageId);
+        validateCaseFieldsOperation.validateCaseDetails(new OperationContext(caseTypeId, content, pageId));
+        return JacksonUtils.convertValueJsonNode(content.getData());
     }
 
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events")
