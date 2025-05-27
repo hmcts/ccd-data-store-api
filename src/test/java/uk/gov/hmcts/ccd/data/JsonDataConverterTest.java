@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.data;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,7 +20,7 @@ public class JsonDataConverterTest {
 
     private JsonDataConverter jsonbConverter;
 
-    @Before
+    @BeforeEach
     public void setup() {
         jsonbConverter = new JsonDataConverter();
     }

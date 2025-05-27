@@ -30,7 +30,7 @@ class AccessTypeTest {
     @BeforeEach
     void setUp() {
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         setupWithAccessType();
         setupWithAccessRoleType();
 

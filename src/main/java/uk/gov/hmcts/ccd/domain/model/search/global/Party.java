@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern;
 
 @Getter
 @Setter

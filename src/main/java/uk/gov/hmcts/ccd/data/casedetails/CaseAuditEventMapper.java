@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
