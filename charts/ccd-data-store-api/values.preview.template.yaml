@@ -3,7 +3,7 @@ java:
   ingressHost: ${SERVICE_FQDN}
   devmemoryRequests: 2048Mi
   devcpuRequests: 2000m
-  devmemoryLimits: 8172Mi
+  devmemoryLimits: 4096Mi
   devcpuLimits: 4000m
   keyVaults:
     ccd:
