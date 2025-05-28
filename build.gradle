@@ -870,7 +870,7 @@ task smoke() {
 
 def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
 //temporary to check feature working on its own in pipeline or not
-tags = tags + " and (@F-1025)"
+//tags = tags + " and (@F-1025)"
 
 task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
