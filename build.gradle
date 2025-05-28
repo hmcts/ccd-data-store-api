@@ -21,7 +21,7 @@ plugins {
     id 'org.jetbrains.gradle.plugin.idea-ext' version '0.7'
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'uk.gov.hmcts.java' version '0.12.57'
-    id 'au.com.dius.pact' version '4.3.12'
+    id 'au.com.dius.pact' version '4.6.14'
     id "org.jsonschema2pojo" version "1.2.1"
 }
 
@@ -154,7 +154,11 @@ tasks.withType(Checkstyle) {
 }
 
 tasks.withType(Test) {
-    maxParallelForks = System.getenv('MAX_NUM_PARALLEL_THREADS') ?: 6 as int
+    // Default heap is 500M and too small for our tests which cache many spring contexts.
+    maxHeapSize = "3g"
+    // Spring contexts maintain database connection pools.
+    // If we have too many we exhaust postgres' ability to create new connections.
+    systemProperty 'spring.test.context.cache.maxSize', '5'
 
     useJUnitPlatform()
 
@@ -664,8 +668,8 @@ jsonSchema2Pojo {
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java," +
-            "**/AppInsightsConfiguration.java," +
-            "**/TestingSupportController.java"
+            "**/AppInsightsConfiguration.java,**/domain/**/*,,**/data/**/*,**/ApplicationParams.java," +
+            "**/UserAuthHeadersInterceptor.java,**/TestingSupportController.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"
@@ -684,14 +688,6 @@ configurations {
 
 compileTestJava {
     options.annotationProcessorPath = configurations.annotationProcessor
-}
-
-idea.project.settings {
-    compiler {
-        javac {
-            javacAdditionalOptions "-parameters"
-        }
-    }
 }
 
 // adopted from
@@ -975,11 +971,11 @@ task runRemoteAAT(type: JavaExec) {
     }
 }
 
-rootProject.tasks.named("processAatResources") {
+tasks.named("processAatResources") {
     duplicatesStrategy = 'include'
 }
 
-rootProject.tasks.named("processContractTestResources") {
+tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
 }
 
