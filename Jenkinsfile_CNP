@@ -22,6 +22,7 @@ def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
 
 def definitionStoreDevelopPr = "PR-1536"  // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-2549" // This doesn't change frequently, but when it does, only change this value.
+
 def prsToUseAat              = "PR-1793,PR-1888" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 def secrets = [
@@ -114,6 +115,11 @@ env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 // Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
 env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
+
+//enable BEFTA logging
+env.LOGGING_LEVEL_UK_GOV_HMCTS_CCD = "DEBUG"
+env.BEFTA_HTTP_LOGGING_ENABLED = "true"
+
 
 withPipeline(type, product, component) {
     onMaster {
