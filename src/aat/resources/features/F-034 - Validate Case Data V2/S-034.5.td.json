@@ -12,18 +12,9 @@
     "body": {
       "data": {
         "RestoredComplexType": {
-          "ComplexTextField": "complex text",
-          "ComplexNestedField": {
-            "NestedNumberField": "20",
-            "NestedCollectionTextField": [
-              {
-                "id": null,
-                "value": "collection text inside complex"
-              }
-            ]
-          },
-          "ComplexFixedListField": "VALUE2",
-          "ComplexTextField2": "complex2 text"
+          "ComplexTextField2": "complex 2 text",
+          "ComplexTextField3": "complex 3 text",
+          "ComplexTextField4": "complex 4 text"
         }
       }
     }
@@ -42,16 +33,8 @@
     "body": {
       "data": {
         "RestoredComplexType": {
-          "ComplexTextField2" : "complex2 text",
-          "ComplexTextField" : "complex text",
-          "ComplexNestedField" : {
-            "NestedNumberField" : "20",
-            "NestedCollectionTextField" : [ {
-              "id" : null,
-              "value" : "collection text inside complex"
-            } ]
-          },
-          "ComplexFixedListField" : "VALUE2"
+          "ComplexTextField2": "complex 2 text",
+          "ComplexTextField4": "complex 4 text"
         }
       },
       "_links": {

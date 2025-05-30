@@ -12,7 +12,7 @@
     "body": {
       "data": {
         "RestoredComplexType": {
-          "ComplexTextField3": "complex3 text"
+          "ComplexTextField3": "complex 3 text"
         }
       }
     }

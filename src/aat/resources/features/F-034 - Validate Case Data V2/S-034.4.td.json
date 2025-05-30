@@ -12,7 +12,8 @@
     "body": {
       "data": {
         "RestoredComplexType": {
-          "ComplexTextField2": "complex text"
+          "ComplexTextField2": "complex 2 text",
+          "ComplexTextField4": "complex 4 text"
         }
       }
     }
@@ -31,7 +32,8 @@
     "body": {
       "data": {
         "RestoredComplexType": {
-          "ComplexTextField2": "complex text"
+          "ComplexTextField2": "complex 2 text",
+          "ComplexTextField4": "complex 4 text"
         }
       },
       "_links": {
