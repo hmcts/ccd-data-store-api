@@ -80,7 +80,7 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleToAccessProfileDef
 @Transactional
 public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
-    private static final long CASE_REFERENCE = 999999L;
+    private static final String CASE_REFERENCE = "999999L";
     private static final String JURISDICTION_ID = "JeyOne";
     private static final String CASE_TYPE_ID = "CaseTypeOne";
     private static final String WRONG_CASE_TYPE_ID = "CaseTypeWrong";
@@ -147,10 +147,10 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         emField.set(defaultCaseDetailsRepository, emMock);
 
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setReference(1L);
+        caseDetails.setReference("1L");
 
         CaseDetailsEntity caseDetailsEntity = new CaseDetailsEntity();
-        caseDetailsEntity.setReference(1L);
+        caseDetailsEntity.setReference("1L");
         caseDetailsEntity.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
         caseDetailsEntity.setVersion(1);
 
@@ -197,7 +197,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     public void findByIdShouldReturnCorrectSingleRecord() {
         assumeDataInitialised();
 
-        final CaseDetails byId = caseDetailsRepository.findById(1L);
+        final CaseDetails byId = caseDetailsRepository.findById("1L");
         assertAll(
             () -> assertThat(byId.getId(), is("1")),
             () -> assertThat(byId.getJurisdiction(), is("PROBATE")),

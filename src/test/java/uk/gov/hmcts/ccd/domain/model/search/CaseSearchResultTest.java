@@ -20,11 +20,11 @@ class CaseSearchResultTest {
     @Test
     void shouldBuildCaseReferenceListForProvidedCaseType() {
         List<CaseDetails> cases = new ArrayList<>();
-        cases.add(caseDetails(CASE_TYPE_A, 111L));
-        cases.add(caseDetails(CASE_TYPE_B, 222L));
-        cases.add(caseDetails(CASE_TYPE_A, 333L));
-        cases.add(caseDetails(CASE_TYPE_B, 444L));
-        cases.add(caseDetails(CASE_TYPE_A, 555L));
+        cases.add(caseDetails(CASE_TYPE_A, "111L"));
+        cases.add(caseDetails(CASE_TYPE_B, "222L"));
+        cases.add(caseDetails(CASE_TYPE_A, "333L"));
+        cases.add(caseDetails(CASE_TYPE_B, "444L"));
+        cases.add(caseDetails(CASE_TYPE_A, "555L"));
         CaseSearchResult caseSearchResult = new CaseSearchResult(5L, cases);
 
         final List<String> result = caseSearchResult.getCaseReferences(CASE_TYPE_A);
@@ -40,7 +40,7 @@ class CaseSearchResultTest {
     @Test
     void shouldReturnEmptyListWhenNoCasesFound() {
         CaseSearchResult caseSearchResult =
-            new CaseSearchResult(1L, Collections.singletonList(caseDetails(CASE_TYPE_A, 111L)));
+            new CaseSearchResult(1L, Collections.singletonList(caseDetails(CASE_TYPE_A, "111L")));
 
         final List<String> result = caseSearchResult.getCaseReferences(CASE_TYPE_B);
 
@@ -60,7 +60,7 @@ class CaseSearchResultTest {
         );
     }
 
-    private CaseDetails caseDetails(String caseTypeId, Long reference) {
+    private CaseDetails caseDetails(String caseTypeId, String reference) {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(caseTypeId);
         caseDetails.setReference(reference);

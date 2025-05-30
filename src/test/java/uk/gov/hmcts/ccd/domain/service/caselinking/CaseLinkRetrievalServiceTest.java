@@ -37,14 +37,14 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
     @InjectMocks
     private CaseLinkRetrievalService caseLinkRetrievalService;
 
-    private static final Long LINKED_CASE_REFERENCE_05 = 8915783755360086L;
-    private static final Long LINKED_CASE_REFERENCE_06 = 2838768175385992L;
+    private static final String LINKED_CASE_REFERENCE_05 = "8915783755360086L";
+    private static final String LINKED_CASE_REFERENCE_06 = "2838768175385992L";
 
     @Test
     void testGetStandardLinkedCasesNoPagination() {
 
         // GIVEN
-        List<Long> linkedCaseReferences = List.of(LINKED_CASE_REFERENCE_01,
+        List<String> linkedCaseReferences = List.of(LINKED_CASE_REFERENCE_01,
             LINKED_CASE_REFERENCE_02, LINKED_CASE_REFERENCE_03);
 
         mockCaseLinkRepositoryCalls(linkedCaseReferences);
@@ -52,14 +52,13 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
 
         // WHEN
         final CaseLinkRetrievalResults standardLinkedCases =
-            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE.toString(), 1, 0);
+            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE, 1, 0);
 
         // THEN
         assertEquals(linkedCaseReferences.size(), standardLinkedCases.getCaseDetails().size());
-        final List<Long> collect = standardLinkedCases.getCaseDetails()
+        final List<String> collect = standardLinkedCases.getCaseDetails()
             .stream()
             .map(CaseDetails::getId)
-            .map(Long::parseLong)
             .collect(Collectors.toList());
         assertTrue(collect.containsAll(linkedCaseReferences));
     }
@@ -69,7 +68,7 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
     void testGetStandardLinkedCasesGetFirstHalfOfResults() {
 
         // GIVEN
-        List<Long> linkedCaseReferences = List.of(LINKED_CASE_REFERENCE_01,
+        List<String> linkedCaseReferences = List.of(LINKED_CASE_REFERENCE_01,
             LINKED_CASE_REFERENCE_02, LINKED_CASE_REFERENCE_03, LINKED_CASE_REFERENCE_04, LINKED_CASE_REFERENCE_05);
 
         mockCaseLinkRepositoryCalls(linkedCaseReferences);
@@ -77,16 +76,15 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
 
         // WHEN
         CaseLinkRetrievalResults standardLinkedCases =
-            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE.toString(), 1, 4);
+            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE, 1, 4);
 
         // THEN
-        final List<Long> expectedLinkedCases = List.of(LINKED_CASE_REFERENCE_01, LINKED_CASE_REFERENCE_02,
+        final List<String> expectedLinkedCases = List.of(LINKED_CASE_REFERENCE_01, LINKED_CASE_REFERENCE_02,
             LINKED_CASE_REFERENCE_03, LINKED_CASE_REFERENCE_04);
         assertEquals(expectedLinkedCases.size(), standardLinkedCases.getCaseDetails().size());
-        final List<Long> collect = standardLinkedCases.getCaseDetails()
+        final List<String> collect = standardLinkedCases.getCaseDetails()
             .stream()
             .map(CaseDetails::getId)
-            .map(Long::parseLong)
             .collect(Collectors.toList());
 
         assertTrue(collect.containsAll(expectedLinkedCases));
@@ -98,7 +96,7 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
     void testGetStandardLinkedCasesGetSecondHalfOfResults() {
 
         // GIVEN
-        List<Long> linkedCaseReferences = List.of(LINKED_CASE_REFERENCE_01,
+        List<String> linkedCaseReferences = List.of(LINKED_CASE_REFERENCE_01,
             LINKED_CASE_REFERENCE_02, LINKED_CASE_REFERENCE_03, LINKED_CASE_REFERENCE_04, LINKED_CASE_REFERENCE_05,
             LINKED_CASE_REFERENCE_06);
 
@@ -107,16 +105,15 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
 
         // WHEN
         CaseLinkRetrievalResults standardLinkedCases =
-            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE.toString(), 4, 3);
+            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE, 4, 3);
 
         // THEN
-        final List<Long> expectedLinkedCases = List.of(LINKED_CASE_REFERENCE_04, LINKED_CASE_REFERENCE_05,
+        final List<String> expectedLinkedCases = List.of(LINKED_CASE_REFERENCE_04, LINKED_CASE_REFERENCE_05,
             LINKED_CASE_REFERENCE_06);
         assertEquals(expectedLinkedCases.size(), standardLinkedCases.getCaseDetails().size());
-        final List<Long> caseDetailIds = standardLinkedCases.getCaseDetails()
+        final List<String> caseDetailIds = standardLinkedCases.getCaseDetails()
             .stream()
             .map(CaseDetails::getId)
-            .map(Long::parseLong)
             .collect(Collectors.toList());
 
         assertTrue(caseDetailIds.containsAll(expectedLinkedCases));
@@ -128,7 +125,7 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
     void testGetStandardLinkedCasesThreePagesOfResults() {
 
         // GIVEN
-        List<Long> linkedCaseReferences = List.of(LINKED_CASE_REFERENCE_01,
+        List<String> linkedCaseReferences = List.of(LINKED_CASE_REFERENCE_01,
             LINKED_CASE_REFERENCE_02, LINKED_CASE_REFERENCE_03, LINKED_CASE_REFERENCE_04, LINKED_CASE_REFERENCE_05,
             LINKED_CASE_REFERENCE_06);
 
@@ -141,19 +138,18 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
         assertPageResults(5, List.of(LINKED_CASE_REFERENCE_05, LINKED_CASE_REFERENCE_06), false);
     }
 
-    private void assertPageResults(int startRecordNumber, List<Long> expectedLinkedCases, boolean hasMoreResults) {
+    private void assertPageResults(int startRecordNumber, List<String> expectedLinkedCases, boolean hasMoreResults) {
 
         // WHEN
         CaseLinkRetrievalResults standardLinkedCases =
-            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE.toString(), startRecordNumber, 2);
+            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE, startRecordNumber, 2);
 
         // THEN
         assertEquals(expectedLinkedCases.size(), standardLinkedCases.getCaseDetails().size());
 
-        List<Long> caseDetailIds = standardLinkedCases.getCaseDetails()
+        List<String> caseDetailIds = standardLinkedCases.getCaseDetails()
             .stream()
             .map(CaseDetails::getId)
-            .map(Long::parseLong)
             .collect(Collectors.toList());
 
         assertTrue(caseDetailIds.containsAll(expectedLinkedCases));
@@ -170,7 +166,7 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
 
         // WHEN
         final CaseLinkRetrievalResults standardLinkedCases =
-            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE.toString(), 1, 0);
+            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE, 1, 0);
 
         // THEN
         assertTrue(standardLinkedCases.getCaseDetails().isEmpty());
@@ -182,8 +178,8 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
     void testShouldExcludeCasesThatDoNotReturnTheStandardCaseLinkField() {
 
         // GIVEN
-        Long caseReferenceToSkip = CASE_REFERENCE_02;
-        List<Long> linkedCaseReferences = List.of(LINKED_CASE_REFERENCE_01,
+        String caseReferenceToSkip = CASE_REFERENCE_02;
+        List<String> linkedCaseReferences = List.of(LINKED_CASE_REFERENCE_01,
             LINKED_CASE_REFERENCE_02, LINKED_CASE_REFERENCE_03, caseReferenceToSkip, LINKED_CASE_REFERENCE_04);
 
         mockCaseLinkRepositoryCalls(linkedCaseReferences);
@@ -197,16 +193,15 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
 
         // WHEN
         CaseLinkRetrievalResults standardLinkedCases =
-            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE.toString(), 1, 4);
+            caseLinkRetrievalService.getStandardLinkedCases(CASE_REFERENCE, 1, 4);
 
         // THEN
-        final List<Long> expectedLinkedCases = List.of(LINKED_CASE_REFERENCE_01, LINKED_CASE_REFERENCE_02,
+        final List<String> expectedLinkedCases = List.of(LINKED_CASE_REFERENCE_01, LINKED_CASE_REFERENCE_02,
             LINKED_CASE_REFERENCE_03, LINKED_CASE_REFERENCE_04);
         assertEquals(expectedLinkedCases.size(), standardLinkedCases.getCaseDetails().size());
-        final List<Long> collect = standardLinkedCases.getCaseDetails()
+        final List<String> collect = standardLinkedCases.getCaseDetails()
             .stream()
             .map(CaseDetails::getId)
-            .map(Long::parseLong)
             .collect(Collectors.toList());
 
         assertTrue(collect.containsAll(expectedLinkedCases));
@@ -216,7 +211,7 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
         assertFalse(collect.contains(caseReferenceToSkip));
     }
 
-    private CaseDetails createCaseDetails(Long linkedCaseReference, List<String> dataValues) {
+    private CaseDetails createCaseDetails(String linkedCaseReference, List<String> dataValues) {
         CaseDetails caseDetails = null;
 
         try {
@@ -230,7 +225,7 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
         return caseDetails;
     }
 
-    private void mockGetCaseOperationCalls(List<Long> linkedCaseReferences) {
+    private void mockGetCaseOperationCalls(List<String> linkedCaseReferences) {
         linkedCaseReferences.forEach(linkedCaseReference -> {
             CaseDetails caseDetails = createCaseDetails(
                 linkedCaseReference,
@@ -238,8 +233,8 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
                     createCaseLinkCollectionString(
                         STANDARD_CASE_LINK_FIELD,
                         List.of(
-                            CASE_REFERENCE_02.toString(), // i.e. another linked case to be ignored
-                            CASE_REFERENCE.toString()
+                            CASE_REFERENCE_02, // i.e. another linked case to be ignored
+                            CASE_REFERENCE
                         )
                     )
                 )
@@ -250,7 +245,7 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
         });
     }
 
-    private void mockCaseLinkRepositoryCalls(List<Long> linkedCaseReferences) {
+    private void mockCaseLinkRepositoryCalls(List<String> linkedCaseReferences) {
         when(caseLinkRepository.findCaseReferencesByLinkedCaseReferenceAndStandardLink(CASE_REFERENCE, STANDARD_LINK))
             .thenReturn(linkedCaseReferences);
     }
