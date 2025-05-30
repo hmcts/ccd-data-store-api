@@ -490,24 +490,31 @@ public class CaseController {
             dataTypeClass = SupplementaryDataCasesUpdateRequest.class,
             examples = @Example(
                 value = {
-                    @ExampleProperty(value = "{\n"
-                        + "\t\"cases\": [\n"
-                        + "\t\"caseId value 1\",\n"
-                        + "\t\"caseId value 2\"\n"
-                        + "\t\"],\n"
-                        + "\"supplementary_data_updates\": {\n"
-                        + "\t\"$inc\": {\n"
-                        + "\t\t\"orgs_assigned_users.OrgA\": 1,\n"
-                        + "\t\t\"orgs_assigned_users.OrgB\": -1\n"
-                        + "\t},\n"
-                        + "\t\"$set\": {\n"
-                        + "\t\t\"orgs_assigned_users.OrgZ\": 34,\n"
-                        + "\t\t\"new_case.OrgZ\": false,\n"
-                        + "\t\t\"processed\": true\n"
-                        + "\t}\n"
-                        + "\t}\n"
-                        + "}", mediaType = "application/json")
-                }))
+                    @ExampleProperty(
+                        value = """
+                    {
+                        "cases": [
+                            "caseId value 1",
+                            "caseId value 2"
+                        ],
+                        "supplementary_data_updates": {
+                            "$inc": {
+                                "orgs_assigned_users.OrgA": 1,
+                                "orgs_assigned_users.OrgB": -1
+                            },
+                            "$set": {
+                                "orgs_assigned_users.OrgZ": 34,
+                                "new_case.OrgZ": false,
+                                "processed": true
+                            }
+                        }
+                    }
+                    """,
+                        mediaType = "application/json"
+                    )
+                }
+            )
+        )
     })
     public ResponseEntity<SupplementaryCasesDataResource> updateCasesSupplementaryData(
         @RequestBody SupplementaryDataCasesUpdateRequest supplementaryDataCasesUpdateRequest) {
