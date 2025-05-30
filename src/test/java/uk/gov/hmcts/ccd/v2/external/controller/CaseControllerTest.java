@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
@@ -22,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataCasesUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.GetLinkedCasesResponseCreator;
@@ -38,6 +42,8 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
+import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryCasesDataResource;
+import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryCaseSuccessDataResource;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -80,6 +86,10 @@ class CaseControllerTest {
     private static final String INVALID_MAX_RETURN_RECORD_COUNT = "A";
     private static final Boolean IGNORE_WARNING = true;
     private static final CaseDataContent CASE_DATA_CONTENT = newCaseDataContent().build();
+
+    private static final String INVALID_CASE_REFERENCE = "1234123412341234";
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaseControllerTest.class);
 
     @Mock
     private GetCaseOperation getCaseOperation;
@@ -293,6 +303,7 @@ class CaseControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> assertThat(response.getBody().getResponse() != null, is(true)),
                 () -> assertThat(response.getBody().getResponse().size(), equalTo(1)),
                 () -> assertThat(response.getBody().getResponse(), is(data))
             );
@@ -385,10 +396,10 @@ class CaseControllerTest {
             return new SupplementaryDataUpdateRequest(convertData(jsonRequest));
         }
 
-        private Map<String, Map<String, Object>> convertData(String jsonRquest) {
+        private Map<String, Map<String, Object>> convertData(String jsonRequest) {
             Map<String, Map<String, Object>> requestData;
             try {
-                requestData = mapper.readValue(jsonRquest, Map.class);
+                requestData = mapper.readValue(jsonRequest, Map.class);
             } catch (JsonProcessingException e) {
                 requestData = new HashMap<>();
             }
@@ -615,6 +626,202 @@ class CaseControllerTest {
 
             return GetLinkedCasesResponse.builder().linkedCases(caseLinkInfos).build();
         }
+    }
+
+    @Nested
+    @DisplayName("POST /cases/supplementary-data")
+    class UpdateCasesSupplementaryData {
+
+        private final ObjectMapper mapper = new ObjectMapper();
+
+        @Test
+        @DisplayName("should return 200 when supplementary data updated")
+        void shouldUpdateSupplementaryData() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
+            SupplementaryCasesDataResource supplementaryCasesDataResource = createResponseDataWithCases();
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+                .thenReturn(new SupplementaryData(new HashMap<>()));
+            Map<String, Object> data = supplementaryCasesDataResource.getSuccesses().getFirst().getResponse();
+
+            SupplementaryData supplementaryData = new SupplementaryData(data);
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+                .thenReturn(supplementaryData);
+
+            final ResponseEntity<SupplementaryCasesDataResource> response =
+                caseController.updateCasesSupplementaryData(createCaseRequestDataOrgAWithCases());
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> assertThat(response.getBody().getFailures().size(), equalTo(0)),
+                () -> assertThat(response.getBody().getSuccesses().size(), equalTo(1)),
+                () -> assertThat(response.getBody().getSuccesses().getFirst().getResponse(), is(data))
+            );
+            validateResponseData(response.getBody().getSuccesses(), "organisationA", FALSE);
+        }
+
+        @Test
+        @DisplayName("should return 200 when supplementary data updated with failures")
+        void shouldUpdateSupplementaryDataWithFails() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
+            SupplementaryCasesDataResource supplementaryCasesDataResource = createResponseDataWithCases();
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+                .thenReturn(new SupplementaryData(new HashMap<>()));
+            Map<String, Object> data = supplementaryCasesDataResource.getSuccesses().getFirst().getResponse();
+
+            SupplementaryData supplementaryData = new SupplementaryData(data);
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+                .thenReturn(supplementaryData);
+
+            final ResponseEntity<SupplementaryCasesDataResource> response =
+                caseController.updateCasesSupplementaryData(createCaseRequestDataOrgAWithCasesFail());
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> assertThat(response.getBody().getFailures().size(), equalTo(1)),
+                () -> assertThat(response.getBody().getSuccesses().size(), equalTo(1)),
+                () -> assertThat(response.getBody().getSuccesses().getFirst().getResponse(), is(data))
+            );
+            validateResponseData(response.getBody().getSuccesses(), "organisationA", FALSE);
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when supplementary data not valid")
+        void invalidSupplementaryDataUpdateRequest() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+            SupplementaryDataCasesUpdateRequest request = new SupplementaryDataCasesUpdateRequest();
+
+            assertThrows(BadRequestException.class,
+                () -> caseController.updateCasesSupplementaryData(request));
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when supplementary data null")
+        void shouldThrowBadRequestExceptionWhenSupplementaryDataNull() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+
+            assertThrows(BadRequestException.class,
+                () -> caseController.updateCasesSupplementaryData(null));
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when supplementary data has empty operation data")
+        void shouldThrowBadRequestExceptionWhenSupplementaryDataHasNoData() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+            SupplementaryDataCasesUpdateRequest request = new SupplementaryDataCasesUpdateRequest();
+
+            assertThrows(BadRequestException.class,
+                () -> caseController.updateCasesSupplementaryData(request));
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when supplementary data has more than one nested levels")
+        void shouldThrowBadRequestExceptionWhenSupplementaryDataHasNestedLevels() {
+            doCallRealMethod().when(requestValidator).validate(any(SupplementaryDataUpdateRequest.class));
+            SupplementaryDataCasesUpdateRequest request = createRequestDataNestedWithCases();
+
+            assertThrows(BadRequestException.class,
+                () -> caseController.updateCasesSupplementaryData(request));
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when case reference not valid")
+        void caseReferenceNotValid() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+            SupplementaryDataCasesUpdateRequest request = new SupplementaryDataCasesUpdateRequest();
+
+            assertThrows(BadRequestException.class,
+                () -> caseController.updateCasesSupplementaryData(request));
+        }
+
+        private SupplementaryCasesDataResource createResponseDataWithCases() {
+            String jsonResponse = "{\n"
+                + "\t\"successes\": [{\n"
+                + "\t\"caseId\": "
+                + "\"" + CASE_REFERENCE + "\",\n"
+                + "\t\"supplementary_data\": {\n"
+                + "\t\t\"organisationA\": false\n"
+                + "\t}\n"
+                + "\t}]\n"
+                + "}";
+            return convertResponseData(jsonResponse);
+        }
+
+        private SupplementaryCasesDataResource convertResponseData(String jsonResponse) {
+            SupplementaryCasesDataResource responseData;
+
+            try {
+                mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+                responseData = mapper.readValue(jsonResponse, SupplementaryCasesDataResource.class);
+            } catch (JsonProcessingException e) {
+                LOG.info(e.getStackTrace().toString());
+                responseData = new SupplementaryCasesDataResource();
+            }
+            return responseData;
+        }
+
+        private SupplementaryDataCasesUpdateRequest createCaseRequestDataOrgAWithCases() {
+            String jsonRequest = "{\n"
+                + "\t\"cases\": [\n"
+                + "\t\t\"" + CASE_REFERENCE + "\"\n"
+                + "\t],\n"
+                + "\"supplementary_data_updates\": {\n"
+                + "\t\"$set\": {\n"
+                + "\t\t\"new_case.organisationA\": false\n"
+                + "\t}\n"
+                + "\t}\n"
+                + "}";
+            return convertData(jsonRequest);
+        }
+
+        private SupplementaryDataCasesUpdateRequest createCaseRequestDataOrgAWithCasesFail() {
+            String jsonRequest = "{\n"
+                + "\t\"cases\": [\n"
+                + "\t\t\"" + CASE_REFERENCE + "\",\n"
+                + "\t\t\"" + INVALID_CASE_REFERENCE + "\"\n"
+                + "\t],\n"
+                + "\"supplementary_data_updates\": {\n"
+                + "\t\"$set\": {\n"
+                + "\t\t\"new_case.organisationA\": false\n"
+                + "\t}\n"
+                + "\t}\n"
+                + "}";
+            return convertData(jsonRequest);
+        }
+
+        private SupplementaryDataCasesUpdateRequest createRequestDataNestedWithCases() {
+            String jsonRequest = "{\n"
+                + "\t\"cases\": [\n"
+                + "\t\t\"" + CASE_REFERENCE + "\n"
+                + "\t],\n"
+                + "\"supplementary_data_updates\": {\n"
+                + "\t\"$set\": {\n"
+                + "\t\t\".organisationA.organisationB\": false\n"
+                + "\t}\n"
+                + "\t}\n"
+                + "}";
+            return convertData(jsonRequest);
+        }
+
+        private SupplementaryDataCasesUpdateRequest convertData(String jsonRequest) {
+            SupplementaryDataCasesUpdateRequest requestData;
+            try {
+                requestData = mapper.readValue(jsonRequest, SupplementaryDataCasesUpdateRequest.class);
+            } catch (JsonProcessingException e) {
+                LOG.info(e.getStackTrace().toString());
+                requestData = new SupplementaryDataCasesUpdateRequest();
+            }
+            return requestData;
+        }
+
+        private void validateResponseData(List<SupplementaryCaseSuccessDataResource> response,
+                                          String expectedKey, Object expectedValue) {
+            response.forEach(success -> {
+                Map<String, Object> childMap = (Map<String, Object>) success.getResponse();
+                assertTrue(childMap.containsKey(expectedKey));
+                assertEquals(expectedValue, childMap.get(expectedKey));
+            });
+        }
+
     }
 
 }
