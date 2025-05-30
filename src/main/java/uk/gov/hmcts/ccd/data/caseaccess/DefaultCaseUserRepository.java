@@ -47,8 +47,9 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         }
     }
 
-    public List<Long> findCasesUserIdHasAccessTo(final String userId) {
-        TypedQuery<Long> namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASES_USER_HAS_ACCESS_TO, Long.class);
+    public List<String> findCasesUserIdHasAccessTo(final String userId) {
+        TypedQuery<String> namedQuery =
+            em.createNamedQuery(CaseUserEntity.GET_ALL_CASES_USER_HAS_ACCESS_TO, String.class);
         namedQuery.setParameter("userId", userId);
 
         return namedQuery.getResultList();

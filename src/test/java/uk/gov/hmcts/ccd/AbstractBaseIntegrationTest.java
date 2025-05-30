@@ -230,7 +230,7 @@ public abstract class AbstractBaseIntegrationTest {
     protected CaseDetails mapCaseData(ResultSet resultSet, Integer i) throws SQLException {
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setId(String.valueOf(resultSet.getLong("id")));
-        caseDetails.setReference(resultSet.getLong("reference"));
+        caseDetails.setReference(resultSet.getString("reference"));
         caseDetails.setState(resultSet.getString("state"));
         caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet
             .getString("security_classification")));

@@ -10,6 +10,6 @@ public interface CaseAssignedUserRolesOperation {
 
     void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles);
 
-    List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds);
+    List<CaseAssignedUserRole> findCaseUserRoles(List<String> caseIds, List<String> userIds);
 
 }

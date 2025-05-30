@@ -94,7 +94,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
             List<CaseUserEntity> cue = caseUserRepository
-                .findCaseUserRoles(List.of(Long.valueOf(CASE_ID_1)), List.of(userId));
+                .findCaseUserRoles(List.of(CASE_ID_1), List.of(userId));
 
             assertThat(cue.size(), is(1));
             assertEquals(CASE_ROLE_1, cue.get(0).getCasePrimaryKey().getCaseRole());
@@ -132,7 +132,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(V2.Error.CASE_ID_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
         assertEquals(0, caseRoles.size());
 
         verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
@@ -164,7 +164,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(V2.Error.CASE_ID_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
         assertEquals(0, caseRoles.size());
 
         verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
@@ -196,7 +196,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(V2.Error.USER_ID_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
         assertEquals(0, caseRoles.size());
 
         verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
@@ -228,7 +228,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(V2.Error.USER_ID_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
         assertEquals(0, caseRoles.size());
 
         verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
@@ -265,7 +265,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
         assertEquals(0, caseRoles.size());
 
         verifyAuditForAddCaseUserRoles(HttpStatus.FORBIDDEN, caseUserRoles);
@@ -297,7 +297,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(V2.Error.CASE_ROLE_FORMAT_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
         assertEquals(0, caseRoles.size());
 
         verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
@@ -329,7 +329,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertThat(exception.getMessage(), containsString(V2.Error.CASE_ROLE_FORMAT_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
         assertEquals(0, caseRoles.size());
 
         verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
@@ -465,7 +465,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
             assertEquals(1, caseRoles.size());
             assertThat(caseRoles, hasItems(CASE_ROLE_1));
         }
@@ -534,7 +534,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
             assertEquals(2, caseRoles.size());
             assertThat(caseRoles, hasItems(CASE_ROLE_1));
             assertThat(caseRoles, hasItems(CASE_ROLE_2));
@@ -642,10 +642,10 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
-            List<String> caseRoles1 = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId1);
+            List<String> caseRoles1 = caseUserRepository.findCaseRoles(CASE_ID_1, userId1);
             assertEquals(1, caseRoles1.size());
             assertThat(caseRoles1, hasItems(CASE_ROLE_1));
-            List<String> caseRoles2 = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId2);
+            List<String> caseRoles2 = caseUserRepository.findCaseRoles(CASE_ID_1, userId2);
             assertEquals(1, caseRoles2.size());
             assertThat(caseRoles2, hasItems(CASE_ROLE_1));
         }
@@ -714,7 +714,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_EXTRA), userId);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
             assertEquals(2, caseRoles.size()); // i.e. 1 + 1: one added + one existing
             assertThat(caseRoles, hasItems(CASE_ROLE_1));
         }
@@ -780,7 +780,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_EXTRA), userId);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_EXTRA, userId);
             assertEquals(1, caseRoles.size());
             assertThat(caseRoles, hasItems(CASE_ROLE_1));
         }
@@ -829,7 +829,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertEquals(orgUserCountersBefore, orgUserCountersAfter); // unchanged
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
         assertEquals(0, caseRoles.size());
     }
 
@@ -885,7 +885,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
                 .headers(createHttpHeaders()))
                 .andExpect(status().isCreated())
                 .andReturn();
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
             assertThat(caseRoles, hasItems(role));
 
             // ACT second request with lower case role
@@ -903,7 +903,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
             // ASSERT
             assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
             // check data has been saved
-            caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
             assertEquals(1, caseRoles.size());
             assertThat(caseRoles, hasItem(role));
             assertThat(caseRoles, not(hasItem(roleWithDifferentCaseLetter)));

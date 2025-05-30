@@ -17,8 +17,8 @@ import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.STANDARD_LINK;
 
 class CaseLinkMapperTest {
 
-    private static final Long CASE_ID = 15L;
-    private static final Long LINKED_CASE_ID = 25L;
+    private static final String CASE_ID = "15L";
+    private static final String LINKED_CASE_ID = "25L";
     private static final String CASE_TYPE_ID = "CaseType";
 
     private CaseLink caseLinkModel;
@@ -78,25 +78,26 @@ class CaseLinkMapperTest {
     @Test
     void testEntitiesToModel() {
 
-        List<CaseLinkEntity> caseLinkEntities = List.of(new CaseLinkEntity(10L, 20L, CASE_TYPE_ID, NON_STANDARD_LINK),
-                                                        new CaseLinkEntity(15L, 25L, CASE_TYPE_ID, STANDARD_LINK),
-                                                        new CaseLinkEntity(20L, 30L, CASE_TYPE_ID, NON_STANDARD_LINK));
+        List<CaseLinkEntity> caseLinkEntities =
+            List.of(new CaseLinkEntity("10L", "20L", CASE_TYPE_ID, NON_STANDARD_LINK),
+                new CaseLinkEntity("15L", "25L", CASE_TYPE_ID, STANDARD_LINK),
+                new CaseLinkEntity("20L", "30L", CASE_TYPE_ID, NON_STANDARD_LINK));
 
         List<CaseLink> expectedCaseLinkModels = List.of(CaseLink.builder()
-                                                            .caseId(10L)
-                                                            .linkedCaseId(20L)
+                                                            .caseId("10L")
+                                                            .linkedCaseId("20L")
                                                             .caseTypeId(CASE_TYPE_ID)
                                                             .standardLink(NON_STANDARD_LINK)
                                                             .build(),
                                                         CaseLink.builder()
-                                                            .caseId(15L)
-                                                            .linkedCaseId(25L)
+                                                            .caseId("15L")
+                                                            .linkedCaseId("25L")
                                                             .caseTypeId(CASE_TYPE_ID)
                                                             .standardLink(STANDARD_LINK)
                                                             .build(),
                                                         CaseLink.builder()
-                                                            .caseId(20L)
-                                                            .linkedCaseId(30L)
+                                                            .caseId("20L")
+                                                            .linkedCaseId("30L")
                                                             .caseTypeId(CASE_TYPE_ID)
                                                             .standardLink(NON_STANDARD_LINK)
                                                             .build());

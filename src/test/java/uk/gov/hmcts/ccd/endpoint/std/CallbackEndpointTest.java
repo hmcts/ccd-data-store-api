@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 class CallbackEndpointTest {
     private static final String JURISDICTION_ID = "Test";
     private static final String CASE_TYPE_ID = "Basic";
-    private static final Long CASE_REFERENCE = 1111222233334444L;
+    private static final String CASE_REFERENCE = "1111222233334444L";
 
     private PrintableDocumentListOperation documentOperation;
     private CallbackEndpoint callbackEndpoint;

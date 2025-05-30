@@ -214,7 +214,7 @@ class SubmitCaseTransactionTest {
             () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
             () -> order.verify(caseDetails).setCreatedDate(notNull(LocalDateTime.class)),
             () -> order.verify(caseDetails).setLastStateModifiedDate(notNull(LocalDateTime.class)),
-            () -> order.verify(caseDetails).setReference(Long.valueOf(CASE_UID)),
+            () -> order.verify(caseDetails).setReference(CASE_UID),
             () -> order.verify(caseDetailsRepository).set(caseDetails)
         );
     }

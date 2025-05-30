@@ -29,21 +29,21 @@ import static uk.gov.hmcts.ccd.WireMockBaseTest.CASE_04_REFERENCE;
 
 public abstract class CaseLinkTestFixtures {
 
-    protected static final Long CASE_DATA_ID = 4321L;
-    protected static final Long CASE_REFERENCE = 4444333322221111L;
-    protected static final Long CASE_REFERENCE_02 = 1111222233334444L;
+    protected static final String CASE_DATA_ID = "4321L";
+    protected static final String CASE_REFERENCE = "4444333322221111L";
+    protected static final String CASE_REFERENCE_02 = "1111222233334444L";
     protected static final String CASE_TYPE_ID = "Test";
     protected static final String CASE_TYPE_ID_02 = "Test-02";
 
-    protected static final Long LINKED_CASE_REFERENCE_01 = Long.parseLong(CASE_01_REFERENCE);
-    protected static final Long LINKED_CASE_REFERENCE_02 = Long.parseLong(CASE_02_REFERENCE);
-    protected static final Long LINKED_CASE_REFERENCE_03 = Long.parseLong(CASE_03_REFERENCE);
-    protected static final Long LINKED_CASE_REFERENCE_04 = Long.parseLong(CASE_04_REFERENCE);
+    protected static final String LINKED_CASE_REFERENCE_01 = CASE_01_REFERENCE;
+    protected static final String LINKED_CASE_REFERENCE_02 = CASE_02_REFERENCE;
+    protected static final String LINKED_CASE_REFERENCE_03 = CASE_03_REFERENCE;
+    protected static final String LINKED_CASE_REFERENCE_04 = CASE_04_REFERENCE;
 
-    protected static final Long LINKED_CASE_DATA_ID_01 = CASE_01_ID;
-    protected static final Long LINKED_CASE_DATA_ID_02 = CASE_02_ID;
-    protected static final Long LINKED_CASE_DATA_ID_03 = CASE_03_ID;
-    protected static final Long LINKED_CASE_DATA_ID_04 = CASE_04_ID;
+    protected static final String LINKED_CASE_DATA_ID_01 = CASE_01_ID;
+    protected static final String LINKED_CASE_DATA_ID_02 = CASE_02_ID;
+    protected static final String LINKED_CASE_DATA_ID_03 = CASE_03_ID;
+    protected static final String LINKED_CASE_DATA_ID_04 = CASE_04_ID;
 
     protected static final String LINKED_CASE_REFERENCE_VIA_SIMPLE_FIELD = CASE_01_REFERENCE;
     protected static final String LINKED_CASE_REFERENCE_VIA_COLLECTION = CASE_02_REFERENCE;
@@ -81,7 +81,7 @@ public abstract class CaseLinkTestFixtures {
         return createCaseDetails(CASE_REFERENCE, CASE_TYPE_ID, caseData);
     }
 
-    protected CaseDetails createCaseDetails(Long caseReference, String caseType, Map<String, JsonNode> caseData) {
+    protected CaseDetails createCaseDetails(String caseReference, String caseType, Map<String, JsonNode> caseData) {
         CaseDetails caseDetails = new CaseDetails();
 
         caseDetails.setReference(caseReference);

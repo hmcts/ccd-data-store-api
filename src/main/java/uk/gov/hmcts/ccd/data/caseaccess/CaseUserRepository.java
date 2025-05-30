@@ -8,7 +8,7 @@ public interface CaseUserRepository {
 
     void revokeAccess(String caseId, String userId, String caseRole);
 
-    List<Long> findCasesUserIdHasAccessTo(String userId);
+    List<String> findCasesUserIdHasAccessTo(String userId);
 
     List<String> findCaseRoles(String caseId, String userId);
 

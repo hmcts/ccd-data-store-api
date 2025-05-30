@@ -24,7 +24,7 @@ public interface CaseDetailsRepository {
     @Deprecated
     CaseDetails findById(String id);
 
-    List<Long> findCaseReferencesByIds(List<String> ids);
+    List<String> findCaseReferencesByIds(List<String> ids);
 
     Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference);
 

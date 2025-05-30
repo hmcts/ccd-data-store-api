@@ -244,7 +244,6 @@ public class CaseAssignedUserRolesController {
         validateRequestParams(caseIds, userIds);
         List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
             .stream()
-            .map(Long::valueOf)
             .collect(Collectors.toCollection(ArrayList::new)), userIds);
         return ResponseEntity.ok(new CaseAssignedUserRolesResource(caseAssignedUserRoles));
     }
@@ -287,7 +286,6 @@ public class CaseAssignedUserRolesController {
         validateRequestParams(caseIds, userIds);
         List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
             .stream()
-            .map(Long::valueOf)
             .collect(Collectors.toCollection(ArrayList::new)), userIds);
         return ResponseEntity.ok(new CaseAssignedUserRolesResource(caseAssignedUserRoles));
     }

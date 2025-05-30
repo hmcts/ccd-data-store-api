@@ -147,7 +147,7 @@ public class RoleBasedCaseDataAccessControl implements NoCacheCaseDataAccessCont
         // R.A uses external micro-services which referer cases by caseReference
         // Non R.A uses internal case id. Both cases should be contemplated in the code.
         if (optionalCaseDetails.isEmpty()) {
-            optionalCaseDetails = caseDetailsRepository.findById(null,Long.parseLong(caseReference));
+            optionalCaseDetails = caseDetailsRepository.findById(null,caseReference);
         }
 
         CaseDetails caseDetails = optionalCaseDetails.orElseThrow(() -> new CaseNotFoundException(caseReference));

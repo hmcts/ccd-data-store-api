@@ -324,14 +324,13 @@ public class CaseAccessOperation {
 
         Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseCaseDetails = new HashMap<>();
 
-        List<Long> caseReferences = caseUserRoles.stream()
+        List<String> caseReferences = caseUserRoles.stream()
             .map(CaseAssignedUserRoleWithOrganisation::getCaseDataId)
             .distinct()
-            .map(Long::parseLong)
             .collect(Collectors.toCollection(ArrayList::new));
 
         // create map of case references to case details
-        Map<Long, CaseDetails> caseDetailsByReferences = getCaseDetailsList(caseReferences).stream()
+        Map<String, CaseDetails> caseDetailsByReferences = getCaseDetailsList(caseReferences).stream()
             .collect(Collectors.toMap(CaseDetails::getReference, caseDetails -> caseDetails));
 
         // group roles by case reference
@@ -418,7 +417,7 @@ public class CaseAccessOperation {
         return result;
     }
 
-    public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseReferences, List<String> userIds) {
+    public List<CaseAssignedUserRole> findCaseUserRoles(List<String> caseReferences, List<String> userIds) {
 
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             final var caseIds = caseReferences.stream().map(String::valueOf).collect(Collectors.toList());
@@ -457,7 +456,7 @@ public class CaseAccessOperation {
         List<CaseUserEntity> caseUserEntities,
         List<CaseDetails> caseDetailsList
     ) {
-        Map<String, Long> caseReferenceAndIds = caseDetailsList.stream()
+        Map<String, String> caseReferenceAndIds = caseDetailsList.stream()
             .collect(Collectors.toMap(CaseDetails::getId, CaseDetails::getReference));
 
         return caseUserEntities.stream()
@@ -468,7 +467,7 @@ public class CaseAccessOperation {
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private List<CaseDetails> getCaseDetailsList(List<Long> caseReferences) {
+    private List<CaseDetails> getCaseDetailsList(List<String> caseReferences) {
         return caseReferences.stream()
             .map(caseReference -> {
                 Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(null, caseReference);

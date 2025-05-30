@@ -23,9 +23,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -103,7 +103,7 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             assertEquals(4, result.size());
 
             // verify lookups used
-            verify(caseDetailsRepository, times(4)).findById(isNull(), anyLong());
+            verify(caseDetailsRepository, times(4)).findById(isNull(), anyString());
             verify(caseDetailsRepository).findById(null, LINKED_CASE_DATA_ID_01);
             verify(caseDetailsRepository).findById(null, LINKED_CASE_DATA_ID_02);
             verify(caseDetailsRepository).findById(null, LINKED_CASE_DATA_ID_03);
@@ -115,13 +115,13 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             assertCaseLink(result, LINKED_CASE_REFERENCE_04, STANDARD_LINK);
         }
 
-        private CaseLinkEntity createCaseLinkEntity(Long caseDataId, Boolean isStandardLink) {
+        private CaseLinkEntity createCaseLinkEntity(String caseDataId, Boolean isStandardLink) {
             return  new CaseLinkEntity(CASE_DATA_ID, caseDataId, CASE_TYPE_ID, isStandardLink);
         }
 
-        private void setupMockForCaseDetailsRepositoryFindById(Long linkedCaseDataId, Long linkedCaseReference) {
+        private void setupMockForCaseDetailsRepositoryFindById(String linkedCaseDataId, String linkedCaseReference) {
             CaseDetails caseDetails = new CaseDetails();
-            caseDetails.setId(linkedCaseDataId.toString());
+            caseDetails.setId(linkedCaseDataId);
             caseDetails.setReference(linkedCaseReference);
             when(caseDetailsRepository.findById(null, linkedCaseDataId)).thenReturn(Optional.of(caseDetails));
         }
@@ -214,8 +214,8 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
 
             // THEN
             verify(caseLinkRepository, times(2)).insertUsingCaseReferences(
-                anyLong(),
-                anyLong(),
+                anyString(),
+                anyString(),
                 anyBoolean()
             );
         }
@@ -267,7 +267,7 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
 
     }
 
-    private CaseLink createCaseLink(Long linkedCaseReference, Long linkedCaseDataId, Boolean isStandardLink) {
+    private CaseLink createCaseLink(String linkedCaseReference, String linkedCaseDataId, Boolean isStandardLink) {
         return CaseLink.builder()
             .caseReference(CASE_REFERENCE)
             .caseId(CASE_DATA_ID)

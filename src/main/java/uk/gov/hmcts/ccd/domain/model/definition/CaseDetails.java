@@ -45,7 +45,7 @@ public class CaseDetails implements Cloneable {
     private String id;
 
     @JsonIgnore
-    private Long reference;
+    private String reference;
 
     @JsonProperty("version")
     private Integer version;
@@ -128,7 +128,7 @@ public class CaseDetails implements Cloneable {
     }
 
     @JsonGetter("id")
-    public Long getReference() {
+    public String getReference() {
         return reference;
     }
 
@@ -138,7 +138,7 @@ public class CaseDetails implements Cloneable {
     }
 
     @JsonSetter("id")
-    public void setReference(Long reference) {
+    public void setReference(String reference) {
         this.reference = reference;
     }
 

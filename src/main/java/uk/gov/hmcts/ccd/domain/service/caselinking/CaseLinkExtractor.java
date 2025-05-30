@@ -60,7 +60,7 @@ public class CaseLinkExtractor {
             .map(linkedCaseReference -> CaseLink.builder()
                 .caseReference(caseDetails.getReference())
                 .caseTypeId(caseDetails.getCaseTypeId())
-                .linkedCaseReference(Long.parseLong(linkedCaseReference))
+                .linkedCaseReference(linkedCaseReference)
                 // set Standard Case Link flag if value also present on list of standard case links
                 .standardLink(standardCaseReferences.stream().anyMatch(s -> s.equals(linkedCaseReference)))
                 .build())

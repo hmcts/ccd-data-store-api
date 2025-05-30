@@ -113,12 +113,12 @@ class MergeDataToSearchResultOperationTest {
         dataMap.put(FAMILY_DETAILS, familyDetails);
 
         CaseDetails caseDetails1 = new CaseDetails();
-        caseDetails1.setReference(999L);
+        caseDetails1.setReference("999L");
         caseDetails1.setData(dataMap);
         caseDetails1.setState("state1");
 
         CaseDetails caseDetails2 = new CaseDetails();
-        caseDetails2.setReference(1000L);
+        caseDetails2.setReference("1000L");
         caseDetails2.setData(dataMap);
         caseDetails2.setState("state2");
 

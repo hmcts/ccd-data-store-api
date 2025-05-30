@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class CaseLink {
 
-    private Long caseReference;
-    private Long linkedCaseReference;
+    private String caseReference;
+    private String linkedCaseReference;
 
     @JsonIgnore
     private String caseId;

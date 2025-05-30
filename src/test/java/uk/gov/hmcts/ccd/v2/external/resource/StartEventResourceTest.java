@@ -24,7 +24,7 @@ class StartEventResourceTest {
 
     private static final String LINK_SELF_FOR_CASE =
             String.format("/case-types/%s/event-triggers/%s?ignore-warning=true", CASE_TYPE_ID, EVENT_ID);
-    private static final Long CASE_REFERENCE = 1111222233334444L;
+    private static final String CASE_REFERENCE = "1111222233334444L";
     private static final String LINK_SELF_FOR_EVENT =
             String.format("/cases/%s/event-triggers/%s?ignore-warning=true", CASE_REFERENCE, EVENT_ID);
 

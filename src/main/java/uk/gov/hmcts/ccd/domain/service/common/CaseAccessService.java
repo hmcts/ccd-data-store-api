@@ -85,7 +85,7 @@ public class CaseAccessService {
             .orElse(AccessLevel.ALL);
     }
 
-    public Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles(CaseTypeDefinition caseTypeDefinition) {
+    public Optional<List<String>> getGrantedCaseReferencesForRestrictedRoles(CaseTypeDefinition caseTypeDefinition) {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             return getGrantedCaseReferences(caseTypeDefinition);
         } else {
@@ -93,15 +93,15 @@ public class CaseAccessService {
         }
     }
 
-    private Optional<List<Long>> getGrantedCaseReferences(CaseTypeDefinition caseTypeDefinition) {
-        final List<Long> caseReferences =
+    private Optional<List<String>> getGrantedCaseReferences(CaseTypeDefinition caseTypeDefinition) {
+        final List<String> caseReferences =
             roleAssignmentService
                 .getCaseReferencesForAGivenUser(userRepository.getUserId(), caseTypeDefinition)
-                .stream().map(Long::parseLong).collect(Collectors.toList());
+                .stream().collect(Collectors.toList());
         return Optional.of(caseReferences);
     }
 
-    private Optional<List<Long>> getGrantedCaseReferences() {
+    private Optional<List<String>> getGrantedCaseReferences() {
         if (userCanOnlyAccessExplicitlyGrantedCases()) {
             final var ids = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
             final var caseReferences = caseDetailsRepository.findCaseReferencesByIds(ids);
@@ -154,7 +154,7 @@ public class CaseAccessService {
 
 
     public Boolean isExplicitAccessGranted(CaseDetails caseDetails) {
-        final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
+        final List<String> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
 
         if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
             return Boolean.TRUE;

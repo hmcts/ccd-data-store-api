@@ -97,7 +97,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
             assertEquals(0, caseRoles.size());
         }
 
@@ -378,7 +378,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
             assertEquals(0, caseRoles.size());
         }
 
@@ -435,7 +435,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
             assertEquals(2, caseRoles.size());
             assertThat(caseRoles, hasItems(CASE_ROLE_1));
             assertThat(caseRoles, hasItems(CASE_ROLE_2));
@@ -456,7 +456,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been removed
-            List<String> caseRoles = caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            List<String> caseRoles = caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
             assertEquals(0, caseRoles.size());
         }
 
@@ -547,7 +547,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
             .andReturn();
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been removed
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId1);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId1);
             assertEquals(0, caseRoles.size());
         }
         // verify counter
@@ -583,9 +583,9 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
-            List<String> caseRoles1 = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId1);
+            List<String> caseRoles1 = caseUserRepository.findCaseRoles(CASE_ID_1, userId1);
             assertEquals(0, caseRoles1.size());
-            List<String> caseRoles2 = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId2);
+            List<String> caseRoles2 = caseUserRepository.findCaseRoles(CASE_ID_1, userId2);
             assertEquals(0, caseRoles2.size());
         }
     }
@@ -658,7 +658,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
             assertEquals(1, caseRoles.size()); // i.e. 1 + 1: one added + one existing
             assertThat(caseRoles, hasItems(CASE_ROLE_1));
         }
@@ -728,7 +728,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has been saved
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_EXTRA), userId);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_EXTRA, userId);
             assertTrue(caseRoles.isEmpty());
         }
     }
@@ -800,7 +800,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         if (!applicationParams.getEnableAttributeBasedAccessControl()) {
             // check data has not been saved
-            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+            List<String> caseRoles = caseUserRepository.findCaseRoles(CASE_ID_1, userId);
             assertEquals(0, caseRoles.size());
         }
     }

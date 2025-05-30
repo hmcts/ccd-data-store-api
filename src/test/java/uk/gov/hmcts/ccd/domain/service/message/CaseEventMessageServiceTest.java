@@ -40,7 +40,7 @@ class CaseEventMessageServiceTest {
 
     private static final String USER_ID = "123";
     private static final Long EVENT_INSTANCE_ID = 2L;
-    private static final Long CASE_ID = 456L;
+    private static final String CASE_ID = "456L";
     private static final String EVENT_ID = "SomeEvent";
     private static final String EVENT_NAME = "Some event";
     private static final String CASE_EVENT = "CASE_EVENT";

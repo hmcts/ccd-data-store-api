@@ -163,7 +163,7 @@ class CaseSearchResultViewGeneratorTest {
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
             .thenReturn(ACCESS_PROFILES);
 
-        CaseDetails caseDetails1 = caseDetails().withReference(999L)
+        CaseDetails caseDetails1 = caseDetails().withReference("999L")
             .withData(dataMap)
             .withCaseTypeId(CASE_TYPE_ID_1)
             .withJurisdiction(JURISDICTION)
@@ -174,7 +174,7 @@ class CaseSearchResultViewGeneratorTest {
             .withSupplementaryData(supplementaryDataMap)
             .build();
         CaseDetails caseDetails2 = caseDetails()
-            .withReference(1000L)
+            .withReference("1000L")
             .withData(dataMap)
             .withCaseTypeId(CASE_TYPE_ID_1)
             .withJurisdiction(JURISDICTION)
@@ -182,7 +182,7 @@ class CaseSearchResultViewGeneratorTest {
             .withSecurityClassification(SECURITY_CLASSIFICATION)
             .build();
         CaseDetails caseDetails3 = caseDetails()
-            .withReference(1001L)
+            .withReference("1001L")
             .withData(dataMap)
             .withCaseTypeId(CASE_TYPE_ID_2)
             .withJurisdiction(JURISDICTION)
@@ -647,7 +647,7 @@ class CaseSearchResultViewGeneratorTest {
             () -> verify(caseDataAccessControl, never()).generateAccessMetadata(anyString())
         );
     }
-    
+
     @Test
     void shouldBuildResultsWithCaseAccessMetadataWhenEnabled() {
         when(applicationParams.getInternalSearchCaseAccessMetadataEnabled()).thenReturn(true);

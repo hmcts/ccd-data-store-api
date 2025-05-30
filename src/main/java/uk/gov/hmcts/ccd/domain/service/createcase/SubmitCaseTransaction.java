@@ -102,7 +102,7 @@ public class SubmitCaseTransaction implements AccessControl {
 
         caseDetails.setCreatedDate(now);
         caseDetails.setLastStateModifiedDate(now);
-        caseDetails.setReference(Long.valueOf(uidService.generateUID()));
+        caseDetails.setReference(uidService.generateUID());
 
         final CaseDetails caseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(caseDetails);
 

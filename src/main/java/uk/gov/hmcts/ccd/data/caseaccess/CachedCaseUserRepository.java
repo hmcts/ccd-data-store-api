@@ -19,7 +19,7 @@ public class CachedCaseUserRepository implements CaseUserRepository {
 
     public static final String QUALIFIER = "cached";
 
-    private final Map<String, List<Long>> casesUserHasAccess = newHashMap();
+    private final Map<String, List<String>> casesUserHasAccess = newHashMap();
     private final Map<String, List<String>> caseUserRoles = newHashMap();
 
     public CachedCaseUserRepository(@Qualifier(DefaultCaseUserRepository.QUALIFIER)
@@ -38,7 +38,7 @@ public class CachedCaseUserRepository implements CaseUserRepository {
     }
 
     @Override
-    public List<Long> findCasesUserIdHasAccessTo(final String userId) {
+    public List<String> findCasesUserIdHasAccessTo(final String userId) {
         return casesUserHasAccess.computeIfAbsent(userId, e -> caseUserRepository.findCasesUserIdHasAccessTo(userId));
     }
 

@@ -176,7 +176,7 @@ class GlobalSearchServiceImplTest extends TestFixtures {
 
     private CaseSearchResult buildCaseSearchResult() {
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
-            .withReference(1629297445116784L)
+            .withReference("1629297445116784L")
             .withState("CaseCreated")
             .withJurisdiction(JURISDICTION_ID)
             .withCaseTypeId(CASE_TYPE_ID)

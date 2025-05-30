@@ -13,7 +13,7 @@ public class MigrationParameters {
 
     private String caseTypeId;
     private String jurisdictionId;
-    private Long caseDataId;
+    private String caseDataId;
     private Integer numRecords;
 
 }

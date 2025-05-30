@@ -56,7 +56,7 @@ class ClassifiedGetEventsOperationTest {
         MockitoAnnotations.initMocks(this);
 
         caseDetails = new CaseDetails();
-        caseDetails.setReference(Long.valueOf(CASE_REFERENCE));
+        caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setJurisdiction(JURISDICTION_ID);
         events = Arrays.asList(new AuditEvent(), new AuditEvent());
         event = new AuditEvent();
