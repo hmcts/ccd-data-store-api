@@ -1,0 +1,21 @@
+{
+  "_guid_": "F-144_Test_Data_Base",
+  "title": "External Elastic Search Endpoint",
+  "productName": "CCD Data Store Elastic Search API",
+  "operationName": "external search query",
+  "method": "POST",
+  "uri": "/searchCases",
+  "user" : {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ctid": "FT_NewCaseSupplementry"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response"
+  }
+}
