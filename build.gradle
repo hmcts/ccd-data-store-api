@@ -851,7 +851,7 @@ task smoke() {
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
             args = ['--plugin', "json:${rootDir}/target/cucumber.json",
                     '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
-                    '--tags', '@Smoke and not @Ignore',
+                    '--tags', '@S-109',
                     '--glue', 'uk.gov.hmcts.befta.player',
                     '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
