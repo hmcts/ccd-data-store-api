@@ -11,7 +11,7 @@ public final class V2 {
     public static final String EXPERIMENTAL_WARNING =
         "Experimental! Subject to change or removal, do not use in production!";
 
-    @NoArgsConstructor(access= AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public final class MediaType {
 
         // External API
