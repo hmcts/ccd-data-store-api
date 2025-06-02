@@ -77,7 +77,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             em.flush();
         } catch (StaleObjectStateException | OptimisticLockException e) {
             LOG.info("Optimistic Lock Exception: Case data has been altered, UUID={}", caseDetails.getReference(), e);
-            throw new CaseConcurrencyException("The case data has been altered outside of this transaction.");
+            throw new CaseConcurrencyException("""
+                Unfortunately we were unable to save your work to the case as \
+                another action happened at the same time.
+                Please review the case and try again.""");
         } catch (PersistenceException e) {
             if (e.getCause() instanceof ConstraintViolationException && isDuplicateReference(e)) {
                 LOG.warn("ConstraintViolationException happen for UUID={}. ConstraintName: {}",

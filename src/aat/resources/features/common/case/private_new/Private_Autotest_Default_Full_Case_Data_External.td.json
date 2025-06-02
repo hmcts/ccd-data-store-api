@@ -1,0 +1,9 @@
+{
+	"_guid_": "Private_Autotest_Default_Full_Case_Data_External",
+
+	"TextField": "Some Text",
+	"NumberField": "164528",
+	"YesOrNoField": "Yes",
+	"PhoneUKField": "07123456789",
+	"MoneyGBPField": "4200"
+}

@@ -254,17 +254,34 @@ class CategoriesAndDocumentsServiceTest extends TestFixtures {
             .isInstanceOf(RuntimeException.class);
     }
 
-    @Test
-    void testShouldParseTimestamp() {
-        final String timestamp = "2022-04-06T16:44:52.000000000";
-        final LocalDateTime expectedTimestamp = LocalDateTime.of(2022, 4, 6, 16,
-            44, 52);
-
+    @ParameterizedTest
+    @MethodSource("provideTimestampParameters")
+    void testShouldParseTimestamps(String timestamp, LocalDateTime expectedTimestamp) {
         final LocalDateTime result = underTest.parseUploadTimestamp(timestamp);
 
         assertThat(result)
             .isNotNull()
             .isEqualTo(expectedTimestamp);
+    }
+
+    private static Stream<Arguments> provideTimestampParameters() {
+        return Stream.of(
+            Arguments.of(
+                "2022-04-06T16:44:52.000000000Z", LocalDateTime.of(2022, 4, 6, 16, 44, 52)
+            ),
+            Arguments.of(
+                "2022-04-06T16:44:52.000000000", LocalDateTime.of(2022, 4, 6, 16, 44, 52)
+            ),
+            Arguments.of(
+                "2022-04-06T16:44:52.000", LocalDateTime.of(2022, 4, 6, 16, 44, 52)
+            ),
+            Arguments.of(
+                "2022-04-06T16:44:52.123", LocalDateTime.of(2022, 4, 6, 16, 44, 52, 123000000)
+            ),
+            Arguments.of(
+                "2022-04-06T16:44:52", LocalDateTime.of(2022, 4, 6, 16, 44, 52)
+            )
+        );
     }
 
     private static Stream<Arguments> provideCaseFieldExtractParameters() {

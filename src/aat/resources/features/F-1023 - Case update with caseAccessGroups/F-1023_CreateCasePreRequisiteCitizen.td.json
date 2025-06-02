@@ -1,0 +1,118 @@
+{
+  "_guid_": "F-1023_CreateCasePreRequisiteCitizen",
+  "_extends_": "Citizen_Case_Creation_Data_Base",
+  "specs": [
+    "to create a case",
+    "As a prerequisite"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1023_GetCitizenCreateToken"
+  }
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "ctid": "FT_CaseAccessGroups",
+      "jid": "BEFTA_MASTER"
+    },
+    "body": {
+      "data": {
+        "OrganisationPolicyField": {
+          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        },
+        "CaseAccessGroups": []
+      },
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "state" : "CaseCreated",
+      "case_type_id": "FT_CaseAccessGroups",
+      "version" : 0,
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "supplementary_data" : null,
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null,
+      "case_data": {
+        "CaseAccessGroups": [
+          {
+            "__ordering__": "ordered"
+          },
+          {
+            "id": "[[ANY_STRING_NOT_NULLABLE]]",
+            "value": {
+              "caseAccessGroupType": "CCD:all-cases-access",
+              "caseAccessGroupId": "BEFTA_MASTER:orgID1"
+            }
+          },
+          {
+            "id": "[[ANY_STRING_NOT_NULLABLE]]",
+            "value": {
+              "caseAccessGroupType": "CCD:all-cases-access",
+              "caseAccessGroupId": "BEFTA_MASTER:orgID1"
+            }
+          }
+        ],
+        "OrganisationPolicyField": {
+          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        }
+      },
+      "data_classification": {
+        "CaseAccessGroups" : {
+          "classification" : "PUBLIC",
+          "value" : [
+            {
+              "__ordering__": "ordered"
+            },
+            {
+              "id" : "[[ANY_STRING_NOT_NULLABLE]]",
+              "value" : {
+                "caseAccessGroupType" : "PUBLIC",
+                "caseAccessGroupId" : "PUBLIC"
+              }
+            },
+            {
+              "id" : "[[ANY_STRING_NOT_NULLABLE]]",
+              "value" : {
+                "caseAccessGroupType" : "PUBLIC",
+                "caseAccessGroupId" : "PUBLIC"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

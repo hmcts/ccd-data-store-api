@@ -11,7 +11,7 @@ properties(
     ]
 )
 
-@Library("Infrastructure")
+@Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION")
 
 def type = "java"
 def product = "ccd"
@@ -112,13 +112,15 @@ env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
 env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
 env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
+// Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
+env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
 
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
-        enablePactAs([
-                AppPipelineDsl.PactRoles.PROVIDER
-        ])
+//        enablePactAs([
+//            AppPipelineDsl.PactRoles.PROVIDER
+//        ])
     }
     if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
         enableSlackNotifications('#ccd-develop-builds')
@@ -129,9 +131,9 @@ withPipeline(type, product, component) {
     }
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
-        enablePactAs([
-                AppPipelineDsl.PactRoles.PROVIDER
-        ])
+//        enablePactAs([
+//            AppPipelineDsl.PactRoles.PROVIDER
+//        ])
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.

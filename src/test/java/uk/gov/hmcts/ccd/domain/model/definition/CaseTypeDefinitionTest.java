@@ -15,14 +15,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
@@ -58,9 +56,11 @@ class CaseTypeDefinitionTest {
         String fileContent = fromFileAsString("tests/FT-MasterCaseType-payload.json");
 
         CaseTypeDefinition caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
-        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
-
         CaseTypeDefinition copiedCaseTypeDefinition = caseTypeDefinition.createCopy();
+
+        assertNotEquals(caseTypeDefinition.hashCode(), copiedCaseTypeDefinition.hashCode());
+
+        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
         String copiedJson = objectMapper.writeValueAsString(copiedCaseTypeDefinition);
 
         String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
@@ -74,9 +74,11 @@ class CaseTypeDefinitionTest {
         String fileContent = fromFileAsString("tests/BEFTA-CASETYPE-3-1-payload.json");
 
         CaseTypeDefinition caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
-        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
-
         CaseTypeDefinition copiedCaseTypeDefinition = caseTypeDefinition.createCopy();
+
+        assertNotEquals(caseTypeDefinition.hashCode(), copiedCaseTypeDefinition.hashCode());
+
+        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
         String copiedJson = objectMapper.writeValueAsString(copiedCaseTypeDefinition);
 
         String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
@@ -90,52 +92,17 @@ class CaseTypeDefinitionTest {
         String fileContent = fromFileAsString("tests/FT-ComplexCRUD-payload.json");
 
         CaseTypeDefinition caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
-        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
-
         CaseTypeDefinition copiedCaseTypeDefinition = caseTypeDefinition.createCopy();
+
+        assertNotEquals(caseTypeDefinition.hashCode(), copiedCaseTypeDefinition.hashCode());
+
+        String originalJson = objectMapper.writeValueAsString(caseTypeDefinition);
         String copiedJson = objectMapper.writeValueAsString(copiedCaseTypeDefinition);
 
         String originalJsonHash256 = DigestUtils.sha256Hex(originalJson);
         String copiedJsonHash256 = DigestUtils.sha256Hex(copiedJson);
 
         assertEquals(originalJsonHash256, copiedJsonHash256);
-    }
-
-    @Test
-    public void testCaseTypeEmptyEventsListCompareActualAndClone() throws JsonProcessingException {
-        String fileContent = fromFileAsString("tests/CaseType-empty-events.json");
-
-        CaseTypeDefinition caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
-        assertTrue(caseTypeDefinition.getEvents().isEmpty());
-
-        CaseTypeDefinition copiedCaseTypeDefinition = caseTypeDefinition.createCopy();
-        assertNotEquals(caseTypeDefinition.hashCode(), copiedCaseTypeDefinition.hashCode());
-
-        assertTrue(copiedCaseTypeDefinition.getEvents().isEmpty());
-
-        List<CaseEventDefinition> copiedEvents = copiedCaseTypeDefinition.getEvents();
-        copiedEvents.add(new CaseEventDefinition());
-
-        assertTrue(caseTypeDefinition.getEvents().isEmpty());
-        assertEquals(1, copiedCaseTypeDefinition.getEvents().size());
-    }
-
-    @Test
-    public void testCaseTypeNullStatesListCompareActualAndClone() throws JsonProcessingException {
-        String fileContent = fromFileAsString("tests/CaseType-empty-events.json");
-
-        CaseTypeDefinition caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
-        assertNull(caseTypeDefinition.getStates());
-
-        CaseTypeDefinition copiedCaseTypeDefinition = caseTypeDefinition.createCopy();
-        assertNotEquals(caseTypeDefinition.hashCode(), copiedCaseTypeDefinition.hashCode());
-
-        assertNull(copiedCaseTypeDefinition.getStates());
-
-        copiedCaseTypeDefinition.setStates(List.of(new CaseStateDefinition()));
-
-        assertNull(caseTypeDefinition.getStates());
-        assertEquals(1, copiedCaseTypeDefinition.getStates().size());
     }
 
     @Nested

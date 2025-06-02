@@ -1,5 +1,9 @@
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
 
 locals {
@@ -12,6 +16,8 @@ locals {
   sharedResourceGroup = "${var.raw_product}-shared-${var.env}"
 
   sharedASPResourceGroup = "${var.raw_product}-shared-${var.env}"
+
+  db_name = "${local.app_full_name}-postgres-db-v15"
 
 }
 
@@ -47,41 +53,6 @@ resource "random_string" "draft_encryption_key" {
   }
 }
 
-
-////////////////////////////////
-// Populate Vault with DB info
-////////////////////////////////
-
-resource "azurerm_key_vault_secret" "POSTGRES-USER" {
-  name         = "${var.component}-POSTGRES-USER"
-  value        = module.data-store-db-v11.user_name
-  key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
-  name         = "${var.component}-POSTGRES-PASS"
-  value        = module.data-store-db-v11.postgresql_password
-  key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
-  name         = "${var.component}-POSTGRES-HOST"
-  value        = module.data-store-db-v11.host_name
-  key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
-  name         = "${var.component}-POSTGRES-PORT"
-  value        = module.data-store-db-v11.postgresql_listen_port
-  key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
-  name         = "${var.component}-POSTGRES-DATABASE"
-  value        = module.data-store-db-v11.postgresql_database
-  key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
-}
-
 resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {
   name         = "${var.component}-draftStoreEncryptionSecret"
   value        = random_string.draft_encryption_key.result
@@ -92,24 +63,6 @@ resource "azurerm_key_vault_secret" "draft-store-key" {
   name         = "${var.component}-draft-key"
   value        = random_string.draft_encryption_key.result
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
-}
-
-module "data-store-db-v11" {
-  source          = "git@github.com:hmcts/cnp-module-postgres?ref=master"
-  product         = var.product
-  component       = var.component
-  name            = "${local.app_full_name}-postgres-db-v11"
-  location        = "${var.location}"
-  env             = "${var.env}"
-  subscription    = "${var.subscription}"
-  postgresql_user = "${var.postgresql_user}"
-  database_name   = "${var.database_name}"
-  postgresql_version = "11"
-  sku_name        = "${var.database_sku_name}"
-  sku_tier        = "GeneralPurpose"
-  sku_capacity    = "${var.database_sku_capacity}"
-  storage_mb      = "${var.database_storage_mb}"
-  common_tags     = "${var.common_tags}"
 }
 
 ////////////////////////////////
@@ -132,14 +85,6 @@ module "postgresql_v15" {
   # Setup Access Reader db user
   force_user_permissions_trigger = "2"
 
-  # Sets correct DB owner after migration to fix permissions
-  enable_schema_ownership = var.enable_schema_ownership
-  force_schema_ownership_trigger = "2"
-  kv_subscription = var.kv_subscription
-  kv_name = data.azurerm_key_vault.ccd_shared_key_vault.name
-  user_secret_name = azurerm_key_vault_secret.POSTGRES-USER.name
-  pass_secret_name = azurerm_key_vault_secret.POSTGRES-PASS.name
-
   pgsql_databases = [
     {
       name = var.database_name
@@ -148,16 +93,44 @@ module "postgresql_v15" {
   pgsql_server_configuration = [
     {
       name  = "azure.extensions"
-      value = "plpgsql,pg_stat_statements,pg_buffercache,hypopg"
+      value = "pg_stat_statements,pg_buffercache,hypopg"
+    },
+    {
+      name  = "logfiles.download_enable"
+      value = "ON"
+    },
+    {
+      name  = "logfiles.retention_days"
+      value = "7"
+    },
+    {
+      name = "pg_qs.query_capture_mode"
+      value = "ALL"
+    },
+    {
+      name  = "log_lock_waits"
+      value = "on"
+    },
+    {
+      name  = "pgms_wait_sampling.query_capture_mode"
+      value = "ALL"
     }
+
   ]
-  pgsql_version    = "15"
-  product          = var.product
-  name             = "${local.app_full_name}-postgres-db-v15"
-  pgsql_sku        = var.pgsql_sku
-  pgsql_storage_mb = var.pgsql_storage_mb
-  auto_grow_enabled = var.auto_grow_enabled
+  pgsql_version               = "15"
+  product                     = var.product
+  name                        = local.db_name
+  pgsql_sku                   = var.pgsql_sku
+  pgsql_storage_mb            = var.pgsql_storage_mb
+  auto_grow_enabled           = var.auto_grow_enabled
+  action_group_name           = join("-", [var.action_group_name, local.db_name, var.env])
+  email_address_key           = var.email_address_key
+  email_address_key_vault_id  = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
+
+////////////////////////////////////
+// Populate KeyVault with DB info //
+////////////////////////////////////
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER-V15" {
   name         = "${var.component}-POSTGRES-USER-V15"
@@ -174,5 +147,17 @@ resource "azurerm_key_vault_secret" "POSTGRES-PASS-V15" {
 resource "azurerm_key_vault_secret" "POSTGRES-HOST-V15" {
   name         = "${var.component}-POSTGRES-HOST-V15"
   value        = module.postgresql_v15.fqdn
+  key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
+  name         = "${var.component}-POSTGRES-PORT"
+  value        = "5432"
+  key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+  name         = "${var.component}-POSTGRES-DATABASE"
+  value        = var.database_name
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }

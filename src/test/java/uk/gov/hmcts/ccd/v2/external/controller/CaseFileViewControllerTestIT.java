@@ -10,17 +10,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.util.UUID;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static uk.gov.hmcts.ccd.ApplicationParams.encode;
@@ -32,6 +35,12 @@ class CaseFileViewControllerTestIT extends WireMockBaseTest {
     @Inject
     private WebApplicationContext wac;
 
+    @Inject
+    private CustomHeadersFilter customHeadersFilter;
+
+    @Inject
+    protected ApplicationParams applicationParams;
+
     private MockMvc mockMvc;
 
     @SpyBean
@@ -39,11 +48,13 @@ class CaseFileViewControllerTestIT extends WireMockBaseTest {
 
     private static final String REQUEST_ID = "request-id";
     private static final String REQUEST_ID_VALUE = "1234567898765432";
+    private static String CUSTOM_CONTEXT = "";
 
     @BeforeEach
     public void setUp() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
+        CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
     }
 
     @Test
@@ -63,12 +74,14 @@ class CaseFileViewControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
+                .header(CUSTOM_CONTEXT, responseJson1.toString())
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
 
         verify(auditRepository).save(captor.capture());
 
+        assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
         assertThat(mvcResult.getResponse())
             .isNotNull()
             .satisfies(response -> {

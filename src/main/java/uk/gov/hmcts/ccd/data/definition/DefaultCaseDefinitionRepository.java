@@ -106,6 +106,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
+    public CaseTypeDefinition getScopedCachedCaseType(String caseTypeId) {
+        return this.getCaseType(caseTypeId);
+    }
+
+    @Override
     public List<FieldTypeDefinition> getBaseTypes() {
         try {
             return Arrays.asList(Objects.requireNonNull(definitionStoreClient
@@ -193,16 +198,20 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Cacheable(value = "jurisdictionCache")
     @Override
     public JurisdictionDefinition getJurisdiction(String jurisdictionId) {
-        return getJurisdictionFromDefinitionStore(jurisdictionId);
+        return retrieveJurisdictions(Optional.of(Collections.singletonList(jurisdictionId)))
+            .stream()
+            .findFirst()
+            .orElse(null);
     }
 
-    public JurisdictionDefinition getJurisdictionFromDefinitionStore(String jurisdictionId) {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
-                Optional.of(Collections.singletonList(jurisdictionId)));
-        if (jurisdictionDefinitions.isEmpty()) {
-            return null;
-        }
-        return jurisdictionDefinitions.get(0);
+    @Cacheable(value = "allJurisdictionsCache")
+    @Override
+    public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore() {
+        return retrieveJurisdictions(Optional.of(Collections.emptyList()));
+    }
+
+    public List<JurisdictionDefinition> retrieveJurisdictions(Optional<List<String>> jurisdictionIds) {
+        return getJurisdictionsFromDefinitionStore(jurisdictionIds);
     }
 
     @Override
@@ -228,12 +237,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         return jurisdictionDefinitions.stream()
                 .flatMap(jurisdictionDefinition -> jurisdictionDefinition.getCaseTypesIDs().stream()).distinct()
                 .collect(Collectors.toList());
-    }
-
-    @Cacheable(value = "allJurisdictionsCache")
-    @Override
-    public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore() {
-        return getJurisdictionsFromDefinitionStore(Optional.of(Collections.emptyList()));
     }
 
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
