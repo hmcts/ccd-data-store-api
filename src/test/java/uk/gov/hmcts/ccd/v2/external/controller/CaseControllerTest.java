@@ -638,12 +638,12 @@ class CaseControllerTest {
         void shouldUpdateSupplementaryData() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
             SupplementaryCasesDataResource supplementaryCasesDataResource = createResponseDataWithCases();
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)))
                 .thenReturn(new SupplementaryData(new HashMap<>()));
             Map<String, Object> data = supplementaryCasesDataResource.getSuccesses().getFirst().getResponse();
 
             SupplementaryData supplementaryData = new SupplementaryData(data);
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)))
                 .thenReturn(supplementaryData);
 
             final ResponseEntity<SupplementaryCasesDataResource> response =
@@ -663,12 +663,12 @@ class CaseControllerTest {
         void shouldUpdateSupplementaryDataWithFails() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
             SupplementaryCasesDataResource supplementaryCasesDataResource = createResponseDataWithCases();
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)))
                 .thenReturn(new SupplementaryData(new HashMap<>()));
             Map<String, Object> data = supplementaryCasesDataResource.getSuccesses().getFirst().getResponse();
 
             SupplementaryData supplementaryData = new SupplementaryData(data);
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)))
                 .thenReturn(supplementaryData);
 
             final ResponseEntity<SupplementaryCasesDataResource> response =
