@@ -395,7 +395,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:32.1.2-jre'
 
         // CVE-2023-41080
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.91') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -834,7 +834,8 @@ task highLevelDataSetup(type: JavaExec) {
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
-task smoke() {
+task 
+() {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
 
@@ -851,7 +852,7 @@ task smoke() {
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
             args = ['--plugin', "json:${rootDir}/target/cucumber.json",
                     '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
-                    '--tags', '@S-109',
+                    '--tags', '@Smoke and not @Ignore',
                     '--glue', 'uk.gov.hmcts.befta.player',
                     '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
