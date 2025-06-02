@@ -64,7 +64,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -295,7 +294,7 @@ class CaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
             Map<String, Object> data = createResponseData();
             SupplementaryData supplementaryData = new SupplementaryData(data);
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)))
                 .thenReturn(supplementaryData);
 
             final ResponseEntity<SupplementaryDataResource> response =
@@ -639,12 +638,12 @@ class CaseControllerTest {
         void shouldUpdateSupplementaryData() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
             SupplementaryCasesDataResource supplementaryCasesDataResource = createResponseDataWithCases();
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)))
                 .thenReturn(new SupplementaryData(new HashMap<>()));
             Map<String, Object> data = supplementaryCasesDataResource.getSuccesses().getFirst().getResponse();
 
             SupplementaryData supplementaryData = new SupplementaryData(data);
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)))
                 .thenReturn(supplementaryData);
 
             final ResponseEntity<SupplementaryCasesDataResource> response =
@@ -664,12 +663,12 @@ class CaseControllerTest {
         void shouldUpdateSupplementaryDataWithFails() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
             SupplementaryCasesDataResource supplementaryCasesDataResource = createResponseDataWithCases();
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)))
                 .thenReturn(new SupplementaryData(new HashMap<>()));
             Map<String, Object> data = supplementaryCasesDataResource.getSuccesses().getFirst().getResponse();
 
             SupplementaryData supplementaryData = new SupplementaryData(data);
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)))
                 .thenReturn(supplementaryData);
 
             final ResponseEntity<SupplementaryCasesDataResource> response =
