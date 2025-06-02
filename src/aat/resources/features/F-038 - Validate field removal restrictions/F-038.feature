@@ -77,8 +77,7 @@ Scenario: must remove complex AddressUKField if sent null in the event data, unl
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-038.5
-  Scenario: must add collection items from CollectionPermissionField if not sent in the event data, if Read=False and
-  Create=True
+  Scenario: must add collection items from CollectionPermissionField if not sent in the event data, if Read=False and Create=True
 
     Given a user with [an active profile in CCD],
     And a case that has just been created as in [F-038-Case-Creation-Data],
