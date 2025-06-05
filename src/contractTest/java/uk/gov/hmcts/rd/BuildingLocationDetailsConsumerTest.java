@@ -33,7 +33,7 @@ public class BuildingLocationDetailsConsumerTest extends AbstractCcdConsumerTest
     @Inject
     private ReferenceDataRepository referenceDataRepository;
 
-    @Pact(provider = "referenceData_location", consumer = "ccd_dataStoreApi")
+    @Pact(provider = "referenceData_location", consumer = "ccd_data_store")
     public V4Pact buildingLocationDetailsFragment(PactBuilder builder) {
         return builder
             .usingLegacyDsl()

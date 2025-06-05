@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@PactTestFor(providerName = "referenceData_location", port = "8091")
+@PactTestFor(providerName = "referenceData_organisation", port = "8091")
 @SpringBootTest({
     "reference.data.api.url:http://localhost:8091"
 })
@@ -34,7 +34,7 @@ public class OrganisationalServiceDetailsConsumerTest extends AbstractCcdConsume
     @Inject
     private ReferenceDataRepository referenceDataRepository;
 
-    @Pact(provider = "referenceData_location", consumer = "ccd_dataStoreApi")
+    @Pact(provider = "referenceData_location", consumer = "ccd_data_store")
     public V4Pact organisationalServiceDetailsFragment(PactBuilder builder) {
         return builder
             .usingLegacyDsl()

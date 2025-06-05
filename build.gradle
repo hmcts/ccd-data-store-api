@@ -939,6 +939,7 @@ pact {
 }
 
 runAndPublishConsumerPactTests.finalizedBy pactPublish
+check.dependsOn runAndPublishConsumerPactTests
 
 task runProviderPactVerification(type:Test) {
     logger.lifecycle("Runs provider pact Tests")
@@ -1006,6 +1007,10 @@ rootProject.tasks.named("processAatResources") {
 
 rootProject.tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
+}
+
+rootProject.tasks.named('runAndPublishConsumerPactTests') {
+    maxParallelForks = 1
 }
 
 void configRemoteRunTask(Task execTask, String env) {
