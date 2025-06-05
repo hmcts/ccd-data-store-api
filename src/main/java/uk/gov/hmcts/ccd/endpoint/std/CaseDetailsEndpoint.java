@@ -424,10 +424,14 @@ public class CaseDetailsEndpoint {
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "created_date", dataType = "string", paramType = "query", value = "ISO date to filter by this date"),
-        @ApiImplicitParam(name = "last_modified_date", dataType = "string", paramType = "query", value = "ISO date to filter by this date"),
-        @ApiImplicitParam(name = "state", dataType = "string", paramType = "query", value = "Search by case state"),
-        @ApiImplicitParam(name = "case_reference", dataType = "string", paramType = "query", value = "Search by case reference")
+        @ApiImplicitParam(name = "created_date", dataType = "string",
+            paramType = "query", value = "ISO date to filter by this date"),
+        @ApiImplicitParam(name = "last_modified_date", dataType = "string",
+            paramType = "query", value = "ISO date to filter by this date"),
+        @ApiImplicitParam(name = "state", dataType = "string",
+            paramType = "query", value = "Search by case state"),
+        @ApiImplicitParam(name = "case_reference", dataType = "string",
+            paramType = "query", value = "Search by case reference")
     })
     public List<CaseDetails> searchCasesForCaseWorkers(
         @ApiParam(value = "Idam user ID", required = true)
