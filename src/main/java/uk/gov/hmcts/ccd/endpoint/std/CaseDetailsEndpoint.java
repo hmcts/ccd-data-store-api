@@ -432,10 +432,15 @@ public class CaseDetailsEndpoint {
         @Parameter(name = "state", description = "Exact state", in = ParameterIn.QUERY),
         @Parameter(name = "reference", description = "Exact reference", in = ParameterIn.QUERY)
     })
-    public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("uid") final String uid,
-                                                       @PathVariable("jid") final String jurisdictionId,
-                                                       @PathVariable("ctid") final String caseTypeId,
-                                                       @RequestParam Map<String, String> queryParameters) {
+    public List<CaseDetails> searchCasesForCaseWorkers(
+        @ApiParam(value = "Idam user ID", required = true)
+        @PathVariable("uid") final String uid,
+        @ApiParam(value = "Jurisdiction ID", required = true)
+        @PathVariable("jid") final String jurisdictionId,
+        @ApiParam(value = "Case type ID", required = true)
+        @PathVariable("ctid") final String caseTypeId,
+        @ApiParam(value = "Query parameter(s)", required = true)
+        @RequestParam Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
 
