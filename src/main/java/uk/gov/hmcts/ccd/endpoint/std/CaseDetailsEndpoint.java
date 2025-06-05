@@ -1,14 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.annotations.*;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -424,13 +417,11 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
-    @Parameters({
-        @Parameter(name = "created_date", description = "ISO date to filter by this date", in = ParameterIn.QUERY),
-        @Parameter(name = "last_modified", description = "ISO date to filter by this date", in = ParameterIn.QUERY),
-        @Parameter(name = "jurisdiction", description = "Exact jurisdiction", in = ParameterIn.QUERY),
-        @Parameter(name = "case_type_id", description = "Exact case type id", in = ParameterIn.QUERY),
-        @Parameter(name = "state", description = "Exact state", in = ParameterIn.QUERY),
-        @Parameter(name = "reference", description = "Exact reference", in = ParameterIn.QUERY)
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "created_date", dataType = "string", paramType = "query", value = "ISO date to filter by this date"),
+        @ApiImplicitParam(name = "last_modified_date", dataType = "string", paramType = "query", value = "ISO date to filter by this date"),
+        @ApiImplicitParam(name = "state", dataType = "string", paramType = "query", value = "Search by case state"),
+        @ApiImplicitParam(name = "case_reference", dataType = "string", paramType = "query", value = "Search by case reference")
     })
     public List<CaseDetails> searchCasesForCaseWorkers(
         @ApiParam(value = "Idam user ID", required = true)
@@ -439,7 +430,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Query parameter(s)", required = true)
+        @ApiParam(value = "Query parameter(s)", required = false)
         @RequestParam Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
