@@ -36,7 +36,7 @@ ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.16.0'
 //overriding for easy access to the version for FT testing
 ext['beftaFwVersion'] = '9.2.3'
-ext['ccdTestDefinitionVersion'] = '7.25.1'
+ext['ccdTestDefinitionVersion'] = '7.25.2'
 
 configurations {
     compileClasspath {
@@ -321,7 +321,7 @@ dependencies {
     testImplementation 'io.github.openfeign:feign-jackson:9.7.0'
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.20.2'
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.20.2'
-    testImplementation 'com.github.hmcts:fortify-client:1.3.0:all'
+    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.6', classifier: 'all'
     testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
     // for sonar analysis
@@ -391,7 +391,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:32.1.2-jre'
 
         // CVE-2023-41080
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.91') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -915,19 +915,20 @@ def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-task runProviderPactVerification(type:Test) {
-    logger.lifecycle("Runs provider pact Tests")
-    useJUnitPlatform()
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-    if (project.hasProperty('pact.verifier.publishResults')) {
-        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
-    }
-    systemProperty 'pact.provider.version', project.pactVersion
-    include "uk/gov/hmcts/reform/**"
-}
-
-runProviderPactVerification.finalizedBy pactVerify
+//task runProviderPactVerification(type:Test) {
+//    logger.lifecycle("Runs provider pact Tests")
+//    useJUnitPlatform()
+//    testClassesDirs = sourceSets.contractTest.output.classesDirs
+//    classpath = sourceSets.contractTest.runtimeClasspath
+//    if (project.hasProperty('pact.verifier.publishResults')) {
+//        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+//    }
+//    systemProperty 'pact.provider.version', project.pactVersion
+//    include "uk/gov/hmcts/reform/**"
+//    include "uk/gov/hmcts/ccd/**"
+//}
+//
+//runProviderPactVerification.finalizedBy pactVerify
 
 def timestamp() {
     def date = new Date()

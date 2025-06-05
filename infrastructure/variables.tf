@@ -105,3 +105,16 @@ variable "kv_subscription" {
   type        = string
   description = "Update this with the name of the subscription where the single server key vault is. Defaults to DCD-CNP-DEV."
 }
+
+variable "action_group_name" {
+  description = "The name of the Action Group to create."
+  type        = string
+  default     = "action_group"
+}
+
+variable "email_address_key" {
+  description = "Email address key in azure Key Vault."
+  type        = string
+  default     = "db-alert-monitoring-email-address"
+}
+
