@@ -110,6 +110,20 @@ public class SwaggerConfiguration {
             .build();
     }
 
+    /*
+    private RequestParameter queryParameters() {
+        return new RequestParameterBuilder()
+            .name("queryParameters")
+            .description("created_date, last_modified, "  +
+                "jurisdiction, case_type_id, state," +
+                " reference")
+            .in("query")
+            .accepts(Collections.singleton(MediaType.APPLICATION_JSON))
+            .required(true)
+            .build();
+    }
+    */
+
     private RequestParameter headerServiceAuthorization() {
         return new RequestParameterBuilder()
             .name("ServiceAuthorization")
