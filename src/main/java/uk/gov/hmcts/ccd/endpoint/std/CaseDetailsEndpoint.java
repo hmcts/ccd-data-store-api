@@ -6,6 +6,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -421,6 +424,14 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
+    @Parameters({
+        @Parameter(name = "created_date", description = "ISO date to filter by this date", in = ParameterIn.QUERY),
+        @Parameter(name = "last_modified", description = "ISO date to filter by this date", in = ParameterIn.QUERY),
+        @Parameter(name = "jurisdiction", description = "Exact jurisdiction", in = ParameterIn.QUERY),
+        @Parameter(name = "case_type_id", description = "Exact case type id", in = ParameterIn.QUERY),
+        @Parameter(name = "state", description = "Exact state", in = ParameterIn.QUERY),
+        @Parameter(name = "reference", description = "Exact reference", in = ParameterIn.QUERY)
+    })
     public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("uid") final String uid,
                                                        @PathVariable("jid") final String jurisdictionId,
                                                        @PathVariable("ctid") final String caseTypeId,
