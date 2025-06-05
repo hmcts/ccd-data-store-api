@@ -5,8 +5,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -423,16 +421,6 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "created_date", dataType = "string",
-            paramType = "query", value = "ISO date to filter by this date"),
-        @ApiImplicitParam(name = "last_modified_date", dataType = "string",
-            paramType = "query", value = "ISO date to filter by this date"),
-        @ApiImplicitParam(name = "state", dataType = "string",
-            paramType = "query", value = "Search by case state"),
-        @ApiImplicitParam(name = "case_reference", dataType = "string",
-            paramType = "query", value = "Search by case reference")
-    })
     public List<CaseDetails> searchCasesForCaseWorkers(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -440,7 +428,8 @@ public class CaseDetailsEndpoint {
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Query parameter(s)", required = false)
+        @ApiParam(value = "Valid options: created_date, last_modified_date, " +
+            "state, case_reference", required = false)
         @RequestParam Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
