@@ -1,7 +1,13 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
