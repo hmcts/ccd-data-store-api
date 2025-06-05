@@ -430,7 +430,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Query Parameters, valid options: created_date, last_modified_date, "
             + "state, case_reference", required = false)
-        @RequestParam Map<String, String> queryParameters) {
+        @RequestParam(required = false) Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
 
