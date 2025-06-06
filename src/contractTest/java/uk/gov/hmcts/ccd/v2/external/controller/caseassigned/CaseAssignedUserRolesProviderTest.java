@@ -19,7 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.WireMockContractBaseTest;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 @IgnoreNoPactsToVerify
 @ActiveProfiles("CASE_ASSIGNED")
 @ExtendWith(SpringExtension.class)
-public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
+public class CaseAssignedUserRolesProviderTest extends WireMockContractBaseTest {
 
     @Autowired
     ApplicationParams applicationParams;
