@@ -75,7 +75,7 @@ class ClassifiedGetCriteriaOperationTest {
             aSearchInput().withFieldId(CASE_FIELD_ID_1_4).build()
         );
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         testCaseTypeDefinition = newCaseType()
             .withJurisdiction(newJurisdiction()
                                   .withJurisdictionId(JURISDICTION_ID)

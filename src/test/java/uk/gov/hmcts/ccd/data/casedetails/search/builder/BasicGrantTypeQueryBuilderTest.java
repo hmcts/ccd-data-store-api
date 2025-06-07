@@ -51,7 +51,7 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         basicGrantTypeQueryBuilder = new BasicGrantTypeQueryBuilder(accessControlService, caseDataAccessControl,
             applicationParams);
         CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
