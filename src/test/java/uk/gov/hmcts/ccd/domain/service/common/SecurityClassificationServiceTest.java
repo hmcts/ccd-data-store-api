@@ -19,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -77,6 +78,8 @@ public class SecurityClassificationServiceTest {
 
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
+    @Mock
+    private ApplicationParams applicationParams;
 
     private CaseDetails caseDetails;
 
@@ -90,7 +93,8 @@ public class SecurityClassificationServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         securityClassificationService = spy(new SecurityClassificationServiceImpl(caseDataAccessControl,
-            caseDefinitionRepository));
+            caseDefinitionRepository, applicationParams));
+        when(applicationParams.isPocFeatureEnabled()).thenReturn(false);
     }
 
     @Nested
