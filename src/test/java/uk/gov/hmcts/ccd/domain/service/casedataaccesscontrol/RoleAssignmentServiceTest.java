@@ -275,7 +275,7 @@ class RoleAssignmentServiceTest {
 
         private CaseDetails createCaseDetails() {
             CaseDetails caseDetails = new CaseDetails();
-            caseDetails.setReference(123456L);
+            caseDetails.setReference("123456L");
             caseDetails.setJurisdiction("test-jurisdiction");
             caseDetails.setCaseTypeId("case-type-id");
             return caseDetails;

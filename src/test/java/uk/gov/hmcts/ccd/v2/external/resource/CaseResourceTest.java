@@ -26,7 +26,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 
 @DisplayName("CaseResource")
 class CaseResourceTest {
-    private static final Long REFERENCE = 1234123412341238L;
+    private static final String REFERENCE = "1234123412341238L";
     private static final Boolean IGNORE_WARNING = true;
     private static final LocalDateTime CREATED_ON = LocalDateTime.now();
     private static final LocalDateTime LAST_MODIFIED_ON = LocalDateTime.now();
