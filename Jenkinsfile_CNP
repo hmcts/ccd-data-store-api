@@ -160,7 +160,6 @@ withPipeline(type, product, component) {
     afterAlways('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'pacts/*.json'
     }
 
     afterAlways('smoketest:preview') {
@@ -181,9 +180,5 @@ withPipeline(type, product, component) {
 
     afterAlways('pact-provider-verification') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
-    }
-
-    afterAlways('runAndPublishConsumerPactTests') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'pacts/*.json'
     }
 }
