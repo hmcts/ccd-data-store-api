@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@PactTestFor(providerName = "referenceData_organisation", port = "8091")
+@PactTestFor(providerName = "referenceData_location", port = "8091")
 @SpringBootTest({
     "reference.data.api.url:http://localhost:8091"
 })
