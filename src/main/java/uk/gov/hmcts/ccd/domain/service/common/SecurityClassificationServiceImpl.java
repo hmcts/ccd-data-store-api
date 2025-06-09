@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -69,10 +68,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
                         cd.setDataClassification(Maps.newHashMap());
                     }
 
-                    JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
-                        JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
-                        securityClassification);
-                    caseDetails.setData(JacksonUtils.convertValue(data));
+                    // We no longer apply field level classification to the case data.
                     return cd;
                 }));
     }
