@@ -8,7 +8,7 @@ Feature: F-129: Access Control tests covering Security Classification feature
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-129.1
-  Scenario: User with PUBLIC SC role access cannot access fields with a Security Classification of PRIVATE or RESTRICTED
+  Scenario: User with PUBLIC SC role access can access fields with a Security Classification of PRIVATE or RESTRICTED since field level classification is disabled
 
     And a user with [idam roles which only have a max Security Classification of PUBLIC]
     And a case that has just been created as in [SC_Public_Case_Created],
@@ -20,41 +20,6 @@ Feature: F-129: Access Control tests covering Security Classification feature
 
     Then a positive response is received,
     And the response has all the details as expected
-    And the response [does not return any fields with a SC of PRIVATE or RESTRICTED]
-
-#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-129.2
-  Scenario: User with PRIVATE SC role access can see both PUBLIC and PRIVATE case fields but not RESTRICTED case fields
-
-    And a user with [idam roles which only have a max Security Classification of PRIVATE],
-    And a case that has just been created as in [SC_Public_Case_Created],
-
-
-    When a request is prepared with appropriate values,
-    And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store],
-
-
-    Then a positive response is received,
-    And the response has all the details as expected
-    And the response [does not return any fields with a SC of RESTRICTED]
-    And the response [shows fields with a SC of PUBLIC or PRIVATE]
-
-#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-129.3
-  Scenario: User with RESTRICTED SC role access can see PUBLIC, PRIVATE and RESTRICTED case fields
-
-
-    And a user with [idam roles which only have a max Security Classification of RESTRICTED],
-    And a case that has just been created as in [SC_Public_Case_Created],
-
-
-    When a request is prepared with appropriate values,
-    And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store],
-
-
-    Then a positive response is received,
-    And the response has all the details as expected
-    And the response [shows fields with a SC of PUBLIC, PRIVATE or RESTRICTED]
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-129.4
