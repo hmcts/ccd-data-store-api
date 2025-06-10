@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
