@@ -3,8 +3,9 @@
   "_extends_": "F-129_Test_Data_Base",
 
   "specs": [
-    "idam roles which only have a max Security Classification of RESTRICTED",
-    "shows fields with a SC of PUBLIC, PRIVATE or RESTRICTED"
+    "Field level classification filtering has been removed ",
+    "idam roles which have a max Security Classification of RESTRICTED",
+    "can see all fields regardless of classification"
   ],
 
   "users" : {
