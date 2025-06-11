@@ -3,9 +3,8 @@
   "_extends_": "F-129_Test_Data_Base",
 
   "specs": [
-    "Field level classification filtering has been removed ",
-    "idam roles which only have a max Security Classification of PRIVATE",
-    "can see all fields regardless of classification"
+    "idam roles which only have a max Security Classification of PUBLIC",
+    "contains all fields regardless of classification"
   ],
 
   "users" : {

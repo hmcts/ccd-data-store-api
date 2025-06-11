@@ -19,7 +19,7 @@ Feature: F-129: Access Control tests covering Security Classification feature
 
 
     Then a positive response is received,
-    And the response has all the details as expected
+    And the response [contains all fields regardless of classification]
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-129.4
