@@ -68,7 +68,8 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
                         cd.setDataClassification(Maps.newHashMap());
                     }
 
-                    // We no longer apply field level classification to the case data.
+                    // We no longer apply field level classification to case data.
+                    // https://tools.hmcts.net/jira/browse/CCD-6378
                     return cd;
                 }));
     }
