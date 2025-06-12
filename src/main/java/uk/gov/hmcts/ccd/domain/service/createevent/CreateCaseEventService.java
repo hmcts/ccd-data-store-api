@@ -243,11 +243,14 @@ public class CreateCaseEventService {
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 
-        boolean isPocCaseType = true;
+        boolean isPocCaseType = this.applicationParams.getPocCaseTypes()
+                .contains(caseDetailsInDatabase.getCaseTypeId());
 
-        CaseDetails finalCaseDetails =
-            pocCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(), caseEventDefinition,
-            caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase);
+        CaseDetails finalCaseDetails = isPocCaseType
+                ? pocCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(), caseEventDefinition,
+                caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase)
+                : saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
+                newState, timeNow);
 
         caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
@@ -332,10 +335,14 @@ public class CreateCaseEventService {
             caseDetailsAfterCallback
         );
 
-        boolean isPocCaseType = true;
+        boolean isPocCaseType = this.applicationParams.getPocCaseTypes()
+                .contains(caseDetailsInDatabase.getCaseTypeId());
 
-        CaseDetails finalCaseDetails = pocCreateCaseEventService.saveAuditEventForCaseDetails(event, caseEventDefinition,
-        caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase);
+        CaseDetails finalCaseDetails = isPocCaseType
+                ? pocCreateCaseEventService.saveAuditEventForCaseDetails(event, caseEventDefinition,
+                caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase)
+                : saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
+                newState, timeNow);
 
         if (!isPocCaseType) {
             saveAuditEventForCaseDetails(
