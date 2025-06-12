@@ -243,8 +243,8 @@ public class CreateCaseEventService {
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 
-        boolean isPocCaseType = this.applicationParams.getPocCaseTypes()
-                .contains(caseDetailsInDatabase.getCaseTypeId());
+        boolean isPocCaseType = applicationParams.getPocCaseTypes().stream()
+            .anyMatch(prefix -> caseDetailsInDatabase.getCaseTypeId().startsWith(prefix));
 
         CaseDetails finalCaseDetails = isPocCaseType
                 ? pocCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(), caseEventDefinition,
@@ -335,8 +335,8 @@ public class CreateCaseEventService {
             caseDetailsAfterCallback
         );
 
-        boolean isPocCaseType = this.applicationParams.getPocCaseTypes()
-                .contains(caseDetailsInDatabase.getCaseTypeId());
+        boolean isPocCaseType = applicationParams.getPocCaseTypes().stream()
+            .anyMatch(prefix -> caseDetailsInDatabase.getCaseTypeId().startsWith(prefix));
 
         CaseDetails finalCaseDetails = isPocCaseType
                 ? pocCreateCaseEventService.saveAuditEventForCaseDetails(event, caseEventDefinition,
