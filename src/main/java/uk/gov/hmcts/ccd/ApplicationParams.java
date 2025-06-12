@@ -636,18 +636,7 @@ public class ApplicationParams {
     }
 
     public boolean isPocFeatureEnabled() {
-        return isPocFeatureEnabled;
+        return true;
     }
 
-    public void setPocFeatureEnabled(boolean pocFeatureEnabled) {
-        isPocFeatureEnabled = pocFeatureEnabled;
-    }
-
-    public List<String> getPocCaseTypes() {
-        return pocCaseTypes;
-    }
-
-    public void setPocCaseTypes(List<String> pocCaseTypes) {
-        this.pocCaseTypes = pocCaseTypes;
-    }
 }
