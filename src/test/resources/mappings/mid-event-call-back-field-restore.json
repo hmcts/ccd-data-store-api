@@ -1,0 +1,25 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "/event-callback/field-restore-mid-event.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "data": {
+        "PersonFirstName": "George",
+        "PersonLastName": "Roof",
+        "CaseNumber": "1234567",
+        "TelephoneNumber": "07865645667",
+        "PersonAddress": {
+          "AddressLine1": "123",
+          "AddressLine2": "Fake Street",
+          "AddressLine3": "Hexton"
+        }
+      }
+    }
+  }
+}
