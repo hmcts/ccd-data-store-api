@@ -19,6 +19,7 @@ plugins {
 
 apply from: './gradle/suppress.gradle'
 
+
 ext {
     set('springCloudVersion', '2024.0.0')
     set('spring-framework.version', '6.2.1')
