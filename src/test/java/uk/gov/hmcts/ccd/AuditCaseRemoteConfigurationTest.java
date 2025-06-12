@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,6 @@ public class AuditCaseRemoteConfigurationTest {
 
     protected AuditCaseRemoteConfiguration auditCaseRemoteConfiguration = new AuditCaseRemoteConfiguration();
 
-    @Before
     @BeforeEach
     public void initMock() throws IOException {
         ReflectionTestUtils.setField(auditCaseRemoteConfiguration,

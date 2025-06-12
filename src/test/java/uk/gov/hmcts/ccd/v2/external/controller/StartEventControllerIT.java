@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+
+import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,7 +20,7 @@ import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.StartEventResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -27,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class StartEventControllerIT extends WireMockBaseTest {
 
-    private static final JSONObject responseJson1 = new JSONObject("""
+    private static final String responseJsonString1 = """
         {
             "user_task": {
                 "task_data": {
@@ -37,8 +39,8 @@ public class StartEventControllerIT extends WireMockBaseTest {
                 "complete_task": "false"
             }
         }
-        """);
-    private static final JSONObject responseJson2 = new JSONObject("""
+        """;
+    private static final String responseJsonString2 = """
         {
             "user_task": {
                 "task_data": {
@@ -48,7 +50,15 @@ public class StartEventControllerIT extends WireMockBaseTest {
                 "complete_task": "false"
             }
         }
-        """);
+        """;
+    private static final String jsonObjectString = """
+        {
+            "json": "anyData"
+        }
+        """;
+    private static JSONObject jsonObject;
+    private static JSONObject responseJsonObject1;
+    private static JSONObject responseJsonObject2;
 
     @Inject
     private WebApplicationContext wac;
@@ -57,14 +67,11 @@ public class StartEventControllerIT extends WireMockBaseTest {
 
     private MockMvc mockMvc;
 
-    private final JSONObject jsonObject = new JSONObject("""
-        {
-            json:anyData
-        }
-        """);
-
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp() throws JSONException {
+        jsonObject = new JSONObject(jsonObjectString);
+        responseJsonObject1 = new JSONObject(responseJsonString1);
+        responseJsonObject2 = new JSONObject(responseJsonString2);
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -94,15 +101,15 @@ public class StartEventControllerIT extends WireMockBaseTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
-        headers.add(customContext, responseJson1.toString());
+        headers.add(customContext, responseJsonObject1.toString());
 
         mockMvc.perform(MockMvcRequestBuilders.get(
             "/case-types/TestAddressBookCreatorCase/event-triggers/NO_PRE_STATES_EVENT")
-                .requestAttr(customContext, responseJson2)
+                .requestAttr(customContext, responseJsonObject2)
                 .headers(headers)
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().string(customContext, responseJson2.toString()));
+            .andExpect(MockMvcResultMatchers.header().string(customContext, responseJsonObject2.toString()));
     }
 
     @Test
