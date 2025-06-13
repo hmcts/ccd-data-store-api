@@ -60,8 +60,7 @@ class AuthorisedCaseSearchOperationTest {
 
     private static final String CASE_TYPE_ID_1 = "caseType1";
     private static final String CASE_TYPE_ID_2 = "caseType2";
-    private static final Long CASE_REFERENCE = 123456L;
-    private static final String CASE_REFERENCE_STR = "123456";
+    private static final String CASE_REFERENCE = "123456L";
 
     @Mock
     private CaseSearchOperation caseSearchOperation;
