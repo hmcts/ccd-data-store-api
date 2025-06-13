@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -37,7 +38,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
@@ -94,9 +94,9 @@ class GlobalSearchParserTest {
         caseTypeDefinition1 = newCaseType()
             .withCaseTypeId(CASE_TYPE_ID_1)
             .withJurisdiction(jurisdiction)
-            .withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
+            .withAcl(AccessControlList.builder()
+                .accessProfile(ROLE_IN_USER_ROLE_1)
+                .read(true)
                 .build())
             .withField(newCaseField().withId("caseManagementLocation")
                 .withSC(SecurityClassification.PUBLIC.name())
@@ -112,15 +112,15 @@ class GlobalSearchParserTest {
                 .build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
+                .withAcl(AccessControlList.builder()
+                    .accessProfile(ROLE_IN_USER_ROLE_1)
+                    .read(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
+                .withAcl(AccessControlList.builder()
+                    .accessProfile(ROLE_IN_USER_ROLE_1)
+                    .read(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .build();
@@ -128,9 +128,9 @@ class GlobalSearchParserTest {
         caseTypeDefinition2 = newCaseType()
             .withCaseTypeId(CASE_TYPE_ID_2)
             .withJurisdiction(jurisdiction)
-            .withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(false)
+            .withAcl(AccessControlList.builder()
+                .accessProfile(ROLE_IN_USER_ROLE_1)
+                .read(false)
                 .build())
             .withField(newCaseField().withId("caseManagementLocation")
                 .withSC(SecurityClassification.PUBLIC.name())
@@ -146,15 +146,15 @@ class GlobalSearchParserTest {
                 .build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
+                .withAcl(AccessControlList.builder()
+                    .accessProfile(ROLE_IN_USER_ROLE_1)
+                    .read(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
+                .withAcl(AccessControlList.builder()
+                    .accessProfile(ROLE_IN_USER_ROLE_1)
+                    .read(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .build();
@@ -162,9 +162,9 @@ class GlobalSearchParserTest {
         caseTypeDefinition3 = newCaseType()
             .withCaseTypeId(CASE_TYPE_ID_3)
             .withJurisdiction(jurisdiction)
-            .withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(false)
+            .withAcl(AccessControlList.builder()
+                .accessProfile(ROLE_IN_USER_ROLE_1)
+                .read(false)
                 .build())
             .withField(newCaseField().withId("caseManagementLocation")
                 .withSC(SecurityClassification.PUBLIC.name())
@@ -193,9 +193,9 @@ class GlobalSearchParserTest {
                 .build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
+                .withAcl(AccessControlList.builder()
+                    .accessProfile(ROLE_IN_USER_ROLE_1)
+                    .read(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .build();
@@ -395,9 +395,9 @@ class GlobalSearchParserTest {
             .withId(id)
             .withFieldType(fieldType(type))
             .withSC(securityClassification.name())
-            .withAcl(anAcl()
-                .withRole(user)
-                .withRead(readAccess)
+            .withAcl(AccessControlList.builder()
+                .accessProfile(user)
+                .read(readAccess)
                 .build())
             .build();
     }

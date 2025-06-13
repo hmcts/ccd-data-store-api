@@ -7,7 +7,7 @@ public interface Copyable<T>  {
 
     T createCopy();
 
-    default <S extends Copyable<S>> List<S> createCopyList(List<S> originalList) {
+    default <S extends Copyable<S>> List<S> createDeepCopyList(List<S> originalList) {
         if (originalList == null) {
             return null;
         }
@@ -19,20 +19,10 @@ public interface Copyable<T>  {
         return copyList;
     }
 
-    default List<AccessControlList> createACLCopyList(List<AccessControlList> accessControlLists) {
-        if (accessControlLists == null || accessControlLists.isEmpty()) {
-            return accessControlLists;
+    default <S> List<S> createShallowCopyList(List<S> originalList) {
+        if (originalList == null) {
+            return null;
         }
-
-        List<AccessControlList> copiedACLs = new ArrayList<>(accessControlLists.size());
-        for (AccessControlList accessControlList : accessControlLists) {
-            if (accessControlList instanceof ComplexACL) {
-                copiedACLs.add(((ComplexACL) accessControlList).deepCopy());
-            } else {
-                copiedACLs.add(accessControlList.createCopy());
-            }
-        }
-
-        return copiedACLs;
+        return new ArrayList<>(originalList);
     }
 }

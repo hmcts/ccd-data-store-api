@@ -173,8 +173,8 @@ public class FieldTypeDefinition implements Serializable, Copyable<FieldTypeDefi
         copy.setMin(this.min);
         copy.setMax(this.max);
         copy.setRegularExpression(this.regularExpression);
-        copy.setFixedListItemDefinitions(createCopyList(this.fixedListItemDefinitions));
-        copy.setComplexFields(createCopyList(this.complexFields));
+        copy.setFixedListItemDefinitions(createDeepCopyList(this.fixedListItemDefinitions));
+        copy.setComplexFields(createDeepCopyList(this.complexFields));
         copy.setCollectionFieldTypeDefinition(this.collectionFieldTypeDefinition != null
                 ? this.collectionFieldTypeDefinition.createCopy() : null);
         return copy;
