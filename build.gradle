@@ -235,6 +235,7 @@ dependencies {
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.1'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
@@ -346,6 +347,8 @@ dependencies {
     contractTestImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     contractTestImplementation "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
     contractTestRuntimeOnly group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
@@ -391,7 +394,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:32.1.2-jre'
 
         // CVE-2023-41080
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.105') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -915,20 +918,43 @@ def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-//task runProviderPactVerification(type:Test) {
-//    logger.lifecycle("Runs provider pact Tests")
-//    useJUnitPlatform()
-//    testClassesDirs = sourceSets.contractTest.output.classesDirs
-//    classpath = sourceSets.contractTest.runtimeClasspath
-//    if (project.hasProperty('pact.verifier.publishResults')) {
-//        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
-//    }
-//    systemProperty 'pact.provider.version', project.pactVersion
-//    include "uk/gov/hmcts/reform/**"
-//    include "uk/gov/hmcts/ccd/**"
-//}
-//
-//runProviderPactVerification.finalizedBy pactVerify
+task runAndPublishConsumerPactTests(type: Test){
+    logger.lifecycle("Runs consumer pact tests")
+    systemProperty 'pact.rootDir', "pacts"
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+    include "uk/gov/hmcts/reform/**"
+    include "uk/gov/hmcts/rd/**"
+}
+
+pact {
+    broker {
+        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    }
+    publish {
+        pactDirectory = 'pacts'
+        tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+        version = System.getenv("GIT_COMMIT") ?: "local-${System.currentTimeMillis()}"
+    }
+}
+
+runAndPublishConsumerPactTests.finalizedBy pactPublish
+check.dependsOn runAndPublishConsumerPactTests
+
+task runProviderPactVerification(type:Test) {
+    logger.lifecycle("Runs provider pact Tests")
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+    if (project.hasProperty('pact.verifier.publishResults')) {
+        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+    }
+    systemProperty 'pact.provider.version', project.pactVersion
+    include "uk/gov/hmcts/reform/**"
+    include "uk/gov/hmcts/ccd/**"
+}
+
+runProviderPactVerification.finalizedBy pactVerify
 
 def timestamp() {
     def date = new Date()
@@ -981,6 +1007,10 @@ rootProject.tasks.named("processAatResources") {
 
 rootProject.tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
+}
+
+rootProject.tasks.named('runAndPublishConsumerPactTests') {
+    maxParallelForks = 1
 }
 
 void configRemoteRunTask(Task execTask, String env) {

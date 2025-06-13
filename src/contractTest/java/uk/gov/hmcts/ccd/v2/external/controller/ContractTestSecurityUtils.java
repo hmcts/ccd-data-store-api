@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -84,6 +85,13 @@ public class ContractTestSecurityUtils extends SecurityUtils {
                                                           String caseworkerPassword) {
         setAuthenticationOnSecurityContext(caseworkerUserName, caseworkerPassword);
         caseTypeUserCredentials.put(caseType, new UserCredentials(caseworkerUserName, caseworkerPassword));
+    }
+
+    public HttpHeaders authorizationHeadersForDataStoreSystemUser() {
+        final HttpHeaders headers = new HttpHeaders();
+        headers.add(SERVICE_AUTHORIZATION, "Bearer ServiceToken");
+        headers.add(HttpHeaders.AUTHORIZATION,  "Bearer UserAuthToken");
+        return headers;
     }
 
     private void setAuthenticationOnSecurityContext(String caseworkerUserName, String caseworkerPassword) {
