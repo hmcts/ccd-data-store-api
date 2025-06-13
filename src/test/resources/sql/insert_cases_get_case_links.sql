@@ -618,7 +618,7 @@ VALUES (2006, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC'
        );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
-VALUES (2007, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
+VALUES (2007, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PRIVATE',
         '{
           "PersonFirstName": "An",
           "PersonLastName": "Other",
@@ -661,7 +661,7 @@ VALUES (2007, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC'
           },
           "caseNameHmctsInternal": "PUBLIC",
           "caseLinks": {
-            "classification": "PRIVATE",
+            "classification": "PUBLIC",
             "value": [ {
               "id": "8a9e1fa2-8cd0-4b0c-b927-dd8177ee3203",
               "value": {
