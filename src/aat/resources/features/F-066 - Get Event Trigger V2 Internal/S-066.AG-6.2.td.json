@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-066.AG-6.2",
+  "_extends_": "F-066_Test_Data_Base__AccessMetadata",
+
+  "title": "Scenario 6 - User's assignments: Role1/BASIC + Role2/SPECIFIC (granted) + Role3/CHALLENGED (Region 123), R2AP mappings: Role1 + Role2 + Role 3 -> AP1 + AP2 + AP3, Authorised Case/State: AP1 + AP2 (state: Created only) + AP3 will return Access Granted: `BASIC,CHALLENGED`",
+
+  "specs": [
+    "a caseworker with RA1: BASIC + RA3: CHALLENGED (Region 123) role assignment",
+    "uses the case-reference of the case just created",
+    "contains `Access Granted` set to `BASIC,CHALLENGED` [Due to AP2 not being authorised for case state]"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker_Role1Basic_Role3Challenged_Region123"
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][CreateCase_FT_CaseAccess_3Roles_PreRequisiteCitizen__Region_123][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "access_granted": "BASIC,CHALLENGED",
+
+      "access_process": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
