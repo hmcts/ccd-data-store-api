@@ -1,14 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.lau;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAndAuditFeignClient;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.lau.ActionLog;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
@@ -16,13 +18,9 @@ import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.SearchLog;
 
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -38,22 +36,18 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         AuditOperationType.CASE_ACCESSED.getLabel(), LAU_CASE_ACTION_VIEW,
         AuditOperationType.UPDATE_CASE.getLabel(), LAU_CASE_ACTION_UPDATE);
 
+    private final LogAndAuditFeignClient logAndAuditFeignClient;
+
     private final SecurityUtils securityUtils;
 
     private final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
-    private final HttpClient httpClient;
-
-    private final ObjectMapper objectMapper;
-
     @Autowired
     public AuditCaseRemoteOperation(@Lazy final SecurityUtils securityUtils,
-                                    @Qualifier("httpClientAudit") final HttpClient httpClient,
-                                    @Qualifier("SimpleObjectMapper") final ObjectMapper objectMapper,
+                                    LogAndAuditFeignClient logAndAuditFeignClient,
                                     final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration) {
         this.securityUtils = securityUtils;
-        this.httpClient = httpClient;
-        this.objectMapper = objectMapper;
+        this.logAndAuditFeignClient = logAndAuditFeignClient;
         this.auditCaseRemoteConfiguration = auditCaseRemoteConfiguration;
     }
 
@@ -68,10 +62,8 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
                 CaseActionPostRequest capr = new CaseActionPostRequest(actionLog);
                 String activity = CASE_ACTION_MAP.get(entry.getOperationType());
-                String requestBody = objectMapper
-                    .writeValueAsString(capr);
 
-                postAsyncAuditRequestAndHandleResponse(entry, activity, requestBody, lauCaseAuditUrl);
+                postAsyncAuditRequestAndHandleResponse(entry, activity, capr,null, lauCaseAuditUrl);
 
             } else {
                 log.warn("The operational type " + entry.getOperationType()
@@ -95,10 +87,8 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
                 CaseSearchPostRequest cspr = new CaseSearchPostRequest(searchLog);
                 String activity = "SEARCH";
-                String requestBody = objectMapper
-                    .writeValueAsString(cspr);
 
-                postAsyncAuditRequestAndHandleResponse(entry, activity, requestBody, lauCaseAuditUrl);
+                postAsyncAuditRequestAndHandleResponse(entry, activity,null, cspr, lauCaseAuditUrl);
 
             } else {
                 log.warn("The operational type " + entry.getOperationType()
@@ -110,30 +100,30 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         }
     }
 
-    private void postAsyncAuditRequestAndHandleResponse(AuditEntry entry, String activity, String body, String url) {
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .header("Content-Type", "application/json")
-            .header("ServiceAuthorization", securityUtils.getServiceAuthorization())
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(body))
-            .build();
+    @Async
+    private void postAsyncAuditRequestAndHandleResponse(AuditEntry entry, String activity,
+             CaseActionPostRequest capr, CaseSearchPostRequest cspr,String url) {
+        try {
+            String auditLogId = UUID.randomUUID().toString();
 
-        String auditLogId = UUID.randomUUID().toString();
-
-        logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId(), auditLogId);
-
-        CompletableFuture<HttpResponse<String>> responseFuture =
-            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-
-        responseFuture.whenComplete((response, error) -> {
-            if (response != null) {
-                logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri(), auditLogId);
+            logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId(), auditLogId);
+            Response response = null;
+            // Use FeignClient to send the request
+            try {
+                if (activity.equals("CREATE") || activity.equals("UPDATE") || activity.equals("VIEW")) {
+                    response = logAndAuditFeignClient.postCaseAction(securityUtils.getServiceAuthorization(), capr);
+                } else if (activity.equals("SEARCH")) {
+                    response = logAndAuditFeignClient.postCaseSearch(securityUtils.getServiceAuthorization(), cspr);
+                }
+                if(response != null){
+                    logAuditResponse(entry.getRequestId(), activity, response.status(), URI.create(url), auditLogId);
+                }
+            } catch (final Exception ex){
+                log.error("Error occurred while processing response for remote log and audit request.", ex);
             }
-            if (error != null) {
-                log.error("Error occurred while processing response for remote log and audit request. ", error);
-            }
-        });
+        } catch (Exception ex) {
+            log.error("Error occurred while processing response for remote log and audit request.", ex);
+        }
     }
 
     private ActionLog createActionLogFromAuditEntry(AuditEntry entry, ZonedDateTime zonedDateTime) {
