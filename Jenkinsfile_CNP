@@ -156,18 +156,8 @@ withPipeline(type, product, component) {
     enableHighLevelDataSetup()
 
     afterAlways('test') {
-        //builder.gradle('integration')
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
-       
-        publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "build/reports/tests/integration",
-            reportFiles          : "index.html",
-            reportName           : "Integration Test Report"
-        ]
     }
 
     afterAlways('smoketest:preview') {
