@@ -103,24 +103,6 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
             .getSecurityClassification();
     }
 
-    public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId,
-                                                               CaseTypeDefinition caseTypeDefinition,
-                                                               String fieldId) {
-        final Optional<SecurityClassification> userClassification =
-            getUserClassification(caseTypeDefinition, false);
-        return userClassification.map(securityClassification ->
-            securityClassification.higherOrEqualTo(caseTypeDefinition.getClassificationForField(fieldId)))
-            .orElse(false);
-    }
-
-    public boolean userHasEnoughSecurityClassificationForField(CaseTypeDefinition caseTypeDefinition,
-                                                               SecurityClassification otherClassification) {
-        final Optional<SecurityClassification> userClassification = getUserClassification(caseTypeDefinition, false);
-        return userClassification.map(securityClassification ->
-            securityClassification.higherOrEqualTo(otherClassification))
-            .orElse(false);
-    }
-
     public Optional<SecurityClassification> getUserClassification(CaseTypeDefinition caseTypeDefinition,
                                                                   boolean isCreateProfile) {
         return maxSecurityClassification(caseDataAccessControl

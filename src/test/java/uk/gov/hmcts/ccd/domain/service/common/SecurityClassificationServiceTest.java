@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
@@ -109,28 +108,6 @@ public class SecurityClassificationServiceTest {
             .withField(testCaseField11)
             .withField(testCaseField12)
             .build();
-
-        @Test
-        @DisplayName("should return TRUE when user has enough SC rank")
-        void userHasEnoughSecurityClassificationForField() {
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
-                .thenReturn(newHashSet(PUBLIC, PRIVATE));
-
-            assertTrue(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-                testCaseTypeDefinition,
-                CASE_FIELD_ID_1_1));
-        }
-
-        @Test
-        @DisplayName("should return FALSE when user doesn't have enough SC rank")
-        void userDoesNotHaveEnoughSecurityClassificationForField() {
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
-                .thenReturn(newHashSet(PUBLIC, PRIVATE));
-
-            assertFalse(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-                testCaseTypeDefinition,
-                CASE_FIELD_ID_1_2));
-        }
     }
 
     @Nested
