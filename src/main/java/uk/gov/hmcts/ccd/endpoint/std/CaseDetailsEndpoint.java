@@ -3,9 +3,9 @@ package uk.gov.hmcts.ccd.endpoint.std;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -421,10 +421,16 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
-    public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("uid") final String uid,
-                                                       @PathVariable("jid") final String jurisdictionId,
-                                                       @PathVariable("ctid") final String caseTypeId,
-                                                       @RequestParam Map<String, String> queryParameters) {
+    public List<CaseDetails> searchCasesForCaseWorkers(
+        @ApiParam(value = "Idam user ID", required = true)
+        @PathVariable("uid") final String uid,
+        @ApiParam(value = "Jurisdiction ID", required = true)
+        @PathVariable("jid") final String jurisdictionId,
+        @ApiParam(value = "Case type ID", required = true)
+        @PathVariable("ctid") final String caseTypeId,
+        @ApiParam(value = "Query Parameters, valid options: created_date, last_modified_date, "
+            + "state, case_reference", required = false)
+        @RequestParam(required = false) Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
 

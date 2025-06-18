@@ -67,6 +67,9 @@ public final class V2 {
         public static final String CASE_EVENTS =
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-events.v2+json;charset=UTF-8";
 
+        public static final String UI_CASE_ACCESS_METADATA =
+            "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-access-metadata.v2+json;charset=UTF-8";
+
     }
 
     public final class Error {
