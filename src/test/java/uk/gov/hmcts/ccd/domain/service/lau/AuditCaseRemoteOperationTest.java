@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
@@ -23,7 +24,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,7 +33,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.ccd.domain.service.lau.AuditCaseRemoteOperation.CASE_ACTION_MAP;
 
 @DisplayName("audit log specific calls")
@@ -65,6 +68,7 @@ class AuditCaseRemoteOperationTest {
 
     private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.01Z"), ZoneOffset.UTC);
 
+    @InjectMocks
     private AuditCaseRemoteOperation auditCaseRemoteOperation;
 
     private AuditContext baseAuditContext = AuditContext.auditContextWith()
@@ -113,8 +117,8 @@ class AuditCaseRemoteOperationTest {
         // Assert the captured request
         CaseActionPostRequest capturedRequest = requestCaptor.getValue();
         assertThat(capturedRequest.getActionLog().getUserId(), is(equalTo(IDAM_ID)));
-        assertThat(capturedRequest.getActionLog().getCaseAction(), is(equalTo(CASE_ACTION_MAP.
-            get(AuditOperationType.CASE_ACCESSED.getLabel()))));
+        assertThat(capturedRequest.getActionLog().getCaseAction(), is(equalTo(CASE_ACTION_MAP
+            .get(AuditOperationType.CASE_ACCESSED.getLabel()))));
         assertThat(capturedRequest.getActionLog().getCaseJurisdictionId(), is(equalTo(JURISDICTION)));
         assertThat(capturedRequest.getActionLog().getCaseRef(), is(equalTo(CASE_ID)));
         assertThat(capturedRequest.getActionLog().getCaseTypeId(), is(equalTo(CASE_TYPE)));

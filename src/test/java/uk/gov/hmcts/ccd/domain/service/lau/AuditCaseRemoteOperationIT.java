@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.ccd.domain.model.lau.SearchLog;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -48,6 +50,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -84,7 +87,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private AuditRepository auditRepository;
 
     @SpyBean
-    private AuditCaseRemoteOperation auditCaseRemoteOperation;
+    private AuditRemoteOperation auditCaseRemoteOperation;
 
     @Inject
     private AuditService auditService;
@@ -169,6 +172,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
         assertThat(captor.getValue().getCaseType(), is(equalTo(CASE_TYPE)));
         verifyWireMock(1, postRequestedFor(urlEqualTo(SEARCH_AUDIT_ENDPOINT))
             .withRequestBody(equalToJson(EXPECTED_CASE_SEARCH_LOG_JSON)));
+
     }
 
     @Test
@@ -240,8 +244,12 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
         auditService.audit(auditContext);
         waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
 
-        verifyWireMock(1, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT))
-            .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
+        Awaitility.await()
+            .atMost(Duration.ofSeconds(10))
+            .untilAsserted(() ->
+                verify(3, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT))
+                    .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)))
+            );
     }
 
     private void waitForPossibleAuditResponse(String pathPrefix) throws InterruptedException {
