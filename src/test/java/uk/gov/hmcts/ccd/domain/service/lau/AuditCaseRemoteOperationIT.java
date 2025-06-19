@@ -216,7 +216,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     }
 
     @Test(expected = Test.None.class)
-    public void shouldNotThrowExceptionInAuditServiceIfLauIsDown()
+    public void shouldNotThrowExceptionInAuditServiceIfLauIsDownAndRetry()
         throws JsonProcessingException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()
             .caseId(CASE_ID)
@@ -249,6 +249,40 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .untilAsserted(() ->
                 verify(3, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT))
                     .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)))
+            );
+    }
+
+    @Test(expected = Test.None.class)
+    public void shouldNotThrowExceptionInAuditServiceIfLauSearchIsDownAndRetry()
+        throws JsonProcessingException, InterruptedException {
+        AuditContext auditContext = AuditContext.auditContextWith()
+            .caseId(CASE_ID)
+            .auditOperationType(AuditOperationType.SEARCH_CASE)
+            .jurisdiction(JURISDICTION)
+            .caseType(CASE_TYPE)
+            .httpStatus(200)
+            .build();
+
+        final SearchLog searchLog = new SearchLog();
+        searchLog.setUserId(SEARCH_LOG_USER_ID);
+        searchLog.setCaseRefs(SEARCH_LOG_CASE_REFS);
+        searchLog.setTimestamp(LOG_TIMESTAMP);
+
+        CaseSearchPostRequest caseSearchPostRequest = new CaseSearchPostRequest(searchLog);
+
+        stubFor(WireMock.post(urlMatching(SEARCH_AUDIT_ENDPOINT))
+            .withHeader(SERVICE_AUTHORIZATION_HEADER, matching("Bearer .+"))
+            .withRequestBody(equalToJson(objectMapper.writeValueAsString(caseSearchPostRequest)))
+            .willReturn(aResponse().withStatus(AUDIT_NOT_FOUND_HTTP_STATUS)));
+
+        auditService.audit(auditContext);
+        waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
+
+        Awaitility.await()
+            .atMost(Duration.ofSeconds(10))
+            .untilAsserted(() ->
+                verify(3, postRequestedFor(urlEqualTo(SEARCH_AUDIT_ENDPOINT))
+                    .withRequestBody(equalToJson(EXPECTED_CASE_SEARCH_LOG_JSON)))
             );
     }
 
