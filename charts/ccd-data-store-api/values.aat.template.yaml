@@ -31,6 +31,8 @@ java:
           alias: IDAM_DATA_STORE_SYSTEM_USER_USERNAME
         - name: idam-data-store-system-user-password
           alias: IDAM_DATA_STORE_SYSTEM_USER_PASSWORD
+        - name: data-store-api-TOKEN-SECRET
+          alias: DATA_STORE_TOKEN_SECRET
   environment:
     DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-v15-aat.postgres.database.azure.com
     TESTING_SUPPORT_ENABLED: true
