@@ -82,12 +82,15 @@ module "postgresql_v15" {
   component            = var.component
   env                  = var.env
   subnet_suffix        = var.subnet_suffix
-  # Setup Access Reader db user
+  # Setup Access for reporting and JiT perms.
   force_user_permissions_trigger = "2"
+  enable_db_report_privileges = true
 
   pgsql_databases = [
     {
       name = var.database_name
+      report_privilege_schema : "public"
+      report_privilege_tables : ["case_data", "case_event"]
     }
   ]
   pgsql_server_configuration = [
