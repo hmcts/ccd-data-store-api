@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -26,13 +27,19 @@ public class CaseAuditEventRepository {
     private static final String EVENT_NOT_FOUND = "Event not found";
 
     private final CaseAuditEventMapper caseAuditEventMapper;
+    private final POCCaseAuditEventRepository pocCaseAuditEventRepository;
+    private final ApplicationParams applicationParams;
 
     @PersistenceContext
     private EntityManager em;
 
     @Inject
-    public CaseAuditEventRepository(final CaseAuditEventMapper caseAuditEventMapper) {
+    public CaseAuditEventRepository(final CaseAuditEventMapper caseAuditEventMapper,
+                                    final POCCaseAuditEventRepository pocCaseAuditEventRepository,
+                                    final ApplicationParams applicationParams) {
         this.caseAuditEventMapper = caseAuditEventMapper;
+        this.pocCaseAuditEventRepository = pocCaseAuditEventRepository;
+        this.applicationParams = applicationParams;
     }
 
     public AuditEvent set(final AuditEvent auditEvent) {
@@ -42,6 +49,10 @@ public class CaseAuditEventRepository {
     }
 
     public List<AuditEvent> findByCase(final CaseDetails caseDetails) {
+        if (applicationParams.isPocFeatureEnabled()) {
+            return pocCaseAuditEventRepository.findByCase(caseDetails);
+        }
+
         final List<CaseAuditEventEntity> resultList = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_CASE)
             .setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()))
             .unwrap(org.hibernate.query.Query.class)

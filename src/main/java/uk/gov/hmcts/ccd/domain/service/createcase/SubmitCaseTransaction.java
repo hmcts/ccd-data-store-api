@@ -52,6 +52,7 @@ public class SubmitCaseTransaction implements AccessControl {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
+    private final POCSubmitCaseTransaction pocSubmitCaseTransaction;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -66,7 +67,8 @@ public class SubmitCaseTransaction implements AccessControl {
                                     final CaseDocumentService caseDocumentService,
                                     final ApplicationParams applicationParams,
                                     final CaseAccessGroupUtils caseAccessGroupUtils,
-                                    final CaseDocumentTimestampService caseDocumentTimestampService
+                                    final CaseDocumentTimestampService caseDocumentTimestampService,
+                                    final POCSubmitCaseTransaction pocSubmitCaseTransaction
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -80,7 +82,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-
+        this.pocSubmitCaseTransaction = pocSubmitCaseTransaction;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -191,14 +193,19 @@ public class SubmitCaseTransaction implements AccessControl {
         auditEvent.setSignificantItem(response.getSignificantItem());
         saveUserDetails(idamUser, onBehalfOfUser, auditEvent);
 
+        CaseDetails messageCaseDetails = this.applicationParams.isPocFeatureEnabled()
+                ? pocSubmitCaseTransaction.saveAuditEventForCaseDetails(response,
+                event, caseTypeDefinition, idamUser, caseEventDefinition, newCaseDetails, onBehalfOfUser)
+                : savedCaseDetails;
+
         caseAuditEventRepository.set(auditEvent);
 
         messageService.handleMessage(MessageContext.builder()
-            .caseDetails(savedCaseDetails)
+            .caseDetails(messageCaseDetails)
             .caseTypeDefinition(caseTypeDefinition)
             .caseEventDefinition(caseEventDefinition)
             .oldState(null).build());
-        return savedCaseDetails;
+        return messageCaseDetails;
     }
 
     private void saveUserDetails(IdamUser idamUser, IdamUser onBehalfOfUser, AuditEvent auditEvent) {
