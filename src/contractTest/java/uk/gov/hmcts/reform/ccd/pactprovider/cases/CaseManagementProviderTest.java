@@ -38,7 +38,7 @@ import static org.mockito.ArgumentMatchers.anyString;
     consumerVersionSelectors = {@VersionSelector(tag = "Dev")})
 @TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
-public class CreateCaseProviderPactTest {
+public class CaseManagementProviderTest {
 
     @Mock
     private GetCaseOperation getCaseOperation;
