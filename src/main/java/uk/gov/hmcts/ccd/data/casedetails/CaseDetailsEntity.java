@@ -102,7 +102,7 @@ public class CaseDetailsEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = REFERENCE_FIELD_COL, nullable = false)
-    private Long reference;
+    private String reference;
     @Column(name = JURISDICTION_FIELD_COL, nullable = false)
     private String jurisdiction;
     @Column(name = CASE_TYPE_ID_FIELD_COL, nullable = false)
@@ -142,11 +142,11 @@ public class CaseDetailsEntity {
         this.id = uuid;
     }
 
-    public Long getReference() {
+    public String getReference() {
         return reference;
     }
 
-    public void setReference(Long reference) {
+    public void setReference(String reference) {
         this.reference = reference;
     }
 
