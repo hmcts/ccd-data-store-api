@@ -3,13 +3,13 @@ package uk.gov.hmcts.ccd.feign;
 import feign.FeignException;
 import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.Date;
 
-@Configuration
 @Slf4j
 public class FeignErrorDecoder implements feign.codec.ErrorDecoder {
+    public static final String CASE_ACTION_PATH = "/audit/caseAction";
+    public static final String CASE_SEARCH_PATH = "/audit/caseSearch";
 
     @Override
     public Exception decode(String methodKey, feign.Response response) {
@@ -19,8 +19,9 @@ public class FeignErrorDecoder implements feign.codec.ErrorDecoder {
         // Make sure we retry for POST s2s validation only
         if (response.status() >= 400
             && "POST".equalsIgnoreCase(response.request().httpMethod().name())
-            && (response.request().url().endsWith("/audit/caseAction") ||
-                response.request().url().endsWith("/audit/caseSearch"))) {
+            && (response.request().url().endsWith(CASE_ACTION_PATH)
+                || response.request().url().endsWith(CASE_SEARCH_PATH)
+            )) {
             return new RetryableException(
                 status,
                 exception.getMessage(),

@@ -1,33 +1,31 @@
 package uk.gov.hmcts.ccd.auditlog;
 
-import feign.Headers;
-import feign.Param;
-import feign.RequestLine;
-import feign.Response;
 import org.springframework.cloud.openfeign.FeignClient;
-import uk.gov.hmcts.ccd.config.LogAndAuditFeignHttpConfig;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostResponse;
+import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostResponse;
+import uk.gov.hmcts.ccd.feign.FeignClientConfig;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostRequest;
 
-@FeignClient(name = "LogAndAuditFeignClient", configuration = LogAndAuditFeignHttpConfig.class)
+@FeignClient(name = "LogAndAuditFeignClient", url = "${lau.remote.case.audit.url}",
+             configuration = FeignClientConfig.class)
 public interface LogAndAuditFeignClient {
 
-    @RequestLine("POST /audit/caseAction")
-    @Headers({
-        "Content-Type: application/json",
-        "Accept: application/json",
-        "ServiceAuthorization: {ServiceAuthorization}"
-    })
-    Response postCaseAction(@Param("ServiceAuthorization") String serviceAuthorization,
-                            CaseActionPostRequest caseActionPostRequest);
 
-    @RequestLine("POST /audit/caseSearch")
-    @Headers({
-        "Content-Type: application/json",
-        "Accept: application/json",
-        "ServiceAuthorization: {ServiceAuthorization}"
-    })
-    Response postCaseSearch(@Param("ServiceAuthorization") String serviceAuthorization,
-                            CaseSearchPostRequest caseSearchPostRequest);
+    @PostMapping("/audit/caseAction")
+    ResponseEntity<CaseActionPostResponse> postCaseAction(
+            @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+            @RequestBody CaseActionPostRequest caseActionPostRequest
+    );
+
+    @PostMapping("/audit/caseSearch")
+    ResponseEntity<CaseSearchPostResponse> postCaseSearch(
+            @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+            @RequestBody CaseSearchPostRequest caseSearchPostRequest
+    );
 
 }
