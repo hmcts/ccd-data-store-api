@@ -255,13 +255,6 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     @Test(expected = Test.None.class)
     public void shouldNotThrowExceptionInAuditServiceIfLauSearchIsDownAndRetry()
         throws JsonProcessingException, InterruptedException {
-        AuditContext auditContext = AuditContext.auditContextWith()
-            .caseId(CASE_ID)
-            .auditOperationType(AuditOperationType.SEARCH_CASE)
-            .jurisdiction(JURISDICTION)
-            .caseType(CASE_TYPE)
-            .httpStatus(200)
-            .build();
 
         final SearchLog searchLog = new SearchLog();
         searchLog.setUserId(SEARCH_LOG_USER_ID);
@@ -274,6 +267,14 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .withHeader(SERVICE_AUTHORIZATION_HEADER, matching("Bearer .+"))
             .withRequestBody(equalToJson(objectMapper.writeValueAsString(caseSearchPostRequest)))
             .willReturn(aResponse().withStatus(AUDIT_NOT_FOUND_HTTP_STATUS)));
+
+        AuditContext auditContext = AuditContext.auditContextWith()
+            .caseId(CASE_ID)
+            .auditOperationType(AuditOperationType.SEARCH_CASE)
+            .jurisdiction(JURISDICTION)
+            .caseType(CASE_TYPE)
+            .httpStatus(200)
+            .build();
 
         auditService.audit(auditContext);
         waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
