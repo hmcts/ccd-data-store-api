@@ -64,9 +64,9 @@ class DateTimeEntryProcessorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
-        when(definitionRepository.getBaseTypes()).thenReturn(Collections.EMPTY_LIST);
+        when(definitionRepository.getBaseTypes()).thenReturn(Collections.emptyList());
         BaseType.setCaseDefinitionRepository(definitionRepository);
         BaseType.initialise();
         setUpBaseTypes();
@@ -86,7 +86,7 @@ class DateTimeEntryProcessorTest {
         JsonNode result = dateTimeEntryProcessor.execute(node,
             new CaseFieldDefinition(),
             new CaseEventFieldDefinition(),
-            wizardPageField(ID, Collections.EMPTY_LIST));
+            wizardPageField(ID, Collections.emptyList()));
 
         assertAll(
             () -> assertThat(result.isTextual(), is(true)),
@@ -107,7 +107,7 @@ class DateTimeEntryProcessorTest {
         JsonNode result = dateTimeEntryProcessor.execute(node,
             new CaseFieldDefinition(),
             new CaseEventFieldDefinition(),
-            wizardPageField(ID, Collections.EMPTY_LIST));
+            wizardPageField(ID, Collections.emptyList()));
 
         assertAll(
             () -> assertThat(result.isTextual(), is(true)),
@@ -129,7 +129,7 @@ class DateTimeEntryProcessorTest {
         JsonNode result = dateTimeEntryProcessor.execute(node,
             new CaseFieldDefinition(),
             new CaseEventFieldDefinition(),
-            wizardPageField(ID, Collections.EMPTY_LIST));
+            wizardPageField(ID, Collections.emptyList()));
 
         assertAll(
             () -> assertThat(result.isTextual(), is(true)),
@@ -143,8 +143,8 @@ class DateTimeEntryProcessorTest {
             + "\"25/12/1995\"}]}";
         JsonNode node = MAPPER.readTree(json).get("CollectionField");
         CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)",
-            fieldType("Collection", "Collection", Collections.EMPTY_LIST, fieldType(
-                "DateTime", "DateTime", Collections.EMPTY_LIST, null
+            fieldType("Collection", "Collection", Collections.emptyList(), fieldType(
+                "DateTime", "DateTime", Collections.emptyList(), null
             ))
         );
         when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
@@ -158,7 +158,7 @@ class DateTimeEntryProcessorTest {
         JsonNode result = dateTimeEntryProcessor.execute(node,
             new CaseFieldDefinition(),
             new CaseEventFieldDefinition(),
-            wizardPageField(ID, Collections.EMPTY_LIST));
+            wizardPageField(ID, Collections.emptyList()));
 
         assertAll(
             () -> assertThat(result.isArray(), is(true)),
@@ -208,7 +208,7 @@ class DateTimeEntryProcessorTest {
             .thenReturn(new TextNode("1970-12-01"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node, caseField6, new CaseEventFieldDefinition(),
-            wizardPageField(ID, Collections.EMPTY_LIST));
+            wizardPageField(ID, Collections.emptyList()));
 
         assertAll(
             () -> assertThat(result.isObject(), is(true)),
@@ -218,12 +218,6 @@ class DateTimeEntryProcessorTest {
             () -> assertThat(result.get("ComplexNestedField").get("NestedCollectionTextField").isArray(), is(true)),
             () -> assertThat(result.get("ComplexNestedField").get("NestedCollectionTextField").size(), is(0))
         );
-    }
-
-    private CaseFieldDefinition caseField(String id) {
-        CaseFieldDefinition caseField = new CaseFieldDefinition();
-        caseField.setId(id);
-        return caseField;
     }
 
     private WizardPageField wizardPageField(String id, List<WizardPageComplexFieldOverride> overrides) {
