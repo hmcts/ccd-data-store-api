@@ -11,6 +11,6 @@ public class FeignClientConfig {
 
     @Bean
     public ErrorDecoder errorDecoder() {
-        return new FeignErrorDecoder(); // move your logic into this class
+        return new FeignErrorDecoder();
     }
 }

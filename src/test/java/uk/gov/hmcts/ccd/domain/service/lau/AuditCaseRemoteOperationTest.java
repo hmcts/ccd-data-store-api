@@ -187,6 +187,26 @@ class AuditCaseRemoteOperationTest {
         verify(feignClient).postCaseAction(any(String.class), any(CaseActionPostRequest.class));
     }
 
+    @Test
+    @DisplayName("should handle exception during postSearchAction")
+    void shouldHandleExceptionDuringPostSearchAction() {
+
+        ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+        AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
+
+        // Setup as viewing a case
+        entry.setOperationType(AuditOperationType.SEARCH_CASE.getLabel());
+
+        // Simulate exception in FeignClient
+        doThrow(new RuntimeException("FeignClient error")).when(feignClient)
+            .postCaseSearch(any(String.class), any(CaseSearchPostRequest.class));
+
+        auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
+
+        // Verify exception is logged and no further interaction occurs
+        verify(feignClient).postCaseSearch(any(String.class), any(CaseSearchPostRequest.class));
+    }
+
     private AuditEntry createBaseAuditEntryData(ZonedDateTime fixedDateTime) {
         AuditEntry entry = new AuditEntry();
 

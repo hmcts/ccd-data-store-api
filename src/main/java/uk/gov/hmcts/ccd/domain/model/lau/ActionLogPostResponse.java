@@ -9,8 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ActionLogPostResponse {
-    public static final long serialVersionUID = 432973322;
+public class ActionLogPostResponse  {
 
     private String caseActionId;
     private String userId;
