@@ -62,9 +62,10 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
                 ActionLog actionLog = createActionLogFromAuditEntry(entry, currentDateTime);
                 String lauCaseAuditUrl = auditCaseRemoteConfiguration.getCaseActionAuditUrl();
 
+                CaseActionPostRequest capr = new CaseActionPostRequest(actionLog);
                 String activity = CASE_ACTION_MAP.get(entry.getOperationType());
 
-                postAsyncAuditRequestAndHandleResponse(entry, activity, new CaseActionPostRequest(actionLog),
+                postAsyncAuditRequestAndHandleResponse(entry, activity, capr,
                     null, lauCaseAuditUrl);
 
             } else {
@@ -86,10 +87,12 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
                 SearchLog searchLog = createSearchLogFromAuditEntry(entry, currentDateTime);
                 String lauCaseAuditUrl = auditCaseRemoteConfiguration.getCaseSearchAuditUrl();
+
+                CaseSearchPostRequest cspr = new CaseSearchPostRequest(searchLog);
                 String activity = "SEARCH";
 
                 postAsyncAuditRequestAndHandleResponse(entry, activity,null,
-                    new CaseSearchPostRequest(searchLog), lauCaseAuditUrl);
+                    cspr, lauCaseAuditUrl);
 
             } else {
                 log.warn("The operational type " + entry.getOperationType()
