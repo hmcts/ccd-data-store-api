@@ -299,7 +299,7 @@ dependencies {
         resolutionStrategy.eachDependency { DependencyResolveDetails details ->
             if (details.requested.group == 'org.springframework.security' &&
                     details.requested.name != 'spring-security-rsa') {
-                details.useVersion '6.2.3'
+                details.useVersion '5.3.33'
             }
         }
     }
