@@ -295,6 +295,12 @@ dependencies {
 
     configurations.all {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
+        //to address CVE-2024-22259
+        resolutionStrategy.eachDependency {
+            if (requested.group == "org.springframework.security") {
+                useVersion("6.2.3")
+            }
+        }
     }
     testImplementation group: 'org.json', name: 'json', version: '20211205'
 
