@@ -19,9 +19,6 @@ public class TransactionConfiguration {
 
     private void jclog(String message) {
         LOG.info("JCDEBUG: Info: TransactionConfiguration: {}", message);
-        LOG.warn("JCDEBUG: Warn: TransactionConfiguration: {}", message);
-        LOG.error("JCDEBUG: Error: TransactionConfiguration: {}", message);
-        LOG.debug("JCDEBUG: Debug: TransactionConfiguration: {}", message);
     }
 
     // JC Note: DATA_STORE_TX_TIMEOUT_DEFAULT does not appear to be defined in cnp-flux-config or data-store values.yaml
