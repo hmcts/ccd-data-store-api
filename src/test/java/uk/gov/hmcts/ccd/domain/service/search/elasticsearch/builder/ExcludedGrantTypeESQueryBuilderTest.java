@@ -33,7 +33,7 @@ class ExcludedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         excludedGrantTypeESQueryBuilder =
             new ExcludedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl, applicationParams);
     }

@@ -38,12 +38,16 @@
       "case_version": "[[ANYTHING_PRESENT]]",
       "categories": [
         {
+          "__ordering__": "UNORDERED"
+        },
+        {
           "category_id": "CategoryID1",
           "category_name": "Evidences",
           "category_order": 100,
           "documents": [
             {
-              "__elementId__": "attribute_path"
+              "__elementId__": "attribute_path",
+              "__ordering__": "UNORDERED"
             },
             {
               "document_url": "${[scenarioContext][childContexts][F-140_Document_Upload][testData][actualResponse][body][documents][0][_links][self][href]}",

@@ -12,7 +12,7 @@ import static java.lang.Boolean.FALSE;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
@@ -46,7 +46,7 @@ class GetUIStartTriggerTest extends BaseTest {
 
                 // Metadata
                 .body("id", equalTo(CREATE))
-                .body("event_token", is(not(isEmptyString())))
+                .body("event_token", is(not(emptyString())))
                 .body("name", is(CREATE_NAME))
                 .body("description", is(nullValue()))
                 .body("case_id", is(nullValue()))

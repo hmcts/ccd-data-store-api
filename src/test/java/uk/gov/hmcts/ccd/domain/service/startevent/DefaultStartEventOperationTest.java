@@ -315,7 +315,7 @@ public class DefaultStartEventOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         doReturn(DEFAULT_VALUE_DATA).when(caseService)
             .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);

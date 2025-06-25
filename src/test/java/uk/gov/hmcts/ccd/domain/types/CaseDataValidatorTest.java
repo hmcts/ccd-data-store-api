@@ -8,8 +8,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.hamcrest.MatcherAssert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.TestFixtures;
@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import java.util.Map;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.any;
@@ -52,7 +52,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     @Mock
     private TextCaseReferenceCaseLinkValidator textCaseReferenceCaseLinkValidator;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws IOException {
         caseFields = TestFixtures.getCaseFieldsFromJson(CASE_FIELD_JSON);
         dynamicCaseFields = TestFixtures.getCaseFieldsFromJson(CASE_FIELD_DYNAMIC_JSON);

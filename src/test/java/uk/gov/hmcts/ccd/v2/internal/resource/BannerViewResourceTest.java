@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
+import java.util.Collections;
 import java.util.List;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,7 @@ class BannerViewResourceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -32,7 +33,7 @@ class BannerViewResourceTest {
     @Test
     @DisplayName("should copy empty banners")
     void shouldCopyEmptyBannerList() {
-        List<Banner> emptyList = Lists.emptyList();
+        List<Banner> emptyList = Collections.emptyList();
         final BannerViewResource resource = new BannerViewResource(emptyList);
         assertAll(
             () -> assertThat(resource.getBanners(), sameInstance(emptyList))

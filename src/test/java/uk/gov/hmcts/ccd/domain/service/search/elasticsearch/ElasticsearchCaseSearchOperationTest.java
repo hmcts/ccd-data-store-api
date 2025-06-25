@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
@@ -407,7 +407,7 @@ class ElasticsearchCaseSearchOperationTest {
 
             MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
             when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-            Whitebox.setInternalState(response, "searchResult", searchResult);
+            ReflectionTestUtils.setField(response, "searchResult", searchResult, SearchResult.class);
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
                 .thenReturn(caseDetailsDTO);
@@ -448,7 +448,7 @@ class ElasticsearchCaseSearchOperationTest {
             MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
             when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
             when(searchResult.getJsonObject()).thenReturn(convertedObject);
-            Whitebox.setInternalState(response, "searchResult", searchResult);
+            ReflectionTestUtils.setField(response, "searchResult", searchResult, SearchResult.class);
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
                 .thenReturn(caseDetailsDTO);
@@ -479,7 +479,7 @@ class ElasticsearchCaseSearchOperationTest {
             MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
             when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
             when(searchResult.getJsonObject()).thenReturn(convertedObject);
-            Whitebox.setInternalState(response, "searchResult", searchResult);
+            ReflectionTestUtils.setField(response, "searchResult", searchResult, SearchResult.class);
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
                 .thenReturn(caseDetailsDTO);
@@ -512,7 +512,7 @@ class ElasticsearchCaseSearchOperationTest {
             MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
             when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
             when(searchResult.getJsonObject()).thenReturn(convertedObject);
-            Whitebox.setInternalState(response, "searchResult", searchResult);
+            ReflectionTestUtils.setField(response, "searchResult", searchResult, SearchResult.class);
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
                 .thenReturn(caseDetailsDTO);
@@ -561,7 +561,7 @@ class ElasticsearchCaseSearchOperationTest {
             when(multiSearchResult.isSucceeded()).thenReturn(true);
             MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
             when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-            Whitebox.setInternalState(response, "searchResult", searchResult);
+            ReflectionTestUtils.setField(response, "searchResult", searchResult, SearchResult.class);
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
                 .thenReturn(caseDetailsDTO);
@@ -606,9 +606,9 @@ class ElasticsearchCaseSearchOperationTest {
 
 
             MultiSearchResult.MultiSearchResponse response1 = mock(MultiSearchResult.MultiSearchResponse.class);
-            Whitebox.setInternalState(response1, "searchResult", searchResult);
+            ReflectionTestUtils.setField(response1, "searchResult", searchResult, SearchResult.class);
             MultiSearchResult.MultiSearchResponse response2 = mock(MultiSearchResult.MultiSearchResponse.class);
-            Whitebox.setInternalState(response2, "searchResult", searchResult);
+            ReflectionTestUtils.setField(response2, "searchResult", searchResult, SearchResult.class);
             when(multiSearchResult.getResponses()).thenReturn(asList(response1, response2));
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
@@ -659,9 +659,9 @@ class ElasticsearchCaseSearchOperationTest {
 
 
             MultiSearchResult.MultiSearchResponse response1 = mock(MultiSearchResult.MultiSearchResponse.class);
-            Whitebox.setInternalState(response1, "searchResult", searchResult);
+            ReflectionTestUtils.setField(response1, "searchResult", searchResult, SearchResult.class);
             MultiSearchResult.MultiSearchResponse response2 = mock(MultiSearchResult.MultiSearchResponse.class);
-            Whitebox.setInternalState(response2, "searchResult", searchResult);
+            ReflectionTestUtils.setField(response2, "searchResult", searchResult, SearchResult.class);
             when(multiSearchResult.getResponses()).thenReturn(asList(response1, response2));
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
@@ -717,8 +717,8 @@ class ElasticsearchCaseSearchOperationTest {
         void searchShouldReturnBadSearchRequestOnResponseError() throws IOException {
             MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
             JsonElement error = mock(JsonElement.class);
-            Whitebox.setInternalState(response, "isError", true);
-            Whitebox.setInternalState(response, "error", error);
+            ReflectionTestUtils.setField(response, "isError", true);
+            ReflectionTestUtils.setField(response, "error", error);
 
             JsonObject errorObject = new JsonObject();
             errorObject.addProperty(MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE, "error msg");

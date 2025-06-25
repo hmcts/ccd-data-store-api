@@ -39,7 +39,6 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -51,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNotNull;
-import static org.mockito.Matchers.notNull;
+import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
@@ -135,7 +134,7 @@ class SubmitCaseTransactionTest {
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
@@ -212,8 +211,8 @@ class SubmitCaseTransactionTest {
 
         assertAll(
             () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
-            () -> order.verify(caseDetails).setCreatedDate(notNull(LocalDateTime.class)),
-            () -> order.verify(caseDetails).setLastStateModifiedDate(notNull(LocalDateTime.class)),
+            () -> order.verify(caseDetails).setCreatedDate(notNull()),
+            () -> order.verify(caseDetails).setLastStateModifiedDate(notNull()),
             () -> order.verify(caseDetails).setReference(Long.valueOf(CASE_UID)),
             () -> order.verify(caseDetailsRepository).set(caseDetails)
         );
