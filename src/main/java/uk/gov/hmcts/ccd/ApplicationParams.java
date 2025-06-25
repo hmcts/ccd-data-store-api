@@ -235,7 +235,7 @@ public class ApplicationParams {
     @Value("#{'${ccd.callback.passthru-header-contexts}'.split(',')}")
     private List<String> callbackPassthruHeaderContexts;
 
-    private List<String> pocCaseTypes = List.of("CIVIL", "NFD", "PCS");
+    private List<String> pocCaseTypes = List.of("CIVIL", "NFD", "PCS", "CriminalInjuriesCompensation");
 
     @Value("${poc.feature.enabled}")
     private boolean isPocFeatureEnabled;
