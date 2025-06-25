@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/cases/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
+    "url": "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
   },
   "response": {
     "status": 200,

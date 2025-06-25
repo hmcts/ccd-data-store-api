@@ -6,19 +6,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 @Named
 @Singleton
@@ -37,13 +33,10 @@ public class DocumentSanitiser implements Sanitiser {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     private final DocumentManagementRestClient documentManagementRestClient;
-    private final ApplicationParams applicationParams;
 
     @Inject
-    public DocumentSanitiser(final DocumentManagementRestClient documentManagementRestClient,
-                             ApplicationParams applicationParams) {
+    public DocumentSanitiser(final DocumentManagementRestClient documentManagementRestClient) {
         this.documentManagementRestClient = documentManagementRestClient;
-        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -62,17 +55,7 @@ public class DocumentSanitiser implements Sanitiser {
             final String documentUrl = fieldData.get(DOCUMENT_URL).textValue();
 
             sanitisedData.put(DOCUMENT_URL, documentUrl);
-
-            String caseDocumentAmEndpoint;
-            try {
-                URI uri = new URI(documentUrl);
-                String documentUrlPath = uri.getPath();
-                caseDocumentAmEndpoint = applicationParams.getCaseDocumentAmUrl() + "/cases" + documentUrlPath;
-            } catch (URISyntaxException | NullPointerException e) {
-                throw new ServiceException("invalid documentUrl", e);
-            }
-
-            Document document = documentManagementRestClient.getDocument(fieldTypeDefinition, caseDocumentAmEndpoint);
+            Document document = documentManagementRestClient.getDocument(fieldTypeDefinition, documentUrl);
 
             Binary binary = document.get_links().getBinary();
             validateBinaryLink(fieldTypeDefinition, binary);
