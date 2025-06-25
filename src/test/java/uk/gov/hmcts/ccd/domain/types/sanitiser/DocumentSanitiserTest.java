@@ -10,8 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -19,7 +17,6 @@ import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClie
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document._links;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Collections;
@@ -50,7 +47,6 @@ class DocumentSanitiserTest {
     private static final String DOCUMENT_FIELD_ID = "D8Document";
     private static final CaseFieldDefinition DOCUMENT_FIELD = new CaseFieldDefinition();
     private static final String DOCUMENT_URL_VALUE = "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
-    private static final String CDAM_DOCUMENT_URL_VALUE = "/cases/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
     private static final String BINARY_URL = "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary";
     private static final String FILENAME = "Seagulls_Sqaure.jpg";
     private static final String CATEGORY_ID = "supportDocuments";
@@ -80,10 +76,7 @@ class DocumentSanitiserTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        ApplicationParams applicationParams = new ApplicationParams();
-        ReflectionTestUtils.setField(applicationParams, "caseDocumentAmUrl", "");
-
-        documentSanitiser = new DocumentSanitiser(documentManagementRestClient, applicationParams);
+        documentSanitiser = new DocumentSanitiser(documentManagementRestClient);
         documentValueInitial.put("document_url", DOCUMENT_URL_VALUE);
         documentValueSanitised.put("document_url", DOCUMENT_URL_VALUE);
         documentValueSanitised.put("document_binary_url",BINARY_URL);
@@ -116,8 +109,7 @@ class DocumentSanitiserTest {
     void shouldSanitizeValidDocument() {
         final Document document = buildDocument(BINARY_URL);
         document.setOriginalDocumentName(FILENAME);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE,
-            CDAM_DOCUMENT_URL_VALUE)).thenReturn(document);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
 
         documentValueSanitised.put("category_id", CATEGORY_ID);
@@ -138,8 +130,7 @@ class DocumentSanitiserTest {
 
         final Document document = buildDocument(BINARY_URL);
         document.setOriginalDocumentName(FILENAME);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE,
-            CDAM_DOCUMENT_URL_VALUE)).thenReturn(document);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         documentValueInitial.put(DOCUMENT_HASH, DOCUMENT_HASH_VALUE);
         JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
@@ -153,8 +144,7 @@ class DocumentSanitiserTest {
     void shouldSanitizeIfDocumentRetrievedButNoHashToken() {
         final Document document = buildDocument(BINARY_URL);
         document.setOriginalDocumentName(FILENAME);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE,
-            CDAM_DOCUMENT_URL_VALUE)).thenReturn(document);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
 
@@ -166,8 +156,7 @@ class DocumentSanitiserTest {
     void shouldSanitizeIfDocumentRetrievedButNullHashToken() {
         final Document document = buildDocument(BINARY_URL);
         document.setOriginalDocumentName(FILENAME);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE,
-            CDAM_DOCUMENT_URL_VALUE)).thenReturn(document);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         documentValueInitial.set(DOCUMENT_HASH, NullNode.getInstance());
         JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
@@ -201,8 +190,7 @@ class DocumentSanitiserTest {
         _links links = new _links();
         document.set_links(links);
         document.setOriginalDocumentName(FILENAME);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE,
-            CDAM_DOCUMENT_URL_VALUE)).thenReturn(document);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
             documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
@@ -214,8 +202,7 @@ class DocumentSanitiserTest {
     void shouldFailToSanitizeIfDocumentRetrievedButEmptyBinaryLink() {
         final Document document = buildDocument();
         document.setOriginalDocumentName(FILENAME);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE,
-            CDAM_DOCUMENT_URL_VALUE)).thenReturn(document);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
             documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
@@ -227,8 +214,7 @@ class DocumentSanitiserTest {
     void shouldFailToSanitizeIfDocumentRetrievedButEmptyStringBinaryLink() {
         final Document document = buildDocument("");
         document.setOriginalDocumentName(FILENAME);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE,
-            CDAM_DOCUMENT_URL_VALUE)).thenReturn(document);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
             documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
@@ -240,8 +226,7 @@ class DocumentSanitiserTest {
     void shouldFailToSanitizeIfDocumentRetrievedButNullBinaryLink() {
         final Document document = buildDocument(null);
         document.setOriginalDocumentName(FILENAME);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE,
-            CDAM_DOCUMENT_URL_VALUE)).thenReturn(document);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
             documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
@@ -252,8 +237,7 @@ class DocumentSanitiserTest {
     @DisplayName("should fail when filename missing")
     void shouldFailToSanitizeIfDocumentRetrievedButMissingDocumentFilename() {
         final Document document = buildDocument(BINARY_URL);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE,
-            CDAM_DOCUMENT_URL_VALUE)).thenReturn(document);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
             documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
@@ -265,37 +249,11 @@ class DocumentSanitiserTest {
     void shouldFailToSanitizeIfDocumentRetrievedButNullDocumentFilename() {
         final Document document = buildDocument(BINARY_URL);
         document.setOriginalDocumentName(null);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE,
-            CDAM_DOCUMENT_URL_VALUE)).thenReturn(document);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
             documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
         });
-    }
-
-    @Test
-    @DisplayName("should fail when documentUrl is invalid")
-    void shouldFailToSanitizeIfDocumentUrlIsInvalid() {
-        String inValidDocumentUrlValue = "http://";
-        final Document document = buildDocument(BINARY_URL);
-        documentValueInitial.put("document_url", inValidDocumentUrlValue);
-        document.setOriginalDocumentName(null);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
-
-        assertThrows(ServiceException.class, () ->
-            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial));
-    }
-
-    @Test
-    @DisplayName("should fail when documentUrl is null")
-    void shouldFailToSanitizeIfDocumentUrlIsNull() {
-        final Document document = buildDocument(BINARY_URL);
-        documentValueInitial.put("document_url", (String) null);
-        document.setOriginalDocumentName(null);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
-
-        assertThrows(ServiceException.class, () ->
-            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial));
     }
 
     private Document buildDocument() {
