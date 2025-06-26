@@ -198,7 +198,7 @@ public class CasesRestController {
             caseDetails.setLastModified(LocalDateTime.of(2025, 6, 16, 10, 5));
 
             return ResponseEntity
-                .ok()
+                .status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(caseDetails);
         }

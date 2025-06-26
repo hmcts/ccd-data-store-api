@@ -35,10 +35,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 @ExtendWith(SpringExtension.class)
 @Provider("ccd_submitForCitizen_api")
 @PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
-    consumerVersionSelectors = {@VersionSelector(tag = "Dev")})
+    consumerVersionSelectors = {@VersionSelector(tag = "Dev", consumer = "prl_cos")})
 @TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
-public class CaseManagementProviderTest {
+public class CcdApiConsumerTest {
 
     @Mock
     private GetCaseOperation getCaseOperation;
