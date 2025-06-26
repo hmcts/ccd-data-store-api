@@ -249,7 +249,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     }
 
     private Event buildEvent() {
-        final Event event = anEvent().build();
+        Event event = anEvent().build();
         event.setEventId(EVENT_ID);
         event.setDescription(EVENT_DESC);
         event.setSummary(EVENT_SUMMARY);
@@ -259,7 +259,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     private CaseTypeDefinition buildCaseType() {
         final Version version = new Version();
         version.setNumber(VERSION);
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(CASE_TYPE_ID);
         caseTypeDefinition.setVersion(version);
         return caseTypeDefinition;
@@ -287,11 +287,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             SubmitCaseTransactionCaseAccessGroupTest.class.getClassLoader()
                 .getResourceAsStream("tests/".concat(fileName));
 
-        HashMap<String, JsonNode> result =
-            new ObjectMapper().readValue(inputStream, new TypeReference<>() {
+        return new ObjectMapper().readValue(inputStream, new TypeReference<>() {
             });
-
-        return result;
     }
 
     @Test
