@@ -158,8 +158,6 @@ class CaseSearchesViewAccessControlTest {
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any()))
             .thenReturn(caseType1SearchResult);
         doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(any(), any());
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any()))
-            .thenReturn(true);
 
         classUnderTest = new CaseSearchesViewAccessControl(caseTypeService,
             searchResultDefinitionService, securityClassificationService, caseDataAccessControl);
@@ -294,84 +292,6 @@ class CaseSearchesViewAccessControlTest {
         mockAccessProfiles(ROLE_IN_USER_ROLE_2);
 
         assertFalse(classUnderTest.filterFieldByAuthorisationAccessOnField(postCode));
-    }
-
-    @Test
-    void shouldReturnTrueForFilterResultsBySecurityClassification() {
-        final CaseFieldDefinition caseFieldDefinition1 = newCaseField().withId(CASE_FIELD_1)
-            .withFieldType(textFieldType())
-            .withSC(SecurityClassification.PRIVATE.name())
-            .withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
-                .build()).build();
-
-        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .build();
-
-        mockAccessProfiles();
-
-        assertTrue(classUnderTest.filterResultsBySecurityClassification(caseFieldDefinition1, caseTypeDefinition1));
-    }
-
-    @Test
-    void shouldReturnFalseForFilterResultsBySecurityClassification() {
-        final CaseFieldDefinition caseFieldDefinition1 = newCaseField().withId(CASE_FIELD_1)
-            .withFieldType(textFieldType())
-            .withSC(SecurityClassification.PUBLIC.name())
-            .withAcl(anAcl()
-                .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
-                .build()).build();
-
-        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
-            .withCaseTypeId(CASE_TYPE_ID_1)
-            .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .build();
-
-
-        mockAccessProfiles();
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any()))
-            .thenReturn(false);
-        assertFalse(classUnderTest.filterResultsBySecurityClassification(caseFieldDefinition1, caseTypeDefinition1));
     }
 
     private void mockAccessProfiles() {
