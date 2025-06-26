@@ -158,6 +158,29 @@ withPipeline(type, product, component) {
     afterAlways('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
+       //copyIgnore('./build/reports/tests/test', './Unit Tests/')
+       //copyIgnore('./build/reports/tests/integration', './Integration Tests/')
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
+
+      publishHTML target: [
+          allowMissing         : true,
+          alwaysLinkToLastBuild: true,
+          keepAll              : true,
+          reportDir            : 'build/reports/tests/test',
+          reportFiles          : "index.html",
+          reportName           : "Unit Test Report"
+        ]
+
+      publishHTML target: [
+      allowMissing         : true,
+      alwaysLinkToLastBuild: true,
+      keepAll              : true,
+      reportDir            : 'build/reports/tests/integration',
+      reportFiles          : "index.html",
+      reportName           : "Integration Test Report"
+      ]
     }
 
     afterAlways('smoketest:preview') {
