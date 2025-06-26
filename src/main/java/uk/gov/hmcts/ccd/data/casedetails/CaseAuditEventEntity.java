@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import lombok.Data;
 import uk.gov.hmcts.ccd.data.JsonDataConverter;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -17,8 +18,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import lombok.Data;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_CASE_DATA_ID_HQL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_CASE_DATA_ID_HQL_EXCLUDE_DATA;
@@ -73,7 +75,10 @@ public class CaseAuditEventEntity {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, 
+        generator = "case_event_id_seq_generator")
+    @SequenceGenerator(name = "case_event_id_seq_generator", 
+        sequenceName = "case_event_id_seq", allocationSize = 1)
     private Long id;
     @Column(name = "user_id")
     private String userId;

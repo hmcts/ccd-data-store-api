@@ -1,8 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.data.JsonDataConverter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -13,10 +16,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @SuppressWarnings("checkstyle:OperatorWrap")
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
@@ -99,7 +101,10 @@ public class CaseDetailsEntity {
 
     @Id
     @Column(name = ID_FIELD_COL)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, 
+        generator = "case_data_id_seq_generator")
+    @SequenceGenerator(name = "case_data_id_seq_generator", 
+        sequenceName = "case_data_id_seq", allocationSize = 1)
     private Long id;
     @Column(name = REFERENCE_FIELD_COL, nullable = false)
     private Long reference;

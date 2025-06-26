@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Table(name = "case_event_significant_items")
@@ -21,7 +22,10 @@ public class SignificantItemEntity {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, 
+        generator = "case_event_significant_items_id_seq_generator")
+    @SequenceGenerator(name = "case_event_significant_items_id_seq_generator", 
+        sequenceName = "case_event_significant_items_id_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "type", nullable = false)
