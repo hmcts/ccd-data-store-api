@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.pactprovider.cases.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -196,6 +198,8 @@ public class CasesRestController {
             caseDetails.setSecurityClassification(SecurityClassification.valueOf("PUBLIC"));
             caseDetails.setCreatedDate(LocalDateTime.of(2025, 6, 16, 10, 0));
             caseDetails.setLastModified(LocalDateTime.of(2025, 6, 16, 10, 5));
+            caseDetails.setData(Map.of("caseTypeOfApplication",
+                new ObjectMapper().valueToTree("C100")));
 
             return ResponseEntity
                 .status(HttpStatus.CREATED)

@@ -7,6 +7,9 @@ import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
@@ -26,6 +29,8 @@ import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.reform.ccd.pactprovider.cases.controller.CasesRestController;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -38,7 +43,7 @@ import static org.mockito.ArgumentMatchers.anyString;
     consumerVersionSelectors = {@VersionSelector(tag = "Dev", consumer = "prl_cos")})
 @TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
-public class CcdApiConsumerTest {
+public class CcdApiProviderTest {
 
     @Mock
     private GetCaseOperation getCaseOperation;
@@ -80,10 +85,14 @@ public class CcdApiConsumerTest {
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId("PRLAPPS");
-        caseDetails.setState("Submitted");
+        caseDetails.setState("CaseCreated");
         caseDetails.setSecurityClassification(SecurityClassification.valueOf("PUBLIC"));
         caseDetails.setCreatedDate(LocalDateTime.of(2025, 6, 16, 10, 0));
         caseDetails.setLastModified(LocalDateTime.of(2025, 6, 16, 10, 5));
+
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("caseTypeOfApplication", new ObjectMapper().valueToTree("C100"));
+        caseDetails.setData(data);
 
         Mockito.when(mockCreateCaseOperation.createCaseDetails(
                 anyString(),
