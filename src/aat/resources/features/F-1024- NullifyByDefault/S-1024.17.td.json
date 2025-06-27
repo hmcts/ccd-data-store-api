@@ -1,0 +1,54 @@
+{
+  "_guid_": "S-1024.17",
+  "_extends_": "MidEvent_v1Ext_Citizen__Base",
+
+  "title": "Value of TTL is not null before validation for v1_external#/case-details-endpoint/validateCaseDetailsUsingPOST_1",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details for case C1",
+    "contains TTL value is not null",
+    "is configured to trigger an Mid event callback that has changed the value of TTL and it is not null",
+    "has the 400 OK code"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_Citizen_MidEventUpdate"
+  } ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+    },
+    "queryParams": {
+      "pageId": "createCaseTTLMENotNullSingleFormPage"
+    },
+    "body": {
+      "data": {
+        "TTL" : {
+          "SystemTTL" : null,
+          "OverrideTTL" : null,
+          "Suspended" : "No"
+        }
+      },
+      "event": {
+        "id": "createCaseTTLMENotNull"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}
