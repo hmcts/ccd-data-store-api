@@ -22,9 +22,13 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.cloud.contract.wiremock.WireMockConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ccd.feign.FeignClientConfig;
+import uk.gov.hmcts.ccd.feign.RetryableFeignConfig;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -41,6 +45,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @AutoConfigureWireMock(port = 0)
+@Import({FeignClientConfig.class, RetryableFeignConfig.class})
+@TestPropertySource(properties = {
+    "lau.remote.case.audit.url=http://localhost:${wiremock.server.port}"
+})
 public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
