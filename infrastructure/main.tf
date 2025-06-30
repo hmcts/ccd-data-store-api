@@ -85,6 +85,9 @@ module "postgresql_v15" {
   # Setup Access for reporting and JiT perms.
   force_user_permissions_trigger = "2"
   enable_db_report_privileges = true
+  kv_subscription                = var.kv_subscription
+  user_secret_name               = azurerm_key_vault_secret.POSTGRES-USER-V15.name
+  pass_secret_name               = azurerm_key_vault_secret.POSTGRES-PASS-v15.name
 
   pgsql_databases = [
     {
