@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.clients.PocApiClient;
+import uk.gov.hmcts.ccd.clients.ServicePersistenceAPI;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.POCCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.POCEventDetails;
@@ -22,14 +22,14 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 public class POCSubmitCaseTransaction {
 
     private final CaseTypeService caseTypeService;
-    private final PocApiClient pocApiClient;
+    private final ServicePersistenceAPI servicePersistenceAPI;
     private final RoleAssignmentService roleAssignmentService;
 
     public POCSubmitCaseTransaction(final CaseTypeService caseTypeService,
-                                    final PocApiClient pocApiClient,
+                                    final ServicePersistenceAPI servicePersistenceAPI,
                                     final RoleAssignmentService roleAssignmentService) {
         this.caseTypeService = caseTypeService;
-        this.pocApiClient = pocApiClient;
+        this.servicePersistenceAPI = servicePersistenceAPI;
         this.roleAssignmentService = roleAssignmentService;
     }
 
@@ -64,7 +64,7 @@ public class POCSubmitCaseTransaction {
 
 
         try {
-            CaseDetails caseDetails = pocApiClient.createEvent(pocCaseEvent);
+            CaseDetails caseDetails = servicePersistenceAPI.createEvent(pocCaseEvent);
             log.info("pocCaseDetails: {}", caseDetails);
             log.info("pocCaseDetails id: {}", caseDetails.getId());
             log.info("pocCaseDetails reference before: {}", caseDetails.getReference());

@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 @FeignClient(name = "pocApi", url = "${poc.apis.url}", configuration = UserAuthHeadersInterceptorConfig.class)
-public interface PocApiClient {
+public interface ServicePersistenceAPI {
 
     @GetMapping(value = "/ccd/cases/{case-ref}")
     CaseDetails getCase(@PathVariable("case-ref") String caseRef);

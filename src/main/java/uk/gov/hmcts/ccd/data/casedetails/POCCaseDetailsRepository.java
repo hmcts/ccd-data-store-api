@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.clients.PocApiClient;
+import uk.gov.hmcts.ccd.clients.ServicePersistenceAPI;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -15,10 +15,10 @@ import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 @Slf4j
 public class POCCaseDetailsRepository implements CaseDetailsRepository {
 
-    private final PocApiClient pocApiClient;
+    private final ServicePersistenceAPI servicePersistenceAPI;
 
-    public POCCaseDetailsRepository(final PocApiClient pocApiClient) {
-        this.pocApiClient = pocApiClient;
+    public POCCaseDetailsRepository(final ServicePersistenceAPI servicePersistenceAPI) {
+        this.servicePersistenceAPI = servicePersistenceAPI;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class POCCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     private CaseDetails getCaseDetails(String reference) {
-        CaseDetails caseDetails = pocApiClient.getCase(reference);
+        CaseDetails caseDetails = servicePersistenceAPI.getCase(reference);
         log.info("case Id {}", caseDetails.getId());
         log.info("case reference {}", caseDetails.getReference());
         if (Optional.ofNullable(caseDetails).isPresent()) {
