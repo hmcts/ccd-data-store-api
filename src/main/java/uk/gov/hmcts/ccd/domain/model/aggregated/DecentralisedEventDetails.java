@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class POCEventDetails {
+public class DecentralisedEventDetails {
 
     @JsonProperty("case_type")
     private String caseType;

@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.clients.ServicePersistenceAPI;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
-import uk.gov.hmcts.ccd.domain.model.aggregated.POCCaseEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.POCEventDetails;
+import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedCaseEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedEventDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -44,7 +44,7 @@ public class DecentralisedSubmitCaseTransaction {
         CaseStateDefinition caseStateDefinition =
                 caseTypeService.findState(caseTypeDefinition, newCaseDetails.getState());
 
-        POCEventDetails.POCEventDetailsBuilder eventDetails = POCEventDetails.builder()
+        DecentralisedEventDetails.DecentralisedEventDetailsBuilder eventDetails = DecentralisedEventDetails.builder()
                 .caseType(caseTypeDefinition.getId())
                 .eventId(event.getEventId())
                 .eventName(caseEventDefinition.getName())
@@ -59,12 +59,12 @@ public class DecentralisedSubmitCaseTransaction {
                     .proxiedByFirstName(onBehalfOfUser.getSurname());
         }
 
-        POCCaseEvent pocCaseEvent = POCCaseEvent.builder()
+        DecentralisedCaseEvent decentralisedCaseEvent = DecentralisedCaseEvent.builder()
                 .caseDetails(newCaseDetails).eventDetails(eventDetails.build()).build();
 
 
         try {
-            CaseDetails caseDetails = servicePersistenceAPI.createEvent(pocCaseEvent);
+            CaseDetails caseDetails = servicePersistenceAPI.createEvent(decentralisedCaseEvent);
             log.info("pocCaseDetails: {}", caseDetails);
             log.info("pocCaseDetails id: {}", caseDetails.getId());
             log.info("pocCaseDetails reference before: {}", caseDetails.getReference());

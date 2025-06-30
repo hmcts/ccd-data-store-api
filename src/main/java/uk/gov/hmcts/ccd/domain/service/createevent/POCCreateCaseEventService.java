@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.clients.ServicePersistenceAPI;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.aggregated.POCCaseEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.POCEventDetails;
+import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedCaseEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedEventDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -50,7 +50,7 @@ public class POCCreateCaseEventService {
         CaseStateDefinition caseStateDefinition =
                 caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
 
-        POCEventDetails.POCEventDetailsBuilder eventDetails = POCEventDetails.builder()
+        DecentralisedEventDetails.DecentralisedEventDetailsBuilder eventDetails = DecentralisedEventDetails.builder()
                 .caseType(caseTypeDefinition.getId())
                 .eventId(event.getEventId())
                 .eventName(caseEventDefinition.getName())
@@ -61,14 +61,14 @@ public class POCCreateCaseEventService {
         //TODO Significant item is not yet set
         //auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 
-        POCCaseEvent pocCaseEvent = POCCaseEvent.builder()
+        DecentralisedCaseEvent decentralisedCaseEvent = DecentralisedCaseEvent.builder()
                 .caseDetailsBefore(caseDetailsBefore)
                 .caseDetails(caseDetails)
                 .eventDetails(eventDetails.build())
                 .build();
 
         try {
-            return servicePersistenceAPI.createEvent(pocCaseEvent);
+            return servicePersistenceAPI.createEvent(decentralisedCaseEvent);
         } catch (FeignException.Conflict conflict) {
             throw new CaseConcurrencyException("""
                     Unfortunately we were unable to save your work to the case as \

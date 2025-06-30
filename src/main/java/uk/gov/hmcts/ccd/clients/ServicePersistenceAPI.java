@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import uk.gov.hmcts.ccd.customheaders.UserAuthHeadersInterceptorConfig;
-import uk.gov.hmcts.ccd.domain.model.aggregated.POCCaseEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
@@ -20,7 +20,7 @@ public interface ServicePersistenceAPI {
 
     @PostMapping(value = "/ccd/cases", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    CaseDetails createEvent(@RequestBody POCCaseEvent caseEvent);
+    CaseDetails createEvent(@RequestBody DecentralisedCaseEvent caseEvent);
 
     @GetMapping(value = "/ccd/cases/{case-ref}/history")
     List<AuditEvent> getCaseHistory(@PathVariable("case-ref") String caseReference);

@@ -27,7 +27,7 @@ public class CaseAuditEventRepository {
     private static final String EVENT_NOT_FOUND = "Event not found";
 
     private final CaseAuditEventMapper caseAuditEventMapper;
-    private final POCCaseAuditEventRepository pocCaseAuditEventRepository;
+    private final DecentralisedCaseAuditEventRepository decentralisedCaseAuditEventRepository;
     private final ApplicationParams applicationParams;
 
     @PersistenceContext
@@ -35,10 +35,10 @@ public class CaseAuditEventRepository {
 
     @Inject
     public CaseAuditEventRepository(final CaseAuditEventMapper caseAuditEventMapper,
-                                    final POCCaseAuditEventRepository pocCaseAuditEventRepository,
+                                    final DecentralisedCaseAuditEventRepository decentralisedCaseAuditEventRepository,
                                     final ApplicationParams applicationParams) {
         this.caseAuditEventMapper = caseAuditEventMapper;
-        this.pocCaseAuditEventRepository = pocCaseAuditEventRepository;
+        this.decentralisedCaseAuditEventRepository = decentralisedCaseAuditEventRepository;
         this.applicationParams = applicationParams;
     }
 
@@ -50,7 +50,7 @@ public class CaseAuditEventRepository {
 
     public List<AuditEvent> findByCase(final CaseDetails caseDetails) {
         if (applicationParams.isPocFeatureEnabled()) {
-            return pocCaseAuditEventRepository.findByCase(caseDetails);
+            return decentralisedCaseAuditEventRepository.findByCase(caseDetails);
         }
 
         final List<CaseAuditEventEntity> resultList = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_CASE)

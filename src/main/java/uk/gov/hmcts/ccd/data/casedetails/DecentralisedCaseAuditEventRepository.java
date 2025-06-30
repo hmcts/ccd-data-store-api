@@ -8,13 +8,13 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 @Service
-public class POCCaseAuditEventRepository {
+public class DecentralisedCaseAuditEventRepository {
 
 
     private final ServicePersistenceAPI servicePersistenceAPI;
 
     @Inject
-    public POCCaseAuditEventRepository(final ServicePersistenceAPI servicePersistenceAPI) {
+    public DecentralisedCaseAuditEventRepository(final ServicePersistenceAPI servicePersistenceAPI) {
         this.servicePersistenceAPI = servicePersistenceAPI;
     }
 
