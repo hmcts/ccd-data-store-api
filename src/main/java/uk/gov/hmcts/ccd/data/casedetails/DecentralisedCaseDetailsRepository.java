@@ -13,11 +13,11 @@ import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 
 @Service
 @Slf4j
-public class POCCaseDetailsRepository implements CaseDetailsRepository {
+public class DecentralisedCaseDetailsRepository implements CaseDetailsRepository {
 
     private final ServicePersistenceAPI servicePersistenceAPI;
 
-    public POCCaseDetailsRepository(final ServicePersistenceAPI servicePersistenceAPI) {
+    public DecentralisedCaseDetailsRepository(final ServicePersistenceAPI servicePersistenceAPI) {
         this.servicePersistenceAPI = servicePersistenceAPI;
     }
 

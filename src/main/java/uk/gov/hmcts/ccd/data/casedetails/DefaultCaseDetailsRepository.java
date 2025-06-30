@@ -54,7 +54,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private final SearchQueryFactoryOperation queryBuilder;
     private final CaseDetailsQueryBuilderFactory queryBuilderFactory;
     private final ApplicationParams applicationParams;
-    private final POCCaseDetailsRepository pocCaseDetailsRepository;
+    private final DecentralisedCaseDetailsRepository decentralisedCaseDetailsRepository;
 
     @Inject
     public DefaultCaseDetailsRepository(
@@ -62,12 +62,12 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         final SearchQueryFactoryOperation queryBuilder,
         final CaseDetailsQueryBuilderFactory queryBuilderFactory,
         final ApplicationParams applicationParams,
-        final POCCaseDetailsRepository pocCaseDetailsRepository) {
+        final DecentralisedCaseDetailsRepository decentralisedCaseDetailsRepository) {
         this.caseDetailsMapper = caseDetailsMapper;
         this.queryBuilder = queryBuilder;
         this.queryBuilderFactory = queryBuilderFactory;
         this.applicationParams = applicationParams;
-        this.pocCaseDetailsRepository = pocCaseDetailsRepository;
+        this.decentralisedCaseDetailsRepository = decentralisedCaseDetailsRepository;
     }
 
     @Override
@@ -122,21 +122,21 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
         String reference = caseReference.toString();
         return applicationParams.isPocFeatureEnabled()
-                ? pocCaseDetailsRepository.findByReference(jurisdiction, reference)
+                ? decentralisedCaseDetailsRepository.findByReference(jurisdiction, reference)
                 : findByReference(jurisdiction, reference);
     }
 
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
         return applicationParams.isPocFeatureEnabled()
-                ? pocCaseDetailsRepository.findByReference(jurisdiction, reference)
+                ? decentralisedCaseDetailsRepository.findByReference(jurisdiction, reference)
                 : find(jurisdiction, null, reference).map(this.caseDetailsMapper::entityToModel);
     }
 
     @Override
     public Optional<CaseDetails> findByReference(String caseReference) {
         return applicationParams.isPocFeatureEnabled()
-                ? pocCaseDetailsRepository.findByReference(caseReference)
+                ? decentralisedCaseDetailsRepository.findByReference(caseReference)
                 : findByReference(null, caseReference);
     }
 
@@ -149,7 +149,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Deprecated
     public CaseDetails findByReference(final Long caseReference) {
         return applicationParams.isPocFeatureEnabled()
-                ? pocCaseDetailsRepository.findByReference(caseReference)
+                ? decentralisedCaseDetailsRepository.findByReference(caseReference)
                 : findByReference(null,
                 caseReference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
     }
@@ -167,7 +167,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
                                       final String caseTypeId,
                                       final String reference) {
         return applicationParams.isPocFeatureEnabled()
-                ? pocCaseDetailsRepository.findUniqueCase(jurisdiction, caseTypeId, reference)
+                ? decentralisedCaseDetailsRepository.findUniqueCase(jurisdiction, caseTypeId, reference)
                 : findByReference(jurisdiction, reference).orElse(null);
     }
 
@@ -236,7 +236,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
         if (applicationParams.isPocFeatureEnabled()) {
-            return pocCaseDetailsRepository.findByReferenceWithNoAccessControl(reference);
+            return decentralisedCaseDetailsRepository.findByReferenceWithNoAccessControl(reference);
         }
 
         CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectUnsecured(em);
