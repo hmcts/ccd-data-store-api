@@ -52,7 +52,7 @@ public class SubmitCaseTransaction implements AccessControl {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
-    private final POCSubmitCaseTransaction pocSubmitCaseTransaction;
+    private final DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -68,7 +68,7 @@ public class SubmitCaseTransaction implements AccessControl {
                                     final ApplicationParams applicationParams,
                                     final CaseAccessGroupUtils caseAccessGroupUtils,
                                     final CaseDocumentTimestampService caseDocumentTimestampService,
-                                    final POCSubmitCaseTransaction pocSubmitCaseTransaction
+                                    final DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -82,7 +82,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-        this.pocSubmitCaseTransaction = pocSubmitCaseTransaction;
+        this.decentralisedSubmitCaseTransaction = decentralisedSubmitCaseTransaction;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -194,7 +194,7 @@ public class SubmitCaseTransaction implements AccessControl {
         saveUserDetails(idamUser, onBehalfOfUser, auditEvent);
 
         CaseDetails messageCaseDetails = this.applicationParams.isPocFeatureEnabled()
-                ? pocSubmitCaseTransaction.saveAuditEventForCaseDetails(response,
+                ? decentralisedSubmitCaseTransaction.saveAuditEventForCaseDetails(response,
                 event, caseTypeDefinition, idamUser, caseEventDefinition, newCaseDetails, onBehalfOfUser)
                 : savedCaseDetails;
 

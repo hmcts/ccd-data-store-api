@@ -19,15 +19,15 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 
 @Slf4j
 @Service
-public class POCSubmitCaseTransaction {
+public class DecentralisedSubmitCaseTransaction {
 
     private final CaseTypeService caseTypeService;
     private final ServicePersistenceAPI servicePersistenceAPI;
     private final RoleAssignmentService roleAssignmentService;
 
-    public POCSubmitCaseTransaction(final CaseTypeService caseTypeService,
-                                    final ServicePersistenceAPI servicePersistenceAPI,
-                                    final RoleAssignmentService roleAssignmentService) {
+    public DecentralisedSubmitCaseTransaction(final CaseTypeService caseTypeService,
+                                              final ServicePersistenceAPI servicePersistenceAPI,
+                                              final RoleAssignmentService roleAssignmentService) {
         this.caseTypeService = caseTypeService;
         this.servicePersistenceAPI = servicePersistenceAPI;
         this.roleAssignmentService = roleAssignmentService;
