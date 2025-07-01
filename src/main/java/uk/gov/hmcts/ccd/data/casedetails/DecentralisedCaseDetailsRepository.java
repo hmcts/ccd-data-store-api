@@ -87,16 +87,16 @@ public class DecentralisedCaseDetailsRepository implements CaseDetailsRepository
 
     @Override
     public List<CaseDetails> findByMetaDataAndFieldData(MetaData metadata, Map<String, String> dataSearchParams) {
-        return List.of();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<CaseDetails> findByParamsWithLimit(MigrationParameters migrationParameters) {
-        return List.of();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData, Map<String, String> dataSearchParams) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }
