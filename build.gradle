@@ -36,7 +36,7 @@ ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.16.0'
 //overriding for easy access to the version for FT testing
 ext['beftaFwVersion'] = '9.2.3'
-ext['ccdTestDefinitionVersion'] = '7.25.2'
+ext['ccdTestDefinitionVersion'] = '7.25.4'
 
 configurations {
     compileClasspath {
@@ -95,7 +95,8 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url 'https://jitpack.io'
+        name = "AzureArtifacts"
+        url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
     }
 }
 
@@ -321,7 +322,7 @@ dependencies {
     testImplementation 'io.github.openfeign:feign-jackson:9.7.0'
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.20.2'
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.20.2'
-    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.6', classifier: 'all'
+    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.9', classifier: 'all'
     testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
     // for sonar analysis
