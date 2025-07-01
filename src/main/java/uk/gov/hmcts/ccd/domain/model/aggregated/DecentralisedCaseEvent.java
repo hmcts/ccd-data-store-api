@@ -14,7 +14,8 @@ public class DecentralisedCaseEvent {
     private DecentralisedEventDetails eventDetails;
 
     @JsonCreator
-    public DecentralisedCaseEvent(CaseDetails caseDetailsBefore, CaseDetails caseDetails, DecentralisedEventDetails eventDetails) {
+    public DecentralisedCaseEvent(CaseDetails caseDetailsBefore, CaseDetails caseDetails,
+                                  DecentralisedEventDetails eventDetails) {
         this.caseDetailsBefore = caseDetailsBefore;
         this.caseDetails = caseDetails;
         this.eventDetails = eventDetails;
