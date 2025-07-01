@@ -82,6 +82,7 @@ module "postgresql_v15" {
   component            = var.component
   env                  = var.env
   subnet_suffix        = var.subnet_suffix
+
   # Setup Access for reporting and JiT perms.
   force_user_permissions_trigger     = "2"
   enable_db_report_privileges        = true
