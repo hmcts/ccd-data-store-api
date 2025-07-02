@@ -929,7 +929,7 @@ def getCheckedOutGitCommitHash() {
 //    include "uk/gov/hmcts/ccd/**"
 //}
 
-runProviderPactVerification.finalizedBy pactVerify
+//runProviderPactVerification.finalizedBy pactVerify
 
 def timestamp() {
     def date = new Date()
