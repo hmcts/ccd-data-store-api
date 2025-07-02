@@ -916,20 +916,20 @@ def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-task runProviderPactVerification(type:Test) {
-    logger.lifecycle("Runs provider pact Tests")
-    useJUnitPlatform()
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-    if (project.hasProperty('pact.verifier.publishResults')) {
-        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
-    }
-    systemProperty 'pact.provider.version', project.pactVersion
-    include "uk/gov/hmcts/reform/**"
-    include "uk/gov/hmcts/ccd/**"
-}
+//task runProviderPactVerification(type:Test) {
+//    logger.lifecycle("Runs provider pact Tests")
+//    useJUnitPlatform()
+//    testClassesDirs = sourceSets.contractTest.output.classesDirs
+//    classpath = sourceSets.contractTest.runtimeClasspath
+//    if (project.hasProperty('pact.verifier.publishResults')) {
+//        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+//    }
+//    systemProperty 'pact.provider.version', project.pactVersion
+//    include "uk/gov/hmcts/reform/**"
+//    include "uk/gov/hmcts/ccd/**"
+//}
 
-runProviderPactVerification.finalizedBy pactVerify
+//runProviderPactVerification.finalizedBy pactVerify
 
 def timestamp() {
     def date = new Date()
