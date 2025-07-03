@@ -11,13 +11,10 @@ class AccessControlListTest {
 
     @Test
     void shouldValidateAccessControlListParsing() throws JsonProcessingException {
-        AccessControlList accessControlList = new AccessControlList();
-
-        accessControlList.setUpdate(false);
-        accessControlList.setRead(false);
-        accessControlList.setDelete(false);
-        accessControlList.setCreate(true);
-        accessControlList.setAccessProfile("test");
+        AccessControlList accessControlList = AccessControlList.builder()
+            .accessProfile("test")
+            .create(true)
+            .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
         String value = objectMapper.writeValueAsString(accessControlList);
@@ -27,13 +24,14 @@ class AccessControlListTest {
 
     @Test
     void shouldValidateAccessControlListSerializationWithRole() throws JsonProcessingException {
-        String accessControlJson = "{\n"
-            + "\t\"role\": \"caseworker-probate-public\",\n"
-            + "\t\"create\": true,\n"
-            + "\t\"read\": true,\n"
-            + "\t\"update\": true,\n"
-            + "\t\"delete\": false\n"
-            + "}";
+        String accessControlJson = """
+            {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+            }""";
 
         ObjectMapper objectMapper = new ObjectMapper();
         AccessControlList value = objectMapper.readValue(accessControlJson, AccessControlList.class);
@@ -42,13 +40,14 @@ class AccessControlListTest {
 
     @Test
     void shouldValidateAccessControlListSerializationWithAccessProfile() throws JsonProcessingException {
-        String accessControlJson = "{\n"
-            + "\t\"accessProfile\": \"caseworker-probate-public\",\n"
-            + "\t\"create\": true,\n"
-            + "\t\"read\": true,\n"
-            + "\t\"update\": true,\n"
-            + "\t\"delete\": false\n"
-            + "}";
+        String accessControlJson = """
+            {
+                "accessProfile": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+            }""";
 
         ObjectMapper objectMapper = new ObjectMapper();
         AccessControlList value = objectMapper.readValue(accessControlJson, AccessControlList.class);
@@ -57,15 +56,12 @@ class AccessControlListTest {
 
     @Test
     void shouldCreateDuplicate() {
-        AccessControlList accessControlList = new AccessControlList();
+        AccessControlList accessControlList = AccessControlList.builder()
+            .accessProfile("test")
+            .create(true)
+            .build();
 
-        accessControlList.setUpdate(false);
-        accessControlList.setRead(false);
-        accessControlList.setDelete(false);
-        accessControlList.setCreate(true);
-        accessControlList.setAccessProfile("test");
-
-        AccessControlList duplicate  = accessControlList.createCopy();
+        AccessControlList duplicate  = accessControlList.duplicate();
 
         assertNotNull(duplicate);
         assertEquals(duplicate.getAccessProfile(), accessControlList.getAccessProfile());
@@ -73,27 +69,24 @@ class AccessControlListTest {
 
     @Test
     void shouldValidateToString() {
-        AccessControlList accessControlList = new AccessControlList();
+        AccessControlList accessControlList = AccessControlList.builder()
+            .accessProfile("test")
+            .create(true)
+            .build();
 
-        accessControlList.setUpdate(false);
-        accessControlList.setRead(false);
-        accessControlList.setDelete(false);
-        accessControlList.setCreate(true);
-        accessControlList.setAccessProfile("test");
-
-        assertNotNull("ACL{accessProfile='test', crud=C}", accessControlList.toString());
+        assertEquals("ACL{accessProfile='test', crud=C}", accessControlList.toString());
     }
 
 
     @Test
     void shouldValidateToStringWithCRUD() {
-        AccessControlList accessControlList = new AccessControlList();
-
-        accessControlList.setUpdate(true);
-        accessControlList.setRead(true);
-        accessControlList.setDelete(true);
-        accessControlList.setCreate(true);
-        accessControlList.setAccessProfile("test");
+        AccessControlList accessControlList = AccessControlList.builder()
+            .accessProfile("test")
+            .create(true)
+            .read(true)
+            .update(true)
+            .delete(true)
+            .build();
 
         assertEquals("ACL{accessProfile='test', crud=CRUD}", accessControlList.toString());
     }
