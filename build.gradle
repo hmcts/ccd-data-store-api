@@ -37,6 +37,7 @@ ext['jackson.version'] = '2.16.0'
 //overriding for easy access to the version for FT testing
 ext['beftaFwVersion'] = '9.2.3'
 ext['ccdTestDefinitionVersion'] = '7.25.2'
+ext['elasticsearchVersion'] = '9.0.3'
 
 configurations {
     compileClasspath {
@@ -319,7 +320,7 @@ dependencies {
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testImplementation 'io.github.openfeign:feign-jackson:9.7.0'
-    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.20.2'
+    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.21.3'
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.20.2'
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.6', classifier: 'all'
     testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
@@ -334,7 +335,7 @@ dependencies {
     implementation(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
-    implementation(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2') {
+    implementation(group: 'org.elasticsearch', name: 'elasticsearch', version: elasticsearchVersion) {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     implementation 'org.jooq:jool-java-8:0.9.14'
