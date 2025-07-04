@@ -64,12 +64,12 @@ class MigrationEndpointIT extends WireMockBaseTest {
     // data values as per:
     //                      classpath:sql/insert_cases_missing_case_link.sql
     //                      classpath:sql/insert_cases_multiple_missing_case_link.sql
-    private static final Long CASE_LINKS_CASE_01_ID = 1L; // 3393027116986763
-    private static final Long CASE_LINKS_CASE_02_ID = 2L; // 1504259907353537
-    private static final Long CASE_LINKS_CASE_03_ID = 3L; // 1504259907353545
-    private static final Long CASE_LINKS_CASE_04_ID = 4L; // 1504259907353552
-    private static final Long CASE_LINKS_CASE_05_ID = 5L; // 1557845948403939
-    private static final Long CASE_LINKS_CASE_06_ID = 6L; // 1504254784737847
+    private static final String CASE_LINKS_CASE_01_ID = "1L"; // 3393027116986763
+    private static final String CASE_LINKS_CASE_02_ID = "2L"; // 1504259907353537
+    private static final String CASE_LINKS_CASE_03_ID = "3L"; // 1504259907353545
+    private static final String CASE_LINKS_CASE_04_ID = "4L"; // 1504259907353552
+    private static final String CASE_LINKS_CASE_05_ID = "5L"; // 1557845948403939
+    private static final String CASE_LINKS_CASE_06_ID = "6L"; // 1504254784737847
     private static final String CASE_LINKS_CASE_01_TYPE = CASE_TYPE_ID;
     private static final String CASE_LINKS_CASE_02_TYPE = "TestAddressBookCase";
     private static final String CASE_LINKS_CASE_03_TYPE = CASE_TYPE_ID;
@@ -249,7 +249,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
         @DisplayName("Should return FORBIDDEN response when case type not available to user")
         void shouldReturnForbiddenWhenCaseTypeNotAvailableToUser() throws Exception {
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_TYPE_ID, SSCS_JURISDICTION_ID, 1L, 5);
+                new MigrationParameters(CASE_TYPE_ID, SSCS_JURISDICTION_ID, "1L", 5);
 
             // NB: IDAM and migration jurisdiction is SSCS but migration case type is for PROBATE
             //     therefore error as case type not permitted.
@@ -270,7 +270,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
         void shouldVerifyLogs() throws Exception {
 
-            Long caseDataId = CASE_LINKS_CASE_01_ID;
+            String caseDataId = CASE_LINKS_CASE_01_ID;
 
             MigrationParameters migrationParameters =
                 new MigrationParameters(CASE_LINKS_CASE_01_TYPE, PROBATE_JURISDICTION_ID, caseDataId, 5);
@@ -334,7 +334,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
         void shouldReturnForbiddenWhenCaseTypeNotAvailableToUser() throws Exception {
 
             MigrationParameters migrationParameters =
-                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
+                new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, "1L", 5);
 
             mockMvc.perform(post(PopulateCaseLinks.URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -345,7 +345,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
 
     }
 
-    private void assertCaseLinksMatch_missing_case_links(Long expectedCaseId) {
+    private void assertCaseLinksMatch_missing_case_links(String expectedCaseId) {
         List<CaseLink> expectedCaseLinks = new ArrayList<>();
 
         // data values as per:   classpath:sql/insert_cases_missing_case_link.sql
@@ -368,7 +368,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
         assertCaseLinks(expectedCaseId, expectedCaseLinks);
     }
 
-    private void assertCaseLinksMatch_multiple_missing_case_links(Long expectedCaseId) {
+    private void assertCaseLinksMatch_multiple_missing_case_links(String expectedCaseId) {
         List<CaseLink> expectedCaseLinks = new ArrayList<>();
 
         // data values as per:   classpath:sql/insert_cases_multiple_missing_case_link.sql
@@ -403,7 +403,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
         assertCaseLinks(expectedCaseId, expectedCaseLinks);
     }
 
-    private void assertCaseLinks(Long expectedCaseId, List<CaseLink> expectedCaseLinks) {
+    private void assertCaseLinks(String expectedCaseId, List<CaseLink> expectedCaseLinks) {
         List<CaseLink> caseLinks = template.query(
             String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
             new BeanPropertyRowMapper<>(CaseLink.class));

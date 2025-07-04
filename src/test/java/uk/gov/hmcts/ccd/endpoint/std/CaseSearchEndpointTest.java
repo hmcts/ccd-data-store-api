@@ -167,7 +167,7 @@ class CaseSearchEndpointTest {
 
             createReferenceList(numberRequired).forEach(reference -> {
                 CaseDetails caseDetails = new CaseDetails();
-                caseDetails.setReference(reference);
+                caseDetails.setReference(String.valueOf(reference));
                 caseDetailsList.add(caseDetails);
             });
 
