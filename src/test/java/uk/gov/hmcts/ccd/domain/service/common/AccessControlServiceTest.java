@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -4699,7 +4699,7 @@ public class AccessControlServiceTest {
         return logger;
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (listAppender != null) {
             listAppender.stop();

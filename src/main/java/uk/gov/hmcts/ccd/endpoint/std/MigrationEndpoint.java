@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.google.common.collect.Iterables;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,13 +51,12 @@ public class MigrationEndpoint {
 
 
     @PostMapping(path = "/populateCaseLinks", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    @ApiOperation(
-        value = "Migrate case links",
-        notes = "Updates the case link records for the cases found using the migration properties")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Migration completed for range of records specified"),
-        @ApiResponse(code = 403, message = "User does not have access to CaseType"),
-    })
+    @Operation(
+        summary = "Migrate case links",
+        description = "Updates the case link records for the cases found using the migration properties"
+    )
+    @ApiResponse(responseCode = "200", description = "Migration completed for range of records specified")
+    @ApiResponse(responseCode = "403", description = "User does not have access to CaseType")
     @LogAudit(
         operationType = AuditOperationType.MIGRATION,
         caseId = "#migrationParameters.caseDataId",

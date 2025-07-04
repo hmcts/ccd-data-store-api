@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public class UpdateCaseDraftRequest {
 
