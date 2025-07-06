@@ -59,8 +59,7 @@ class ClassifiedCreateEventOperationTest {
         doReturn(Optional.of(classifiedCase)).when(classificationService).applyClassification(caseDetails);
 
         classifiedCreateEventOperation =
-                new ClassifiedCreateEventOperation(createEventOperation, classificationService, applicationParams);
-        when(applicationParams.isPocFeatureEnabled()).thenReturn(false);
+                new ClassifiedCreateEventOperation(createEventOperation, classificationService);
     }
 
     @Test

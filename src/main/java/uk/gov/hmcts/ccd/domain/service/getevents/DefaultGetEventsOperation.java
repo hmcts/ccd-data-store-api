@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
@@ -23,7 +24,7 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     private final CaseAuditEventRepository auditEventRepository;
     private final GetCaseOperation getCaseOperation;
     private final UIDService uidService;
-    private final ApplicationParams applicationParams;
+    private final PersistenceStrategyResolver resolver;
     private static final String RESOURCE_NOT_FOUND //
         = "No case found ( jurisdiction = '%s', case type id = '%s', case reference = '%s' )";
     private static final String CASE_RESOURCE_NOT_FOUND //
@@ -35,11 +36,11 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
             CaseAuditEventRepository auditEventRepository,
             @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
             UIDService uidService,
-            final ApplicationParams applicationParams) {
+            final PersistenceStrategyResolver resolver) {
         this.auditEventRepository = auditEventRepository;
         this.getCaseOperation = getCaseOperation;
         this.uidService = uidService;
-        this.applicationParams = applicationParams;
+        this.resolver = resolver;
     }
 
     @Override
@@ -71,7 +72,8 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
 
     @Override
     public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
-        if (applicationParams.isPocFeatureEnabled()) {
+        // TODO: Looks like we need to fetch individual case events by id
+        if (resolver.isDecentralised(caseDetails)) {
             return getEvents(caseDetails).stream().filter(event -> event.getId().equals(eventId)).findFirst();
         }
         return auditEventRepository.findByEventId(eventId).map(Optional::of)

@@ -93,8 +93,7 @@ public class SecurityClassificationServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         securityClassificationService = spy(new SecurityClassificationServiceImpl(caseDataAccessControl,
-            caseDefinitionRepository, applicationParams));
-        when(applicationParams.isPocFeatureEnabled()).thenReturn(false);
+            caseDefinitionRepository));
     }
 
     @Nested

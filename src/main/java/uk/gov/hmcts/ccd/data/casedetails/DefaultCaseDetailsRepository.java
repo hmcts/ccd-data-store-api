@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CasePersistenceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
@@ -54,20 +55,17 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private final SearchQueryFactoryOperation queryBuilder;
     private final CaseDetailsQueryBuilderFactory queryBuilderFactory;
     private final ApplicationParams applicationParams;
-    private final DecentralisedCaseDetailsRepository decentralisedCaseDetailsRepository;
 
     @Inject
     public DefaultCaseDetailsRepository(
         final CaseDetailsMapper caseDetailsMapper,
         final SearchQueryFactoryOperation queryBuilder,
         final CaseDetailsQueryBuilderFactory queryBuilderFactory,
-        final ApplicationParams applicationParams,
-        final DecentralisedCaseDetailsRepository decentralisedCaseDetailsRepository) {
+        final ApplicationParams applicationParams) {
         this.caseDetailsMapper = caseDetailsMapper;
         this.queryBuilder = queryBuilder;
         this.queryBuilderFactory = queryBuilderFactory;
         this.applicationParams = applicationParams;
-        this.decentralisedCaseDetailsRepository = decentralisedCaseDetailsRepository;
     }
 
     @Override
@@ -120,24 +118,17 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
-        String reference = caseReference.toString();
-        return applicationParams.isPocFeatureEnabled()
-                ? decentralisedCaseDetailsRepository.findByReference(jurisdiction, reference)
-                : findByReference(jurisdiction, reference);
+                return findByReference(jurisdiction, caseReference.toString());
     }
 
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
-        return applicationParams.isPocFeatureEnabled()
-                ? decentralisedCaseDetailsRepository.findByReference(jurisdiction, reference)
-                : find(jurisdiction, null, reference).map(this.caseDetailsMapper::entityToModel);
+        return find(jurisdiction, null, reference).map(this.caseDetailsMapper::entityToModel);
     }
 
     @Override
     public Optional<CaseDetails> findByReference(String caseReference) {
-        return applicationParams.isPocFeatureEnabled()
-                ? decentralisedCaseDetailsRepository.findByReference(caseReference)
-                : findByReference(null, caseReference);
+        return findByReference(null, caseReference);
     }
 
     /**
@@ -148,10 +139,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     @Deprecated
     public CaseDetails findByReference(final Long caseReference) {
-        return applicationParams.isPocFeatureEnabled()
-                ? decentralisedCaseDetailsRepository.findByReference(caseReference)
-                : findByReference(null,
-                caseReference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
+        return findByReference(null, caseReference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
     }
 
     /**
@@ -166,9 +154,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     public CaseDetails findUniqueCase(final String jurisdiction,
                                       final String caseTypeId,
                                       final String reference) {
-        return applicationParams.isPocFeatureEnabled()
-                ? decentralisedCaseDetailsRepository.findUniqueCase(jurisdiction, caseTypeId, reference)
-                : findByReference(jurisdiction, reference).orElse(null);
+        return findByReference(jurisdiction, reference).orElse(null);
     }
 
     @Override
@@ -235,10 +221,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
      */
     @Override
     public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
-        if (applicationParams.isPocFeatureEnabled()) {
-            return decentralisedCaseDetailsRepository.findByReferenceWithNoAccessControl(reference);
-        }
-
         CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectUnsecured(em);
         qb.whereReference(String.valueOf(reference));
         return qb.getSingleResult().map(this.caseDetailsMapper::entityToModel);

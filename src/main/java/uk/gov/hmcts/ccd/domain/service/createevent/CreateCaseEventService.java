@@ -33,6 +33,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -98,6 +99,7 @@ public class CreateCaseEventService {
     private final POCCreateCaseEventService pocCreateCaseEventService;
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
+    private final PersistenceStrategyResolver resolver;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -132,7 +134,8 @@ public class CreateCaseEventService {
                                   final ApplicationParams applicationParams,
                                   final CaseAccessGroupUtils caseAccessGroupUtils,
                                   final CaseDocumentTimestampService caseDocumentTimestampService,
-                                  final POCCreateCaseEventService pocCreateCaseEventService) {
+                                  final POCCreateCaseEventService pocCreateCaseEventService,
+                                  final PersistenceStrategyResolver resolver) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -163,8 +166,8 @@ public class CreateCaseEventService {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-
         this.pocCreateCaseEventService = pocCreateCaseEventService;
+        this.resolver = resolver;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -243,10 +246,9 @@ public class CreateCaseEventService {
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 
-        boolean isPocCaseType = applicationParams.getPocCaseTypes().stream()
-            .anyMatch(prefix -> caseDetailsInDatabase.getCaseTypeId().startsWith(prefix));
+        boolean isDecentralised = resolver.isDecentralised(caseDetailsInDatabase);
 
-        CaseDetails finalCaseDetails = isPocCaseType
+        CaseDetails finalCaseDetails = isDecentralised
                 ? pocCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(), caseEventDefinition,
                 caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase)
                 : saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
@@ -254,7 +256,7 @@ public class CreateCaseEventService {
 
         caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
-        if (!isPocCaseType) {
+        if (!isDecentralised) {
             saveAuditEventForCaseDetails(
                     aboutToSubmitCallbackResponse,
                     content.getEvent(),
@@ -335,16 +337,15 @@ public class CreateCaseEventService {
             caseDetailsAfterCallback
         );
 
-        boolean isPocCaseType = applicationParams.getPocCaseTypes().stream()
-            .anyMatch(prefix -> caseDetailsInDatabase.getCaseTypeId().startsWith(prefix));
+        boolean isDecentralised = resolver.isDecentralised(caseDetailsInDatabase);
 
-        CaseDetails finalCaseDetails = isPocCaseType
+        CaseDetails finalCaseDetails = isDecentralised
                 ? pocCreateCaseEventService.saveAuditEventForCaseDetails(event, caseEventDefinition,
                 caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase)
                 : saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
                 newState, timeNow);
 
-        if (!isPocCaseType) {
+        if (!isDecentralised) {
             saveAuditEventForCaseDetails(
                     aboutToSubmitCallbackResponse,
                     event,

@@ -51,8 +51,7 @@ class ClassifiedGetCaseOperationTest {
         doReturn(classifiedDetails).when(classificationService).applyClassification(caseDetails.get());
 
         classifiedGetCaseOperation = new ClassifiedGetCaseOperation(getCaseOperation,
-                classificationService, applicationParams);
-        when(applicationParams.isPocFeatureEnabled()).thenReturn(false);
+                classificationService);
     }
 
     @Nested

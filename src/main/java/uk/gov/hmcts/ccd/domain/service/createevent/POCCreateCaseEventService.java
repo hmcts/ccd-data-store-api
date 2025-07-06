@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 
@@ -24,20 +25,14 @@ public class POCCreateCaseEventService {
 
     private final CaseTypeService caseTypeService;
     private final ServicePersistenceAPI servicePersistenceAPI;
-    private final MessageService messageService;
-    private final SecurityUtils securityUtils;
-    private final RoleAssignmentService roleAssignmentService;
+    private final PersistenceStrategyResolver resolver;
 
     public POCCreateCaseEventService(final CaseTypeService caseTypeService,
                                      final ServicePersistenceAPI servicePersistenceAPI,
-                                     @Qualifier("caseEventMessageService") final MessageService messageService,
-                                     final SecurityUtils securityUtils,
-                                     final RoleAssignmentService roleAssignmentService) {
+                                     final PersistenceStrategyResolver resolver) {
         this.caseTypeService = caseTypeService;
         this.servicePersistenceAPI = servicePersistenceAPI;
-        this.messageService = messageService;
-        this.securityUtils = securityUtils;
-        this.roleAssignmentService = roleAssignmentService;
+        this.resolver = resolver;
     }
 
     public CaseDetails saveAuditEventForCaseDetails(final Event event,
@@ -68,7 +63,8 @@ public class POCCreateCaseEventService {
                 .build();
 
         try {
-            return servicePersistenceAPI.createEvent(decentralisedCaseEvent);
+            var uri = resolver.resolveUriOrThrow(caseDetails);
+            return servicePersistenceAPI.createEvent(uri, decentralisedCaseEvent);
         } catch (FeignException.Conflict conflict) {
             throw new CaseConcurrencyException("""
                     Unfortunately we were unable to save your work to the case as \

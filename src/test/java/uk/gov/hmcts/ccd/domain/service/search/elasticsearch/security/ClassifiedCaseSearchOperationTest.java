@@ -36,8 +36,6 @@ class ClassifiedCaseSearchOperationTest {
 
     @Mock
     private CaseSearchOperation searchOperation;
-    @Mock
-    private ApplicationParams applicationParams;
 
     @Mock
     private SecurityClassificationServiceImpl classificationService;
@@ -56,7 +54,7 @@ class ClassifiedCaseSearchOperationTest {
         doReturn(Optional.of(classifiedCase2)).when(classificationService).applyClassification(case2);
 
         classifiedSearchOperation = new ClassifiedCaseSearchOperation(searchOperation,
-                classificationService, applicationParams);
+                classificationService);
     }
 
     @Test

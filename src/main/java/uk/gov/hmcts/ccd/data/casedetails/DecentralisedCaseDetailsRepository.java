@@ -10,20 +10,24 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 
 @Service
 @Slf4j
 public class DecentralisedCaseDetailsRepository implements CaseDetailsRepository {
 
     private final ServicePersistenceAPI servicePersistenceAPI;
+    private final PersistenceStrategyResolver resolver;
 
-    public DecentralisedCaseDetailsRepository(final ServicePersistenceAPI servicePersistenceAPI) {
+    public DecentralisedCaseDetailsRepository(final ServicePersistenceAPI servicePersistenceAPI,
+                                             final PersistenceStrategyResolver resolver) {
         this.servicePersistenceAPI = servicePersistenceAPI;
+        this.resolver = resolver;
     }
 
     @Override
     public CaseDetails set(CaseDetails caseDetails) {
-        return null;
+        throw new UnsupportedOperationException("Decentralised data is modified through events.");
     }
 
     @Override
@@ -67,7 +71,8 @@ public class DecentralisedCaseDetailsRepository implements CaseDetailsRepository
     }
 
     private CaseDetails getCaseDetails(String reference) {
-        CaseDetails caseDetails = servicePersistenceAPI.getCase(reference);
+        var uri = resolver.resolveUriOrThrow(reference);
+        CaseDetails caseDetails = servicePersistenceAPI.getCase(uri, reference);
         log.info("case Id {}", caseDetails.getId());
         log.info("case reference {}", caseDetails.getReference());
         if (Optional.ofNullable(caseDetails).isPresent()) {

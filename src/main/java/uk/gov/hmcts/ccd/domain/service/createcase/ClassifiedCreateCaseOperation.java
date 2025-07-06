@@ -13,16 +13,13 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 public class ClassifiedCreateCaseOperation implements CreateCaseOperation {
     private final CreateCaseOperation createCaseOperation;
     private final SecurityClassificationServiceImpl classificationService;
-    private final ApplicationParams applicationParams;
 
     @Autowired
     public ClassifiedCreateCaseOperation(@Qualifier("default") CreateCaseOperation createCaseOperation,
-                                         SecurityClassificationServiceImpl classificationService,
-                                         ApplicationParams applicationParams) {
+                                         SecurityClassificationServiceImpl classificationService) {
 
         this.createCaseOperation = createCaseOperation;
         this.classificationService = classificationService;
-        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -35,8 +32,6 @@ public class ClassifiedCreateCaseOperation implements CreateCaseOperation {
         if (null == caseDetails) {
             return null;
         }
-        return (applicationParams.isPocFeatureEnabled())
-                ? caseDetails
-                : classificationService.applyClassification(caseDetails, true).orElse(null);
+        return classificationService.applyClassification(caseDetails, true).orElse(null);
     }
 }

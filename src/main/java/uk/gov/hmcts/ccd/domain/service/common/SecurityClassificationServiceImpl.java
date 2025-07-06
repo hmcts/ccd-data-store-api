@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -45,22 +44,20 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     private final CaseDataAccessControl caseDataAccessControl;
     private final CaseDefinitionRepository caseDefinitionRepository;
-    private final ApplicationParams applicationParams;
+    private final PersistenceStrategyResolver resolver;
 
     @Autowired
     public SecurityClassificationServiceImpl(CaseDataAccessControl caseDataAccessControl,
                                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                              final CaseDefinitionRepository caseDefinitionRepository,
-                                             ApplicationParams applicationParams) {
+                                             PersistenceStrategyResolver applicationParams) {
         this.caseDataAccessControl = caseDataAccessControl;
         this.caseDefinitionRepository = caseDefinitionRepository;
-        this.applicationParams = applicationParams;
+        this.resolver = applicationParams;
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
-        return applicationParams.isPocFeatureEnabled()
-                ? Optional.of(caseDetails)
-                : applyClassification(caseDetails, false);
+        return applyClassification(caseDetails, false);
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
@@ -75,10 +72,12 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
                         cd.setDataClassification(Maps.newHashMap());
                     }
 
-                    JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
-                        JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
-                        securityClassification);
-                    caseDetails.setData(JacksonUtils.convertValue(data));
+                    if (!resolver.isDecentralised(caseDetails)) {
+                        JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                            JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
+                            securityClassification);
+                        caseDetails.setData(JacksonUtils.convertValue(data));
+                    }
                     return cd;
                 }));
     }

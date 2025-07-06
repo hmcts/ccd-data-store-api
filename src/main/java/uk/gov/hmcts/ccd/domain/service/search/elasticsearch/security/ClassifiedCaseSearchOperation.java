@@ -19,17 +19,14 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSea
 public class ClassifiedCaseSearchOperation implements CaseSearchOperation {
     private final CaseSearchOperation caseSearchOperation;
     private final SecurityClassificationServiceImpl classificationService;
-    private final ApplicationParams applicationParams;
 
     @Autowired
     public ClassifiedCaseSearchOperation(@Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER)
                                                  CaseSearchOperation caseSearchOperation,
-                                         SecurityClassificationServiceImpl classificationService,
-                                         ApplicationParams applicationParams) {
+                                         SecurityClassificationServiceImpl classificationService) {
 
         this.caseSearchOperation = caseSearchOperation;
         this.classificationService = classificationService;
-        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -40,9 +37,7 @@ public class ClassifiedCaseSearchOperation implements CaseSearchOperation {
             return new CaseSearchResult();
         }
 
-        List<CaseDetails> classifiedCases = applicationParams.isPocFeatureEnabled()
-                ? results.getCases()
-                : results.getCases()
+        List<CaseDetails> classifiedCases = results.getCases()
                 .stream()
                 .map(classificationService::applyClassification)
                 .filter(Optional::isPresent)

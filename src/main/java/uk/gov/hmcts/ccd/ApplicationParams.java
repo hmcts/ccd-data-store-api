@@ -235,10 +235,6 @@ public class ApplicationParams {
     @Value("#{'${ccd.callback.passthru-header-contexts}'.split(',')}")
     private List<String> callbackPassthruHeaderContexts;
 
-    private List<String> pocCaseTypes = List.of("CIVIL", "NFD", "PCS", "CriminalInjuriesCompensation");
-
-    @Value("${poc.feature.enabled}")
-    private boolean isPocFeatureEnabled;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -635,19 +631,4 @@ public class ApplicationParams {
         return uploadTimestampFeaturedCaseTypes;
     }
 
-    public boolean isPocFeatureEnabled() {
-        return isPocFeatureEnabled;
-    }
-
-    public void setPocFeatureEnabled(boolean pocFeatureEnabled) {
-        isPocFeatureEnabled = pocFeatureEnabled;
-    }
-
-    public List<String> getPocCaseTypes() {
-        return pocCaseTypes;
-    }
-
-    public void setPocCaseTypes(List<String> pocCaseTypes) {
-        this.pocCaseTypes = pocCaseTypes;
-    }
 }

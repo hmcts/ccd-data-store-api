@@ -11,7 +11,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
@@ -53,8 +52,6 @@ class ClassifiedStartEventOperationTest {
 
     @Mock
     private DraftGateway draftGateway;
-    @Mock
-    private ApplicationParams applicationParams;
 
     private ClassifiedStartEventOperation classifiedStartEventOperation;
 
@@ -79,9 +76,7 @@ class ClassifiedStartEventOperationTest {
                 classificationService,
                 caseDefinitionRepository,
                 caseDataService,
-                draftGateway,
-                applicationParams);
-        when(applicationParams.isPocFeatureEnabled()).thenReturn(false);
+                draftGateway);
     }
 
     @Nested

@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 
@@ -23,14 +24,15 @@ public class DecentralisedSubmitCaseTransaction {
 
     private final CaseTypeService caseTypeService;
     private final ServicePersistenceAPI servicePersistenceAPI;
-    private final RoleAssignmentService roleAssignmentService;
+    private final PersistenceStrategyResolver resolver;
 
     public DecentralisedSubmitCaseTransaction(final CaseTypeService caseTypeService,
                                               final ServicePersistenceAPI servicePersistenceAPI,
-                                              final RoleAssignmentService roleAssignmentService) {
+                                              final PersistenceStrategyResolver resolver
+                                              ) {
         this.caseTypeService = caseTypeService;
         this.servicePersistenceAPI = servicePersistenceAPI;
-        this.roleAssignmentService = roleAssignmentService;
+        this.resolver = resolver;
     }
 
     public CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response,
@@ -64,7 +66,8 @@ public class DecentralisedSubmitCaseTransaction {
 
 
         try {
-            CaseDetails caseDetails = servicePersistenceAPI.createEvent(decentralisedCaseEvent);
+            var uri = resolver.resolveUriOrThrow(decentralisedCaseEvent.getCaseDetails());
+            CaseDetails caseDetails = servicePersistenceAPI.createEvent(uri, decentralisedCaseEvent);
             log.info("pocCaseDetails: {}", caseDetails);
             log.info("pocCaseDetails id: {}", caseDetails.getId());
             log.info("pocCaseDetails reference before: {}", caseDetails.getReference());

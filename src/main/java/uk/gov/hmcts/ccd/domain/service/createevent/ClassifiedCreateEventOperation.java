@@ -15,16 +15,13 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 public class ClassifiedCreateEventOperation implements CreateEventOperation {
     private final CreateEventOperation createEventOperation;
     private final SecurityClassificationServiceImpl classificationService;
-    private final ApplicationParams applicationParams;
 
     @Autowired
     public ClassifiedCreateEventOperation(@Qualifier("default") CreateEventOperation createEventOperation,
-                                          SecurityClassificationServiceImpl classificationService,
-                                          ApplicationParams applicationParams) {
+                                          SecurityClassificationServiceImpl classificationService) {
 
         this.createEventOperation = createEventOperation;
         this.classificationService = classificationService;
-        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -32,9 +29,7 @@ public class ClassifiedCreateEventOperation implements CreateEventOperation {
                                        CaseDataContent content) {
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference,
                                                                            content);
-        return applicationParams.isPocFeatureEnabled()
-                ? caseDetails
-                : Optional.ofNullable(caseDetails)
+        return Optional.ofNullable(caseDetails)
                        .flatMap(classificationService::applyClassification)
                        .orElse(null);
     }

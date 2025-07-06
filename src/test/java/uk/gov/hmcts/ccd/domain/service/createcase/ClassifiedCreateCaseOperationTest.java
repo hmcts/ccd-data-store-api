@@ -54,8 +54,7 @@ class ClassifiedCreateCaseOperationTest {
         doReturn(Optional.of(classifiedCase)).when(classificationService).applyClassification(caseDetails, true);
 
         classifiedCreateCaseOperation = new ClassifiedCreateCaseOperation(createCaseOperation,
-                classificationService, applicationParams);
-        when(applicationParams.isPocFeatureEnabled()).thenReturn(false);
+                classificationService);
     }
 
     @Test

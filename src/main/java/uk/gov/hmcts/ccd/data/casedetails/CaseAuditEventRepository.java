@@ -3,9 +3,10 @@ package uk.gov.hmcts.ccd.data.casedetails;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.config.PersistenceStrategyConfiguration;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import javax.inject.Inject;
@@ -28,7 +29,7 @@ public class CaseAuditEventRepository {
 
     private final CaseAuditEventMapper caseAuditEventMapper;
     private final DecentralisedCaseAuditEventRepository decentralisedCaseAuditEventRepository;
-    private final ApplicationParams applicationParams;
+    private final PersistenceStrategyResolver resolver;
 
     @PersistenceContext
     private EntityManager em;
@@ -36,10 +37,10 @@ public class CaseAuditEventRepository {
     @Inject
     public CaseAuditEventRepository(final CaseAuditEventMapper caseAuditEventMapper,
                                     final DecentralisedCaseAuditEventRepository decentralisedCaseAuditEventRepository,
-                                    final ApplicationParams applicationParams) {
+                                    final PersistenceStrategyResolver resolver) {
         this.caseAuditEventMapper = caseAuditEventMapper;
         this.decentralisedCaseAuditEventRepository = decentralisedCaseAuditEventRepository;
-        this.applicationParams = applicationParams;
+        this.resolver = resolver;
     }
 
     public AuditEvent set(final AuditEvent auditEvent) {
@@ -49,7 +50,7 @@ public class CaseAuditEventRepository {
     }
 
     public List<AuditEvent> findByCase(final CaseDetails caseDetails) {
-        if (applicationParams.isPocFeatureEnabled()) {
+        if (resolver.isDecentralised(caseDetails)) {
             return decentralisedCaseAuditEventRepository.findByCase(caseDetails);
         }
 
