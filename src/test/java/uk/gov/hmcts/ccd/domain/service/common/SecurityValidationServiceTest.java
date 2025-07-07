@@ -217,7 +217,7 @@ class SecurityValidationServiceTest {
 
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
-                .withReference(1111L)
+                .withReference("1111L")
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("field1", getTextNode("PRIVATE"))
@@ -250,7 +250,7 @@ class SecurityValidationServiceTest {
 
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
-                .withReference(2222L)
+                .withReference("2222L")
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("field1", getTextNode("PRIVATE"))
@@ -293,7 +293,7 @@ class SecurityValidationServiceTest {
 
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
-                .withReference(3333L)
+                .withReference("3333L")
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("field1", getTextNode("PRIVATE"))

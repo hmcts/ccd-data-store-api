@@ -64,7 +64,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
     private static final CaseEventDefinition CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
     private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_REFERENCE)
-            .withCaseTypeId(CASE_TYPE_ID).withReference(Long.valueOf(CASE_REFERENCE)).build();
+            .withCaseTypeId(CASE_TYPE_ID).withReference(CASE_REFERENCE).build();
     private static final CaseEventDefinition CASE_EVENT_2 = newCaseEvent().withId("event2").build();
     private static final CaseTypeDefinition TEST_CASE_TYPE = newCaseType().withEvent(CASE_EVENT)
             .withEvent(CASE_EVENT_2).build();
@@ -145,7 +145,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         doReturn(ACCESS_PROFILES).when(caseDataAccessControl)
             .generateAccessProfilesByCaseReference(anyString());
         doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
-        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
+        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(CASE_REFERENCE, USER_ID);
         doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         authorisedGetCaseHistoryViewOperation =
