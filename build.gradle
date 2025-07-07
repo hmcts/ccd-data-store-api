@@ -242,7 +242,7 @@ dependencies {
     implementation "org.flywaydb:flyway-core:8.5.13"
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
-    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.2'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.77'
 
@@ -928,7 +928,7 @@ def getCheckedOutGitCommitHash() {
 //    include "uk/gov/hmcts/reform/**"
 //    include "uk/gov/hmcts/ccd/**"
 //}
-//
+
 //runProviderPactVerification.finalizedBy pactVerify
 
 def timestamp() {
