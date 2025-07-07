@@ -95,7 +95,8 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url 'https://jitpack.io'
+        name = "AzureArtifacts"
+        url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
     }
 }
 
@@ -241,7 +242,7 @@ dependencies {
     implementation "org.flywaydb:flyway-core:8.5.13"
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
-    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.2'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.77'
 
@@ -321,7 +322,7 @@ dependencies {
     testImplementation 'io.github.openfeign:feign-jackson:9.7.0'
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.20.2'
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.20.2'
-    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.6', classifier: 'all'
+    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.9', classifier: 'all'
     testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
     // for sonar analysis
@@ -927,7 +928,7 @@ def getCheckedOutGitCommitHash() {
 //    include "uk/gov/hmcts/reform/**"
 //    include "uk/gov/hmcts/ccd/**"
 //}
-//
+
 //runProviderPactVerification.finalizedBy pactVerify
 
 def timestamp() {
