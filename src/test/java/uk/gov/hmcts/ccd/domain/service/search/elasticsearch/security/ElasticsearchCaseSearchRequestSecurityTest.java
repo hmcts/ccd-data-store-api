@@ -32,8 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.NATIVE_ES_QUERY;
@@ -68,7 +66,6 @@ class ElasticsearchCaseSearchRequestSecurityTest {
 
     private ElasticsearchCaseSearchRequestSecurity underTest = null;
 
-
     @BeforeEach
     void setUp() {
         searchRequestNode = objectMapperService.convertStringToObject(SEARCH_QUERY, JsonNode.class);
@@ -93,10 +90,10 @@ class ElasticsearchCaseSearchRequestSecurityTest {
             JsonNode.class);
         String decodedQuery = getDecodedQuery(jsonNode);
 
-        assertEquals(CASE_TYPE_ID_1, securedSearchRequest.getCaseTypeId());
-        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
-        assertEquals(FILTER_VALUE_1, jsonNode.at("/query/bool/filter").get(0).at("/term/filterTermValue/value")
-            .asText());
+        assertThat(securedSearchRequest.getCaseTypeId()).isEqualTo(CASE_TYPE_ID_1);
+        assertThat(decodedQuery).isEqualTo(EXPECTED_SEARCH_TERM);
+        assertThat(jsonNode.at("/query/bool/filter").get(0).at("/term/filterTermValue/value")
+            .asText()).isEqualTo(FILTER_VALUE_1);
     }
 
     @Test
@@ -114,8 +111,8 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         // THEN
         String decodedQuery = getDecodedQuery(securedSearchRequest.getSearchRequestJsonNode());
 
-        assertEquals(CASE_TYPE_IDS, securedSearchRequest.getCaseTypeIds());
-        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
+        assertThat(securedSearchRequest.getCaseTypeIds()).isEqualTo(CASE_TYPE_IDS);
+        assertThat(decodedQuery).isEqualTo(EXPECTED_SEARCH_TERM);
     }
 
     @Test
@@ -134,65 +131,15 @@ class ElasticsearchCaseSearchRequestSecurityTest {
 
         // THEN
         final String expectedQueryJson = """
-            {
-              "query": {
-                "bool": {
-                  "must": [
-                    {
-                      "wrapper": {
-                        "query": "eyJtYXRjaCI6eyJyZWZlcmVuY2UiOjE2MzA1OTYyNjc4OTk1Mjd9fQ=="
-                      }
-                    }
-                  ],
-                  "should": [
-                    {
-                      "bool": {
-                        "must": [
-                          {
-                            "term": {
-                              "filterTermValue": {
-                                "value": "filterType1"
-                              }
-                            }
-                          },
-                          {
-                            "term": {
-                              "case_type_id": {
-                                "value": "casetype"
-                              }
-                            }
-                          }
-                        ],
-                        "boost": 1.0
-                      }
-                    },
-                    {
-                      "bool": {
-                        "must": [
-                          {
-                            "term": {
-                              "filterTermValue": {
-                                "value": "filterType2"
-                              }
-                            }
-                          },
-                          {
-                            "term": {
-                              "case_type_id": {
-                                "value": "casetype2"
-                              }
-                            }
-                          }
-                        ],
-                        "boost": 1.0
-                      }
-                    }
-                  ],
-                  "minimum_should_match": "1",
-                  "boost": 1.0
-                }
-              }
-            }
+            {"query": {"bool": {"must": [{"wrapper": {
+            "query": "eyJtYXRjaCI6eyJyZWZlcmVuY2UiOjE2MzA1OTYyNjc4OTk1Mjd9fQ=="}}],
+            "should": [{"bool": {"must": [{"term": {"filterTermValue": {"value": "filterType1"}}},
+            {"term": {"case_type_id": {"value": "casetype"}}}],
+            "boost": 1.0}},
+            {"bool": {"must": [{"term": {"filterTermValue": {"value": "filterType2"}}},
+            {"term": {"case_type_id": { "value": "casetype2"}}}],
+            "boost": 1.0}}],
+            "minimum_should_match": "1", "boost": 1.0}}}
             """;
         ObjectMapper mapper = new ObjectMapper();
         JsonNode expectedNode = null;
@@ -227,14 +174,14 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         // THEN
         Map<String, JsonNode> mapOfFilterValues =
             createMapOfFilterValues(securedSearchRequest.getSearchRequestJsonNode());
-        assertEquals(FILTER_VALUE_1, mapOfFilterValues.get(CASE_TYPE_ID_1.toLowerCase()).at("/bool/must").get(0)
-            .at("/term/filterTermValue/value").asText());
-        assertEquals(FILTER_VALUE_2, mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must").get(0)
-            .at("/term/filterTermValue/value").asText());
-        assertEquals(CASE_TYPE_ID_1.toLowerCase(), mapOfFilterValues.get(CASE_TYPE_ID_1.toLowerCase()).at("/bool/must")
-            .get(1).at("/term/case_type_id/value").asText());
-        assertEquals(CASE_TYPE_ID_2.toLowerCase(), mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must")
-            .get(1).at("/term/case_type_id/value").asText());
+        assertThat(mapOfFilterValues.get(CASE_TYPE_ID_1.toLowerCase()).at("/bool/must").get(0)
+            .at("/term/filterTermValue/value").asText()).isEqualTo(FILTER_VALUE_1);
+        assertThat(mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must").get(0)
+            .at("/term/filterTermValue/value").asText()).isEqualTo(FILTER_VALUE_2);
+        assertThat(mapOfFilterValues.get(CASE_TYPE_ID_1.toLowerCase()).at("/bool/must")
+            .get(1).at("/term/case_type_id/value").asText()).isEqualTo(CASE_TYPE_ID_1.toLowerCase());
+        assertThat(mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must")
+            .get(1).at("/term/case_type_id/value").asText()).isEqualTo(CASE_TYPE_ID_2.toLowerCase());
     }
 
     @Test
@@ -283,11 +230,11 @@ class ElasticsearchCaseSearchRequestSecurityTest {
 
         // THEN
         // :: SearchIndex
-        assertTrue(securedSearchRequest.getSearchIndex().isPresent());
-        assertEquals(searchIndex, securedSearchRequest.getSearchIndex().get());
+        assertThat(securedSearchRequest.getSearchIndex()).isPresent();
+        assertThat(securedSearchRequest.getSearchIndex().get()).isEqualTo(searchIndex);
         // :: pagination
-        assertEquals(from, securedSearchRequest.getSearchRequestJsonNode().get(FROM).asInt());
-        assertEquals(size, securedSearchRequest.getSearchRequestJsonNode().get(SIZE).asInt());
+        assertThat(securedSearchRequest.getSearchRequestJsonNode().get(FROM).asInt()).isEqualTo(from);
+        assertThat(securedSearchRequest.getSearchRequestJsonNode().get(SIZE).asInt()).isEqualTo(size);
         // :: source fields
         JSONAssert.assertEquals(
             "[\"" + sourceField1 + "\",\"" + sourceField2 + "\"]",
@@ -308,8 +255,8 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         // GIVEN
         when(caseSearchFilter.getFilter(CASE_TYPE_ID_2)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_2)));
 
-        int from = 100;
-        int size = 999;
+        final int from = 100;
+        final int size = 999;
 
         final String sourceField1 = "my.source.field.one";
         final String sourceField2 = "my.source.field.two";
@@ -338,11 +285,11 @@ class ElasticsearchCaseSearchRequestSecurityTest {
 
         // THEN
         // :: SearchIndex
-        assertTrue(securedSearchRequest.getSearchIndex().isPresent());
-        assertEquals(searchIndex, securedSearchRequest.getSearchIndex().get());
+        assertThat(securedSearchRequest.getSearchIndex()).isPresent();
+        assertThat(securedSearchRequest.getSearchIndex().get()).isEqualTo(searchIndex);
         // :: pagination
-        assertEquals(from, securedSearchRequest.getSearchRequestJsonNode().get(FROM).asInt());
-        assertEquals(size, securedSearchRequest.getSearchRequestJsonNode().get(SIZE).asInt());
+        assertThat(securedSearchRequest.getSearchRequestJsonNode().get(FROM).asInt()).isEqualTo(from);
+        assertThat(securedSearchRequest.getSearchRequestJsonNode().get(SIZE).asInt()).isEqualTo(size);
         // :: source fields
         JSONAssert.assertEquals(
             "[\"" + sourceField1 + "\",\"" + sourceField2 + "\"]",
