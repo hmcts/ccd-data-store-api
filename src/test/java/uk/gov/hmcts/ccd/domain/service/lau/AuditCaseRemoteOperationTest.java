@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.lau;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -86,7 +85,7 @@ class AuditCaseRemoteOperationTest {
         .build();
 
     @BeforeEach
-    void setUp() throws JsonProcessingException {
+    void setUp() {
         MockitoAnnotations.initMocks(this);
         doReturn("Bearer 1234").when(securityUtils).getServiceAuthorization();
         doReturn("http://localhost/caseAction").when(auditCaseRemoteConfiguration).getCaseActionAuditUrl();

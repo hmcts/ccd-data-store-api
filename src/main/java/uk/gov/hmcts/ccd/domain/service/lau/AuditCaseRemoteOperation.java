@@ -104,7 +104,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         }
     }
 
-    @Async("TaskExecutor")
+    @Async("taskExecutor")
     public void postAsyncAuditRequestAndHandleResponse(
         AuditEntry entry,
         String activity,
@@ -115,9 +115,11 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         String auditLogId = UUID.randomUUID().toString();
 
         try {
-            logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId(), auditLogId);
+            logCorrelationId(entry.getRequestId(), activity,
+                entry.getJurisdiction(), entry.getIdamId(), auditLogId);
 
-            if ("CREATE".equals(activity) || "UPDATE".equals(activity) || "VIEW".equals(activity)) {
+            if (LAU_CASE_ACTION_CREATE.equals(activity) || LAU_CASE_ACTION_UPDATE.equals(activity)
+                || LAU_CASE_ACTION_VIEW.equals(activity)) {
                 ResponseEntity<CaseActionPostResponse> caseResponse = logAndAuditFeignClient
                     .postCaseAction(securityUtils.getServiceAuthorization(), capr);
                 if (caseResponse != null) {
