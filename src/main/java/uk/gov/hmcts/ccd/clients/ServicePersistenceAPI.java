@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.clients;
 
 import java.net.URI;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +33,7 @@ public interface ServicePersistenceAPI {
 
     @PostMapping(value = "/ccd/cases/{case-ref}/supplementary-data", consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    SupplementaryData updateSupplementaryData(URI baseURI, @PathVariable("case-ref") String caseRef,
-                                                      SupplementaryDataUpdateRequest supplementaryData);
+    JsonNode updateSupplementaryData(URI baseURI, @PathVariable("case-ref") String caseRef,
+                                     SupplementaryDataUpdateRequest supplementaryData);
 
     }

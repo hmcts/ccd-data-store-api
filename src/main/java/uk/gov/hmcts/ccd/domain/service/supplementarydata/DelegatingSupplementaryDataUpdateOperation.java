@@ -16,18 +16,15 @@ import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 @Qualifier("default")
 public class DelegatingSupplementaryDataUpdateOperation implements SupplementaryDataUpdateOperation {
 
-    private final CaseDetailsRepository caseDetailsRepository;
     private final PersistenceStrategyResolver persistenceResolver;
     private final DefaultSupplementaryDataUpdateOperation defaultSupplementaryDataUpdateOperation;
     private final ServicePersistenceAPI servicePersistenceAPI;
 
     @Autowired
     public DelegatingSupplementaryDataUpdateOperation(
-        @Qualifier("default") CaseDetailsRepository caseDetailsRepository,
         PersistenceStrategyResolver persistenceResolver,
         @Qualifier("db") DefaultSupplementaryDataUpdateOperation defaultSupplementaryDataUpdateOperation,
         ServicePersistenceAPI servicePersistenceAPI) {
-        this.caseDetailsRepository = caseDetailsRepository;
         this.persistenceResolver = persistenceResolver;
         this.defaultSupplementaryDataUpdateOperation = defaultSupplementaryDataUpdateOperation;
         this.servicePersistenceAPI = servicePersistenceAPI;
@@ -38,11 +35,12 @@ public class DelegatingSupplementaryDataUpdateOperation implements Supplementary
         Optional<URI> serviceUrl = persistenceResolver.resolveUrl(caseReference);
 
         if (serviceUrl.isPresent()) {
-            return servicePersistenceAPI.updateSupplementaryData(
+            var updated = servicePersistenceAPI.updateSupplementaryData(
                 serviceUrl.get(),
                 caseReference,
                 supplementaryData
             );
+            return new SupplementaryData(updated, supplementaryData.getPropertiesNames());
         }
 
         return defaultSupplementaryDataUpdateOperation.updateSupplementaryData(caseReference, supplementaryData);
