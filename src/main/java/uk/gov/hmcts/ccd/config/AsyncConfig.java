@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 @SuppressWarnings({"PMD.DoNotUseThreads"})
 public class AsyncConfig implements AsyncConfigurer {
 
-    @Bean(name = "TaskExecutor")
+    @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
         return Executors.newVirtualThreadPerTaskExecutor();
     }

@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.feign;
 
 import feign.FeignException;
-import feign.Request;
-import feign.Request.HttpMethod;
 import feign.Response;
 import feign.RetryableException;
+import feign.Request;
+import feign.Request.HttpMethod;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -46,88 +46,70 @@ class FeignErrorDecoderTest {
 
     @Test
     void shouldReturnRetryableExceptionForPostRequestWithCaseActionUrlAndStatus400() {
-        Response response = buildResponse(401, POST_METHOD, CASE_ACTION_URL);
-        Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
-        assertThat(ex).isInstanceOf(RetryableException.class);
+        isRetryableException(400, POST_METHOD, CASE_ACTION_URL);
     }
 
     @Test
     void shouldReturnRetryableExceptionForPostRequestWithSearchUrlAndStatus500() {
-        Response response = buildResponse(500, POST_METHOD, CASE_SEARCH_URL);
-        Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
-        assertThat(ex).isInstanceOf(RetryableException.class);
+        isRetryableException(500, POST_METHOD, CASE_SEARCH_URL);
     }
 
     @Test
     void shouldReturnFeignExceptionForPostRequestWithoutCaseActionOrCaseSerachUrl() {
-        Response response = buildResponse(403, POST_METHOD, "http://localhost/service/validate");
-        Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
-        assertThat(ex).isInstanceOf(FeignException.class)
-            .isNotInstanceOf(RetryableException.class);
+        isNotRetryableException(403, POST_METHOD, "http://localhost/service/validate");
     }
 
     @Test
     void shouldReturnFeignExceptionForGetRequestEvenWithCaseActionUrl() {
-        Response response = buildResponse(401, "GET", CASE_ACTION_URL);
-        Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
-        assertThat(ex).isInstanceOf(FeignException.class)
-            .isNotInstanceOf(RetryableException.class);
+        isNotRetryableException(401, "GET", CASE_ACTION_URL);
     }
 
     @Test
     void shouldReturnFeignExceptionForPutRequestWithCaseSearchUrl() {
-        Response response = buildResponse(403, "PUT", CASE_SEARCH_URL);
-        Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
-        assertThat(ex).isInstanceOf(FeignException.class)
-            .isNotInstanceOf(RetryableException.class);
+        isNotRetryableException(403, "PUT", CASE_SEARCH_URL);
     }
 
     @Test
     void shouldReturnFeignExceptionForPostRequestWithCaseActionUrlAndStatus200() {
-        Response response = buildResponse(200, POST_METHOD, CASE_ACTION_URL);
-        Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
-        assertThat(ex).isInstanceOf(FeignException.class)
-            .isNotInstanceOf(RetryableException.class);
+        isNotRetryableException(200, POST_METHOD, CASE_ACTION_URL);
     }
 
     @Test
     void shouldReturnFeignExceptionForPostRequestWithCaseActionUrlAndStatus399() {
-        Response response = buildResponse(399, POST_METHOD, CASE_ACTION_URL);
-        Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
-        assertThat(ex).isInstanceOf(FeignException.class)
-            .isNotInstanceOf(RetryableException.class);
+        isNotRetryableException(399, POST_METHOD, CASE_ACTION_URL);
     }
 
     @Test
     void shouldReturnRetryableExceptionForPostRequestWithCaseActionInPath() {
-        Response response = buildResponse(403, POST_METHOD, "http://localhost/api/v1/audit/caseAction/user");
-        Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
-        assertThat(ex).isInstanceOf(FeignException.class)
-            .isNotInstanceOf(RetryableException.class);
+        isNotRetryableException(403, POST_METHOD, "http://localhost/api/v1/audit/caseAction/user");
     }
 
     @Test
     void shouldReturnRetryableExceptionForPostRequestWithCaseSearchInPath() {
-        Response response = buildResponse(403, POST_METHOD, "http://localhost/api/v1/audit/caseSearch/user");
-        Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
-        assertThat(ex).isInstanceOf(FeignException.class)
-            .isNotInstanceOf(RetryableException.class);
+        isNotRetryableException(403, POST_METHOD, "http://localhost/api/v1/audit/caseSearch/user");
     }
 
     @Test
     void shouldReturnRetryableExceptionForPostRequestWithCaseActionAsQueryParam() {
-        Response response = buildResponse(401, POST_METHOD, "http://localhost/api?endpoint=/audit/caseAction&user=123");
+        isNotRetryableException(401, POST_METHOD, "http://localhost/api?endpoint=/audit/caseAction&user=123");
+    }
+
+    @Test
+    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchAsQueryParam() {
+        isNotRetryableException(401, POST_METHOD, "http://localhost/api?endpoint=/audit/caseSearch&user=123");
+    }
+
+    private void isNotRetryableException(int status, String method, String url) {
+        Response response = buildResponse(status, method, url);
         Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
         assertThat(ex).isInstanceOf(FeignException.class)
             .isNotInstanceOf(RetryableException.class);
     }
 
-    @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchAsQueryParam() {
-        Response response = buildResponse(401, POST_METHOD, "http://localhost/api?endpoint=/audit/caseSearch&user=123");
+    private void isRetryableException(int status, String method, String url) {
+        Response response = buildResponse(status, method, url);
         Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
-        assertThat(ex).isInstanceOf(FeignException.class)
-            .isNotInstanceOf(RetryableException.class);
+        assertThat(ex).isInstanceOf(RetryableException.class);
     }
 }
 
