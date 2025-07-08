@@ -43,3 +43,4 @@ befta_recent_executions_info_LOCAL.json
 
 lib/applicationinsights-agent-*.jar
 lib/applicationinsights.log
+/pacts/
