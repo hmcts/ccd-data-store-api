@@ -7,17 +7,17 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -47,7 +47,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -64,17 +64,17 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.collection.IsIn.isIn;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.core.Every.everyItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
@@ -159,14 +159,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     private JdbcTemplate template;
 
-    @SpyBean
+    @MockitoSpyBean
     private AuditRepository auditRepository;
 
     private static final String REFERENCE_2 = "1504259907353545";
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
@@ -180,7 +180,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn409WhenPostCreateCaseAndNonUniqueReferenceOccursTwiceForCaseworker() throws Exception {
-        when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE);
+        when(uidService.generateUID()).thenReturn(REFERENCE);
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -394,7 +394,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  },\n" +
                 "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
                 "  \"D8Document\":{" +
-                "    \"document_url\": \"http://localhost:" + getPort()
+                "    \"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
                 + "  \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}" +
@@ -410,7 +410,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  },\n" +
                 "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
                 "  \"D8Document\":{\n" +
-                "    \"document_url\": \"http://localhost:" + getPort()
+                "    \"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
                 "    \"document_binary_url\": \"http://localhost:[port]/documents/"
                 + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
@@ -436,8 +436,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
-        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData
-            .entrySet())));
+
+        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));  
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -447,8 +447,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
-        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(
-            sanitizedDataMap.entrySet())));
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(is(in(
+            sanitizedDataMap.entrySet()))));
         assertEquals("Incorrect security classification size", 5, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree(
             "{" +
@@ -897,7 +897,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort()
+                + "\"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
                 + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}"
@@ -912,7 +912,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "  \"D8Document\":{\n"
-                + "    \"document_url\": \"http://localhost:" + getPort()
+                + "    \"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
                 + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
                 + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
@@ -939,8 +939,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
-        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData
-            .entrySet())));
+        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));  
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -950,8 +949,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
-        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(
-            sanitizedDataMap.entrySet())));
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(is(in(
+            sanitizedDataMap.entrySet()))));
         assertEquals("Incorrect security classification size", 4, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
             "  \"PersonAddress\":{" +
@@ -1018,10 +1017,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         GlobalSearchTestFixture.assertGlobalSearchData(actualData.getData());
     }
 
-    private int getPort() {
-        return super.wiremockPort;
-    }
-
     @Test
     public void shouldReturn422WhenPostCreateCaseWithMissingDocumentBinaryLinkForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
@@ -1034,7 +1029,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort()
+                + "\"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\",\n"
                 + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}"
@@ -1073,7 +1068,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort()
+                + "\"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\",\n"
                 + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}"
@@ -3612,16 +3607,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  }\n" +
                 "}\n"
         );
-        Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
+        Map<Object,Object> expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         JsonNode caseData = mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data");
         JsonNode dataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("data_classification");
-        Map actualData = mapper.readValue(caseData.toString(), Map.class);
-        assertAll(() -> assertThat("Incorrect Response Content",
-            actualData.entrySet(),
-            everyItem(isIn(expectedSanitizedData.entrySet()))),
-            () -> assertThat("Response contains filtered out data", caseData.has("PersonFirstName"),
-                is(false)),
+        Map<Object,Object> actualData = mapper.readValue(caseData.toString(), Map.class);
+        assertAll(() -> 
+            assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet()
+                .containsAll(actualData.entrySet())),
+            () -> assertThat("Response contains filtered out data", 
+                caseData.has("PersonFirstName"), is(false)),
             () -> assertThat(dataClassification.has("PersonFirstName"), CoreMatchers.is(false)),
             () -> assertThat(dataClassification.has("PersonLastName"), CoreMatchers.is(true)),
             () -> assertThat(dataClassification.has("PersonAddress"), CoreMatchers.is(true))
@@ -3673,7 +3668,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertThat(mvcResult.getResponse().getContentAsString(), CoreMatchers.is(isEmptyString()));
+        assertThat(mvcResult.getResponse().getContentAsString(), CoreMatchers.is(emptyString()));
     }
 
     private void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess(String userRole)
@@ -3705,7 +3700,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        assertThat(response, CoreMatchers.is(isEmptyString()));
+        assertThat(response, CoreMatchers.is(emptyString()));
     }
 
 
@@ -4237,7 +4232,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"," +
             "\"D8Document\":{" +
-            "    \"document_url\": \"http://localhost:" + getPort()
+            "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
             "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
             + "/binary\","
@@ -4285,7 +4280,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
         assertThat(
             "Incorrect Data content: Data should have changed",
-            savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedDataMap.entrySet())));
+            savedCaseDetails.getData().entrySet(), everyItem(is(in(sanitizedDataMap.entrySet()))));
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
         JSONAssert.assertEquals(expectedClassificationString,
             mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode
@@ -4371,7 +4366,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
         assertThat(
             "Incorrect Data content: Data should have changed",
-            savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedDataMap.entrySet())));
+            savedCaseDetails.getData().entrySet(), everyItem(is(in(sanitizedDataMap.entrySet()))));
     }
 
     @Test
@@ -5274,7 +5269,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"PersonLastName\":\"_ Roof\","
             + "\"PersonFirstName\":\"_ George\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort()
+            + "\"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "}"
@@ -5292,7 +5287,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"PersonLastName\":\"_ Roof\","
             + "\"PersonFirstName\":\"_ George\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort()
+            + "\"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "}"
@@ -5622,7 +5617,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "      \"PersonFirstName\" : \"_ George\",\n"
             + "      \"TelephoneNumber\" : \"_ 07865645667\",\n"
             + "      \"D8Document\" : {\n"
-            + "        \"document_url\" : \"http://localhost:" + this.getPort()
+            + "        \"document_url\" : \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "        \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "      }\n"
@@ -5646,7 +5641,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null,"
             + "\"last_state_modified_date\":null,\"security_classification\":null,"
             + "\"case_data\":{\"PersonLastName\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
-            + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort()
+            + "\"D8Document\":{\"document_url\":\"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\"}},"
             + "\"data_classification\":null,\"supplementary_data\":null,\"after_submit_callback_response\":null,"
@@ -5685,7 +5680,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .withOrder(pageOrder)
             .withField(caseViewField1)
             .withField(caseViewField2)
-            .withCallBackURLMidEvent("http://localhost:" + getPort() + eventCallBackURI)
+            .withCallBackURLMidEvent(hostUrl + eventCallBackURI)
             .build();
     }
 
@@ -5730,7 +5725,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseNumber\":\"_ 1234567\","
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5746,7 +5741,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseField41\":\"_ Test987\","
             + "\"CaseField42\":\"_ Test567\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5756,7 +5751,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"PersonLastName\":\"Roof\","
             + "\"PersonFirstName\":\"George\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5768,7 +5763,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseNumber\":\"_ 1234567\","
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5780,7 +5775,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseNumber\":\"_ 1234567\","
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "},"
             + "\"TTL\":{"
             + "\"Suspended\": \"No\","

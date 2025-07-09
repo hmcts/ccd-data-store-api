@@ -1,20 +1,20 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@ApiModel(description = "")
+@Schema
 public class Version implements Serializable, Copyable<Version> {
 
     private Integer number = null;
     private Date liveFrom = null;
     private Date liveUntil = null;
 
-    @ApiModelProperty(required = true, value = "Sequantial version number")
+    @Schema(required = true, description = "Sequantial version number")
     @JsonProperty("number")
     public Integer getNumber() {
         return number;
@@ -27,7 +27,7 @@ public class Version implements Serializable, Copyable<Version> {
     /**
      * Date and time from when this version is valid from.
      **/
-    @ApiModelProperty(required = true, value = "Date and time from when this version is valid from")
+    @Schema(required = true, description = "Date and time from when this version is valid from")
     @JsonProperty("live_from")
     public Date getLiveFrom() {
         return liveFrom;
@@ -40,7 +40,7 @@ public class Version implements Serializable, Copyable<Version> {
     /**
      * Date and time this version is to be retired.
      **/
-    @ApiModelProperty(value = "Date and time this version is to be retired")
+    @Schema(description = "Date and time this version is to be retired")
     @JsonProperty("live_until")
     public Date getLiveUntil() {
         return liveUntil;

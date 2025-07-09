@@ -35,7 +35,7 @@ class CachedUserRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         cachedUserRepository = new uk.gov.hmcts.ccd.data.user.CachedUserRepository(userRepository);
     }

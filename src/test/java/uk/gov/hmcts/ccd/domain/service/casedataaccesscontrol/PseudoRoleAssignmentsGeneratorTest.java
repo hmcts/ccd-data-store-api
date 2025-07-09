@@ -50,7 +50,7 @@ class PseudoRoleAssignmentsGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         pseudoRoleAssignmentsGenerator = new PseudoRoleAssignmentsGenerator(userRepository,
                                                                             caseDefinitionRepository,
