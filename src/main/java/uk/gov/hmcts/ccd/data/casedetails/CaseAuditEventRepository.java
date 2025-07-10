@@ -29,18 +29,15 @@ public class CaseAuditEventRepository {
 
     private final CaseAuditEventMapper caseAuditEventMapper;
     private final DecentralisedCaseAuditEventRepository decentralisedCaseAuditEventRepository;
-    private final PersistenceStrategyResolver resolver;
 
     @PersistenceContext
     private EntityManager em;
 
     @Inject
     public CaseAuditEventRepository(final CaseAuditEventMapper caseAuditEventMapper,
-                                    final DecentralisedCaseAuditEventRepository decentralisedCaseAuditEventRepository,
-                                    final PersistenceStrategyResolver resolver) {
+                                    final DecentralisedCaseAuditEventRepository decentralisedCaseAuditEventRepository) {
         this.caseAuditEventMapper = caseAuditEventMapper;
         this.decentralisedCaseAuditEventRepository = decentralisedCaseAuditEventRepository;
-        this.resolver = resolver;
     }
 
     public AuditEvent set(final AuditEvent auditEvent) {
@@ -50,10 +47,6 @@ public class CaseAuditEventRepository {
     }
 
     public List<AuditEvent> findByCase(final CaseDetails caseDetails) {
-        if (resolver.isDecentralised(caseDetails)) {
-            return decentralisedCaseAuditEventRepository.findByCase(caseDetails);
-        }
-
         final List<CaseAuditEventEntity> resultList = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_CASE)
             .setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()))
             .unwrap(org.hibernate.query.Query.class)
@@ -61,17 +54,6 @@ public class CaseAuditEventRepository {
             .getResultList();
 
         return caseAuditEventMapper.entityToModel(resultList);
-    }
-
-    public Optional<AuditEvent> getCreateEvent(CaseDetails caseDetails) {
-        final Query query = em.createNamedQuery(CaseAuditEventEntity.FIND_CREATE_EVENT);
-
-        query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()));
-        List<CaseAuditEventEntity> auditEvents = query.getResultList();
-
-        return (auditEvents == null || auditEvents.size() == 0)
-              ? Optional.empty()
-              : Optional.of(caseAuditEventMapper.entityToModel(auditEvents.get(0)));
     }
 
     public Optional<AuditEvent> findByEventId(Long eventId) {

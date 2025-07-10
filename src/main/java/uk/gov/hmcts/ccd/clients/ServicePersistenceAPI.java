@@ -31,6 +31,11 @@ public interface ServicePersistenceAPI {
     @GetMapping(value = "/ccd/cases/{case-ref}/history")
     List<AuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") String caseReference);
 
+    @GetMapping(value = "/ccd/cases/{case-ref}/history/{event-id}")
+    AuditEvent getCaseHistoryEvent(URI baseURI,
+                                   @PathVariable("case-ref") String caseReference,
+                                   @PathVariable("event-id") Long eventId);
+
     @PostMapping(value = "/ccd/cases/{case-ref}/supplementary-data", consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     JsonNode updateSupplementaryData(URI baseURI, @PathVariable("case-ref") String caseRef,

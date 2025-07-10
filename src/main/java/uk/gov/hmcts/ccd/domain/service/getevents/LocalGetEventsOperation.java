@@ -6,11 +6,9 @@ import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
@@ -18,13 +16,12 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Service
-@Qualifier("default")
-public class DefaultGetEventsOperation implements GetEventsOperation {
+@Qualifier("local")
+public class LocalGetEventsOperation implements GetEventsOperation {
 
     private final CaseAuditEventRepository auditEventRepository;
     private final GetCaseOperation getCaseOperation;
     private final UIDService uidService;
-    private final PersistenceStrategyResolver resolver;
     private static final String RESOURCE_NOT_FOUND //
         = "No case found ( jurisdiction = '%s', case type id = '%s', case reference = '%s' )";
     private static final String CASE_RESOURCE_NOT_FOUND //
@@ -32,15 +29,13 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     private static final String CASE_EVENT_NOT_FOUND = "Case audit events not found";
 
     @Autowired
-    public DefaultGetEventsOperation(
+    public LocalGetEventsOperation(
             CaseAuditEventRepository auditEventRepository,
             @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
-            UIDService uidService,
-            final PersistenceStrategyResolver resolver) {
+            UIDService uidService) {
         this.auditEventRepository = auditEventRepository;
         this.getCaseOperation = getCaseOperation;
         this.uidService = uidService;
-        this.resolver = resolver;
     }
 
     @Override
@@ -72,10 +67,6 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
 
     @Override
     public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
-        // TODO: Looks like we need to fetch individual case events by id
-        if (resolver.isDecentralised(caseDetails)) {
-            return getEvents(caseDetails).stream().filter(event -> event.getId().equals(eventId)).findFirst();
-        }
         return auditEventRepository.findByEventId(eventId).map(Optional::of)
                 .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }
