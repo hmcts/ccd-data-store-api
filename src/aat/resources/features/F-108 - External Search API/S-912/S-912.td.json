@@ -5,7 +5,7 @@
     "private multi jurisdiction access",
     "is configured to search for both the previously created cases",
     "contains details of 2 previously created cases",
-    "does not return the case field where user role has lower security classification than case field"
+    "returns all case fields regardless of field-level classification which is now disabled"
   ],
 
   "user": {
@@ -40,7 +40,8 @@
         "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-912_Create_Case_Private_Autotest1]}",
         "case_data": {
           "NumberFieldAlias": "912",
-          "TextFieldAlias": "text"
+          "TextFieldAlias": "text",
+          "EmailFieldAlias": "fuctional@test.com"
         }
       },{
         "_extends_" : "F-108_Base_Case_Fields_expected",
@@ -49,7 +50,8 @@
         "case_type_id" : "AAT_PRIVATE2",
         "case_data": {
           "NumberFieldAlias": "912",
-          "TextFieldAlias": "text"
+          "TextFieldAlias": "text",
+          "EmailFieldAlias": "fuctional@test.com"
         }
       }],
       "case_types_results" : [{
