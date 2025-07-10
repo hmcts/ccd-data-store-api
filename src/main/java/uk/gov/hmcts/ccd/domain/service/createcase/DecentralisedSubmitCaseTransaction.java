@@ -68,12 +68,9 @@ public class DecentralisedSubmitCaseTransaction {
         try {
             var uri = resolver.resolveUriOrThrow(decentralisedCaseEvent.getCaseDetails());
             CaseDetails caseDetails = servicePersistenceAPI.createEvent(uri, decentralisedCaseEvent);
-            log.info("pocCaseDetails: {}", caseDetails);
-            log.info("pocCaseDetails id: {}", caseDetails.getId());
-            log.info("pocCaseDetails reference before: {}", caseDetails.getReference());
+            // We currently need an ID for the case details to be set because it is written to ccd's db.
+            // TODO: remove when enableCaseUsersDbSync is switched off and that functionality removed.
             caseDetails.setId(caseDetails.getReference().toString());
-            caseDetails.setReference(caseDetails.getReference());
-            log.info("pocCaseDetails reference: {}", caseDetails.getReference());
 
             return caseDetails;
         } catch (FeignException.Conflict conflict) {
