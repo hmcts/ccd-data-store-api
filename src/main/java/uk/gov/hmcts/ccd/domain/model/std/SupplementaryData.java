@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @ToString
@@ -40,7 +41,11 @@ public class SupplementaryData {
                     Object value = context.read("$." + key, Object.class);
                     this.response.put(key, value);
                 } catch (PathNotFoundException e) {
-                    throw new ServiceException(String.format("Path %s is not found", key));
+                    if (key.contains(NewCaseUtils.ORG_POLICY_NEW_CASE)) {
+                        this.response.put(key, null);
+                    } else {
+                        throw new ServiceException(String.format("Path %s is not found", key));
+                    }
                 }
             });
         }
