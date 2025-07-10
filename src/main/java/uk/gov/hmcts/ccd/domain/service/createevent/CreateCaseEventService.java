@@ -96,7 +96,7 @@ public class CreateCaseEventService {
     private final TimeToLiveService timeToLiveService;
     private final CaseLinkService caseLinkService;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
-    private final POCCreateCaseEventService pocCreateCaseEventService;
+    private final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService;
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final PersistenceStrategyResolver resolver;
@@ -134,7 +134,7 @@ public class CreateCaseEventService {
                                   final ApplicationParams applicationParams,
                                   final CaseAccessGroupUtils caseAccessGroupUtils,
                                   final CaseDocumentTimestampService caseDocumentTimestampService,
-                                  final POCCreateCaseEventService pocCreateCaseEventService,
+                                  final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
                                   final PersistenceStrategyResolver resolver) {
 
         this.userRepository = userRepository;
@@ -166,7 +166,7 @@ public class CreateCaseEventService {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-        this.pocCreateCaseEventService = pocCreateCaseEventService;
+        this.decentralisedCreateCaseEventService = decentralisedCreateCaseEventService;
         this.resolver = resolver;
     }
 
@@ -249,7 +249,7 @@ public class CreateCaseEventService {
         boolean isDecentralised = resolver.isDecentralised(caseDetailsInDatabase);
 
         CaseDetails finalCaseDetails = isDecentralised
-                ? pocCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(), caseEventDefinition,
+                ? decentralisedCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(), caseEventDefinition,
                 caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase)
                 : saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
                 newState, timeNow);
@@ -340,7 +340,7 @@ public class CreateCaseEventService {
         boolean isDecentralised = resolver.isDecentralised(caseDetailsInDatabase);
 
         CaseDetails finalCaseDetails = isDecentralised
-                ? pocCreateCaseEventService.saveAuditEventForCaseDetails(event, caseEventDefinition,
+                ? decentralisedCreateCaseEventService.saveAuditEventForCaseDetails(event, caseEventDefinition,
                 caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase)
                 : saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
                 newState, timeNow);

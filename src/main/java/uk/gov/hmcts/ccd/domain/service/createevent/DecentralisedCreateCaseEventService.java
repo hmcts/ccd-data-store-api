@@ -2,10 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.clients.ServicePersistenceAPI;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedEventDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -13,23 +11,21 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
-import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 
 @Slf4j
 @Service
-public class POCCreateCaseEventService {
+public class DecentralisedCreateCaseEventService {
 
     private final CaseTypeService caseTypeService;
     private final ServicePersistenceAPI servicePersistenceAPI;
     private final PersistenceStrategyResolver resolver;
 
-    public POCCreateCaseEventService(final CaseTypeService caseTypeService,
-                                     final ServicePersistenceAPI servicePersistenceAPI,
-                                     final PersistenceStrategyResolver resolver) {
+    public DecentralisedCreateCaseEventService(final CaseTypeService caseTypeService,
+                                               final ServicePersistenceAPI servicePersistenceAPI,
+                                               final PersistenceStrategyResolver resolver) {
         this.caseTypeService = caseTypeService;
         this.servicePersistenceAPI = servicePersistenceAPI;
         this.resolver = resolver;
