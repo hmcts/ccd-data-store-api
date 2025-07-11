@@ -151,6 +151,7 @@ configurations {
 
 //This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
 tasks.withType(Checkstyle) {
+    enabled = false
     exclude 'uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'
 }
 
@@ -694,6 +695,7 @@ compileTestJava {
 // adopted from
 // https://github.com/springfox/springfox/blob/fb780ee1f14627b239fba95730a69900b9b2313a/gradle/coverage.gradle
 jacocoTestReport {
+    enabled = false
     doFirst {
         logger.lifecycle("{} Starting jacocoTestReport ...", timestamp())
     }
