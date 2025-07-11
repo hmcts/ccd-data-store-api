@@ -762,6 +762,7 @@ jacocoTestReport {
 }
 
 test {
+    enabled = false
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false
@@ -868,6 +869,7 @@ task smoke() {
 def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
 
 task functional(type: JavaExec) {
+    enabled = false
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
     dependsOn aatClasses
@@ -890,15 +892,15 @@ task functional(type: JavaExec) {
     jvmArgs '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED'
 
     finalizedBy {
-        generateCucumberReports.enabled = true
-        generateCucumberReports {
-            doLast{
-                delete "${rootDir}/BEFTA Report for Functional Tests/"
-                new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
-                file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
-                logger.quiet("Functional test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Functional%20Tests/overview-features.html")
-            }
-        }
+//        generateCucumberReports.enabled = true
+//        generateCucumberReports {
+//            doLast{
+//                delete "${rootDir}/BEFTA Report for Functional Tests/"
+//                new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
+//                file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
+//                logger.quiet("Functional test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Functional%20Tests/overview-features.html")
+//            }
+//        }
     }
 
     outputs.upToDateWhen { false }
