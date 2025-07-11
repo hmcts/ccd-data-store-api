@@ -16,8 +16,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Service
-@Qualifier("default")
-public class DefaultGetEventsOperation implements GetEventsOperation {
+@Qualifier("local")
+public class LocalGetEventsOperation implements GetEventsOperation {
 
     private final CaseAuditEventRepository auditEventRepository;
     private final GetCaseOperation getCaseOperation;
@@ -29,8 +29,10 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     private static final String CASE_EVENT_NOT_FOUND = "Case audit events not found";
 
     @Autowired
-    public DefaultGetEventsOperation(CaseAuditEventRepository auditEventRepository, @Qualifier(
-        CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation, UIDService uidService) {
+    public LocalGetEventsOperation(
+            CaseAuditEventRepository auditEventRepository,
+            @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
+            UIDService uidService) {
         this.auditEventRepository = auditEventRepository;
         this.getCaseOperation = getCaseOperation;
         this.uidService = uidService;
@@ -66,6 +68,6 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     @Override
     public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
         return auditEventRepository.findByEventId(eventId).map(Optional::of)
-            .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }
 }

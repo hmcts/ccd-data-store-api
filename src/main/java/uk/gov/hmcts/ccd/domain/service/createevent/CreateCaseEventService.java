@@ -33,6 +33,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -95,8 +96,10 @@ public class CreateCaseEventService {
     private final TimeToLiveService timeToLiveService;
     private final CaseLinkService caseLinkService;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
+    private final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService;
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
+    private final PersistenceStrategyResolver resolver;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -130,7 +133,9 @@ public class CreateCaseEventService {
                                   final CaseLinkService caseLinkService,
                                   final ApplicationParams applicationParams,
                                   final CaseAccessGroupUtils caseAccessGroupUtils,
-                                  final CaseDocumentTimestampService caseDocumentTimestampService) {
+                                  final CaseDocumentTimestampService caseDocumentTimestampService,
+                                  final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
+                                  final PersistenceStrategyResolver resolver) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -161,7 +166,8 @@ public class CreateCaseEventService {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-
+        this.decentralisedCreateCaseEventService = decentralisedCreateCaseEventService;
+        this.resolver = resolver;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -240,29 +246,31 @@ public class CreateCaseEventService {
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 
-        final CaseDetails savedCaseDetails = saveCaseDetails(
-            caseDetailsInDatabase,
-            caseDetailsAfterCallbackWithoutHashes,
-            caseEventDefinition,
-            newState,
-            timeNow
-        );
+        boolean isDecentralised = resolver.isDecentralised(caseDetailsInDatabase);
 
-        caseLinkService.updateCaseLinks(savedCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+        CaseDetails finalCaseDetails = isDecentralised
+                ? decentralisedCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(), caseEventDefinition,
+                caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase)
+                : saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
+                newState, timeNow);
 
-        saveAuditEventForCaseDetails(
-            aboutToSubmitCallbackResponse,
-            content.getEvent(),
-            caseEventDefinition,
-            savedCaseDetails,
-            caseTypeDefinition,
-            timeNow,
-            oldState,
-            content.getOnBehalfOfUserToken(),
-            content.getOnBehalfOfId(),
-            securityClassificationService.getClassificationForEvent(caseTypeDefinition,
-                caseEventDefinition)
-        );
+        caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+
+        if (!isDecentralised) {
+            saveAuditEventForCaseDetails(
+                    aboutToSubmitCallbackResponse,
+                    content.getEvent(),
+                    caseEventDefinition,
+                    finalCaseDetails,
+                    caseTypeDefinition,
+                    timeNow,
+                    oldState,
+                    content.getOnBehalfOfUserToken(),
+                    content.getOnBehalfOfId(),
+                    securityClassificationService.getClassificationForEvent(caseTypeDefinition,
+                            caseEventDefinition)
+            );
+        }
 
         caseDocumentService.attachCaseDocuments(
             caseDetails.getReferenceAsString(),
@@ -273,7 +281,7 @@ public class CreateCaseEventService {
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
-            .savedCaseDetails(savedCaseDetails)
+            .savedCaseDetails(finalCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
     }
@@ -329,25 +337,28 @@ public class CreateCaseEventService {
             caseDetailsAfterCallback
         );
 
-        final CaseDetails savedCaseDetails = saveCaseDetails(
-            caseDetailsInDatabase,
-            caseDetailsAfterCallbackWithoutHashes,
-            caseEventDefinition,
-            newState,
-            timeNow
-        );
-        saveAuditEventForCaseDetails(
-            aboutToSubmitCallbackResponse,
-            event,
-            caseEventDefinition,
-            savedCaseDetails,
-            caseTypeDefinition,
-            timeNow,
-            oldState,
-            null,
-            null,
-            SecurityClassification.PUBLIC
-        );
+        boolean isDecentralised = resolver.isDecentralised(caseDetailsInDatabase);
+
+        CaseDetails finalCaseDetails = isDecentralised
+                ? decentralisedCreateCaseEventService.saveAuditEventForCaseDetails(event, caseEventDefinition,
+                caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase)
+                : saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
+                newState, timeNow);
+
+        if (!isDecentralised) {
+            saveAuditEventForCaseDetails(
+                    aboutToSubmitCallbackResponse,
+                    event,
+                    caseEventDefinition,
+                    finalCaseDetails,
+                    caseTypeDefinition,
+                    timeNow,
+                    oldState,
+                    null,
+                    null,
+                    SecurityClassification.PUBLIC
+            );
+        }
 
         caseDocumentService.attachCaseDocuments(
             caseDetails.getReferenceAsString(),
@@ -358,7 +369,7 @@ public class CreateCaseEventService {
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
-            .savedCaseDetails(savedCaseDetails)
+            .savedCaseDetails(finalCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
     }

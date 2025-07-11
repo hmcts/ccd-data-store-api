@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -30,14 +31,17 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     private final EventValidator eventValidator;
     private final CreateCaseEventService createEventService;
     private final CallbackInvoker callbackInvoker;
+    private final IdempotencyKeyHolder keyHolder;
 
     @Inject
     public DefaultCreateEventOperation(final EventValidator eventValidator,
                                        final CreateCaseEventService createEventService,
-                                       final CallbackInvoker callbackInvoker) {
+                                       final CallbackInvoker callbackInvoker,
+                                       final IdempotencyKeyHolder keyHolder) {
         this.createEventService = createEventService;
         this.eventValidator = eventValidator;
         this.callbackInvoker = callbackInvoker;
+        this.keyHolder = keyHolder;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -46,7 +50,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     public CaseDetails createCaseEvent(final String caseReference,
                                        final CaseDataContent content) {
         eventValidator.validate(content.getEvent());
-
+        keyHolder.computeAndSetKeyToRequestContext(content.getToken());
         final CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(caseReference, content);
 
         if (!isBlank(caseEventResult.getEventTrigger().getCallBackURLSubmittedEvent())) {

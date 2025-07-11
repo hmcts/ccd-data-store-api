@@ -44,13 +44,16 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     private final CaseDataAccessControl caseDataAccessControl;
     private final CaseDefinitionRepository caseDefinitionRepository;
+    private final PersistenceStrategyResolver resolver;
 
     @Autowired
     public SecurityClassificationServiceImpl(CaseDataAccessControl caseDataAccessControl,
                                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                             final CaseDefinitionRepository caseDefinitionRepository) {
+                                             final CaseDefinitionRepository caseDefinitionRepository,
+                                             PersistenceStrategyResolver applicationParams) {
         this.caseDataAccessControl = caseDataAccessControl;
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.resolver = applicationParams;
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
@@ -69,10 +72,12 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
                         cd.setDataClassification(Maps.newHashMap());
                     }
 
-                    JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
-                        JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
-                        securityClassification);
-                    caseDetails.setData(JacksonUtils.convertValue(data));
+                    if (!resolver.isDecentralised(caseDetails)) {
+                        JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                            JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
+                            securityClassification);
+                        caseDetails.setData(JacksonUtils.convertValue(data));
+                    }
                     return cd;
                 }));
     }

@@ -10,8 +10,10 @@ import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.createcase.DecentralisedSubmitCaseTransaction;
 import uk.gov.hmcts.ccd.domain.service.createcase.SubmitCaseTransaction;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
@@ -35,11 +37,13 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              CaseDocumentService caseDocumentService,
                                              ApplicationParams applicationParams,
                                              CaseAccessGroupUtils caseAccessGroupUtils,
-                                             CaseDocumentTimestampService caseDocumentTimestampService) {
+                                             CaseDocumentTimestampService caseDocumentTimestampService,
+                                             DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction,
+                                             PersistenceStrategyResolver resolver) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
             caseDataAccessControl, messageService, caseDocumentService, applicationParams,
-            caseAccessGroupUtils, caseDocumentTimestampService);
+            caseAccessGroupUtils, caseDocumentTimestampService, decentralisedSubmitCaseTransaction, resolver);
 
     }
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
@@ -89,7 +90,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         CaseDetails caseDetails = startEventResult.getCaseDetails();
         if (null != caseDetails) {
             startEventResult.setCaseDetails(classificationService.applyClassification(caseDetails)
-                .orElseThrow(() -> new CaseNotFoundException(caseReference)));
+                    .orElseThrow(() -> new CaseNotFoundException(caseReference)));
         }
         return startEventResult;
     }
