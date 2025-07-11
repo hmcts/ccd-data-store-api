@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -35,8 +34,7 @@ class ClassifiedCreateCaseOperationTest {
 
     @Mock
     private SecurityClassificationServiceImpl classificationService;
-    @Mock
-    private ApplicationParams applicationParams;
+
     private ClassifiedCreateCaseOperation classifiedCreateCaseOperation;
     private CaseDetails caseDetails;
     private CaseDetails classifiedCase;
@@ -53,8 +51,7 @@ class ClassifiedCreateCaseOperationTest {
         classifiedCase = new CaseDetails();
         doReturn(Optional.of(classifiedCase)).when(classificationService).applyClassification(caseDetails, true);
 
-        classifiedCreateCaseOperation = new ClassifiedCreateCaseOperation(createCaseOperation,
-                classificationService);
+        classifiedCreateCaseOperation = new ClassifiedCreateCaseOperation(createCaseOperation, classificationService);
     }
 
     @Test

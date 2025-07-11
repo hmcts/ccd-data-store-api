@@ -109,9 +109,6 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
 
-    @MockBean
-    private DecentralisedCaseDetailsRepository decentralisedCaseDetailsRepository;
-
     @Inject
     private ApplicationParams applicationParams;
 
