@@ -36,7 +36,7 @@ public class PersistenceStrategyResolver {
     }
 
     public boolean isDecentralised(CaseDetails details) {
-        return config.getCaseTypeServiceUrls().containsKey(details.getCaseTypeId());
+        return config.getCaseTypeServiceUrl(details.getCaseTypeId()).isPresent();
     }
 
     public boolean isDecentralised(long reference) {
@@ -45,7 +45,7 @@ public class PersistenceStrategyResolver {
 
     public boolean isDecentralised(String reference) {
         var details = caseDetailsRepository.findByReferenceWithNoAccessControl(reference).get();
-        return config.getCaseTypeServiceUrls().containsKey(details.getCaseTypeId());
+        return config.getCaseTypeServiceUrl(details.getCaseTypeId()).isPresent();
     }
 
 
@@ -74,7 +74,7 @@ public class PersistenceStrategyResolver {
             return Optional.empty();
         }
 
-        Optional<URI> url = Optional.ofNullable(config.getCaseTypeServiceUrls().get(caseDetailsOptional.get().getCaseTypeId()));
+        Optional<URI> url = config.getCaseTypeServiceUrl(caseDetailsOptional.get().getCaseTypeId());
         return url;
     }
 
@@ -89,12 +89,12 @@ public class PersistenceStrategyResolver {
             throw new UnsupportedOperationException();
         }
 
-        return config.getCaseTypeServiceUrls().get(caseDetailsOptional.get().getCaseTypeId());
+        return config.getCaseTypeServiceUrl(caseDetailsOptional.get().getCaseTypeId()).orElseThrow();
     }
 
 
     public URI resolveUriOrThrow(CaseDetails caseDetails) {
-        Optional<URI> url = Optional.ofNullable(config.getCaseTypeServiceUrls().get(caseDetails.getCaseTypeId()));
+        Optional<URI> url = config.getCaseTypeServiceUrl(caseDetails.getCaseTypeId());
         if (url.isPresent()) {
             return url.get();
         }
