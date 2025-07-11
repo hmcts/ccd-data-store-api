@@ -81,6 +81,9 @@ public class SecurityClassificationServiceTest {
     @Mock
     private ApplicationParams applicationParams;
 
+    @Mock
+    private PersistenceStrategyResolver resolver;
+
     private CaseDetails caseDetails;
 
     @BeforeEach
@@ -93,7 +96,7 @@ public class SecurityClassificationServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         securityClassificationService = spy(new SecurityClassificationServiceImpl(caseDataAccessControl,
-            caseDefinitionRepository));
+            caseDefinitionRepository, resolver));
     }
 
     @Nested

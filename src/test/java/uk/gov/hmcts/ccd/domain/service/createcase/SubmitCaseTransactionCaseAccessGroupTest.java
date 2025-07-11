@@ -37,6 +37,7 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -135,6 +136,9 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     @Mock
     private DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction;
 
+    @Mock
+    private PersistenceStrategyResolver resolver;
+
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -167,7 +171,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             applicationParams,
             caseAccessGroupUtils,
             caseDocumentTimestampService,
-            decentralisedSubmitCaseTransaction
+            decentralisedSubmitCaseTransaction,
+            resolver
         );
 
         idamUser = buildIdamUser();

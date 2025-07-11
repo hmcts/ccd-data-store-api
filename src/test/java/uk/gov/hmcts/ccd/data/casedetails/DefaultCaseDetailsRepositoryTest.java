@@ -143,7 +143,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         DefaultCaseDetailsRepository defaultCaseDetailsRepository =
             new DefaultCaseDetailsRepository(caseDetailsMapper, null, null,
-                applicationParams, decentralisedCaseDetailsRepository);
+                applicationParams);
 
         Field emField = DefaultCaseDetailsRepository.class.getDeclaredField("em");
         emField.setAccessible(true);
