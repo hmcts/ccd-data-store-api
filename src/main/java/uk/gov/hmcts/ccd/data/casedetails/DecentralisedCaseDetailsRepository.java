@@ -32,17 +32,17 @@ public class DecentralisedCaseDetailsRepository implements CaseDetailsRepository
 
     @Override
     public Optional<CaseDetails> findById(String jurisdiction, Long id) {
-        return Optional.empty();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CaseDetails findById(Long id) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Long> findCaseReferencesByIds(List<Long> ids) {
-        return List.of();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -73,14 +73,8 @@ public class DecentralisedCaseDetailsRepository implements CaseDetailsRepository
     private CaseDetails getCaseDetails(String reference) {
         var uri = resolver.resolveUriOrThrow(reference);
         CaseDetails caseDetails = servicePersistenceAPI.getCase(uri, reference);
-        log.info("case Id {}", caseDetails.getId());
-        log.info("case reference {}", caseDetails.getReference());
-        if (Optional.ofNullable(caseDetails).isPresent()) {
-            caseDetails.setId(caseDetails.getReference().toString());
-            caseDetails.setReference(Long.valueOf(reference));
-            log.info("case Id after{}", caseDetails.getId());
-            log.info("case reference after{}", caseDetails.getReference());
-        }
+        // TODO: Remove this when legacy RBAC code is removed which relies on details having an id.
+        caseDetails.setId(caseDetails.getReference().toString());
         return caseDetails;
     }
 

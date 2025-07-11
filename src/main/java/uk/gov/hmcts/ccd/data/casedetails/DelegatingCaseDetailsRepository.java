@@ -49,7 +49,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public List<Long> findCaseReferencesByIds(final List<Long> ids) {
-        // TODO
+        // Case references and ids are stored locally.
         return defaultRepository.findCaseReferencesByIds(ids);
     }
 
@@ -115,23 +115,6 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata,
-                                                        final Map<String, String> dataSearchParams) {
-        return defaultRepository.findByMetaDataAndFieldData(metadata, dataSearchParams);
-    }
-
-    @Override
-    public List<CaseDetails> findByParamsWithLimit(final MigrationParameters migrationParameters) {
-        return defaultRepository.findByParamsWithLimit(migrationParameters);
-    }
-
-    @Override
-    public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData,
-                                                              Map<String, String> dataSearchParams) {
-        return defaultRepository.getPaginatedSearchMetadata(metaData, dataSearchParams);
-    }
-
-    @Override
     public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
         if (resolver.isDecentralised(reference)) {
             return decentralisedCaseDetailsRepository.findByReferenceWithNoAccessControl(reference);
@@ -139,4 +122,31 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
             return defaultRepository.findByReferenceWithNoAccessControl(reference);
         }
     }
+
+    /**
+     * Legacy postgres based search method; Decentralised case types cannot use it.
+     */
+    @Override
+    public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata,
+                                                        final Map<String, String> dataSearchParams) {
+        return defaultRepository.findByMetaDataAndFieldData(metadata, dataSearchParams);
+    }
+
+    /**
+     * Legacy postgres based search method; Decentralised case types cannot use it.
+     */
+    @Override
+    public List<CaseDetails> findByParamsWithLimit(final MigrationParameters migrationParameters) {
+        return defaultRepository.findByParamsWithLimit(migrationParameters);
+    }
+
+    /**
+     * Legacy postgres based search method; Decentralised case types cannot use it.
+     */
+    @Override
+    public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData,
+                                                              Map<String, String> dataSearchParams) {
+        return defaultRepository.getPaginatedSearchMetadata(metaData, dataSearchParams);
+    }
+
 }
