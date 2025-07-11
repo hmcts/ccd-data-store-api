@@ -73,6 +73,12 @@ public class ApplicationParams {
     @Value("${ccd.user-profile.host}")
     private String userProfileHost;
 
+    @Value("${case_document_am.url}")
+    private String caseDocumentAmUrl;
+
+    @Value("${document.sanitiser.case-document-am-api.enabled}")
+    private boolean documentSanitiserCaseDocumentAMEnabled;
+
     @Value("${ccd.document.url.pattern}")
     private String documentURLPattern;
 
@@ -384,6 +390,14 @@ public class ApplicationParams {
 
     public List<Integer> getCallbackRetries() {
         return callbackRetries;
+    }
+
+    public String getCaseDocumentAmUrl() {
+        return caseDocumentAmUrl;
+    }
+
+    public boolean isDocumentSanitiserCaseDocAMEnable() {
+        return documentSanitiserCaseDocumentAMEnabled;
     }
 
     public String getDocumentURLPattern() {
