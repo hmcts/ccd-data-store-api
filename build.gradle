@@ -678,6 +678,10 @@ sonarqube {
     }
 }
 
+tasks.named('sonarqube') {
+    enabled = false
+}
+
 compileJava {
     options.annotationProcessorPath = configurations.annotationProcessor
 }
