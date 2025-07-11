@@ -62,4 +62,4 @@ public interface ServicePersistenceAPI {
     JsonNode updateSupplementaryData(URI baseURI, @PathVariable("case-ref") String caseRef,
                                      SupplementaryDataUpdateRequest supplementaryData);
 
-    }
+}

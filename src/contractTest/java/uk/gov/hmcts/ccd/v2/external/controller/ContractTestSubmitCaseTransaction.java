@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.DecentralisedSubmitCaseTransaction;
@@ -37,11 +38,12 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              ApplicationParams applicationParams,
                                              CaseAccessGroupUtils caseAccessGroupUtils,
                                              CaseDocumentTimestampService caseDocumentTimestampService,
-                                             DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction) {
+                                             DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction,
+                                             PersistenceStrategyResolver resolver) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
             caseDataAccessControl, messageService, caseDocumentService, applicationParams,
-            caseAccessGroupUtils, caseDocumentTimestampService, decentralisedSubmitCaseTransaction);
+            caseAccessGroupUtils, caseDocumentTimestampService, decentralisedSubmitCaseTransaction, resolver);
 
     }
 }

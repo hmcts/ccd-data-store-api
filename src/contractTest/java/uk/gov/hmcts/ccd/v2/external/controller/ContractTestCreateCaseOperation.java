@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdate
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 @Service
 @Qualifier("authorised")
@@ -59,11 +60,12 @@ public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation 
                                                SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
                                            SupplementaryDataUpdateRequestValidator supplementaryDataValidator,
                                            CaseLinkService caseLinkService,
-                                           TimeToLiveService timeToLiveService) {
+                                           TimeToLiveService timeToLiveService,
+                                           final IdempotencyKeyHolder idempotencyKeyHolder) {
         super(userRepository, caseDefinitionRepository, eventTriggerService, eventTokenService, caseDataService,
             submitCaseTransaction, caseSanitiser, caseTypeService, callbackInvoker, validateCaseFieldsOperation,
             casePostStateService, draftGateway, caseDataIssueLogger, globalSearchProcessorService,
-            supplementaryDataUpdateOperation, supplementaryDataValidator, caseLinkService, timeToLiveService);
+            supplementaryDataUpdateOperation, supplementaryDataValidator, caseLinkService, timeToLiveService, idempotencyKeyHolder);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
     }
 
