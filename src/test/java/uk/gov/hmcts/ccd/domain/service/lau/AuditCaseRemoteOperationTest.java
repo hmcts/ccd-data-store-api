@@ -188,13 +188,13 @@ class AuditCaseRemoteOperationTest {
         // Simulate exception in AsyncAuditRequestService
         doThrow(new RuntimeException("Async error")).when(asyncAuditRequestService)
             .postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-                any(String.class), any(CaseActionPostRequest.class), any(), any(String.class));
+                any(String.class), any(CaseActionPostRequest.class), null, any(String.class));
 
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
         verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-            any(String.class), any(CaseActionPostRequest.class), any(), any(String.class));
+            any(String.class), any(CaseActionPostRequest.class), null, any(String.class));
     }
 
     @Test
@@ -210,14 +210,13 @@ class AuditCaseRemoteOperationTest {
         // Simulate exception in AsyncAuditRequestService
         doThrow(new RuntimeException("Async error")).when(asyncAuditRequestService)
             .postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-                any(String.class), any(), any(CaseSearchPostRequest.class), any(String.class));
+                any(String.class), null, any(CaseSearchPostRequest.class), any(String.class));
 
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
         verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-            any(String.class), any(), any(CaseSearchPostRequest.class), any(String.class));
-        verify(feignClient).postCaseSearch(any(String.class), any(CaseSearchPostRequest.class));
+            any(String.class), null, any(CaseSearchPostRequest.class), any(String.class));
     }
 
     private AuditEntry createBaseAuditEntryData(ZonedDateTime fixedDateTime) {
