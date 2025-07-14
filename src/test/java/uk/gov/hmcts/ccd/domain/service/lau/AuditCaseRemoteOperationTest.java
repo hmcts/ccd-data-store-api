@@ -30,8 +30,7 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -111,10 +110,13 @@ class AuditCaseRemoteOperationTest {
 
         // Verify FeignClient interaction
         ArgumentCaptor<CaseActionPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseActionPostRequest.class);
-        verify(feignClient).postCaseAction(any(String.class), requestCaptor.capture());
-        // Verify headers and endpoint
-        verify(feignClient).postCaseAction(eq("Bearer 1234"), any(CaseActionPostRequest.class));
-        assertThat(auditCaseRemoteConfiguration.getCaseActionAuditUrl(), is(equalTo("http://localhost/caseAction")));
+        verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(
+            eq(entry),
+            eq("VIEW"),
+            requestCaptor.capture(),
+            isNull(),
+            eq("http://localhost/caseAction")
+        );
 
         // Assert the captured request
         CaseActionPostRequest capturedRequest = requestCaptor.getValue();
@@ -143,9 +145,13 @@ class AuditCaseRemoteOperationTest {
 
         // Verify FeignClient interaction
         ArgumentCaptor<CaseSearchPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseSearchPostRequest.class);
-        verify(feignClient).postCaseSearch(any(String.class), requestCaptor.capture());
-        verify(feignClient).postCaseSearch(eq("Bearer 1234"), any(CaseSearchPostRequest.class));
-        assertThat(auditCaseRemoteConfiguration.getCaseSearchAuditUrl(), is(equalTo("http://localhost/caseSearch")));
+        verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(
+            eq(entry),
+            eq("SEARCH"),
+            isNull(),
+            requestCaptor.capture(),
+            eq("http://localhost/caseSearch")
+        );
 
         // Assert the captured request
         CaseSearchPostRequest capturedRequest = requestCaptor.getValue();
@@ -179,14 +185,16 @@ class AuditCaseRemoteOperationTest {
         // Setup as viewing a case
         entry.setOperationType(AuditOperationType.CASE_ACCESSED.getLabel());
 
-        // Simulate exception in FeignClient
-        doThrow(new RuntimeException("FeignClient error")).when(feignClient)
-            .postCaseAction(any(String.class), any(CaseActionPostRequest.class));
+        // Simulate exception in AsyncAuditRequestService
+        doThrow(new RuntimeException("Async error")).when(asyncAuditRequestService)
+            .postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
+                any(String.class), any(CaseActionPostRequest.class), any(), any(String.class));
 
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
-        verify(feignClient).postCaseAction(any(String.class), any(CaseActionPostRequest.class));
+        verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
+            any(String.class), any(CaseActionPostRequest.class), any(), any(String.class));
     }
 
     @Test
@@ -199,13 +207,16 @@ class AuditCaseRemoteOperationTest {
         // Setup as viewing a case
         entry.setOperationType(AuditOperationType.SEARCH_CASE.getLabel());
 
-        // Simulate exception in FeignClient
-        doThrow(new RuntimeException("FeignClient error")).when(feignClient)
-            .postCaseSearch(any(String.class), any(CaseSearchPostRequest.class));
+        // Simulate exception in AsyncAuditRequestService
+        doThrow(new RuntimeException("Async error")).when(asyncAuditRequestService)
+            .postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
+                any(String.class), any(), any(CaseSearchPostRequest.class), any(String.class));
 
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
+        verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
+            any(String.class), any(), any(CaseSearchPostRequest.class), any(String.class));
         verify(feignClient).postCaseSearch(any(String.class), any(CaseSearchPostRequest.class));
     }
 

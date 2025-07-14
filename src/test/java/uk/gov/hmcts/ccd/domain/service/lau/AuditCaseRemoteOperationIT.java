@@ -83,13 +83,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     @Mock
     private AuditRepository auditRepository;
 
-    @SpyBean
-    private AuditRemoteOperation auditCaseRemoteOperation;
-
-    @SpyBean
-    private AsyncAuditRequestService asyncAuditRequestService;
-
-    @Inject
+    @Autowired
     private AuditService auditService;
 
     @Autowired
@@ -127,9 +121,6 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
         IdamUser user = new IdamUser();
         user.setId(IDAM_ID);
         doReturn(user).when(userRepository).getUser();
-
-        auditService = new AuditService(fixedClock, userRepository, securityUtils, auditRepository,
-            auditCaseRemoteConfiguration, auditCaseRemoteOperation);
     }
 
     @After
