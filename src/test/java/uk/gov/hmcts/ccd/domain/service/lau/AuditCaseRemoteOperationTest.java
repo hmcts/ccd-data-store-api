@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.lau;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,6 +63,9 @@ class AuditCaseRemoteOperationTest {
     @Mock
     private AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
+    @Mock
+    private AsyncAuditRequestService asyncAuditRequestService;
+
     @Captor
     ArgumentCaptor<HttpRequest> captor;
 
@@ -91,7 +95,7 @@ class AuditCaseRemoteOperationTest {
         doReturn("http://localhost/caseAction").when(auditCaseRemoteConfiguration).getCaseActionAuditUrl();
         doReturn("http://localhost/caseSearch").when(auditCaseRemoteConfiguration).getCaseSearchAuditUrl();
         auditCaseRemoteOperation = new AuditCaseRemoteOperation(securityUtils, feignClient,
-            auditCaseRemoteConfiguration);
+            auditCaseRemoteConfiguration,asyncAuditRequestService);
     }
 
     @Test
