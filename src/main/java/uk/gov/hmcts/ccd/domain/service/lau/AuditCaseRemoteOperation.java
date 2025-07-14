@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
@@ -14,15 +12,11 @@ import uk.gov.hmcts.ccd.auditlog.LogAndAuditFeignClient;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.lau.ActionLog;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
-import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostResponse;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostRequest;
-import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostResponse;
 import uk.gov.hmcts.ccd.domain.model.lau.SearchLog;
 
-import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -44,13 +38,17 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
     private final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
+    private final AsyncAuditRequestService asyncAuditRequestService;
+
     @Autowired
     public AuditCaseRemoteOperation(@Lazy final SecurityUtils securityUtils,
                                     LogAndAuditFeignClient logAndAuditFeignClient,
-                                    final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration) {
+                                    final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration,
+                                    AsyncAuditRequestService asyncAuditRequestService) {
         this.securityUtils = securityUtils;
         this.logAndAuditFeignClient = logAndAuditFeignClient;
         this.auditCaseRemoteConfiguration = auditCaseRemoteConfiguration;
+        this.asyncAuditRequestService = asyncAuditRequestService;
     }
 
     @Override
@@ -65,7 +63,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
                 CaseActionPostRequest capr = new CaseActionPostRequest(actionLog);
                 String activity = CASE_ACTION_MAP.get(entry.getOperationType());
 
-                postAsyncAuditRequestAndHandleResponse(entry, activity, capr,
+                asyncAuditRequestService.postAsyncAuditRequestAndHandleResponse(entry, activity, capr,
                     null, lauCaseAuditUrl);
 
             } else {
@@ -91,7 +89,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
                 CaseSearchPostRequest cspr = new CaseSearchPostRequest(searchLog);
                 String activity = "SEARCH";
 
-                postAsyncAuditRequestAndHandleResponse(entry, activity,null,
+                asyncAuditRequestService.postAsyncAuditRequestAndHandleResponse(entry, activity,null,
                     cspr, lauCaseAuditUrl);
 
             } else {
@@ -101,41 +99,6 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
         } catch (Exception excep) {
             log.error("Error occurred while generating remote log and audit search request.", excep);
-        }
-    }
-
-    @Async("taskExecutor")
-    public void postAsyncAuditRequestAndHandleResponse(
-        AuditEntry entry,
-        String activity,
-        CaseActionPostRequest capr,
-        CaseSearchPostRequest cspr,
-        String url) {
-
-        String auditLogId = UUID.randomUUID().toString();
-
-        try {
-            logCorrelationId(entry.getRequestId(), activity,
-                entry.getJurisdiction(), entry.getIdamId(), auditLogId);
-
-            if (LAU_CASE_ACTION_CREATE.equals(activity) || LAU_CASE_ACTION_UPDATE.equals(activity)
-                || LAU_CASE_ACTION_VIEW.equals(activity)) {
-                ResponseEntity<CaseActionPostResponse> caseResponse = logAndAuditFeignClient
-                    .postCaseAction(securityUtils.getServiceAuthorization(), capr);
-                if (caseResponse != null) {
-                    logAuditResponse(entry.getRequestId(), activity, caseResponse.getStatusCode().value(),
-                        URI.create(url), auditLogId);
-                }
-            } else if ("SEARCH".equals(activity)) {
-                ResponseEntity<CaseSearchPostResponse> searchResponse = logAndAuditFeignClient
-                    .postCaseSearch(securityUtils.getServiceAuthorization(), cspr);
-                if (searchResponse != null) {
-                    logAuditResponse(entry.getRequestId(), activity, searchResponse.getStatusCode().value(),
-                        URI.create(url), auditLogId);
-                }
-            }
-        } catch (Exception ex) {
-            log.error("Unexpected error occurred during audit Feign call: {}", ex.getMessage(), ex);
         }
     }
 
@@ -157,25 +120,5 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         searchLog.setCaseRefs(entry.getCaseId());
         searchLog.setTimestamp(zonedDateTime);
         return searchLog;
-    }
-
-    private void logCorrelationId(
-        String requestId, String activity, String jurisdiction, String idamId, String auditLogId) {
-        log.info("LAU Correlation-ID:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},jurisdiction:{},idamId:{}, logId:{}",
-            activity,
-            requestId,
-            jurisdiction,
-            idamId,
-            auditLogId);
-    }
-
-    private void logAuditResponse(
-        String requestId, String activity, int httpStatus, URI uri, String auditLogId) {
-        log.info("LAU Response:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},httpStatus:{},url:{}, logId:{}",
-            activity,
-            requestId,
-            httpStatus,
-            uri.toString(),
-            auditLogId);
     }
 }
