@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.clients.ServicePersistenceAPI;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
@@ -32,7 +31,7 @@ public class DelegatingSupplementaryDataUpdateOperation implements Supplementary
 
     @Override
     public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
-        Optional<URI> serviceUrl = persistenceResolver.resolveUrl(caseReference);
+        Optional<URI> serviceUrl = persistenceResolver.resolveUri(caseReference);
 
         if (serviceUrl.isPresent()) {
             var updated = servicePersistenceAPI.updateSupplementaryData(

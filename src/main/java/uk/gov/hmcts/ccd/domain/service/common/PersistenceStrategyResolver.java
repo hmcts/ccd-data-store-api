@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.PersistenceStrategyConfiguration;
-import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -64,7 +63,7 @@ public class PersistenceStrategyResolver {
      *         an empty Optional to indicate that the case should be handled
      *         by the internal CCD database.
      */
-    public Optional<URI> resolveUrl(String caseReference) {
+    public Optional<URI> resolveUri(String caseReference) {
 
         // 1. Get CaseDetails using the repository. The injected 'cached' version handles caching.
         Optional<CaseDetails> caseDetailsOptional = caseDetailsRepository.findByReference(caseReference);
