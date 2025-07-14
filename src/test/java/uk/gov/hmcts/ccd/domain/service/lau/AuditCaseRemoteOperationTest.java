@@ -30,7 +30,9 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -108,7 +110,7 @@ class AuditCaseRemoteOperationTest {
 
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
-        // Verify FeignClient interaction
+        // Verify asyncRequestService interaction
         ArgumentCaptor<CaseActionPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseActionPostRequest.class);
         verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(
             eq(entry),
@@ -188,13 +190,13 @@ class AuditCaseRemoteOperationTest {
         // Simulate exception in AsyncAuditRequestService
         doThrow(new RuntimeException("Async error")).when(asyncAuditRequestService)
             .postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-                any(String.class), any(CaseActionPostRequest.class), null, any(String.class));
+                any(String.class), any(CaseActionPostRequest.class), isNull(), any(String.class));
 
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
         verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-            any(String.class), any(CaseActionPostRequest.class), null, any(String.class));
+            any(String.class), any(CaseActionPostRequest.class), isNull(), any(String.class));
     }
 
     @Test
@@ -210,13 +212,13 @@ class AuditCaseRemoteOperationTest {
         // Simulate exception in AsyncAuditRequestService
         doThrow(new RuntimeException("Async error")).when(asyncAuditRequestService)
             .postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-                any(String.class), null, any(CaseSearchPostRequest.class), any(String.class));
+                any(String.class), isNull(), any(CaseSearchPostRequest.class), any(String.class));
 
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
         verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-            any(String.class), null, any(CaseSearchPostRequest.class), any(String.class));
+            any(String.class), isNull(), any(CaseSearchPostRequest.class), any(String.class));
     }
 
     private AuditEntry createBaseAuditEntryData(ZonedDateTime fixedDateTime) {
