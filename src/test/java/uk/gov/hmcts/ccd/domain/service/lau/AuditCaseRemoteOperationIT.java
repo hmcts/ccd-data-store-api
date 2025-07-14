@@ -83,6 +83,9 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     @Mock
     private AuditRepository auditRepository;
 
+    @SpyBean
+    private AuditRemoteOperation auditCaseRemoteOperation;
+
     @Autowired
     private AuditService auditService;
 
