@@ -30,21 +30,13 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public Optional<CaseDetails> findById(String jurisdiction, Long id) {
-        if (resolver.isDecentralised(id)) {
-            return decentralisedCaseDetailsRepository.findById(jurisdiction, id);
-        } else {
-            return defaultRepository.findById(jurisdiction, id);
-        }
+        return getRepository(id).findById(jurisdiction, id);
     }
 
     @Override
     @Deprecated
     public CaseDetails findById(final Long id) {
-        if (resolver.isDecentralised(id)) {
-            return decentralisedCaseDetailsRepository.findById(id);
-        } else {
-            return defaultRepository.findById(id);
-        }
+        return getRepository(id).findById(id);
     }
 
     @Override
@@ -55,29 +47,17 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
-        if (resolver.isDecentralised(caseReference)) {
-            return decentralisedCaseDetailsRepository.findByReference(jurisdiction, caseReference);
-        } else {
-            return defaultRepository.findByReference(jurisdiction, caseReference);
-        }
+        return getRepository(caseReference).findByReference(jurisdiction, caseReference);
     }
 
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
-        if (resolver.isDecentralised(reference)) {
-            return decentralisedCaseDetailsRepository.findByReference(jurisdiction, reference);
-        } else {
-            return defaultRepository.findByReference(jurisdiction, reference);
-        }
+        return getRepository(Long.parseLong(reference)).findByReference(jurisdiction, reference);
     }
 
     @Override
     public Optional<CaseDetails> findByReference(String caseReference) {
-        if (resolver.isDecentralised(caseReference)) {
-            return decentralisedCaseDetailsRepository.findByReference(caseReference);
-        } else {
-            return defaultRepository.findByReference(caseReference);
-        }
+        return getRepository(Long.parseLong(caseReference)).findByReference(caseReference);
     }
 
     /**
@@ -88,11 +68,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     @Deprecated
     public CaseDetails findByReference(final Long caseReference) {
-        if (resolver.isDecentralised(caseReference)) {
-            return decentralisedCaseDetailsRepository.findByReference(caseReference);
-        } else {
-            return defaultRepository.findByReference(caseReference);
-        }
+        return getRepository(caseReference).findByReference(caseReference);
     }
 
     /**
@@ -107,20 +83,12 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     public CaseDetails findUniqueCase(final String jurisdiction,
                                       final String caseTypeId,
                                       final String reference) {
-       if (resolver.isDecentralised(reference)) {
-            return decentralisedCaseDetailsRepository.findUniqueCase(jurisdiction, caseTypeId, reference);
-        } else {
-            return defaultRepository.findUniqueCase(jurisdiction, caseTypeId, reference);
-        }
+        return getRepository(Long.parseLong(reference)).findUniqueCase(jurisdiction, caseTypeId, reference);
     }
 
     @Override
     public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
-        if (resolver.isDecentralised(reference)) {
-            return decentralisedCaseDetailsRepository.findByReferenceWithNoAccessControl(reference);
-        } else {
-            return defaultRepository.findByReferenceWithNoAccessControl(reference);
-        }
+        return getRepository(Long.parseLong(reference)).findByReferenceWithNoAccessControl(reference);
     }
 
     /**
@@ -149,4 +117,11 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
         return defaultRepository.getPaginatedSearchMetadata(metaData, dataSearchParams);
     }
 
+    private CaseDetailsRepository getRepository(long identifier) {
+        if (resolver.isDecentralised(identifier)) {
+            return decentralisedCaseDetailsRepository;
+        } else {
+            return defaultRepository;
+        }
+    }
 }
