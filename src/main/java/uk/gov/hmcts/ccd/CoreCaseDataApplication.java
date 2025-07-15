@@ -4,24 +4,16 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import uk.gov.hmcts.ccd.customheaders.ServicePersistenceClientConfiguration;
 
 import java.time.Clock;
 
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableRetry
-@ComponentScan(
-    basePackages = { "uk.gov.hmcts.ccd" },
-    excludeFilters = @ComponentScan.Filter(
-        type = FilterType.ASSIGNABLE_TYPE,
-        classes = ServicePersistenceClientConfiguration.class // This should not apply to all our feign clients.
-    )
-)
+@ComponentScan({ "uk.gov.hmcts.ccd" })
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 public class CoreCaseDataApplication {
 

@@ -1,11 +1,9 @@
 package uk.gov.hmcts.ccd.customheaders;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
-@Configuration
 public class ServicePersistenceClientConfiguration {
 
     @Bean
