@@ -172,7 +172,7 @@ withNightlyPipeline(type, product, component) {
 
                 echo "List of changed files: ${changedFiles}"
 
-                if (changedFiles == '[]' || !changedFiles.trim()) {
+                if (changedFiles.isEmpty()) {
                     echo "No changed files to extract."
                 } else {
                     def fileName = sh(
