@@ -133,7 +133,7 @@ class DefaultGetCaseViewOperationTest {
         caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setReference(Long.valueOf(CASE_REFERENCE));
+        caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setState(STATE);
         Map<String, JsonNode> dataMap = buildData("dataTestField1", "dataTestField2");
         caseDetails.setData(dataMap);

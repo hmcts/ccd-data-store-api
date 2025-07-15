@@ -692,7 +692,7 @@ class DefaultCreateCaseOperationTest {
     @DisplayName("Should insert case links when case is created")
     void shouldInsertCaseLinks() {
         final String caseEventStateId = "Some state";
-        final Long caseReference = 1855854166952584L;
+        final String caseReference = "1855854166952584L";
 
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
