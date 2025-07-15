@@ -2,12 +2,10 @@ package uk.gov.hmcts.ccd.domain.service.getcase;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.Optional;
 
-import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 @Service
@@ -26,13 +24,13 @@ public class ClassifiedGetCaseOperation implements GetCaseOperation {
 
     @Override
     public Optional<CaseDetails> execute(String jurisdictionId, String caseTypeId, String caseReference) {
-        Optional<CaseDetails> caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference);
-        return caseDetails.flatMap(classificationService::applyClassification);
+        return getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference)
+                               .flatMap(classificationService::applyClassification);
     }
 
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
         return getCaseOperation.execute(caseReference)
-                .flatMap(classificationService::applyClassification);
+                               .flatMap(classificationService::applyClassification);
     }
 }
