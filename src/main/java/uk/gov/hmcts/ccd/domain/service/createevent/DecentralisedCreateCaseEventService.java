@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.clients.ServicePersistenceAPI;
+import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceAPI;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedEventDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;

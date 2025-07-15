@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.customheaders;
+package uk.gov.hmcts.ccd.data.persistence;
 
 import java.util.UUID;
 

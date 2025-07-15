@@ -6,11 +6,11 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.clients.ServicePersistenceAPI;
+import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceAPI;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
-import uk.gov.hmcts.ccd.v2.external.dto.DecentralisedAuditEvent;
+import uk.gov.hmcts.ccd.data.persistence.DecentralisedAuditEvent;
 
 @Service
 @Qualifier("decentralised")
