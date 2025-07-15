@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -34,6 +35,37 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
     protected DataSource db;
 
     private static final Long CASE_DATA_ID = 69L;
+
+    @Test
+    @DisplayName("should return the earliest event as the 'create event'")
+    public void databaseContainsThreeEventsForCaseDetails_getCreateEventCalled_EarliestEventReturned() {
+
+        setUpCaseData(CASE_DATA_ID);
+
+        String createEventSummary = "The Create Event";
+
+        setUpCaseEvent(CASE_DATA_ID, createEventSummary, "2017-09-28 08:46:16.258");
+        setUpCaseEvent(CASE_DATA_ID, "First Event after Create Event", "2017-09-28 08:46:16.259");
+        setUpCaseEvent(CASE_DATA_ID, "Second Event after Create Event", "2017-09-28 08:46:16.260");
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setId(String.valueOf(CASE_DATA_ID));
+
+        Optional<AuditEvent> createEventOptional = classUnderTest.getCreateEvent(caseDetails);
+
+        assertTrue(createEventOptional.isPresent());
+        assertEquals(createEventSummary, createEventOptional.get().getSummary());
+    }
+
+    @Test
+    @DisplayName("should return an empty optional if no events for CaseDetails")
+    public void databaseContainsNoEventsForCaseDetails_getCreateEventCalled_EmptyOptionalReturned() {
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setId(String.valueOf(CASE_DATA_ID));
+
+        assertFalse(classUnderTest.getCreateEvent(caseDetails).isPresent());
+    }
 
     @Test
     @DisplayName("should return audit event for the event id")
