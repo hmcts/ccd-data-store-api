@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.v2.external.dto.DecentralisedAuditEvent;
 
 @FeignClient(name = "servicePersistenceAPI", configuration = ServicePersistenceClientConfiguration.class)
 public interface ServicePersistenceAPI {
@@ -50,10 +51,10 @@ public interface ServicePersistenceAPI {
     CaseDetails createEvent(URI baseURI, @RequestBody DecentralisedCaseEvent caseEvent);
 
     @GetMapping(value = "/ccd/cases/{case-ref}/history")
-    List<AuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") String caseReference);
+    List<DecentralisedAuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") String caseReference);
 
     @GetMapping(value = "/ccd/cases/{case-ref}/history/{event-id}")
-    AuditEvent getCaseHistoryEvent(URI baseURI,
+    DecentralisedAuditEvent getCaseHistoryEvent(URI baseURI,
                                    @PathVariable("case-ref") String caseReference,
                                    @PathVariable("event-id") Long eventId);
 
