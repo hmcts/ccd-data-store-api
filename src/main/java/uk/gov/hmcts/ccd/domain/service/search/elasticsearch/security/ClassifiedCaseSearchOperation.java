@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
@@ -38,11 +37,11 @@ public class ClassifiedCaseSearchOperation implements CaseSearchOperation {
         }
 
         List<CaseDetails> classifiedCases = results.getCases()
-                .stream()
-                .map(classificationService::applyClassification)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+            .stream()
+            .map(classificationService::applyClassification)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
 
         return new CaseSearchResult(results.getTotal(),
             classifiedCases, results.getCaseTypesResults());

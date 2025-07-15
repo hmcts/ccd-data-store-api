@@ -241,7 +241,6 @@ public class ApplicationParams {
     @Value("#{'${ccd.callback.passthru-header-contexts}'.split(',')}")
     private List<String> callbackPassthruHeaderContexts;
 
-
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -644,5 +643,4 @@ public class ApplicationParams {
     public List<String> getUploadTimestampFeaturedCaseTypes() {
         return uploadTimestampFeaturedCaseTypes;
     }
-
 }

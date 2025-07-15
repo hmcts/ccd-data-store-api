@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * A request-scoped bean responsible for holding a unique idempotency key for the duration of a single HTTP request.
+ * A request-scoped bean responsible for holding a unique idempotency key that identifies a CCD event operation
+ * as the hash of the event's start event token.
  * It is used to pass a unique identifier from an orchestrating service (e.g., one handling an event submission) to
  * a cross-cutting component like a Feign {@code RequestInterceptor} without polluting method signatures.
  */

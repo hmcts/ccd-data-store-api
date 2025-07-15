@@ -26,7 +26,6 @@ import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 
 @Transactional
-
 public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
 
     private static final String COUNT_CASE_USERS =

@@ -73,10 +73,10 @@ class ClassifiedStartEventOperationTest {
         doReturn(Optional.of(classifiedDetails)).when(classificationService).applyClassification(caseDetails);
 
         classifiedStartEventOperation = new ClassifiedStartEventOperation(startEventOperation,
-                classificationService,
-                caseDefinitionRepository,
-                caseDataService,
-                draftGateway);
+                                                                          classificationService,
+                                                                          caseDefinitionRepository,
+                                                                          caseDataService,
+                                                                          draftGateway);
     }
 
     @Nested

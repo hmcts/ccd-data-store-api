@@ -52,8 +52,7 @@ class ClassifiedCaseSearchOperationTest {
         doReturn(Optional.of(classifiedCase1)).when(classificationService).applyClassification(case1);
         doReturn(Optional.of(classifiedCase2)).when(classificationService).applyClassification(case2);
 
-        classifiedSearchOperation = new ClassifiedCaseSearchOperation(searchOperation,
-                classificationService);
+        classifiedSearchOperation = new ClassifiedCaseSearchOperation(searchOperation, classificationService);
     }
 
     @Test
