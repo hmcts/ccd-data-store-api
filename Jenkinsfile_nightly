@@ -172,14 +172,18 @@ withNightlyPipeline(type, product, component) {
 
                 echo "List of changed files: ${changedFiles}"
 
-                def fileName = sh(
-                    script: """
-                        echo '${changedFiles}' | tr -d '[]' | xargs basename
-                    """,
-                    returnStdout: true
-                ).trim()
+                if (changedFiles == '[]' || !changedFiles.trim()) {
+                    echo "No changed files to extract."
+                } else {
+                    def fileName = sh(
+                        script: """
+                            echo '${changedFiles}' | tr -d '[]' | xargs basename
+                        """,
+                        returnStdout: true
+                    ).trim()
 
-                echo "File name: ${fileName}" // → suppressions.xml
+                    echo "Extracted file name: ${fileName}"
+                }
 
                 if (changedFiles.size() == 1 && changedFiles[0] == suppressionFile) {
                     echo "✅ Only suppression file changed. Proceeding..."
