@@ -1,37 +1,45 @@
 package uk.gov.hmcts.ccd.customheaders;
 
+import java.util.UUID;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
+
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
-public class UserAuthHeadersInterceptor implements RequestInterceptor {
+@RequiredArgsConstructor
+public class ServicePersistenceAPIInterceptor implements RequestInterceptor {
 
-    private static final String EXPERIMENTAL = "experimental";
-    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    public static final String IDEMPOTENCY_KEY_HEADER = "Idempotency-Key";
+
+    private final IdempotencyKeyHolder idempotencyKeyHolder;
     private final SecurityUtils securityUtils;
-
-    public UserAuthHeadersInterceptor(SecurityUtils securityUtils) {
-        this.securityUtils = securityUtils;
-    }
 
     @Override
     public void apply(RequestTemplate template) {
+        UUID idempotencyKey = idempotencyKeyHolder.getKey();
+
+        if (idempotencyKey != null) {
+            template.header(IDEMPOTENCY_KEY_HEADER, idempotencyKey.toString());
+        }
+
         if (!template.headers().containsKey(AUTHORIZATION)) {
             template.header(AUTHORIZATION, securityUtils.getUserBearerToken());
         }
         if (!template.headers().containsKey(SERVICE_AUTHORIZATION)) {
             template.header(SERVICE_AUTHORIZATION, securityUtils.getServiceAuthorization());
         }
-        // TODO: will be removed once ccd cleaned in their end
-        template.header(EXPERIMENTAL, "true");
 
         var requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         var request = requestAttributes.getRequest();
         template.header(HttpHeaders.REFERER, request.getHeader(HttpHeaders.REFERER));
+
     }
 }
