@@ -4,15 +4,14 @@ import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
-import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedCaseEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedEventDetails;
+import uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseEvent;
+import uk.gov.hmcts.ccd.data.persistence.DecentralisedEventDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 
 @Slf4j
