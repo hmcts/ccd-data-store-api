@@ -23,15 +23,15 @@ interface ServicePersistenceAPI {
      *
      * <p><b>Idempotency</b></p>
      *
-     * <p>Service endpoints are expected to be idempotent.
+     * <p>Services are expected to ensure idempotency based on the associated idempotency key.
      *
-     * <p><b>Server Behavior:</b></p>
+     * <p><b>Service Behavior:</b></p>
      * <ul>
-     *   <li><b>First Request:</b> When the server receives a request with a new idempotency key,
+     *   <li><b>First Request:</b> When the service receives a request with a new idempotency key,
      *       it will process the event, create the case, and respond with an
      *       HTTP {@code 201 Created} status. The response body will contain the details of the
      *       newly created case.</li>
-     *   <li><b>Subsequent Requests:</b> If the server receives a subsequent request with the
+     *   <li><b>Subsequent Requests:</b> If the service receives a subsequent request with the
      *       <b>same idempotency key</b>, it will not re-process the event. Instead, it will
      *       retrieve the details of the previously created case and respond with an
      *       HTTP {@code 200 OK} status. The response body <b>>must be the same as that returned by the previously
