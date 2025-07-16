@@ -51,6 +51,7 @@
           },
           "DateTimeField": "1989-09-19T14:30:01.000",
           "PhoneUKField": "02033343555",
+          "EmailField" : "fuctional@test.com",
           "NumberField": "1",
           "MultiSelectListField": [
             "OPTION1"
