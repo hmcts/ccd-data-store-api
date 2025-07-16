@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 
 @FeignClient(name = "servicePersistenceAPI", configuration = ServicePersistenceAPIInterceptor.class)
@@ -18,12 +19,11 @@ interface ServicePersistenceAPI {
     DecentralisedGetCaseResponse getCase(URI baseURI, @PathVariable("case-ref") String caseRef);
 
     /**
-     * Submits an event to create or update a case in CCD.
+     * Submits an event to create or update a case.
      *
      * <p><b>Idempotency</b></p>
      *
-     * <p>Service endpoints are expected to be idempotent. The {@code Idempotency-Key} header is set
-     * by a Feign client interceptor based on the event's token.
+     * <p>Service endpoints are expected to be idempotent.
      *
      * <p><b>Server Behavior:</b></p>
      * <ul>
@@ -41,7 +41,9 @@ interface ServicePersistenceAPI {
      */
     @PostMapping(value = "/ccd/cases", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    DecentralisedGetCaseResponse createEvent(URI baseURI, @RequestBody DecentralisedCaseEvent caseEvent);
+    DecentralisedGetCaseResponse submitEvent(URI baseURI,
+                                             @RequestHeader("Idempotency-Key") String idempotencyKey,
+                                             @RequestBody DecentralisedCaseEvent caseEvent);
 
     @GetMapping(value = "/ccd/cases/{case-ref}/history")
     List<DecentralisedAuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") String caseReference);

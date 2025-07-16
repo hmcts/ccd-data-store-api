@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.persistence;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
@@ -9,12 +10,14 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 @RequiredArgsConstructor
 @Service
 public class ServicePersistenceClient {
     private final ServicePersistenceAPI api;
     private final PersistenceStrategyResolver resolver;
+    private final IdempotencyKeyHolder idempotencyKeyHolder;
 
     public CaseDetails getCase(String caseRef) {
         var uri = resolver.resolveUriOrThrow(caseRef);
@@ -23,7 +26,13 @@ public class ServicePersistenceClient {
 
     public CaseDetails createEvent(DecentralisedCaseEvent caseEvent) {
         var uri = resolver.resolveUriOrThrow(caseEvent.getCaseDetails());
-        return api.createEvent(uri, caseEvent).getCaseDetails();
+        UUID idempotencyKey = idempotencyKeyHolder.getKey();
+
+        if (idempotencyKey == null) {
+            throw new IllegalStateException("No idempotency key set for the request context.");
+        }
+
+        return api.submitEvent(uri, idempotencyKey.toString(), caseEvent).getCaseDetails();
     }
 
     public List<AuditEvent> getCaseHistory(String caseReference) {

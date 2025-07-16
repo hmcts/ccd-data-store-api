@@ -17,19 +17,10 @@ import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 @RequiredArgsConstructor
 class ServicePersistenceAPIInterceptor implements RequestInterceptor {
 
-    public static final String IDEMPOTENCY_KEY_HEADER = "Idempotency-Key";
-
-    private final IdempotencyKeyHolder idempotencyKeyHolder;
     private final SecurityUtils securityUtils;
 
     @Override
     public void apply(RequestTemplate template) {
-        UUID idempotencyKey = idempotencyKeyHolder.getKey();
-
-        if (idempotencyKey != null) {
-            template.header(IDEMPOTENCY_KEY_HEADER, idempotencyKey.toString());
-        }
-
         if (!template.headers().containsKey(AUTHORIZATION)) {
             template.header(AUTHORIZATION, securityUtils.getUserBearerToken());
         }
@@ -40,6 +31,5 @@ class ServicePersistenceAPIInterceptor implements RequestInterceptor {
         var requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         var request = requestAttributes.getRequest();
         template.header(HttpHeaders.REFERER, request.getHeader(HttpHeaders.REFERER));
-
     }
 }
