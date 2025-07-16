@@ -2,6 +2,100 @@ DELETE FROM case_event;
 DELETE FROM case_data;
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
+VALUES (25, 'TestAddressBookCaseFiltered', 'PROBATE', 'CaseCreated', 'PUBLIC',
+        '{
+          "PersonFirstName": "Janet",
+          "PersonLastName": "Parker",
+          "PersonAddress": {
+            "AddressLine1": "123",
+            "AddressLine2": "Fake Street",
+            "AddressLine3": "Hexton",
+            "Country": "England",
+            "Postcode": "HX08 5TG"
+          },
+          "Aliases": [
+            {
+              "id": "1",
+              "value": "Alias1"
+            },
+            {
+              "id": "2",
+              "value": "Alias2"
+            },
+            {
+              "id": "3",
+              "value": "Alias3"
+            }
+          ],
+          "D8Document": {
+            "category_id": "detailsOfClaim",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_filename": "Seagulls_Square.jpg"
+          }
+        }',
+        '{
+          "PersonFirstName": "PUBLIC",
+          "PersonLastName": "PUBLIC",
+          "PersonAddress": {
+            "classification" : "PUBLIC",
+            "value" : {
+              "AddressLine1": "PUBLIC",
+              "AddressLine2": "PUBLIC",
+              "AddressLine3": "PUBLIC",
+              "Country": "PUBLIC",
+              "Postcode": "PUBLIC"
+            }
+          },
+          "D8Document": "PUBLIC"
+        }',
+        '6512245793128983',
+        '2016-06-22 20:44:52.824',
+        '2016-06-24 20:44:52.824',
+        '2016-06-24 20:44:52.824'
+);
+
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
+VALUES (24, 'TestAddressBookCaseFiltered', 'PROBATE', 'CaseCreated', 'PUBLIC',
+        '{
+          "PersonFirstName": "Janet",
+          "PersonLastName": "Parker",
+          "PersonAddress": {
+            "AddressLine1": "123",
+            "AddressLine2": "Fake Street",
+            "AddressLine3": "Hexton",
+            "Country": "England",
+            "Postcode": "HX08 5TG"
+          },
+          "D8Document": {
+            "category_id": "detailsOfClaim",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_filename": "Seagulls_Square.jpg"
+          }
+        }',
+        '{
+          "PersonFirstName": "PUBLIC",
+          "PersonLastName": "PUBLIC",
+          "PersonAddress": {
+            "classification" : "PUBLIC",
+            "value" : {
+              "AddressLine1": "PUBLIC",
+              "AddressLine2": "PUBLIC",
+              "AddressLine3": "PUBLIC",
+              "Country": "PUBLIC",
+              "Postcode": "PUBLIC"
+            }
+          },
+          "D8Document": "PUBLIC"
+        }',
+        '1202264432028419',
+        '2016-06-22 20:44:52.824',
+        '2016-06-24 20:44:52.824',
+        '2016-06-24 20:44:52.824'
+);
+
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
 VALUES (1, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet",
