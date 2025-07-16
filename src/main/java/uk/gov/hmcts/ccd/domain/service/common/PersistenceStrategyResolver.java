@@ -39,6 +39,8 @@ public class PersistenceStrategyResolver {
     private Map<String, URI> caseTypeServiceUrls;
 
 
+    // TODO: Using the DefaultCaseDetailsRepository and looking up the whole case is inefficient.
+    // We should lookup only the case type and cache it per request.
     @Autowired
     public PersistenceStrategyResolver(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
                                            CaseDetailsRepository caseDetailsRepository ) {
@@ -70,13 +72,9 @@ public class PersistenceStrategyResolver {
     }
 
     public URI resolveUriOrThrow(String caseReference) {
-
-        // 1. Get CaseDetails using the repository. The injected 'cached' version handles caching.
         Optional<CaseDetails> caseDetailsOptional = caseDetailsRepository.findByReference(caseReference);
 
         if (caseDetailsOptional.isEmpty()) {
-            // TODO
-            log.warn("Could not find case details for reference: {}. Assuming centralised persistence.", caseReference);
             throw new UnsupportedOperationException();
         }
 
