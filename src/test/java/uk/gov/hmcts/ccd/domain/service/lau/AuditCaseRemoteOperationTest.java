@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -98,7 +98,7 @@ class AuditCaseRemoteOperationTest {
 
     @Test
     @DisplayName("should post case action remote audit request")
-    void shouldPostCaseActionRemoteAuditRequest() throws InterruptedException {
+    void shouldPostCaseActionRemoteAuditRequest() {
 
         ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
         AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
@@ -185,7 +185,7 @@ class AuditCaseRemoteOperationTest {
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
-        await().atMost(2, SECONDS).untilAsserted(() ->
+        await().atMost(200, MILLISECONDS).untilAsserted(() ->
             verify(feignClient).postCaseAction(any(String.class), any(CaseActionPostRequest.class))
         );
     }
@@ -207,7 +207,7 @@ class AuditCaseRemoteOperationTest {
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
-        await().atMost(2, SECONDS).untilAsserted(() ->
+        await().atMost(200, MILLISECONDS).untilAsserted(() ->
             verify(feignClient).postCaseSearch(any(String.class), any(CaseSearchPostRequest.class))
         );
     }
