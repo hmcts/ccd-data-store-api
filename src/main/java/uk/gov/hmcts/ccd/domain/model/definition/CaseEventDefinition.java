@@ -246,16 +246,16 @@ public class CaseEventDefinition implements Serializable, Copyable<CaseEventDefi
         copy.setName(this.getName());
         copy.setDescription(this.getDescription());
         copy.setDisplayOrder(this.getDisplayOrder());
-        copy.setCaseFields(createCopyList(this.getCaseFields()));
+        copy.setCaseFields(createDeepCopyList(this.getCaseFields()));
         copy.setPreStates(this.getPreStates() != null ? new ArrayList<>(this.getPreStates()) : null);
-        copy.setPostStates(createCopyList(this.getPostStates()));
+        copy.setPostStates(createDeepCopyList(this.getPostStates()));
         copy.setRetriesTimeoutAboutToStartEvent(this.getRetriesTimeoutAboutToStartEvent() != null
             ? new ArrayList<>(this.getRetriesTimeoutAboutToStartEvent()) : null);
         copy.setRetriesTimeoutURLAboutToSubmitEvent(this.getRetriesTimeoutURLAboutToSubmitEvent() != null
             ? new ArrayList<>(this.getRetriesTimeoutURLAboutToSubmitEvent()) : null);
         copy.setRetriesTimeoutURLSubmittedEvent(this.getRetriesTimeoutURLSubmittedEvent() != null
             ? new ArrayList<>(this.getRetriesTimeoutURLSubmittedEvent()) : null);
-        copy.setAccessControlLists(createACLCopyList(this.getAccessControlLists()));
+        copy.setAccessControlLists(createShallowCopyList(this.getAccessControlLists()));
         copy.setCallBackURLAboutToStartEvent(this.getCallBackURLAboutToStartEvent());
         copy.setCallBackURLAboutToSubmitEvent(this.getCallBackURLAboutToSubmitEvent());
         copy.setCallBackURLSubmittedEvent(this.getCallBackURLSubmittedEvent());
