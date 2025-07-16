@@ -13,7 +13,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 
@@ -23,15 +22,12 @@ public class DecentralisedSubmitCaseTransaction {
 
     private final CaseTypeService caseTypeService;
     private final ServicePersistenceClient servicePersistenceClient;
-    private final PersistenceStrategyResolver resolver;
 
     public DecentralisedSubmitCaseTransaction(final CaseTypeService caseTypeService,
-                                              final ServicePersistenceClient servicePersistenceAPI,
-                                              final PersistenceStrategyResolver resolver
+                                              final ServicePersistenceClient servicePersistenceAPI
                                               ) {
         this.caseTypeService = caseTypeService;
         this.servicePersistenceClient = servicePersistenceAPI;
-        this.resolver = resolver;
     }
 
     public CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response,
@@ -65,8 +61,7 @@ public class DecentralisedSubmitCaseTransaction {
 
 
         try {
-            var uri = resolver.resolveUriOrThrow(decentralisedCaseEvent.getCaseDetails());
-            CaseDetails caseDetails = servicePersistenceClient.createEvent(uri, decentralisedCaseEvent);
+            CaseDetails caseDetails = servicePersistenceClient.createEvent(decentralisedCaseEvent);
             // We currently need an ID for the case details to be set because it is written to ccd's db.
             // TODO: remove when enableCaseUsersDbSync is switched off and that functionality removed.
             caseDetails.setId(caseDetails.getReference().toString());

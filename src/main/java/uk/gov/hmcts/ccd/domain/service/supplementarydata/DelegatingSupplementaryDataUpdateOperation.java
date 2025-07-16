@@ -31,11 +31,8 @@ public class DelegatingSupplementaryDataUpdateOperation implements Supplementary
 
     @Override
     public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
-        Optional<URI> serviceUrl = persistenceResolver.resolveUri(caseReference);
-
-        if (serviceUrl.isPresent()) {
+        if (persistenceResolver.isDecentralised(caseReference)) {
             var updated = servicePersistenceClient.updateSupplementaryData(
-                serviceUrl.get(),
                 caseReference,
                 supplementaryData
             );

@@ -17,12 +17,9 @@ import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 public class DecentralisedCaseDetailsRepository implements CaseDetailsRepository {
 
     private final ServicePersistenceClient servicePersistenceAPI;
-    private final PersistenceStrategyResolver resolver;
 
-    public DecentralisedCaseDetailsRepository(final ServicePersistenceClient servicePersistenceAPI,
-                                             final PersistenceStrategyResolver resolver) {
+    public DecentralisedCaseDetailsRepository(final ServicePersistenceClient servicePersistenceAPI) {
         this.servicePersistenceAPI = servicePersistenceAPI;
-        this.resolver = resolver;
     }
 
     @Override
@@ -71,8 +68,7 @@ public class DecentralisedCaseDetailsRepository implements CaseDetailsRepository
     }
 
     private CaseDetails getCaseDetails(String reference) {
-        var uri = resolver.resolveUriOrThrow(reference);
-        CaseDetails caseDetails = servicePersistenceAPI.getCase(uri, reference);
+        CaseDetails caseDetails = servicePersistenceAPI.getCase(reference);
         // TODO: Remove this when legacy RBAC code is removed which relies on details having an id.
         caseDetails.setId(caseDetails.getReference().toString());
         return caseDetails;

@@ -21,14 +21,12 @@ public class DecentralisedCreateCaseEventService {
 
     private final CaseTypeService caseTypeService;
     private final ServicePersistenceClient servicePersistenceClient;
-    private final PersistenceStrategyResolver resolver;
 
     public DecentralisedCreateCaseEventService(final CaseTypeService caseTypeService,
-                                               final ServicePersistenceClient servicePersistenceClient,
-                                               final PersistenceStrategyResolver resolver) {
+                                               final ServicePersistenceClient servicePersistenceClient
+                                               ) {
         this.caseTypeService = caseTypeService;
         this.servicePersistenceClient = servicePersistenceClient;
-        this.resolver = resolver;
     }
 
     public CaseDetails saveAuditEventForCaseDetails(final Event event,
@@ -59,8 +57,7 @@ public class DecentralisedCreateCaseEventService {
                 .build();
 
         try {
-            var uri = resolver.resolveUriOrThrow(caseDetails);
-            return servicePersistenceClient.createEvent(uri, decentralisedCaseEvent);
+            return servicePersistenceClient.createEvent(decentralisedCaseEvent);
         } catch (FeignException.Conflict conflict) {
             throw new CaseConcurrencyException("""
                     Unfortunately we were unable to save your work to the case as \

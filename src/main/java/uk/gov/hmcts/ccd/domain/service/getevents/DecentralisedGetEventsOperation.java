@@ -16,31 +16,26 @@ import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 @RequiredArgsConstructor
 public class DecentralisedGetEventsOperation implements GetEventsOperation {
 
-    private final PersistenceStrategyResolver resolver;
     private final ServicePersistenceClient servicePersistenceAPI;
 
     @Override
     public List<AuditEvent> getEvents(CaseDetails caseDetails) {
-        var uri = resolver.resolveUriOrThrow(caseDetails);
-        return servicePersistenceAPI.getCaseHistory(uri, caseDetails.getReferenceAsString());
+        return servicePersistenceAPI.getCaseHistory(caseDetails.getReferenceAsString());
     }
 
     @Override
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
-        var uri = resolver.resolveUriOrThrow(caseReference);
-        return servicePersistenceAPI.getCaseHistory(uri, caseReference);
+        return servicePersistenceAPI.getCaseHistory(caseReference);
     }
 
     @Override
     public List<AuditEvent> getEvents(String caseReference) {
-        var uri = resolver.resolveUriOrThrow(caseReference);
-        return servicePersistenceAPI.getCaseHistory(uri, caseReference);
+        return servicePersistenceAPI.getCaseHistory(caseReference);
     }
 
     @Override
     public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
-        var uri = resolver.resolveUriOrThrow(caseDetails);
-        return Optional.of(servicePersistenceAPI.getCaseHistoryEvent(uri, caseDetails.getReferenceAsString(),
+        return Optional.of(servicePersistenceAPI.getCaseHistoryEvent(caseDetails.getReferenceAsString(),
             eventId));
     }
 }
