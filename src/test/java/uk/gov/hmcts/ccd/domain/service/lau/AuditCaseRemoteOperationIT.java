@@ -56,7 +56,7 @@ import static org.mockito.Mockito.doReturn;
 public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
 
     private static int ASYNC_DELAY_TIMEOUT_MILLISECONDS = 2000;
-    private static int ASYNC_DELAY_INTERVAL_MILLISECONDS = 200;
+    private static int ASYNC_DELAY_INTERVAL_MILLISECONDS = 500;
 
     private static final String EXPECTED_CASE_ACTION_LOG_JSON =
         "{\"actionLog\":{\"userId\":\"1234\",\"caseAction\":\"VIEW\",\"caseRef\":\"1504259907353529\","
@@ -84,9 +84,9 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private AuditRepository auditRepository;
 
     @SpyBean
-    private AuditRemoteOperation auditCaseRemoteOperation;
+    private AuditCaseRemoteOperation auditCaseRemoteOperation;
 
-    @Autowired
+    @Inject
     private AuditService auditService;
 
     @Autowired
@@ -124,6 +124,8 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
         IdamUser user = new IdamUser();
         user.setId(IDAM_ID);
         doReturn(user).when(userRepository).getUser();
+        auditService = new AuditService(fixedClock, userRepository, securityUtils, auditRepository,
+            auditCaseRemoteConfiguration, auditCaseRemoteOperation);
     }
 
     @After
@@ -268,7 +270,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .build();
 
         auditService.audit(auditContext);
-        waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
+        waitForPossibleAuditResponse(SEARCH_AUDIT_ENDPOINT);
 
         verifyWireMock(3, postRequestedFor(urlEqualTo(SEARCH_AUDIT_ENDPOINT))
             .withRequestBody(equalToJson(EXPECTED_CASE_SEARCH_LOG_JSON)));
