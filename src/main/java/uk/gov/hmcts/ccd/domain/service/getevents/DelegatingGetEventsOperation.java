@@ -20,33 +20,32 @@ public class DelegatingGetEventsOperation implements GetEventsOperation {
 
     @Override
     public List<AuditEvent> getEvents(CaseDetails caseDetails) {
-        if (resolver.isDecentralised(caseDetails)) {
-            return decentralisedGetEventsOperation.getEvents(caseDetails);
-        }
-        return localGetEventsOperation.getEvents(caseDetails);
+        return getOperation(caseDetails.getReferenceAsString())
+            .getEvents(caseDetails);
     }
 
     @Override
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
-        if (resolver.isDecentralised(caseReference)) {
-            return decentralisedGetEventsOperation.getEvents(jurisdiction, caseTypeId, caseReference);
-        }
-        return localGetEventsOperation.getEvents(jurisdiction, caseTypeId, caseReference);
+        return getOperation(caseReference)
+            .getEvents(jurisdiction, caseTypeId, caseReference);
     }
 
     @Override
     public List<AuditEvent> getEvents(String caseReference) {
-        if (resolver.isDecentralised(caseReference)) {
-            return decentralisedGetEventsOperation.getEvents(caseReference);
-        }
-        return localGetEventsOperation.getEvents(caseReference);
+        return getOperation(caseReference)
+            .getEvents(caseReference);
     }
 
     @Override
     public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
-        if (resolver.isDecentralised(caseDetails)) {
-            return decentralisedGetEventsOperation.getEvent(caseDetails, caseTypeId, eventId);
+        return getOperation(caseDetails.getReferenceAsString())
+            .getEvent(caseDetails, caseTypeId, eventId);
+    }
+
+    private GetEventsOperation getOperation(String caseReference) {
+        if (resolver.isDecentralised(caseReference)) {
+            return decentralisedGetEventsOperation;
         }
-        return localGetEventsOperation.getEvent(caseDetails, caseTypeId, eventId);
+        return localGetEventsOperation;
     }
 }
