@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -183,7 +185,9 @@ class AuditCaseRemoteOperationTest {
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
-        verify(feignClient).postCaseAction(any(String.class), any(CaseActionPostRequest.class));
+        await().atMost(2, SECONDS).untilAsserted(() ->
+            verify(feignClient).postCaseAction(any(String.class), any(CaseActionPostRequest.class))
+        );
     }
 
     @Test
@@ -203,7 +207,9 @@ class AuditCaseRemoteOperationTest {
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
-        verify(feignClient).postCaseSearch(any(String.class), any(CaseSearchPostRequest.class));
+        await().atMost(2, SECONDS).untilAsserted(() ->
+            verify(feignClient).postCaseSearch(any(String.class), any(CaseSearchPostRequest.class))
+        );
     }
 
     private AuditEntry createBaseAuditEntryData(ZonedDateTime fixedDateTime) {
