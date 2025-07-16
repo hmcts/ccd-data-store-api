@@ -45,13 +45,13 @@ class FeignErrorDecoderTest {
     }
 
     @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseActionUrlAndStatus400() {
-        isRetryableException(400, POST_METHOD, CASE_ACTION_URL);
+    void shouldReturnRetryableExceptionForPostRequestWithCaseActionUrlAndStatus401() {
+        isRetryableException(401, POST_METHOD, CASE_ACTION_URL);
     }
 
     @Test
-    void shouldReturnRetryableExceptionForPostRequestWithSearchUrlAndStatus500() {
-        isRetryableException(500, POST_METHOD, CASE_SEARCH_URL);
+    void shouldReturnFeignExceptionForPostRequestWithSearchUrlAndStatus500() {
+        isNotRetryableException(500, POST_METHOD, CASE_SEARCH_URL);
     }
 
     @Test
