@@ -17,7 +17,7 @@ public class FeignErrorDecoder implements feign.codec.ErrorDecoder {
         FeignException exception = FeignException.errorStatus(methodKey, response);
         log.info("Feign response status: {}, message - {}", status, exception.getMessage());
         // Make sure we retry for POST CaseAction and CaseSearch requests
-        if (response.status() >= 400
+        if (response.status() == 401
             && "POST".equalsIgnoreCase(response.request().httpMethod().name())
             && (response.request().url().endsWith(CASE_ACTION_PATH)
                 || response.request().url().endsWith(CASE_SEARCH_PATH)
