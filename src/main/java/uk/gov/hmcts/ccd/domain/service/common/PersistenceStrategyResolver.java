@@ -1,13 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import javax.validation.constraints.NotNull;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.config.PersistenceStrategyConfiguration;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -20,22 +23,36 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
  */
 @Service
 @Slf4j
+@ConfigurationProperties("ccd.decentralised")
 public class PersistenceStrategyResolver {
 
-    private final PersistenceStrategyConfiguration config;
     private final CaseDetailsRepository caseDetailsRepository;
 
+    /**
+     * A map where the key is lowercase(case-type-id) and the value is the base URL
+     * of the owning service responsible for its persistence.
+     * e.g., 'MyCaseType': 'http://my-service-host:port'
+     *
+     * This can be set via application properties and environment variables.
+     */
+    @NotNull
+    private Map<String, URI> caseTypeServiceUrls;
+
+    public void setCaseTypeServiceUrls(Map<String, URI> caseTypeServiceUrls) {
+        this.caseTypeServiceUrls = new HashMap<>();
+        caseTypeServiceUrls.forEach((key, value) ->
+            this.caseTypeServiceUrls.put(key.toLowerCase(), value)
+        );
+    }
+
     @Autowired
-    public PersistenceStrategyResolver(
-        PersistenceStrategyConfiguration decentralisedConfiguration,
-        @Qualifier(DefaultCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository
+    public PersistenceStrategyResolver(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository
     ) {
-        this.config = decentralisedConfiguration;
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
     public boolean isDecentralised(CaseDetails details) {
-        return config.getCaseTypeServiceUrl(details.getCaseTypeId()).isPresent();
+        return getCaseTypeServiceUrl(details.getCaseTypeId()).isPresent();
     }
 
     public boolean isDecentralised(long reference) {
@@ -44,7 +61,7 @@ public class PersistenceStrategyResolver {
 
     public boolean isDecentralised(String reference) {
         var details = caseDetailsRepository.findByReferenceWithNoAccessControl(reference).get();
-        return config.getCaseTypeServiceUrl(details.getCaseTypeId()).isPresent();
+        return getCaseTypeServiceUrl(details.getCaseTypeId()).isPresent();
     }
 
 
@@ -73,7 +90,7 @@ public class PersistenceStrategyResolver {
             return Optional.empty();
         }
 
-        Optional<URI> url = config.getCaseTypeServiceUrl(caseDetailsOptional.get().getCaseTypeId());
+        Optional<URI> url = getCaseTypeServiceUrl(caseDetailsOptional.get().getCaseTypeId());
         return url;
     }
 
@@ -88,12 +105,12 @@ public class PersistenceStrategyResolver {
             throw new UnsupportedOperationException();
         }
 
-        return config.getCaseTypeServiceUrl(caseDetailsOptional.get().getCaseTypeId()).orElseThrow();
+        return getCaseTypeServiceUrl(caseDetailsOptional.get().getCaseTypeId()).orElseThrow();
     }
 
 
     public URI resolveUriOrThrow(CaseDetails caseDetails) {
-        Optional<URI> url = config.getCaseTypeServiceUrl(caseDetails.getCaseTypeId());
+        Optional<URI> url = getCaseTypeServiceUrl(caseDetails.getCaseTypeId());
         if (url.isPresent()) {
             return url.get();
         }
@@ -102,5 +119,10 @@ public class PersistenceStrategyResolver {
             caseDetails.getCaseTypeId()
         );
         throw new UnsupportedOperationException(message);
+    }
+
+
+    private Optional<URI> getCaseTypeServiceUrl(String caseTypeId) {
+        return Optional.ofNullable(caseTypeServiceUrls.get(caseTypeId.toLowerCase()));
     }
 }
