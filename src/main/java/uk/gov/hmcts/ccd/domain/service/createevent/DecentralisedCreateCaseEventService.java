@@ -46,9 +46,6 @@ public class DecentralisedCreateCaseEventService {
                 .description(event.getDescription())
                 .stateName(caseStateDefinition.getName());
 
-        //TODO Significant item is not yet set
-        //auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
-
         DecentralisedCaseEvent decentralisedCaseEvent = DecentralisedCaseEvent.builder()
                 .caseDetailsBefore(caseDetailsBefore)
                 .caseDetails(caseDetails)
