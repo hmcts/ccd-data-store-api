@@ -77,51 +77,8 @@
       "requestsItem2": "return the grant of probate to the court",
       "understandItem1": "our application will be rejected if we do not answer any questions about the information we have given"
     },
-    "welshLegalStatement": {
-      "deceasedEstateValue": "Mae gwerth gros yr ystad yn &pound;2000000.00 ac mae gwerth net yr ystad yn &pound;1000000.00.",
-      "executorsNotApplying": [
-        {
-          "id": "cb62d566-b252-4b8d-abd8-da6eedc26c26",
-          "value": {
-            "executor": "executor:Nid yw Exec2 Name, ysgutor a enwir yn yr ewyllys, yn gwneud y cais hwn oherwydd bu iddynt farw cyn i Deceased fn Deceased ln farw."
-          }
-        }
-      ],
-      "executorsApplying": [
-        {
-          "id": "b4c0e385-193e-4195-9657-a1091df50b28",
-          "value": {
-            "name": "Mae Applicant fn Applicant ln, ysgutor a enwir yn yr ewyllys, yn gwneud cais am brofiant.",
-            "sign": "Bydd Applicant fn Applicant ln yn anfon i&rsquo;r Gofrestrfa Brofiant yr hyn yr ydym wedi&rsquo;i weld a&rsquo;i gredu i fod yn ewyllys a thestament gwir a gwreiddiol olaf Deceased fn Deceased ln."
-          }
-        }
-      ],
-      "deceased": "Deceased fn Deceased ln ar undefined a bu farw ar undefined, ac roedd fel arfer yn preswylio yng Nghymru a Lloegr.",
-      "deceasedEstateLand": "Hyd eithaf ein gwybodaeth a&rsquo;n cred, nid oedd unrhyw dir wedi&rsquo;i freinio yn Deceased fn Deceased ln a setlwyd cyn marwolaeth (ac nid drwy ewyllys) Deceased fn Deceased ln ac a oedd dal yn dir a setlwyd er gwaethaf y farwolaeth honno.",
-      "deceasedOtherNames": "names",
-      "intro": "Mae&rsquo;r datganiad hwn wedi&rsquo;i seilio ar yr wybodaeth y mae Applicant fn Applicant ln wedi&rsquo;i rhoi yn eu cais. Bydd yn cael ei storio fel cofnod cyhoeddus.",
-      "applicant": "Rydym ni, Applicant fn Applicant ln o Wells Cathedral Wells BA5 2PA United Kingdom, Exec4 Name o Wells Cathedral Wells BA5 2PA United Kingdom, Exec5 Name o Wells Cathedral Wells BA5 2PA United Kingdom a/ac Exec6 Name o Wells Cathedral Wells BA5 2PA United Kingdom, yn gwneud y datganiad canlynol:"
-    },
     "numberOfApplicants": 2,
     "registryAddress": "Line 1 Ox\nLine 2 Ox\nLine 3 Ox\nPostCode Ox\n",
-    "executorsApplying": [
-      {
-        "id": "b4c0e385-193e-4195-9657-a1091df50b28",
-        "value": {
-          "applyingExecutorAgreed": "Yes",
-          "applyingExecutorPhoneNumber": "07769351102",
-          "applyingExecutorAddress": {
-            "AddressLine1": "Westeros",
-            "Country": "United Kingdom",
-            "PostTown": "London",
-            "PostCode": "SW17 0QT"
-          },
-          "applyingExecutorName": "Exec4 Name",
-          "applyingExecutorEmail": "bruno.cypress@outree.org",
-          "applyingExecutorInvitationId": "inviteId"
-        }
-      }
-    ],
     "languagePreferenceWelsh": "No",
     "ihtGrossValue": "200000",
     "ihtFormCompletedOnline": "Yes",
@@ -152,23 +109,11 @@
       "deceasedOtherNames": "They were also known as King North.",
       "intro": "This statement is based on the information Applicant fn Applicant ln has given in their application. It will be stored as a public record.",
       "applicant": "We, Jon Snow of place make the following statement:"
-    },
-    "welshDeclaration": {
-      "confirm": "Rydym yn cadarnhau y byddwn yn gweinyddu ystad Deceased fn Deceased ln, yn unol &acirc;&rsquo;r gyfraith. Byddwn yn:",
-      "confirmItem1": "Rydym yn deall:",
-      "submitWarning": "Unwaith y bydd pawb wedi cytuno i&rsquo;r datganiad cyfreithiol ac wedi gwneud eu datganiad, ni ellir newid yr wybodaeth hon.",
-      "confirmItem2": "cadw manylion llawn (rhestr) yr ystad",
-      "understand": "Rydym yn deall:",
-      "requests": "Os bydd y gofrestrfa brofiant (y llys) yn gofyn inni byddwn yn:",
-      "confirmItem3": "cadw cofnod llawn o&rsquo;r ffordd y mae&rsquo;r ystad wedi cael ei gweinyddu",
-      "requestsItem1": "darparu manylion llawn yr ystad a&rsquo;r ffordd y cafodd ei gweinyddu",
-      "understandItem2": "y gellir dwyn achos troseddol yn ein herbyn am dwyll os penderfynir ein bod heb ddweud y gwir neu wedi bod yn anonest yn fwriadol",
-      "accept": "Rwy&rsquo;n cadarnhau y byddaf yn gweinyddu  ystad yr unigolyn sydd wedi marw yn unol &acirc;&rsquo;r gyfraith, a bod fy  nghais yn gywir.",
-      "requestsItem2": "dychwelyd y grant profiant i&rsquo;r llys",
-      "understandItem1": "y bydd ein cais yn cael ei wrthod os na fyddwn yn ateb unrhyw gwestiynau am yr wybodaeth rydym wedi&rsquo;i rhoi"
     }
   },
   "jurisdiction": "PROBATE",
-  "id": 2000,
+  "id": 1593694526480034,
+  "state": "CaseCreated",
+  "security_classification": "PUBLIC",
   "case_type_id": "GrantOfRepresentation"
 }

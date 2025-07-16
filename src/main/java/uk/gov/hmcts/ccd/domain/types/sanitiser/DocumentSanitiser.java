@@ -6,15 +6,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Named
 @Singleton
@@ -33,10 +37,13 @@ public class DocumentSanitiser implements Sanitiser {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     private final DocumentManagementRestClient documentManagementRestClient;
+    private final ApplicationParams applicationParams;
 
     @Inject
-    public DocumentSanitiser(final DocumentManagementRestClient documentManagementRestClient) {
+    public DocumentSanitiser(final DocumentManagementRestClient documentManagementRestClient,
+                             ApplicationParams applicationParams) {
         this.documentManagementRestClient = documentManagementRestClient;
+        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -55,7 +62,7 @@ public class DocumentSanitiser implements Sanitiser {
             final String documentUrl = fieldData.get(DOCUMENT_URL).textValue();
 
             sanitisedData.put(DOCUMENT_URL, documentUrl);
-            Document document = documentManagementRestClient.getDocument(fieldTypeDefinition, documentUrl);
+            Document document = retrieveDocument(fieldTypeDefinition, documentUrl);
 
             Binary binary = document.get_links().getBinary();
             validateBinaryLink(fieldTypeDefinition, binary);
@@ -77,6 +84,27 @@ public class DocumentSanitiser implements Sanitiser {
             validateDocumentFilename(fieldTypeDefinition, document);
             sanitisedData.put(DOCUMENT_FILENAME, document.getOriginalDocumentName());
             return sanitisedData;
+        }
+    }
+
+    private Document retrieveDocument(FieldTypeDefinition fieldTypeDefinition, String documentUrl) {
+        // TODO: Remove this feature flag once all services have migrated to CDAM.
+        // At that point, dm-store will only allow CDAM to call its APIs directly,
+        // and data-store should always go through case-doc-am-api.
+        if (applicationParams.isDocumentSanitiserCaseDocAMEnable()) {
+            return retrieveDocumentFromCaseDocAM(fieldTypeDefinition, documentUrl);
+        }
+        return documentManagementRestClient.getDocument(fieldTypeDefinition, documentUrl);
+    }
+
+    private Document retrieveDocumentFromCaseDocAM(FieldTypeDefinition fieldTypeDefinition, String documentUrl) {
+        try {
+            final URI uri = new URI(documentUrl);
+            final String documentUrlPath = uri.getPath();
+            final String caseDocumentAmEndpoint = applicationParams.getCaseDocumentAmUrl() + "/cases" + documentUrlPath;
+            return documentManagementRestClient.getDocument(fieldTypeDefinition, caseDocumentAmEndpoint);
+        } catch (URISyntaxException | NullPointerException e) {
+            throw new ServiceException("Invalid document URL format: " + documentUrl, e);
         }
     }
 

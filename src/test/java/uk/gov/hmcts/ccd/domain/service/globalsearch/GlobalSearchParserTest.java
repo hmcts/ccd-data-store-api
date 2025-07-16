@@ -20,7 +20,6 @@ import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
@@ -74,8 +72,6 @@ class GlobalSearchParserTest {
     private CaseDataAccessControl caseDataAccessControl;
     @Mock
     private CaseTypeService caseTypeService;
-    @Mock
-    private SecurityClassificationServiceImpl securityClassificationService;
 
     private GlobalSearchParser globalSearchParser;
 
@@ -205,7 +201,7 @@ class GlobalSearchParserTest {
         when(caseTypeService.getCaseType(CASE_TYPE_ID_3)).thenReturn(caseTypeDefinition3);
 
         globalSearchParser =
-            new GlobalSearchParser(caseDataAccessControl, caseTypeService, securityClassificationService);
+            new GlobalSearchParser(caseDataAccessControl, caseTypeService);
     }
 
     @Test
@@ -213,8 +209,6 @@ class GlobalSearchParserTest {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setCaseManagementBaseLocationIds(validFields);
         searchCriteria.setCaseManagementRegionIds(validFields);
-        doReturn(true).when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(any(), any());
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
@@ -243,9 +237,6 @@ class GlobalSearchParserTest {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setCaseManagementBaseLocationIds(validFields);
         searchCriteria.setCaseManagementRegionIds(validFields);
-
-        doReturn(true)
-            .when(securityClassificationService).userHasEnoughSecurityClassificationForField(any(), any());
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
@@ -277,28 +268,10 @@ class GlobalSearchParserTest {
     }
 
     @Test
-    void shouldFilterResultsWhenFieldIsRestricted() throws JsonProcessingException {
+    void shouldNotFilterResultsWhenFieldIsRestricted() throws JsonProcessingException {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setCaseManagementBaseLocationIds(validFields);
         searchCriteria.setCaseManagementRegionIds(validFields);
-
-        doReturn(false)
-            .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(any(CaseTypeDefinition.class),
-                eq(SecurityClassification.RESTRICTED));
-        doReturn(true)
-            .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(any(CaseTypeDefinition.class),
-                eq(SecurityClassification.PUBLIC));
-        doReturn(true)
-            .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(any(CaseTypeDefinition.class),
-                eq(SecurityClassification.PUBLIC));
-        doReturn(true)
-            .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(any(CaseTypeDefinition.class),
-                eq(SecurityClassification.PUBLIC));
-
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
@@ -324,7 +297,7 @@ class GlobalSearchParserTest {
                     searchCriteria);
 
         assertAll(
-            () -> assertThat(response.size(), Is.is(1))
+            () -> assertThat(response.size(), Is.is(2))
         );
 
     }
@@ -334,9 +307,6 @@ class GlobalSearchParserTest {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setParties(parties);
         searchCriteria.setOtherReferences(validFields);
-
-        doReturn(true).when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(any(), any());
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
