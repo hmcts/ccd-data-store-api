@@ -32,7 +32,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -63,9 +62,6 @@ class AuditCaseRemoteOperationTest {
     @Mock
     private AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
-    @Mock
-    private AsyncAuditRequestService asyncAuditRequestService;
-
     @Captor
     ArgumentCaptor<HttpRequest> captor;
 
@@ -95,12 +91,12 @@ class AuditCaseRemoteOperationTest {
         doReturn("http://localhost/caseAction").when(auditCaseRemoteConfiguration).getCaseActionAuditUrl();
         doReturn("http://localhost/caseSearch").when(auditCaseRemoteConfiguration).getCaseSearchAuditUrl();
         auditCaseRemoteOperation = new AuditCaseRemoteOperation(securityUtils, feignClient,
-            auditCaseRemoteConfiguration,asyncAuditRequestService);
+            auditCaseRemoteConfiguration);
     }
 
     @Test
     @DisplayName("should post case action remote audit request")
-    void shouldPostCaseActionRemoteAuditRequest() {
+    void shouldPostCaseActionRemoteAuditRequest() throws InterruptedException {
 
         ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
         AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
@@ -112,13 +108,10 @@ class AuditCaseRemoteOperationTest {
 
         // Verify asyncRequestService interaction
         ArgumentCaptor<CaseActionPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseActionPostRequest.class);
-        verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(
-            eq(entry),
-            eq("VIEW"),
-            requestCaptor.capture(),
-            isNull(),
-            eq("http://localhost/caseAction")
-        );
+        verify(feignClient).postCaseAction(any(String.class), requestCaptor.capture());
+        // Verify headers and endpoint
+        verify(feignClient).postCaseAction(eq("Bearer 1234"), any(CaseActionPostRequest.class));
+        assertThat(auditCaseRemoteConfiguration.getCaseActionAuditUrl(), is(equalTo("http://localhost/caseAction")));
 
         // Assert the captured request
         CaseActionPostRequest capturedRequest = requestCaptor.getValue();
@@ -147,13 +140,9 @@ class AuditCaseRemoteOperationTest {
 
         // Verify FeignClient interaction
         ArgumentCaptor<CaseSearchPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseSearchPostRequest.class);
-        verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(
-            eq(entry),
-            eq("SEARCH"),
-            isNull(),
-            requestCaptor.capture(),
-            eq("http://localhost/caseSearch")
-        );
+        verify(feignClient).postCaseSearch(any(String.class), requestCaptor.capture());
+        verify(feignClient).postCaseSearch(eq("Bearer 1234"), any(CaseSearchPostRequest.class));
+        assertThat(auditCaseRemoteConfiguration.getCaseSearchAuditUrl(), is(equalTo("http://localhost/caseSearch")));
 
         // Assert the captured request
         CaseSearchPostRequest capturedRequest = requestCaptor.getValue();
@@ -187,16 +176,14 @@ class AuditCaseRemoteOperationTest {
         // Setup as viewing a case
         entry.setOperationType(AuditOperationType.CASE_ACCESSED.getLabel());
 
-        // Simulate exception in AsyncAuditRequestService
-        doThrow(new RuntimeException("Async error")).when(asyncAuditRequestService)
-            .postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-                any(String.class), any(CaseActionPostRequest.class), isNull(), any(String.class));
+        // Simulate exception in FeignClient
+        doThrow(new RuntimeException("FeignClient error")).when(feignClient)
+            .postCaseAction(any(String.class), any(CaseActionPostRequest.class));
 
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
-        verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-            any(String.class), any(CaseActionPostRequest.class), isNull(), any(String.class));
+        verify(feignClient).postCaseAction(any(String.class), any(CaseActionPostRequest.class));
     }
 
     @Test
@@ -209,16 +196,14 @@ class AuditCaseRemoteOperationTest {
         // Setup as viewing a case
         entry.setOperationType(AuditOperationType.SEARCH_CASE.getLabel());
 
-        // Simulate exception in AsyncAuditRequestService
-        doThrow(new RuntimeException("Async error")).when(asyncAuditRequestService)
-            .postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-                any(String.class), isNull(), any(CaseSearchPostRequest.class), any(String.class));
+        // Simulate exception in FeignClient
+        doThrow(new RuntimeException("FeignClient error")).when(feignClient)
+            .postCaseSearch(any(String.class), any(CaseSearchPostRequest.class));
 
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
-        verify(asyncAuditRequestService).postAsyncAuditRequestAndHandleResponse(any(AuditEntry.class),
-            any(String.class), isNull(), any(CaseSearchPostRequest.class), any(String.class));
+        verify(feignClient).postCaseSearch(any(String.class), any(CaseSearchPostRequest.class));
     }
 
     private AuditEntry createBaseAuditEntryData(ZonedDateTime fixedDateTime) {

@@ -15,8 +15,11 @@ import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.SearchLog;
 
+import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -38,17 +41,13 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
     private final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
-    private final AsyncAuditRequestService asyncAuditRequestService;
-
     @Autowired
     public AuditCaseRemoteOperation(@Lazy final SecurityUtils securityUtils,
                                     LogAndAuditFeignClient logAndAuditFeignClient,
-                                    final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration,
-                                    AsyncAuditRequestService asyncAuditRequestService) {
+                                    final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration) {
         this.securityUtils = securityUtils;
         this.logAndAuditFeignClient = logAndAuditFeignClient;
         this.auditCaseRemoteConfiguration = auditCaseRemoteConfiguration;
-        this.asyncAuditRequestService = asyncAuditRequestService;
     }
 
     @Override
@@ -63,7 +62,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
                 CaseActionPostRequest capr = new CaseActionPostRequest(actionLog);
                 String activity = CASE_ACTION_MAP.get(entry.getOperationType());
 
-                asyncAuditRequestService.postAsyncAuditRequestAndHandleResponse(entry, activity, capr,
+                postAsyncAuditRequestAndHandleResponse(entry, activity, capr,
                     null, lauCaseAuditUrl);
 
             } else {
@@ -89,7 +88,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
                 CaseSearchPostRequest cspr = new CaseSearchPostRequest(searchLog);
                 String activity = "SEARCH";
 
-                asyncAuditRequestService.postAsyncAuditRequestAndHandleResponse(entry, activity,null,
+                postAsyncAuditRequestAndHandleResponse(entry, activity,null,
                     cspr, lauCaseAuditUrl);
 
             } else {
@@ -102,6 +101,53 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         }
     }
 
+    public void postAsyncAuditRequestAndHandleResponse(
+        AuditEntry entry,
+        String activity,
+        CaseActionPostRequest capr,
+        CaseSearchPostRequest cspr,
+        String url) {
+
+        String auditLogId = UUID.randomUUID().toString();
+
+        try {
+            logCorrelationId(entry.getRequestId(), activity,
+                entry.getJurisdiction(), entry.getIdamId(), auditLogId);
+
+            if (LAU_CASE_ACTION_CREATE.equals(activity) || LAU_CASE_ACTION_UPDATE.equals(activity)
+                || LAU_CASE_ACTION_VIEW.equals(activity)) {
+                CompletableFuture
+                    .supplyAsync(() -> logAndAuditFeignClient.postCaseAction(
+                    securityUtils.getServiceAuthorization(), capr))
+                    .whenComplete((response, error) -> {
+                        if (response != null) {
+                            logAuditResponse(entry.getRequestId(), activity,
+                                response.getStatusCode().value(), URI.create(url), auditLogId);
+                        }
+                        if (error != null) {
+                            log.error("Error occurred while processing response for "
+                                + "case action audit request. ", error);
+                        }
+                    });
+            } else if ("SEARCH".equals(activity)) {
+                CompletableFuture
+                    .supplyAsync(() -> logAndAuditFeignClient.postCaseSearch(
+                    securityUtils.getServiceAuthorization(), cspr))
+                    .whenComplete((response, error) -> {
+                        if (response != null) {
+                            logAuditResponse(entry.getRequestId(), activity,
+                                response.getStatusCode().value(), URI.create(url), auditLogId);
+                        }
+                        if (error != null) {
+                            log.error("Error occurred while processing response for "
+                                + "case search audit request. ", error);
+                        }
+                    });
+            }
+        } catch (Exception ex) {
+            log.error("Unexpected error occurred during audit Feign call: {}", ex.getMessage(), ex);
+        }
+    }
 
     private ActionLog createActionLogFromAuditEntry(AuditEntry entry, ZonedDateTime zonedDateTime) {
         ActionLog actionLog = new ActionLog();
@@ -120,5 +166,25 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         searchLog.setCaseRefs(entry.getCaseId());
         searchLog.setTimestamp(zonedDateTime);
         return searchLog;
+    }
+
+    private void logCorrelationId(
+        String requestId, String activity, String jurisdiction, String idamId, String auditLogId) {
+        log.info("LAU Correlation-ID:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},jurisdiction:{},idamId:{}, logId:{}",
+            activity,
+            requestId,
+            jurisdiction,
+            idamId,
+            auditLogId);
+    }
+
+    private void logAuditResponse(
+        String requestId, String activity, int httpStatus, URI uri, String auditLogId) {
+        log.info("LAU Response:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},httpStatus:{},url:{}, logId:{}",
+            activity,
+            requestId,
+            httpStatus,
+            uri.toString(),
+            auditLogId);
     }
 }
