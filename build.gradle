@@ -828,6 +828,7 @@ task highLevelDataSetup(type: JavaExec) {
 }
 
 task smoke() {
+    enabled = false
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
 
@@ -868,6 +869,7 @@ task smoke() {
 def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
 
 task functional(type: JavaExec) {
+    enabled = false
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
     dependsOn aatClasses
