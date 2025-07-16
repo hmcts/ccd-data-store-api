@@ -19,6 +19,8 @@ java:
           alias: IDAM_DATA_STORE_SYSTEM_USER_USERNAME
         - name: idam-data-store-system-user-password
           alias: IDAM_DATA_STORE_SYSTEM_USER_PASSWORD
+        - name: data-store-api-TOKEN-SECRET
+          alias: DATA_STORE_TOKEN_SECRET
   environment:
     AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "2dcb834e-768e-4429-9050-ab15af959995"
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
