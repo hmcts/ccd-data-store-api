@@ -155,8 +155,6 @@ public class CaseSearchResultViewGenerator {
                 .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
                 .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
                 .filter(caseField -> caseSearchesViewAccessControl.filterFieldByAuthorisationAccessOnField(caseField))
-                .filter(caseField ->
-                    caseSearchesViewAccessControl.filterResultsBySecurityClassification(caseField, caseTypeDefinition))
                 .map(caseField -> buildSearchResultViewColumn(searchResultField, caseField))
             )
             .collect(toList());

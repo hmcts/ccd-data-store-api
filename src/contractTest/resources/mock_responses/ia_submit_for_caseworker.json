@@ -1,0 +1,58 @@
+{
+  "case_data": {
+    "subscriptions": [
+      {
+        "id": "1",
+        "value": {
+          "subscriber": "appellant",
+          "wantsSms": "Yes",
+          "mobileNumber": "0111111111",
+          "wantsEmail": "Yes",
+          "email": "test@example.com"
+        }
+      }
+    ],
+    "currentCaseStateVisibleToLegalRepresentative": "appealStarted",
+    "caseManagementLocation": {
+      "baseLocation": "765324",
+      "region": "1"
+    },
+    "staffLocation": "Taylor House",
+    "appellantDateOfBirth": "1990-12-07",
+    "uploadAddendumEvidenceLegalRepActionAvailable": "No",
+    "legalRepCompanyAddress": {
+      "PostCode": ""
+    },
+    "legalRepCompanyName": "",
+    "applicationOutOfTimeExplanation": "test case",
+    "uploadTheNoticeOfDecisionDocs": [
+      {
+        "id": "1",
+        "value": {
+          "document": {
+            "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/7f63ca9b-c361-49ab-aa8c-8fbdb6bc2936",
+            "document_filename": "some-notice-of-decision-letter.pdf",
+            "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/7f63ca9b-c361-49ab-aa8c-8fbdb6bc2936"
+          },
+          "description": "some notice of decision description"
+        }
+      }
+    ],
+    "appealReferenceNumber": "DRAFT",
+    "appellantGivenNames": "Bob",
+    "appealType": "protection",
+    "appellantFamilyName": "Smith",
+    "uploadAdditionalEvidenceActionAvailable": "No",
+    "appellantNameForDisplay": "Bob Smith",
+    "appellantTitle": "Mr",
+    "homeOfficeDecisionDate": "2019-08-01",
+    "submissionOutOfTime": "Yes",
+    "homeOfficeReferenceNumber": "000123456"
+  },
+  "callback_response_status": "CALLBACK_COMPLETED",
+  "jurisdiction": "IA",
+  "security_classification": "PUBLIC",
+  "id": 1593694526480000,
+  "state": "appealStarted",
+  "case_type_id": "Asylum"
+}

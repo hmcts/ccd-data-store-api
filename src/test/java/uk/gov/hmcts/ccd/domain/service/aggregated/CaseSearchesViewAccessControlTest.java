@@ -157,8 +157,6 @@ class CaseSearchesViewAccessControlTest {
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any()))
             .thenReturn(caseType1SearchResult);
         doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(any(), any());
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any()))
-            .thenReturn(true);
 
         classUnderTest = new CaseSearchesViewAccessControl(caseTypeService,
             searchResultDefinitionService, securityClassificationService, caseDataAccessControl);
