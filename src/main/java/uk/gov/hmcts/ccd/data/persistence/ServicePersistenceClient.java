@@ -37,7 +37,7 @@ public class ServicePersistenceClient {
     }
 
     public JsonNode updateSupplementaryData(URI baseURI, String caseRef, SupplementaryDataUpdateRequest supplementaryData) {
-        return api.updateSupplementaryData(baseURI, caseRef, supplementaryData);
+        return api.updateSupplementaryData(baseURI, caseRef, supplementaryData).getSupplementaryData();
     }
 
 }

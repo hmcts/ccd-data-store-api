@@ -3,8 +3,6 @@ package uk.gov.hmcts.ccd.data.persistence;
 import java.net.URI;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedCaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
-import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
-import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 @FeignClient(name = "servicePersistenceAPI", configuration = ServicePersistenceAPIInterceptor.class)
 interface ServicePersistenceAPI {
@@ -59,7 +54,7 @@ interface ServicePersistenceAPI {
 
     @PostMapping(value = "/ccd/cases/{case-ref}/supplementary-data", consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    JsonNode updateSupplementaryData(URI baseURI, @PathVariable("case-ref") String caseRef,
+    DecentralisedUpdateSupplementaryDataResponse updateSupplementaryData(URI baseURI, @PathVariable("case-ref") String caseRef,
                                      SupplementaryDataUpdateRequest supplementaryData);
 
 }
