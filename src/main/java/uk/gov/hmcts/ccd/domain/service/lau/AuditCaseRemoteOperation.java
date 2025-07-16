@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
@@ -12,7 +13,9 @@ import uk.gov.hmcts.ccd.auditlog.LogAndAuditFeignClient;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.lau.ActionLog;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
+import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostResponse;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostRequest;
+import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostResponse;
 import uk.gov.hmcts.ccd.domain.model.lau.SearchLog;
 
 import java.net.URI;
@@ -116,33 +119,15 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
             if (LAU_CASE_ACTION_CREATE.equals(activity) || LAU_CASE_ACTION_UPDATE.equals(activity)
                 || LAU_CASE_ACTION_VIEW.equals(activity)) {
-                CompletableFuture
-                    .supplyAsync(() -> logAndAuditFeignClient.postCaseAction(
-                    securityUtils.getServiceAuthorization(), capr))
-                    .whenComplete((response, error) -> {
-                        if (response != null) {
-                            logAuditResponse(entry.getRequestId(), activity,
-                                response.getStatusCode().value(), URI.create(url), auditLogId);
-                        }
-                        if (error != null) {
-                            log.error("Error occurred while processing response for "
-                                + "case action audit request. ", error);
-                        }
-                    });
+                CompletableFuture<ResponseEntity<CaseActionPostResponse>> future = CompletableFuture.supplyAsync(() ->
+                    logAndAuditFeignClient.postCaseAction(securityUtils.getServiceAuthorization(), capr));
+                future.whenComplete((response, error) ->
+                    handleAuditResponse(response, error, entry.getRequestId(), activity, url, auditLogId));
             } else if ("SEARCH".equals(activity)) {
-                CompletableFuture
-                    .supplyAsync(() -> logAndAuditFeignClient.postCaseSearch(
-                    securityUtils.getServiceAuthorization(), cspr))
-                    .whenComplete((response, error) -> {
-                        if (response != null) {
-                            logAuditResponse(entry.getRequestId(), activity,
-                                response.getStatusCode().value(), URI.create(url), auditLogId);
-                        }
-                        if (error != null) {
-                            log.error("Error occurred while processing response for "
-                                + "case search audit request. ", error);
-                        }
-                    });
+                CompletableFuture<ResponseEntity<CaseSearchPostResponse>> future = CompletableFuture.supplyAsync(() ->
+                    logAndAuditFeignClient.postCaseSearch(securityUtils.getServiceAuthorization(), cspr));
+                future.whenComplete((response, error) ->
+                    handleAuditResponse(response, error, entry.getRequestId(), activity, url, auditLogId));
             }
         } catch (Exception ex) {
             log.error("Unexpected error occurred during audit Feign call: {}", ex.getMessage(), ex);
@@ -187,4 +172,21 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             uri.toString(),
             auditLogId);
     }
+
+    private void handleAuditResponse(
+        ResponseEntity<?> response,
+        Throwable error,
+        String requestId,
+        String activity,
+        String url,
+        String auditLogId) {
+
+        if (response != null) {
+            logAuditResponse(requestId, activity, response.getStatusCode().value(), URI.create(url), auditLogId);
+        }
+        if (error != null) {
+            log.error("Error occurred while processing response for {} audit request.", activity, error);
+        }
+    }
+
 }

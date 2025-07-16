@@ -14,8 +14,8 @@ public class FeignClientConfig {
     @Value("${lau.remote.delayOnError:10}")
     private long initialDelay;
 
-    private final long maxDelay = 100;
-    private final int maxRetries = 3;
+    private static final long maxDelay = 100;
+    private static final int maxRetries = 3;
 
     @Bean
     public Retryer feignRetryer() {
