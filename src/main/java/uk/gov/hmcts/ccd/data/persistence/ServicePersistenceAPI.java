@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,12 +14,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
+import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 @FeignClient(name = "servicePersistenceAPI", configuration = ServicePersistenceAPIInterceptor.class)
-public interface ServicePersistenceAPI {
+interface ServicePersistenceAPI {
 
     @GetMapping(value = "/ccd/cases/{case-ref}")
-    CaseDetails getCase(URI baseURI, @PathVariable("case-ref") String caseRef);
+    DecentralisedGetCaseResponse getCase(URI baseURI, @PathVariable("case-ref") String caseRef);
 
     /**
      * Submits an event to create or update a case in CCD.
@@ -44,7 +47,7 @@ public interface ServicePersistenceAPI {
      */
     @PostMapping(value = "/ccd/cases", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    CaseDetails createEvent(URI baseURI, @RequestBody DecentralisedCaseEvent caseEvent);
+    DecentralisedGetCaseResponse createEvent(URI baseURI, @RequestBody DecentralisedCaseEvent caseEvent);
 
     @GetMapping(value = "/ccd/cases/{case-ref}/history")
     List<DecentralisedAuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") String caseReference);

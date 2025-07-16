@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceAPI;
+import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedEventDetails;
@@ -22,15 +22,15 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 public class DecentralisedSubmitCaseTransaction {
 
     private final CaseTypeService caseTypeService;
-    private final ServicePersistenceAPI servicePersistenceAPI;
+    private final ServicePersistenceClient servicePersistenceClient;
     private final PersistenceStrategyResolver resolver;
 
     public DecentralisedSubmitCaseTransaction(final CaseTypeService caseTypeService,
-                                              final ServicePersistenceAPI servicePersistenceAPI,
+                                              final ServicePersistenceClient servicePersistenceAPI,
                                               final PersistenceStrategyResolver resolver
                                               ) {
         this.caseTypeService = caseTypeService;
-        this.servicePersistenceAPI = servicePersistenceAPI;
+        this.servicePersistenceClient = servicePersistenceAPI;
         this.resolver = resolver;
     }
 
@@ -66,7 +66,7 @@ public class DecentralisedSubmitCaseTransaction {
 
         try {
             var uri = resolver.resolveUriOrThrow(decentralisedCaseEvent.getCaseDetails());
-            CaseDetails caseDetails = servicePersistenceAPI.createEvent(uri, decentralisedCaseEvent);
+            CaseDetails caseDetails = servicePersistenceClient.createEvent(uri, decentralisedCaseEvent);
             // We currently need an ID for the case details to be set because it is written to ccd's db.
             // TODO: remove when enableCaseUsersDbSync is switched off and that functionality removed.
             caseDetails.setId(caseDetails.getReference().toString());

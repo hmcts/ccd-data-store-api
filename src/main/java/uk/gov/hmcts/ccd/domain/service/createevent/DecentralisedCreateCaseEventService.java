@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceAPI;
+import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DecentralisedEventDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -20,14 +20,14 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 public class DecentralisedCreateCaseEventService {
 
     private final CaseTypeService caseTypeService;
-    private final ServicePersistenceAPI servicePersistenceAPI;
+    private final ServicePersistenceClient servicePersistenceClient;
     private final PersistenceStrategyResolver resolver;
 
     public DecentralisedCreateCaseEventService(final CaseTypeService caseTypeService,
-                                               final ServicePersistenceAPI servicePersistenceAPI,
+                                               final ServicePersistenceClient servicePersistenceClient,
                                                final PersistenceStrategyResolver resolver) {
         this.caseTypeService = caseTypeService;
-        this.servicePersistenceAPI = servicePersistenceAPI;
+        this.servicePersistenceClient = servicePersistenceClient;
         this.resolver = resolver;
     }
 
@@ -60,7 +60,7 @@ public class DecentralisedCreateCaseEventService {
 
         try {
             var uri = resolver.resolveUriOrThrow(caseDetails);
-            return servicePersistenceAPI.createEvent(uri, decentralisedCaseEvent);
+            return servicePersistenceClient.createEvent(uri, decentralisedCaseEvent);
         } catch (FeignException.Conflict conflict) {
             throw new CaseConcurrencyException("""
                     Unfortunately we were unable to save your work to the case as \

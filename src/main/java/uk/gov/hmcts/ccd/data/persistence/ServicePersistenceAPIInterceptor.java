@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 @RequiredArgsConstructor
-public class ServicePersistenceAPIInterceptor implements RequestInterceptor {
+class ServicePersistenceAPIInterceptor implements RequestInterceptor {
 
     public static final String IDEMPOTENCY_KEY_HEADER = "Idempotency-Key";
 

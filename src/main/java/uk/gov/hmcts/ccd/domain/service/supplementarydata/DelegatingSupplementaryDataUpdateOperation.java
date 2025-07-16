@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceAPI;
+import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
@@ -17,16 +17,16 @@ public class DelegatingSupplementaryDataUpdateOperation implements Supplementary
 
     private final PersistenceStrategyResolver persistenceResolver;
     private final DefaultSupplementaryDataUpdateOperation defaultSupplementaryDataUpdateOperation;
-    private final ServicePersistenceAPI servicePersistenceAPI;
+    private final ServicePersistenceClient servicePersistenceClient;
 
     @Autowired
     public DelegatingSupplementaryDataUpdateOperation(
         PersistenceStrategyResolver persistenceResolver,
         @Qualifier("db") DefaultSupplementaryDataUpdateOperation defaultSupplementaryDataUpdateOperation,
-        ServicePersistenceAPI servicePersistenceAPI) {
+        ServicePersistenceClient servicePersistenceClient) {
         this.persistenceResolver = persistenceResolver;
         this.defaultSupplementaryDataUpdateOperation = defaultSupplementaryDataUpdateOperation;
-        this.servicePersistenceAPI = servicePersistenceAPI;
+        this.servicePersistenceClient = servicePersistenceClient;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class DelegatingSupplementaryDataUpdateOperation implements Supplementary
         Optional<URI> serviceUrl = persistenceResolver.resolveUri(caseReference);
 
         if (serviceUrl.isPresent()) {
-            var updated = servicePersistenceAPI.updateSupplementaryData(
+            var updated = servicePersistenceClient.updateSupplementaryData(
                 serviceUrl.get(),
                 caseReference,
                 supplementaryData

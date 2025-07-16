@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
-@Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class DecentralisedAuditEvent {
+@Data
+class DecentralisedAuditEvent {
     private Long id;
     private Long caseReference;
     private AuditEvent event;
