@@ -13,18 +13,19 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Slf4j
 public class FeignClientConfig {
 
-    @Value("${lau.remote.delayOnError:3}")
+    @Value("${lau.remote.delayOnError:20}")
     private long initialDelay;
 
-    private static final long MAX_DELAY = 10;
+    @Value("${lau.remote.maxDelay:100}")
+    private long maxDelay;
+
     private static final int MAX_RETRIES = 3;
 
     @Bean
     public Retryer feignRetryer() {
         return new Retryer.Default(
-                SECONDS.toMillis(initialDelay),
-                SECONDS.toMillis(MAX_DELAY),
-                MAX_RETRIES);
+                initialDelay,maxDelay,MAX_RETRIES
+        );
     }
 
     @Bean
