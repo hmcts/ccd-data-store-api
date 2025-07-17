@@ -248,29 +248,29 @@ public class CreateCaseEventService {
 
         boolean isDecentralised = resolver.isDecentralised(caseDetailsInDatabase);
 
-        CaseDetails finalCaseDetails = isDecentralised
-                ? decentralisedCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(), caseEventDefinition,
-                caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase)
-                : saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
+        CaseDetails finalCaseDetails;
+        if (isDecentralised) {
+            finalCaseDetails = decentralisedCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(), caseEventDefinition,
+                caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase);
+        } else {
+            finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
                 newState, timeNow);
-
-        caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
-
-        if (!isDecentralised) {
             saveAuditEventForCaseDetails(
-                    aboutToSubmitCallbackResponse,
-                    content.getEvent(),
-                    caseEventDefinition,
-                    finalCaseDetails,
-                    caseTypeDefinition,
-                    timeNow,
-                    oldState,
-                    content.getOnBehalfOfUserToken(),
-                    content.getOnBehalfOfId(),
-                    securityClassificationService.getClassificationForEvent(caseTypeDefinition,
-                            caseEventDefinition)
+                aboutToSubmitCallbackResponse,
+                content.getEvent(),
+                caseEventDefinition,
+                finalCaseDetails,
+                caseTypeDefinition,
+                timeNow,
+                oldState,
+                content.getOnBehalfOfUserToken(),
+                content.getOnBehalfOfId(),
+                securityClassificationService.getClassificationForEvent(caseTypeDefinition,
+                    caseEventDefinition)
             );
         }
+
+        caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
         caseDocumentService.attachCaseDocuments(
             caseDetails.getReferenceAsString(),
