@@ -337,26 +337,24 @@ public class CreateCaseEventService {
             caseDetailsAfterCallback
         );
 
-        boolean isDecentralised = resolver.isDecentralised(caseDetailsInDatabase);
-
-        CaseDetails finalCaseDetails = isDecentralised
-                ? decentralisedCreateCaseEventService.saveAuditEventForCaseDetails(event, caseEventDefinition,
-                caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase)
-                : saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
+        CaseDetails finalCaseDetails;
+        if (resolver.isDecentralised(caseDetailsInDatabase)) {
+            finalCaseDetails = decentralisedCreateCaseEventService.saveAuditEventForCaseDetails(event, caseEventDefinition,
+                caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase);
+        } else {
+            finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
                 newState, timeNow);
-
-        if (!isDecentralised) {
             saveAuditEventForCaseDetails(
-                    aboutToSubmitCallbackResponse,
-                    event,
-                    caseEventDefinition,
-                    finalCaseDetails,
-                    caseTypeDefinition,
-                    timeNow,
-                    oldState,
-                    null,
-                    null,
-                    SecurityClassification.PUBLIC
+                aboutToSubmitCallbackResponse,
+                event,
+                caseEventDefinition,
+                finalCaseDetails,
+                caseTypeDefinition,
+                timeNow,
+                oldState,
+                null,
+                null,
+                SecurityClassification.PUBLIC
             );
         }
 
