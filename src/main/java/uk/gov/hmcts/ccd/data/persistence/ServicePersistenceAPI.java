@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 
 @FeignClient(name = "servicePersistenceAPI", configuration = ServicePersistenceAPIInterceptor.class)
 interface ServicePersistenceAPI {
 
-    @GetMapping(value = "/ccd/cases/{case-ref}")
-    DecentralisedGetCaseResponse getCase(URI baseURI, @PathVariable("case-ref") String caseRef);
+    @GetMapping(value = "/ccd/cases")
+    List<DecentralisedCaseDetails> getCases(URI baseURI, @RequestParam("case-refs") List<String> caseRefs);
 
     /**
      * Submits an event to create or update a case.
@@ -41,9 +42,9 @@ interface ServicePersistenceAPI {
      */
     @PostMapping(value = "/ccd/cases", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    DecentralisedGetCaseResponse submitEvent(URI baseURI,
-                                             @RequestHeader("Idempotency-Key") String idempotencyKey,
-                                             @RequestBody DecentralisedCaseEvent caseEvent);
+    DecentralisedCaseDetails submitEvent(URI baseURI,
+                                         @RequestHeader("Idempotency-Key") String idempotencyKey,
+                                         @RequestBody DecentralisedCaseEvent caseEvent);
 
     @GetMapping(value = "/ccd/cases/{case-ref}/history")
     List<DecentralisedAuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") String caseReference);

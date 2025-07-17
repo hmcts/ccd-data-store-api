@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 @RequiredArgsConstructor
@@ -21,7 +22,13 @@ public class ServicePersistenceClient {
 
     public CaseDetails getCase(String caseRef) {
         var uri = resolver.resolveUriOrThrow(caseRef);
-        return api.getCase(uri, caseRef).getCaseDetails();
+        var response = api.getCases(uri, List.of(caseRef));
+
+        if (response.isEmpty()) {
+            throw new CaseNotFoundException(caseRef);
+        }
+
+        return response.getFirst().getCaseDetails();
     }
 
     public CaseDetails createEvent(DecentralisedCaseEvent caseEvent) {
