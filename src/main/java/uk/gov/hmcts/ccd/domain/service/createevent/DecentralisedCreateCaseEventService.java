@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import feign.FeignException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
 import uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.data.persistence.DecentralisedEventDetails;
@@ -15,18 +17,14 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class DecentralisedCreateCaseEventService {
 
     private final CaseTypeService caseTypeService;
     private final ServicePersistenceClient servicePersistenceClient;
+    private final DefaultCaseDetailsRepository caseDetailsRepository;
 
-    public DecentralisedCreateCaseEventService(final CaseTypeService caseTypeService,
-                                               final ServicePersistenceClient servicePersistenceClient
-                                               ) {
-        this.caseTypeService = caseTypeService;
-        this.servicePersistenceClient = servicePersistenceClient;
-    }
 
     public CaseDetails submitDecentralisedEvent(final Event event,
                                                 final CaseEventDefinition caseEventDefinition,
@@ -34,6 +32,9 @@ public class DecentralisedCreateCaseEventService {
                                                 final CaseTypeDefinition caseTypeDefinition,
                                                 final CaseDetails caseDetailsBefore
     ) {
+
+        // The one remaining mutable local column is resolvedTTL, which we update.
+        caseDetailsRepository.updateResolvedTtl(caseDetails.getReference(), caseDetails.getResolvedTTL());
 
         CaseStateDefinition caseStateDefinition =
                 caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
