@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-class DefaultGetEventsOperationTest {
+class LocalGetEventsOperationTest {
 
     private static final Long CASE_ID = 123L;
     private static final String JURISDICTION_ID = "Probate";
@@ -39,8 +40,10 @@ class DefaultGetEventsOperationTest {
     private GetCaseOperation getCaseOperation;
     @Mock
     private UIDService uidService;
+    @Mock
+    private ApplicationParams applicationParams;
 
-    private DefaultGetEventsOperation listEventsOperation;
+    private LocalGetEventsOperation listEventsOperation;
     private CaseDetails caseDetails;
     private AuditEvent event;
 
@@ -53,7 +56,8 @@ class DefaultGetEventsOperationTest {
 
         doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
 
-        listEventsOperation = new DefaultGetEventsOperation(auditEventRepository, getCaseOperation, uidService);
+        listEventsOperation
+                = new LocalGetEventsOperation(auditEventRepository, getCaseOperation, uidService);
         event = new AuditEvent();
     }
 

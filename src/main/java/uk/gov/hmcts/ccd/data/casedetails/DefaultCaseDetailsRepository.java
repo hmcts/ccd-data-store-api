@@ -26,6 +26,7 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
@@ -223,6 +224,16 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectUnsecured(em);
         qb.whereReference(String.valueOf(reference));
         return qb.getSingleResult().map(this.caseDetailsMapper::entityToModel);
+    }
+
+    public void updateResolvedTtl(final Long caseId, final LocalDate resolvedTtl) {
+        LOG.info("Updating resolved TTL for caseId {}: {}", caseId, resolvedTtl);
+        final Query query = em.createQuery(
+            "UPDATE CaseDetailsEntity SET resolvedTTL = :ttl WHERE id = :caseId"
+        );
+        query.setParameter("ttl", resolvedTtl);
+        query.setParameter("caseId", caseId);
+        query.executeUpdate();
     }
 
     private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id,
