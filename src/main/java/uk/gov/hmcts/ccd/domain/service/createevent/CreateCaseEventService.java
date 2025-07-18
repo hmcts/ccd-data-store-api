@@ -249,7 +249,15 @@ public class CreateCaseEventService {
         boolean isDecentralised = resolver.isDecentralised(caseDetailsInDatabase);
 
         CaseDetails finalCaseDetails;
-        if (isDecentralised) {
+        if (resolver.isDecentralised(caseDetailsInDatabase)) {
+            // Documents must be attached before the event is committed.
+            // When decentralised we must do the attach before the event is submitted to the decentralised service.
+            caseDocumentService.attachCaseDocuments(
+                caseDetails.getReferenceAsString(),
+                caseDetails.getCaseTypeId(),
+                caseDetails.getJurisdiction(),
+                documentHashes
+            );
             finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(content.getEvent(), caseEventDefinition,
                 caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase);
         } else {
@@ -268,16 +276,18 @@ public class CreateCaseEventService {
                 securityClassificationService.getClassificationForEvent(caseTypeDefinition,
                     caseEventDefinition)
             );
+
+            // Documents must be attached before event is committed.
+            // When centralised this will be upon method return when the transaction commits.
+            caseDocumentService.attachCaseDocuments(
+                caseDetails.getReferenceAsString(),
+                caseDetails.getCaseTypeId(),
+                caseDetails.getJurisdiction(),
+                documentHashes
+            );
         }
 
         caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
-
-        caseDocumentService.attachCaseDocuments(
-            caseDetails.getReferenceAsString(),
-            caseDetails.getCaseTypeId(),
-            caseDetails.getJurisdiction(),
-            documentHashes
-        );
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
@@ -339,6 +349,15 @@ public class CreateCaseEventService {
 
         CaseDetails finalCaseDetails;
         if (resolver.isDecentralised(caseDetailsInDatabase)) {
+            // Documents must be attached before event is committed.
+            // When decentralised we must do the attach before the event is submitted.
+            caseDocumentService.attachCaseDocuments(
+                caseDetails.getReferenceAsString(),
+                caseDetails.getCaseTypeId(),
+                caseDetails.getJurisdiction(),
+                documentHashes
+            );
+
             finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(event, caseEventDefinition,
                 caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase);
         } else {
@@ -356,14 +375,17 @@ public class CreateCaseEventService {
                 null,
                 SecurityClassification.PUBLIC
             );
+
+            // Documents must be attached before event is committed.
+            // When centralised this will be upon method return when the transaction commits.
+            caseDocumentService.attachCaseDocuments(
+                caseDetails.getReferenceAsString(),
+                caseDetails.getCaseTypeId(),
+                caseDetails.getJurisdiction(),
+                documentHashes
+            );
         }
 
-        caseDocumentService.attachCaseDocuments(
-            caseDetails.getReferenceAsString(),
-            caseDetails.getCaseTypeId(),
-            caseDetails.getJurisdiction(),
-            documentHashes
-        );
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
