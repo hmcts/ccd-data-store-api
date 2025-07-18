@@ -339,7 +339,7 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     implementation 'org.jooq:jool-java-8:0.9.14'
-    implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
+    implementation 'com.github.hmcts:ccd-case-document-am-client:1.59.2'
 
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version:  ccdTestDefinitionVersion
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
@@ -401,6 +401,9 @@ dependencyManagement {
         dependencySet(group: 'commons-beanutils', version: '1.9.4') {
             entry 'commons-beanutils'
         }
+        // CVE-2023-3635
+        dependency 'com.squareup.okio:okio:3.5.0'
+        dependency 'com.squareup.okhttp3:okhttp:4.11.0'
 
         // Required for Embedded ES with Java 11
         dependency 'org.rauschig:jarchivelib:1.0.0'
