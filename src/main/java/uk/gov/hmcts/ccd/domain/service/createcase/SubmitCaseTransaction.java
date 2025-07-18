@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.persistence.ShellCaseCreator;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -55,23 +56,25 @@ public class SubmitCaseTransaction implements AccessControl {
     private final CaseDocumentTimestampService caseDocumentTimestampService;
     private final DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction;
     private final PersistenceStrategyResolver resolver;
+    private final ShellCaseCreator shellCaseCreator;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                      final CaseDetailsRepository caseDetailsRepository,
-                                    final CaseAuditEventRepository caseAuditEventRepository,
-                                    final CaseTypeService caseTypeService,
-                                    final CallbackInvoker callbackInvoker,
-                                    final UIDService uidService,
-                                    final SecurityClassificationService securityClassificationService,
-                                    final CaseDataAccessControl caseDataAccessControl,
-                                    final @Qualifier("caseEventMessageService") MessageService messageService,
-                                    final CaseDocumentService caseDocumentService,
-                                    final ApplicationParams applicationParams,
-                                    final CaseAccessGroupUtils caseAccessGroupUtils,
-                                    final CaseDocumentTimestampService caseDocumentTimestampService,
-                                    final DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction,
-                                    final PersistenceStrategyResolver resolver
+                                 final CaseAuditEventRepository caseAuditEventRepository,
+                                 final CaseTypeService caseTypeService,
+                                 final CallbackInvoker callbackInvoker,
+                                 final UIDService uidService,
+                                 final SecurityClassificationService securityClassificationService,
+                                 final CaseDataAccessControl caseDataAccessControl,
+                                 final @Qualifier("caseEventMessageService") MessageService messageService,
+                                 final CaseDocumentService caseDocumentService,
+                                 final ApplicationParams applicationParams,
+                                 final CaseAccessGroupUtils caseAccessGroupUtils,
+                                 final CaseDocumentTimestampService caseDocumentTimestampService,
+                                 final DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction,
+                                 final PersistenceStrategyResolver resolver,
+                                 final ShellCaseCreator shellCaseCreator
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -87,6 +90,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.caseDocumentTimestampService = caseDocumentTimestampService;
         this.decentralisedSubmitCaseTransaction = decentralisedSubmitCaseTransaction;
         this.resolver = resolver;
+        this.shellCaseCreator = shellCaseCreator;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -176,43 +180,41 @@ public class SubmitCaseTransaction implements AccessControl {
                                                      CaseDetails newCaseDetails,
                                                      IdamUser onBehalfOfUser) {
 
-        // We store an immutable record in our local database.
-        CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
-        if (resolver.isDecentralised(savedCaseDetails)) {
-            // TODO: Commit to our local database before sending to the decentralised service.
+        if (resolver.isDecentralised(newCaseDetails)) {
+            this.shellCaseCreator.persistCasePointer(newCaseDetails);
             // Send the event to the decentralised service.
-            savedCaseDetails = decentralisedSubmitCaseTransaction.saveAuditEventForCaseDetails(response,
-                event, caseTypeDefinition, idamUser, caseEventDefinition, newCaseDetails, onBehalfOfUser);
-        } else {
-            // Store a case event history record locally.
-            final AuditEvent auditEvent = new AuditEvent();
-            auditEvent.setEventId(event.getEventId());
-            auditEvent.setEventName(caseEventDefinition.getName());
-            auditEvent.setSummary(event.getSummary());
-            auditEvent.setDescription(event.getDescription());
-            auditEvent.setCaseDataId(savedCaseDetails.getId());
-            auditEvent.setData(savedCaseDetails.getData());
-            auditEvent.setStateId(savedCaseDetails.getState());
-            CaseStateDefinition caseStateDefinition =
-                caseTypeService.findState(caseTypeDefinition, savedCaseDetails.getState());
-            auditEvent.setStateName(caseStateDefinition.getName());
-            auditEvent.setCaseTypeId(caseTypeDefinition.getId());
-            auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
-            auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
-            auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition,
-                caseEventDefinition));
-            auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
-            auditEvent.setSignificantItem(response.getSignificantItem());
-            saveUserDetails(idamUser, onBehalfOfUser, auditEvent);
-
-            caseAuditEventRepository.set(auditEvent);
-
-            messageService.handleMessage(MessageContext.builder()
-                .caseDetails(savedCaseDetails)
-                .caseTypeDefinition(caseTypeDefinition)
-                .caseEventDefinition(caseEventDefinition)
-                .oldState(null).build());
+            return decentralisedSubmitCaseTransaction.saveAuditEventForCaseDetails(event,
+                caseTypeDefinition, idamUser, caseEventDefinition, newCaseDetails, onBehalfOfUser);
         }
+        CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
+        // Store a case event history record locally.
+        final AuditEvent auditEvent = new AuditEvent();
+        auditEvent.setEventId(event.getEventId());
+        auditEvent.setEventName(caseEventDefinition.getName());
+        auditEvent.setSummary(event.getSummary());
+        auditEvent.setDescription(event.getDescription());
+        auditEvent.setCaseDataId(savedCaseDetails.getId());
+        auditEvent.setData(savedCaseDetails.getData());
+        auditEvent.setStateId(savedCaseDetails.getState());
+        CaseStateDefinition caseStateDefinition =
+            caseTypeService.findState(caseTypeDefinition, savedCaseDetails.getState());
+        auditEvent.setStateName(caseStateDefinition.getName());
+        auditEvent.setCaseTypeId(caseTypeDefinition.getId());
+        auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
+        auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
+        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition,
+            caseEventDefinition));
+        auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
+        auditEvent.setSignificantItem(response.getSignificantItem());
+        saveUserDetails(idamUser, onBehalfOfUser, auditEvent);
+
+        caseAuditEventRepository.set(auditEvent);
+
+        messageService.handleMessage(MessageContext.builder()
+            .caseDetails(savedCaseDetails)
+            .caseTypeDefinition(caseTypeDefinition)
+            .caseEventDefinition(caseEventDefinition)
+            .oldState(null).build());
         return savedCaseDetails;
     }
 

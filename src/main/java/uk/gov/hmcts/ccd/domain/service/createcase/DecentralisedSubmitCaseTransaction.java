@@ -23,6 +23,7 @@ public class DecentralisedSubmitCaseTransaction {
     private final CaseTypeService caseTypeService;
     private final ServicePersistenceClient servicePersistenceClient;
 
+    // TODO: merge this with DecentralisedCreateCaseEventService
     public DecentralisedSubmitCaseTransaction(final CaseTypeService caseTypeService,
                                               final ServicePersistenceClient servicePersistenceAPI
                                               ) {
@@ -30,8 +31,7 @@ public class DecentralisedSubmitCaseTransaction {
         this.servicePersistenceClient = servicePersistenceAPI;
     }
 
-    public CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response,
-                                                    Event event,
+    public CaseDetails saveAuditEventForCaseDetails(Event event,
                                                     CaseTypeDefinition caseTypeDefinition,
                                                     IdamUser idamUser,
                                                     CaseEventDefinition caseEventDefinition,
