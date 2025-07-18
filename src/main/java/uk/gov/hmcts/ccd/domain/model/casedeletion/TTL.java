@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -17,6 +19,8 @@ import java.util.Objects;
 @Data
 public class TTL {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TTL.class);
+
     public static final String TTL_CASE_FIELD_ID = "TTL";
     public static final String YES = "Yes";
     public static final String NO = "No";
@@ -27,8 +31,17 @@ public class TTL {
 
     private String suspended;
 
+    private void jclog(String message) {
+        LOG.info("JCDEBUG: Info: TTL: {}", message);
+        LOG.warn("JCDEBUG: Warn: TTL: {}", message);
+        LOG.error("JCDEBUG: Error: TTL: {}", message);
+        LOG.debug("JCDEBUG: Debug: TTL: {}", message);
+    }
+
     public boolean isSuspended() {
-        return suspended != null && !suspended.equalsIgnoreCase(NO);
+        boolean rc = suspended != null && !suspended.equalsIgnoreCase(NO);
+        jclog("isSuspended(): suspended = " + (suspended==null ? "NULL" : suspended) + "  ,  rc = " + rc);
+        return rc;
     }
 
     @Override
@@ -59,9 +72,12 @@ public class TTL {
         //     null, 'No' and 'NO' all return the same isSuspended() = false,
         //     however we don't want to return true in this 'do values equal' when comparing `null = 'no'`.
 
-        return Objects.equals(suspended, suspendedB)
+        boolean rc = Objects.equals(suspended, suspendedB)
             // NB: some callbacks may change case of YES/NO values: so use extra ignores case check
             || ((suspended != null) && suspended.equalsIgnoreCase(suspendedB));
+        jclog("suspendedValuesEqual(): suspended = " + (suspended==null ? "NULL" : suspended)
+                               + "  ,  suspendedB = " + (suspendedB==null ? "NULL" : suspendedB) + "  ,  rc = " + rc);
+        return rc;
     }
 
 }
