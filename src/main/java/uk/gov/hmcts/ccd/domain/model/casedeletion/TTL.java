@@ -33,9 +33,6 @@ public class TTL {
 
     private void jclog(String message) {
         LOG.info("JCDEBUG: Info: TTL: {}", message);
-        LOG.warn("JCDEBUG: Warn: TTL: {}", message);
-        LOG.error("JCDEBUG: Error: TTL: {}", message);
-        LOG.debug("JCDEBUG: Debug: TTL: {}", message);
     }
 
     public boolean isSuspended() {
