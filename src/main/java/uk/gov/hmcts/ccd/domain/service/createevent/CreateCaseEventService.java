@@ -250,7 +250,7 @@ public class CreateCaseEventService {
 
         CaseDetails finalCaseDetails;
         if (isDecentralised) {
-            finalCaseDetails = decentralisedCreateCaseEventService.saveAuditEventForCaseDetails(content.getEvent(), caseEventDefinition,
+            finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(content.getEvent(), caseEventDefinition,
                 caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase);
         } else {
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
@@ -339,7 +339,7 @@ public class CreateCaseEventService {
 
         CaseDetails finalCaseDetails;
         if (resolver.isDecentralised(caseDetailsInDatabase)) {
-            finalCaseDetails = decentralisedCreateCaseEventService.saveAuditEventForCaseDetails(event, caseEventDefinition,
+            finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(event, caseEventDefinition,
                 caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase);
         } else {
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,

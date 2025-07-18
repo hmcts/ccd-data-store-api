@@ -178,8 +178,8 @@ public class SubmitCaseTransaction implements AccessControl {
 
         // We store an immutable record in our local database.
         CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
-        var isDecentralised = resolver.isDecentralised(savedCaseDetails);
-        if (isDecentralised) {
+        if (resolver.isDecentralised(savedCaseDetails)) {
+            // TODO: Commit to our local database before sending to the decentralised service.
             // Send the event to the decentralised service.
             savedCaseDetails = decentralisedSubmitCaseTransaction.saveAuditEventForCaseDetails(response,
                 event, caseTypeDefinition, idamUser, caseEventDefinition, newCaseDetails, onBehalfOfUser);

@@ -28,11 +28,11 @@ public class DecentralisedCreateCaseEventService {
         this.servicePersistenceClient = servicePersistenceClient;
     }
 
-    public CaseDetails saveAuditEventForCaseDetails(final Event event,
-                                                    final CaseEventDefinition caseEventDefinition,
-                                                    final CaseDetails caseDetails,
-                                                    final CaseTypeDefinition caseTypeDefinition,
-                                                    final CaseDetails caseDetailsBefore
+    public CaseDetails submitDecentralisedEvent(final Event event,
+                                                final CaseEventDefinition caseEventDefinition,
+                                                final CaseDetails caseDetails,
+                                                final CaseTypeDefinition caseTypeDefinition,
+                                                final CaseDetails caseDetailsBefore
     ) {
 
         CaseStateDefinition caseStateDefinition =
