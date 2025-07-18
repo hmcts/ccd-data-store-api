@@ -40,7 +40,7 @@ public class TTL {
 
     public boolean isSuspended() {
         boolean rc = suspended != null && !suspended.equalsIgnoreCase(NO);
-        jclog("isSuspended(): suspended = " + (suspended==null ? "NULL" : suspended) + "  ,  rc = " + rc);
+        jclog("isSuspended(): suspended = " + (suspended == null ? "NULL" : suspended) + "  ,  rc = " + rc);
         return rc;
     }
 
@@ -75,8 +75,8 @@ public class TTL {
         boolean rc = Objects.equals(suspended, suspendedB)
             // NB: some callbacks may change case of YES/NO values: so use extra ignores case check
             || ((suspended != null) && suspended.equalsIgnoreCase(suspendedB));
-        jclog("suspendedValuesEqual(): suspended = " + (suspended==null ? "NULL" : suspended)
-                               + "  ,  suspendedB = " + (suspendedB==null ? "NULL" : suspendedB) + "  ,  rc = " + rc);
+        jclog("suspendedValuesEqual(): suspended = " + (suspended == null ? "NULL" : suspended)
+                              + "  ,  suspendedB = " + (suspendedB == null ? "NULL" : suspendedB) + "  ,  rc = " + rc);
         return rc;
     }
 
