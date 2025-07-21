@@ -261,6 +261,7 @@ public class CreateCaseEventService {
         } else {
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
                 newState, timeNow);
+            var onBehalfOfUser = getOnBehalfOfUser(content.getOnBehalfOfId(), content.getOnBehalfOfUserToken());
             saveAuditEventForCaseDetails(
                 aboutToSubmitCallbackResponse,
                 content.getEvent(),
@@ -269,8 +270,7 @@ public class CreateCaseEventService {
                 caseTypeDefinition,
                 timeNow,
                 oldState,
-                content.getOnBehalfOfUserToken(),
-                content.getOnBehalfOfId(),
+                onBehalfOfUser,
                 securityClassificationService.getClassificationForEvent(caseTypeDefinition,
                     caseEventDefinition)
             );
@@ -369,8 +369,7 @@ public class CreateCaseEventService {
                 caseTypeDefinition,
                 timeNow,
                 oldState,
-                null,
-                null,
+                Optional.empty(),
                 SecurityClassification.PUBLIC
             );
 
@@ -423,6 +422,15 @@ public class CreateCaseEventService {
         return caseDetailsRepository.findByReference(caseReference)
             .orElseThrow(() ->
                 new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
+    }
+
+    private Optional<IdamUser> getOnBehalfOfUser(String onBehalfOfId, String onBehalfOfToken) {
+        if (!StringUtils.isEmpty(onBehalfOfToken)) {
+            return Optional.of(userRepository.getUser(onBehalfOfToken));
+        } else if (!StringUtils.isEmpty(onBehalfOfId)) {
+            return Optional.of(userRepository.getUserByUserId(onBehalfOfId));
+        }
+        return Optional.empty();
     }
 
     private CaseDetails saveCaseDetails(final CaseDetails caseDetailsBefore,
@@ -501,8 +509,7 @@ public class CreateCaseEventService {
                                               final CaseTypeDefinition caseTypeDefinition,
                                               final LocalDateTime timeNow,
                                               final String oldState,
-                                              final String onBehalfOfUserToken,
-                                              final String onBehalfOfId,
+                                              final Optional<IdamUser> onBehalfOf,
                                               final SecurityClassification securityClassification) {
         final CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition,
             caseDetails.getState());
@@ -521,7 +528,7 @@ public class CreateCaseEventService {
         auditEvent.setSecurityClassification(securityClassification);
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
-        saveUserDetails(onBehalfOfUserToken, onBehalfOfId, auditEvent);
+        saveUserDetails(onBehalfOf, auditEvent);
 
         caseAuditEventRepository.set(auditEvent);
         messageService.handleMessage(MessageContext.builder()
@@ -532,20 +539,20 @@ public class CreateCaseEventService {
             .build());
     }
 
-    private void saveUserDetails(String onBehalfOfUserToken, String onBehalfOfId, AuditEvent auditEvent) {
-        boolean onBehalfOfUserTokenExists = !StringUtils.isEmpty(onBehalfOfUserToken);
-        boolean onBehalfOfIdExists = !StringUtils.isEmpty(onBehalfOfId);
-        IdamUser user = onBehalfOfUserTokenExists
-            ? userRepository.getUser(onBehalfOfUserToken)
-            : onBehalfOfIdExists ? userRepository.getUserByUserId(onBehalfOfId) : userRepository.getUser();
-        auditEvent.setUserId(user.getId());
-        auditEvent.setUserLastName(user.getSurname());
-        auditEvent.setUserFirstName(user.getForename());
-        if (onBehalfOfUserTokenExists || onBehalfOfIdExists) {
-            user = userRepository.getUser();
-            auditEvent.setProxiedBy(user.getId());
-            auditEvent.setProxiedByLastName(user.getSurname());
-            auditEvent.setProxiedByFirstName(user.getForename());
+    private void saveUserDetails(Optional<IdamUser> onBehalfOf, AuditEvent auditEvent) {
+        var idamUser = userRepository.getUser();
+        if (onBehalfOf.isEmpty()) {
+            auditEvent.setUserId(idamUser.getId());
+            auditEvent.setUserLastName(idamUser.getSurname());
+            auditEvent.setUserFirstName(idamUser.getForename());
+        } else {
+            var onBehalfOfUser = onBehalfOf.orElse(null);
+            auditEvent.setUserId(onBehalfOfUser.getId());
+            auditEvent.setUserLastName(onBehalfOfUser.getSurname());
+            auditEvent.setUserFirstName(onBehalfOfUser.getForename());
+            auditEvent.setProxiedBy(idamUser.getId());
+            auditEvent.setProxiedByLastName(idamUser.getSurname());
+            auditEvent.setProxiedByFirstName(idamUser.getForename());
         }
     }
 
