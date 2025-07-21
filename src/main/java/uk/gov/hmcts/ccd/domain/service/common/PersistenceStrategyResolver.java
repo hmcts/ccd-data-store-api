@@ -44,7 +44,8 @@ public class PersistenceStrategyResolver {
     public PersistenceStrategyResolver(DefaultCaseDetailsRepository caseDetailsRepository ) {
         this.caseDetailsRepository = caseDetailsRepository;
         // Least Recently Used cache for lookup of case type by reference.
-        // At around 100 bytes per entry this cache will use up to 10MB of memory.
+        // At around 100 bytes per entry this cache will use up to 10MB of memory
+        // while comfortably accommodating the current working set of cases.
         // https://github.com/ben-manes/caffeine/wiki/Memory-overhead
         this.caseTypeCache = Caffeine.newBuilder()
             .maximumSize(100_000)
