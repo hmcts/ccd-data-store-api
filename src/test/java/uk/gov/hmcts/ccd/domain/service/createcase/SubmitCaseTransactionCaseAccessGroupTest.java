@@ -40,6 +40,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
@@ -134,7 +135,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     @Mock
     private ApplicationParams applicationParams;
     @Mock
-    private DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction;
+    private DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
 
     @Mock
     private PersistenceStrategyResolver resolver;

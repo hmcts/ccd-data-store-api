@@ -246,6 +246,7 @@ public class CreateCaseEventService {
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 
+        var onBehalfOfUser = getOnBehalfOfUser(content.getOnBehalfOfId(), content.getOnBehalfOfUserToken());
         CaseDetails finalCaseDetails;
         if (resolver.isDecentralised(caseDetailsInDatabase)) {
             // Documents must be attached before the event is committed.
@@ -257,11 +258,10 @@ public class CreateCaseEventService {
                 documentHashes
             );
             finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(content.getEvent(), caseEventDefinition,
-                caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase);
+                caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.of(caseDetailsInDatabase), onBehalfOfUser);
         } else {
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
                 newState, timeNow);
-            var onBehalfOfUser = getOnBehalfOfUser(content.getOnBehalfOfId(), content.getOnBehalfOfUserToken());
             saveAuditEventForCaseDetails(
                 aboutToSubmitCallbackResponse,
                 content.getEvent(),
@@ -357,7 +357,7 @@ public class CreateCaseEventService {
             );
 
             finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(event, caseEventDefinition,
-                caseDetailsAfterCallbackWithoutHashes, caseTypeDefinition, caseDetailsInDatabase);
+                caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.of(caseDetailsInDatabase), Optional.empty());
         } else {
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
                 newState, timeNow);

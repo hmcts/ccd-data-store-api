@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
@@ -38,6 +39,7 @@ import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SubmitCaseTransaction implements AccessControl {
@@ -54,7 +56,7 @@ public class SubmitCaseTransaction implements AccessControl {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
-    private final DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction;
+    private final DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
     private final PersistenceStrategyResolver resolver;
     private final ShellCaseCreator shellCaseCreator;
 
@@ -72,7 +74,7 @@ public class SubmitCaseTransaction implements AccessControl {
                                  final ApplicationParams applicationParams,
                                  final CaseAccessGroupUtils caseAccessGroupUtils,
                                  final CaseDocumentTimestampService caseDocumentTimestampService,
-                                 final DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction,
+                                 final DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction,
                                  final PersistenceStrategyResolver resolver,
                                  final ShellCaseCreator shellCaseCreator
                                  ) {
@@ -183,8 +185,9 @@ public class SubmitCaseTransaction implements AccessControl {
         if (resolver.isDecentralised(newCaseDetails)) {
             this.shellCaseCreator.persistCasePointer(newCaseDetails);
             // Send the event to the decentralised service.
-            return decentralisedSubmitCaseTransaction.saveAuditEventForCaseDetails(event,
-                caseTypeDefinition, idamUser, caseEventDefinition, newCaseDetails, onBehalfOfUser);
+            return decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
+                caseEventDefinition, caseTypeDefinition, newCaseDetails, Optional.empty(),
+                Optional.ofNullable(onBehalfOfUser));
         }
         CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         // Store a case event history record locally.
