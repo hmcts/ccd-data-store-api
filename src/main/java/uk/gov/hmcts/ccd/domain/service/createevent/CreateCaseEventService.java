@@ -246,8 +246,6 @@ public class CreateCaseEventService {
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 
-        boolean isDecentralised = resolver.isDecentralised(caseDetailsInDatabase);
-
         CaseDetails finalCaseDetails;
         if (resolver.isDecentralised(caseDetailsInDatabase)) {
             // Documents must be attached before the event is committed.

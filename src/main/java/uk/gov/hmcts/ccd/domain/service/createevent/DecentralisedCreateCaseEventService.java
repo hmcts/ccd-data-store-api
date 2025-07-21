@@ -33,7 +33,7 @@ public class DecentralisedCreateCaseEventService {
                                                 final CaseDetails caseDetailsBefore
     ) {
 
-        // The one remaining mutable local column is resolvedTTL, which we update.
+        // A remaining mutable local column is resolvedTTL, which we continue to synchronise locally.
         caseDetailsRepository.updateResolvedTtl(caseDetails.getReference(), caseDetails.getResolvedTTL());
 
         CaseStateDefinition caseStateDefinition =
