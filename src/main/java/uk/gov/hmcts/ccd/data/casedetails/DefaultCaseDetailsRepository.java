@@ -227,6 +227,19 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return qb.getSingleResult().map(this.caseDetailsMapper::entityToModel);
     }
 
+    public Long findIdByReference(Long caseReference) {
+        try {
+            final Query query = em.createQuery(
+                "SELECT id FROM CaseDetailsEntity WHERE reference = :reference"
+            );
+            query.setParameter("reference", caseReference);
+            return (Long) query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException("No case found for reference: " + caseReference, e);
+        }
+    }
+
+
     public String findCaseTypeByReference(Long caseReference) {
         try {
             final Query query = em.createQuery(
