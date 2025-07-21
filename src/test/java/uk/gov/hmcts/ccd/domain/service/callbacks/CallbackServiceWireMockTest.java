@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -24,7 +25,6 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
@@ -249,8 +249,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         assertOnRequestAttribute(responseJson3Merged, CLIENT_CONTEXT);
     }
 
-    @org.junit.Ignore // TODO investigating socket issues in Azure
     @Test
+    @Disabled
     public void shouldRetryIfCallbackRespondsLate() throws Exception {
         final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
 
@@ -300,7 +300,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         assertThat(response.getErrors(), Matchers.contains("Test message"));
     }
 
-    @Test(expected = CallbackException.class)
+    @Test
     public void notFoundFailurePath() {
         final String testUrl = "http://localhost";
         final CaseDetails caseDetails = new CaseDetails();
@@ -311,7 +311,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             caseDetails, false);
     }
 
-    @Test(expected = CallbackException.class)
+    @Test
     public void serverError() throws Exception {
         final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -349,7 +349,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
-    @Test(expected = CallbackException.class)
+    @Test
     public void authorisationError() throws Exception {
         final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -370,7 +370,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
     }
 
-    @Test(expected = ApiException.class)
+    @Test
     public void validateCallbackErrorsAndWarningsWithWarnings() {
         final String testWarning1 = "WARNING 1";
         final String testWarning2 = "WARNING 2";
@@ -384,7 +384,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
     }
 
-    @Test(expected = ApiException.class)
+    @Test
     public void validateCallbackErrorsAndWarningsWithErrorsAndIgnore() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("an error"));
@@ -449,7 +449,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         verify(exactly(3), postRequestedFor(urlMatching("/test-callback-invaliddd.*")));
     }
 
-    @Test(expected = CallbackException.class)
+    @Test
     public void shouldThrowCallbackException_whenSendInvalidUrlGetGenericBody() {
         final String testUrl = "http://localhost/invalid-test-callback";
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);

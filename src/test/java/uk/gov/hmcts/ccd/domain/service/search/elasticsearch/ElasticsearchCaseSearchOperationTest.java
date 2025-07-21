@@ -43,7 +43,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.*;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createFailureItem;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createHit;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createMsearchResponse;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createSuccessItem;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createSuccessItemWithNoHits;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createTotalHits;
 
 
 class ElasticsearchCaseSearchOperationTest {
@@ -337,17 +342,19 @@ class ElasticsearchCaseSearchOperationTest {
             when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
 
+            final String indexName = "global_search";
             final CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(List.of(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
-                .withSearchIndex(new SearchIndex("global_search", "_doc"))
+                .withSearchIndex(new SearchIndex(indexName, "_doc"))
                 .build();
+            final CaseSearchRequest caseSearchRequest = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
 
             // Secure the original request
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CrossCaseTypeSearchRequest.class)))
                 .thenReturn(crossCaseTypeSearchRequest);
-
-            String indexName = "casetypeid1_cases-000001";
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(new CaseSearchRequest(indexName, elasticsearchRequest));
             // Simulate a named-index response with no hits
             Hit<ElasticSearchCaseDetailsDTO> hit = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
                 .source(new ElasticSearchCaseDetailsDTO())
@@ -355,7 +362,6 @@ class ElasticsearchCaseSearchOperationTest {
                 .build();
             MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem = createSuccessItemWithNoHits(indexName);
             MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse = createMsearchResponse(List.of(responseItem));
-
 
             when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
                 .thenReturn(msearchResponse);
@@ -369,9 +375,9 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> assertThat(caseSearchResult.getCases()).isEmpty(),
                 () -> assertThat(caseSearchResult.getTotal()).isEqualTo(0L),
                 () -> verify(elasticsearchClient).msearch(any(MsearchRequest.class),
-                    eq(ElasticSearchCaseDetailsDTO.class))
-            // () -> verify(caseSearchRequestSecurity)
-            //    .createSecuredSearchRequest(any(CrossCaseTypeSearchRequest.class))
+                    eq(ElasticSearchCaseDetailsDTO.class)),
+                () -> verify(caseSearchRequestSecurity)
+                    .createSecuredSearchRequest(any(CaseSearchRequest.class))
             );
         }
     }

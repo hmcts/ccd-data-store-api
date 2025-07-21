@@ -2,9 +2,9 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Maps;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -51,15 +51,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -104,7 +96,6 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @MockBean
     private AccessControlService accessControlService;
 
-
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
@@ -112,7 +103,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Inject
     private ApplicationParams applicationParams;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         template = new JdbcTemplate(db);
 
@@ -128,7 +119,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         wireMockServer.resetToDefaultMappings();
     }
 
-    @After
+    @AfterEach
     public void clearDown() {
         listener.requestDestroyed(new ServletRequestEvent(context, request));
     }
@@ -161,8 +152,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         CaseConcurrencyException exception = assertThrows(CaseConcurrencyException.class,
             () -> defaultCaseDetailsRepository.set(caseDetails));
 
-        assertThat(exception.getMessage(), is("Unfortunately we were unable to save your work to the case as "
-            + "another action happened at the same time.\nPlease review the case and try again."));
+        assertThat(exception.getMessage()).isEqualTo("Unfortunately we were unable to save your work to the case as "
+            + "another action happened at the same time.\nPlease review the case and try again.");
 
         verify(emMock).merge(caseDetailsEntity);
         verify(emMock).flush();
@@ -185,11 +176,11 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             e.printStackTrace();
         }
         final CaseDetails caseDetailsPersisted = caseDetailsRepository.set(caseDetails);
-        assertThat(caseDetailsPersisted.getId(), is(notNullValue()));
-        assertThat(caseDetailsPersisted.getReference(), is(caseDetails.getReference()));
-        assertThat(caseDetailsPersisted.getJurisdiction(), is(caseDetails.getJurisdiction()));
-        assertThat(caseDetailsPersisted.getCaseTypeId(), is(caseDetails.getCaseTypeId()));
-        assertThat(caseDetailsPersisted.getResolvedTTL(), is(caseDetails.getResolvedTTL()));
+        assertThat(caseDetailsPersisted.getId()).isNotNull();
+        assertThat(caseDetailsPersisted.getReference()).isEqualTo(caseDetails.getReference());
+        assertThat(caseDetailsPersisted.getJurisdiction()).isEqualTo(caseDetails.getJurisdiction());
+        assertThat(caseDetailsPersisted.getCaseTypeId()).isEqualTo(caseDetails.getCaseTypeId());
+        assertThat(caseDetailsPersisted.getResolvedTTL()).isEqualTo(caseDetails.getResolvedTTL());
     }
 
     @Test
@@ -199,17 +190,17 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         final CaseDetails byId = caseDetailsRepository.findById(1L);
         assertAll(
-            () -> assertThat(byId.getId(), is("1")),
-            () -> assertThat(byId.getJurisdiction(), is("PROBATE")),
-            () -> assertThat(byId.getState(), is("CaseCreated")),
-            () -> assertThat(byId.getCaseTypeId(), is("TestAddressBookCase")),
-            () -> assertThat(byId.getSecurityClassification(), is(SecurityClassification.PUBLIC)),
-            () -> assertThat(byId.getReference(), is(1504259907353529L)),
-            () -> assertThat(byId.getData().get("PersonFirstName").asText(), is("Janet")),
-            () -> assertThat(byId.getData().get("PersonLastName").asText(), is("Parker")),
-            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine1").asText(), is("123")),
-            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine2").asText(), is("Fake Street")),
-            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton"))
+            () -> assertThat(byId.getId()).isEqualTo("1"),
+            () -> assertThat(byId.getJurisdiction()).isEqualTo("PROBATE"),
+            () -> assertThat(byId.getState()).isEqualTo("CaseCreated"),
+            () -> assertThat(byId.getCaseTypeId()).isEqualTo("TestAddressBookCase"),
+            () -> assertThat(byId.getSecurityClassification()).isEqualTo(SecurityClassification.PUBLIC),
+            () -> assertThat(byId.getReference()).isEqualTo(1504259907353529L),
+            () -> assertThat(byId.getData().get("PersonFirstName").asText()).isEqualTo("Janet"),
+            () -> assertThat(byId.getData().get("PersonLastName").asText()).isEqualTo("Parker"),
+            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine1").asText()).isEqualTo("123"),
+            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine2").asText()).isEqualTo("Fake Street"),
+            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine3").asText()).isEqualTo("Hexton")
         );
     }
 
@@ -220,18 +211,20 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         final CaseDetails byReference = caseDetailsRepository.findByReference(1504259907353529L);
         assertAll(
-            () -> assertThat(byReference.getId(), is("1")),
-            () -> assertThat(byReference.getJurisdiction(), is("PROBATE")),
-            () -> assertThat(byReference.getState(), is("CaseCreated")),
-            () -> assertThat(byReference.getCaseTypeId(), is("TestAddressBookCase")),
-            () -> assertThat(byReference.getSecurityClassification(), is(SecurityClassification.PUBLIC)),
-            () -> assertThat(byReference.getReference(), is(1504259907353529L)),
-            () -> assertThat(byReference.getData().get("PersonFirstName").asText(), is("Janet")),
-            () -> assertThat(byReference.getData().get("PersonLastName").asText(), is("Parker")),
-            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine1").asText(), is("123")),
-            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine2").asText(),
-                    is("Fake Street")),
-            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton"))
+            () -> assertThat(byReference.getId()).isEqualTo("1"),
+            () -> assertThat(byReference.getJurisdiction()).isEqualTo("PROBATE"),
+            () -> assertThat(byReference.getState()).isEqualTo("CaseCreated"),
+            () -> assertThat(byReference.getCaseTypeId()).isEqualTo("TestAddressBookCase"),
+            () -> assertThat(byReference.getSecurityClassification()).isEqualTo(SecurityClassification.PUBLIC),
+            () -> assertThat(byReference.getReference()).isEqualTo(1504259907353529L),
+            () -> assertThat(byReference.getData().get("PersonFirstName").asText()).isEqualTo("Janet"),
+            () -> assertThat(byReference.getData().get("PersonLastName").asText()).isEqualTo("Parker"),
+            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine1").asText())
+                    .isEqualTo("123"),
+            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine2").asText())
+                    .isEqualTo("Fake Street"),
+            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine3").asText())
+                    .isEqualTo("Hexton")
         );
     }
 
@@ -262,7 +255,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // If any input is not correctly sanitized it will cause an exception since query result structure will not be
         // as hibernate expects.
-        assertThat(byMetaData.getTotalResultsCount(), is(0));
+        assertThat(byMetaData.getTotalResultsCount()).isEqualTo(0);
     }
 
 //CHECKSTYLE.OFF: CommentsIndentation
@@ -307,10 +300,10 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // If any input is not correctly sanitized it will cause an exception since query result structure will not be
         // as hibernate expects.
-        assertThat(byMetaData.size(), is(0));
+        assertThat(byMetaData.size()).isEqualTo(0);
     }
 
-    @Test (expected = BadRequestException.class)
+    @Test
     public void sanitiseInputMainQuerySortOrderForCaseFieldID() {
         final String caseFieldId = "insert into case users values(1,2,3)";
 
@@ -322,17 +315,19 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             .thenReturn(asList(caseStateDefinition), asList());
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
-        metadata.setSortDirection(Optional.of("Asc"));
+        metadata.setSortDirection(Optional.of("ASC"));
         metadata.addSortOrderField(SortOrderField.sortOrderWith()
             .caseFieldId(caseFieldId)
             .metadata(true)
-            .direction("DESC")
+            .direction("Desc")
             .build());
 
-        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+        assertThrows(BadRequestException.class, () -> {
+            caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void validateInputMainQueryMetaDataFieldId() {
         final String notSoEvil = "[UNKNOWN_FIELD]";
 
@@ -353,7 +348,9 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql
         // injection vulnerability
-        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+        assertThrows(IllegalArgumentException.class, () -> {
+            caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+        });
     }
 
     @Test
@@ -373,7 +370,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         params.put("PersonFirstName", "%An%");
         final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, params);
         // See case types and citizen names in insert_cases.sql to understand this result.
-        assertThat(byMetaData.getTotalResultsCount(), is(2));
+        assertThat(byMetaData.getTotalResultsCount()).isEqualTo(2);
     }
 
     @Test
@@ -391,7 +388,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         final PaginatedSearchMetadata byMetaData =
             caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
-        assertThat(byMetaData.getTotalResultsCount(), is(4));
+        assertThat(byMetaData.getTotalResultsCount()).isEqualTo(4);
     }
 
     @Test
@@ -403,8 +400,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final PaginatedSearchMetadata byMetaData =
             caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
         assertAll(
-            () -> assertThat(byMetaData.getTotalResultsCount(), is(0)),
-            () -> assertThat(byMetaData.getTotalPagesCount(), is(0))
+            () -> assertThat(byMetaData.getTotalResultsCount()).isEqualTo(0),
+            () -> assertThat(byMetaData.getTotalPagesCount()).isEqualTo(0)
         );
     }
 
@@ -428,7 +425,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
             searchParams);
 
-        assertEquals(0, byMetaDataAndFieldData.size());
+        assertThat(byMetaDataAndFieldData).hasSize(0);
     }
 
     @Test
@@ -460,8 +457,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // See the timestamps in insert_cases.sql.
         // Should be ordered by last modified desc, creation date asc.
-        assertThat(byMetaDataAndFieldData.get(0).getId(), is("16"));
-        assertThat(byMetaDataAndFieldData.get(1).getId(), is("1"));
+        assertThat(byMetaDataAndFieldData.get(0).getId()).isEqualTo("16");
+        assertThat(byMetaDataAndFieldData.get(1).getId()).isEqualTo("1");
     }
 
     @Test
@@ -494,9 +491,9 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // See the timestamps in insert_cases.sql. (2 results based on pagination size = 2)
         // Should be ordered by last modified desc, person last name, creation date asc.
-        assertThat(byMetaDataAndFieldData.size(), is(2));
-        assertThat(byMetaDataAndFieldData.get(0).getId(), is("1"));
-        assertThat(byMetaDataAndFieldData.get(1).getId(), is("2"));
+        assertThat(byMetaDataAndFieldData.size()).isEqualTo(2);
+        assertThat(byMetaDataAndFieldData.get(0).getId()).isEqualTo("1");
+        assertThat(byMetaDataAndFieldData.get(1).getId()).isEqualTo("2");
     }
 
     @Test
@@ -518,22 +515,24 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
             searchParams);
         assertAll(
-            () -> assertThat(byMetaDataAndFieldData.size(), is(2)),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getId(), is("1")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getJurisdiction(), is("PROBATE")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getState(), is("CaseCreated")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getCaseTypeId(), is("TestAddressBookCase")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getSecurityClassification(),
-                is(SecurityClassification.PUBLIC)),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getReference(), is(1504259907353529L)),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonFirstName").asText(), is("Janet")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonLastName").asText(), is("Parker")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine1").asText(),
-                is("123")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine2").asText(),
-                is("Fake Street")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine3").asText(),
-                is("Hexton"))
+            () -> assertThat(byMetaDataAndFieldData).hasSize(2),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getId()).isEqualTo("1"),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getJurisdiction()).isEqualTo("PROBATE"),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getState()).isEqualTo("CaseCreated"),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getCaseTypeId()).isEqualTo("TestAddressBookCase"),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getSecurityClassification())
+                    .isEqualTo(SecurityClassification.PUBLIC),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getReference()).isEqualTo(1504259907353529L),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonFirstName").asText())
+                    .isEqualTo("Janet"),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonLastName").asText())
+                    .isEqualTo("Parker"),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine1").asText())
+                    .isEqualTo("123"),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine2").asText())
+                    .isEqualTo("Fake Street"),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine3").asText())
+                    .isEqualTo("Hexton")
         );
     }
 
@@ -557,8 +556,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             caseDetailsRepository.getPaginatedSearchMetadata(metadata,
                 new HashMap<>());
         assertAll(
-            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(4)),
-            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(2))
+            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount()).isEqualTo(4),
+            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount()).isEqualTo(2)
         );
     }
 
@@ -581,8 +580,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final PaginatedSearchMetadata paginatedSearchMetadata =
             caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams);
         assertAll(
-            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(2)),
-            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(1))
+            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount()).isEqualTo(2),
+            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount()).isEqualTo(1)
         );
     }
 
@@ -590,7 +589,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         // Check that we have the expected test data set size, this is to ensure
         // that state filtering is correct
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
+        assertThat(resultList).hasSize(NUMBER_OF_CASES);
     }
 
     @Test
@@ -610,15 +609,11 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, searchParams);
 
         assertAll(
-            () -> assertThat(results, hasSize(2)),
-            () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo("1")),
-                hasProperty("reference", equalTo(1504259907353529L))
-            ))),
-            () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo("16")),
-                hasProperty("reference", equalTo(1504254784737847L))
-            )))
+            () -> assertThat(results).hasSize(2),
+            () -> assertThat(results).anyMatch(r -> "1".equals(r.getId())
+                && 1504259907353529L == r.getReference()),
+            () -> assertThat(results).anyMatch(r -> "16".equals(r.getId())
+                && 1504254784737847L == r.getReference())
         );
     }
 
@@ -664,11 +659,11 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, searchParams);
 
         assertAll(
-            () -> assertThat(results, hasSize(1)),
-            () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo("16")),
-                hasProperty("reference", equalTo(1504254784737847L))
-            )))
+            () -> assertThat(results).hasSize(1),
+            () -> assertThat(results).anySatisfy(r -> {
+                assertThat(r.getId()).isEqualTo("16");
+                assertThat(r.getReference()).isEqualTo(1504254784737847L);
+            })
         );
 
         CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
@@ -678,8 +673,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
             .thenReturn(asList(caseStateDefinition), asList());
 
-        assertThat(caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams).getTotalResultsCount(),
-            is(1));
+        assertThat(caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams).getTotalResultsCount())
+            .isEqualTo(1);
     }
 
     @Test
@@ -704,8 +699,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
 
-        assertThat(results.size(), is(1));
-        assertThat(results.get(0).getReference(), is(1504254784737848L));
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).getReference()).isEqualTo(1504254784737848L);
     }
 
     @Test
@@ -723,7 +718,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     public void findByReference_withJurisdiction_jurisdictionNotFound() {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(WRONG_JURISDICTION, REFERENCE);
 
-        assertThat(maybeCase.isPresent(), is(false));
+        assertThat(maybeCase).isNotPresent();
     }
 
     @Test
@@ -731,7 +726,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     public void findByReference_withJurisdiction_referenceNotFound() {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(JURISDICTION, WRONG_REFERENCE);
 
-        assertThat(maybeCase.isPresent(), is(false));
+        assertThat(maybeCase).isNotPresent();
     }
 
     @Test
@@ -771,7 +766,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
 
         // THEN
-        assertEquals(1, results.size());
+        assertThat(results).hasSize(1);
         assertCaseDetails(results.get(0), CASE_01_ID.toString(), JURISDICTION, Long.parseLong(CASE_01_REFERENCE));
     }
 
@@ -791,7 +786,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
 
         // THEN
-        assertEquals(5, results.size());
+        assertThat(results).hasSize(5);
     }
 
     @Test
@@ -810,7 +805,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
 
         // THEN
-        assertEquals(1, results.size());
+        assertThat(results).hasSize(1);
         assertCaseDetails(results.get(0), CASE_03_ID.toString(), JURISDICTION, Long.parseLong(CASE_03_REFERENCE));
     }
 
@@ -830,7 +825,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
 
         // THEN
-        assertEquals(0, results.size());
+        assertThat(results).hasSize(0);
     }
 
     @Test
@@ -849,13 +844,13 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final List<CaseDetails> results = caseDetailsRepository.findByParamsWithLimit(parameters);
 
         // THEN
-        assertEquals(0, results.size());
+        assertThat(results).hasSize(0);
     }
 
     private void assertCaseDetails(CaseDetails caseDetails, String id, String jurisdictionId, Long caseReference) {
-        assertThat(caseDetails.getId(), equalTo(id));
-        assertThat(caseDetails.getJurisdiction(), equalTo(jurisdictionId));
-        assertThat(caseDetails.getReference(), equalTo(caseReference));
+        assertThat(caseDetails.getId()).isEqualTo(id);
+        assertThat(caseDetails.getJurisdiction()).isEqualTo(jurisdictionId);
+        assertThat(caseDetails.getReference()).isEqualTo(caseReference);
     }
 
 }

@@ -8,8 +8,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.hamcrest.MatcherAssert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.TestFixtures;
@@ -25,12 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -52,7 +50,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     @Mock
     private TextCaseReferenceCaseLinkValidator textCaseReferenceCaseLinkValidator;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws IOException {
         caseFields = TestFixtures.getCaseFieldsFromJson(CASE_FIELD_JSON);
         dynamicCaseFields = TestFixtures.getCaseFieldsFromJson(CASE_FIELD_DYNAMIC_JSON);
@@ -62,20 +60,21 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     public void validValueComplex() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"Person\" : {\n" +
-                "    \"Name\" : \"Name\",\n" +
-                "    \"Address\": {\n" +
-                "      \"Line1\": \"Address Line 1\",\n" +
-                "      \"Line2\": \"Address Line 2\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
+            """
+                {
+                  "Person" : {
+                    "Name" : "Name",
+                    "Address": {
+                      "Line1": "Address Line 1",
+                      "Line2": "Address Line 2"
+                    }
+                  }
+                }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
-        assertEquals(result.toString(), 0, result.size());
+        assertThat(result).hasSize(0);
     }
 
     private ValidationContext getValidationContext(Map<String, JsonNode> values) {
@@ -95,489 +94,503 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     public void unrecognisedValueComplex() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"Person\" : {\n" +
-                "    \"Name\" : \"Name\",\n" +
-                "    \"Address\": {\n" +
-                "      \"Line1\": \"Address Line 1\",\n" +
-                "      \"\": \"Address Line 2\",\n" +
-                "      \"Line4\": \"Address Line 2\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
+            """
+                {
+                  "Person" : {
+                    "Name" : "Name",
+                    "Address": {
+                      "Line1": "Address Line 1",
+                      "": "Address Line 2",
+                      "Line4": "Address Line 2"
+                    }
+                  }
+                }""";
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
-        assertEquals(result.toString(), 2, result.size());
+        assertThat(result).hasSize(2);
     }
 
     @Test
     public void shouldPrefixComplexChildrenIDWithPath() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"Person\" : {\n" +
-                "    \"Address\": {\n" +
-                "      \"Line4\": \"Address Line 2\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
+            """
+                {
+                  "Person" : {
+                    "Address": {
+                      "Line4": "Address Line 2"
+                    }
+                  }
+                }""";
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
-        assertEquals(result.toString(), 1, result.size());
+        assertThat(result).hasSize(1);
 
         final ValidationResult error = result.get(0);
-        assertThat(error.getFieldId(), equalTo("Person.Address.Line4"));
+        assertThat(error.getFieldId()).isEqualTo("Person.Address.Line4");
     }
 
     @Test
     public void shouldPrefixComplexChildrenIDWithPath_oneLevel() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"Person\" : {\n" +
-                "    \"FirstName\": \"Invalid field\"," +
-                "    \"Address\": {\n" +
-                "      \"Line1\": \"Address Line 1\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
+            """
+                {
+                  "Person" : {
+                    "FirstName": "Invalid field",\
+                    "Address": {
+                      "Line1": "Address Line 1"
+                    }
+                  }
+                }""";
         final Map<String, JsonNode> values = mapper.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
-        assertEquals(result.toString(), 1, result.size());
+        assertThat(result).hasSize(1);
 
         final ValidationResult error = result.get(0);
-        assertThat(error.getFieldId(), equalTo("Person.FirstName"));
+        assertThat(error.getFieldId()).isEqualTo("Person.FirstName");
     }
 
     @Test
     public void shouldNotPrefixRootFields() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"PersonGender\" : \"\"\n" +
-                "}";
+            """
+                {
+                  "PersonGender" : ""
+                }""";
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
-        assertEquals(result.toString(), 1, result.size());
+        assertThat(result).hasSize(1);
 
         final ValidationResult error = result.get(0);
-        assertThat(error.getFieldId(), equalTo("PersonGender"));
+        assertThat(error.getFieldId()).isEqualTo("PersonGender");
     }
 
     @Test
     public void unknownType() throws Exception {
         final String data =
-            "{\n" +
-                "  \"Person\" : {\n" +
-                "    \"Name\" : \"Name\",\n" +
-                "    \"Address\": {\n" +
-                "      \"Line1\": \"Address Line 1\",\n" +
-                "      \"\": \"Address Line 2\",\n" +
-                "      \"Line4\": \"Address Line 2\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
+            """
+                {
+                  "Person" : {
+                    "Name" : "Name",
+                    "Address": {
+                      "Line1": "Address Line 1",
+                      "": "Address Line 2",
+                      "Line4": "Address Line 2"
+                    }
+                  }
+                }""";
         final Map<String, JsonNode> values = caseDataFromJsonString(data);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
-        assertEquals(result.toString(), 2, result.size());
+        assertThat(result).hasSize(2);
     }
 
     @Test
     public void validValueCollection() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"OtherAddresses\" : [\n" +
-                "    {\n" +
-                "      \"value\": \n" +
-                "        {\n" +
-                "          \"Line1\": \"Address Line 1\",\n" +
-                "          \"Line2\": \"Address Line 2\"\n" +
-                "        }\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+            """
+                {
+                  "OtherAddresses" : [
+                    {
+                      "value":\s
+                        {
+                          "Line1": "Address Line 1",
+                          "Line2": "Address Line 2"
+                        }
+                    }
+                  ]
+                }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
-        assertEquals(result.toString(), 0, result.size());
+        assertThat(result).hasSize(0);
     }
 
     @Test
     public void validDynamicListInCollection() throws Exception {
-        final String DATA = "{\n"
-            + "        \"TextAreaField\": \"textAreaField1\",\n"
-            + "        \"TextField\": \"textField1\",\n"
-            + "        \"EmailField\": \"test@hmcts.net\",\n"
-            + "        \"DynamicListsComplexField\": {\n"
-            + "            \"DynamicRadioListComplex\": {\n"
-            + "                \"value\": {\n"
-            + "                    \"code\": \"JUDGESMITH\",\n"
-            + "                    \"label\": \"Judge Smith\"\n"
-            + "                },\n"
-            + "                \"list_items\": [{\n"
-            + "                    \"code\": \"JUDGEJUDY\",\n"
-            + "                    \"label\": \"Judge Judy\"\n"
-            + "                }, {\n"
-            + "                    \"code\": \"JUDGERINDER\",\n"
-            + "                    \"label\": \"Judge Rinder\"\n"
-            + "                }, {\n"
-            + "                    \"code\": \"JUDGESMITH\",\n"
-            + "                    \"label\": \"Judge Smith\"\n"
-            + "                }, {\n"
-            + "                    \"code\": \"JUDGEDREDD\",\n"
-            + "                    \"label\": \"Judge Dredd\"\n"
-            + "                }]\n"
-            + "            },\n"
-            + "            \"DynamicMultiSelectComplex\": {\n"
-            + "                \"value\": [{\n"
-            + "                    \"code\": \"MONDAYFIRSTOFMAY\",\n"
-            + "                    \"label\": \"Monday, May 1st\"\n"
-            + "                }, {\n"
-            + "\n"
-            + "                    \"code\": \"THURSDAYFOURTHOFMAY\",\n"
-            + "                    \"label\": \"Thursday, May 4th\"\n"
-            + "                }],\n"
-            + "                \"list_items\": [{\n"
-            + "                    \"code\": \"MONDAYFIRSTOFMAY\",\n"
-            + "                    \"label\": \"Monday, May 1st\"\n"
-            + "                }, {\n"
-            + "                    \"code\": \"TUESDAYSECONDOFMAY\",\n"
-            + "                    \"label\": \"Tuesday, May 2nd\"\n"
-            + "                }, {\n"
-            + "                    \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
-            + "                    \"label\": \"Wednesday, May 3rd\"\n"
-            + "                }, {\n"
-            + "                    \"code\": \"THURSDAYFOURTHOFMAY\",\n"
-            + "                    \"label\": \"Thursday, May 4th\"\n"
-            + "                }]\n"
-            + "            }\n"
-            + "\n"
-            + "\n"
-            + "        },\n"
-            + "        \"CollectionDynamicMultiSelectList\": [\n"
-            + "            {\n"
-            + "                \"id\": \"MultiSelect1\",\n"
-            + "                \"value\": {\n"
-            + "                    \"value\": [{\n"
-            + "                        \"code\": \"MONDAYFIRSTOFMAY\",\n"
-            + "                        \"label\": \"Monday, May 1st\"\n"
-            + "                    }, {\n"
-            + "\n"
-            + "                        \"code\": \"THURSDAYFOURTHOFMAY\",\n"
-            + "                        \"label\": \"Thursday, May 4th\"\n"
-            + "                    }],\n"
-            + "                    \"list_items\": [{\n"
-            + "                        \"code\": \"MONDAYFIRSTOFMAY\",\n"
-            + "                        \"label\": \"Monday, May 1st\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"TUESDAYSECONDOFMAY\",\n"
-            + "                        \"label\": \"Tuesday, May 2nd\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
-            + "                        \"label\": \"Wednesday, May 3rd\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"THURSDAYFOURTHOFMAY\",\n"
-            + "                        \"label\": \"Thursday, May 4th\"\n"
-            + "                    }]\n"
-            + "                }\n"
-            + "            },\n"
-            + "            {\n"
-            + "                \"id\": \"MultiSelect2\",\n"
-            + "                \"value\": {\n"
-            + "                    \"value\": [{\n"
-            + "                        \"code\": \"TUESDAYSECONDOFMAY\",\n"
-            + "                        \"label\": \"Tuesday, May 2nd\"\n"
-            + "                    }, {\n"
-            + "\n"
-            + "                        \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
-            + "                        \"label\": \"Wednesday, May 3rd\"\n"
-            + "                    }],\n"
-            + "                    \"list_items\": [{\n"
-            + "                        \"code\": \"MONDAYFIRSTOFMAY\",\n"
-            + "                        \"label\": \"Monday, May 1st\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"TUESDAYSECONDOFMAY\",\n"
-            + "                        \"label\": \"Tuesday, May 2nd\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
-            + "                        \"label\": \"Wednesday, May 3rd\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"THURSDAYFOURTHOFMAY\",\n"
-            + "                        \"label\": \"Thursday, May 4th\"\n"
-            + "                    }]\n"
-            + "                }\n"
-            + "            }\n"
-            + "\n"
-            + "        ],\n"
-            + "        \"CollectionDynamicRadioList\": [\n"
-            + "            {\n"
-            + "                \"id\": \"RadioList1\",\n"
-            + "                \"value\": {\n"
-            + "                    \"value\": {\n"
-            + "                        \"code\": \"JUDGESMITH\",\n"
-            + "                        \"label\": \"Judge Smith\"\n"
-            + "                    },\n"
-            + "                    \"list_items\": [{\n"
-            + "                        \"code\": \"JUDGEJUDY\",\n"
-            + "                        \"label\": \"Judge Judy\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"JUDGERINDER\",\n"
-            + "                        \"label\": \"Judge Rinder\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"JUDGESMITH\",\n"
-            + "                        \"label\": \"Judge Smith\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"JUDGEDREDD\",\n"
-            + "                        \"label\": \"Judge Dredd\"\n"
-            + "                    }]\n"
-            + "                }\n"
-            + "            },\n"
-            + "            {\n"
-            + "                \"id\": \"RadioList2\",\n"
-            + "                \"value\": {\n"
-            + "                    \"value\": {\n"
-            + "                        \"code\": \"JUDGESMITH\",\n"
-            + "                        \"label\": \"Judge Smith\"\n"
-            + "                    },\n"
-            + "                    \"list_items\": [{\n"
-            + "                        \"code\": \"JUDGEJUDY\",\n"
-            + "                        \"label\": \"Judge Judy\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"JUDGERINDER\",\n"
-            + "                        \"label\": \"Judge Rinder\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"JUDGESMITH\",\n"
-            + "                        \"label\": \"Judge Smith\"\n"
-            + "                    }, {\n"
-            + "                        \"code\": \"JUDGEDREDD\",\n"
-            + "                        \"label\": \"Judge Dredd\"\n"
-            + "                    }]\n"
-            + "                }\n"
-            + "            }\n"
-            + "        ],\n"
-            + "        \"DynamicRadioList\": {\n"
-            + "            \"value\": {\n"
-            + "                \"code\": \"JUDGESMITH\",\n"
-            + "                \"label\": \"Judge Smith\"\n"
-            + "            },\n"
-            + "            \"list_items\": [{\n"
-            + "                \"code\": \"JUDGEJUDY\",\n"
-            + "                \"label\": \"Judge Judy\"\n"
-            + "            }, {\n"
-            + "                \"code\": \"JUDGERINDER\",\n"
-            + "                \"label\": \"Judge Rinder\"\n"
-            + "            }, {\n"
-            + "                \"code\": \"JUDGESMITH\",\n"
-            + "                \"label\": \"Judge Smith\"\n"
-            + "            }, {\n"
-            + "                \"code\": \"JUDGEDREDD\",\n"
-            + "                \"label\": \"Judge Dredd\"\n"
-            + "            }]\n"
-            + "        },\n"
-            + "        \"DynamicMultiSelectList\": {\n"
-            + "            \"value\": [{\n"
-            + "                \"code\": \"MONDAYFIRSTOFMAY\",\n"
-            + "                \"label\": \"Monday, May 1st\"\n"
-            + "            }, {\n"
-            + "\n"
-            + "                \"code\": \"THURSDAYFOURTHOFMAY\",\n"
-            + "                \"label\": \"Thursday, May 4th\"\n"
-            + "            }],\n"
-            + "            \"list_items\": [{\n"
-            + "                \"code\": \"MONDAYFIRSTOFMAY\",\n"
-            + "                \"label\": \"Monday, May 1st\"\n"
-            + "            }, {\n"
-            + "                \"code\": \"TUESDAYSECONDOFMAY\",\n"
-            + "                \"label\": \"Tuesday, May 2nd\"\n"
-            + "            }, {\n"
-            + "                \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
-            + "                \"label\": \"Wednesday, May 3rd\"\n"
-            + "            }, {\n"
-            + "                \"code\": \"THURSDAYFOURTHOFMAY\",\n"
-            + "                \"label\": \"Thursday, May 4th\"\n"
-            + "            }]\n"
-            + "        }\n"
-            + "    }";
+        final String DATA = """
+            {
+                    "TextAreaField": "textAreaField1",
+                    "TextField": "textField1",
+                    "EmailField": "test@hmcts.net",
+                    "DynamicListsComplexField": {
+                        "DynamicRadioListComplex": {
+                            "value": {
+                                "code": "JUDGESMITH",
+                                "label": "Judge Smith"
+                            },
+                            "list_items": [{
+                                "code": "JUDGEJUDY",
+                                "label": "Judge Judy"
+                            }, {
+                                "code": "JUDGERINDER",
+                                "label": "Judge Rinder"
+                            }, {
+                                "code": "JUDGESMITH",
+                                "label": "Judge Smith"
+                            }, {
+                                "code": "JUDGEDREDD",
+                                "label": "Judge Dredd"
+                            }]
+                        },
+                        "DynamicMultiSelectComplex": {
+                            "value": [{
+                                "code": "MONDAYFIRSTOFMAY",
+                                "label": "Monday, May 1st"
+                            }, {
+
+                                "code": "THURSDAYFOURTHOFMAY",
+                                "label": "Thursday, May 4th"
+                            }],
+                            "list_items": [{
+                                "code": "MONDAYFIRSTOFMAY",
+                                "label": "Monday, May 1st"
+                            }, {
+                                "code": "TUESDAYSECONDOFMAY",
+                                "label": "Tuesday, May 2nd"
+                            }, {
+                                "code": "WEDNESDAYTHIRDOFMAY",
+                                "label": "Wednesday, May 3rd"
+                            }, {
+                                "code": "THURSDAYFOURTHOFMAY",
+                                "label": "Thursday, May 4th"
+                            }]
+                        }
+
+
+                    },
+                    "CollectionDynamicMultiSelectList": [
+                        {
+                            "id": "MultiSelect1",
+                            "value": {
+                                "value": [{
+                                    "code": "MONDAYFIRSTOFMAY",
+                                    "label": "Monday, May 1st"
+                                }, {
+
+                                    "code": "THURSDAYFOURTHOFMAY",
+                                    "label": "Thursday, May 4th"
+                                }],
+                                "list_items": [{
+                                    "code": "MONDAYFIRSTOFMAY",
+                                    "label": "Monday, May 1st"
+                                }, {
+                                    "code": "TUESDAYSECONDOFMAY",
+                                    "label": "Tuesday, May 2nd"
+                                }, {
+                                    "code": "WEDNESDAYTHIRDOFMAY",
+                                    "label": "Wednesday, May 3rd"
+                                }, {
+                                    "code": "THURSDAYFOURTHOFMAY",
+                                    "label": "Thursday, May 4th"
+                                }]
+                            }
+                        },
+                        {
+                            "id": "MultiSelect2",
+                            "value": {
+                                "value": [{
+                                    "code": "TUESDAYSECONDOFMAY",
+                                    "label": "Tuesday, May 2nd"
+                                }, {
+
+                                    "code": "WEDNESDAYTHIRDOFMAY",
+                                    "label": "Wednesday, May 3rd"
+                                }],
+                                "list_items": [{
+                                    "code": "MONDAYFIRSTOFMAY",
+                                    "label": "Monday, May 1st"
+                                }, {
+                                    "code": "TUESDAYSECONDOFMAY",
+                                    "label": "Tuesday, May 2nd"
+                                }, {
+                                    "code": "WEDNESDAYTHIRDOFMAY",
+                                    "label": "Wednesday, May 3rd"
+                                }, {
+                                    "code": "THURSDAYFOURTHOFMAY",
+                                    "label": "Thursday, May 4th"
+                                }]
+                            }
+                        }
+
+                    ],
+                    "CollectionDynamicRadioList": [
+                        {
+                            "id": "RadioList1",
+                            "value": {
+                                "value": {
+                                    "code": "JUDGESMITH",
+                                    "label": "Judge Smith"
+                                },
+                                "list_items": [{
+                                    "code": "JUDGEJUDY",
+                                    "label": "Judge Judy"
+                                }, {
+                                    "code": "JUDGERINDER",
+                                    "label": "Judge Rinder"
+                                }, {
+                                    "code": "JUDGESMITH",
+                                    "label": "Judge Smith"
+                                }, {
+                                    "code": "JUDGEDREDD",
+                                    "label": "Judge Dredd"
+                                }]
+                            }
+                        },
+                        {
+                            "id": "RadioList2",
+                            "value": {
+                                "value": {
+                                    "code": "JUDGESMITH",
+                                    "label": "Judge Smith"
+                                },
+                                "list_items": [{
+                                    "code": "JUDGEJUDY",
+                                    "label": "Judge Judy"
+                                }, {
+                                    "code": "JUDGERINDER",
+                                    "label": "Judge Rinder"
+                                }, {
+                                    "code": "JUDGESMITH",
+                                    "label": "Judge Smith"
+                                }, {
+                                    "code": "JUDGEDREDD",
+                                    "label": "Judge Dredd"
+                                }]
+                            }
+                        }
+                    ],
+                    "DynamicRadioList": {
+                        "value": {
+                            "code": "JUDGESMITH",
+                            "label": "Judge Smith"
+                        },
+                        "list_items": [{
+                            "code": "JUDGEJUDY",
+                            "label": "Judge Judy"
+                        }, {
+                            "code": "JUDGERINDER",
+                            "label": "Judge Rinder"
+                        }, {
+                            "code": "JUDGESMITH",
+                            "label": "Judge Smith"
+                        }, {
+                            "code": "JUDGEDREDD",
+                            "label": "Judge Dredd"
+                        }]
+                    },
+                    "DynamicMultiSelectList": {
+                        "value": [{
+                            "code": "MONDAYFIRSTOFMAY",
+                            "label": "Monday, May 1st"
+                        }, {
+
+                            "code": "THURSDAYFOURTHOFMAY",
+                            "label": "Thursday, May 4th"
+                        }],
+                        "list_items": [{
+                            "code": "MONDAYFIRSTOFMAY",
+                            "label": "Monday, May 1st"
+                        }, {
+                            "code": "TUESDAYSECONDOFMAY",
+                            "label": "Tuesday, May 2nd"
+                        }, {
+                            "code": "WEDNESDAYTHIRDOFMAY",
+                            "label": "Wednesday, May 3rd"
+                        }, {
+                            "code": "THURSDAYFOURTHOFMAY",
+                            "label": "Thursday, May 4th"
+                        }]
+                    }
+                }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContextDynamicFields(values);
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
-        assertEquals(result.toString(), 0, result.size());
+        assertThat(result).hasSize(0);
     }
 
     @Test
     public void unknownFieldInCollectionOfComplex() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"OtherAddresses\" : [\n" +
-                "    {\n" +
-                "      \"value\": " +
-                "        {\n" +
-                "          \"UnknownField\": \"Address Line 1\",\n" +
-                "          \"Line2\": \"Address Line 2\"\n" +
-                "        }\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+            """
+                {
+                  "OtherAddresses" : [
+                    {
+                      "value": \
+                        {
+                          "UnknownField": "Address Line 1",
+                          "Line2": "Address Line 2"
+                        }
+                    }
+                  ]
+                }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
-        assertEquals(results.toString(), 1, results.size());
+        assertThat(results).hasSize(1);
 
-        final ValidationResult result = results.get(0);
-        assertThat(result.getFieldId(), equalTo("OtherAddresses.0.UnknownField"));
+        final ValidationResult result = results.getFirst();
+        assertThat(result.getFieldId()).isEqualTo("OtherAddresses.0.UnknownField");
     }
 
     @Test
     public void exceedMaxItemsInCollection() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"OtherAddresses\" : [\n" +
-                "    {\n" +
-                "      \"value\": " +
-                "        {\n" +
-                "          \"Line1\": \"Address 1 Line 1\",\n" +
-                "          \"Line2\": \"Address 1 Line 2\"\n" +
-                "        }\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"value\": " +
-                "        {\n" +
-                "          \"Line1\": \"Address 2 Line 1\",\n" +
-                "          \"Line2\": \"Address 2 Line 2\"\n" +
-                "        }\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+            """
+                {
+                  "OtherAddresses" : [
+                    {
+                      "value": \
+                        {
+                          "Line1": "Address 1 Line 1",
+                          "Line2": "Address 1 Line 2"
+                        }
+                    },
+                    {
+                      "value": \
+                        {
+                          "Line1": "Address 2 Line 1",
+                          "Line2": "Address 2 Line 2"
+                        }
+                    }
+                  ]
+                }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
-        assertEquals(results.toString(), 1, results.size());
+        assertThat(results).hasSize(1);
 
-        final ValidationResult result = results.get(0);
-        assertThat(result.getFieldId(), equalTo("OtherAddresses"));
+        final ValidationResult result = results.getFirst();
+        assertThat(result.getFieldId()).isEqualTo("OtherAddresses");
     }
 
     @Test
     public void validCollectionOfSimpleFields() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"Initials\" : [ { \"value\": \"A\" }, { \"value\": \"B\" } ]\n" +
-                "}";
+            """
+                {
+                  "Initials" : [ { "value": "A" }, { "value": "B" } ]
+                }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
-        assertEquals(results.toString(), 0, results.size());
+        assertThat(results).hasSize(0);
     }
 
     @Test
     public void invalidCollectionOfSimpleFields() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"Initials\" : [ { \"value\": \"TooLong\" }, { \"value\": \"B\" } ]\n" +
-                "}";
+            """
+                {
+                  "Initials" : [ { "value": "TooLong" }, { "value": "B" } ]
+                }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
-        assertEquals(results.toString(), 1, results.size());
+        assertThat(results).hasSize(1);
 
-        final ValidationResult result = results.get(0);
-        assertThat(result.getFieldId(), equalTo("Initials.0"));
+        final ValidationResult result = results.getFirst();
+        assertThat(result.getFieldId()).isEqualTo("Initials.0");
     }
 
     @Test
     public void multipleInvalidItemsInCollection() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"Initials\" : [ { \"value\": \"TooLong\" }, { \"value\": \"TooLong\" } ]\n" +
-                "}";
+            """
+                {
+                  "Initials" : [ { "value": "TooLong" }, { "value": "TooLong" } ]
+                }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
-        assertEquals(results.toString(), 2, results.size());
+        assertThat(results).hasSize(2);
 
         final ValidationResult result0 = results.get(0);
-        assertThat(result0.getFieldId(), equalTo("Initials.0"));
+        assertThat(result0.getFieldId()).isEqualTo("Initials.0");
 
         final ValidationResult result1 = results.get(1);
-        assertThat(result1.getFieldId(), equalTo("Initials.1"));
+        assertThat(result1.getFieldId()).isEqualTo("Initials.1");
     }
 
     @Test
     public void invalidCollection_valuesMissing() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"Initials\" : [ { \"x\": \"TooLong\" }, { \"y\": \"TooLong\" } ]\n" +
-                "}";
+            """
+                {
+                  "Initials" : [ { "x": "TooLong" }, { "y": "TooLong" } ]
+                }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
-        assertEquals(results.toString(), 2, results.size());
+        assertThat(results).hasSize(2);
 
         final ValidationResult result0 = results.get(0);
-        assertThat(result0.getFieldId(), equalTo("Initials.0"));
+        assertThat(result0.getFieldId()).isEqualTo("Initials.0");
 
         final ValidationResult result1 = results.get(1);
-        assertThat(result1.getFieldId(), equalTo("Initials.1"));
+        assertThat(result1.getFieldId()).isEqualTo("Initials.1");
     }
 
     @Test
     public void invalidCollection_notObject() throws Exception {
 
         final String DATA =
-            "{\n" +
-                "  \"Initials\" : [ \"x\", \"y\" ]\n" +
-                "}";
+            """
+                {
+                  "Initials" : [ "x", "y" ]
+                }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
-        assertEquals(results.toString(), 2, results.size());
+        assertThat(results).hasSize(2);
 
         final ValidationResult result0 = results.get(0);
-        assertThat(result0.getFieldId(), equalTo("Initials.0"));
+        assertThat(result0.getFieldId()).isEqualTo("Initials.0");
 
         final ValidationResult result1 = results.get(1);
-        assertThat(result1.getFieldId(), equalTo("Initials.1"));
+        assertThat(result1.getFieldId()).isEqualTo("Initials.1");
     }
 
     @Test
     public void shouldFailForPredefinedType() throws Exception {
-        final String DATA = "{\n" +
-            "        \"CaseReference\": \"1596XXXXX1048-4059XXXOOOO\"\n" +
-            "      }";
+        final String DATA = """
+            {
+                    "CaseReference": "1596XXXXX1048-4059XXXOOOO"
+                  }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
-        assertEquals(results.toString(), 1, results.size());
+        assertThat(results).hasSize(1);
 
         final ValidationResult result0 = results.get(0);
-        assertThat(result0.getFieldId(), equalTo("CaseReference"));
-        assertThat(result0.getErrorMessage(),
-            equalTo("The data entered is not valid for this type of field, please delete and re-enter using only valid"
-                + " data")
-        );
+        assertThat(result0.getFieldId()).isEqualTo("CaseReference");
+        assertThat(result0.getErrorMessage()).isEqualTo(
+            "The data entered is not valid for this type of field, please delete and re-enter using only valid"
+                + " data");
     }
 
     @Test
@@ -588,15 +601,16 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         when(textCaseReferenceCaseLinkValidator.getCustomTypeId()).thenReturn("TextCaseReference");
 
-        final String DATA = "{\n" +
-            "        \"CaseReference\": \"1596104840593131\"\n" +
-            "      }";
+        final String DATA = """
+            {
+                    "CaseReference": "1596104840593131"
+                  }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
 
-        assertEquals(results.toString(), 0, results.size());
+        assertThat(results.size()).isEqualTo(0);
         verify(textCaseReferenceCaseLinkValidator).validate(any(ValidationContext.class));
     }
 
@@ -610,23 +624,24 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         when(textCaseReferenceCaseLinkValidator.getCustomTypeId()).thenReturn("TextCaseReference");
 
         final String DATA =
-            "{\n" +
-                "  \"CaseLink\" : [\n" +
-                "    {\n" +
-                "      \"value\": " +
-                "        {\n" +
-                "          \"CaseLink1\": \"1596104840593131\",\n" +
-                "          \"CaseLink2\": \"1596104840593131\"\n" +
-                "        }\n" +
-                "    }" +
-                "  ]\n" +
-                "}";
+            """
+                {
+                  "CaseLink" : [
+                    {
+                      "value": \
+                        {
+                          "CaseLink1": "1596104840593131",
+                          "CaseLink2": "1596104840593131"
+                        }
+                    }\
+                  ]
+                }""";
 
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
 
-        assertEquals(results.toString(), 0, results.size());
+        assertThat(results).hasSize(0);
         verify(textCaseReferenceCaseLinkValidator, times(2))
             .validate(any(ValidationContext.class));
     }
@@ -634,16 +649,17 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     @Test
     public void textFieldWithMaxMin() throws Exception {
         final String caseFieldString =
-            "[{\n" +
-                "  \"id\": \"PersonFirstName\",\n" +
-                "  \"case_type_id\": \"TestAddressBookCase\",\n" +
-                "  \"label\": \"First name\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"type\": \"Text\",\n" +
-                "    \"max\": 100,\n" +
-                "    \"min\": 10\n" +
-                "  }\n" +
-                "}]";
+            """
+                [{
+                  "id": "PersonFirstName",
+                  "case_type_id": "TestAddressBookCase",
+                  "label": "First name",
+                  "field_type": {
+                    "type": "Text",
+                    "max": 100,
+                    "min": 10
+                  }
+                }]""";
         final List<CaseFieldDefinition> caseFields =
             mapper.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class,
                 CaseFieldDefinition.class));
@@ -653,7 +669,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(caseFields);
         final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, values);
-        assertEquals(0, caseDataValidator.validate(validationContext).size());
+        assertThat(caseDataValidator.validate(validationContext)).hasSize(0);
     }
 
     /**
@@ -663,16 +679,17 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     @Test
     public void textFieldWithInvalidMaxMin() throws Exception {
         final String caseFieldString =
-            "[{\n" +
-                "  \"id\": \"PersonFirstName\",\n" +
-                "  \"case_type_id\": \"TestAddressBookCase\",\n" +
-                "  \"label\": \"First name\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"type\": \"Text\",\n" +
-                "    \"max\": 10,\n" +
-                "    \"min\": 5\n" +
-                "  }\n" +
-                "}]";
+            """
+                [{
+                  "id": "PersonFirstName",
+                  "case_type_id": "TestAddressBookCase",
+                  "label": "First name",
+                  "field_type": {
+                    "type": "Text",
+                    "max": 10,
+                    "min": 5
+                  }
+                }]""";
         final List<CaseFieldDefinition> caseFields =
             mapper.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class,
                 CaseFieldDefinition.class));
@@ -683,27 +700,28 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(caseFields);
         final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, invalidMaxVal);
-        assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(validationContext).size());
+        assertThat(caseDataValidator.validate(validationContext)).hasSize(1);
 
         final Map<String, JsonNode> invalidMinVal = caseDataFromJsonString("{\"PersonFirstName\" : \"Test\"}");
         final ValidationContext validationContext1 = new ValidationContext(caseTypeDefinition, invalidMinVal);
-        assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(validationContext1).size());
+        assertThat(caseDataValidator.validate(validationContext1)).hasSize(1);
     }
 
     @Test
     public void fieldTypeWithNoValidator() throws Exception {
         final String DATA =
-            "{\n" +
-                "  \"NoValidatorForFieldType\" : [\n" +
-                "    {\n" +
-                "      \"value\": \n" +
-                "        {\n" +
-                "          \"Line1\": \"Address Line 1\",\n" +
-                "          \"Line2\": \"Address Line 2\"\n" +
-                "        }\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+            """
+                {
+                  "NoValidatorForFieldType" : [
+                    {
+                      "value":\s
+                        {
+                          "Line1": "Address Line 1",
+                          "Line2": "Address Line 2"
+                        }
+                    }
+                  ]
+                }""";
 
         final ValidationContext validationContext = getValidationContext(caseDataFromJsonString(DATA));
 

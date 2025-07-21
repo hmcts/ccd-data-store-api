@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @SuppressWarnings("checkstyle:OperatorWrap")
-public class CaseSearchEndpointIT extends WireMockBaseTest {
+class CaseSearchEndpointIT extends WireMockBaseTest {
 
     @Inject
     private WebApplicationContext wac;
@@ -61,13 +61,13 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
     @Test
-    public void testSearchCaseDetails() throws Exception {
+    void testSearchCaseDetails() throws Exception {
         stubElasticSearchSearchRequestWillReturn("1535450291607660");
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
