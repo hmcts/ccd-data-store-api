@@ -1,18 +1,18 @@
 package uk.gov.hmcts.ccd.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class JsonDataConverterTest {
-    private static ObjectMapper mapper = new ObjectMapper();
+
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     static {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -20,34 +20,38 @@ public class JsonDataConverterTest {
 
     private JsonDataConverter jsonbConverter;
 
-    @Before
+    @BeforeEach
     public void setup() {
         jsonbConverter = new JsonDataConverter();
     }
 
     @Test
-    public void convertToDatabaseColumn() throws Exception {
-        assertNull(jsonbConverter.convertToDatabaseColumn(null));
+    public void convertToDatabaseColumn_shouldHandleNullAndValidJson() throws JsonProcessingException {
+        // Null input
+        assertThat(jsonbConverter.convertToDatabaseColumn(null)).isNull();
 
+        // Valid JSON input
         final String jsonString = "{\"key\":\"value\"}";
-        assertEquals(jsonString, jsonbConverter.convertToDatabaseColumn(mapper.readTree(jsonString)));
+        JsonNode jsonNode = mapper.readTree(jsonString);
+        String result = jsonbConverter.convertToDatabaseColumn(jsonNode);
+
+        assertThat(result).isEqualTo(jsonString);
     }
 
     @Test
-    public void convertToEntityAttribute() {
-        // Testing null
-        assertNull(jsonbConverter.convertToEntityAttribute(null));
+    public void convertToEntityAttribute_shouldHandleNullAndValidJson() {
+        // Null input
+        assertThat(jsonbConverter.convertToEntityAttribute(null)).isNull();
 
-        // Teasing valid non null
+        // Valid JSON string
         final JsonNode converted = jsonbConverter.convertToEntityAttribute("{\"key\":\"value\"}");
-        assertEquals("value", converted.get("key").asText());
-
-        try {
-            jsonbConverter.convertToEntityAttribute("hjkdash\"");
-            fail("Expected failure due to incorrect JSON");
-        } catch (Exception e) {
-            assertNotNull(e);
-        }
+        assertThat(converted.get("key").asText()).isEqualTo("value");
     }
 
+    @Test
+    public void convertToEntityAttribute_shouldThrowOnInvalidJson() {
+        assertThatThrownBy(() -> jsonbConverter.convertToEntityAttribute("hjkdash\""))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("Unable to deserialize to json field");
+    }
 }

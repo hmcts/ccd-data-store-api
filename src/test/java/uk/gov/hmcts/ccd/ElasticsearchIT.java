@@ -2,10 +2,10 @@ package uk.gov.hmcts.ccd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.PortBinding;
-import com.github.dockerjava.api.model.Ports;
+//import com.github.dockerjava.api.model.ExposedPort;
+//import com.github.dockerjava.api.model.HostConfig;
+//import com.github.dockerjava.api.model.PortBinding;
+//import com.github.dockerjava.api.model.Ports;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -204,26 +204,29 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     @BeforeAll
     public static void initElastic(@Value("${search.elastic.version}") final String elasticVersion,
                                    @Value("${search.elastic.port}") final int httpPortValue)
-        throws IOException, InterruptedException {
+        throws IOException {
 
         log.info("Starting Elastic search...");
         container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:" + elasticVersion)
             .withEnv("discovery.type", "single-node")
             .withExposedPorts(9200)
-            .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
-                new HostConfig().withPortBindings(
-                    new PortBinding(Ports.Binding.bindPort(httpPortValue), new ExposedPort(9200))
-                )
-            ));
-
-        String regex = ".*(\"message\":\\s?\"started\".*|] started\n$)";
-        container.setWaitStrategy((new LogMessageWaitStrategy())
-            .withRegEx(regex)
-            .withStartupTimeout(Duration.ofMinutes(3)));
+            //.withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
+            //    new HostConfig().withPortBindings(
+            //        new PortBinding(Ports.Binding.bindPort(httpPortValue), new ExposedPort(9200))
+            //    )
+            //));
+            .withEnv("xpack.security.enabled", "false")
+            .withEnv("xpack.security.transport.ssl.enabled", "false")
+            .withEnv("ES_JAVA_OPTS", "-Xms1g -Xmx1g")
+            .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(3)));
 
         container.start();
-        log.info("Elastic search started.");
-        ElasticsearchITSetup configurer = new ElasticsearchITSetup(httpPortValue);
+        int mappedPort = container.getMappedPort(9200);
+        log.info("Elastic search started on port {}", mappedPort);
+        //log.info("Elastic search started on port {}", httpPortValue);
+        //ElasticsearchITSetup configurer = new ElasticsearchITSetup(httpPortValue);
+        ElasticsearchITSetup configurer = new ElasticsearchITSetup(mappedPort);
+
         log.info("Elastic search adding indexes.");
         configurer.initIndexes();
         log.info("Elastic search adding data.");
@@ -1672,7 +1675,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 JsonNode.class);
         }
     }
-
 
     @Nested
     class GlobalSearchEndpointESIT {

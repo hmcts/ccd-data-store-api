@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -309,8 +308,13 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         return new String(Base64.getDecoder().decode(queryJsonNode.asText()));
     }
 
-    private QueryBuilder newQueryBuilder(String value) {
-        return QueryBuilders.termQuery("filterTermValue", value);
+    private Query newQueryBuilder(String value) {
+        return Query.of(q -> q
+            .term(t -> t
+                .field("filterTermValue")
+                .value(value)
+            )
+        );
     }
 
     private Map<String, JsonNode> createMapOfFilterValues(JsonNode jsonNode) {

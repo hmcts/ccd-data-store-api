@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.search.global;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,7 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
                                    final ElasticsearchQueryHelper elasticsearchQueryHelper,
                                    final GlobalSearchQueryBuilder globalSearchQueryBuilder,
                                    @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                       final CaseDefinitionRepository caseDefinitionRepository) {
+                                   final CaseDefinitionRepository caseDefinitionRepository) {
         this.applicationParams = applicationParams;
         this.objectMapperService = objectMapperService;
         this.referenceDataRepository = referenceDataRepository;
@@ -74,15 +75,12 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
     @Override
     public CrossCaseTypeSearchRequest assembleSearchQuery(GlobalSearchRequestPayload request) {
 
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-
         if (request == null || request.getSearchCriteria() == null) {
             return null;
         }
 
-        // if no CaseType filter applied :: load all case types available for jurisdictions
+        // Populate caseTypeIds if not provided
         if (CollectionUtils.isEmpty(request.getSearchCriteria().getCcdCaseTypeIds())) {
-            // NB: population of CaseTypeIds is needed to ensure the case type filters are applied to the search
             request.getSearchCriteria().setCcdCaseTypeIds(
                 caseDefinitionRepository.getCaseTypesIDsByJurisdictions(
                     request.getSearchCriteria().getCcdJurisdictionIds()
@@ -90,38 +88,42 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
             );
         }
 
-        // generate ES query builder
-        searchSourceBuilder.query(globalSearchQueryBuilder.globalSearchQuery(request));
+        // Prepare base query
+        Query query = globalSearchQueryBuilder.globalSearchQuery(request);
 
-        // add sort(s)
-        globalSearchQueryBuilder.globalSearchSort(request).forEach(searchSourceBuilder::sort);
+        // Build search request DSL
+        SearchRequest.Builder searchBuilder = new SearchRequest.Builder()
+            .index(applicationParams.getGlobalSearchIndexName())
+            .query(query);
 
-        // add pagination
+        // Add sorts
+        globalSearchQueryBuilder.globalSearchSort(request).forEach(searchBuilder::sort);
+
+        // Add pagination
         if (request.getMaxReturnRecordCount() != null && request.getMaxReturnRecordCount() > 0) {
-            searchSourceBuilder.size(request.getMaxReturnRecordCount());
+            searchBuilder.size(request.getMaxReturnRecordCount());
         }
         if (request.getStartRecordNumber() != null && request.getStartRecordNumber() > 0) {
-            // NB: `GS.StartRecordNumber` is not zero indexed but `ES.from` is
-            searchSourceBuilder.from(request.getStartRecordNumber() - 1);
+            searchBuilder.from(request.getStartRecordNumber() - 1);
         }
 
-        // construct search JSON
-        ObjectNode jsonSearchRequest =
-            objectMapperService.convertStringToObject(searchSourceBuilder.toString(), ObjectNode.class);
+        // Convert DSL to JSON for legacy validation pipeline (if still needed)
+        String dslJson = objectMapperService.convertObjectToString(searchBuilder.build());
+        ObjectNode jsonSearchRequest = objectMapperService.convertStringToObject(dslJson, ObjectNode.class);
 
-        // :: configure data fields to return
-        jsonSearchRequest.set(ElasticsearchRequest.SOURCE, globalSearchQueryBuilder.globalSearchSourceFields());
+        // Add source fields
+        jsonSearchRequest.set("_source", globalSearchQueryBuilder.globalSearchSourceFields());
 
-        // convert to CCD ES request
+        // Convert to ElasticsearchRequest
         ElasticsearchRequest elasticsearchRequest =
             elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest.toString());
 
-        // :: configure SupplementaryData fields to return
+        // Add supplementary data fields
         elasticsearchRequest.setRequestedSupplementaryData(
             globalSearchQueryBuilder.globalSearchSupplementaryDataFields()
         );
 
-        // point to global search index
+        // Search index setup
         SearchIndex searchIndex = new SearchIndex(
             applicationParams.getGlobalSearchIndexName(),
             applicationParams.getGlobalSearchIndexType()
@@ -159,5 +161,4 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
             .results(results)
             .build();
     }
-
 }

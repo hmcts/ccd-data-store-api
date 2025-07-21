@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+//import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +36,8 @@ import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRe
  */
 @Slf4j
 public class CrossCaseTypeSearchRequest {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final String SEARCH_ALIAS_FIELD_PREFIX = "alias.";
 
@@ -74,7 +78,12 @@ public class CrossCaseTypeSearchRequest {
 
     private void validateJsonSearchRequest() {
         if (!getElasticSearchRequest().hasQuery()) {
-            throw new BadSearchRequest("missing required field 'query'");
+            try {
+                JsonNode matchAllQuery = OBJECT_MAPPER.readTree("{\"query\": {\"match_all\": {}}}");
+                getElasticSearchRequest().setNativeSearchRequest(matchAllQuery);
+            } catch (JsonProcessingException e) {
+                throw new IllegalStateException("Failed to set default match_all query", e);
+            }
         }
     }
 

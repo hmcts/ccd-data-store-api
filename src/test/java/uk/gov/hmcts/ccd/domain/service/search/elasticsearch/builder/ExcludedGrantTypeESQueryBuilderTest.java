@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import com.google.common.collect.Lists;
-import org.elasticsearch.index.query.BoolQueryBuilder;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -33,16 +33,22 @@ class ExcludedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         excludedGrantTypeESQueryBuilder =
             new ExcludedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl, applicationParams);
     }
 
     @Test
     void shouldReturnQueryWhenExcludedGrantTypePresentInRoleAssignments() {
-        RoleAssignment roleAssignment = createRoleAssignment(GrantType.EXCLUDED, "CASE",
-            "PRIVATE",  "TEST", "", "", null, "123");
-        BoolQueryBuilder query = excludedGrantTypeESQueryBuilder
+        RoleAssignment roleAssignment = createRoleAssignment(
+            GrantType.EXCLUDED,
+            "CASE",
+            "PRIVATE",
+            "TEST",
+            "", "", null, "123"
+        );
+
+        Query query = excludedGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(roleAssignment), caseTypeDefinition);
 
         assertNotNull(query);
@@ -50,20 +56,32 @@ class ExcludedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
 
     @Test
     void shouldReturnQueryWhenExcludedGrantTypeNoCaseIdPresentInRoleAssignments() {
-        RoleAssignment roleAssignment = createRoleAssignment(GrantType.EXCLUDED, "CASE",
-            "PRIVATE",  "TEST", "", "", null);
-        BoolQueryBuilder query = excludedGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment),
-            caseTypeDefinition);
+        RoleAssignment roleAssignment = createRoleAssignment(
+            GrantType.EXCLUDED,
+            "CASE",
+            "PRIVATE",
+            "TEST",
+            "", "", null
+        );
+
+        Query query = excludedGrantTypeESQueryBuilder
+            .createQuery(Lists.newArrayList(roleAssignment), caseTypeDefinition);
 
         assertNotNull(query);
     }
 
     @Test
     void shouldReturnEmptyQueryWhenExcludedGrantTypeNoCaseIdNoClassificationPresentInRoleAssignments() {
-        RoleAssignment roleAssignment = createRoleAssignment(GrantType.EXCLUDED, "CASE",
-            "",  "TEST", "", "", null);
-        BoolQueryBuilder query = excludedGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment),
-            caseTypeDefinition);
+        RoleAssignment roleAssignment = createRoleAssignment(
+            GrantType.EXCLUDED,
+            "CASE",
+            "",
+            "TEST",
+            "", "", null
+        );
+
+        Query query = excludedGrantTypeESQueryBuilder
+            .createQuery(Lists.newArrayList(roleAssignment), caseTypeDefinition);
 
         assertNotNull(query);
     }

@@ -33,9 +33,9 @@ def versions = [
 
 ext['spring-security.version'] = '5.7.11'
 ext['spring-framework.version'] = '5.3.27'
-ext['jackson.version'] = '2.16.0'
+ext['jacksonVersion'] = '2.19.1'
 //overriding for easy access to the version for FT testing
-ext['beftaFwVersion'] = '9.2.3'
+ext['beftaFwVersion'] = '9.2.4'
 ext['ccdTestDefinitionVersion'] = '7.25.4'
 ext['elasticsearchVersion'] = '9.0.3'
 
@@ -168,6 +168,7 @@ tasks.withType(Test) {
 dependencies {
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
+    implementation 'com.auth0:java-jwt:4.4.0'
     implementation('org.springframework.cloud:spring-cloud-starter-bootstrap') {
         version {
             strictly '4.0.5'
@@ -243,7 +244,7 @@ dependencies {
     implementation "org.flywaydb:flyway-core:8.5.13"
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
-    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.2'
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.77'
 
@@ -339,6 +340,23 @@ dependencies {
     implementation(group: 'org.elasticsearch', name: 'elasticsearch', version: elasticsearchVersion) {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
+    implementation (group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticsearchVersion) {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    }
+    implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: '9.0.3'
+    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: '9.0.3'
+    implementation 'org.glassfish:jakarta.json:2.0.1'
+
+    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    testImplementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    testImplementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    testImplementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+
+    // Required JSON processing support for the Elasticsearch client
+    implementation "jakarta.json:jakarta.json-api:2.1.1"
+    implementation "org.glassfish:jakarta.json:2.0.1"
     implementation 'org.jooq:jool-java-8:0.9.14'
     implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
@@ -369,7 +387,7 @@ dependencies {
     }
     contractTestImplementation("org.springframework.boot:spring-boot-starter-data-jpa")
     contractTestImplementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
-    contractTestImplementation(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2') {
+    contractTestImplementation(group: 'org.elasticsearch', name: 'elasticsearch', version: elasticsearchVersion) {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     contractTestImplementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'

@@ -2,11 +2,12 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL;
 
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -34,12 +35,23 @@ public class ElasticsearchSecurityClassificationFilter implements CaseSearchFilt
     }
 
     @Override
-    public Optional<QueryBuilder> getFilter(String caseTypeId) {
+    public Optional<Query> getFilter(String caseTypeId) {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             return Optional.empty();
         }
-        return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL,
-            getSecurityClassifications(caseTypeId)));
+
+        List<String> classifications = getSecurityClassifications(caseTypeId);
+
+        return Optional.of(Query.of(q -> q
+            .terms(t -> t
+                .field(SECURITY_CLASSIFICATION_FIELD_COL)
+                .terms(tf -> tf.value(
+                    classifications.stream()
+                        .map(FieldValue::of)
+                        .collect(Collectors.toList())
+                ))
+            )
+        ));
     }
 
     private List<String> getSecurityClassifications(String caseTypeId) {

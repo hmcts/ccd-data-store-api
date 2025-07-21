@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -37,28 +37,33 @@ public class ExcludedGrantTypeESQueryBuilder extends GrantTypeESQueryBuilder {
     }
 
     @Override
-    public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments,
-                                        CaseTypeDefinition caseType) {
+    public Query createQuery(List<RoleAssignment> roleAssignments, CaseTypeDefinition caseType) {
         Supplier<Stream<RoleAssignment>> streamSupplier = filterGrantTypeRoleAssignments(roleAssignments);
 
-        BoolQueryBuilder excludedQuery = QueryBuilders.boolQuery();
-        getCaseReferences(streamSupplier).ifPresent(excludedQuery::must);
-        return excludedQuery;
+        return getCaseReferenceQuery(streamSupplier)
+            .orElse(Query.of(q -> q.bool(b -> b))); // return empty bool query if no case refs
     }
 
-    @SuppressWarnings("java:S2789")
-    private Optional<TermsQueryBuilder> getCaseReferences(Supplier<Stream<RoleAssignment>> streamSupplier) {
+    private Optional<Query> getCaseReferenceQuery(Supplier<Stream<RoleAssignment>> streamSupplier) {
         Set<String> caseReferences = streamSupplier.get()
-            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
-            .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
+            .filter(role -> role.getAttributes() != null)
+            .map(role -> role.getAttributes().getCaseId())
             .filter(Objects::nonNull)
             .map(Optional::get)
             .filter(StringUtils::isNotBlank)
             .collect(Collectors.toSet());
 
-        if (!caseReferences.isEmpty()) {
-            return Optional.of(QueryBuilders.termsQuery(REFERENCE_FIELD_COL + KEYWORD, caseReferences));
+        if (caseReferences.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        return Optional.of(Query.of(q -> q.terms(t -> t
+            .field(REFERENCE_FIELD_COL + KEYWORD)
+            .terms(TermsQueryField.of(f -> f.value(
+                caseReferences.stream()
+                    .map(FieldValue::of)
+                    .collect(Collectors.toList())
+            )))
+        )));
     }
 }

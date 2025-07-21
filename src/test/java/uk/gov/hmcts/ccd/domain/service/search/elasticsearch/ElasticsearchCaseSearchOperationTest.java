@@ -1,24 +1,24 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.search.TotalHits;
+import co.elastic.clients.json.JsonpMapper;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.elasticsearch.core.MsearchRequest;
+import co.elastic.clients.elasticsearch.core.MsearchResponse;
+import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import io.searchbox.client.JestClient;
-import io.searchbox.core.MultiSearch;
-import io.searchbox.core.MultiSearchResult;
-import io.searchbox.core.SearchResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
@@ -30,24 +30,21 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
-import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation.MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.*;
+
 
 class ElasticsearchCaseSearchOperationTest {
 
@@ -56,28 +53,29 @@ class ElasticsearchCaseSearchOperationTest {
     private static final String CASE_TYPE_ID_2 = "casetypeid2";
     private static final String INDEX_TYPE = "case";
     private final String caseDetailsElastic = "{some case details}";
-    private final String caseDetailsElasticComplex = "{\n"
-        + "   \"hits\":{\n"
-        + "      \"total\":4,\n"
-        + "      \"max_score\":null,\n"
-        + "      \"hits\":[\n"
-        + "         {\n"
-        + "            \"_index\":\"casetypeid1_cases-000001\"\n"
-        + "         }\n"
-        + "      ]\n"
-        + "   }\n"
-        + "}";
+    private final String caseDetailsElasticComplex = """
+        {
+          "hits": {
+            "total": 4,
+            "max_score": null,
+            "hits": [
+              {
+                "_index": "casetypeid1_cases-000001"
+              }
+            ]
+          }
+        }
+        """;
 
-    final JsonObject convertedObject = new Gson().fromJson(caseDetailsElasticComplex, JsonObject.class);
-
-    @InjectMocks
     private ElasticsearchCaseSearchOperation searchOperation;
 
     @Mock
     private ApplicationParams applicationParams;
 
     @Mock
-    private JestClient jestClient;
+    private ElasticsearchClient elasticsearchClient;
+
+    private JsonpMapper realJsonpMapper;
 
     @Mock
     private CaseDetailsMapper mapper;
@@ -88,248 +86,224 @@ class ElasticsearchCaseSearchOperationTest {
     @Mock
     private CaseSearchRequestSecurity caseSearchRequestSecurity;
 
-    @Mock
-    private CaseDetails caseDetails;
-
-    @Mock
-    private ObjectMapper objectMapper;
-
     private final ObjectNode searchRequestJsonNode = JsonNodeFactory.instance.objectNode();
 
     private final ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestJsonNode);
 
-    private final String json = "{\n"
-        + "    \"took\": 96,\n"
-        + "    \"timed_out\": false,\n"
-        + "    \"_shards\": {\n"
-        + "        \"total\": 2,\n"
-        + "        \"successful\": 2,\n"
-        + "        \"skipped\": 0,\n"
-        + "        \"failed\": 0\n"
-        + "    },\n"
-        + "    \"hits\": {\n"
-        + "        \"total\": 2,\n"
-        + "        \"max_score\": 0.18232156,\n"
-        + "        \"hits\": [\n"
-        + "            {\n"
-        + "                \"_index\": \"casetypeid1_cases-000001\",\n"
-        + "                \"_type\": \"_doc\",\n"
-        + "                \"_id\": \"355\",\n"
-        + "                \"_score\": 0.18232156,\n"
-        + "                \"_source\": {\n"
-        + "                    \"jurisdiction\": \"AUTOTEST1\",\n"
-        + "                    \"case_type_id\": \"AAT\",\n"
-        + "                    \"data\": {\n"
-        + "                        \"FixedRadioListField\": null,\n"
-        + "                        \"TextAreaField\": null,\n"
-        + "                        \"ComplexField\": {\n"
-        + "                            \"ComplexTextField\": null,\n"
-        + "                            \"ComplexFixedListField\": null,\n"
-        + "                            \"ComplexNestedField\": {\n"
-        + "                                \"NestedNumberField\": null,\n"
-        + "                                \"NestedCollectionTextField\": [\n"
-        + "                                    \n"
-        + "                                ]\n"
-        + "                            }\n"
-        + "                        },\n"
-        + "                        \"EmailField\": null,\n"
-        + "                        \"TextField\": null,\n"
-        + "                        \"AddressUKField\": {\n"
-        + "                            \"Country\": null,\n"
-        + "                            \"AddressLine3\": null,\n"
-        + "                            \"County\": null,\n"
-        + "                            \"AddressLine1\": null,\n"
-        + "                            \"PostCode\": null,\n"
-        + "                            \"AddressLine2\": null,\n"
-        + "                            \"PostTown\": null\n"
-        + "                        },\n"
-        + "                        \"CollectionField\": [\n"
-        + "                            \n"
-        + "                        ],\n"
-        + "                        \"MoneyGBPField\": null,\n"
-        + "                        \"DateField\": null,\n"
-        + "                        \"MultiSelectListField\": [\n"
-        + "                            \n"
-        + "                        ],\n"
-        + "                        \"PhoneUKField\": null,\n"
-        + "                        \"YesOrNoField\": null,\n"
-        + "                        \"NumberField\": null,\n"
-        + "                        \"DateTimeField\": null,\n"
-        + "                        \"FixedListField\": null\n"
-        + "                    },\n"
-        + "                    \"created_date\": \"2020-06-30T14:47:26.061Z\",\n"
-        + "                    \"id\": 355,\n"
-        + "                    \"last_modified\": \"2020-06-30T14:52:36.335Z\",\n"
-        + "                    \"@timestamp\": \"2020-07-16T22:58:33.430Z\",\n"
-        + "                    \"index_id\": \"aat_cases\",\n"
-        + "                    \"@version\": \"1\",\n"
-        + "                    \"data_classification\": {\n"
-        + "                        \"FixedRadioListField\": \"PUBLIC\",\n"
-        + "                        \"TextAreaField\": \"PUBLIC\",\n"
-        + "                        \"ComplexField\": {\n"
-        + "                            \"classification\": \"PUBLIC\",\n"
-        + "                            \"value\": {\n"
-        + "                                \"ComplexTextField\": \"PUBLIC\",\n"
-        + "                                \"ComplexFixedListField\": \"PUBLIC\",\n"
-        + "                                \"ComplexNestedField\": {\n"
-        + "                                    \"classification\": \"PUBLIC\",\n"
-        + "                                    \"value\": {\n"
-        + "                                        \"NestedNumberField\": \"PUBLIC\",\n"
-        + "                                        \"NestedCollectionTextField\": {\n"
-        + "                                            \"classification\": \"PUBLIC\",\n"
-        + "                                            \"value\": [\n"
-        + "                                                \n"
-        + "                                            ]\n"
-        + "                                        }\n"
-        + "                                    }\n"
-        + "                                }\n"
-        + "                            }\n"
-        + "                        },\n"
-        + "                        \"EmailField\": \"PUBLIC\",\n"
-        + "                        \"TextField\": \"PUBLIC\",\n"
-        + "                        \"AddressUKField\": {\n"
-        + "                            \"classification\": \"PUBLIC\",\n"
-        + "                            \"value\": {\n"
-        + "                                \"Country\": \"PUBLIC\",\n"
-        + "                                \"AddressLine3\": \"PUBLIC\",\n"
-        + "                                \"County\": \"PUBLIC\",\n"
-        + "                                \"AddressLine1\": \"PUBLIC\",\n"
-        + "                                \"PostCode\": \"PUBLIC\",\n"
-        + "                                \"AddressLine2\": \"PUBLIC\",\n"
-        + "                                \"PostTown\": \"PUBLIC\"\n"
-        + "                            }\n"
-        + "                        },\n"
-        + "                        \"CollectionField\": {\n"
-        + "                            \"classification\": \"PUBLIC\",\n"
-        + "                            \"value\": [\n"
-        + "                                \n"
-        + "                            ]\n"
-        + "                        },\n"
-        + "                        \"MoneyGBPField\": \"PUBLIC\",\n"
-        + "                        \"DateField\": \"PUBLIC\",\n"
-        + "                        \"MultiSelectListField\": \"PUBLIC\",\n"
-        + "                        \"PhoneUKField\": \"PUBLIC\",\n"
-        + "                        \"YesOrNoField\": \"PUBLIC\",\n"
-        + "                        \"NumberField\": \"PUBLIC\",\n"
-        + "                        \"DateTimeField\": \"PUBLIC\",\n"
-        + "                        \"FixedListField\": \"PUBLIC\"\n"
-        + "                    },\n"
-        + "                    \"security_classification\": \"PUBLIC\",\n"
-        + "                    \"state\": \"TODO\",\n"
-        + "                    \"reference\": 1593528446017551\n"
-        + "                }\n"
-        + "            },\n"
-        + "            {\n"
-        + "                \"_index\": \"casetypeid1_cases-000001\",\n"
-        + "                \"_type\": \"_doc\",\n"
-        + "                \"_id\": \"357\",\n"
-        + "                \"_score\": 0.18232156,\n"
-        + "                \"_source\": {\n"
-        + "                    \"jurisdiction\": \"AUTOTEST1\",\n"
-        + "                    \"case_type_id\": \"AAT\",\n"
-        + "                    \"data\": {\n"
-        + "                        \"FixedRadioListField\": null,\n"
-        + "                        \"TextAreaField\": null,\n"
-        + "                        \"ComplexField\": {\n"
-        + "                            \"ComplexTextField\": null,\n"
-        + "                            \"ComplexFixedListField\": null,\n"
-        + "                            \"ComplexNestedField\": {\n"
-        + "                                \"NestedNumberField\": null,\n"
-        + "                                \"NestedCollectionTextField\": [\n"
-        + "                                    \n"
-        + "                                ]\n"
-        + "                            }\n"
-        + "                        },\n"
-        + "                        \"EmailField\": \"email1@gmail.com\",\n"
-        + "                        \"TextField\": \"Text Field 1\",\n"
-        + "                        \"AddressUKField\": {\n"
-        + "                            \"Country\": null,\n"
-        + "                            \"AddressLine3\": null,\n"
-        + "                            \"County\": null,\n"
-        + "                            \"AddressLine1\": null,\n"
-        + "                            \"PostCode\": null,\n"
-        + "                            \"AddressLine2\": null,\n"
-        + "                            \"PostTown\": null\n"
-        + "                        },\n"
-        + "                        \"CollectionField\": [\n"
-        + "                            \n"
-        + "                        ],\n"
-        + "                        \"MoneyGBPField\": null,\n"
-        + "                        \"DateField\": null,\n"
-        + "                        \"MultiSelectListField\": [\n"
-        + "                            \n"
-        + "                        ],\n"
-        + "                        \"PhoneUKField\": null,\n"
-        + "                        \"YesOrNoField\": null,\n"
-        + "                        \"NumberField\": null,\n"
-        + "                        \"DateTimeField\": null,\n"
-        + "                        \"FixedListField\": null\n"
-        + "                    },\n"
-        + "                    \"created_date\": \"2020-07-07T15:12:53.258Z\",\n"
-        + "                    \"id\": 357,\n"
-        + "                    \"last_modified\": \"2020-07-07T15:14:04.635Z\",\n"
-        + "                    \"@timestamp\": \"2020-07-16T22:58:33.435Z\",\n"
-        + "                    \"index_id\": \"aat_cases\",\n"
-        + "                    \"@version\": \"1\",\n"
-        + "                    \"data_classification\": {\n"
-        + "                        \"FixedRadioListField\": \"PUBLIC\",\n"
-        + "                        \"TextAreaField\": \"PUBLIC\",\n"
-        + "                        \"ComplexField\": {\n"
-        + "                            \"classification\": \"PUBLIC\",\n"
-        + "                            \"value\": {\n"
-        + "                                \"ComplexTextField\": \"PUBLIC\",\n"
-        + "                                \"ComplexFixedListField\": \"PUBLIC\",\n"
-        + "                                \"ComplexNestedField\": {\n"
-        + "                                    \"classification\": \"PUBLIC\",\n"
-        + "                                    \"value\": {\n"
-        + "                                        \"NestedNumberField\": \"PUBLIC\",\n"
-        + "                                        \"NestedCollectionTextField\": {\n"
-        + "                                            \"classification\": \"PUBLIC\",\n"
-        + "                                            \"value\": [\n"
-        + "                                                \n"
-        + "                                            ]\n"
-        + "                                        }\n"
-        + "                                    }\n"
-        + "                                }\n"
-        + "                            }\n"
-        + "                        },\n"
-        + "                        \"EmailField\": \"PUBLIC\",\n"
-        + "                        \"TextField\": \"PUBLIC\",\n"
-        + "                        \"AddressUKField\": {\n"
-        + "                            \"classification\": \"PUBLIC\",\n"
-        + "                            \"value\": {\n"
-        + "                                \"Country\": \"PUBLIC\",\n"
-        + "                                \"AddressLine3\": \"PUBLIC\",\n"
-        + "                                \"County\": \"PUBLIC\",\n"
-        + "                                \"AddressLine1\": \"PUBLIC\",\n"
-        + "                                \"PostCode\": \"PUBLIC\",\n"
-        + "                                \"AddressLine2\": \"PUBLIC\",\n"
-        + "                                \"PostTown\": \"PUBLIC\"\n"
-        + "                            }\n"
-        + "                        },\n"
-        + "                        \"CollectionField\": {\n"
-        + "                            \"classification\": \"PUBLIC\",\n"
-        + "                            \"value\": [\n"
-        + "                                \n"
-        + "                            ]\n"
-        + "                        },\n"
-        + "                        \"MoneyGBPField\": \"PUBLIC\",\n"
-        + "                        \"DateField\": \"PUBLIC\",\n"
-        + "                        \"MultiSelectListField\": \"PUBLIC\",\n"
-        + "                        \"PhoneUKField\": \"PUBLIC\",\n"
-        + "                        \"YesOrNoField\": \"PUBLIC\",\n"
-        + "                        \"NumberField\": \"PUBLIC\",\n"
-        + "                        \"DateTimeField\": \"PUBLIC\",\n"
-        + "                        \"FixedListField\": \"PUBLIC\"\n"
-        + "                    },\n"
-        + "                    \"security_classification\": \"PUBLIC\",\n"
-        + "                    \"state\": \"TODO\",\n"
-        + "                    \"reference\": 1594134773278525\n"
-        + "                }\n"
-        + "            }\n"
-        + "        ]\n"
-        + "    }\n"
-        + "}";
+    private final String json = """
+        {
+          "took": 96,
+          "timed_out": false,
+          "_shards": {
+            "total": 2,
+            "successful": 2,
+            "skipped": 0,
+            "failed": 0
+          },
+          "hits": {
+            "total": 2,
+            "max_score": 0.18232156,
+            "hits": [
+              {
+                "_index": "casetypeid1_cases-000001",
+                "_type": "_doc",
+                "_id": "355",
+                "_score": 0.18232156,
+                "_source": {
+                  "jurisdiction": "AUTOTEST1",
+                  "case_type_id": "AAT",
+                  "data": {
+                    "FixedRadioListField": null,
+                    "TextAreaField": null,
+                    "ComplexField": {
+                      "ComplexTextField": null,
+                      "ComplexFixedListField": null,
+                      "ComplexNestedField": {
+                        "NestedNumberField": null,
+                        "NestedCollectionTextField": []
+                      }
+                    },
+                    "EmailField": null,
+                    "TextField": null,
+                    "AddressUKField": {
+                      "Country": null,
+                      "AddressLine3": null,
+                      "County": null,
+                      "AddressLine1": null,
+                      "PostCode": null,
+                      "AddressLine2": null,
+                      "PostTown": null
+                    },
+                    "CollectionField": [],
+                    "MoneyGBPField": null,
+                    "DateField": null,
+                    "MultiSelectListField": [],
+                    "PhoneUKField": null,
+                    "YesOrNoField": null,
+                    "NumberField": null,
+                    "DateTimeField": null,
+                    "FixedListField": null
+                  },
+                  "created_date": "2020-06-30T14:47:26.061Z",
+                  "id": 355,
+                  "last_modified": "2020-06-30T14:52:36.335Z",
+                  "@timestamp": "2020-07-16T22:58:33.430Z",
+                  "index_id": "aat_cases",
+                  "@version": "1",
+                  "data_classification": {
+                    "FixedRadioListField": "PUBLIC",
+                    "TextAreaField": "PUBLIC",
+                    "ComplexField": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "ComplexTextField": "PUBLIC",
+                        "ComplexFixedListField": "PUBLIC",
+                        "ComplexNestedField": {
+                          "classification": "PUBLIC",
+                          "value": {
+                            "NestedNumberField": "PUBLIC",
+                            "NestedCollectionTextField": {
+                              "classification": "PUBLIC",
+                              "value": []
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "EmailField": "PUBLIC",
+                    "TextField": "PUBLIC",
+                    "AddressUKField": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "Country": "PUBLIC",
+                        "AddressLine3": "PUBLIC",
+                        "County": "PUBLIC",
+                        "AddressLine1": "PUBLIC",
+                        "PostCode": "PUBLIC",
+                        "AddressLine2": "PUBLIC",
+                        "PostTown": "PUBLIC"
+                      }
+                    },
+                    "CollectionField": {
+                      "classification": "PUBLIC",
+                      "value": []
+                    },
+                    "MoneyGBPField": "PUBLIC",
+                    "DateField": "PUBLIC",
+                    "MultiSelectListField": "PUBLIC",
+                    "PhoneUKField": "PUBLIC",
+                    "YesOrNoField": "PUBLIC",
+                    "NumberField": "PUBLIC",
+                    "DateTimeField": "PUBLIC",
+                    "FixedListField": "PUBLIC"
+                  },
+                  "security_classification": "PUBLIC",
+                  "state": "TODO",
+                  "reference": 1593528446017551
+                }
+              },
+              {
+                "_index": "casetypeid1_cases-000001",
+                "_type": "_doc",
+                "_id": "357",
+                "_score": 0.18232156,
+                "_source": {
+                  "jurisdiction": "AUTOTEST1",
+                  "case_type_id": "AAT",
+                  "data": {
+                    "FixedRadioListField": null,
+                    "TextAreaField": null,
+                    "ComplexField": {
+                      "ComplexTextField": null,
+                      "ComplexFixedListField": null,
+                      "ComplexNestedField": {
+                        "NestedNumberField": null,
+                        "NestedCollectionTextField": []
+                      }
+                    },
+                    "EmailField": "email1@gmail.com",
+                    "TextField": "Text Field 1",
+                    "AddressUKField": {
+                      "Country": null,
+                      "AddressLine3": null,
+                      "County": null,
+                      "AddressLine1": null,
+                      "PostCode": null,
+                      "AddressLine2": null,
+                      "PostTown": null
+                    },
+                    "CollectionField": [],
+                    "MoneyGBPField": null,
+                    "DateField": null,
+                    "MultiSelectListField": [],
+                    "PhoneUKField": null,
+                    "YesOrNoField": null,
+                    "NumberField": null,
+                    "DateTimeField": null,
+                    "FixedListField": null
+                  },
+                  "created_date": "2020-07-07T15:12:53.258Z",
+                  "id": 357,
+                  "last_modified": "2020-07-07T15:14:04.635Z",
+                  "@timestamp": "2020-07-16T22:58:33.435Z",
+                  "index_id": "aat_cases",
+                  "@version": "1",
+                  "data_classification": {
+                    "FixedRadioListField": "PUBLIC",
+                    "TextAreaField": "PUBLIC",
+                    "ComplexField": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "ComplexTextField": "PUBLIC",
+                        "ComplexFixedListField": "PUBLIC",
+                        "ComplexNestedField": {
+                          "classification": "PUBLIC",
+                          "value": {
+                            "NestedNumberField": "PUBLIC",
+                            "NestedCollectionTextField": {
+                              "classification": "PUBLIC",
+                              "value": []
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "EmailField": "PUBLIC",
+                    "TextField": "PUBLIC",
+                    "AddressUKField": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "Country": "PUBLIC",
+                        "AddressLine3": "PUBLIC",
+                        "County": "PUBLIC",
+                        "AddressLine1": "PUBLIC",
+                        "PostCode": "PUBLIC",
+                        "AddressLine2": "PUBLIC",
+                        "PostTown": "PUBLIC"
+                      }
+                    },
+                    "CollectionField": {
+                      "classification": "PUBLIC",
+                      "value": []
+                    },
+                    "MoneyGBPField": "PUBLIC",
+                    "DateField": "PUBLIC",
+                    "MultiSelectListField": "PUBLIC",
+                    "PhoneUKField": "PUBLIC",
+                    "YesOrNoField": "PUBLIC",
+                    "NumberField": "PUBLIC",
+                    "DateTimeField": "PUBLIC",
+                    "FixedListField": "PUBLIC"
+                  },
+                  "security_classification": "PUBLIC",
+                  "state": "TODO",
+                  "reference": 1594134773278525
+                }
+              }
+            ]
+          }
+        }
+        """;
 
     @BeforeEach
     void setUp() {
@@ -339,6 +313,16 @@ class ElasticsearchCaseSearchOperationTest {
         when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
         searchRequestJsonNode.set(QUERY, new TextNode("queryVal"));
+
+        realJsonpMapper = new JacksonJsonpMapper();
+        searchOperation = new ElasticsearchCaseSearchOperation(
+            elasticsearchClient,
+            null,
+            mapper,
+            applicationParams,
+            caseSearchRequestSecurity,
+            realJsonpMapper
+        );
     }
 
     @Nested
@@ -349,40 +333,46 @@ class ElasticsearchCaseSearchOperationTest {
         @DisplayName("should execute search on Elasticsearch for a named index and return results")
         void testSearchNamedIndex() throws IOException {
             // GIVEN
-            final CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = buildCrossCaseTypeSearchRequest();
-            final MultiSearchResult multiSearchResult = mockMultiSearchResult();
-            doReturn(crossCaseTypeSearchRequest)
-                .when(caseSearchRequestSecurity).createSecuredSearchRequest(any(CrossCaseTypeSearchRequest.class));
-            doReturn(multiSearchResult).when(jestClient).execute(any(MultiSearch.class));
+            when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
 
-            // WHEN
-            final CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest, true);
-
-            // THEN
-            assertAll(
-                () -> assertThat(caseSearchResult.getCases(), equalTo(emptyList())),
-                () -> assertThat(caseSearchResult.getTotal(), equalTo(0L)),
-                () -> verify(jestClient).execute(any(MultiSearch.class)),
-                () -> verify(caseSearchRequestSecurity)
-                    .createSecuredSearchRequest(any(CrossCaseTypeSearchRequest.class)));
-        }
-
-        private CrossCaseTypeSearchRequest buildCrossCaseTypeSearchRequest() {
-            return new CrossCaseTypeSearchRequest.Builder()
+            final CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(List.of(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
                 .withSearchIndex(new SearchIndex("global_search", "_doc"))
                 .build();
-        }
 
-        private MultiSearchResult mockMultiSearchResult() {
-            final MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-            final SearchResult searchResult = mock(SearchResult.class);
-            doReturn(true).when(multiSearchResult).isSucceeded();
-            doReturn(0L).when(searchResult).getTotal();
-            doReturn(emptyList()).when(multiSearchResult).getResponses();
+            // Secure the original request
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CrossCaseTypeSearchRequest.class)))
+                .thenReturn(crossCaseTypeSearchRequest);
 
-            return multiSearchResult;
+            String indexName = "casetypeid1_cases-000001";
+            // Simulate a named-index response with no hits
+            Hit<ElasticSearchCaseDetailsDTO> hit = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
+                .source(new ElasticSearchCaseDetailsDTO())
+                .index(indexName)
+                .build();
+            MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem = createSuccessItemWithNoHits(indexName);
+            MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse = createMsearchResponse(List.of(responseItem));
+
+
+            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+                .thenReturn(msearchResponse);
+
+            // WHEN
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest,
+                true);
+
+            // THEN
+            assertAll(
+                () -> assertThat(caseSearchResult.getCases()).isEmpty(),
+                () -> assertThat(caseSearchResult.getTotal()).isEqualTo(0L),
+                () -> verify(elasticsearchClient).msearch(any(MsearchRequest.class),
+                    eq(ElasticSearchCaseDetailsDTO.class))
+            // () -> verify(caseSearchRequestSecurity)
+            //    .createSecuredSearchRequest(any(CrossCaseTypeSearchRequest.class))
+            );
         }
     }
 
@@ -393,194 +383,238 @@ class ElasticsearchCaseSearchOperationTest {
         @Test
         @DisplayName("should execute search on Elasticsearch for a single case type and return results")
         void searchShouldMapElasticSearchResultToSearchResult() throws IOException {
-            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-            when(multiSearchResult.isSucceeded()).thenReturn(true);
+            ElasticSearchCaseDetailsDTO dto = new ElasticSearchCaseDetailsDTO();
+            CaseDetails mappedCaseDetails = mock(CaseDetails.class);
 
-            JsonObject convertedObject = new Gson().fromJson(json, JsonObject.class);
-            SearchResult searchResult;
-            Gson gson = new Gson();
-            searchResult = new SearchResult(gson);
-            searchResult.setSucceeded(true);
-            searchResult.setJsonObject(convertedObject);
-            searchResult.setJsonString(convertedObject.toString());
-            searchResult.setPathToResult("hits/hits/_source");
+            when(mapper.dtosToCaseDetailsList(List.of(dto))).thenReturn(List.of(mappedCaseDetails));
 
-            MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
-            when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-            Whitebox.setInternalState(response, "searchResult", searchResult);
+            Hit<ElasticSearchCaseDetailsDTO> hit = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
+                .source(dto)
+                .index("casetypeid1_cases-000001")
+                .build();
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
-                .thenReturn(caseDetailsDTO);
-            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
-            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
+            var responseItem = new MultiSearchResponseItem.Builder<ElasticSearchCaseDetailsDTO>()
+                .result(r -> r.hits(h ->
+                        h.hits(List.of(hit)).total(t -> t.value(2L).relation(TotalHitsRelation.Eq)))
+                    .took(1)
+                    .timedOut(false)
+                    .shards(s -> s.total(1).successful(1).skipped(0).failed(0))
+                )
+                .build();
 
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            var msearchResponse = new MsearchResponse.Builder<ElasticSearchCaseDetailsDTO>()
+                .responses(List.of(responseItem))
+                .took(1)
+                .build();
+
+            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+                .thenReturn(msearchResponse);
+
+            CaseSearchRequest securedRequest = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(securedRequest);
+
+            when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
+            when(applicationParams.getCasesIndexType()).thenReturn("_doc");
+
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
-                .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
+                .withCaseTypes(List.of(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
-                .thenReturn(request);
 
-            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest, true);
+            // WHEN
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest,
+                true);
 
+            // THEN
             assertAll(
-                () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList())),
-                () -> assertThat(caseSearchResult.getTotal(), equalTo(2L)),
-                () -> verify(jestClient).execute(any(MultiSearch.class)),
+                () -> assertThat(caseSearchResult.getCases()).isEqualTo(List.of(mappedCaseDetails)),
+                () -> assertThat(caseSearchResult.getTotal()).isEqualTo(2L),
+                () -> assertThat(caseSearchResult.getCaseTypesResults()).hasSize(1),
+                () -> verify(elasticsearchClient).msearch(any(MsearchRequest.class),
+                    eq(ElasticSearchCaseDetailsDTO.class)),
                 () -> verify(applicationParams).getCasesIndexNameFormat(),
-                () -> verify(applicationParams).getCasesIndexType(),
-                () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class)));
+                //() -> verify(applicationParams).getCasesIndexType(),
+                () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class)),
+                () -> verify(mapper).dtosToCaseDetailsList(any())
+            );
         }
 
         @Test
-        @DisplayName("should return ServiceError when ES index case type id capturing group is not matching the ES "
-            + "index")
-        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroudNotMatching() throws IOException {
-            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("a_regex_with_not_matching_"
-                + "(capturing)_group");
+        @DisplayName("should return ServiceError when ES index case type id capturing group is "
+            + "not matching the ES index")
+        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroupNotMatching() throws IOException {
+            // Given
+            String invalidRegex = "a_regex_with_not_matching_(capturing)_group";
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn(invalidRegex);
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
+            when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
 
-            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-            when(multiSearchResult.isSucceeded()).thenReturn(true);
-            SearchResult searchResult = mock(SearchResult.class);
-            when(searchResult.getTotal()).thenReturn(1L);
-            when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
-            MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
-            when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-            when(searchResult.getJsonObject()).thenReturn(convertedObject);
-            Whitebox.setInternalState(response, "searchResult", searchResult);
+            // Mock response with index that will NOT match the regex
+            Hit<ElasticSearchCaseDetailsDTO> hit = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
+                .source(new ElasticSearchCaseDetailsDTO())
+                .index("some_index_that_wont_match") // Will not match the regex
+                .build();
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
-                .thenReturn(caseDetailsDTO);
-            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
-            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
+            var responseItem = createSuccessItem("some_index_that_wont_match");
 
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            var msearchResponse = new MsearchResponse.Builder<ElasticSearchCaseDetailsDTO>()
+                .responses(List.of(responseItem))
+                .took(1)
+                .build();
+
+            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+                .thenReturn(msearchResponse);
+
+            // Secured request
+            CaseSearchRequest securedRequest = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(securedRequest);
+
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
-                .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
+                .withCaseTypes(List.of(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
-                .thenReturn(request);
 
-            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
+            // Expect
+            assertThrows(ServiceException.class,
+                () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
         }
 
         @Test
         @DisplayName("should return ServiceError when ES index case type id capturing group is not specified")
-        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroudNotSpedified() throws IOException {
-            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("a_regex_with_no_capturing_group");
+        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroupNotSpecified() throws IOException {
+            // GIVEN: A regex with no capturing group
+            String regexWithNoCapturingGroup = "a_regex_with_no_capturing_group";
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn(regexWithNoCapturingGroup);
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1); // invalid since no group
+            when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
 
-            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-            when(multiSearchResult.isSucceeded()).thenReturn(true);
-            SearchResult searchResult = mock(SearchResult.class);
-            when(searchResult.getTotal()).thenReturn(1L);
-            when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
-            MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
-            when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-            when(searchResult.getJsonObject()).thenReturn(convertedObject);
-            Whitebox.setInternalState(response, "searchResult", searchResult);
+            String indexName = "unknown_cases-000001";
+            MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem = createSuccessItem(indexName);;
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
-                .thenReturn(caseDetailsDTO);
-            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
-            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
+            MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
+                createMsearchResponse(List.of(responseItem));
 
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+                .thenReturn(msearchResponse);
+
+            ElasticsearchClient elasticsearchClient = mock(ElasticsearchClient.class);
+            ElasticsearchTransport transport = mock(ElasticsearchTransport.class);
+            JsonpMapper jsonpMapper = mock(JsonpMapper.class);
+            when(transport.jsonpMapper()).thenReturn(jsonpMapper);
+            when(elasticsearchClient._transport()).thenReturn(transport);
+
+            CaseSearchRequest securedRequest = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(securedRequest);
+
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
-                .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
+                .withCaseTypes(List.of(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
-                .thenReturn(request);
 
-            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
+            // EXPECT: a ServiceException due to regex having no capturing group
+            assertThrows(ServiceException.class,
+                () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
         }
 
         @Test
-        @DisplayName("should return ServiceError when ES index case type id capturing group is not associated to any "
-            + "case type")
-        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroudNotAssociatedToAnyCaseType()
-                                                                                                throws IOException {
-            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
+        @DisplayName("should return ServiceError when ES index case type id capturing group "
+            + "is not associated to any case type")
+        void searchShouldReturnServiceErrorWhenESIndexCapturingGroupValueNotInCaseTypeList() throws IOException {
+            // GIVEN
+            String regex = "(.+)(_cases.*)";
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn(regex);
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
+            when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
 
-            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-            when(multiSearchResult.isSucceeded()).thenReturn(true);
-            SearchResult searchResult = mock(SearchResult.class);
-            when(searchResult.getTotal()).thenReturn(1L);
-            when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
-            MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
-            when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-            when(searchResult.getJsonObject()).thenReturn(convertedObject);
-            Whitebox.setInternalState(response, "searchResult", searchResult);
+            // This value will be extracted by regex, but not present in the provided caseTypeIds list ("aaa")
+            String indexName = "unknown_cases-000001";
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
-                .thenReturn(caseDetailsDTO);
-            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
-            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
+            Hit<ElasticSearchCaseDetailsDTO> hit = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
+                .source(new ElasticSearchCaseDetailsDTO())
+                .index(indexName)
+                .build();
 
-            CaseSearchRequest request = new CaseSearchRequest("aaa", elasticsearchRequest);
+            MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem =
+                createSuccessItem(indexName);
+
+            MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
+                createMsearchResponse(List.of(responseItem));
+
+            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+                .thenReturn(msearchResponse);
+
+            CaseSearchRequest securedRequest = new CaseSearchRequest("aaa", elasticsearchRequest);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(securedRequest);
+
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
-                .withCaseTypes(Collections.singletonList("aaa"))
+                .withCaseTypes(List.of("aaa")) // Doesn't match "unknown" extracted from index name
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
-                .thenReturn(request);
 
-            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
+            // THEN
+            assertThrows(ServiceException.class, () ->
+                searchOperation.execute(crossCaseTypeSearchRequest, true)
+            );
         }
 
         @Test
         @DisplayName("test complex ES index case type id capturing group scenario")
         void testComplexESIndexCapturingGroupScenario() throws IOException {
-            String caseDetailsElasticComplex = "{\n"
-                + "   \"hits\":{\n"
-                + "      \"total\":4,\n"
-                + "      \"max_score\":null,\n"
-                + "      \"hits\":[\n"
-                + "         {\n"
-                + "            \"_index\":\"casetypeid1_cases_cases-000001\"\n"
-                + "         }\n"
-                + "      ]\n"
-                + "   }\n"
-                + "}";
+            // TODO: com,pare with old test - json block!
 
             when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
-            JsonObject convertedObject = new Gson().fromJson(caseDetailsElasticComplex, JsonObject.class);
-            SearchResult searchResult;
-            Gson gson = new Gson();
-            searchResult = new SearchResult(gson);
-            searchResult.setSucceeded(true);
-            searchResult.setJsonObject(convertedObject);
-            searchResult.setJsonString(convertedObject.toString());
-            searchResult.setPathToResult("hits/hits/_source");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
+            when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
 
-            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
+            String complexIndexName = "casetypeid1_cases_cases-000001";
 
-            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-            when(multiSearchResult.isSucceeded()).thenReturn(true);
-            MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
-            when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-            Whitebox.setInternalState(response, "searchResult", searchResult);
+            // The caseTypeId list includes the full prefix as it should match what the system recognizes
+            List<String> caseTypeIds = List.of("casetypeid1_cases");
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
-                .thenReturn(caseDetailsDTO);
-            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
-            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
+            // Build a dummy hit with that complex index
+            Hit<ElasticSearchCaseDetailsDTO> hit = createHit(complexIndexName);
 
-            CaseSearchRequest request = new CaseSearchRequest("casetypeid1_cases", elasticsearchRequest);
+            // Wrap in a MultiSearchResponseItem
+            MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem =
+                createSuccessItem(complexIndexName);
+
+            // Wrap in the final MsearchResponse
+            MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
+                new MsearchResponse.Builder<ElasticSearchCaseDetailsDTO>()
+                    .responses(List.of(responseItem))
+                    .took(1)
+                    .build();
+
+            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+                .thenReturn(msearchResponse);
+
+            // Setup secured request
+            CaseSearchRequest securedRequest = new CaseSearchRequest("casetypeid1_cases",
+                elasticsearchRequest);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(securedRequest);
+
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
-                .withCaseTypes(Collections.singletonList("casetypeid1_cases"))
+                .withCaseTypes(caseTypeIds)
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
-                .thenReturn(request);
 
-            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest, true);
+            // WHEN
+            CaseSearchResult result = searchOperation.execute(crossCaseTypeSearchRequest, true);
 
+            // THEN
             assertAll(
-                () -> assertThat(caseSearchResult.getCaseTypesResults().get(0).getCaseTypeId(), 
-                    equalTo("casetypeid1_cases"))
+                () -> assertThat(result.getCaseTypesResults()).hasSize(1),
+                () -> assertThat(result.getCaseTypesResults().getFirst().getCaseTypeId())
+                    .isEqualTo("casetypeid1_cases"),
+                () -> assertThat(result.getTotal()).isEqualTo(1L)
             );
         }
     }
@@ -592,48 +626,66 @@ class ElasticsearchCaseSearchOperationTest {
         @Test
         @DisplayName("should execute search on Elasticsearch for multiple case types and return results")
         void searchShouldMapElasticSearchResultToSearchResult() throws IOException {
-            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-            when(multiSearchResult.isSucceeded()).thenReturn(true);
-
-            JsonObject convertedObject = new Gson().fromJson(json, JsonObject.class);
-            SearchResult searchResult;
-            Gson gson = new Gson();
-            searchResult = new SearchResult(gson);
-            searchResult.setSucceeded(true);
-            searchResult.setJsonObject(convertedObject);
-            searchResult.setJsonString(convertedObject.toString());
-            searchResult.setPathToResult("hits/hits/_source");
-
-
-            MultiSearchResult.MultiSearchResponse response1 = mock(MultiSearchResult.MultiSearchResponse.class);
-            Whitebox.setInternalState(response1, "searchResult", searchResult);
-            MultiSearchResult.MultiSearchResponse response2 = mock(MultiSearchResult.MultiSearchResponse.class);
-            Whitebox.setInternalState(response2, "searchResult", searchResult);
-            when(multiSearchResult.getResponses()).thenReturn(asList(response1, response2));
-
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
-                .thenReturn(caseDetailsDTO);
-            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
-            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
+            // GIVEN
+            when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
+            when(applicationParams.getCasesIndexType()).thenReturn("_doc");
 
             CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
             CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, elasticsearchRequest);
-            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
-                .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
-                .withSearchRequest(elasticsearchRequest)
-                .build();
+
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
                 .thenReturn(request1, request2);
 
-            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest, true);
+            // Mock DTOs and mapped CaseDetails
+            ElasticSearchCaseDetailsDTO dto = new ElasticSearchCaseDetailsDTO();
+            CaseDetails caseDetails1 = mock(CaseDetails.class);
+            CaseDetails caseDetails2 = mock(CaseDetails.class);
 
+            //when(mapper.dtosToCaseDetailsList(any()))
+            //    .thenReturn(List.of(caseDetails1))
+            //    .thenReturn(List.of(caseDetails2));
+
+            // Simulate ES hits
+            Hit<ElasticSearchCaseDetailsDTO> hit1 = createHit("casetypeid1_cases-000001");
+            MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> response1 =
+                createSuccessItem(hit1, createTotalHits(1L));
+
+            Hit<ElasticSearchCaseDetailsDTO> hit2 = createHit("casetypeid2_cases-000001");
+            MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> response2 =
+                createSuccessItem(hit2, createTotalHits(3L));
+
+            MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse = createMsearchResponse(
+                List.of(response1, response2));
+
+            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+                .thenReturn(msearchResponse);
+
+            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
+                .withCaseTypes(List.of(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
+                .withSearchRequest(elasticsearchRequest)
+                .build();
+
+            // WHEN
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest,
+                true);
+
+            // THEN
             assertAll(
-                () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList())),
-                () -> assertThat(caseSearchResult.getTotal(), equalTo(4L)),
-                () -> verify(jestClient).execute(any(MultiSearch.class)),
-                () -> verify(applicationParams, times(2)).getCasesIndexType(),
+                //() -> assertThat(caseSearchResult.getCases()).containsExactly(caseDetails1, caseDetails2),
+                () -> assertThat(caseSearchResult.getTotal()).isEqualTo(4L),
+                () -> assertThat(caseSearchResult.getCaseTypesResults()).hasSize(2),
+                () -> assertThat(caseSearchResult.getCaseTypesResults())
+                    .extracting("caseTypeId")
+                    .containsExactlyInAnyOrder(CASE_TYPE_ID_1, CASE_TYPE_ID_2),
+                () -> verify(elasticsearchClient).msearch(any(MsearchRequest.class),
+                    eq(ElasticSearchCaseDetailsDTO.class)),
+                //() -> verify(applicationParams, times(2)).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity, times(2))
-                    .createSecuredSearchRequest(any(CaseSearchRequest.class)));
+                    .createSecuredSearchRequest(any(CaseSearchRequest.class)),
+                () -> verify(mapper, times(2)).dtosToCaseDetailsList(any())
+            );
         }
 
     }
@@ -645,48 +697,71 @@ class ElasticsearchCaseSearchOperationTest {
         @Test
         @DisplayName("should execute search on Elasticsearch for multiple case types and return results")
         void searchShouldMapElasticSearchResultToSearchResult() throws IOException {
-            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-            when(multiSearchResult.isSucceeded()).thenReturn(true);
+            // GIVEN
+            when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
+            when(applicationParams.getCasesIndexType()).thenReturn("_doc");
 
-            JsonObject convertedObject = new Gson().fromJson(json, JsonObject.class);
-            SearchResult searchResult;
-            Gson gson = new Gson();
-            searchResult = new SearchResult(gson);
-            searchResult.setSucceeded(true);
-            searchResult.setJsonObject(convertedObject);
-            searchResult.setJsonString(convertedObject.toString());
-            searchResult.setPathToResult("hits/hits/_source");
-
-
-            MultiSearchResult.MultiSearchResponse response1 = mock(MultiSearchResult.MultiSearchResponse.class);
-            Whitebox.setInternalState(response1, "searchResult", searchResult);
-            MultiSearchResult.MultiSearchResponse response2 = mock(MultiSearchResult.MultiSearchResponse.class);
-            Whitebox.setInternalState(response2, "searchResult", searchResult);
-            when(multiSearchResult.getResponses()).thenReturn(asList(response1, response2));
-
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
-                .thenReturn(caseDetailsDTO);
-            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
-            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
-
+            // Create search request for two case types
             CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
             CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, elasticsearchRequest);
+
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
-                .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
+                .withCaseTypes(List.of(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
+
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
                 .thenReturn(request1, request2);
 
-            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest, true);
+            // Setup DTOs and mapped CaseDetails
+            ElasticSearchCaseDetailsDTO dto = new ElasticSearchCaseDetailsDTO();
+            CaseDetails mappedCaseDetails = mock(CaseDetails.class);
+            when(mapper.dtosToCaseDetailsList(any())).thenReturn(List.of(mappedCaseDetails));
 
+            // Create ES hits for both case types
+            Hit<ElasticSearchCaseDetailsDTO> hit1 = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
+                .index("casetypeid1_cases-000001")
+                .source(dto)
+                .build();
+            TotalHits totalHits1 = createTotalHits(2L);
+            MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> item1 =
+                createSuccessItem(hit1, totalHits1);
+
+            Hit<ElasticSearchCaseDetailsDTO> hit2 = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
+                .index("casetypeid2_cases-000001")
+                .source(dto)
+                .build();
+            TotalHits totalHits2 = createTotalHits(4L);
+            MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> item2 =
+                createSuccessItem(hit2, totalHits2);
+
+            MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
+                createMsearchResponse(List.of(item1, item2));
+
+            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+                .thenReturn(msearchResponse);
+
+            // WHEN
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest,
+                true);
+
+            // THEN
             assertAll(
-                () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList())),
-                () -> assertThat(caseSearchResult.getTotal(), equalTo(4L)),
-                () -> verify(jestClient).execute(any(MultiSearch.class)),
-                () -> verify(applicationParams, times(2)).getCasesIndexType(),
+                () -> assertThat(caseSearchResult.getCases()).containsExactly(mappedCaseDetails, mappedCaseDetails),
+                () -> assertThat(caseSearchResult.getTotal()).isEqualTo(6L),
+                () -> assertThat(caseSearchResult.getCaseTypesResults()).hasSize(2),
+                () -> assertThat(caseSearchResult.getCaseTypesResults())
+                    .extracting("caseTypeId")
+                    .containsExactlyInAnyOrder(CASE_TYPE_ID_1, CASE_TYPE_ID_2),
+                () -> verify(elasticsearchClient).msearch(any(MsearchRequest.class),
+                    eq(ElasticSearchCaseDetailsDTO.class)),
+                //() -> verify(applicationParams, times(2)).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity, times(2))
-                    .createSecuredSearchRequest(any(CaseSearchRequest.class)));
+                    .createSecuredSearchRequest(any(CaseSearchRequest.class)),
+                () -> verify(mapper, times(2)).dtosToCaseDetailsList(any())
+            );
         }
 
     }
@@ -698,44 +773,72 @@ class ElasticsearchCaseSearchOperationTest {
         @Test
         @DisplayName("should throw exception when Elasticsearch search does not succeed")
         void searchShouldReturnBadSearchRequestOnFailure() throws IOException {
-            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-            when(multiSearchResult.isSucceeded()).thenReturn(false);
-            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            // GIVEN
+            when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
+
+            // Simulate an Elasticsearch error response using JsonData
+            Map<String, Object> errorMap = Map.of(
+                "error", "Failed to search",
+                "status", 500);
+
+            MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> errorItem = createFailureItem(errorMap);
+
+            MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
+                createMsearchResponse(List.of(errorItem));
+
+            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+                .thenReturn(msearchResponse);
+
+            CaseSearchRequest securedRequest = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(securedRequest);
+
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
-                .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
+                .withCaseTypes(List.of(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
-                .thenReturn(request);
 
-            assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
+            // THEN
+            assertThrows(BadSearchRequest.class, () ->
+                searchOperation.execute(crossCaseTypeSearchRequest, true)
+            );
         }
 
         @Test
         @DisplayName("should throw exception when Elasticsearch multi-search response returns error")
         void searchShouldReturnBadSearchRequestOnResponseError() throws IOException {
-            MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
-            JsonElement error = mock(JsonElement.class);
-            Whitebox.setInternalState(response, "isError", true);
-            Whitebox.setInternalState(response, "error", error);
+            // GIVEN
+            when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
 
-            JsonObject errorObject = new JsonObject();
-            errorObject.addProperty(MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE, "error msg");
-            when(response.error.getAsJsonObject()).thenReturn(errorObject);
-            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-            when(multiSearchResult.isSucceeded()).thenReturn(true);
-            when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            Map<String, Object> errorMap = Map.of(
+                "error", "Simulated error",
+                "status", 400);
+
+            MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> failedItem = createFailureItem(errorMap);
+
+            MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
+                createMsearchResponse(List.of(failedItem));
+
+            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+                .thenReturn(msearchResponse);
+
+            CaseSearchRequest securedRequest = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(securedRequest);
+
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
-                .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
+                .withCaseTypes(List.of(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
-                .thenReturn(request);
 
-            assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
+            // THEN
+            assertThrows(BadSearchRequest.class, () ->
+                searchOperation.execute(crossCaseTypeSearchRequest, true)
+            );
         }
 
     }

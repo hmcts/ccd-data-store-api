@@ -1,16 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.search.global;
 
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.ChildScoreMode;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOptionsBuilders;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.search.join.ScoreMode;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortByCategory;
@@ -19,7 +18,9 @@ import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
 
+
 import javax.inject.Named;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,170 +50,203 @@ import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.S
 @Named
 public class GlobalSearchQueryBuilder {
 
-    static final String STANDARD_ANALYZER = "standard";
     static final String KEYWORD = ".keyword";
 
-    public QueryBuilder globalSearchQuery(GlobalSearchRequestPayload request) {
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+    public Query globalSearchQuery(GlobalSearchRequestPayload request) {
+        BoolQuery.Builder boolBuilder = new BoolQuery.Builder();
         int numberOfShouldFields = 0;
 
         if (request != null) {
             SearchCriteria searchCriteria = request.getSearchCriteria();
             if (searchCriteria != null) {
-
-                numberOfShouldFields += checkForWildcardValues(boolQueryBuilder, REFERENCE,
+                numberOfShouldFields += checkForWildcardValues(boolBuilder, REFERENCE,
                     searchCriteria.getCaseReferences());
-                // add terms queries for properties that must match 1 from many
-                addTermsQuery(boolQueryBuilder, CASE_TYPE, searchCriteria.getCcdCaseTypeIds());
-                addTermsQuery(boolQueryBuilder, JURISDICTION, searchCriteria.getCcdJurisdictionIds());
-                addTermsQuery(boolQueryBuilder, STATE, searchCriteria.getStateIds());
-                addTermsQuery(boolQueryBuilder, REGION, searchCriteria.getCaseManagementRegionIds());
-                addTermsQuery(boolQueryBuilder, BASE_LOCATION, searchCriteria.getCaseManagementBaseLocationIds());
-                numberOfShouldFields += checkForWildcardValues(boolQueryBuilder, OTHER_REFERENCE_VALUE,
+                addTermsQuery(boolBuilder, CASE_TYPE, searchCriteria.getCcdCaseTypeIds());
+                addTermsQuery(boolBuilder, JURISDICTION, searchCriteria.getCcdJurisdictionIds());
+                addTermsQuery(boolBuilder, STATE, searchCriteria.getStateIds());
+                addTermsQuery(boolBuilder, REGION, searchCriteria.getCaseManagementRegionIds());
+                addTermsQuery(boolBuilder, BASE_LOCATION, searchCriteria.getCaseManagementBaseLocationIds());
+                numberOfShouldFields += checkForWildcardValues(boolBuilder, OTHER_REFERENCE_VALUE,
                     searchCriteria.getOtherReferences());
 
-                // add parties query for all party values
-                addPartiesQuery(boolQueryBuilder, searchCriteria.getParties());
-                boolQueryBuilder.minimumShouldMatch(numberOfShouldFields);
+                addPartiesQuery(boolBuilder, searchCriteria.getParties());
+
+                if (numberOfShouldFields > 0) {
+                    boolBuilder.minimumShouldMatch(String.valueOf(numberOfShouldFields));
+                }
             }
         }
 
-        return boolQueryBuilder;
+        return Query.of(q -> q.bool(boolBuilder.build()));
     }
 
-    public int checkForWildcardValues(BoolQueryBuilder boolQueryBuilder, String field, List<String> values) {
-        if (values != null) {
-            for (String str : values) {
-                boolQueryBuilder.should(QueryBuilders.wildcardQuery(field + KEYWORD, str));
+    private Optional<Query> createPartyQuery(Party party) {
+        if (party == null) {
+            return Optional.empty();
+        }
+
+        BoolQuery.Builder innerBool = new BoolQuery.Builder();
+
+        addNameQueryIfPresent(party, innerBool);
+        addEmailQueryIfPresent(party, innerBool);
+        addAddressQueryIfPresent(party, innerBool);
+        addPostCodeQueryIfPresent(party, innerBool);
+        addDateOfBirthQueryIfPresent(party, innerBool);
+        addDateOfDeathQueryIfPresent(party, innerBool);
+
+        if (innerBool.build().must().isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(createNestedPartyQuery(innerBool));
+    }
+
+    public List<SortOptions> globalSearchSort(GlobalSearchRequestPayload request) {
+        List<SortOptions> sortOptions = new ArrayList<>();
+
+        if (request != null && request.getSortCriteria() != null) {
+            for (SortCriteria sortCriteria : request.getSortCriteria()) {
+                Optional<SortOptions> sort = createSort(sortCriteria);
+                sort.ifPresent(sortOptions::add);
+            }
+        }
+
+        return sortOptions;
+    }
+
+    private int checkForWildcardValues(BoolQuery.Builder builder, String field, List<String> values) {
+        if (values != null && !values.isEmpty()) {
+            for (String val : values) {
+                builder.should(Query.of(q -> q.wildcard(w -> w.field(field + KEYWORD)
+                    .value(val))));
             }
             return 1;
         }
         return 0;
     }
 
-    public List<FieldSortBuilder> globalSearchSort(GlobalSearchRequestPayload request) {
-        List<FieldSortBuilder> sortBuilders = Lists.newArrayList();
-
-        if (request != null && request.getSortCriteria() != null) {
-            request.getSortCriteria().forEach(sortCriteria -> createSort(sortCriteria).ifPresent(sortBuilders::add));
-        }
-
-        return sortBuilders;
-    }
-
-    /**
-     * Get list of all case data fields to return from search.
-     */
-    public ArrayNode globalSearchSourceFields() {
-        return JacksonUtils.MAPPER.createArrayNode()
-            // root level case data fields
-            .add(CASE_ACCESS_CATEGORY)
-            .add(CASE_MANAGEMENT_CATEGORY_ID)
-            .add(CASE_MANAGEMENT_CATEGORY_NAME)
-            .add(CASE_MANAGEMENT_LOCATION)
-            .add(CASE_NAME_HMCTS_INTERNAL)
-            // remaining case data fields
-            .add(OTHER_REFERENCE);
-    }
-
-    /**
-     * Get list of all SupplementaryData fields to return from search.
-     */
-    public ArrayNode globalSearchSupplementaryDataFields() {
-        return JacksonUtils.MAPPER.createArrayNode()
-            .add(SERVICE_ID);
-    }
-
-    private void addTermsQuery(BoolQueryBuilder boolQueryBuilder, String term, List<String> values) {
+    private void addTermsQuery(BoolQuery.Builder builder, String field, List<String> values) {
         if (CollectionUtils.isNotEmpty(values)) {
-            boolQueryBuilder.must(
-                // NB: switch to lower case for terms query
-                QueryBuilders.termsQuery(term, values.stream().map(String::toLowerCase).collect(Collectors.toList()))
-            );
+            builder.must(Query.of(q -> q.terms(t -> t
+                .field(field)
+                .terms(v -> v.value(values.stream().map(String::toLowerCase).map(FieldValue::of)
+                    .collect(Collectors.toList())))
+            )));
         }
     }
 
-    private void addPartiesQuery(BoolQueryBuilder boolQueryBuilder, List<Party> parties) {
+    private void addPartiesQuery(BoolQuery.Builder builder, List<Party> parties) {
         if (CollectionUtils.isNotEmpty(parties)) {
-            // NB: the generated ShouldQuery, which will contain all the party specific queries, will be wrapped in a
-            //     single BoolQuery and added to the list of 'must' queries (i.e. alongside the other term based
-            //     queries) rather than added directly to the main query.  This will allow any future additional
-            //     SearchCriteria object based queries to be added in a similar fashion without impacting this query.
-            BoolQueryBuilder partiesQueryBuilder = QueryBuilders.boolQuery();
+            BoolQuery.Builder partyBoolBuilder = new BoolQuery.Builder();
 
-            parties.forEach(party -> createPartyQuery(party).ifPresent(partiesQueryBuilder::should));
+            for (Party party : parties) {
+                createPartyQuery(party).ifPresent(partyBoolBuilder::should);
+            }
 
-            // if found any party queries:: complete the parties query and attach to main query.
-            if (!partiesQueryBuilder.should().isEmpty()) {
-                partiesQueryBuilder.minimumShouldMatch(1);
-                boolQueryBuilder.must(partiesQueryBuilder);
+            if (!partyBoolBuilder.build().should().isEmpty()) {
+                partyBoolBuilder.minimumShouldMatch("1");
+                builder.must(Query.of(q -> q.bool(partyBoolBuilder.build())));
             }
         }
     }
 
-    private Optional<QueryBuilder> createPartyQuery(Party party) {
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-
-        if (party != null) {
-            if (StringUtils.isNotBlank(party.getPartyName())) {
-                boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_NAME + KEYWORD,
-                    party.getPartyName()));
-            }
-            if (StringUtils.isNotBlank(party.getEmailAddress())) {
-                boolQueryBuilder.must(
-                    QueryBuilders.matchPhraseQuery(SEARCH_PARTY_EMAIL_ADDRESS, party.getEmailAddress())
-                        .analyzer(STANDARD_ANALYZER)
-                );
-            }
-            if (StringUtils.isNotBlank(party.getAddressLine1())) {
-                boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_ADDRESS_LINE_1 + KEYWORD,
-                    party.getAddressLine1()));
-            }
-            if (StringUtils.isNotBlank(party.getPostCode())) {
-                boolQueryBuilder.must(
-                    QueryBuilders.matchPhraseQuery(SEARCH_PARTY_POSTCODE, party.getPostCode())
-                        .analyzer(STANDARD_ANALYZER)
-                );
-            }
-            if (StringUtils.isNotBlank(party.getDateOfBirth())) {
-                boolQueryBuilder.must(QueryBuilders.rangeQuery(SEARCH_PARTY_DATE_OF_BIRTH)
-                    .gte(party.getDateOfBirth())
-                    .lte(party.getDateOfBirth())
-                );
-            }
-            if (StringUtils.isNotBlank(party.getDateOfDeath())) {
-                boolQueryBuilder.must(QueryBuilders.rangeQuery(SEARCH_PARTY_DATE_OF_DEATH)
-                    .gte(party.getDateOfDeath())
-                    .lte(party.getDateOfDeath())
-                );
-            }
+    private void addNameQueryIfPresent(Party party, BoolQuery.Builder builder) {
+        if (StringUtils.isNotBlank(party.getPartyName())) {
+            builder.must(Query.of(q -> q.wildcard(w -> w
+                .field(SEARCH_PARTY_NAME + KEYWORD)
+                .value(party.getPartyName()))));
         }
-
-        if (boolQueryBuilder.must().isEmpty()) {
-            return Optional.empty();
-        }
-
-        // NB: uses nested query so multiple property search is against a single party object
-        return Optional.of(QueryBuilders.nestedQuery(SEARCH_PARTIES, boolQueryBuilder, ScoreMode.Total));
     }
 
-    private Optional<FieldSortBuilder> createSort(SortCriteria sortCriteria) {
+    private void addEmailQueryIfPresent(Party party, BoolQuery.Builder builder) {
+        if (StringUtils.isNotBlank(party.getEmailAddress())) {
+            builder.must(Query.of(q -> q.matchPhrase(m -> m
+                .field(SEARCH_PARTY_EMAIL_ADDRESS)
+                .query(party.getEmailAddress()))));
+        }
+    }
 
+    private void addAddressQueryIfPresent(Party party, BoolQuery.Builder builder) {
+        if (StringUtils.isNotBlank(party.getAddressLine1())) {
+            builder.must(Query.of(q -> q.wildcard(w -> w
+                .field(SEARCH_PARTY_ADDRESS_LINE_1 + KEYWORD)
+                .value(party.getAddressLine1()))));
+        }
+    }
+
+    private void addPostCodeQueryIfPresent(Party party, BoolQuery.Builder builder) {
+        if (StringUtils.isNotBlank(party.getPostCode())) {
+            builder.must(Query.of(q -> q.matchPhrase(m -> m
+                .field(SEARCH_PARTY_POSTCODE)
+                .query(party.getPostCode()))));
+        }
+    }
+
+    private void addDateOfBirthQueryIfPresent(Party party, BoolQuery.Builder builder) {
+        if (StringUtils.isNotBlank(party.getDateOfBirth())) {
+            builder.must(createDateRangeQuery(SEARCH_PARTY_DATE_OF_BIRTH, party.getDateOfBirth()));
+        }
+    }
+
+    private void addDateOfDeathQueryIfPresent(Party party, BoolQuery.Builder builder) {
+        if (StringUtils.isNotBlank(party.getDateOfDeath())) {
+            builder.must(createDateRangeQuery(SEARCH_PARTY_DATE_OF_DEATH, party.getDateOfDeath()));
+        }
+    }
+
+    private Query createDateRangeQuery(String fieldName, String dateToDo) {
+
+        if (StringUtils.isNotBlank(dateToDo)) {
+            return Query.of(q -> q.range(r -> r
+                .date(d -> d
+                    .field(fieldName)
+                    .gte(dateToDo)
+                    .lte(dateToDo)
+                )
+            ));
+
+        }
+        return null; // TODO: Handle null case appropriately
+    }
+
+    private Query createNestedPartyQuery(BoolQuery.Builder innerBool) {
+        return Query.of(q -> q.nested(n -> n
+            .path(SEARCH_PARTIES)
+            .query(Query.of(b -> b.bool(innerBool.build())))
+            .scoreMode(ChildScoreMode.Sum)));
+    }
+
+
+    private Optional<SortOptions> createSort(SortCriteria sortCriteria) {
         if (sortCriteria != null && StringUtils.isNotBlank(sortCriteria.getSortBy())) {
             GlobalSearchSortByCategory sortByCategory = GlobalSearchSortByCategory.getEnum(sortCriteria.getSortBy());
 
             if (sortByCategory != null) {
                 SortOrder sortOrder =
                     GlobalSearchSortDirection.DESCENDING.name().equalsIgnoreCase(sortCriteria.getSortDirection())
-                        ? SortOrder.DESC : SortOrder.ASC;
+                        ? SortOrder.Desc : SortOrder.Asc;
 
-                return Optional.of(SortBuilders
-                    .fieldSort(sortByCategory.getField())
-                    .order(sortOrder));
+                return Optional.of(SortOptionsBuilders.field(f -> f
+                    .field(sortByCategory.getField())
+                    .order(sortOrder)));
             }
         }
-
         return Optional.empty();
     }
 
+
+    public ArrayNode globalSearchSourceFields() {
+        return JacksonUtils.MAPPER.createArrayNode()
+            .add(CASE_ACCESS_CATEGORY)
+            .add(CASE_MANAGEMENT_CATEGORY_ID)
+            .add(CASE_MANAGEMENT_CATEGORY_NAME)
+            .add(CASE_MANAGEMENT_LOCATION)
+            .add(CASE_NAME_HMCTS_INTERNAL)
+            .add(OTHER_REFERENCE);
+    }
+
+    public ArrayNode globalSearchSupplementaryDataFields() {
+        return JacksonUtils.MAPPER.createArrayNode()
+            .add(SERVICE_ID);
+    }
 }

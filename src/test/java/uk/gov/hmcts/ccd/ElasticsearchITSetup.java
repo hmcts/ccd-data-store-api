@@ -99,7 +99,7 @@ public class ElasticsearchITSetup {
                         responseBody = ElasticsearchIndexSettings.unwrapIO(response.getEntity().getContent());
                     } catch (IOException e) {
                         log.error("Error during reading response body", e);
-                        responseBody = "!! Failed to get the response boy !!";
+                        responseBody = "!! Failed to get the response body !!";
                     }
                     throw new RuntimeException("Call to elasticsearch resulted in error:\n" + responseBody);
                 }
@@ -110,7 +110,8 @@ public class ElasticsearchITSetup {
 
     private boolean indexExists(String indexName) {
         HttpHead request = new HttpHead(url("/" + indexName));
-        return httpClient.execute(request, response -> response.getStatusLine().getStatusCode() == 200);
+        return httpClient.execute(request, response
+            -> response.getStatusLine().getStatusCode() == 200);
     }
 
     // * * * * * * * * * * * * * * Initializing data * * * * * * * * * * * * * * * * * * * * * * * *
@@ -123,7 +124,7 @@ public class ElasticsearchITSetup {
                 resourceResolver.getResources(String.format("classpath:%s/%s/*.json", DATA_DIR, idx));
             for (Resource resource : resources) {
                 String caseString = IOUtils.toString(resource.getInputStream(), UTF_8);
-                doIndex(idx, INDEX_TYPE, caseString);
+                doIndex(idx, null, caseString);
             }
         }
     }
