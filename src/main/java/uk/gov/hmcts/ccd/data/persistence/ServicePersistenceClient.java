@@ -21,7 +21,7 @@ public class ServicePersistenceClient {
     private final IdempotencyKeyHolder idempotencyKeyHolder;
 
     public CaseDetails getCase(String caseRef) {
-        var uri = resolver.resolveUriOrThrow(caseRef);
+        var uri = resolver.resolveUriOrThrow(Long.valueOf(caseRef));
         var response = api.getCases(uri, List.of(caseRef));
 
         if (response.isEmpty()) {
@@ -43,7 +43,7 @@ public class ServicePersistenceClient {
     }
 
     public List<AuditEvent> getCaseHistory(String caseReference) {
-        var uri = resolver.resolveUriOrThrow(caseReference);
+        var uri = resolver.resolveUriOrThrow(Long.valueOf(caseReference));
         return api.getCaseHistory(uri, caseReference)
             .stream()
             .map(DecentralisedAuditEvent::getEvent)
@@ -51,12 +51,12 @@ public class ServicePersistenceClient {
     }
 
     public AuditEvent getCaseHistoryEvent(String caseReference, Long eventId) {
-        var uri = resolver.resolveUriOrThrow(caseReference);
+        var uri = resolver.resolveUriOrThrow(Long.valueOf(caseReference));
         return api.getCaseHistoryEvent(uri, caseReference, eventId).getEvent();
     }
 
     public JsonNode updateSupplementaryData(String caseRef, SupplementaryDataUpdateRequest supplementaryData) {
-        var uri = resolver.resolveUriOrThrow(caseRef);
+        var uri = resolver.resolveUriOrThrow(Long.valueOf(caseRef));
         return api.updateSupplementaryData(uri, caseRef, supplementaryData).getSupplementaryData();
     }
 

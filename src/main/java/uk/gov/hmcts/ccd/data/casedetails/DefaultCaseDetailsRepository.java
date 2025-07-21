@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
@@ -226,13 +227,25 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return qb.getSingleResult().map(this.caseDetailsMapper::entityToModel);
     }
 
-    public void updateResolvedTtl(final Long caseId, final LocalDate resolvedTtl) {
-        LOG.info("Updating resolved TTL for caseId {}: {}", caseId, resolvedTtl);
+    public String findCaseTypeByReference(Long caseReference) {
+        try {
+            final Query query = em.createQuery(
+                "SELECT caseType FROM CaseDetailsEntity WHERE reference = :reference"
+            );
+            query.setParameter("reference", caseReference);
+            return (String) query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException("No case found for reference: " + caseReference, e);
+        }
+    }
+
+    public void updateResolvedTtl(final Long caseReference, final LocalDate resolvedTtl) {
+        LOG.info("Updating resolved TTL for caseReference {}: {}", caseReference, resolvedTtl);
         final Query query = em.createQuery(
-            "UPDATE CaseDetailsEntity SET resolvedTTL = :ttl WHERE id = :caseId"
+            "UPDATE CaseDetailsEntity SET resolvedTTL = :ttl WHERE reference = :caseReference"
         );
         query.setParameter("ttl", resolvedTtl);
-        query.setParameter("caseId", caseId);
+        query.setParameter("caseReference", caseReference);
         query.executeUpdate();
     }
 

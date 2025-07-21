@@ -31,7 +31,7 @@ public class DelegatingSupplementaryDataUpdateOperation implements Supplementary
 
     @Override
     public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
-        if (persistenceResolver.isDecentralised(caseReference)) {
+        if (persistenceResolver.isDecentralised(Long.valueOf(caseReference))) {
             var updated = servicePersistenceClient.updateSupplementaryData(
                 caseReference,
                 supplementaryData

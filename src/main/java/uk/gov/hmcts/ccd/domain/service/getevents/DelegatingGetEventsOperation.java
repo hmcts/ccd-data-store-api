@@ -43,7 +43,7 @@ public class DelegatingGetEventsOperation implements GetEventsOperation {
     }
 
     private GetEventsOperation getOperation(String caseReference) {
-        if (resolver.isDecentralised(caseReference)) {
+        if (resolver.isDecentralised(Long.valueOf(caseReference))) {
             return decentralisedGetEventsOperation;
         }
         return localGetEventsOperation;

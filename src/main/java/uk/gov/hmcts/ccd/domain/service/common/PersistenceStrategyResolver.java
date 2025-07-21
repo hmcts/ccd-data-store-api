@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
@@ -26,7 +26,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 @ConfigurationProperties("ccd.decentralised")
 public class PersistenceStrategyResolver {
 
-    private final CaseDetailsRepository caseDetailsRepository;
+    private final DefaultCaseDetailsRepository caseDetailsRepository;
+    private final Cache<Long, String> caseTypeCache;
 
     /**
      * A map where the key is lowercase(case-type-id) and the value is the base URL
@@ -39,12 +40,15 @@ public class PersistenceStrategyResolver {
     private Map<String, URI> caseTypeServiceUrls;
 
 
-    // TODO: Using the DefaultCaseDetailsRepository and looking up the whole case is inefficient.
-    // We should lookup only the case type and cache it per request.
     @Autowired
-    public PersistenceStrategyResolver(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
-                                           CaseDetailsRepository caseDetailsRepository ) {
+    public PersistenceStrategyResolver(DefaultCaseDetailsRepository caseDetailsRepository ) {
         this.caseDetailsRepository = caseDetailsRepository;
+        // Least Recently Used cache for lookup of case type by reference.
+        // At around 100 bytes per entry this cache will use up to 10MB of memory.
+        // https://github.com/ben-manes/caffeine/wiki/Memory-overhead
+        this.caseTypeCache = Caffeine.newBuilder()
+            .maximumSize(100_000)
+            .build();
     }
 
     /**
@@ -62,23 +66,15 @@ public class PersistenceStrategyResolver {
         return getCaseTypeServiceUrl(details.getCaseTypeId()).isPresent();
     }
 
-    public boolean isDecentralised(long reference) {
-        return isDecentralised(String.valueOf(reference));
+    public boolean isDecentralised(Long reference) {
+        var caseType = getCaseTypeByReference(reference);
+        return getCaseTypeServiceUrl(caseType).isPresent();
     }
 
-    public boolean isDecentralised(String reference) {
-        var details = caseDetailsRepository.findByReferenceWithNoAccessControl(reference).get();
-        return getCaseTypeServiceUrl(details.getCaseTypeId()).isPresent();
-    }
+    public URI resolveUriOrThrow(Long caseReference) {
+        var caseType = getCaseTypeByReference(caseReference);
 
-    public URI resolveUriOrThrow(String caseReference) {
-        Optional<CaseDetails> caseDetailsOptional = caseDetailsRepository.findByReference(caseReference);
-
-        if (caseDetailsOptional.isEmpty()) {
-            throw new UnsupportedOperationException();
-        }
-
-        return getCaseTypeServiceUrl(caseDetailsOptional.get().getCaseTypeId()).orElseThrow();
+        return getCaseTypeServiceUrl(caseType).orElseThrow();
     }
 
 
@@ -97,5 +93,9 @@ public class PersistenceStrategyResolver {
 
     private Optional<URI> getCaseTypeServiceUrl(String caseTypeId) {
         return Optional.ofNullable(caseTypeServiceUrls.get(caseTypeId.toLowerCase()));
+    }
+
+    private String getCaseTypeByReference(Long reference) {
+        return caseTypeCache.get(reference, this.caseDetailsRepository::findCaseTypeByReference);
     }
 }
