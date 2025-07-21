@@ -59,14 +59,6 @@ public class CaseSearchesViewAccessControl {
         return true;
     }
 
-    public Boolean filterResultsBySecurityClassification(CaseFieldDefinition caseFieldDefinition,
-                                                          CaseTypeDefinition caseTypeDefinition) {
-        return securityClassificationService.userHasEnoughSecurityClassificationForField(
-            caseTypeDefinition.getJurisdictionId(),
-            caseTypeDefinition,
-            caseFieldDefinition.getId());
-    }
-
     private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
         return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
     }
