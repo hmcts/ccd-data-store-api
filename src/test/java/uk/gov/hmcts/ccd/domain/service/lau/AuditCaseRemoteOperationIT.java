@@ -101,8 +101,6 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
 
     private static final int SEARCH_AUDIT_HTTP_STATUS = 201;
     private static final int ACTION_AUDIT_HTTP_STATUS = 201;
-    private static final int AUDIT_NOT_FOUND_HTTP_STATUS = 404;
-    private static final int AUDIT_FORBIDDEN_HTTP_STATUS = 403;
     private static final int AUDIT_UNAUTHORISED_HTTP_STATUS = 401;
 
     private static final String SEARCH_LOG_USER_ID = IDAM_ID;
