@@ -110,7 +110,9 @@ class AuditCaseRemoteOperationTest {
 
         // Verify asyncRequestService interaction
         ArgumentCaptor<CaseActionPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseActionPostRequest.class);
-        verify(feignClient).postCaseAction(any(String.class), requestCaptor.capture());
+        await().atMost(200, MILLISECONDS).untilAsserted(() ->
+            verify(feignClient).postCaseAction(any(String.class), requestCaptor.capture())
+        );
         // Verify headers and endpoint
         verify(feignClient).postCaseAction(eq("Bearer 1234"), any(CaseActionPostRequest.class));
         assertThat(auditCaseRemoteConfiguration.getCaseActionAuditUrl(), is(equalTo("http://localhost/caseAction")));
@@ -142,7 +144,9 @@ class AuditCaseRemoteOperationTest {
 
         // Verify FeignClient interaction
         ArgumentCaptor<CaseSearchPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseSearchPostRequest.class);
-        verify(feignClient).postCaseSearch(any(String.class), requestCaptor.capture());
+        await().atMost(200, MILLISECONDS).untilAsserted(() ->
+            verify(feignClient).postCaseSearch(any(String.class), requestCaptor.capture())
+        );
         verify(feignClient).postCaseSearch(eq("Bearer 1234"), any(CaseSearchPostRequest.class));
         assertThat(auditCaseRemoteConfiguration.getCaseSearchAuditUrl(), is(equalTo("http://localhost/caseSearch")));
 
