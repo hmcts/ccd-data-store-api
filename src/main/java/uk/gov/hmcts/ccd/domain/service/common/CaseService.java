@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -32,9 +34,18 @@ import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 // partal javadoc attributes added prior to checkstyle implementation in module
 public class CaseService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CaseService.class);
+
     private final CaseDataService caseDataService;
     private final CaseDetailsRepository caseDetailsRepository;
     private final UIDService uidService;
+
+    private void jclog(String message) {
+        LOG.info("JCDEBUG: Info: CaseService: {}", message);
+        LOG.warn("JCDEBUG: Warn: CaseService: {}", message);
+        LOG.error("JCDEBUG: Error: CaseService: {}", message);
+        LOG.debug("JCDEBUG: Debug: CaseService: {}", message);
+    }
 
     @Autowired
     public CaseService(CaseDataService caseDataService,
@@ -76,7 +87,22 @@ public class CaseService {
      * @return <code>Optional&lt;CaseDetails&gt;</code> - CaseDetails wrapped in Optional
      */
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
-        content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+        final Map<String, JsonNode> eventData = content.getEventData();
+        Map<String, JsonNode> caseData = caseDetails.getData();
+
+        // LOG eventData
+        eventData.forEach((key, value) -> jclog("eventData: " + key + " = " + value));
+
+        // LOG caseDataBefore
+        caseData.forEach((key, value) -> jclog("caseDataBefore: " + key + " = " + value));
+
+        // Process eventData -> caseData
+        eventData.forEach((key, value) -> caseData.put(key, value));
+        caseDetails.setData(caseData);
+
+        // LOG caseDataAfter
+        caseData.forEach((key, value) -> jclog("caseDataAfter: " + key + " = " + value));
+
         return caseDetails;
     }
 
