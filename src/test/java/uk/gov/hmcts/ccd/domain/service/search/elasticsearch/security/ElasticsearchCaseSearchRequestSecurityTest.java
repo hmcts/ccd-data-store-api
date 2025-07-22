@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -145,9 +146,9 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         JsonNode returnedFinalQueryBody = securedSearchRequest.getSearchRequestJsonNode();
         String decodedQuery = getDecodedQuery(returnedFinalQueryBody);
 
-        assertEquals(CASE_TYPE_IDS, securedSearchRequest.getCaseTypeIds());
-        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
-        assertEquals(expectedFinalQueryBody, returnedFinalQueryBody.toString());
+        assertThat(securedSearchRequest.getCaseTypeIds()).isEqualTo(CASE_TYPE_IDS);
+        assertThat(decodedQuery).isEqualTo(expectedFinalQueryBody);
+        assertThat(returnedFinalQueryBody.toString()).isEqualTo(expectedFinalQueryBody);
     }
 
     @Test

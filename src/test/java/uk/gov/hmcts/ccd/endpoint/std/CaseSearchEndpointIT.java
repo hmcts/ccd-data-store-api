@@ -1,16 +1,16 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import io.searchbox.client.JestClient;
-import io.searchbox.core.MultiSearchResult;
-import io.searchbox.core.SearchResult;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
+import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -25,9 +25,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 
 import jakarta.inject.Inject;
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,8 +38,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,16 +48,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("checkstyle:OperatorWrap")
 public class CaseSearchEndpointIT extends WireMockBaseTest {
 
-    private static final String POST_SEARCH_CASES = "/searchCases";
-
     @Inject
     private WebApplicationContext wac;
-    private MockMvc mockMvc;
+
     @MockitoBean
-    private JestClient jestClient;
+    private ElasticsearchClient elasticsearchClient;
 
     @MockitoSpyBean
     private AuditRepository auditRepository;
+
+    private static final String POST_SEARCH_CASES = "/searchCases";
+    private MockMvc mockMvc;
 
     @BeforeEach
     public void setUp() {
@@ -187,21 +189,44 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             + "}";
     }
 
-    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic) throws java.io.IOException {
-        Gson gson = new Gson();
-        JsonObject convertedObject = gson.fromJson(caseDetailElastic, JsonObject.class);
-        MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-        when(multiSearchResult.isSucceeded()).thenReturn(true);
-        SearchResult searchResult = new SearchResult(gson);
-        searchResult.setSucceeded(true);
-        searchResult.setJsonObject(convertedObject);
-        searchResult.setJsonString(convertedObject.toString());
-        searchResult.setPathToResult("hits/hits/_source");
 
-        MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
-        when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-        ReflectionTestUtils.setField(response, "searchResult", searchResult, SearchResult.class);
+    private void stubElasticSearchSearchRequestWillReturn(String... references) throws IOException {
+        List<Hit<CaseDetails>> hits = Arrays.asList(references).stream()
+            .map(ref -> {
+                CaseDetails caseDetails = new CaseDetails();
+                caseDetails.setReference(Long.parseLong("1535450291607660"));
+                caseDetails.setJurisdiction("PROBATE");
+                caseDetails.setCaseTypeId("TestAddressBookCase");
+                caseDetails.setState("NY");
+                caseDetails.setCreatedDate(LocalDateTime.parse("2018-08-28T09:58:11.627"));
+                caseDetails.setLastModified(LocalDateTime.parse("2018-08-28T09:58:11.643"));
+                caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
 
-        given(jestClient.execute(any())).willReturn(multiSearchResult);
+                // Build Hit<T> properly
+                return new Hit.Builder<CaseDetails>().source(caseDetails).index("case_ca_001").build();
+            })
+            .collect(Collectors.toList());
+
+        HitsMetadata<CaseDetails> hitsMetadata = new HitsMetadata.Builder<CaseDetails>()
+            .hits(hits)
+            .total(t -> t
+                .value(hits.size())
+                .relation(TotalHitsRelation.Eq)
+            )
+            .build();
+
+        SearchResponse<CaseDetails> mockResponse = new SearchResponse.Builder<CaseDetails>()
+            .hits(hitsMetadata)
+            .took(100)
+            .timedOut(false)
+            .shards(s -> s
+                .total(1)
+                .successful(1)
+                .skipped(0)
+                .failed(0)
+            )
+            .build();
+
+        when(elasticsearchClient.search(any(SearchRequest.class), eq(CaseDetails.class))).thenReturn(mockResponse);
     }
 }
