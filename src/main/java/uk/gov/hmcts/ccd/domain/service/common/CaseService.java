@@ -52,6 +52,7 @@ public class CaseService {
                        @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                             final CaseDetailsRepository caseDetailsRepository,
                        UIDService uidService) {
+        jclog("Constructor");
         this.caseDataService = caseDataService;
         this.caseDetailsRepository = caseDetailsRepository;
         this.uidService = uidService;
@@ -64,6 +65,7 @@ public class CaseService {
      * @return SHA256 hash of the given case data
      */
     public String hashData(CaseDetails caseDetails) {
+        jclog("hashData()");
         final JsonNode jsonData = JacksonUtils.convertValueJsonNode(caseDetails.getData());
         return DigestUtils.sha256Hex(jsonData.toString());
     }
@@ -74,6 +76,7 @@ public class CaseService {
      * @return <code>CaseDetails</code> - new case details object
      */
     public CaseDetails createNewCaseDetails(String caseTypeId, String jurisdictionId, Map<String, JsonNode> data) {
+        jclog("createNewCaseDetails()");
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(caseTypeId);
         caseDetails.setJurisdiction(jurisdictionId);
@@ -87,6 +90,7 @@ public class CaseService {
      * @return <code>Optional&lt;CaseDetails&gt;</code> - CaseDetails wrapped in Optional
      */
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
+        jclog("populateCurrentCaseDetailsWithEventFields()");
         final Map<String, JsonNode> eventData = content.getEventData();
         Map<String, JsonNode> caseData = caseDetails.getData();
 
@@ -107,6 +111,7 @@ public class CaseService {
     }
 
     public CaseDetails clone(CaseDetails source) {
+        jclog("clone()");
         final CaseDetails clone;
 
         try {
@@ -124,6 +129,7 @@ public class CaseService {
     }
 
     public CaseDetails getCaseDetails(String jurisdictionId, String caseReference) {
+        jclog("getCaseDetails()");
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
@@ -133,6 +139,7 @@ public class CaseService {
     }
 
     public CaseDetails getCaseDetailsByCaseReference(String caseReference) {
+        jclog("getCaseDetailsByCaseReference()");
         final Optional<CaseDetails> caseDetails =
             caseDetailsRepository.findByReferenceWithNoAccessControl(caseReference);
         return caseDetails.orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
@@ -144,6 +151,7 @@ public class CaseService {
      */
     public Map<String, JsonNode> buildJsonFromCaseFieldsWithDefaultValue(
         List<CaseEventFieldDefinition> caseEventDefinition) {
+        jclog("buildJsonFromCaseFieldsWithDefaultValue()");
         Map<String, JsonNode> data = new HashMap<>();
 
         caseEventDefinition.forEach(
@@ -177,6 +185,7 @@ public class CaseService {
 
     public Map<String, JsonNode> buildJsonFromCaseFieldsWithNullifyByDefault(CaseTypeDefinition caseTypeDefinition,
         List<CaseEventFieldDefinition> caseEventDefinition) {
+        jclog("buildJsonFromCaseFieldsWithNullifyByDefault()");
         Map<String, JsonNode> data = new HashMap<>();
 
         caseEventDefinition.forEach(
