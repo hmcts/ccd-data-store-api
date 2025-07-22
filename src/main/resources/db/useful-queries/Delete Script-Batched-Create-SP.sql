@@ -6,6 +6,9 @@ DECLARE
     rows_deleted INTEGER;
 BEGIN
     -- Step 1: Create temp table
+    -- This temp table will hold the case_data_ids that are older than 3 months
+    -- and will be used to delete related records in other tables.
+    -- tmp_case_data_ids will generally contain a large number of rows
     DROP TABLE IF EXISTS tmp_case_data_ids;
     CREATE TEMP TABLE tmp_case_data_ids AS
     SELECT id
@@ -14,6 +17,7 @@ BEGIN
     ORDER BY id ASC;
 
     -- Create log table if not exists
+    -- This table will log the actions performed during the cleanup process
     CREATE TABLE IF NOT EXISTS ddl_log (
         log_time TIMESTAMP DEFAULT now(),
         action TEXT,
@@ -24,6 +28,7 @@ BEGIN
     PERFORM pg_sleep(1);
     PERFORM pg_sleep(1);
 
+    -- Step 2: Looped deletes for each dependent table in batches of 1000
     -- case_users_audit
     BEGIN
         <<batch_delete_loop_case_users_audit>>
