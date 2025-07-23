@@ -9,6 +9,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     @Deprecated
     public CaseDetails findByReference(final Long caseReference) {
-        return findByReference(null, caseReference).orElse(null);
+        return findByReference(null, caseReference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
     }
 
     @Override
