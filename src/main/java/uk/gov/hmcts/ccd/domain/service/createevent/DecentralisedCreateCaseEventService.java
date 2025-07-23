@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import javax.swing.text.html.Option;
+
 
 import java.util.Optional;
 

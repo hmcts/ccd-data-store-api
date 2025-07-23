@@ -36,14 +36,14 @@ public class DelegatingGetEventsOperation implements GetEventsOperation {
     }
 
     @Override
-    public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
-        return getEvents(caseReference, () ->
-            String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference));
+    public List<AuditEvent> getEvents(String caseReference) {
+        return getEvents(caseReference, () -> String.format(CASE_RESOURCE_NOT_FOUND, caseReference));
     }
 
     @Override
-    public List<AuditEvent> getEvents(String caseReference) {
-        return getEvents(caseReference, () -> String.format(CASE_RESOURCE_NOT_FOUND, caseReference));
+    public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
+        return getEvents(caseReference, () ->
+            String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference));
     }
 
     @Override

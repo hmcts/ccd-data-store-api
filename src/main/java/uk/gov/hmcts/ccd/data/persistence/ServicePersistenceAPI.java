@@ -33,8 +33,8 @@ interface ServicePersistenceAPI {
      *   <li><b>Subsequent Requests:</b> If the service receives a subsequent request with the
      *       <b>same idempotency key</b>, it will not re-process the event. Instead, it will
      *       retrieve the details of the previously created case and respond with an
-     *       HTTP {@code 200 OK} status. The response body <b>>must be the same as that returned by the previously
-     *       successful request.</b></li>
+     *       HTTP {@code 200 OK} status. The response body <b>>must be the same as that returned by
+     *       the previously successful request.</b></li>
      * </ul>
      *
      */
@@ -46,7 +46,8 @@ interface ServicePersistenceAPI {
 
     @PostMapping(value = "/ccd/cases/{case-ref}/supplementary-data", consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    DecentralisedUpdateSupplementaryDataResponse updateSupplementaryData(URI baseURI, @PathVariable("case-ref") String caseRef,
+    DecentralisedUpdateSupplementaryDataResponse updateSupplementaryData(URI baseURI,
+                                                                         @PathVariable("case-ref") String caseRef,
                                                                          SupplementaryDataUpdateRequest supplementaryData);
 
     @GetMapping(value = "/ccd/cases")

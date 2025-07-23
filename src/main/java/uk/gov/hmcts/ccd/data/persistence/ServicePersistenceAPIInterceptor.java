@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.data.persistence;
 
-import java.util.UUID;
+
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
@@ -12,7 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
+
 
 @RequiredArgsConstructor
 class ServicePersistenceAPIInterceptor implements RequestInterceptor {

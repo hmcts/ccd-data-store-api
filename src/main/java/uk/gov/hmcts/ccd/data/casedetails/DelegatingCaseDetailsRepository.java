@@ -22,7 +22,8 @@ import java.util.function.Supplier;
  * A delegating repository that acts as a router between the local (Postgres)
  * and decentralised (remote service) case data stores.
  *
- * The routing strategy is 'local first' delegating first to the local repository
+ *  *
+ * <p>The routing strategy is 'local first' delegating first to the local repository
  * and only if the resulting case type is decentralised delegating to the relevant remote service.
  *
  * This allows us to reuse the existing local repository access control and private case ID lookups.
