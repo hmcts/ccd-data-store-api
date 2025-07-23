@@ -33,7 +33,7 @@ public class ElasticsearchITSetup {
     private static final String DATA_DIR = "elasticsearch/data";
     private static final String CONFIG_DIR = "elasticsearch/config";
     private static final String INDEX_SETTINGS = "classpath:" + CONFIG_DIR + "/index-settings.json";
-    // public static final String INDEX_TYPE = "_doc";
+    public static final String INDEX_TYPE = "_doc";
     public static final String[] INDICES = {"aat_cases", "mapper_cases", "security_cases",
         "restricted_security_cases", "global_search"};
 
@@ -80,9 +80,9 @@ public class ElasticsearchITSetup {
                 Optional.of(resourceResolver.getResource(INDEX_SETTINGS).getInputStream()), Optional.empty()
             );
 
-            //settings.addType(INDEX_TYPE, resourceResolver
-            //    .getResource(String.format("classpath:%s/mappings-%s.json", CONFIG_DIR, idx))
-            //    .getInputStream());
+            settings.addType(INDEX_TYPE, resourceResolver
+                .getResource(String.format("classpath:%s/mappings-%s.json", CONFIG_DIR, idx))
+                .getInputStream());
 
             createIndex(idx, settings);
         }
