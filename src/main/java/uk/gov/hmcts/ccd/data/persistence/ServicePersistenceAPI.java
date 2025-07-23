@@ -16,8 +16,6 @@ import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 @FeignClient(name = "servicePersistenceAPI", configuration = ServicePersistenceAPIInterceptor.class)
 interface ServicePersistenceAPI {
 
-    @GetMapping(value = "/ccd/cases")
-    List<DecentralisedCaseDetails> getCases(URI baseURI, @RequestParam("case-refs") List<Long> caseRefs);
 
     /**
      * Submits an event to create or update a case.
@@ -46,6 +44,14 @@ interface ServicePersistenceAPI {
                                          @RequestHeader("Idempotency-Key") String idempotencyKey,
                                          @RequestBody DecentralisedCaseEvent caseEvent);
 
+    @PostMapping(value = "/ccd/cases/{case-ref}/supplementary-data", consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    DecentralisedUpdateSupplementaryDataResponse updateSupplementaryData(URI baseURI, @PathVariable("case-ref") String caseRef,
+                                                                         SupplementaryDataUpdateRequest supplementaryData);
+
+    @GetMapping(value = "/ccd/cases")
+    List<DecentralisedCaseDetails> getCases(URI baseURI, @RequestParam("case-refs") List<Long> caseRefs);
+
     @GetMapping(value = "/ccd/cases/{case-ref}/history")
     List<DecentralisedAuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") String caseReference);
 
@@ -53,10 +59,4 @@ interface ServicePersistenceAPI {
     DecentralisedAuditEvent getCaseHistoryEvent(URI baseURI,
                                    @PathVariable("case-ref") String caseReference,
                                    @PathVariable("event-id") Long eventId);
-
-    @PostMapping(value = "/ccd/cases/{case-ref}/supplementary-data", consumes = MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    DecentralisedUpdateSupplementaryDataResponse updateSupplementaryData(URI baseURI, @PathVariable("case-ref") String caseRef,
-                                     SupplementaryDataUpdateRequest supplementaryData);
-
 }
