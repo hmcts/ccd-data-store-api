@@ -204,6 +204,8 @@ dependencies {
     }
 
 
+    implementation 'commons-beanutils:commons-beanutils:1.11.0'
+    
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.9'
 
@@ -295,6 +297,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     configurations.all {
+        exclude group: "org.apache.commons", module:"commons-beanutils"
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
     testImplementation group: 'org.json', name: 'json', version: '20211205'
