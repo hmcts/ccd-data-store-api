@@ -21,12 +21,8 @@ class ServicePersistenceAPIInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
-        if (!template.headers().containsKey(AUTHORIZATION)) {
-            template.header(AUTHORIZATION, securityUtils.getUserBearerToken());
-        }
-        if (!template.headers().containsKey(SERVICE_AUTHORIZATION)) {
-            template.header(SERVICE_AUTHORIZATION, securityUtils.getServiceAuthorization());
-        }
+        template.header(AUTHORIZATION, securityUtils.getUserBearerToken());
+        template.header(SERVICE_AUTHORIZATION, securityUtils.getServiceAuthorization());
 
         var requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         var request = requestAttributes.getRequest();
