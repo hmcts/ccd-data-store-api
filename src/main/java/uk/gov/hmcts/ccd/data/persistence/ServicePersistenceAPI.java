@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 interface ServicePersistenceAPI {
 
     @GetMapping(value = "/ccd/cases")
-    List<DecentralisedCaseDetails> getCases(URI baseURI, @RequestParam("case-refs") List<String> caseRefs);
+    List<DecentralisedCaseDetails> getCases(URI baseURI, @RequestParam("case-refs") List<Long> caseRefs);
 
     /**
      * Submits an event to create or update a case.

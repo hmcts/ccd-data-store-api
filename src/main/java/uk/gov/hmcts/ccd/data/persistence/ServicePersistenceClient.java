@@ -20,12 +20,12 @@ public class ServicePersistenceClient {
     private final PersistenceStrategyResolver resolver;
     private final IdempotencyKeyHolder idempotencyKeyHolder;
 
-    public CaseDetails getCase(String caseRef) {
-        var uri = resolver.resolveUriOrThrow(Long.valueOf(caseRef));
+    public CaseDetails getCase(Long caseRef) {
+        var uri = resolver.resolveUriOrThrow(caseRef);
         var response = api.getCases(uri, List.of(caseRef));
 
         if (response.isEmpty()) {
-            throw new CaseNotFoundException(caseRef);
+            throw new CaseNotFoundException(String.valueOf(caseRef));
         }
 
         return response.getFirst().getCaseDetails();
