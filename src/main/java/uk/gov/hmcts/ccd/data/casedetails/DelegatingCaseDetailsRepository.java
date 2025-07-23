@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
@@ -38,7 +39,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     public static final String QUALIFIER = "delegating";
 
     private final PersistenceStrategyResolver resolver;
-    private final DecentralisedCaseDetailsRepository decentralisedRepository;
+    private final ServicePersistenceClient decentralisedClient;
     private final DefaultCaseDetailsRepository localRepository;
 
     @Override
@@ -58,7 +59,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     public Optional<CaseDetails> findById(String jurisdiction, Long id) {
         return findAndDelegate(
             () -> localRepository.findById(jurisdiction, id),
-            decentralisedRepository::findFromShellCase
+            decentralisedClient::getCase
         );
     }
 
@@ -66,7 +67,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
         return findAndDelegate(
             () -> localRepository.findByReference(jurisdiction, caseReference),
-            decentralisedRepository::findFromShellCase
+            decentralisedClient::getCase
         );
     }
 
@@ -74,27 +75,22 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
         return findAndDelegate(
             () -> localRepository.findByReferenceWithNoAccessControl(reference),
-            decentralisedRepository::findFromShellCase
+            decentralisedClient::getCase
         );
     }
 
     /**
-     * Centralised delegation logic.
-     *
-     * @param localCaseFinder     A supplier function to find the case in the local database.
-     * @param decentralisedFinder A function to call the decentralised repository if needed.
-     * @return An Optional containing the full CaseDetails if found, or empty otherwise.
+     * Centralised delegation logic; route to the local repository first,
+     * then delegate to the decentralised service if the case type is decentralised.
      */
     private Optional<CaseDetails> findAndDelegate(Supplier<Optional<CaseDetails>> localCaseFinder,
-                                                  Function<CaseDetails, Optional<CaseDetails>> decentralisedFinder) {
-        return localCaseFinder.get().flatMap(shellCase -> {
+                                                  Function<CaseDetails, CaseDetails> decentralisedFinder) {
+        return localCaseFinder.get().map(shellCase -> {
             if (resolver.isDecentralised(shellCase)) {
                 log.debug("Case reference '{}' is decentralised. Delegating to remote service.", shellCase.getReference());
                 return decentralisedFinder.apply(shellCase);
-            } else {
-                // It's a local case, the result we already have is the complete one.
-                return Optional.of(shellCase);
             }
+            return shellCase;
         });
     }
 
