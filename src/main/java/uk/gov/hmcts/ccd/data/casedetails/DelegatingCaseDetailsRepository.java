@@ -22,13 +22,12 @@ import java.util.function.Supplier;
  * A delegating repository that acts as a router between the local (Postgres)
  * and decentralised (remote service) case data stores.
  *
- *  *
  * <p>The routing strategy is 'local first' delegating first to the local repository
  * and only if the resulting case type is decentralised delegating to the relevant remote service.
  *
- * This allows us to reuse the existing local repository access control and private case ID lookups.
+ * <p>This allows us to reuse the existing local repository access control and private case ID lookups.
  *
- * Where cases are centralised this avoids additional database round trips.
+ * <p>Where cases are centralised this avoids additional database round trips.
  * Where cases are decentralised the local case details will be a lightweight metadata 'shell'.
  */
 @Slf4j
@@ -57,22 +56,6 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public Optional<CaseDetails> findById(String jurisdiction, Long id) {
-        return findAndDelegate(
-            () -> localRepository.findById(jurisdiction, id),
-            decentralisedClient::getCase
-        );
-    }
-
-    @Override
-    public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
-        return findAndDelegate(
-            () -> localRepository.findByReference(jurisdiction, caseReference),
-            decentralisedClient::getCase
-        );
-    }
-
-    @Override
     public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
         return findAndDelegate(
             () -> localRepository.findByReferenceWithNoAccessControl(reference),
@@ -88,7 +71,6 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
                                                   Function<CaseDetails, CaseDetails> decentralisedFinder) {
         return localCaseFinder.get().map(shellCase -> {
             if (resolver.isDecentralised(shellCase)) {
-                log.debug("Case reference '{}' is decentralised. Delegating to remote service.", shellCase.getReference());
                 return decentralisedFinder.apply(shellCase);
             }
             return shellCase;
@@ -99,9 +81,25 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     // These delegate to the primary methods above.
 
     @Override
+    public Optional<CaseDetails> findById(String jurisdiction, Long id) {
+        return findAndDelegate(
+            () -> localRepository.findById(jurisdiction, id),
+            decentralisedClient::getCase
+        );
+    }
+
+    @Override
     @Deprecated
     public CaseDetails findById(Long id) {
         return findById(null, id).orElse(null);
+    }
+
+    @Override
+    public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
+        return findAndDelegate(
+            () -> localRepository.findByReference(jurisdiction, caseReference),
+            decentralisedClient::getCase
+        );
     }
 
     @Override

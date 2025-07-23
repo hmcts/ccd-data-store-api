@@ -1,10 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.supplementarydata;
 
-import java.net.URI;
-import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
@@ -22,7 +18,8 @@ public class DelegatingSupplementaryDataUpdateOperation implements Supplementary
     private final ServicePersistenceClient servicePersistenceClient;
 
     @Override
-    public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
+    public SupplementaryData updateSupplementaryData(String caseReference,
+                                                     SupplementaryDataUpdateRequest supplementaryData) {
         if (persistenceResolver.isDecentralised(Long.valueOf(caseReference))) {
             var updated = servicePersistenceClient.updateSupplementaryData(
                 Long.valueOf(caseReference),

@@ -257,11 +257,12 @@ public class CreateCaseEventService {
                 caseDetails.getJurisdiction(),
                 documentHashes
             );
-            finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(content.getEvent(), caseEventDefinition,
-                caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.of(caseDetailsInDatabase), onBehalfOfUser);
+            finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(content.getEvent(),
+                caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes,
+                Optional.of(caseDetailsInDatabase), onBehalfOfUser);
         } else {
-            finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
-                newState, timeNow);
+            finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes,
+                caseEventDefinition, newState, timeNow);
             saveAuditEventForCaseDetails(
                 aboutToSubmitCallbackResponse,
                 content.getEvent(),
@@ -357,10 +358,11 @@ public class CreateCaseEventService {
             );
 
             finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(event, caseEventDefinition,
-                caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.of(caseDetailsInDatabase), Optional.empty());
+                caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.of(caseDetailsInDatabase),
+                Optional.empty());
         } else {
-            finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes, caseEventDefinition,
-                newState, timeNow);
+            finalCaseDetails = saveCaseDetails(caseDetailsInDatabase,
+                caseDetailsAfterCallbackWithoutHashes, caseEventDefinition, newState, timeNow);
             saveAuditEventForCaseDetails(
                 aboutToSubmitCallbackResponse,
                 event,

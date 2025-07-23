@@ -101,9 +101,9 @@ public class CallbackService {
                                                         final CaseDetails caseDetailsBefore,
                                                         final CaseDetails caseDetails,
                                                         final Boolean ignoreWarning) {
-        if (url == null || url.isEmpty() ||
+        if (url == null || url.isEmpty()
             // Decentralised cases handle their own event submission and do not receive AboutToSubmit callbacks
-            (callbackType == CallbackType.ABOUT_TO_SUBMIT && resolver.isDecentralised(caseDetails))) {
+            || (callbackType == CallbackType.ABOUT_TO_SUBMIT && resolver.isDecentralised(caseDetails))) {
             return Optional.empty();
         }
         final CallbackRequest callbackRequest =

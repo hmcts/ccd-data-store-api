@@ -31,6 +31,12 @@ public class DelegatingGetEventsOperation implements GetEventsOperation {
     private static final String CASE_EVENT_NOT_FOUND = "Case audit events not found";
 
     @Override
+    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
+        return getEventLoader(caseDetails).getEvent(caseDetails, eventId).map(Optional::of)
+            .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
+    }
+
+    @Override
     public List<AuditEvent> getEvents(CaseDetails caseDetails) {
         return getEventLoader(caseDetails).getEvents(caseDetails);
     }
@@ -44,12 +50,6 @@ public class DelegatingGetEventsOperation implements GetEventsOperation {
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
         return getEvents(caseReference, () ->
             String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference));
-    }
-
-    @Override
-    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
-        return getEventLoader(caseDetails).getEvent(caseDetails, eventId).map(Optional::of)
-            .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }
 
     private List<AuditEvent> getEvents(String caseReference, Supplier<String> errorMessageSupplier) {

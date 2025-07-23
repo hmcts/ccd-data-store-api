@@ -16,10 +16,8 @@ import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 /**
- * Resolves the persistence strategy for a given case.
- *
- * This service determines whether a case's mutable data should be handled by the
- * internal CCD database or delegated to an external, case-type-specific service.
+ * Determines whether a case's mutable data is handled by the
+ * internal CCD database or delegated to an external, service implemented persistence handler.
  */
 @Service
 @Slf4j
@@ -34,14 +32,14 @@ public class PersistenceStrategyResolver {
      * of the owning service responsible for its persistence.
      * e.g., 'MyCaseType': 'http://my-service-host:port'
      *
-     * This can be set via application properties and environment variables.
+     * <p>This can be set via application properties and environment variables.
      */
     @NotNull
     private Map<String, URI> caseTypeServiceUrls;
 
 
     @Autowired
-    public PersistenceStrategyResolver(DefaultCaseDetailsRepository caseDetailsRepository ) {
+    public PersistenceStrategyResolver(DefaultCaseDetailsRepository caseDetailsRepository) {
         this.caseDetailsRepository = caseDetailsRepository;
         // Least Recently Used cache for lookup of case type by reference.
         // At around 100 bytes per entry this cache will use up to 10MB of memory
