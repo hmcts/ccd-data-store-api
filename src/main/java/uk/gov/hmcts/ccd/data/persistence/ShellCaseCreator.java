@@ -32,6 +32,8 @@ public class ShellCaseCreator {
         shell.setVersion(null);
         shell.setDataClassification(null);
         shell.setState("");
-        caseDetailsRepository.set(shell);
+        var persisted = caseDetailsRepository.set(shell);
+        // We need the ID that the database has allocated us.
+        caseDetails.setId(persisted.getId());
     }
 }

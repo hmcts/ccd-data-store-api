@@ -67,13 +67,7 @@ public class DecentralisedCreateCaseEventService {
                 .build();
 
         try {
-            var result = servicePersistenceClient.createEvent(decentralisedCaseEvent);
-            // We currently need to lookup the internal ID for a case because other tables (such as case_users)
-            // are written to which have foreign keys to the case_data table.
-            // TODO: remove when enableCaseUsersDbSync is switched off and that functionality removed.
-            result.setId(String.valueOf(caseDetailsRepository.findIdByReference(caseDetails.getReference())));
-            return result;
-
+            return servicePersistenceClient.createEvent(decentralisedCaseEvent);
         } catch (FeignException.Conflict conflict) {
             throw new CaseConcurrencyException("""
                     Unfortunately we were unable to save your work to the case as \

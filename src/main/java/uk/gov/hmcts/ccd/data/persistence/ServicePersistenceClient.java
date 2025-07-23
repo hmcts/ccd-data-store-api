@@ -43,7 +43,9 @@ public class ServicePersistenceClient {
             throw new IllegalStateException("No idempotency key set for the request context.");
         }
 
-        return api.submitEvent(uri, idempotencyKey.toString(), caseEvent).getCaseDetails();
+        var result = api.submitEvent(uri, idempotencyKey.toString(), caseEvent).getCaseDetails();
+        result.setId(caseEvent.getCaseDetails().getId());
+        return result;
     }
 
     public List<AuditEvent> getCaseHistory(String caseReference) {
