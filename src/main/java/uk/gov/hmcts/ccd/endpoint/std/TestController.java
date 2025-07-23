@@ -37,7 +37,7 @@ public class TestController {
      */
     @GetMapping("/jcdebugtest")
     public String jcdebugtest() {
-        return jcLog("TESTING POST");
+        return jcLog("TESTING POST (built 23rd July)");
     }
 
     /*

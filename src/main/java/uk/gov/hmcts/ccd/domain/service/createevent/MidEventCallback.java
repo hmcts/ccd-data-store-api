@@ -27,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.endpoint.std.TestController;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -41,11 +42,12 @@ public class MidEventCallback {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseService caseService;
 
-    private void jclog(String message) {
+    private void jclog(final String message) {
         LOG.info("JCDEBUG: Info: MidEventCallback: {}", message);
         LOG.warn("JCDEBUG: Warn: MidEventCallback: {}", message);
         LOG.error("JCDEBUG: Error: MidEventCallback: {}", message);
         LOG.debug("JCDEBUG: Debug: MidEventCallback: {}", message);
+        TestController.jcLog("MidEventCallback: " + message);
     }
 
     @Autowired
