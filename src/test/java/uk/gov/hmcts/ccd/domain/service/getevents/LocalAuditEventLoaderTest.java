@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-class LocalGetEventsOperationTest {
+class LocalAuditEventLoaderTest {
 
     private static final Long CASE_ID = 123L;
     private static final String JURISDICTION_ID = "Probate";
@@ -43,7 +43,7 @@ class LocalGetEventsOperationTest {
     @Mock
     private ApplicationParams applicationParams;
 
-    private LocalGetEventsOperation listEventsOperation;
+    private LocalAuditEventLoader listEventsOperation;
     private CaseDetails caseDetails;
     private AuditEvent event;
 
@@ -57,7 +57,7 @@ class LocalGetEventsOperationTest {
         doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
 
         listEventsOperation
-                = new LocalGetEventsOperation(auditEventRepository, getCaseOperation, uidService);
+                = new LocalAuditEventLoader(auditEventRepository, getCaseOperation, uidService);
         event = new AuditEvent();
     }
 

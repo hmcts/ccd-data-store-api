@@ -20,8 +20,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 @RequiredArgsConstructor
 public class DelegatingGetEventsOperation implements GetEventsOperation {
     private final PersistenceStrategyResolver resolver;
-    private final DecentralisedGetEventsOperation decentralisedGetEventsOperation;
-    private final LocalGetEventsOperation localGetEventsOperation;
+    private final DecentralisedAuditEventLoader decentralisedAuditEventLoader;
+    private final LocalAuditEventLoader localGetEventsOperation;
     private final CreatorGetCaseOperation getCaseOperation;
     private final UIDService uidService;
     private static final String RESOURCE_NOT_FOUND //
@@ -32,13 +32,24 @@ public class DelegatingGetEventsOperation implements GetEventsOperation {
 
     @Override
     public List<AuditEvent> getEvents(CaseDetails caseDetails) {
-        return getOperation(caseDetails).getEvents(caseDetails);
+        return getEventLoader(caseDetails).getEvents(caseDetails);
     }
 
     @Override
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
         return getEvents(caseReference, () ->
             String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference));
+    }
+
+    @Override
+    public List<AuditEvent> getEvents(String caseReference) {
+        return getEvents(caseReference, () -> String.format(CASE_RESOURCE_NOT_FOUND, caseReference));
+    }
+
+    @Override
+    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
+        return getEventLoader(caseDetails).getEvent(caseDetails, eventId).map(Optional::of)
+            .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }
 
     private List<AuditEvent> getEvents(String caseReference, Supplier<String> errorMessageSupplier) {
@@ -52,20 +63,9 @@ public class DelegatingGetEventsOperation implements GetEventsOperation {
         return getEvents(caseDetails);
     }
 
-    @Override
-    public List<AuditEvent> getEvents(String caseReference) {
-        return getEvents(caseReference, () -> String.format(CASE_RESOURCE_NOT_FOUND, caseReference));
-    }
-
-    @Override
-    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
-        return getOperation(caseDetails).getEvent(caseDetails, eventId).map(Optional::of)
-            .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
-    }
-
-    private AuditEventLoader getOperation(CaseDetails caseDetails) {
+    private AuditEventLoader getEventLoader(CaseDetails caseDetails) {
         if (resolver.isDecentralised(caseDetails)) {
-            return decentralisedGetEventsOperation;
+            return decentralisedAuditEventLoader;
         }
         return localGetEventsOperation;
     }

@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 @Service
 @RequiredArgsConstructor
-public class DecentralisedGetEventsOperation implements AuditEventLoader {
+public class DecentralisedAuditEventLoader implements AuditEventLoader {
 
     private final ServicePersistenceClient serviceClient;
 
