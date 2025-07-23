@@ -48,16 +48,16 @@ public class ServicePersistenceClient {
         return result;
     }
 
-    public List<AuditEvent> getCaseHistory(String caseReference) {
-        var uri = resolver.resolveUriOrThrow(Long.valueOf(caseReference));
+    public List<AuditEvent> getCaseHistory(Long caseReference) {
+        var uri = resolver.resolveUriOrThrow(caseReference);
         return api.getCaseHistory(uri, caseReference)
             .stream()
             .map(DecentralisedAuditEvent::getEvent)
             .toList();
     }
 
-    public AuditEvent getCaseHistoryEvent(String caseReference, Long eventId) {
-        var uri = resolver.resolveUriOrThrow(Long.valueOf(caseReference));
+    public AuditEvent getCaseHistoryEvent(Long caseReference, Long eventId) {
+        var uri = resolver.resolveUriOrThrow(caseReference);
         return api.getCaseHistoryEvent(uri, caseReference, eventId).getEvent();
     }
 

@@ -53,10 +53,10 @@ interface ServicePersistenceAPI {
     List<DecentralisedCaseDetails> getCases(URI baseURI, @RequestParam("case-refs") List<Long> caseRefs);
 
     @GetMapping(value = "/ccd/cases/{case-ref}/history")
-    List<DecentralisedAuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") String caseReference);
+    List<DecentralisedAuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") Long caseReference);
 
     @GetMapping(value = "/ccd/cases/{case-ref}/history/{event-id}")
     DecentralisedAuditEvent getCaseHistoryEvent(URI baseURI,
-                                   @PathVariable("case-ref") String caseReference,
+                                   @PathVariable("case-ref") Long caseReference,
                                    @PathVariable("event-id") Long eventId);
 }
