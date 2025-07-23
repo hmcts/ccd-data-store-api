@@ -16,15 +16,10 @@ public class DecentralisedCaseDetailsRepository {
         this.servicePersistenceAPI = servicePersistenceAPI;
     }
 
-    public Optional<CaseDetails> findByReference(Long reference) {
-        return Optional.of(getCaseDetails(reference));
-    }
-
-
-    private CaseDetails getCaseDetails(Long reference) {
-        CaseDetails caseDetails = servicePersistenceAPI.getCase(reference);
-        // TODO: Remove this when legacy RBAC code is removed which relies on details having an id.
-        caseDetails.setId(caseDetails.getReference().toString());
-        return caseDetails;
+    public Optional<CaseDetails> findFromShellCase(CaseDetails shellCase) {
+        CaseDetails caseDetails = servicePersistenceAPI.getCase(shellCase.getReference());
+        // Decentralised services won't have our private ID so we set it here.
+        caseDetails.setId(shellCase.getId());
+        return Optional.of(caseDetails);
     }
 }

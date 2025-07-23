@@ -54,7 +54,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     public Optional<CaseDetails> findById(String jurisdiction, Long id) {
         return findAndDelegate(
             () -> localRepository.findById(jurisdiction, id),
-            this::delegateToRemoteRepository
+            decentralisedRepository::findFromShellCase
         );
     }
 
@@ -62,7 +62,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
         return findAndDelegate(
             () -> localRepository.findByReference(jurisdiction, caseReference),
-            this::delegateToRemoteRepository
+            decentralisedRepository::findFromShellCase
         );
     }
 
@@ -70,7 +70,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
         return findAndDelegate(
             () -> localRepository.findByReferenceWithNoAccessControl(reference),
-            this::delegateToRemoteRepository
+            decentralisedRepository::findFromShellCase
         );
     }
 
@@ -92,14 +92,6 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
                 return Optional.of(shellCase);
             }
         });
-    }
-
-    /**
-     * Default delegation strategy which uses the shell case's jurisdiction and reference
-     * to fetch the full case details from the remote repository.
-     */
-    private Optional<CaseDetails> delegateToRemoteRepository(CaseDetails shellCase) {
-        return decentralisedRepository.findByReference(shellCase.getReference());
     }
 
     // Overloaded and Deprecated methods
