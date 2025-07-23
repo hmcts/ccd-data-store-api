@@ -21,9 +21,13 @@ import java.util.function.Supplier;
  * A delegating repository that acts as a router between the local (Postgres)
  * and decentralised (remote service) case data stores.
  *
- * It first retrieves a "shell" case from the local repository. Based on the
- * case type's configuration, it either returns the local case details or
- * delegates the call to the remote service responsible for that case type.
+ * The routing strategy is 'local first' delegating first to the local repository
+ * and only if the resulting case type is decentralised delegating to the relevant remote service.
+ *
+ * This allows us to reuse the existing local repository access control and private case ID lookups.
+ *
+ * Where cases are centralised this avoids additional database round trips.
+ * Where cases are decentralised the local case details will be a lightweight metadata 'shell'.
  */
 @Slf4j
 @Service

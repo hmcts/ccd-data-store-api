@@ -18,7 +18,8 @@ public class DecentralisedCaseDetailsRepository {
 
     public Optional<CaseDetails> findFromShellCase(CaseDetails shellCase) {
         CaseDetails caseDetails = servicePersistenceAPI.getCase(shellCase.getReference());
-        // Decentralised services won't have our private ID so we set it here.
+        // Decentralised services don't have our private ID and it isn't part of the decentralised contract.
+        // We set it here for internal use only.
         caseDetails.setId(shellCase.getId());
         return Optional.of(caseDetails);
     }
