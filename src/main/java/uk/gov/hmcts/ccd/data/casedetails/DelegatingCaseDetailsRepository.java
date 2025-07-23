@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @Qualifier(DelegatingCaseDetailsRepository.QUALIFIER)
+@RequiredArgsConstructor
 public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
 
     public static final String QUALIFIER = "delegating";
@@ -23,19 +25,16 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     private final DecentralisedCaseDetailsRepository decentralisedRepository;
     private final DefaultCaseDetailsRepository localRepository;
 
-    public DelegatingCaseDetailsRepository(
-        final PersistenceStrategyResolver resolver,
-        final DecentralisedCaseDetailsRepository decentralisedRepository,
-        @Qualifier(DefaultCaseDetailsRepository.QUALIFIER) final DefaultCaseDetailsRepository localRepository
-    ) {
-        this.resolver = resolver;
-        this.decentralisedRepository = decentralisedRepository;
-        this.localRepository = localRepository;
-    }
-
     @Override
     public CaseDetails set(final CaseDetails caseDetails) {
-        // All write operations for the case pointer are handled by the local repository.
+        if (resolver.isDecentralised(caseDetails)) {
+            throw new UnsupportedOperationException(
+                String.format("""
+                        Case type '%s' is decentralised and managed by the owning service.
+                        CCD's Decentralised CaseDetails is an immutable pointer.""",
+                    caseDetails.getCaseTypeId())
+            );
+        }
         return localRepository.set(caseDetails);
     }
 
