@@ -229,11 +229,11 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     public String findCaseTypeByReference(Long caseReference) {
         try {
-            final Query query = em.createQuery(
-                "SELECT caseType FROM CaseDetailsEntity WHERE reference = :reference"
-            );
-            query.setParameter("reference", caseReference);
-            return (String) query.getSingleResult();
+            return em.createQuery(
+                    "SELECT cd.caseType FROM CaseDetailsEntity cd WHERE cd.reference = :reference",
+                    String.class
+                ).setParameter("reference", caseReference)
+                .getSingleResult();
         } catch (NoResultException e) {
             throw new ResourceNotFoundException("No case found for reference: " + caseReference, e);
         }
@@ -241,12 +241,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     public void updateResolvedTtl(final Long caseReference, final LocalDate resolvedTtl) {
         LOG.info("Updating resolved TTL for caseReference {}: {}", caseReference, resolvedTtl);
-        final Query query = em.createQuery(
-            "UPDATE CaseDetailsEntity SET resolvedTTL = :ttl WHERE reference = :caseReference"
-        );
-        query.setParameter("ttl", resolvedTtl);
-        query.setParameter("caseReference", caseReference);
-        query.executeUpdate();
+        em.createQuery("UPDATE CaseDetailsEntity SET resolvedTTL = :ttl WHERE reference = :caseReference")
+            .setParameter("ttl", resolvedTtl)
+            .setParameter("caseReference", caseReference)
+            .executeUpdate();
     }
 
     private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id,
