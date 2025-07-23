@@ -239,7 +239,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         }
     }
 
-    public void updateResolvedTtl(final Long caseReference, final LocalDate resolvedTtl) {
+    public void updateResolvedTtl(Long caseReference, LocalDate resolvedTtl) {
         LOG.info("Updating resolved TTL for caseReference {}: {}", caseReference, resolvedTtl);
         em.createQuery("UPDATE CaseDetailsEntity SET resolvedTTL = :ttl WHERE reference = :caseReference")
             .setParameter("ttl", resolvedTtl)
