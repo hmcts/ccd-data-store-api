@@ -61,8 +61,8 @@ public class ServicePersistenceClient {
         return api.getCaseHistoryEvent(uri, caseReference, eventId).getEvent();
     }
 
-    public JsonNode updateSupplementaryData(String caseRef, SupplementaryDataUpdateRequest supplementaryData) {
-        var uri = resolver.resolveUriOrThrow(Long.valueOf(caseRef));
+    public JsonNode updateSupplementaryData(Long caseRef, SupplementaryDataUpdateRequest supplementaryData) {
+        var uri = resolver.resolveUriOrThrow(caseRef);
         return api.updateSupplementaryData(uri, caseRef, supplementaryData).getSupplementaryData();
     }
 

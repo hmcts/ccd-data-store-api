@@ -47,7 +47,7 @@ interface ServicePersistenceAPI {
     @PostMapping(value = "/ccd/cases/{case-ref}/supplementary-data", consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     DecentralisedUpdateSupplementaryDataResponse updateSupplementaryData(URI baseURI,
-                                                                         @PathVariable("case-ref") String caseRef,
+                                                                         @PathVariable("case-ref") Long caseRef,
                                                                          SupplementaryDataUpdateRequest supplementaryData);
 
     @GetMapping(value = "/ccd/cases")
