@@ -42,7 +42,7 @@ public class MidEventCallback {
     private final CaseService caseService;
 
     private void jclog(final String message) {
-        LOG.info("JCDEBUG: Info: MidEventCallback: {}", message);
+        LOG.info("| JCDEBUG: Info: MidEventCallback: {}", message);
     }
 
     @Autowired

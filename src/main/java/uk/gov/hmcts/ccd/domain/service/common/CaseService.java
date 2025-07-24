@@ -41,7 +41,7 @@ public class CaseService {
     private final UIDService uidService;
 
     private void jclog(final String message) {
-        LOG.info("JCDEBUG: Info: CaseService: {}", message);
+        LOG.info("| JCDEBUG: Info: CaseService: {}", message);
     }
 
     @Autowired
