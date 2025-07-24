@@ -1,8 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
+import co.elastic.clients.json.JsonpMapper;
+import jakarta.json.stream.JsonParser;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Sample ES json search request.
@@ -49,5 +54,18 @@ public class CaseSearchRequest {
         String jsonString = elasticsearchRequest.toFinalRequest();
         log.debug("json search request: {}", jsonString);
         return jsonString;
+    }
+
+    public JsonParser toElasticsearchJsonParser(JsonpMapper mapper) {
+        try {
+            String jsonString = elasticsearchRequest.toFinalRequest();
+            log.debug("json search request: {}", jsonString);
+
+            return mapper.jsonProvider().createParser(
+                new ByteArrayInputStream(jsonString.getBytes(StandardCharsets.UTF_8))
+            );
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to convert search request to JsonParser", e);
+        }
     }
 }

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -18,10 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -53,8 +50,8 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
 
         Optional<AuditEvent> createEventOptional = classUnderTest.getCreateEvent(caseDetails);
 
-        assertTrue(createEventOptional.isPresent());
-        assertEquals(createEventSummary, createEventOptional.get().getSummary());
+        assertThat(createEventOptional).isPresent();
+        assertThat(createEventOptional.get().getSummary()).isEqualTo(createEventSummary);
     }
 
     @Test
@@ -64,7 +61,7 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setId(String.valueOf(CASE_DATA_ID));
 
-        assertFalse(classUnderTest.getCreateEvent(caseDetails).isPresent());
+        assertThat(classUnderTest.getCreateEvent(caseDetails)).isNotPresent();
     }
 
     @Test
@@ -77,8 +74,8 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
 
         Optional<AuditEvent> createEventOptional = classUnderTest.findByEventId(eventId);
 
-        assertTrue(createEventOptional.isPresent());
-        assertEquals(createEventSummary, createEventOptional.get().getSummary());
+        assertThat(createEventOptional).isPresent();
+        assertThat(createEventOptional.get().getSummary()).isEqualTo(createEventSummary);
     }
 
     @Test
@@ -102,13 +99,13 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
         List<AuditEvent> eventList = classUnderTest.findByCase(caseDetails);
 
         assertAll(
-            () -> assertEquals(3, eventList.size()),
-            () -> assertNull(eventList.get(0).getData()),
-            () -> assertNull(eventList.get(0).getDataClassification()),
-            () -> assertNull(eventList.get(1).getData()),
-            () -> assertNull(eventList.get(1).getDataClassification()),
-            () -> assertNull(eventList.get(2).getData()),
-            () -> assertNull(eventList.get(2).getDataClassification())
+            () -> assertThat(eventList).hasSize(3),
+            () -> assertThat(eventList.get(0).getData()).isNull(),
+            () -> assertThat(eventList.get(0).getDataClassification()).isNull(),
+            () -> assertThat(eventList.get(1).getData()).isNull(),
+            () -> assertThat(eventList.get(1).getDataClassification()).isNull(),
+            () -> assertThat(eventList.get(2).getData()).isNull(),
+            () -> assertThat(eventList.get(2).getDataClassification()).isNull()
         );
     }
 

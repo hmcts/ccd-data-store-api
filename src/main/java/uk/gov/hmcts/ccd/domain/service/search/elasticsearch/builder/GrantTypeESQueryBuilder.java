@@ -1,12 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -15,6 +13,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchRoleAssignment;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.CASE_ACCESS_CATEGORY;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_COL;
@@ -36,85 +39,116 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
         super(accessControlService, caseDataAccessControl, applicationParams);
     }
 
-    public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments,
-                                        CaseTypeDefinition caseType) {
+    public Query createQuery(List<RoleAssignment> roleAssignments, CaseTypeDefinition caseType) {
         List<CaseStateDefinition> caseStates = getStatesForCaseType(caseType);
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        List<Query> shouldQueries = new ArrayList<>();
 
         getGroupedSearchRoleAssignments(roleAssignments)
-            .forEach((hash, groupedSearchRoleAssignments) -> {
-                BoolQueryBuilder innerQuery = QueryBuilders.boolQuery();
-                SearchRoleAssignment representative = groupedSearchRoleAssignments.get(0);
-                Set<String> readableCaseStates = getReadableCaseStates(representative, caseStates, caseType);
-                if (readableCaseStates.isEmpty()) {
+            .forEach((hash, groupedAssignments) -> {
+                SearchRoleAssignment representative = groupedAssignments.get(0);
+                Set<String> readableStates = getReadableCaseStates(representative, caseStates, caseType);
+                if (readableStates.isEmpty()) {
                     return;
                 }
 
-                if (getApplicationParams().getCaseGroupAccessFilteringEnabled()) {
-                    addTermQueryForOptionalAttribute(representative.getCaseAccessGroupId(), innerQuery,
-                        CASE_ACCESS_GROUP_ID_FIELD_COL);
-                }
-                addTermQueryForOptionalAttribute(representative.getJurisdiction(), innerQuery, JURISDICTION_FIELD_COL);
-                addTermQueryForOptionalAttribute(representative.getRegion(), innerQuery, REGION);
-                addTermQueryForOptionalAttribute(representative.getLocation(), innerQuery, LOCATION);
-                addTermsQueryForReference(groupedSearchRoleAssignments, innerQuery);
-                addTermsQueryForState(readableCaseStates, caseStates, innerQuery);
-                addTermsQueryForClassification(representative, innerQuery);
-                addPrefixQueryForCaseAccessCategory(caseType, representative, innerQuery);
+                List<Query> innerMustQueries = new ArrayList<>();
 
-                query.should(innerQuery);
+                if (getApplicationParams().getCaseGroupAccessFilteringEnabled()) {
+                    addTermQueryForOptionalAttribute(representative.getCaseAccessGroupId(),
+                        CASE_ACCESS_GROUP_ID_FIELD_COL, innerMustQueries);
+                }
+                addTermQueryForOptionalAttribute(representative.getJurisdiction(), JURISDICTION_FIELD_COL,
+                    innerMustQueries);
+                addTermQueryForOptionalAttribute(representative.getRegion(), REGION, innerMustQueries);
+                addTermQueryForOptionalAttribute(representative.getLocation(), LOCATION, innerMustQueries);
+
+                addTermsQueryForReference(groupedAssignments, innerMustQueries);
+                addTermsQueryForState(readableStates, caseStates, innerMustQueries);
+                addTermsQueryForClassification(representative, innerMustQueries);
+                addPrefixQueryForCaseAccessCategory(caseType, representative, innerMustQueries);
+
+                if (!innerMustQueries.isEmpty()) {
+                    shouldQueries.add(Query.of(q -> q.bool(b -> b.must(innerMustQueries))));
+                }
             });
 
-        return query;
+        if (shouldQueries.isEmpty()) {
+            return Query.of(q -> q.bool(b -> b)); // empty bool query
+        }
+
+        return Query.of(q -> q.bool(b -> b.should(shouldQueries).minimumShouldMatch("1")));
     }
 
-    private void addTermsQueryForState(Set<String> readableCaseStates,
-                                       List<CaseStateDefinition> allCaseStates,
-                                       BoolQueryBuilder parentQuery) {
-        if (readableCaseStates.size() != allCaseStates.size()) {
-            parentQuery.must(QueryBuilders.termsQuery(STATE_FIELD_COL + KEYWORD, readableCaseStates));
+    private void addTermsQueryForState(Set<String> readableStates,
+                                       List<CaseStateDefinition> allStates,
+                                       List<Query> mustQueries) {
+        if (readableStates.size() != allStates.size()) {
+            mustQueries.add(Query.of(q -> q.terms(t -> t
+                .field(STATE_FIELD_COL + KEYWORD)
+                .terms(TermsQueryField.of(f -> f
+                    .value(readableStates.stream()
+                        .map(FieldValue::of)
+                        .collect(Collectors.toList()))
+                ))
+            )));
         }
     }
 
-    private void addTermsQueryForReference(List<SearchRoleAssignment> searchRoleAssignments,
-                                           BoolQueryBuilder parentQuery) {
-        if (allRoleAssignmentsHaveCaseReference(searchRoleAssignments)) {
-            parentQuery.must(QueryBuilders.termsQuery(REFERENCE_FIELD_COL + KEYWORD,
-                searchRoleAssignments.stream()
-                    .map(SearchRoleAssignment::getCaseReference)
-                    .collect(Collectors.toList())));
+    private void addTermsQueryForReference(List<SearchRoleAssignment> assignments, List<Query> mustQueries) {
+        if (allRoleAssignmentsHaveCaseReference(assignments)) {
+            List<String> references = assignments.stream()
+                .map(SearchRoleAssignment::getCaseReference)
+                .collect(Collectors.toList());
+
+            mustQueries.add(Query.of(q -> q.terms(t -> t
+                .field(REFERENCE_FIELD_COL + KEYWORD)
+                .terms(TermsQueryField.of(f -> f
+                    .value(references.stream()
+                        .map(FieldValue::of)
+                        .collect(Collectors.toList()))
+                ))
+            )));
         }
     }
 
-    private void addTermQueryForOptionalAttribute(String attribute,
-                                                  BoolQueryBuilder parentQuery,
-                                                  String matchName) {
+    private void addTermQueryForOptionalAttribute(String attribute, String field, List<Query> mustQueries) {
         if (StringUtils.isNotBlank(attribute)) {
-            parentQuery.must(QueryBuilders.termQuery(matchName + KEYWORD, attribute));
+            mustQueries.add(Query.of(q -> q.term(t -> t
+                .field(field + KEYWORD)
+                .value(attribute)
+            )));
         }
     }
 
-    private void addTermsQueryForClassification(SearchRoleAssignment searchRoleAssignment,
-                                                BoolQueryBuilder parentQuery) {
-        List<String> classifications = getClassifications(searchRoleAssignment);
+    private void addTermsQueryForClassification(SearchRoleAssignment role, List<Query> mustQueries) {
+        List<String> classifications = getClassifications(role);
         if (!classifications.isEmpty()) {
-            parentQuery.must(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL, classifications));
+            mustQueries.add(Query.of(q -> q.terms(t -> t
+                .field(SECURITY_CLASSIFICATION_FIELD_COL)
+                .terms(TermsQueryField.of(f -> f
+                    .value(classifications.stream()
+                        .map(FieldValue::of)
+                        .collect(Collectors.toList()))
+                ))
+            )));
         }
     }
 
     private void addPrefixQueryForCaseAccessCategory(CaseTypeDefinition caseType,
-                                                     SearchRoleAssignment representative,
-                                                     BoolQueryBuilder parentQuery) {
-
-        List<String> caseAccessCategories = getCaseAccessCategories(representative.getRoleAssignment(), caseType);
-        if (caseAccessCategories.isEmpty()) {
+                                                     SearchRoleAssignment role,
+                                                     List<Query> mustQueries) {
+        List<String> categories = getCaseAccessCategories(role.getRoleAssignment(), caseType);
+        if (categories.isEmpty()) {
             return;
         }
 
-        BoolQueryBuilder caseAccessQuery = QueryBuilders.boolQuery();
+        List<Query> shouldPrefixes = categories.stream()
+            .map(cac -> Query.of(q -> q.matchPhrasePrefix(mpp -> mpp
+                .field(CASE_ACCESS_CATEGORY)
+                .query(cac)
+            )))
+            .collect(Collectors.toList());
 
-        caseAccessCategories
-            .forEach(cac -> caseAccessQuery.should(QueryBuilders.matchPhrasePrefixQuery(CASE_ACCESS_CATEGORY, cac)));
-        parentQuery.must(caseAccessQuery);
+        mustQueries.add(Query.of(q -> q.bool(b -> b.should(shouldPrefixes))));
     }
 }

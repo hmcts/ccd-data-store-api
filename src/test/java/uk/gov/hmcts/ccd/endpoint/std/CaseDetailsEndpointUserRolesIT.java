@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -17,17 +17,16 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import javax.inject.Inject;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
-public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
+class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
     private static final String JURISDICTION = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
     private static final String UID = "123";
@@ -40,15 +39,15 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     private JdbcTemplate template;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
         final String description = "A very long comment.......";
         final String summary = "Short comment";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE
@@ -69,21 +68,21 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("case_data").asText());
+        assertEquals("", mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").asText(), "Expected empty case data");
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
+        assertEquals(1, caseDetailsList.size(), "Incorrect Case Reference");
 
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+        assertTrue(uidService.validateUID(String.valueOf(savedCaseDetails
             .getReference())));
-        assertEquals("Incorrect Case Type", CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId());
-        assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
+        assertEquals(CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId(), "Incorrect Case Type");
+        assertEquals("{}", savedCaseDetails.getData().toString(), "Incorrect Data content");
         assertEquals("state3", savedCaseDetails.getState());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
+        assertEquals(1, caseAuditEventList.size(), "Incorrect number of case events");
 
         final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
         assertEquals("123", caseAuditEvent.getUserId());
@@ -94,15 +93,15 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         assertEquals("Case in state 3", caseAuditEvent.getStateName());
         assertEquals(savedCaseDetails.getCreatedDate(), caseAuditEvent.getCreatedDate());
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
-        assertEquals("Event ID", TEST_EVENT_ID, caseAuditEvent.getEventId());
-        assertEquals("Description", description, caseAuditEvent.getDescription());
-        assertEquals("Summary", summary, caseAuditEvent.getSummary());
-        assertTrue(caseAuditEvent.getDataClassification().isEmpty());
-        assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
+        assertThat(caseAuditEvent.getEventId()).isEqualTo(TEST_EVENT_ID);
+        assertThat(caseAuditEvent.getDescription()).isEqualTo(description);
+        assertThat(caseAuditEvent.getSummary()).isEqualTo(summary);
+        assertThat(caseAuditEvent.getDataClassification()).isEmpty();
+        assertThat(caseAuditEvent.getSecurityClassification()).isEqualTo(PRIVATE);
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCitizen() throws Exception {
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
@@ -124,21 +123,21 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("case_data").asText());
+        assertThat(mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").asText()).isEqualTo("");
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
+        assertEquals(1, caseDetailsList.size(), "Incorrect number of cases");
 
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
-            .getReference())));
-        assertEquals("Incorrect Case Type", CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId());
-        assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
+        assertTrue(uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())), "Incorrect Case Reference");
+        assertEquals(CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId(), "Incorrect Case Type");
+        assertEquals("{}", savedCaseDetails.getData().toString(), "Incorrect Data content");
         assertEquals("state3", savedCaseDetails.getState());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
+        assertEquals(1, caseAuditEventList.size(), "Incorrect number of case events");
 
         final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
         assertEquals("123", caseAuditEvent.getUserId());
@@ -149,21 +148,21 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         assertEquals("Case in state 3", caseAuditEvent.getStateName());
         assertEquals(savedCaseDetails.getCreatedDate(), caseAuditEvent.getCreatedDate());
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
-        assertEquals("Event ID", TEST_EVENT_ID, caseAuditEvent.getEventId());
-        assertEquals("Description", description, caseAuditEvent.getDescription());
-        assertEquals("Summary", summary, caseAuditEvent.getSummary());
-        assertTrue(caseAuditEvent.getDataClassification().isEmpty());
-        assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
+        assertThat(caseAuditEvent.getEventId()).isEqualTo(TEST_EVENT_ID);
+        assertThat(caseAuditEvent.getDescription()).isEqualTo(description);
+        assertThat(caseAuditEvent.getSummary()).isEqualTo(summary);
+        assertThat(caseAuditEvent.getDataClassification().isEmpty());
+        assertThat(caseAuditEvent.getSecurityClassification()).isEqualTo(PRIVATE);
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCaseworker() throws Exception {
         shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("caseworkers",
             CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCitizen() throws Exception {
         shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("citizens",
             CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
     }

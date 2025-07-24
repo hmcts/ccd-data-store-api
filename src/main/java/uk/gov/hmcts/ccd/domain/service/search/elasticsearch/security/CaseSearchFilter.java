@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
-import java.util.Optional;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 
-import org.elasticsearch.index.query.QueryBuilder;
+import java.util.Optional;
 
 public interface CaseSearchFilter {
 
-    Optional<QueryBuilder> getFilter(String caseTypeId);
+    Optional<Query> getFilter(String caseTypeId);
 
 }
