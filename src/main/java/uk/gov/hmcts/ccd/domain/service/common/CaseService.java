@@ -19,7 +19,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.std.TestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,10 +42,6 @@ public class CaseService {
 
     private void jclog(final String message) {
         LOG.info("JCDEBUG: Info: CaseService: {}", message);
-        LOG.warn("JCDEBUG: Warn: CaseService: {}", message);
-        LOG.error("JCDEBUG: Error: CaseService: {}", message);
-        LOG.debug("JCDEBUG: Debug: CaseService: {}", message);
-        TestController.jcLog("CaseService: " + message);
     }
 
     @Autowired
