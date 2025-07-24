@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -46,6 +47,7 @@ import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampServ
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -173,7 +175,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             caseAccessGroupUtils,
             caseDocumentTimestampService,
             decentralisedSubmitCaseTransaction,
-            resolver
+            resolver,
+            Mockito.mock(CasePointerCreator.class)
         );
 
         idamUser = buildIdamUser();

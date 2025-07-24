@@ -91,7 +91,7 @@ public class SecurityClassificationServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         securityClassificationService = spy(new SecurityClassificationServiceImpl(caseDataAccessControl,
-            caseDefinitionRepository, resolver));
+            caseDefinitionRepository));
     }
 
     @Nested

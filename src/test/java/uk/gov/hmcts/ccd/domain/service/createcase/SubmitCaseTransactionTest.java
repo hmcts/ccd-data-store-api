@@ -36,6 +36,8 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
 import java.io.IOException;
@@ -131,12 +133,14 @@ class SubmitCaseTransactionTest {
     private CaseStateDefinition state;
     @Mock
     private ApplicationParams applicationParams;
-    @Mock
-    private DecentralisedSubmitCaseTransaction decentralisedSubmitCaseTransaction;
     private CaseAccessGroupUtils caseAccessGroupUtils;
     private ObjectMapper objectMapper;
     @Mock
     private PersistenceStrategyResolver resolver;
+    @Mock
+    private DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
+    @Mock
+    private CasePointerCreator casePointerCreator;
 
     @BeforeEach
     void setup() {
@@ -160,7 +164,8 @@ class SubmitCaseTransactionTest {
             caseAccessGroupUtils,
             caseDocumentTimestampService,
             decentralisedSubmitCaseTransaction,
-            resolver
+            resolver,
+            casePointerCreator
         );
 
         idamUser = buildIdamUser();

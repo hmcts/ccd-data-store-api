@@ -56,8 +56,7 @@ class LocalAuditEventLoaderTest {
 
         doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
 
-        listEventsOperation
-                = new LocalAuditEventLoader(auditEventRepository, getCaseOperation, uidService);
+        listEventsOperation = new LocalAuditEventLoader(auditEventRepository);
         event = new AuditEvent();
     }
 
@@ -78,7 +77,7 @@ class LocalAuditEventLoaderTest {
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
 
-        final List<AuditEvent> events = listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final List<AuditEvent> events = listEventsOperation.getEvents(caseDetails);
 
         assertAll(
             () -> verify(auditEventRepository).findByCase(caseDetails),
@@ -92,7 +91,7 @@ class LocalAuditEventLoaderTest {
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
 
-        final List<AuditEvent> events = listEventsOperation.getEvents(CASE_REFERENCE);
+        final List<AuditEvent> events = listEventsOperation.getEvents(caseDetails);
 
         assertAll(
             () -> verify(auditEventRepository).findByCase(caseDetails),
@@ -107,7 +106,7 @@ class LocalAuditEventLoaderTest {
         doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
         assertThrows(ResourceNotFoundException.class,
-            () -> listEventsOperation.getEvents(CASE_REFERENCE));
+            () -> listEventsOperation.getEvents(caseDetails));
     }
 
     @Test
@@ -116,7 +115,7 @@ class LocalAuditEventLoaderTest {
         doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
 
         assertThrows(BadRequestException.class,
-            () -> listEventsOperation.getEvents(CASE_REFERENCE));
+            () -> listEventsOperation.getEvents(caseDetails));
     }
 
 
@@ -126,7 +125,7 @@ class LocalAuditEventLoaderTest {
         doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
 
         assertThrows(BadRequestException.class, () ->
-                listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
+                listEventsOperation.getEvents(caseDetails));
     }
 
     @Test
@@ -136,7 +135,7 @@ class LocalAuditEventLoaderTest {
         doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
         assertThrows(ResourceNotFoundException.class, () ->
-                listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
+                listEventsOperation.getEvents(caseDetails));
     }
 
     @Test
@@ -144,7 +143,7 @@ class LocalAuditEventLoaderTest {
     void shouldFindEventAndDelegateCallToRepository() {
         doReturn(Optional.of(event)).when(auditEventRepository).findByEventId(EVENT_ID);
 
-        Optional<AuditEvent> optionalAuditEvent = listEventsOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
+        Optional<AuditEvent> optionalAuditEvent = listEventsOperation.getEvent(caseDetails, EVENT_ID);
 
         assertThat(optionalAuditEvent.isPresent(), is(true));
         AuditEvent output = optionalAuditEvent.get();
@@ -160,6 +159,6 @@ class LocalAuditEventLoaderTest {
         doReturn(Optional.empty()).when(auditEventRepository).findByEventId(EVENT_ID);
 
         assertThrows(ResourceNotFoundException.class, () ->
-                listEventsOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID));
+                listEventsOperation.getEvent(caseDetails, EVENT_ID));
     }
 }
