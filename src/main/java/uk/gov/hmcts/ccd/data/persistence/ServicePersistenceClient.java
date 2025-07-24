@@ -20,18 +20,18 @@ public class ServicePersistenceClient {
     private final PersistenceStrategyResolver resolver;
     private final IdempotencyKeyHolder idempotencyKeyHolder;
 
-    public CaseDetails getCase(CaseDetails shellCase) {
-        var uri = resolver.resolveUriOrThrow(shellCase.getReference());
-        var response = api.getCases(uri, List.of(shellCase.getReference()));
+    public CaseDetails getCase(CaseDetails casePointer) {
+        var uri = resolver.resolveUriOrThrow(casePointer.getReference());
+        var response = api.getCases(uri, List.of(casePointer.getReference()));
 
         if (response.isEmpty()) {
-            throw new CaseNotFoundException(String.valueOf(shellCase.getReference()));
+            throw new CaseNotFoundException(String.valueOf(casePointer.getReference()));
         }
 
         var result = response.getFirst().getCaseDetails();
         // Decentralised services don't have our private ID and it isn't part of the decentralised contract.
         // We set it here for our internal use.
-        result.setId(shellCase.getId());
+        result.setId(casePointer.getId());
         return result;
     }
 

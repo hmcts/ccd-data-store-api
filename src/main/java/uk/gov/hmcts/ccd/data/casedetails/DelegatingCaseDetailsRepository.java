@@ -28,7 +28,7 @@ import java.util.function.Supplier;
  * <p>This allows us to reuse the existing local repository access control and private case ID lookups.
  *
  * <p>Where cases are centralised this avoids additional database round trips.
- * Where cases are decentralised the local case details will be a lightweight metadata 'shell'.
+ * Where cases are decentralised the local case details will be a lightweight metadata 'pointer'.
  */
 @Slf4j
 @Service
@@ -69,11 +69,11 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
      */
     private Optional<CaseDetails> findAndDelegate(Supplier<Optional<CaseDetails>> localCaseFinder,
                                                   Function<CaseDetails, CaseDetails> decentralisedFinder) {
-        return localCaseFinder.get().map(shellCase -> {
-            if (resolver.isDecentralised(shellCase)) {
-                return decentralisedFinder.apply(shellCase);
+        return localCaseFinder.get().map(casePointer -> {
+            if (resolver.isDecentralised(casePointer)) {
+                return decentralisedFinder.apply(casePointer);
             }
-            return shellCase;
+            return casePointer;
         });
     }
 

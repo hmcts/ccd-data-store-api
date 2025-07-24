@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.persistence.ShellCaseCreator;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -58,7 +58,7 @@ public class SubmitCaseTransaction implements AccessControl {
     private final CaseDocumentTimestampService caseDocumentTimestampService;
     private final DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
     private final PersistenceStrategyResolver resolver;
-    private final ShellCaseCreator shellCaseCreator;
+    private final CasePointerCreator casePointerCreator;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -76,7 +76,7 @@ public class SubmitCaseTransaction implements AccessControl {
                                  final CaseDocumentTimestampService caseDocumentTimestampService,
                                  final DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction,
                                  final PersistenceStrategyResolver resolver,
-                                 final ShellCaseCreator shellCaseCreator
+                                 final CasePointerCreator casePointerCreator
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -92,7 +92,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.caseDocumentTimestampService = caseDocumentTimestampService;
         this.decentralisedSubmitCaseTransaction = decentralisedSubmitCaseTransaction;
         this.resolver = resolver;
-        this.shellCaseCreator = shellCaseCreator;
+        this.casePointerCreator = casePointerCreator;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -183,7 +183,7 @@ public class SubmitCaseTransaction implements AccessControl {
                                                      IdamUser onBehalfOfUser) {
 
         if (resolver.isDecentralised(newCaseDetails)) {
-            this.shellCaseCreator.persistCasePointer(newCaseDetails);
+            this.casePointerCreator.persistCasePointer(newCaseDetails);
             // Send the event to the decentralised service.
             return decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
                 caseEventDefinition, caseTypeDefinition, newCaseDetails, Optional.empty(),
