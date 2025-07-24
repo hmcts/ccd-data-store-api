@@ -190,7 +190,6 @@ public class SubmitCaseTransaction implements AccessControl {
                 Optional.ofNullable(onBehalfOfUser));
         }
         CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
-        // Store a case event history record locally.
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());
         auditEvent.setEventName(caseEventDefinition.getName());
