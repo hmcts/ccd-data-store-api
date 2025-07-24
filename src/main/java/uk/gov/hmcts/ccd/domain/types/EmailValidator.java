@@ -5,8 +5,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +16,8 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 @Singleton
 public class EmailValidator implements BaseTypeValidator {
     static final String TYPE_ID = "Email";
+
+    private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
     @Override
     public BaseType getType() {
@@ -61,6 +61,12 @@ public class EmailValidator implements BaseTypeValidator {
             );
         }
 
+        if (!checkRegex(EMAIL_REGEX, value)) {
+            return Collections.singletonList(
+                new ValidationResult(REGEX_GUIDANCE, dataFieldId)
+            );
+        }
+
         if (!isValidEmailAddress(value)) {
             return Collections.singletonList(new ValidationResult(value + " is not a valid Email address",
                 dataFieldId));
@@ -70,11 +76,6 @@ public class EmailValidator implements BaseTypeValidator {
     }
 
     private boolean isValidEmailAddress(final String email) {
-        try {
-            new InternetAddress(email).validate();
-            return true;
-        } catch (AddressException ex) {
-            return false;
-        }
+        return org.apache.commons.validator.routines.EmailValidator.getInstance().isValid(email);
     }
 }
