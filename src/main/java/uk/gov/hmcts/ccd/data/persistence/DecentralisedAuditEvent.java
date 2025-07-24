@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.persistence;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
+import lombok.Getter;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -10,11 +11,12 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 class DecentralisedAuditEvent {
     private Long id;
     private Long caseReference;
+    @Getter(lombok.AccessLevel.NONE)
     private AuditEvent event;
 
-    public AuditEvent getEvent() {
+    public AuditEvent getEvent(String caseDataId) {
         this.event.setId(id);
-        this.event.setCaseDataId(String.valueOf(caseReference));
+        this.event.setCaseDataId(caseDataId);
         return event;
     }
 }

@@ -17,11 +17,11 @@ public class DecentralisedAuditEventLoader implements AuditEventLoader {
 
     @Override
     public List<AuditEvent> getEvents(CaseDetails caseDetails) {
-        return serviceClient.getCaseHistory(caseDetails.getReference());
+        return serviceClient.getCaseHistory(caseDetails);
     }
 
     @Override
     public Optional<AuditEvent> getEvent(CaseDetails caseDetails, Long eventId) {
-        return Optional.of(serviceClient.getCaseHistoryEvent(caseDetails.getReference(), eventId));
+        return Optional.of(serviceClient.getCaseHistoryEvent(caseDetails, eventId));
     }
 }
