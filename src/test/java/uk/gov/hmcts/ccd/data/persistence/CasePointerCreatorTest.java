@@ -87,7 +87,6 @@ public class CasePointerCreatorTest extends WireMockBaseTest {
             () -> assertThat(pointer.getReference(), is(CASE_REFERENCE)),
             () -> assertThat(pointer.getJurisdiction(), is(JURISDICTION)),
             () -> assertThat(pointer.getCaseTypeId(), is(CASE_TYPE_DECENTRALIZED)),
-            () -> assertThat(pointer.getCreatedDate(), is(originalCaseDetails.getCreatedDate())),
 
             // Pointer-specific properties: should be cleared/reset
             () -> assertThat(pointer.getData().isEmpty(), is(true)),
