@@ -53,6 +53,20 @@ public class CallbackService {
     private final HttpServletRequest request;
     private final ObjectMapper objectMapper;
 
+    private void jclog(final String message) {
+        LOG.info("| JCDEBUG: Info: CallbackService: {}", message);
+    }
+
+    private String getCallStackAsString() {
+        final StringBuilder sb = new StringBuilder();
+        final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        // Skip the first two elements to exclude getStackTrace() and getCallStackAsString()
+        for (int i = 2; i < stackTrace.length; i++) {
+            sb.append(stackTrace[i].toString()).append("\t");
+        }
+        return sb.toString();
+    }
+
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
                            @Qualifier("restTemplate") final RestTemplate restTemplate,
@@ -133,6 +147,7 @@ public class CallbackService {
                                                         final CallbackType callbackType,
                                                         final Class<T> clazz,
                                                         final CallbackRequest callbackRequest) {
+        jclog("sendRequest(): CALL STACK = " + getCallStackAsString());
 
         HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
 

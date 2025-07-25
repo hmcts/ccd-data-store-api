@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -31,11 +33,17 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Service
 public class MidEventCallback {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MidEventCallback.class);
+
     private final CallbackInvoker callbackInvoker;
     private final UIDefinitionRepository uiDefinitionRepository;
     private final EventTriggerService eventTriggerService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseService caseService;
+
+    private void jclog(final String message) {
+        LOG.info("| JCDEBUG: Info: MidEventCallback: {}", message);
+    }
 
     @Autowired
     public MidEventCallback(CallbackInvoker callbackInvoker,
@@ -44,6 +52,7 @@ public class MidEventCallback {
                             @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                     CaseDefinitionRepository caseDefinitionRepository,
                             CaseService caseService) {
+        jclog("Constructor");
         this.callbackInvoker = callbackInvoker;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.eventTriggerService = eventTriggerService;
@@ -55,6 +64,7 @@ public class MidEventCallback {
     public JsonNode invoke(String caseTypeId,
                            CaseDataContent content,
                            String pageId) {
+        jclog("invoke()");
         if (!isBlank(pageId)) {
             Event event = content.getEvent();
             final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
@@ -100,6 +110,7 @@ public class MidEventCallback {
 
     private void removeNextPageFieldData(CaseDetails currentCaseDetails, Integer order,
                                          String caseTypeId, String eventId) {
+        jclog("removeNextPageFieldData()");
         if (order != null) {
             Set<String> wizardPageFields = uiDefinitionRepository
                 .getWizardPageCollection(caseTypeId, eventId)
@@ -113,6 +124,7 @@ public class MidEventCallback {
     }
 
     private JsonNode dataJsonNode(Map<String, JsonNode> data) {
+        jclog("dataJsonNode()");
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.set("data", mapper.valueToTree(data));
@@ -120,6 +132,7 @@ public class MidEventCallback {
     }
 
     private CaseTypeDefinition getCaseType(String caseTypeId) {
+        jclog("getCaseType()");
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
@@ -128,6 +141,7 @@ public class MidEventCallback {
     }
 
     private CaseEventDefinition getCaseEvent(Event event, CaseTypeDefinition caseTypeDefinition) {
+        jclog("getCaseEvent()");
         final CaseEventDefinition caseEventDefinition =
             eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
         if (caseEventDefinition == null) {
