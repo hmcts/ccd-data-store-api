@@ -44,7 +44,8 @@ interface ServicePersistenceAPI {
                                          @RequestHeader("Idempotency-Key") String idempotencyKey,
                                          @RequestBody DecentralisedCaseEvent caseEvent);
 
-    @PostMapping(value = "/ccd-persistence/cases/{case-ref}/supplementary-data", consumes = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(value = "/ccd-persistence/cases/{case-ref}/supplementary-data",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     DecentralisedUpdateSupplementaryDataResponse updateSupplementaryData(
         URI baseURI,

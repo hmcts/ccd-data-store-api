@@ -11,7 +11,6 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
@@ -27,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-class DefaultGetEventsOperationTest {
+class DelegatingGetEventsOperationTest {
 
     private static final Long CASE_ID = 123L;
     private static final String JURISDICTION_ID = "Probate";
@@ -59,7 +58,8 @@ class DefaultGetEventsOperationTest {
 
         doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
 
-        listEventsOperation = new DelegatingGetEventsOperation(resolver, decentralisedAuditEventLoader, new LocalAuditEventLoader(auditEventRepository), getCaseOperation, uidService);
+        listEventsOperation = new DelegatingGetEventsOperation(resolver, decentralisedAuditEventLoader,
+            new LocalAuditEventLoader(auditEventRepository), getCaseOperation, uidService);
         event = new AuditEvent();
     }
 

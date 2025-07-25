@@ -16,7 +16,6 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
 
 import javax.inject.Inject;
@@ -164,7 +163,8 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
         assertEquals("Expected exactly one case pointer in local database", 1, casePointers.size());
 
         final var casePointer = casePointers.get(0);
-        assertEquals("Case pointer should have correct case type", DECENTRALISED_CASE_TYPE_ID, casePointer.getCaseTypeId());
+        assertEquals("Case pointer should have correct case type", DECENTRALISED_CASE_TYPE_ID,
+            casePointer.getCaseTypeId());
         assertEquals("Case pointer should have empty data", Map.of(), casePointer.getData());
         assertEquals("Case pointer should be in empty state", "", casePointer.getState());
         assertNotNull("Case pointer should have a reference", casePointer.getReference());
