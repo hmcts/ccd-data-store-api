@@ -33,6 +33,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -95,8 +96,10 @@ public class CreateCaseEventService {
     private final TimeToLiveService timeToLiveService;
     private final CaseLinkService caseLinkService;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
+    private final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService;
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
+    private final PersistenceStrategyResolver resolver;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -130,7 +133,9 @@ public class CreateCaseEventService {
                                   final CaseLinkService caseLinkService,
                                   final ApplicationParams applicationParams,
                                   final CaseAccessGroupUtils caseAccessGroupUtils,
-                                  final CaseDocumentTimestampService caseDocumentTimestampService) {
+                                  final CaseDocumentTimestampService caseDocumentTimestampService,
+                                  final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
+                                  final PersistenceStrategyResolver resolver) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -161,7 +166,8 @@ public class CreateCaseEventService {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-
+        this.decentralisedCreateCaseEventService = decentralisedCreateCaseEventService;
+        this.resolver = resolver;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -240,40 +246,51 @@ public class CreateCaseEventService {
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 
-        final CaseDetails savedCaseDetails = saveCaseDetails(
-            caseDetailsInDatabase,
-            caseDetailsAfterCallbackWithoutHashes,
-            caseEventDefinition,
-            newState,
-            timeNow
-        );
+        var onBehalfOfUser = getOnBehalfOfUser(content.getOnBehalfOfId(), content.getOnBehalfOfUserToken());
+        CaseDetails finalCaseDetails;
+        if (resolver.isDecentralised(caseDetailsInDatabase)) {
+            // Documents must be attached before the event is committed.
+            // When decentralised we must do the attach before the event is submitted to the decentralised service.
+            caseDocumentService.attachCaseDocuments(
+                caseDetails.getReferenceAsString(),
+                caseDetails.getCaseTypeId(),
+                caseDetails.getJurisdiction(),
+                documentHashes
+            );
+            finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(content.getEvent(),
+                caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes,
+                Optional.of(caseDetailsInDatabase), onBehalfOfUser);
+        } else {
+            finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes,
+                caseEventDefinition, newState, timeNow);
+            saveAuditEventForCaseDetails(
+                aboutToSubmitCallbackResponse,
+                content.getEvent(),
+                caseEventDefinition,
+                finalCaseDetails,
+                caseTypeDefinition,
+                timeNow,
+                oldState,
+                onBehalfOfUser,
+                securityClassificationService.getClassificationForEvent(caseTypeDefinition,
+                    caseEventDefinition)
+            );
 
-        caseLinkService.updateCaseLinks(savedCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+            // Documents must be attached before event is committed.
+            // When centralised this will be upon method return when the transaction commits.
+            caseDocumentService.attachCaseDocuments(
+                caseDetails.getReferenceAsString(),
+                caseDetails.getCaseTypeId(),
+                caseDetails.getJurisdiction(),
+                documentHashes
+            );
+        }
 
-        saveAuditEventForCaseDetails(
-            aboutToSubmitCallbackResponse,
-            content.getEvent(),
-            caseEventDefinition,
-            savedCaseDetails,
-            caseTypeDefinition,
-            timeNow,
-            oldState,
-            content.getOnBehalfOfUserToken(),
-            content.getOnBehalfOfId(),
-            securityClassificationService.getClassificationForEvent(caseTypeDefinition,
-                caseEventDefinition)
-        );
-
-        caseDocumentService.attachCaseDocuments(
-            caseDetails.getReferenceAsString(),
-            caseDetails.getCaseTypeId(),
-            caseDetails.getJurisdiction(),
-            documentHashes
-        );
+        caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
-            .savedCaseDetails(savedCaseDetails)
+            .savedCaseDetails(finalCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
     }
@@ -329,36 +346,49 @@ public class CreateCaseEventService {
             caseDetailsAfterCallback
         );
 
-        final CaseDetails savedCaseDetails = saveCaseDetails(
-            caseDetailsInDatabase,
-            caseDetailsAfterCallbackWithoutHashes,
-            caseEventDefinition,
-            newState,
-            timeNow
-        );
-        saveAuditEventForCaseDetails(
-            aboutToSubmitCallbackResponse,
-            event,
-            caseEventDefinition,
-            savedCaseDetails,
-            caseTypeDefinition,
-            timeNow,
-            oldState,
-            null,
-            null,
-            SecurityClassification.PUBLIC
-        );
+        CaseDetails finalCaseDetails;
+        if (resolver.isDecentralised(caseDetailsInDatabase)) {
+            // Documents must be attached before event is committed.
+            // When decentralised we must do the attach before the event is submitted.
+            caseDocumentService.attachCaseDocuments(
+                caseDetails.getReferenceAsString(),
+                caseDetails.getCaseTypeId(),
+                caseDetails.getJurisdiction(),
+                documentHashes
+            );
 
-        caseDocumentService.attachCaseDocuments(
-            caseDetails.getReferenceAsString(),
-            caseDetails.getCaseTypeId(),
-            caseDetails.getJurisdiction(),
-            documentHashes
-        );
+            finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(event, caseEventDefinition,
+                caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.of(caseDetailsInDatabase),
+                Optional.empty());
+        } else {
+            finalCaseDetails = saveCaseDetails(caseDetailsInDatabase,
+                caseDetailsAfterCallbackWithoutHashes, caseEventDefinition, newState, timeNow);
+            saveAuditEventForCaseDetails(
+                aboutToSubmitCallbackResponse,
+                event,
+                caseEventDefinition,
+                finalCaseDetails,
+                caseTypeDefinition,
+                timeNow,
+                oldState,
+                Optional.empty(),
+                SecurityClassification.PUBLIC
+            );
+
+            // Documents must be attached before event is committed.
+            // When centralised this will be upon method return when the transaction commits.
+            caseDocumentService.attachCaseDocuments(
+                caseDetails.getReferenceAsString(),
+                caseDetails.getCaseTypeId(),
+                caseDetails.getJurisdiction(),
+                documentHashes
+            );
+        }
+
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
-            .savedCaseDetails(savedCaseDetails)
+            .savedCaseDetails(finalCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
     }
@@ -394,6 +424,15 @@ public class CreateCaseEventService {
         return caseDetailsRepository.findByReference(caseReference)
             .orElseThrow(() ->
                 new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
+    }
+
+    private Optional<IdamUser> getOnBehalfOfUser(String onBehalfOfId, String onBehalfOfToken) {
+        if (!StringUtils.isEmpty(onBehalfOfToken)) {
+            return Optional.of(userRepository.getUser(onBehalfOfToken));
+        } else if (!StringUtils.isEmpty(onBehalfOfId)) {
+            return Optional.of(userRepository.getUserByUserId(onBehalfOfId));
+        }
+        return Optional.empty();
     }
 
     private CaseDetails saveCaseDetails(final CaseDetails caseDetailsBefore,
@@ -472,8 +511,7 @@ public class CreateCaseEventService {
                                               final CaseTypeDefinition caseTypeDefinition,
                                               final LocalDateTime timeNow,
                                               final String oldState,
-                                              final String onBehalfOfUserToken,
-                                              final String onBehalfOfId,
+                                              final Optional<IdamUser> onBehalfOf,
                                               final SecurityClassification securityClassification) {
         final CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition,
             caseDetails.getState());
@@ -492,7 +530,7 @@ public class CreateCaseEventService {
         auditEvent.setSecurityClassification(securityClassification);
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
-        saveUserDetails(onBehalfOfUserToken, onBehalfOfId, auditEvent);
+        saveUserDetails(onBehalfOf, auditEvent);
 
         caseAuditEventRepository.set(auditEvent);
         messageService.handleMessage(MessageContext.builder()
@@ -503,20 +541,20 @@ public class CreateCaseEventService {
             .build());
     }
 
-    private void saveUserDetails(String onBehalfOfUserToken, String onBehalfOfId, AuditEvent auditEvent) {
-        boolean onBehalfOfUserTokenExists = !StringUtils.isEmpty(onBehalfOfUserToken);
-        boolean onBehalfOfIdExists = !StringUtils.isEmpty(onBehalfOfId);
-        IdamUser user = onBehalfOfUserTokenExists
-            ? userRepository.getUser(onBehalfOfUserToken)
-            : onBehalfOfIdExists ? userRepository.getUserByUserId(onBehalfOfId) : userRepository.getUser();
-        auditEvent.setUserId(user.getId());
-        auditEvent.setUserLastName(user.getSurname());
-        auditEvent.setUserFirstName(user.getForename());
-        if (onBehalfOfUserTokenExists || onBehalfOfIdExists) {
-            user = userRepository.getUser();
-            auditEvent.setProxiedBy(user.getId());
-            auditEvent.setProxiedByLastName(user.getSurname());
-            auditEvent.setProxiedByFirstName(user.getForename());
+    private void saveUserDetails(Optional<IdamUser> onBehalfOf, AuditEvent auditEvent) {
+        var idamUser = userRepository.getUser();
+        if (onBehalfOf.isEmpty()) {
+            auditEvent.setUserId(idamUser.getId());
+            auditEvent.setUserLastName(idamUser.getSurname());
+            auditEvent.setUserFirstName(idamUser.getForename());
+        } else {
+            var onBehalfOfUser = onBehalfOf.orElse(null);
+            auditEvent.setUserId(onBehalfOfUser.getId());
+            auditEvent.setUserLastName(onBehalfOfUser.getSurname());
+            auditEvent.setUserFirstName(onBehalfOfUser.getForename());
+            auditEvent.setProxiedBy(idamUser.getId());
+            auditEvent.setProxiedByLastName(idamUser.getSurname());
+            auditEvent.setProxiedByFirstName(idamUser.getForename());
         }
     }
 
