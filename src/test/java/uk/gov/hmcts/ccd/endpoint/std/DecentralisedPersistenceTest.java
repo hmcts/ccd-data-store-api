@@ -3,12 +3,13 @@ package uk.gov.hmcts.ccd.endpoint.std;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Assertions;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -16,7 +17,9 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -33,9 +36,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.auditlog.AuditInterceptor.REQUEST_ID;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.v2.V2.EXPERIMENTAL_HEADER;
 
 /**
  * Integration test for decentralised data persistence feature.
@@ -44,7 +51,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 @TestPropertySource(properties = {
     "ccd.decentralised.case-type-service-urls[PCS]=http://localhost:${wiremock.server.port}"
 })
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DecentralisedPersistenceTest extends WireMockBaseTest {
 
     private static final String DECENTRALISED_CASE_TYPE_ID = "PCS"; // Matches test property
@@ -52,7 +58,6 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
     private static final String USER_ID = "123";
     private static final String CREATE_CASE_EVENT_ID = "CREATE-CASE";
     private static final String SERVICE_PERSISTENCE_API_PATH = "/ccd-persistence/cases";
-    private static final String CASE_DETAILS_FIELD = "case_details";
     private static final String CASE_DATA_FIELD = "case_data";
 
     private static final String DATA_JSON_STRING = """
@@ -168,7 +173,39 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
         assertEquals("Case pointer should have empty data", Map.of(), casePointer.getData());
         assertEquals("Case pointer should be in empty state", "", casePointer.getState());
         assertNotNull("Case pointer should have a reference", casePointer.getReference());
+
+        final MvcResult result = mockMvc
+            .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION_ID + "/case-types/" + DECENTRALISED_CASE_TYPE_ID
+                + "/cases/" + createdCaseReference)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final CaseDetails caseDetails =
+            mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
+
+        System.out.println(caseDetails);
     }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_shell_case.sql"})
+    public void testGetCase() throws Exception {
+        String caseId = "1504259907353550";
+        final String URL = "/cases/" + caseId;
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+            .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(REQUEST_ID, "12335")
+            .contentType(JSON_CONTENT_TYPE)
+        ).andReturn();
+
+        Assertions.assertEquals(200, mvcResult.getResponse().getStatus(), mvcResult.getResponse().getContentAsString());
+        String content = mvcResult.getResponse().getContentAsString();
+        Assertions.assertNotNull(content, "Content Should not be null");
+        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+
+    }
+
 
     private String getTestDefinition(int port, String caseTypeId) {
         return CallbackTestData.getTestDefinition(port).replace("CallbackCase", caseTypeId);

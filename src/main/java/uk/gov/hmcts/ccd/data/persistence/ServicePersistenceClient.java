@@ -59,8 +59,8 @@ public class ServicePersistenceClient {
      * @throws ServiceException if the remote service returns mismatched case identity information.
      */
     public CaseDetails createEvent(DecentralisedCaseEvent caseEvent) {
-        var trustedCaseDetails = caseEvent.getCaseDetails();
-        var uri = resolver.resolveUriOrThrow(trustedCaseDetails);
+        var casePointer = caseEvent.getCaseDetails();
+        var uri = resolver.resolveUriOrThrow(casePointer);
         UUID idempotencyKey = idempotencyKeyHolder.getKey();
 
         if (idempotencyKey == null) {
@@ -80,10 +80,10 @@ public class ServicePersistenceClient {
 
         var returnedCaseDetails = response.getCaseDetails();
 
-        validateCaseDetails(trustedCaseDetails, returnedCaseDetails);
+        validateCaseDetails(casePointer, returnedCaseDetails);
 
         // The decentralised service doesn't know about our internal ID. We enrich the object here for internal use.
-        returnedCaseDetails.setId(trustedCaseDetails.getId());
+        returnedCaseDetails.setId(casePointer.getId());
         return returnedCaseDetails;
     }
 
