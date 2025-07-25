@@ -38,26 +38,26 @@ interface ServicePersistenceAPI {
      * </ul>
      *
      */
-    @PostMapping(value = "/ccd/cases", consumes = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(value = "/ccd-persistence/cases", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     DecentralisedSubmitEventResponse submitEvent(URI baseURI,
                                          @RequestHeader("Idempotency-Key") String idempotencyKey,
                                          @RequestBody DecentralisedCaseEvent caseEvent);
 
-    @PostMapping(value = "/ccd/cases/{case-ref}/supplementary-data", consumes = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(value = "/ccd-persistence/cases/{case-ref}/supplementary-data", consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     DecentralisedUpdateSupplementaryDataResponse updateSupplementaryData(
         URI baseURI,
         @PathVariable("case-ref") Long caseRef,
         SupplementaryDataUpdateRequest supplementaryData);
 
-    @GetMapping(value = "/ccd/cases")
+    @GetMapping(value = "/ccd-persistence/cases")
     List<DecentralisedCaseDetails> getCases(URI baseURI, @RequestParam("case-refs") List<Long> caseRefs);
 
-    @GetMapping(value = "/ccd/cases/{case-ref}/history")
+    @GetMapping(value = "/ccd-persistence/cases/{case-ref}/history")
     List<DecentralisedAuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") Long caseReference);
 
-    @GetMapping(value = "/ccd/cases/{case-ref}/history/{event-id}")
+    @GetMapping(value = "/ccd-persistence/cases/{case-ref}/history/{event-id}")
     DecentralisedAuditEvent getCaseHistoryEvent(URI baseURI,
                                    @PathVariable("case-ref") Long caseReference,
                                    @PathVariable("event-id") Long eventId);

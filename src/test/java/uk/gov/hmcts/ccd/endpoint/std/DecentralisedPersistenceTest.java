@@ -52,23 +52,11 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
     private static final String JURISDICTION_ID = "TEST";
     private static final String USER_ID = "123";
     private static final String CREATE_CASE_EVENT_ID = "CREATE-CASE";
-    private static final String SERVICE_PERSISTENCE_API_PATH = "/ccd/cases";
+    private static final String SERVICE_PERSISTENCE_API_PATH = "/ccd-persistence/cases";
     private static final String CASE_DETAILS_FIELD = "case_details";
     private static final String CASE_DATA_FIELD = "case_data";
 
     private static final String DATA_JSON_STRING = """
-        {
-          "PersonFirstName": "ccd-First Name",
-          "PersonLastName": "Last Name",
-          "PersonAddress": {
-            "AddressLine1": "Address Line 1",
-            "AddressLine2": "Address Line 2"
-          }
-        }
-        """;
-
-    // Expected response data should only include fields with read permissions
-    private static final String EXPECTED_RESPONSE_DATA_JSON_STRING = """
         {
           "PersonLastName": "Last Name",
           "PersonAddress": {
@@ -154,13 +142,6 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
 
         // Extract the case reference from the response - it's in the 'id' field at the top level
         JsonNode referenceNode = responseJson.get("id");
-        if (referenceNode == null) {
-            // Fallback: try to find it in case_details.reference if the response structure is different
-            JsonNode caseDetailsNode = responseJson.get(CASE_DETAILS_FIELD);
-            if (caseDetailsNode != null) {
-                referenceNode = caseDetailsNode.get("reference");
-            }
-        }
         assertNotNull("Case reference should be present in response", referenceNode);
         createdCaseReference = referenceNode.asLong();
         assertNotNull("Case reference should be present in response", createdCaseReference);
@@ -168,7 +149,7 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
 
         // AND: The response should contain the case data from the decentralised service
         final var actualResponseData = extractCaseDataFromResponse(mvcResult);
-        final var expectedResponseDataNode = mapper.readTree(EXPECTED_RESPONSE_DATA_JSON_STRING);
+        final var expectedResponseDataNode = mapper.readTree(DATA_JSON_STRING);
         final var expectedResponseData = JacksonUtils.convertJsonNode(expectedResponseDataNode);
 
         assertThat("Response should contain case data from decentralised service (only readable fields)",
