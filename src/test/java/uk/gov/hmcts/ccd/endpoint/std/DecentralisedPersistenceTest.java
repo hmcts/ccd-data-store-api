@@ -217,6 +217,36 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
 
     }
 
+    @Test
+    public void shouldReturn409ConflictWhenServicePersistenceAPIReturnsConflict() throws Exception {
+        // GIVEN: A decentralised case type with a configured service URL
+        final var url = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases",
+            USER_ID, JURISDICTION_ID, DECENTRALISED_CASE_TYPE_ID);
+
+        final var caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().withEventId(CREATE_CASE_EVENT_ID).build());
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+        caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID,
+            DECENTRALISED_CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
+
+        // WHEN: We stub the ServicePersistenceAPI to return a 409 Conflict response
+        stubFor(WireMock.post(urlEqualTo(SERVICE_PERSISTENCE_API_PATH))
+            .withHeader("Idempotency-Key", matching(".*"))
+            .willReturn(aResponse()
+                .withStatus(409)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"message\": \"Case already exists\"}")));
+
+        // AND: We attempt to create a case via CCD's API
+        final var mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andReturn();
+
+        // THEN: The request should return a 409 Conflict status
+        assertEquals("Expected 409 Conflict response", 409, mvcResult.getResponse().getStatus());
+    }
+
 
     private String getTestDefinition(int port, String caseTypeId) {
         return CallbackTestData.getTestDefinition(port).replace("CallbackCase", caseTypeId);
