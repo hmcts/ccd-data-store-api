@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
@@ -35,6 +36,8 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
 import java.io.IOException;
@@ -55,6 +58,7 @@ import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
@@ -132,6 +136,12 @@ class SubmitCaseTransactionTest {
     private ApplicationParams applicationParams;
     private CaseAccessGroupUtils caseAccessGroupUtils;
     private ObjectMapper objectMapper;
+    @Mock
+    private PersistenceStrategyResolver resolver;
+    @Mock
+    private DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
+    @Mock
+    private CasePointerCreator casePointerCreator;
 
     @BeforeEach
     void setup() {
@@ -153,8 +163,10 @@ class SubmitCaseTransactionTest {
             caseDocumentService,
             applicationParams,
             caseAccessGroupUtils,
-            caseDocumentTimestampService
-
+            caseDocumentTimestampService,
+            decentralisedSubmitCaseTransaction,
+            resolver,
+            casePointerCreator
         );
 
         idamUser = buildIdamUser();
@@ -327,6 +339,85 @@ class SubmitCaseTransactionTest {
             () -> assertAuditEventProxyByUser(auditEventCaptor.getValue()),
             () -> verify(messageService).handleMessage(messageCandidateCaptor.capture())
         );
+    }
+
+    @Test
+    @DisplayName("should use decentralised service when resolver indicates decentralised case")
+    void shouldUseDecentralisedServiceWhenDecentralised() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(savedCaseDetails).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails, 
+                Optional.empty(), Optional.empty());
+
+        final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            null);
+
+        assertAll(
+            () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
+            () -> verify(casePointerCreator).persistCasePointer(caseDetails),
+            () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
+                event, caseEventDefinition, caseTypeDefinition, caseDetails, 
+                Optional.empty(), Optional.empty()),
+            () -> verify(caseDetailsRepository, never()).set(caseDetails),
+            () -> verify(caseAuditEventRepository, never()).set(isNotNull())
+        );
+    }
+
+    @Test
+    @DisplayName("should use decentralised service when resolver indicates decentralised case with onBehalfOfUser")
+    void shouldUseDecentralisedServiceWhenDecentralisedWithOnBehalfOfUser() {
+        IdamUser onBehalfOfUser = buildOnBehalfOfUser();
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(savedCaseDetails).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails, 
+                Optional.empty(), Optional.of(onBehalfOfUser));
+
+        final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            onBehalfOfUser);
+
+        assertAll(
+            () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
+            () -> verify(casePointerCreator).persistCasePointer(caseDetails),
+            () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
+                event, caseEventDefinition, caseTypeDefinition, caseDetails, 
+                Optional.empty(), Optional.of(onBehalfOfUser)),
+            () -> verify(caseDetailsRepository, never()).set(caseDetails),
+            () -> verify(caseAuditEventRepository, never()).set(isNotNull())
+        );
+    }
+
+    @Test
+    @DisplayName("should still grant access and attach documents for decentralised cases")
+    void shouldGrantAccessAndAttachDocumentsForDecentralisedCases() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(savedCaseDetails).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails, 
+                Optional.empty(), Optional.empty());
+        doReturn("12345").when(caseDetails).getReferenceAsString();
+        doReturn("TestType").when(caseDetails).getCaseTypeId();
+        doReturn("TestJurisdiction").when(caseDetails).getJurisdiction();
+
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            null);
+
+        verify(caseDataAccessControl).grantAccess(savedCaseDetails, IDAM_ID);
+        verify(caseDocumentService).attachCaseDocuments(
+            anyString(), anyString(), anyString(), anyList());
     }
 
     private void assertAuditEventProxyByUser(final AuditEvent auditEvent) {

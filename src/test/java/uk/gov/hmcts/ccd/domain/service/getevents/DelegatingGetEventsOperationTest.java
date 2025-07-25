@@ -8,8 +8,9 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-class DefaultGetEventsOperationTest {
+class DelegatingGetEventsOperationTest {
 
     private static final Long CASE_ID = 123L;
     private static final String JURISDICTION_ID = "Probate";
@@ -36,11 +37,15 @@ class DefaultGetEventsOperationTest {
     @Mock
     private CaseAuditEventRepository auditEventRepository;
     @Mock
-    private GetCaseOperation getCaseOperation;
+    private CreatorGetCaseOperation getCaseOperation;
     @Mock
     private UIDService uidService;
+    @Mock
+    private PersistenceStrategyResolver resolver;
+    @Mock
+    private DecentralisedAuditEventLoader decentralisedAuditEventLoader;
 
-    private DefaultGetEventsOperation listEventsOperation;
+    private DelegatingGetEventsOperation listEventsOperation;
     private CaseDetails caseDetails;
     private AuditEvent event;
 
@@ -53,7 +58,8 @@ class DefaultGetEventsOperationTest {
 
         doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
 
-        listEventsOperation = new DefaultGetEventsOperation(auditEventRepository, getCaseOperation, uidService);
+        listEventsOperation = new DelegatingGetEventsOperation(resolver, decentralisedAuditEventLoader,
+            new LocalAuditEventLoader(auditEventRepository), getCaseOperation, uidService);
         event = new AuditEvent();
     }
 
@@ -122,7 +128,7 @@ class DefaultGetEventsOperationTest {
         doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
 
         assertThrows(BadRequestException.class, () ->
-                listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
+            listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
     }
 
     @Test
@@ -132,7 +138,7 @@ class DefaultGetEventsOperationTest {
         doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
         assertThrows(ResourceNotFoundException.class, () ->
-                listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
+            listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
     }
 
     @Test
@@ -156,6 +162,6 @@ class DefaultGetEventsOperationTest {
         doReturn(Optional.empty()).when(auditEventRepository).findByEventId(EVENT_ID);
 
         assertThrows(ResourceNotFoundException.class, () ->
-                listEventsOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID));
+            listEventsOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID));
     }
 }
