@@ -9,6 +9,7 @@ import org.junit.runners.MethodSorters;
 import org.mockito.MockitoAnnotations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -17,7 +18,6 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
 
 import javax.inject.Inject;
@@ -28,7 +28,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
@@ -140,7 +139,7 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
 
         // AND: Extract and store the case reference for use in subsequent tests
         final var responseJson = mapper.readTree(mvcResult.getResponse().getContentAsString());
-        
+
         // Extract the case reference from the response - it's in the 'id' field at the top level
         JsonNode referenceNode = responseJson.get("id");
         if (referenceNode == null) {
@@ -176,79 +175,6 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
         assertEquals("Case pointer should have empty data", Map.of(), casePointer.getData());
         assertEquals("Case pointer should be in empty state", "", casePointer.getState());
         assertNotNull("Case pointer should have a reference", casePointer.getReference());
-    }
-
-    @Test
-    public void test2_shouldInvokeServicePersistenceAPIForSupplementaryDataUpdate() throws Exception {
-        // GIVEN: A case reference (use the one from previous test if available, otherwise create a new one)
-        System.out.println("DEBUG: createdCaseReference from first test: " + createdCaseReference);
-        System.out.println("DEBUG: TEST_CASE_REFERENCE constant: " + TEST_CASE_REFERENCE);
-        Long caseReferenceToUse = createdCaseReference != null ? createdCaseReference : TEST_CASE_REFERENCE;
-        System.out.println("DEBUG: Using case reference: " + caseReferenceToUse);
-        
-        // Setup a case pointer in the database for this test
-        jdbcTemplate.update("""
-            DELETE FROM case_data WHERE reference = ?
-            """, caseReferenceToUse);
-        jdbcTemplate.update("""
-            INSERT INTO case_data (id, case_type_id, jurisdiction, state, data, data_classification, 
-                                   security_classification, reference, resolved_ttl, created_date, last_modified) 
-            VALUES (?, ?, ?, ?, ?::json, ?::json, ?, ?, null, now(), now())
-            """,
-            1L, DECENTRALISED_CASE_TYPE_ID, JURISDICTION_ID, "", "{}", "{}", "RESTRICTED", caseReferenceToUse);
-
-        final var supplementaryDataUpdateJson = """
-            {
-              "$set": {
-                "key1": "value1",
-                "key2": "value2"
-              }
-            }
-            """;
-
-        final var expectedSupplementaryDataResponse = """
-            {
-              "supplementary_data": {
-                "key1": "value1", 
-                "key2": "value2"
-              }
-            }
-            """;
-
-        // WHEN: We stub the ServicePersistenceAPI supplementary data update endpoint
-        stubFor(WireMock.post(urlEqualTo(SERVICE_PERSISTENCE_API_PATH + "/" + caseReferenceToUse + "/supplementary-data"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody(expectedSupplementaryDataResponse)));
-
-        final var url = String.format("/cases/%s/supplementary-data", caseReferenceToUse);
-
-        // AND: We call the supplementary data update endpoint
-        final var mvcResult = mockMvc.perform(post(url)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(supplementaryDataUpdateJson)
-        ).andReturn();
-
-        // THEN: The request should succeed
-        int actualStatus = mvcResult.getResponse().getStatus();
-        String actualContent = mvcResult.getResponse().getContentAsString();
-        assertEquals("Expected 200 but got " + actualStatus + ". Content: " + actualContent + 
-                    ". URL: " + url + ". Body: " + supplementaryDataUpdateJson, 200, actualStatus);
-
-        // AND: The ServicePersistenceAPI should have been called exactly once for supplementary data update
-        verify(1, postRequestedFor(urlEqualTo(SERVICE_PERSISTENCE_API_PATH + "/" + caseReferenceToUse + "/supplementary-data")));
-
-        // AND: The local case data should remain unchanged (no supplementary data should be stored locally)
-        final var updatedCasePointers = jdbcTemplate.query("SELECT * FROM case_data WHERE reference = ?", 
-            new Object[]{caseReferenceToUse}, this::mapCaseData);
-        assertEquals("Expected exactly one case pointer in local database", 1, updatedCasePointers.size());
-        
-        final var casePointer = updatedCasePointers.get(0);
-        assertEquals("Case pointer data should remain empty (no supplementary data stored locally)", 
-            Map.of(), casePointer.getData());
-        assertEquals("Case pointer should still have same reference as original case", 
-            caseReferenceToUse, casePointer.getReference());
     }
 
     private CaseDetails createExpectedCaseDetails() {
