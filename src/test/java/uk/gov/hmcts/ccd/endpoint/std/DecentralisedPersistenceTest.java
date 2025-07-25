@@ -9,7 +9,6 @@ import org.junit.runners.MethodSorters;
 import org.mockito.MockitoAnnotations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -36,7 +35,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
@@ -57,7 +55,6 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
     private static final String SERVICE_PERSISTENCE_API_PATH = "/ccd/cases";
     private static final String CASE_DETAILS_FIELD = "case_details";
     private static final String CASE_DATA_FIELD = "case_data";
-    private static final Long TEST_CASE_REFERENCE = 1234567890123456L;
 
     private static final String DATA_JSON_STRING = """
         {
@@ -115,18 +112,33 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID,
             DECENTRALISED_CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
-        final var expectedCaseDetails = createExpectedCaseDetails();
-        final var decentralisedResponseJson = """
-            {"%s": %s}
-            """.formatted(CASE_DETAILS_FIELD, mapper.writeValueAsString(expectedCaseDetails));
+        final String responseBodyTemplate = """
+            {
+                "case_details": {
+                    "id": {{jsonPath request.body '$.case_details.id'}},
+                    "case_type_id": "{{jsonPath request.body '$.case_details.case_type_id'}}",
+                    "jurisdiction": "{{jsonPath request.body '$.case_details.jurisdiction'}}",
+                    "state": "{{jsonPath request.body '$.case_details.state'}}",
+                    "security_classification": "PUBLIC",
+                    "case_data": {
+                      "PersonLastName": "Last Name",
+                      "PersonAddress": {
+                        "AddressLine1": "Address Line 1",
+                        "AddressLine2": "Address Line 2"
+                      }
+                    }
+                }
+            }
+            """;
 
-        // WHEN: We stub the ServicePersistenceAPI to return a successful response
+        // WHEN: We stub the ServicePersistenceAPI to return a successful response using a dynamic template
         stubFor(WireMock.post(urlEqualTo(SERVICE_PERSISTENCE_API_PATH))
             .withHeader("Idempotency-Key", matching(".*"))
             .willReturn(aResponse()
                 .withStatus(201)
                 .withHeader("Content-Type", "application/json")
-                .withBody(decentralisedResponseJson)));
+                .withBody(responseBodyTemplate)
+                .withTransformers("response-template"))); // Enable response templating
 
         // AND: We create a case via CCD's API
         final var mvcResult = mockMvc.perform(post(url)
@@ -175,17 +187,6 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
         assertEquals("Case pointer should have empty data", Map.of(), casePointer.getData());
         assertEquals("Case pointer should be in empty state", "", casePointer.getState());
         assertNotNull("Case pointer should have a reference", casePointer.getReference());
-    }
-
-    private CaseDetails createExpectedCaseDetails() {
-        final var caseDetails = new CaseDetails();
-        caseDetails.setCaseTypeId(DECENTRALISED_CASE_TYPE_ID);
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setReference(TEST_CASE_REFERENCE);
-        caseDetails.setState("CaseCreated");
-        caseDetails.setData(JacksonUtils.convertValue(data));
-        caseDetails.setSecurityClassification(PUBLIC);
-        return caseDetails;
     }
 
     private String getTestDefinition(int port, String caseTypeId) {
