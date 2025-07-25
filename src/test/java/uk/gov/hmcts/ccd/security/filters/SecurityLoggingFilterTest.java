@@ -16,8 +16,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 

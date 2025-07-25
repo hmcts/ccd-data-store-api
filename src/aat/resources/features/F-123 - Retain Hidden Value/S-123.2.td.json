@@ -1361,6 +1361,8 @@
         "label" : "Retain Hidden Value Page",
         "order" : 1,
         "wizard_page_fields" : [ {
+          "__ordering__": "UNORDERED"
+        },{
           "case_field_id" : "NumberField",
           "order" : 1,
           "page_column_no" : null,

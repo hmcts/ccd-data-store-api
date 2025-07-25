@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +10,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.documentdata.DocumentDataRequest;
 import uk.gov.hmcts.ccd.domain.model.casefileview.CategoriesAndDocuments;
@@ -48,20 +48,18 @@ public class CaseFileViewController extends AbstractCaseController {
         path = "/categoriesAndDocuments/{caseRef}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 204,
-            message = "Success"
-            ),
-        @ApiResponse(
-            code = 400,
-            message = V2.Error.CASE_ID_INVALID
-            ),
-        @ApiResponse(
-            code = 404,
-            message = V2.Error.CASE_NOT_FOUND
-            )
-    })
+    @ApiResponse(
+        responseCode = "204",
+        description = "Success"
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = V2.Error.CASE_ID_INVALID
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = V2.Error.CASE_NOT_FOUND
+    )
     @LogAudit(operationType = CATEGORIES_AND_DOCUMENTS_ACCESSED, caseId = "#caseRef")
     public ResponseEntity<CategoriesAndDocuments> getCategoriesAndDocuments(
         @PathVariable("caseRef") final String caseRef
@@ -82,9 +80,9 @@ public class CaseFileViewController extends AbstractCaseController {
         value = "/documentData/caseref/{caseRef}",
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiOperation(value = "Document Data Endpoint", notes = "Document Data Endpoint")
+    @Operation(summary = "Document Data Endpoint", description = "Document Data Endpoint")
     public ResponseEntity<CategoriesAndDocuments> updateDocumentField(
-        @ApiParam(value = "Case Reference", required = true)
+        @Parameter(name = "Case Reference", required = true)
         @PathVariable("caseRef") final String caseRef,
         @RequestBody final DocumentDataRequest request
     ) {
