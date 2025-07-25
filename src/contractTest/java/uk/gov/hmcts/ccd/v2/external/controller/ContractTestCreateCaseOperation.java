@@ -65,7 +65,8 @@ public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation 
         super(userRepository, caseDefinitionRepository, eventTriggerService, eventTokenService, caseDataService,
             submitCaseTransaction, caseSanitiser, caseTypeService, callbackInvoker, validateCaseFieldsOperation,
             casePostStateService, draftGateway, caseDataIssueLogger, globalSearchProcessorService,
-            supplementaryDataUpdateOperation, supplementaryDataValidator, caseLinkService, timeToLiveService, idempotencyKeyHolder);
+            supplementaryDataUpdateOperation, supplementaryDataValidator, caseLinkService, timeToLiveService,
+            idempotencyKeyHolder);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
     }
 
