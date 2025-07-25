@@ -1,13 +1,16 @@
 package uk.gov.hmcts.ccd;
 
-import java.util.concurrent.TimeUnit;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.JsonpMapper;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
-import io.searchbox.client.config.HttpClientConfig;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
+import org.apache.http.HttpHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -20,29 +23,35 @@ public class ElasticSearchConfiguration {
 
     private final ApplicationParams applicationParams;
 
+    @Bean(name = "DefaultObjectMapper")
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
+    @Bean
+    public JsonpMapper jsonpMapper(ObjectMapper objectMapper) {
+        return new JacksonJsonpMapper(objectMapper);
+    }
+
     @Autowired
     public ElasticSearchConfiguration(ApplicationParams applicationParams) {
         this.applicationParams = applicationParams;
     }
 
     @Bean
-    public JestClient jestClient() {
-
-        JestClientFactory factory = new JestClientFactory();
-        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-        factory.setHttpClientConfig(new HttpClientConfig.Builder(applicationParams.getElasticSearchDataHosts())
-                                        .multiThreaded(true)
-                                        .maxConnectionIdleTime(15, TimeUnit.SECONDS)
-                                        .connTimeout(4000)
-                                        .readTimeout(applicationParams.getElasticSearchRequestTimeout())
-                                        .gson(gson)
-                                        .discoveryEnabled(applicationParams.isElasticsearchNodeDiscoveryEnabled())
-                                        .discoveryFrequency(
-                                            applicationParams.getElasticsearchNodeDiscoveryFrequencyMillis(),
-                                            TimeUnit.MILLISECONDS)
-                                        .discoveryFilter(applicationParams.getElasticsearchNodeDiscoveryFilter())
-                                        .build());
-        return factory.getObject();
+    public ElasticsearchClient elasticsearchClient() {
+        //TODO: Replace with applicationParams.getElasticsearchHost() and port
+        RestClientBuilder builder = RestClient.builder(
+            new HttpHost("localhost", 9200))
+                .setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder
+                    .setConnectTimeout(5000)
+                    .setSocketTimeout(60000))
+            .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
+                .setDefaultIOReactorConfig(IOReactorConfig.custom().setSoKeepAlive(true).build())
+            );
+        RestClient restClient = builder.build();
+        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        return new ElasticsearchClient(transport);
     }
 
 }
