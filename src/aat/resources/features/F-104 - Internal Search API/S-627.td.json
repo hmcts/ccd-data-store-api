@@ -103,10 +103,12 @@
         {
           "_extends_": "104_Base_Case_Fields_expected",
           "fields": {
-            "FixedListField": "VALUE1"
+            "FixedListField": "VALUE1",
+            "EmailField" : "fuctional@test.com"
           },
           "fields_formatted": {
-            "FixedListField": "VALUE1"
+            "FixedListField": "VALUE1",
+            "EmailField" : "fuctional@test.com"
           }
         }
       ],
