@@ -51,7 +51,7 @@ class ElasticsearchUserCaseAccessFilterTest {
     @Test
     void shouldCreateTermsQueryBuilder() {
         String caseTypeId = "caseType";
-        Long caseId = 100L;
+        String caseId = "100L";
         when(caseAccessService.getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition))
             .thenReturn(Optional.of(singletonList(caseId)));
         when(caseDefinitionRepository.getCaseType(caseTypeId))
