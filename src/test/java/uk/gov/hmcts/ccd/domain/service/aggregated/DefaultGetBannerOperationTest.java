@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.Collections;
 import java.util.List;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +28,7 @@ class DefaultGetBannerOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -41,7 +42,7 @@ class DefaultGetBannerOperationTest {
     }
 
     private BannersResult createBannersResultWithEmptyCollection() {
-        BannersResult bannersResult = new BannersResult(Lists.emptyList());
+        BannersResult bannersResult = new BannersResult(Collections.emptyList());
         return bannersResult;
     }
 

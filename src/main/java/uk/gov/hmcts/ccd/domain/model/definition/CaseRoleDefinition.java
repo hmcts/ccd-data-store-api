@@ -3,11 +3,11 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.ToString;
 
-@ApiModel(description = "")
+@Schema
 @ToString
 public class CaseRoleDefinition implements Serializable {
 
@@ -15,7 +15,7 @@ public class CaseRoleDefinition implements Serializable {
     private String name = null;
     private String description = null;
 
-    @ApiModelProperty(required = true, value = "")
+    @Schema(required = true)
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -25,7 +25,7 @@ public class CaseRoleDefinition implements Serializable {
         this.id = id;
     }
 
-    @ApiModelProperty(required = true, value = "")
+    @Schema(required = true)
     @JsonProperty("name")
     public String getName() {
         return name;
@@ -35,7 +35,7 @@ public class CaseRoleDefinition implements Serializable {
         this.name = name;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("description")
     public String getDescription() {
         return description;
