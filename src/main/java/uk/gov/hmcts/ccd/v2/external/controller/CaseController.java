@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -8,6 +9,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -65,6 +69,9 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 @RequestMapping(path = "/")
 @Validated
 public class CaseController {
+    private static final Logger LOG = LoggerFactory.getLogger(CaseController.class);
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
+
     private final GetCaseOperation getCaseOperation;
     private final CreateEventOperation createEventOperation;
     private final CreateCaseOperation createCaseOperation;
@@ -74,6 +81,18 @@ public class CaseController {
     private final SupplementaryDataUpdateRequestValidator requestValidator;
     private final CaseLinkRetrievalService caseLinkRetrievalService;
     private final GetLinkedCasesResponseCreator getLinkedCasesResponseCreator;
+
+    private void jclog(String message) {
+        LOG.info("| JCDEBUG: Info: CaseController: {}", message);
+    }
+
+    private String printObject(final Object object) {
+        try {
+            return MAPPER.writeValueAsString(object);
+        } catch (Exception e) {
+            return "ERROR_WRITING_OBJECT";
+        }
+    }
 
     @Autowired
     public CaseController(
@@ -248,6 +267,7 @@ public class CaseController {
                                                         + "}"
                                                         + "\n```", required = true)
                                                     @RequestBody final CaseDataContent content) {
+        jclog("createEvent() content = " +  printObject(content));
         return createCaseEvent(caseId, content);
     }
 
