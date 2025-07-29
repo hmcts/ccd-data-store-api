@@ -39,6 +39,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -59,6 +60,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -214,6 +216,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     new PortBinding(Ports.Binding.bindPort(httpPortValue), new ExposedPort(9200))
                 )
             ));
+
+        String regex = ".*(\"message\":\\s?\"started\".*|] started\n$)";
+        container.setWaitStrategy((new LogMessageWaitStrategy())
+            .withRegEx(regex)
+            .withStartupTimeout(Duration.ofMinutes(3)));
+
         container.start();
         log.info("Elastic search started.");
         ElasticsearchITSetup configurer = new ElasticsearchITSetup(httpPortValue);
@@ -1125,7 +1133,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
-            void shouldNotReturnCaseFieldsWithHigherSC() throws Exception {
+            void shouldReturnCaseFieldsWithHigherSC() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
@@ -1133,8 +1141,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                    () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD), is(false)), // RESTRICTED
-                    () -> assertThat(data.containsKey(PHONE_FIELD), is(false)), // PRIVATE
+                    () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD), is(true)), // RESTRICTED
+                    () -> assertThat(data.containsKey(PHONE_FIELD), is(true)), // PRIVATE
                     () -> assertThat(data.containsKey(COLLECTION_FIELD), is(true)) // PUBLIC
                 );
             }
@@ -1205,7 +1213,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
-            void shouldNotReturnComplexNestedFieldsWithHigherSC() throws Exception {
+            void shouldReturnComplexNestedFieldsRegardlessOfSC() throws Exception {
                 if (applicationParams.getEnableAttributeBasedAccessControl()) {
                     String userId = "123";
                     String roleAssignmentResponseJson = roleAssignmentResponseJson(
@@ -1224,8 +1232,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
-                        .has(NESTED_COLLECTION_TEXT_FIELD), is(false)), // RESTRICTED
-                    () -> assertThat(data.get(COMPLEX_FIELD).has(POST_CODE_FIELD), is(false)), // PRIVATE
+                        .has(NESTED_COLLECTION_TEXT_FIELD), is(true)), // RESTRICTED
+                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
+                        .has(NESTED_NUMBER_FIELD), is(true)), // PRIVATE
                     () -> assertThat(data.get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD), is(true)) // PUBLIC
                 );
             }

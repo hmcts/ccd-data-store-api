@@ -31,7 +31,7 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
     private final CaseDataAccessControl caseDataAccessControl;
 
     public AuthorisedGetCriteriaOperation(
-        @Qualifier(ClassifiedGetCriteriaOperation.QUALIFIER) final GetCriteriaOperation getCriteriaOperation,
+        @Qualifier(DefaultGetCriteriaOperation.QUALIFIER) final GetCriteriaOperation getCriteriaOperation,
         @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
         CaseDataAccessControl caseDataAccessControl) {
         this.getCriteriaOperation = getCriteriaOperation;
