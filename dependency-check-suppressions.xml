@@ -20,5 +20,8 @@
     <cve>CVE-2025-49124</cve>
     <cve>CVE-2025-49125</cve>
     <cve>CVE-2025-48976</cve>
+    <cve>CVE-2025-52434</cve>
+    <cve>CVE-2025-52520</cve>
+    <cve>CVE-2025-53506</cve>
   </suppress>
 </suppressions>
