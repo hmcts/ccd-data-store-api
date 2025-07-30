@@ -25,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
@@ -42,6 +43,9 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 public class CallbackService {
+
+    private final JcLogger jclogger = new JcLogger("CallbackService", true);
+
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
     private static final String WILDCARD = "*";
     public static final String CLIENT_CONTEXT = "Client-Context";
@@ -52,20 +56,6 @@ public class CallbackService {
     private final AppInsights appinsights;
     private final HttpServletRequest request;
     private final ObjectMapper objectMapper;
-
-    private void jclog(final String message) {
-        LOG.info("| JCDEBUG: Info: CallbackService: {}", message);
-    }
-
-    private String getCallStackAsString() {
-        final StringBuilder sb = new StringBuilder();
-        final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        // Skip the first two elements to exclude getStackTrace() and getCallStackAsString()
-        for (int i = 2; i < stackTrace.length; i++) {
-            sb.append(stackTrace[i].toString()).append("\t");
-        }
-        return sb.toString();
-    }
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
@@ -147,7 +137,8 @@ public class CallbackService {
                                                         final CallbackType callbackType,
                                                         final Class<T> clazz,
                                                         final CallbackRequest callbackRequest) {
-        jclog("sendRequest(): CALL STACK = " + getCallStackAsString());
+        jclogger.jclog("sendRequest(): CALL STACK = " + jclogger.getCallStackAsString());
+        jclogger.jclog("sendRequest(): callbackRequest = " + jclogger.printObjectToString(callbackRequest));
 
         HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
 

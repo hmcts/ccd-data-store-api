@@ -7,8 +7,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.V2;
@@ -27,23 +26,12 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 @RestController
 @RequestMapping(path = "/case-types")
 public class CaseDataValidatorController {
-    private static final Logger LOG = LoggerFactory.getLogger(CaseDataValidatorController.class);
+
+    private final JcLogger jclogger = new JcLogger("CaseDataValidatorController", true);
 
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final MidEventCallback midEventCallback;
-
-    private void jclog(String message) {
-        LOG.info("| JCDEBUG: Info: CaseDataValidatorController: {}", message);
-    }
-
-    private String printObject(final Object object) {
-        try {
-            return MAPPER.writeValueAsString(object);
-        } catch (Exception e) {
-            return "ERROR_WRITING_OBJECT";
-        }
-    }
 
     @Autowired
     public CaseDataValidatorController(
@@ -87,7 +75,7 @@ public class CaseDataValidatorController {
     public ResponseEntity<CaseDataResource> validate(@PathVariable("caseTypeId") String caseTypeId,
                                                      @RequestParam(required = false) final String pageId,
                                                      @RequestBody final CaseDataContent content) {
-        jclog("validate() content = " +  printObject(content));
+        jclogger.jclog("validate() content = " +  jclogger.printObjectToString(content));
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
             content);
 

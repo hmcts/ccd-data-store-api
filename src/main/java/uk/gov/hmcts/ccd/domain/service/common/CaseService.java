@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -34,40 +32,17 @@ import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 // partal javadoc attributes added prior to checkstyle implementation in module
 public class CaseService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CaseService.class);
+    private final JcLogger jclogger = new JcLogger("CaseService", true);
 
     private final CaseDataService caseDataService;
     private final CaseDetailsRepository caseDetailsRepository;
     private final UIDService uidService;
-
-    private void jclog(final String message) {
-        LOG.info("| JCDEBUG: Info: CaseService: {}", message);
-    }
-
-    private String getCallStackAsString() {
-        final StringBuilder sb = new StringBuilder();
-        final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        // Skip the first two elements to exclude getStackTrace() and getCallStackAsString()
-        for (int i = 2; i < stackTrace.length; i++) {
-            sb.append(stackTrace[i].toString()).append("\t");
-        }
-        return sb.toString();
-    }
-
-    private String printObject(final Object object) {
-        try {
-            return MAPPER.writeValueAsString(object);
-        } catch (Exception e) {
-            return "ERROR_WRITING_OBJECT";
-        }
-    }
 
     @Autowired
     public CaseService(CaseDataService caseDataService,
                        @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                             final CaseDetailsRepository caseDetailsRepository,
                        UIDService uidService) {
-        jclog("Constructor");
         this.caseDataService = caseDataService;
         this.caseDetailsRepository = caseDetailsRepository;
         this.uidService = uidService;
@@ -80,7 +55,7 @@ public class CaseService {
      * @return SHA256 hash of the given case data
      */
     public String hashData(CaseDetails caseDetails) {
-        jclog("hashData()");
+        jclogger.jclog("hashData()");
         final JsonNode jsonData = JacksonUtils.convertValueJsonNode(caseDetails.getData());
         return DigestUtils.sha256Hex(jsonData.toString());
     }
@@ -91,7 +66,7 @@ public class CaseService {
      * @return <code>CaseDetails</code> - new case details object
      */
     public CaseDetails createNewCaseDetails(String caseTypeId, String jurisdictionId, Map<String, JsonNode> data) {
-        jclog("createNewCaseDetails()");
+        jclogger.jclog("createNewCaseDetails()");
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(caseTypeId);
         caseDetails.setJurisdiction(jurisdictionId);
@@ -106,30 +81,32 @@ public class CaseService {
      */
 
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
-        jclog("populateCurrentCaseDetailsWithEventFields(): CALL STACK = " + getCallStackAsString());
-        jclog("populateCurrentCaseDetailsWithEventFields(): content = " + printObject(content));
-        jclog("populateCurrentCaseDetailsWithEventFields(): caseDetails = " + printObject(caseDetails));
+        jclogger.jclog("populateCurrentCaseDetailsWithEventFields(): CALL STACK = " + jclogger.getCallStackAsString());
+        jclogger.jclog("populateCurrentCaseDetailsWithEventFields(): content = "
+            + jclogger.printObjectToString(content));
+        jclogger.jclog("populateCurrentCaseDetailsWithEventFields(): caseDetails = "
+            + jclogger.printObjectToString(caseDetails));
         final Map<String, JsonNode> eventData = content.getEventData();
         Map<String, JsonNode> caseData = caseDetails.getData();
 
         // LOG eventData
-        eventData.forEach((key, value) -> jclog("eventData: " + key + " = " + value));
+        eventData.forEach((key, value) -> jclogger.jclog("eventData: " + key + " = " + value));
 
         // LOG caseDataBefore
-        caseData.forEach((key, value) -> jclog("caseDataBefore: " + key + " = " + value));
+        caseData.forEach((key, value) -> jclogger.jclog("caseDataBefore: " + key + " = " + value));
 
         // Process eventData -> caseData
         eventData.forEach((key, value) -> caseData.put(key, value));
         caseDetails.setData(caseData);
 
         // LOG caseDataAfter
-        caseData.forEach((key, value) -> jclog("caseDataAfter: " + key + " = " + value));
+        caseData.forEach((key, value) -> jclogger.jclog("caseDataAfter: " + key + " = " + value));
 
         return caseDetails;
     }
 
     public CaseDetails clone(CaseDetails source) {
-        jclog("clone()");
+        jclogger.jclog("clone()");
         final CaseDetails clone;
 
         try {
@@ -147,7 +124,7 @@ public class CaseService {
     }
 
     public CaseDetails getCaseDetails(String jurisdictionId, String caseReference) {
-        jclog("getCaseDetails()");
+        jclogger.jclog("getCaseDetails()");
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
@@ -157,7 +134,7 @@ public class CaseService {
     }
 
     public CaseDetails getCaseDetailsByCaseReference(String caseReference) {
-        jclog("getCaseDetailsByCaseReference()");
+        jclogger.jclog("getCaseDetailsByCaseReference()");
         final Optional<CaseDetails> caseDetails =
             caseDetailsRepository.findByReferenceWithNoAccessControl(caseReference);
         return caseDetails.orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
@@ -169,7 +146,7 @@ public class CaseService {
      */
     public Map<String, JsonNode> buildJsonFromCaseFieldsWithDefaultValue(
         List<CaseEventFieldDefinition> caseEventDefinition) {
-        jclog("buildJsonFromCaseFieldsWithDefaultValue()");
+        jclogger.jclog("buildJsonFromCaseFieldsWithDefaultValue()");
         Map<String, JsonNode> data = new HashMap<>();
 
         caseEventDefinition.forEach(
@@ -203,7 +180,7 @@ public class CaseService {
 
     public Map<String, JsonNode> buildJsonFromCaseFieldsWithNullifyByDefault(CaseTypeDefinition caseTypeDefinition,
         List<CaseEventFieldDefinition> caseEventDefinition) {
-        jclog("buildJsonFromCaseFieldsWithNullifyByDefault()");
+        jclogger.jclog("buildJsonFromCaseFieldsWithNullifyByDefault()");
         Map<String, JsonNode> data = new HashMap<>();
 
         caseEventDefinition.forEach(
