@@ -21,7 +21,6 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -462,8 +461,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         // Builds a new callback service to avoid wiremock exception to get in the way
         final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class), restTemplate,
             Mockito.mock(ApplicationParams.class), Mockito.mock(AppInsights.class),
-            Mockito.mock(HttpServletRequest.class), Mockito.mock(ObjectMapper.class),
-            Mockito.mock(PersistenceStrategyResolver.class));
+            Mockito.mock(HttpServletRequest.class), Mockito.mock(ObjectMapper.class));
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("TEST-EVENT");

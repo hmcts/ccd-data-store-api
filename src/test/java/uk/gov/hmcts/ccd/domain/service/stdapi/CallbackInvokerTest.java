@@ -16,7 +16,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -139,6 +138,9 @@ class CallbackInvokerTest {
     @Mock
     private AppInsights appinsights;
 
+    @Mock
+    private PersistenceStrategyResolver persistenceStrategyResolver;
+
     @InjectMocks
     private CallbackInvoker callbackInvoker;
 
@@ -219,8 +221,7 @@ class CallbackInvokerTest {
                 applicationParams,
                 appinsights,
                 null,
-                objectMapper,
-                Mockito.mock(PersistenceStrategyResolver.class));
+                objectMapper);
 
             when(objectMapper.writeValueAsString(any()))
                 .thenThrow(new RuntimeException("Mocked exception"));

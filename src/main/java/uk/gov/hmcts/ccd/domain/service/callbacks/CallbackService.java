@@ -25,7 +25,6 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
@@ -53,7 +52,6 @@ public class CallbackService {
     private final AppInsights appinsights;
     private final HttpServletRequest request;
     private final ObjectMapper objectMapper;
-    private final PersistenceStrategyResolver resolver;
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
@@ -61,15 +59,13 @@ public class CallbackService {
                            final ApplicationParams applicationParams,
                            AppInsights appinsights,
                            HttpServletRequest request,
-                           @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
-                           PersistenceStrategyResolver resolver) {
+                           @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
         this.applicationParams = applicationParams;
         this.appinsights = appinsights;
         this.request = request;
         this.objectMapper = objectMapper;
-        this.resolver = resolver;
     }
 
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
@@ -101,9 +97,7 @@ public class CallbackService {
                                                         final CaseDetails caseDetailsBefore,
                                                         final CaseDetails caseDetails,
                                                         final Boolean ignoreWarning) {
-        if (url == null || url.isEmpty()
-            // Decentralised cases handle their own event submission and do not receive AboutToSubmit callbacks
-            || (callbackType == CallbackType.ABOUT_TO_SUBMIT && resolver.isDecentralised(caseDetails))) {
+        if (url == null || url.isEmpty()) {
             return Optional.empty();
         }
         final CallbackRequest callbackRequest =
