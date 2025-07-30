@@ -35,7 +35,7 @@ public class PersistenceStrategyResolver {
      * <p>This can be set via application properties and environment variables.
      */
     @NotNull
-    private Map<String, URI> caseTypeServiceUrls;
+    private Map<String, URI> caseTypeServiceUrls = Map.of();
 
 
     @Autowired
