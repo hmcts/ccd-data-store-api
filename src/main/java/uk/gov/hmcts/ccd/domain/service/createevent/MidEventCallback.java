@@ -29,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 @Service
 public class MidEventCallback {
@@ -43,6 +44,24 @@ public class MidEventCallback {
 
     private void jclog(final String message) {
         LOG.info("| JCDEBUG: Info: MidEventCallback: {}", message);
+    }
+
+    private String getCallStackAsString() {
+        final StringBuilder sb = new StringBuilder();
+        final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        // Skip the first two elements to exclude getStackTrace() and getCallStackAsString()
+        for (int i = 2; i < stackTrace.length; i++) {
+            sb.append(stackTrace[i].toString()).append("\t");
+        }
+        return sb.toString();
+    }
+
+    private String printObject(final Object object) {
+        try {
+            return MAPPER.writeValueAsString(object);
+        } catch (Exception e) {
+            return "ERROR_WRITING_OBJECT";
+        }
     }
 
     @Autowired
@@ -64,7 +83,9 @@ public class MidEventCallback {
     public JsonNode invoke(String caseTypeId,
                            CaseDataContent content,
                            String pageId) {
-        jclog("invoke()");
+        jclog("invoke(): CALL STACK = " + getCallStackAsString());
+        jclog("invoke() content = " + printObject(content));
+        jclog("invoke(): caseTypeId = " + caseTypeId + "  ,  pageId = " + pageId);
         if (!isBlank(pageId)) {
             Event event = content.getEvent();
             final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);

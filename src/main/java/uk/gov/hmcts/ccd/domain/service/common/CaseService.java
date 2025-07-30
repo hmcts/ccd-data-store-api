@@ -44,6 +44,24 @@ public class CaseService {
         LOG.info("| JCDEBUG: Info: CaseService: {}", message);
     }
 
+    private String getCallStackAsString() {
+        final StringBuilder sb = new StringBuilder();
+        final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        // Skip the first two elements to exclude getStackTrace() and getCallStackAsString()
+        for (int i = 2; i < stackTrace.length; i++) {
+            sb.append(stackTrace[i].toString()).append("\t");
+        }
+        return sb.toString();
+    }
+
+    private String printObject(final Object object) {
+        try {
+            return MAPPER.writeValueAsString(object);
+        } catch (Exception e) {
+            return "ERROR_WRITING_OBJECT";
+        }
+    }
+
     @Autowired
     public CaseService(CaseDataService caseDataService,
                        @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -86,8 +104,11 @@ public class CaseService {
      * @param caseDetails of the case.
      * @return <code>Optional&lt;CaseDetails&gt;</code> - CaseDetails wrapped in Optional
      */
+
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
-        jclog("populateCurrentCaseDetailsWithEventFields()");
+        jclog("populateCurrentCaseDetailsWithEventFields(): CALL STACK = " + getCallStackAsString());
+        jclog("populateCurrentCaseDetailsWithEventFields(): content = " + printObject(content));
+        jclog("populateCurrentCaseDetailsWithEventFields(): caseDetails = " + printObject(caseDetails));
         final Map<String, JsonNode> eventData = content.getEventData();
         Map<String, JsonNode> caseData = caseDetails.getData();
 
