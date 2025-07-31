@@ -58,7 +58,7 @@ dependencyUpdates.resolutionStrategy = {
 
 apply from: './gradle/suppress.gradle'
 dependencyCheck {
-    suppressionFile = 'config/owasp/suppressions.xml'
+    suppressionFile = 'dependency-check-suppressions.xml'
 }
 
 tasks.register("printSuppressionFile") {
