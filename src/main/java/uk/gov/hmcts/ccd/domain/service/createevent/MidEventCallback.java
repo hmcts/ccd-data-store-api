@@ -52,6 +52,7 @@ public class MidEventCallback {
         this.eventTriggerService = eventTriggerService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseService = caseService;
+        jclogger.jclog("constructor");
     }
 
     @Transactional
@@ -59,7 +60,7 @@ public class MidEventCallback {
                            CaseDataContent content,
                            String pageId) {
         jclogger.jclog("invoke(): CALL STACK = " + jclogger.getCallStackAsString());
-        jclogger.jclog("invoke() content = " + jclogger.printObjectToString(content));
+        jclogger.jclog("invoke(): content = " + jclogger.printObjectToString(content));
         jclogger.jclog("invoke(): caseTypeId = " + caseTypeId + "  ,  pageId = " + pageId);
         if (!isBlank(pageId)) {
             Event event = content.getEvent();

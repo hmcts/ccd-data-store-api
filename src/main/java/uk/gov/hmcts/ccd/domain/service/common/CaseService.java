@@ -46,6 +46,7 @@ public class CaseService {
         this.caseDataService = caseDataService;
         this.caseDetailsRepository = caseDetailsRepository;
         this.uidService = uidService;
+        jclogger.jclog("constructor");
     }
 
     /**

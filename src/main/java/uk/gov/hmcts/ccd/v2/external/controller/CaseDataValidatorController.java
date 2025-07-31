@@ -39,6 +39,7 @@ public class CaseDataValidatorController {
         MidEventCallback midEventCallback) {
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.midEventCallback = midEventCallback;
+        jclogger.jclog("Constructor");
     }
 
     @PostMapping(

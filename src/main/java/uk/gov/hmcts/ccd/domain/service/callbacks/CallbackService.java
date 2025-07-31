@@ -70,6 +70,7 @@ public class CallbackService {
         this.appinsights = appinsights;
         this.request = request;
         this.objectMapper = objectMapper;
+        jclogger.jclog("constructor");
     }
 
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0

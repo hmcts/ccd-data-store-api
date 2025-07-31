@@ -99,6 +99,7 @@ public class CaseController {
         this.requestValidator = requestValidator;
         this.caseLinkRetrievalService = caseLinkRetrievalService;
         this.getLinkedCasesResponseCreator = getLinkedCasesResponseCreator;
+        jclogger.jclog("constructor");
     }
 
     @GetMapping(
