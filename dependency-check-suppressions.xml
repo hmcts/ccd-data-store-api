@@ -10,6 +10,10 @@
         CVE-2025-49124 refer [https://tools.hmcts.net/jira/browse/CCD-6601]
         CVE-2025-49125 refer [https://tools.hmcts.net/jira/browse/CCD-6601]
         CVE-2025-48976 refer [https://tools.hmcts.net/jira/browse/CCD-6601]
+        CVE-2025-48924 refer [https://tools.hmcts.net/jira/browse/CCD-6636]
+        CVE-2025-52434 refer [https://tools.hmcts.net/jira/browse/CCD-6640]
+        CVE-2025-52520 refer [https://tools.hmcts.net/jira/browse/CCD-6640]
+        CVE-2025-53506 refer [https://tools.hmcts.net/jira/browse/CCD-6640]
     </notes>
     <cve>CVE-2024-38820</cve>
     <cve>CVE-2025-48734</cve>
@@ -20,5 +24,9 @@
     <cve>CVE-2025-49124</cve>
     <cve>CVE-2025-49125</cve>
     <cve>CVE-2025-48976</cve>
+    <cve>CVE-2025-48924</cve>
+    <cve>CVE-2025-52434</cve>
+    <cve>CVE-2025-52520</cve>
+    <cve>CVE-2025-53506</cve>
   </suppress>
 </suppressions>
