@@ -19,7 +19,8 @@
     "body" : {
       "data": {
         "PublicTextField" : "public text",
-        "PrivateTextField" : "private text"
+        "PrivateTextField" : "private text",
+        "RestrictedTextField" : "restricted text"
       },
       "data_classification" : {
         "PublicTextField" : "PUBLIC",
