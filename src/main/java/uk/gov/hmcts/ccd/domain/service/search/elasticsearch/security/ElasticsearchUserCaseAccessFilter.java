@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIELD_COL;
 
@@ -38,10 +40,11 @@ public class ElasticsearchUserCaseAccessFilter implements CaseSearchFilter {
     }
 
     @Override
-    public Optional<QueryBuilder> getFilter(String caseTypeId) {
+    public Optional<Query> getFilter(String caseTypeId) {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             return Optional.empty();
         }
+
         Instant start = Instant.now();
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseTypeDefinition == null) {
@@ -51,8 +54,18 @@ public class ElasticsearchUserCaseAccessFilter implements CaseSearchFilter {
         return getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition).map(caseReferences -> {
             Duration between = Duration.between(start, Instant.now());
             log.info("retrieved {} granted case references {} in {} millisecs...",
-                    caseReferences.size(), String.join(",", caseReferences.toString()), between.toMillis());
-            return QueryBuilders.termsQuery(REFERENCE_FIELD_COL, caseReferences);
+                caseReferences.size(),
+                caseReferences,
+                between.toMillis());
+
+            return Query.of(q -> q.terms(t -> t
+                .field(REFERENCE_FIELD_COL)
+                .terms(TermsQueryField.of(tf -> tf
+                    .value(caseReferences.stream()
+                        .map(FieldValue::of)
+                        .collect(Collectors.toList()))
+                ))
+            ));
         });
     }
 

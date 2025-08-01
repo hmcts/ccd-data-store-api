@@ -1,12 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
-import com.google.common.collect.Lists;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -17,17 +14,19 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderTest {
+class AccessControlGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
 
     private static final String CASE_TYPE_ID = "FT_MasterCaseType";
 
@@ -59,119 +58,116 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
             new ExcludedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
             caseDefinitionRepository,
             caseDataAccessControl);
+
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         when(caseDefinitionRepository.getCaseType(anyString())).thenReturn(caseTypeDefinition);
         when(caseStateDefinition.getId()).thenReturn("TestState");
-        when(accessControlService.filterCaseStatesByAccess(Mockito.anyList(), any(), any()))
-            .thenReturn(List.of(caseStateDefinition));
+
+        // Fixed: disambiguate overloaded method using argument types
+        when(accessControlService.filterCaseStatesByAccess(
+            any(CaseTypeDefinition.class),
+            any(Set.class),
+            any(Predicate.class))
+        ).thenReturn(List.of(caseStateDefinition));
     }
 
     @Test
-    void shouldReturnEmptyQueryWhenNoRoleAssignmentsExists() {
-        when(caseDataAccessControl.generateRoleAssignments(any(CaseTypeDefinition.class)))
-            .thenReturn(Lists.newArrayList());
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
-        assertNotNull(query);
-        assertFalse(query.hasClauses());
+    void shouldReturnEmptyQueryListWhenNoRoleAssignmentsExists() {
+        when(caseDataAccessControl.generateRoleAssignments(any())).thenReturn(List.of());
+
+        List<Query> filters = new ArrayList<>();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, filters);
+
+        assertNotNull(filters);
+        assertEquals(0, filters.size());
     }
 
     @Test
-    void shouldReturnBasicQueryWhenRoleAssignmentsWithBasicGrantTypeExists() {
-        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE", "", "", null);
-        when(caseDataAccessControl.generateRoleAssignments(any(CaseTypeDefinition.class)))
-            .thenReturn(Lists.newArrayList(roleAssignment));
+    void shouldAddBasicGrantTypeQuery() {
+        RoleAssignment role = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE", "",
+            "", null);
+        when(caseDataAccessControl.generateRoleAssignments(any())).thenReturn(List.of(role));
 
+        List<Query> filters = new ArrayList<>();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, filters);
 
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
-        assertNotNull(query);
-        assertEquals(1, query.must().size());
+        assertNotNull(filters);
+        assertEquals(1, filters.size());
     }
 
     @Test
-    void shouldReturnBasicQueryWhenRoleAssignmentsWithCaseAccessGroupsExists() {
-        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, null, null, null, null, null, null,
+    void shouldAddQueryForCaseAccessGroup() {
+        RoleAssignment role = createRoleAssignment(GrantType.BASIC, null, null, null,
+            null, null, null,
             null, null, "caseAccessGroupId");
-        when(caseDataAccessControl.generateRoleAssignments(any(CaseTypeDefinition.class)))
-            .thenReturn(Lists.newArrayList(roleAssignment));
+        when(caseDataAccessControl.generateRoleAssignments(any())).thenReturn(List.of(role));
 
+        List<Query> filters = new ArrayList<>();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, filters);
 
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
-        assertNotNull(query);
-        assertEquals(1, query.must().size());
-    }
-
-
-    @Test
-    void shouldReturnNonOrganisationalQueryWhenRoleAssignmentsGrantTypeExists() {
-        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
-            "CASE", "PRIVATE", "", "", null);
-        RoleAssignment specificRoleAssignment = createRoleAssignment(GrantType.SPECIFIC,
-            "CASE", "PRIVATE", "Test", "", "", null, "caseId1");
-
-        when(caseDataAccessControl.generateRoleAssignments(any(CaseTypeDefinition.class)))
-            .thenReturn(Lists.newArrayList(roleAssignment, specificRoleAssignment));
-
-
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
-        assertNotNull(query);
-        assertEquals(1, query.must().size());
+        assertNotNull(filters);
+        assertEquals(1, filters.size());
     }
 
     @Test
-    void shouldReturnOrgAndNonOrganisationalQueryWhenRoleAssignmentsGrantTypeExists() {
-        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
-            "CASE", "PRIVATE", "", "", null);
-        RoleAssignment specificRoleAssignment = createRoleAssignment(GrantType.SPECIFIC,
-            "CASE", "PRIVATE", "Test", "", "", null, "caseId1");
+    void shouldReturnQueryForMultipleNonOrganisationalGrantTypes() {
+        RoleAssignment basic = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE", "",
+            "", null);
+        RoleAssignment specific = createRoleAssignment(GrantType.SPECIFIC, "CASE", "PRIVATE",
+            "Test", "", "", null, "caseId1");
 
-        RoleAssignment challengedRoleAssignment = createRoleAssignment(GrantType.CHALLENGED,
-            "CASE", "PRIVATE", "Test", "", "",
-            Lists.newArrayList("auth1"), "caseId1");
+        when(caseDataAccessControl.generateRoleAssignments(any())).thenReturn(List.of(basic, specific));
 
-        RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
-            "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
+        List<Query> filters = new ArrayList<>();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, filters);
 
-        when(caseDataAccessControl.generateRoleAssignments(any(CaseTypeDefinition.class)))
-            .thenReturn(Lists.newArrayList(roleAssignment, specificRoleAssignment,
-                challengedRoleAssignment, standardRoleAssignment));
-
-
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
-
-        assertNotNull(query);
-        assertEquals(1, query.must().size());
+        assertNotNull(filters);
+        assertEquals(1, filters.size()); // Combined under one bool query
     }
 
     @Test
-    void shouldReturnOrgAndNonAndExcludedOrganisationalQueryWhenRoleAssignmentsGrantTypeExists() {
-        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
-            "CASE", "PRIVATE", "", "", null);
-        RoleAssignment specificRoleAssignment = createRoleAssignment(GrantType.SPECIFIC,
-            "CASE", "PRIVATE", "Test", "", "", null, "caseId1");
+    void shouldReturnQueryForOrgAndNonOrgGrants() {
+        RoleAssignment basic = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE",
+            "", "", null);
+        RoleAssignment specific = createRoleAssignment(GrantType.SPECIFIC, "CASE", "PRIVATE",
+            "Test", "", "", null, "caseId1");
+        RoleAssignment challenged = createRoleAssignment(GrantType.CHALLENGED, "CASE", "PRIVATE",
+            "Test", "", "",
+            List.of("auth1"), "caseId1");
+        RoleAssignment standard = createRoleAssignment(GrantType.STANDARD, "CASE", "PRIVATE",
+            "Test", "loc1", "reg1", null, "caseId1");
 
-        RoleAssignment challengedRoleAssignment = createRoleAssignment(GrantType.CHALLENGED,
-            "CASE", "PRIVATE", "Test", "", "",
-            Lists.newArrayList("auth1"), "caseId1");
+        when(caseDataAccessControl.generateRoleAssignments(any())).thenReturn(List.of(basic, specific, challenged,
+            standard));
 
-        RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
-            "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
+        List<Query> filters = new ArrayList<>();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, filters);
 
-        RoleAssignment excludedRoleAssignment = createRoleAssignment(GrantType.EXCLUDED,
-            "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
+        assertNotNull(filters);
+        assertEquals(1, filters.size());
+    }
 
-        when(caseDataAccessControl.generateRoleAssignments(any(CaseTypeDefinition.class)))
-            .thenReturn(Lists.newArrayList(roleAssignment, specificRoleAssignment,
-                challengedRoleAssignment, standardRoleAssignment, excludedRoleAssignment));
+    @Test
+    void shouldReturnQueryForOrgNonOrgAndExcludedGrants() {
+        RoleAssignment basic = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE", "",
+            "", null);
+        RoleAssignment specific = createRoleAssignment(GrantType.SPECIFIC, "CASE", "PRIVATE",
+            "Test", "", "", null, "caseId1");
+        RoleAssignment challenged = createRoleAssignment(GrantType.CHALLENGED, "CASE", "PRIVATE",
+            "Test", "", "",
+            List.of("auth1"), "caseId1");
+        RoleAssignment standard = createRoleAssignment(GrantType.STANDARD, "CASE", "PRIVATE",
+            "Test", "loc1", "reg1", null, "caseId1");
+        RoleAssignment excluded = createRoleAssignment(GrantType.EXCLUDED, "CASE", "PRIVATE",
+            "Test", "loc1", "reg1", null, "caseId1");
 
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
+        when(caseDataAccessControl.generateRoleAssignments(any()))
+            .thenReturn(List.of(basic, specific, challenged, standard, excluded));
 
-        assertNotNull(query);
-        assertEquals(1, query.must().size());
+        List<Query> filters = new ArrayList<>();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, filters);
+
+        assertNotNull(filters);
+        assertEquals(1, filters.size());
     }
 }

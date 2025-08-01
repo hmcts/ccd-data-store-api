@@ -13,7 +13,6 @@ import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import org.apache.http.HttpHeaders;
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +106,6 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
     @Inject
     protected WireMockServer wireMockServer;
 
-    @Before
     @BeforeEach
     public void initMock() throws IOException {
         super.initMock();

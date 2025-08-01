@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -51,6 +51,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.doReturn;
 
 public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
@@ -116,7 +117,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private static final ZonedDateTime LOG_TIMESTAMP =
         ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
 
@@ -128,7 +129,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             auditCaseRemoteConfiguration, auditCaseRemoteOperation);
     }
 
-    @After
+    @AfterEach
     public void after() throws IOException {
         WireMock.reset();
     }
@@ -211,9 +212,9 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
     }
 
-    @Test(expected = Test.None.class)
-    public void shouldNotThrowExceptionInAuditServiceIfLauIsDown()
-        throws JsonProcessingException, InterruptedException {
+
+    @Test
+    void shouldNotThrowExceptionInAuditServiceIfLauIsDown() throws JsonProcessingException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()
             .caseId(CASE_ID)
             .auditOperationType(AuditOperationType.CASE_ACCESSED)
@@ -237,8 +238,11 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .withRequestBody(equalToJson(objectMapper.writeValueAsString(caseActionPostRequest)))
             .willReturn(aResponse().withStatus(AUDIT_NOT_FOUND_HTTP_STATUS)));
 
-        auditService.audit(auditContext);
-        waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
+        // ✅ Now using assertDoesNotThrow
+        assertDoesNotThrow(() -> {
+            auditService.audit(auditContext);
+            waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
+        });
 
         verifyWireMock(1, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT))
             .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
