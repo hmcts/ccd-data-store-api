@@ -25,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
@@ -42,6 +43,9 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 public class CallbackService {
+
+    private final JcLogger jclogger = new JcLogger("CallbackService", true);
+
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
     private static final String WILDCARD = "*";
     public static final String CLIENT_CONTEXT = "Client-Context";
@@ -66,6 +70,7 @@ public class CallbackService {
         this.appinsights = appinsights;
         this.request = request;
         this.objectMapper = objectMapper;
+        jclogger.jclog("constructor");
     }
 
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
@@ -133,6 +138,8 @@ public class CallbackService {
                                                         final CallbackType callbackType,
                                                         final Class<T> clazz,
                                                         final CallbackRequest callbackRequest) {
+        jclogger.jclog("sendRequest(): CALL STACK = " + jclogger.getCallStackAsString());
+        jclogger.jclog("sendRequest(): callbackRequest = " + jclogger.printObjectToString(callbackRequest));
 
         HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
 
