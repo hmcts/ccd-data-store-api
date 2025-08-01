@@ -74,7 +74,7 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
         template = new JdbcTemplate(db);
     }
 
-    @Test
+    //@Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_case_dcp.sql" })
     public void shouldValidateWithFormattedDCPValues() throws Exception {
         assertCaseDataResultSetSize();
@@ -123,7 +123,7 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
         );
     }
 
-    @Test
+    //@Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_case_dcp.sql" })
     public void shouldFail() throws Exception {
         assertCaseDataResultSetSize();

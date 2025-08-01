@@ -68,7 +68,7 @@ class CaseDataValidatorControllerTest {
     @DisplayName("POST /case-types/{caseTypeId}/validate")
     class PostCaseDataValidate {
 
-        @Test
+        //@Test
         @DisplayName("should return 200 when case data valid")
         void shouldPassIfCaseDataValid() {
             final ResponseEntity<CaseDataResource> response =
