@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 /**
@@ -24,7 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 @ConfigurationProperties("ccd.decentralised")
 public class PersistenceStrategyResolver {
 
-    private final CasePointerCreator pointerRepository;
+    private final CasePointerRepository pointerRepository;
     private final Cache<Long, String> caseTypeCache;
 
     /**
@@ -39,7 +39,7 @@ public class PersistenceStrategyResolver {
 
 
     @Autowired
-    public PersistenceStrategyResolver(CasePointerCreator pointerRepository) {
+    public PersistenceStrategyResolver(CasePointerRepository pointerRepository) {
         this.pointerRepository = pointerRepository;
         // Least Recently Used cache for lookup of case type by reference.
         // At around 100 bytes per entry this cache will use up to 10MB of memory

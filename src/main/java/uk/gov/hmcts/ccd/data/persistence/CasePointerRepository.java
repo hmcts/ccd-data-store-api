@@ -24,7 +24,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class CasePointerCreator {
+public class CasePointerRepository {
 
     private final DefaultCaseDetailsRepository caseDetailsRepository;
     private final CaseService caseService;

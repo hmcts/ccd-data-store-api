@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Transactional
-public class CasePointerCreatorTest extends WireMockBaseTest {
+public class CasePointerRepositoryTest extends WireMockBaseTest {
 
     private static final String JURISDICTION = "TEST_JURISDICTION";
     private static final String CASE_TYPE_DECENTRALIZED = "DecentralizedCaseType";
@@ -31,7 +31,7 @@ public class CasePointerCreatorTest extends WireMockBaseTest {
     private static final String CASE_STATE = "CaseCreated";
 
     @Inject
-    private CasePointerCreator casePointerCreator;
+    private CasePointerRepository casePointerRepository;
 
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
@@ -66,7 +66,7 @@ public class CasePointerCreatorTest extends WireMockBaseTest {
     @Test
     public void persistCasePointer_shouldCreateCasePointerWithEmptyData() {
         // When: Creating a case pointer
-        casePointerCreator.persistCasePointer(originalCaseDetails);
+        casePointerRepository.persistCasePointer(originalCaseDetails);
 
         // Original case details should not be modified
         assertThat(originalCaseDetails.getData().size(), is(1));

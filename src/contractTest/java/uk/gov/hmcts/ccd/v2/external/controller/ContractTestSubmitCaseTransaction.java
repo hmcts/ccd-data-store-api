@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -41,7 +41,7 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              CaseDocumentTimestampService caseDocumentTimestampService,
                                              DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
                                              PersistenceStrategyResolver resolver,
-                                             CasePointerCreator creator) {
+                                             CasePointerRepository creator) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
             caseDataAccessControl, messageService, caseDocumentService, applicationParams,

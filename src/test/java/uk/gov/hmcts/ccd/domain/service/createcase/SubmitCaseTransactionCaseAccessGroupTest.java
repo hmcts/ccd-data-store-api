@@ -47,7 +47,7 @@ import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampServ
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -176,7 +176,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             caseDocumentTimestampService,
             decentralisedSubmitCaseTransaction,
             resolver,
-            Mockito.mock(CasePointerCreator.class)
+            Mockito.mock(CasePointerRepository.class)
         );
 
         idamUser = buildIdamUser();

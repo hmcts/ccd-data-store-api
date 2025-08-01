@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -102,7 +102,7 @@ public class CreateCaseEventService {
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final PersistenceStrategyResolver resolver;
     private final SynchronisedCaseViewUpdater concurrentCaseUpdater;
-    private final CasePointerCreator pointerRepository;
+    private final CasePointerRepository pointerRepository;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -139,7 +139,7 @@ public class CreateCaseEventService {
                                   final CaseDocumentTimestampService caseDocumentTimestampService,
                                   final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
                                   final PersistenceStrategyResolver resolver,
-                                  final CasePointerCreator pointerRepository,
+                                  final CasePointerRepository pointerRepository,
                                   final SynchronisedCaseViewUpdater concurrentCaseUpdater) {
 
         this.userRepository = userRepository;

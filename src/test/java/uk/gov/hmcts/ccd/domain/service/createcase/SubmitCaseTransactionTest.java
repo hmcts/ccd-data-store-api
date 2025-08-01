@@ -37,7 +37,7 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
-import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
 import java.io.IOException;
@@ -106,7 +106,7 @@ class SubmitCaseTransactionTest {
 
     @Mock
     private CaseDetails savedCaseDetails;
-    
+
     private uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseDetails savedDecentralisedCaseDetails;
 
     @Mock
@@ -143,7 +143,7 @@ class SubmitCaseTransactionTest {
     @Mock
     private DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
     @Mock
-    private CasePointerCreator casePointerCreator;
+    private CasePointerRepository casePointerRepository;
 
     @BeforeEach
     void setup() {
@@ -168,7 +168,7 @@ class SubmitCaseTransactionTest {
             caseDocumentTimestampService,
             decentralisedSubmitCaseTransaction,
             resolver,
-            casePointerCreator
+            casePointerRepository
         );
 
         idamUser = buildIdamUser();
@@ -186,7 +186,7 @@ class SubmitCaseTransactionTest {
         doReturn(savedCaseDetails).when(caseDetailsRepository).set(caseDetails);
 
         doReturn(CASE_ID).when(savedCaseDetails).getId();
-        
+
         // Setup DecentralisedCaseDetails mock
         savedDecentralisedCaseDetails = new uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseDetails();
         savedDecentralisedCaseDetails.setCaseDetails(savedCaseDetails);
@@ -353,7 +353,7 @@ class SubmitCaseTransactionTest {
     void shouldUseDecentralisedServiceWhenDecentralised() {
         doReturn(true).when(resolver).isDecentralised(caseDetails);
         doReturn(savedDecentralisedCaseDetails).when(decentralisedSubmitCaseTransaction)
-            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails, 
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.empty());
 
         final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
@@ -366,9 +366,9 @@ class SubmitCaseTransactionTest {
 
         assertAll(
             () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
-            () -> verify(casePointerCreator).persistCasePointer(caseDetails),
+            () -> verify(casePointerRepository).persistCasePointer(caseDetails),
             () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
-                event, caseEventDefinition, caseTypeDefinition, caseDetails, 
+                event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.empty()),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
             () -> verify(caseAuditEventRepository, never()).set(isNotNull())
@@ -381,7 +381,7 @@ class SubmitCaseTransactionTest {
         IdamUser onBehalfOfUser = buildOnBehalfOfUser();
         doReturn(true).when(resolver).isDecentralised(caseDetails);
         doReturn(savedDecentralisedCaseDetails).when(decentralisedSubmitCaseTransaction)
-            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails, 
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.of(onBehalfOfUser));
 
         final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
@@ -394,9 +394,9 @@ class SubmitCaseTransactionTest {
 
         assertAll(
             () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
-            () -> verify(casePointerCreator).persistCasePointer(caseDetails),
+            () -> verify(casePointerRepository).persistCasePointer(caseDetails),
             () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
-                event, caseEventDefinition, caseTypeDefinition, caseDetails, 
+                event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.of(onBehalfOfUser)),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
             () -> verify(caseAuditEventRepository, never()).set(isNotNull())
@@ -408,7 +408,7 @@ class SubmitCaseTransactionTest {
     void shouldGrantAccessAndAttachDocumentsForDecentralisedCases() {
         doReturn(true).when(resolver).isDecentralised(caseDetails);
         doReturn(savedDecentralisedCaseDetails).when(decentralisedSubmitCaseTransaction)
-            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails, 
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.empty());
         doReturn("12345").when(caseDetails).getReferenceAsString();
         doReturn("TestType").when(caseDetails).getCaseTypeId();
