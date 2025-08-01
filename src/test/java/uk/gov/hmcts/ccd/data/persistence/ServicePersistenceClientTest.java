@@ -101,12 +101,13 @@ public class ServicePersistenceClientTest {
     private DecentralisedCaseDetails createDecentralisedCaseDetails() {
         DecentralisedCaseDetails details = new DecentralisedCaseDetails();
         details.setCaseDetails(caseDetails);
+        details.setVersion(1L);
         return details;
     }
 
     private DecentralisedSubmitEventResponse createSubmitEventResponse() {
         DecentralisedSubmitEventResponse response = new DecentralisedSubmitEventResponse();
-        response.setCaseDetails(caseDetails);
+        response.setCaseDetails(decentralisedCaseDetails);
         return response;
     }
 
@@ -181,13 +182,14 @@ public class ServicePersistenceClientTest {
         when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
             .thenReturn(submitEventResponse);
 
-        CaseDetails result = servicePersistenceClient.createEvent(caseEvent);
+        DecentralisedCaseDetails result = servicePersistenceClient.createEvent(caseEvent);
+        CaseDetails caseDetailsResult = result.getCaseDetails();
 
         assertAll("Case details should be correctly populated",
-            () -> assertThat(result.getId(), is(CASE_ID)),
-            () -> assertThat(result.getReference(), is(CASE_REFERENCE)),
-            () -> assertThat(result.getCaseTypeId(), is(CASE_TYPE)),
-            () -> assertThat(result.getJurisdiction(), is(JURISDICTION))
+            () -> assertThat(caseDetailsResult.getId(), is(CASE_ID)),
+            () -> assertThat(caseDetailsResult.getReference(), is(CASE_REFERENCE)),
+            () -> assertThat(caseDetailsResult.getCaseTypeId(), is(CASE_TYPE)),
+            () -> assertThat(caseDetailsResult.getJurisdiction(), is(JURISDICTION))
         );
     }
 
@@ -205,7 +207,7 @@ public class ServicePersistenceClientTest {
     @Test
     public void createEvent_shouldThrowApiException_whenResponseHasErrors() {
         DecentralisedSubmitEventResponse errorResponse = new DecentralisedSubmitEventResponse();
-        errorResponse.setCaseDetails(caseDetails);
+        errorResponse.setCaseDetails(decentralisedCaseDetails);
         errorResponse.setErrors(List.of("Validation error"));
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
@@ -225,7 +227,7 @@ public class ServicePersistenceClientTest {
     @Test
     public void createEvent_shouldThrowApiException_whenResponseHasWarningsAndIgnoreWarningIsFalse() {
         DecentralisedSubmitEventResponse warningResponse = new DecentralisedSubmitEventResponse();
-        warningResponse.setCaseDetails(caseDetails);
+        warningResponse.setCaseDetails(decentralisedCaseDetails);
         warningResponse.setWarnings(List.of("Warning message"));
         warningResponse.setIgnoreWarning(false);
 
@@ -246,7 +248,7 @@ public class ServicePersistenceClientTest {
     @Test
     public void createEvent_shouldSucceed_whenResponseHasWarningsButIgnoreWarningIsTrue() {
         DecentralisedSubmitEventResponse warningResponse = new DecentralisedSubmitEventResponse();
-        warningResponse.setCaseDetails(caseDetails);
+        warningResponse.setCaseDetails(decentralisedCaseDetails);
         warningResponse.setWarnings(List.of("Warning message"));
         warningResponse.setIgnoreWarning(true);
 
@@ -255,18 +257,22 @@ public class ServicePersistenceClientTest {
         when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
             .thenReturn(warningResponse);
 
-        CaseDetails result = servicePersistenceClient.createEvent(caseEvent);
+        DecentralisedCaseDetails result = servicePersistenceClient.createEvent(caseEvent);
 
-        assertThat(result.getId(), is(CASE_ID));
+        assertThat(result.getCaseDetails().getId(), is(CASE_ID));
     }
 
     @Test
     public void createEvent_shouldThrowServiceException_whenResponseHasMismatchedCaseDetails() {
         CaseDetails mismatchedCaseDetails = createCaseDetails();
         mismatchedCaseDetails.setReference(9999999999999999L);
+        
+        DecentralisedCaseDetails mismatchedDecentralisedCaseDetails = new DecentralisedCaseDetails();
+        mismatchedDecentralisedCaseDetails.setCaseDetails(mismatchedCaseDetails);
+        mismatchedDecentralisedCaseDetails.setVersion(1L);
 
         DecentralisedSubmitEventResponse mismatchedResponse = new DecentralisedSubmitEventResponse();
-        mismatchedResponse.setCaseDetails(mismatchedCaseDetails);
+        mismatchedResponse.setCaseDetails(mismatchedDecentralisedCaseDetails);
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);

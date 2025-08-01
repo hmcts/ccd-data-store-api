@@ -22,7 +22,8 @@ public class SynchronisedCaseViewUpdater {
      * Executes the provided operation if the case has a version greater than that which we last processed.
      * It uses a pessimistic lock on the case_data row to serialise these operations.
      */
-    public void ifFresh(DecentralisedCaseDetails decentralisedCase, Consumer<CaseDetails> operation) {
+    public void applyConditionallyWithLock(DecentralisedCaseDetails decentralisedCase,
+                                           Consumer<CaseDetails> operation) {
         var caseDetails = decentralisedCase.getCaseDetails();
         log.debug("Acquiring lock for case reference {}", caseDetails.getReference());
         Integer currentVersion = (Integer) em.createNativeQuery(

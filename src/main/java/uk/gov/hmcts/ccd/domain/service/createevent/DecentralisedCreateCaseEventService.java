@@ -1,16 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-
-
 import java.util.Optional;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseDetails;
-import uk.gov.hmcts.ccd.data.persistence.DecentralisedSubmitEventResponse;
 import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
 import uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.data.persistence.DecentralisedEventDetails;
@@ -37,8 +33,7 @@ public class DecentralisedCreateCaseEventService {
                                                              final CaseTypeDefinition caseTypeDefinition,
                                                              final CaseDetails caseDetails,
                                                              final Optional<CaseDetails> caseDetailsBefore,
-                                                             final Optional<IdamUser> onBehalfOf
-                                                ) {
+                                                             final Optional<IdamUser> onBehalfOf) {
         CaseStateDefinition caseStateDefinition =
                 caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
 

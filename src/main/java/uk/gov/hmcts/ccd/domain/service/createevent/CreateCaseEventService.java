@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -71,7 +72,7 @@ public class CreateCaseEventService {
 
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
-    private final DefaultCaseDetailsRepository defaultCaseDetailsRepository;
+    private final CaseDetailsRepository defaultCaseDetailsRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final EventTriggerService eventTriggerService;
@@ -101,12 +102,14 @@ public class CreateCaseEventService {
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final PersistenceStrategyResolver resolver;
     private final SynchronisedCaseViewUpdater concurrentCaseUpdater;
+    private final CasePointerCreator pointerRepository;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                   final CaseDetailsRepository caseDetailsRepository,
-                                  final DefaultCaseDetailsRepository defaultCaseDetailsRepository,
+                                  @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+                                  final CaseDetailsRepository defaultCaseDetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                   final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
@@ -136,7 +139,8 @@ public class CreateCaseEventService {
                                   final CaseDocumentTimestampService caseDocumentTimestampService,
                                   final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
                                   final PersistenceStrategyResolver resolver,
-                                  SynchronisedCaseViewUpdater concurrentCaseUpdater) {
+                                  final CasePointerCreator pointerRepository,
+                                  final SynchronisedCaseViewUpdater concurrentCaseUpdater) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -169,6 +173,7 @@ public class CreateCaseEventService {
         this.caseDocumentTimestampService = caseDocumentTimestampService;
         this.decentralisedCreateCaseEventService = decentralisedCreateCaseEventService;
         this.resolver = resolver;
+        this.pointerRepository = pointerRepository;
         this.concurrentCaseUpdater = concurrentCaseUpdater;
     }
 
@@ -257,14 +262,14 @@ public class CreateCaseEventService {
                 caseDetails.getJurisdiction(),
                 documentHashes
             );
-            var decentralisedCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(content.getEvent(),
-                caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes,
+            var decentralisedCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(
+                content.getEvent(), caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes,
                 Optional.of(caseDetailsInDatabase), onBehalfOfUser);
             finalCaseDetails = decentralisedCaseDetails.getCaseDetails();
 
-            concurrentCaseUpdater.ifFresh(decentralisedCaseDetails, freshDetails -> {
+            concurrentCaseUpdater.applyConditionallyWithLock(decentralisedCaseDetails, freshDetails -> {
                 // A remaining mutable local column is resolvedTTL, which we continue to synchronise locally.
-                defaultCaseDetailsRepository.updateResolvedTtl(caseDetails.getReference(), caseDetails.getResolvedTTL());
+                pointerRepository.updateResolvedTtl(freshDetails.getReference(), freshDetails.getResolvedTTL());
                 caseLinkService.updateCaseLinks(freshDetails, caseTypeDefinition.getCaseFieldDefinitions());
             });
         } else {

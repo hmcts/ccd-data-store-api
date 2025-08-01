@@ -106,6 +106,8 @@ class SubmitCaseTransactionTest {
 
     @Mock
     private CaseDetails savedCaseDetails;
+    
+    private uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseDetails savedDecentralisedCaseDetails;
 
     @Mock
     private UIDService uidService;
@@ -184,6 +186,11 @@ class SubmitCaseTransactionTest {
         doReturn(savedCaseDetails).when(caseDetailsRepository).set(caseDetails);
 
         doReturn(CASE_ID).when(savedCaseDetails).getId();
+        
+        // Setup DecentralisedCaseDetails mock
+        savedDecentralisedCaseDetails = new uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseDetails();
+        savedDecentralisedCaseDetails.setCaseDetails(savedCaseDetails);
+        savedDecentralisedCaseDetails.setVersion(1L);
 
         doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
                                                                              null,
@@ -345,7 +352,7 @@ class SubmitCaseTransactionTest {
     @DisplayName("should use decentralised service when resolver indicates decentralised case")
     void shouldUseDecentralisedServiceWhenDecentralised() {
         doReturn(true).when(resolver).isDecentralised(caseDetails);
-        doReturn(savedCaseDetails).when(decentralisedSubmitCaseTransaction)
+        doReturn(savedDecentralisedCaseDetails).when(decentralisedSubmitCaseTransaction)
             .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails, 
                 Optional.empty(), Optional.empty());
 
@@ -373,7 +380,7 @@ class SubmitCaseTransactionTest {
     void shouldUseDecentralisedServiceWhenDecentralisedWithOnBehalfOfUser() {
         IdamUser onBehalfOfUser = buildOnBehalfOfUser();
         doReturn(true).when(resolver).isDecentralised(caseDetails);
-        doReturn(savedCaseDetails).when(decentralisedSubmitCaseTransaction)
+        doReturn(savedDecentralisedCaseDetails).when(decentralisedSubmitCaseTransaction)
             .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails, 
                 Optional.empty(), Optional.of(onBehalfOfUser));
 
@@ -400,7 +407,7 @@ class SubmitCaseTransactionTest {
     @DisplayName("should still grant access and attach documents for decentralised cases")
     void shouldGrantAccessAndAttachDocumentsForDecentralisedCases() {
         doReturn(true).when(resolver).isDecentralised(caseDetails);
-        doReturn(savedCaseDetails).when(decentralisedSubmitCaseTransaction)
+        doReturn(savedDecentralisedCaseDetails).when(decentralisedSubmitCaseTransaction)
             .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails, 
                 Optional.empty(), Optional.empty());
         doReturn("12345").when(caseDetails).getReferenceAsString();

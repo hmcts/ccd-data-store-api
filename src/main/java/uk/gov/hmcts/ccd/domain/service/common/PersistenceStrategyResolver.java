@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 /**
@@ -24,7 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 @ConfigurationProperties("ccd.decentralised")
 public class PersistenceStrategyResolver {
 
-    private final DefaultCaseDetailsRepository caseDetailsRepository;
+    private final CasePointerCreator pointerRepository;
     private final Cache<Long, String> caseTypeCache;
 
     /**
@@ -39,8 +39,8 @@ public class PersistenceStrategyResolver {
 
 
     @Autowired
-    public PersistenceStrategyResolver(DefaultCaseDetailsRepository caseDetailsRepository) {
-        this.caseDetailsRepository = caseDetailsRepository;
+    public PersistenceStrategyResolver(CasePointerCreator pointerRepository) {
+        this.pointerRepository = pointerRepository;
         // Least Recently Used cache for lookup of case type by reference.
         // At around 100 bytes per entry this cache will use up to 10MB of memory
         // while comfortably accommodating the current working set of cases.
@@ -95,6 +95,6 @@ public class PersistenceStrategyResolver {
     }
 
     private String getCaseTypeByReference(Long reference) {
-        return caseTypeCache.get(reference, this.caseDetailsRepository::findCaseTypeByReference);
+        return caseTypeCache.get(reference, this.pointerRepository::findCaseTypeByReference);
     }
 }
