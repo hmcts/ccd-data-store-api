@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Data
 public class DecentralisedSubmitEventResponse {
-    private CaseDetails caseDetails;
+    private DecentralisedCaseDetails caseDetails;
     private List<String> errors;
     private List<String> warnings;
     private Boolean ignoreWarning;

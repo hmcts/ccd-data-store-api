@@ -71,7 +71,7 @@ public class CreateCaseEventService {
 
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
-    private final CaseDetailsRepository defaultCaseDetailsRepository;
+    private final DefaultCaseDetailsRepository defaultCaseDetailsRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final EventTriggerService eventTriggerService;
@@ -100,13 +100,13 @@ public class CreateCaseEventService {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final PersistenceStrategyResolver resolver;
+    private final SynchronisedCaseViewUpdater concurrentCaseUpdater;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                   final CaseDetailsRepository caseDetailsRepository,
-                                  @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
-                                  final CaseDetailsRepository defaultCaseDetailsRepository,
+                                  final DefaultCaseDetailsRepository defaultCaseDetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                   final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
@@ -135,7 +135,8 @@ public class CreateCaseEventService {
                                   final CaseAccessGroupUtils caseAccessGroupUtils,
                                   final CaseDocumentTimestampService caseDocumentTimestampService,
                                   final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
-                                  final PersistenceStrategyResolver resolver) {
+                                  final PersistenceStrategyResolver resolver,
+                                  SynchronisedCaseViewUpdater concurrentCaseUpdater) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -168,6 +169,7 @@ public class CreateCaseEventService {
         this.caseDocumentTimestampService = caseDocumentTimestampService;
         this.decentralisedCreateCaseEventService = decentralisedCreateCaseEventService;
         this.resolver = resolver;
+        this.concurrentCaseUpdater = concurrentCaseUpdater;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -243,8 +245,6 @@ public class CreateCaseEventService {
                 caseTypeDefinition);
         }
 
-        caseDetailsAfterCallbackWithoutHashes
-            .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 
         var onBehalfOfUser = getOnBehalfOfUser(content.getOnBehalfOfId(), content.getOnBehalfOfUserToken());
         CaseDetails finalCaseDetails;
@@ -257,10 +257,19 @@ public class CreateCaseEventService {
                 caseDetails.getJurisdiction(),
                 documentHashes
             );
-            finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(content.getEvent(),
+            var decentralisedCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(content.getEvent(),
                 caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes,
                 Optional.of(caseDetailsInDatabase), onBehalfOfUser);
+            finalCaseDetails = decentralisedCaseDetails.getCaseDetails();
+
+            concurrentCaseUpdater.ifFresh(decentralisedCaseDetails, freshDetails -> {
+                // A remaining mutable local column is resolvedTTL, which we continue to synchronise locally.
+                defaultCaseDetailsRepository.updateResolvedTtl(caseDetails.getReference(), caseDetails.getResolvedTTL());
+                caseLinkService.updateCaseLinks(freshDetails, caseTypeDefinition.getCaseFieldDefinitions());
+            });
         } else {
+            caseDetailsAfterCallbackWithoutHashes
+                .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes,
                 caseEventDefinition, newState, timeNow);
             saveAuditEventForCaseDetails(
@@ -276,6 +285,8 @@ public class CreateCaseEventService {
                     caseEventDefinition)
             );
 
+            caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+
             // Documents must be attached before event is committed.
             // When centralised this will be upon method return when the transaction commits.
             caseDocumentService.attachCaseDocuments(
@@ -284,9 +295,9 @@ public class CreateCaseEventService {
                 caseDetails.getJurisdiction(),
                 documentHashes
             );
+
         }
 
-        caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
@@ -359,7 +370,8 @@ public class CreateCaseEventService {
 
             finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(event, caseEventDefinition,
                 caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.of(caseDetailsInDatabase),
-                Optional.empty());
+                Optional.empty())
+                .getCaseDetails();
         } else {
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase,
                 caseDetailsAfterCallbackWithoutHashes, caseEventDefinition, newState, timeNow);

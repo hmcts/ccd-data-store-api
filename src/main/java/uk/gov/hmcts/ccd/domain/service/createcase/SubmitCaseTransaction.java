@@ -152,15 +152,24 @@ public class SubmitCaseTransaction implements AccessControl {
                 caseTypeDefinition);
         }
 
-        final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(
-            aboutToSubmitCallbackResponse,
-            event,
-            caseTypeDefinition,
-            idamUser,
-            caseEventDefinition,
-            caseDetailsAfterCallbackWithoutHashes,
-            onBehalfOfUser
-        );
+        CaseDetails savedCaseDetails;
+        if (resolver.isDecentralised(caseDetailsAfterCallbackWithoutHashes)) {
+            this.casePointerCreator.persistCasePointer(caseDetailsAfterCallbackWithoutHashes);
+            savedCaseDetails = decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
+                caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.empty(),
+                Optional.ofNullable(onBehalfOfUser))
+                .getCaseDetails();
+        } else {
+            savedCaseDetails = saveAuditEventForCaseDetails(
+                aboutToSubmitCallbackResponse,
+                event,
+                caseTypeDefinition,
+                idamUser,
+                caseEventDefinition,
+                caseDetailsAfterCallbackWithoutHashes,
+                onBehalfOfUser
+            );
+        }
 
         caseDataAccessControl.grantAccess(savedCaseDetails, idamUser.getId());
 
@@ -182,13 +191,6 @@ public class SubmitCaseTransaction implements AccessControl {
                                                      CaseDetails newCaseDetails,
                                                      IdamUser onBehalfOfUser) {
 
-        if (resolver.isDecentralised(newCaseDetails)) {
-            this.casePointerCreator.persistCasePointer(newCaseDetails);
-            // Send the event to the decentralised service.
-            return decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
-                caseEventDefinition, caseTypeDefinition, newCaseDetails, Optional.empty(),
-                Optional.ofNullable(onBehalfOfUser));
-        }
         CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());

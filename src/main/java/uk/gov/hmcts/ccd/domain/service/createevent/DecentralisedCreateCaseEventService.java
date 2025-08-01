@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseDetails;
+import uk.gov.hmcts.ccd.data.persistence.DecentralisedSubmitEventResponse;
 import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
 import uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.data.persistence.DecentralisedEventDetails;
@@ -28,20 +30,15 @@ public class DecentralisedCreateCaseEventService {
 
     private final CaseTypeService caseTypeService;
     private final ServicePersistenceClient servicePersistenceClient;
-    private final DefaultCaseDetailsRepository caseDetailsRepository;
 
 
-    public CaseDetails submitDecentralisedEvent(final Event event,
-                                                final CaseEventDefinition caseEventDefinition,
-                                                final CaseTypeDefinition caseTypeDefinition,
-                                                final CaseDetails caseDetails,
-                                                final Optional<CaseDetails> caseDetailsBefore,
-                                                final Optional<IdamUser> onBehalfOf
+    public DecentralisedCaseDetails submitDecentralisedEvent(final Event event,
+                                                             final CaseEventDefinition caseEventDefinition,
+                                                             final CaseTypeDefinition caseTypeDefinition,
+                                                             final CaseDetails caseDetails,
+                                                             final Optional<CaseDetails> caseDetailsBefore,
+                                                             final Optional<IdamUser> onBehalfOf
                                                 ) {
-
-        // A remaining mutable local column is resolvedTTL, which we continue to synchronise locally.
-        caseDetailsRepository.updateResolvedTtl(caseDetails.getReference(), caseDetails.getResolvedTTL());
-
         CaseStateDefinition caseStateDefinition =
                 caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
 

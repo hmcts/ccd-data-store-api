@@ -37,9 +37,10 @@ public class ServicePersistenceClient {
             throw new CaseNotFoundException(String.valueOf(casePointer.getReference()));
         }
 
-        var returnedCaseDetails = response.getFirst().getCaseDetails();
+        var first = response.getFirst();
 
-        validateCaseDetails(casePointer, returnedCaseDetails);
+        validateCaseDetails(casePointer, first);
+        var returnedCaseDetails = first.getCaseDetails();
 
         // The decentralised service doesn't know about our internal ID. We enrich the object here for internal use.
         returnedCaseDetails.setId(casePointer.getId());
@@ -58,7 +59,7 @@ public class ServicePersistenceClient {
      * @throws ApiException if the remote service returns validation errors or warnings.
      * @throws ServiceException if the remote service returns mismatched case identity information.
      */
-    public CaseDetails createEvent(DecentralisedCaseEvent caseEvent) {
+    public DecentralisedCaseDetails createEvent(DecentralisedCaseEvent caseEvent) {
         var casePointer = caseEvent.getCaseDetails();
         var uri = resolver.resolveUriOrThrow(casePointer);
         UUID idempotencyKey = idempotencyKeyHolder.getKey();
@@ -67,7 +68,7 @@ public class ServicePersistenceClient {
             throw new IllegalStateException("No idempotency key set for the request context.");
         }
 
-        var response = api.submitEvent(uri, idempotencyKey.toString(), caseEvent);
+        DecentralisedSubmitEventResponse response = api.submitEvent(uri, idempotencyKey.toString(), caseEvent);
 
         // Handle functional errors and warnings returned by the service
         if (!isEmpty(response.getErrors())
@@ -78,13 +79,13 @@ public class ServicePersistenceClient {
                 .withWarnings(response.getWarnings());
         }
 
-        var returnedCaseDetails = response.getCaseDetails();
+        var details = response.getCaseDetails();
 
-        validateCaseDetails(casePointer, returnedCaseDetails);
+        validateCaseDetails(casePointer, details);
 
         // The decentralised service doesn't know about our internal ID. We enrich the object here for internal use.
-        returnedCaseDetails.setId(casePointer.getId());
-        return returnedCaseDetails;
+        details.getCaseDetails().setId(casePointer.getId());
+        return details;
     }
 
     public List<AuditEvent> getCaseHistory(CaseDetails caseDetails) {
@@ -105,7 +106,12 @@ public class ServicePersistenceClient {
         return api.updateSupplementaryData(uri, caseRef, supplementaryData).getSupplementaryData();
     }
 
-    private void validateCaseDetails(CaseDetails casePointer, CaseDetails returnedCaseDetails) {
+    private void validateCaseDetails(CaseDetails casePointer, DecentralisedCaseDetails details) {
+        if (details.getVersion() == null) {
+            throw new ServiceException("Downstream service failed to return a version for case reference "
+                + casePointer.getReference());
+        }
+        var returnedCaseDetails = details.getCaseDetails();
         if (!casePointer.getReference().equals(returnedCaseDetails.getReference())
             || !casePointer.getCaseTypeId().equals(returnedCaseDetails.getCaseTypeId())) {
 

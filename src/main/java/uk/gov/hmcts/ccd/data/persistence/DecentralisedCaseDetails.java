@@ -7,6 +7,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Data
-class DecentralisedCaseDetails {
+public class DecentralisedCaseDetails {
     private CaseDetails caseDetails;
+    private Long version;
 }
