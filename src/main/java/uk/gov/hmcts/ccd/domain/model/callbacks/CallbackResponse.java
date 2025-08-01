@@ -30,6 +30,7 @@ public class CallbackResponse {
     private SignificantItem significantItem;
     private String state;
 
+    @JsonProperty("error_message_override")
     private String errorMessageOverride;
     private List<String> errors;
     private List<String> warnings;
