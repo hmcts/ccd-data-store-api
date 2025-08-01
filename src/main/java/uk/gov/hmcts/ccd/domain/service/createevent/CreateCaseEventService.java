@@ -101,7 +101,7 @@ public class CreateCaseEventService {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final PersistenceStrategyResolver resolver;
-    private final SynchronisedCaseViewUpdater concurrentCaseUpdater;
+    private final SynchronisedCaseProcessor concurrentCaseUpdater;
     private final CasePointerRepository pointerRepository;
 
     @Inject
@@ -140,7 +140,7 @@ public class CreateCaseEventService {
                                   final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
                                   final PersistenceStrategyResolver resolver,
                                   final CasePointerRepository pointerRepository,
-                                  final SynchronisedCaseViewUpdater concurrentCaseUpdater) {
+                                  final SynchronisedCaseProcessor concurrentCaseUpdater) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;

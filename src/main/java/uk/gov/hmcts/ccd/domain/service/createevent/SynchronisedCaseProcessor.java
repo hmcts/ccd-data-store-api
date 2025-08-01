@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
@@ -10,10 +12,26 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.function.Consumer;
 
+/**
+ * Provides a concurrency-safe mechanism for processing updates to locally-persisted data for decentralised cases.
+ *
+ * <p>In the decentralised persistence model, the source of truth for case data lies with decentralised services.
+ * However, certain features, such as resolvedTTL and caseLinks, require maintaining derived data in
+ * CCD's database.</p>
+ *
+ * <p>Since decentralised services can process events concurrently for the same case, direct updates to this
+ * shared local data would lead to race conditions and potential data corruption. This processor prevents this by
+ * serializing updates for a given case reference.</p>
+ *
+ * <p>It also prevents stale updates by comparing the version number from the decentralised service's response with the
+ * last-processed version. An operation is only executed if the incoming version is newer.</p>
+ *
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SynchronisedCaseViewUpdater {
+@Transactional(propagation = Propagation.MANDATORY)
+public class SynchronisedCaseProcessor {
 
     @PersistenceContext
     private final EntityManager em;
