@@ -5,6 +5,7 @@
   },
   "preview": {
     "sampling": {
+      "percentage": 50,
       "overrides": [
         {
           "telemetryType": "request",
@@ -21,6 +22,21 @@
             }
           ],
           "percentage": 1
+        },
+        {
+          "telemetryType": "dependency",
+          "percentage": 25
+        },
+        {
+          "telemetryType": "request",
+          "attributes": [
+            {
+              "key": "http.url",
+              "value": ".*(/documents|/cases/[^/]+/documents).*",
+              "matchType": "regexp"
+            }
+          ],
+          "percentage": 15
         }
       ]
     }
