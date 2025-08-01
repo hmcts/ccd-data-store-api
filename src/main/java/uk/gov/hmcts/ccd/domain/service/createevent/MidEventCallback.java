@@ -1,8 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -52,9 +51,7 @@ public class MidEventCallback {
     }
 
     @Transactional
-    public JsonNode invoke(String caseTypeId,
-                           CaseDataContent content,
-                           String pageId) {
+    public Map<String, JsonNode> invoke(String caseTypeId, CaseDataContent content, String pageId) {
         if (!isBlank(pageId)) {
             Event event = content.getEvent();
             final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
@@ -91,11 +88,10 @@ public class MidEventCallback {
                     caseDetailsBefore,
                     currentOrNewCaseDetails,
                     content.getIgnoreWarning());
-
-                return dataJsonNode(caseDetailsFromMidEventCallback.getData());
+                return caseDetailsFromMidEventCallback.getData();
             }
         }
-        return dataJsonNode(content.getData());
+        return content.getData();
     }
 
     private void removeNextPageFieldData(CaseDetails currentCaseDetails, Integer order,
@@ -110,13 +106,6 @@ public class MidEventCallback {
                 .collect(Collectors.toSet());
             currentCaseDetails.getData().entrySet().removeIf(entry -> wizardPageFields.contains(entry.getKey()));
         }
-    }
-
-    private JsonNode dataJsonNode(Map<String, JsonNode> data) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode objectNode = mapper.createObjectNode();
-        objectNode.set("data", mapper.valueToTree(data));
-        return objectNode;
     }
 
     private CaseTypeDefinition getCaseType(String caseTypeId) {
