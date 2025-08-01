@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
@@ -39,6 +41,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
@@ -324,6 +328,81 @@ class CallbackServiceTest {
         assertTrue(httpHeaders.containsKey(customHeaders.get(1)));
         assertEquals(customHeaderValues.get(1), httpHeaders.get(customHeaders.get(1)).get(0));
         assertFalse(httpHeaders.containsKey(customHeaders.get(2)));
+    }
+
+    @Test
+    @DisplayName("Should not throw ApiException when no error or warning fields set in response")
+    void shouldNotThrowApiExceptionWhenNoErrorOrWarningFieldsSet() {
+        assertThatNoException().isThrownBy(
+            () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false)
+        );
+    }
+
+    @Test
+    @DisplayName("Should not throw ApiException when only warning fields set in response and warnings ignored")
+    void shouldNotThrowApiExceptionWhenIgnorableWarningsSet() {
+        callbackResponse.setWarnings(List.of("Warning 1"));
+
+        assertThatNoException().isThrownBy(
+            () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true)
+        );
+    }
+
+    @Test
+    @DisplayName("Should throw ApiException when only warning fields set in response and warnings not ignored")
+    void shouldThrowApiExceptionWhenNonIgnorableWarningsSet() {
+        List<String> expectedWarnings = List.of("Warning 1");
+        callbackResponse.setWarnings(expectedWarnings);
+
+        Throwable throwable = catchThrowable(
+            () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false)
+        );
+
+        Assertions.assertThat(throwable)
+            .isInstanceOf(ApiException.class)
+            .hasMessage("Unable to proceed because there are one or more callback Errors or Warnings");
+
+        ApiException apiException = (ApiException) throwable;
+        Assertions.assertThat(apiException.getCallbackWarnings()).isEqualTo(expectedWarnings);
+        Assertions.assertThat(apiException.getCallbackErrors()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Should throw ApiException when only error fields set in response")
+    void shouldThrowApiExceptionWhenErrorsSet() {
+        List<String> expectedErrors = List.of("Error 1");
+        callbackResponse.setErrors(expectedErrors);
+
+        Throwable throwable = catchThrowable(
+            () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false)
+        );
+
+        Assertions.assertThat(throwable)
+            .isInstanceOf(ApiException.class)
+            .hasMessage("Unable to proceed because there are one or more callback Errors or Warnings");
+
+        ApiException apiException = (ApiException) throwable;
+        Assertions.assertThat(apiException.getCallbackErrors()).isEqualTo(expectedErrors);
+        Assertions.assertThat(apiException.getCallbackWarnings()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Should throw ApiException with custom error message")
+    void shouldThrowApiExceptionWithCustomMessageWhenErrorMessageOverrideSet() {
+        String expectedErrorMessage = "Some custom error message";
+        callbackResponse.setErrorMessageOverride(expectedErrorMessage);
+
+        Throwable throwable = catchThrowable(
+            () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false)
+        );
+
+        Assertions.assertThat(throwable)
+            .isInstanceOf(ApiException.class)
+            .hasMessage(expectedErrorMessage);
+
+        ApiException apiException = (ApiException) throwable;
+        Assertions.assertThat(apiException.getCallbackErrors()).isEmpty();
+        Assertions.assertThat(apiException.getCallbackWarnings()).isEmpty();
     }
 
     private void initSecurityContext() {
