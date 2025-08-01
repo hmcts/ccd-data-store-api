@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerCreator;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -19,9 +20,11 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
@@ -36,6 +39,7 @@ import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SubmitCaseTransaction implements AccessControl {
@@ -52,21 +56,27 @@ public class SubmitCaseTransaction implements AccessControl {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final CaseDocumentTimestampService caseDocumentTimestampService;
+    private final DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
+    private final PersistenceStrategyResolver resolver;
+    private final CasePointerCreator casePointerCreator;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                      final CaseDetailsRepository caseDetailsRepository,
-                                    final CaseAuditEventRepository caseAuditEventRepository,
-                                    final CaseTypeService caseTypeService,
-                                    final CallbackInvoker callbackInvoker,
-                                    final UIDService uidService,
-                                    final SecurityClassificationService securityClassificationService,
-                                    final CaseDataAccessControl caseDataAccessControl,
-                                    final @Qualifier("caseEventMessageService") MessageService messageService,
-                                    final CaseDocumentService caseDocumentService,
-                                    final ApplicationParams applicationParams,
-                                    final CaseAccessGroupUtils caseAccessGroupUtils,
-                                    final CaseDocumentTimestampService caseDocumentTimestampService
+                                 final CaseAuditEventRepository caseAuditEventRepository,
+                                 final CaseTypeService caseTypeService,
+                                 final CallbackInvoker callbackInvoker,
+                                 final UIDService uidService,
+                                 final SecurityClassificationService securityClassificationService,
+                                 final CaseDataAccessControl caseDataAccessControl,
+                                 final @Qualifier("caseEventMessageService") MessageService messageService,
+                                 final CaseDocumentService caseDocumentService,
+                                 final ApplicationParams applicationParams,
+                                 final CaseAccessGroupUtils caseAccessGroupUtils,
+                                 final CaseDocumentTimestampService caseDocumentTimestampService,
+                                 final DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction,
+                                 final PersistenceStrategyResolver resolver,
+                                 final CasePointerCreator casePointerCreator
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -80,7 +90,9 @@ public class SubmitCaseTransaction implements AccessControl {
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
-
+        this.decentralisedSubmitCaseTransaction = decentralisedSubmitCaseTransaction;
+        this.resolver = resolver;
+        this.casePointerCreator = casePointerCreator;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -170,7 +182,14 @@ public class SubmitCaseTransaction implements AccessControl {
                                                      CaseDetails newCaseDetails,
                                                      IdamUser onBehalfOfUser) {
 
-        final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
+        if (resolver.isDecentralised(newCaseDetails)) {
+            this.casePointerCreator.persistCasePointer(newCaseDetails);
+            // Send the event to the decentralised service.
+            return decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
+                caseEventDefinition, caseTypeDefinition, newCaseDetails, Optional.empty(),
+                Optional.ofNullable(onBehalfOfUser));
+        }
+        CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());
         auditEvent.setEventName(caseEventDefinition.getName());
