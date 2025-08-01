@@ -30,6 +30,7 @@ public class CallbackResponse {
     private SignificantItem significantItem;
     private String state;
 
+    private String errorMessageOverride;
     private List<String> errors;
     private List<String> warnings;
 
@@ -39,6 +40,14 @@ public class CallbackResponse {
 
     public void setData(Map<String, JsonNode> data) {
         this.data = data;
+    }
+
+    public String getErrorMessageOverride() {
+        return errorMessageOverride;
+    }
+
+    public void setErrorMessageOverride(String errorMessageOverride) {
+        this.errorMessageOverride = errorMessageOverride;
     }
 
     public List<String> getErrors() {
