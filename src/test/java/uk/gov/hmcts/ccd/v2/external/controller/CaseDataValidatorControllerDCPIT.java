@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Before;
-import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
