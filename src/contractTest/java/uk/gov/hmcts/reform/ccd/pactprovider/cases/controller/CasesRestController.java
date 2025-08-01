@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.pactprovider.cases.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -7,13 +8,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -23,6 +26,9 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
+
+import java.time.LocalDateTime;
+import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -182,6 +188,24 @@ public class CasesRestController {
         @RequestParam(value = "ignore-warning", required = false, defaultValue = "false") final Boolean ignoreWarning,
         @RequestBody(required = false) final CaseDataContent content) {
 
+        String pactScenario = System.getProperty("PACT_TEST_SCENARIO");
+        System.out.println("pact scenario" + pactScenario);
+
+        if ("CreateCase".equalsIgnoreCase(pactScenario)) {
+            CaseDetails caseDetails = new CaseDetails();
+            caseDetails.setCaseTypeId("PRLAPPS");
+            caseDetails.setState("Submitted");
+            caseDetails.setSecurityClassification(SecurityClassification.valueOf("PUBLIC"));
+            caseDetails.setCreatedDate(LocalDateTime.of(2025, 6, 16, 10, 0));
+            caseDetails.setLastModified(LocalDateTime.of(2025, 6, 16, 10, 5));
+            caseDetails.setData(Map.of("caseTypeOfApplication",
+                new ObjectMapper().valueToTree("C100")));
+
+            return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(caseDetails);
+        }
         CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
         return ResponseEntity.status(HttpStatus.CREATED).body(caseDetails);
     }
