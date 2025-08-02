@@ -224,6 +224,50 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
     }
 
     @Test
+    public void shouldRollbackCasePointerWhenServicePersistenceAPIReturnsErrorsResponse() throws Exception {
+        // GIVEN: We first create a case pointer directly by setting up a successful response
+        // then simulating a failure on the second request
+        final var url = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases",
+            USER_ID, JURISDICTION_ID, DECENTRALISED_CASE_TYPE_ID);
+
+        final var caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().withEventId(CREATE_CASE_EVENT_ID).build());
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+        caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID,
+            DECENTRALISED_CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
+
+        // WHEN: We stub the ServicePersistenceAPI to return a response with validation errors
+        final String errorResponseBody = """
+            {
+                "errors": ["Field is required", "Invalid value provided"],
+                "warnings": [],
+                "case_details": null
+            }
+            """;
+
+        stubFor(WireMock.post(urlEqualTo(SERVICE_PERSISTENCE_API_PATH))
+            .withHeader("Idempotency-Key", matching(".*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(errorResponseBody)));
+
+        // AND: We attempt to create a case via CCD's API
+        final var mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andReturn();
+
+        // THEN: The request should fail due to validation errors
+        assertEquals("Expected 422 Unprocessable Entity due to validation errors",
+            422, mvcResult.getResponse().getStatus());
+
+        // AND: No case pointer should remain in the local database (rolled back)
+        final var casePointers = jdbcTemplate.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Expected no case pointers in local database after rollback", 0, casePointers.size());
+    }
+
+    @Test
     public void shouldReturn409ConflictWhenServicePersistenceAPIReturnsConflict() throws Exception {
         // GIVEN: A decentralised case type with a configured service URL
         final var url = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases",

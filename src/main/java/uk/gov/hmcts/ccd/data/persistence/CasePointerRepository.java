@@ -67,4 +67,24 @@ public class CasePointerRepository {
             .setParameter("caseReference", caseReference)
             .executeUpdate();
     }
+
+    /**
+     * Ensure a case pointer is deleted regardless of the state of any outer transaction.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void deleteCasePointer(Long caseReference) {
+        log.info("Deleting case pointer for caseReference: {}", caseReference);
+        // Case pointers are stored with empty data, as an additional precaution.
+        int deletedCount = em.createNativeQuery("""
+                delete from case_data where reference = :caseReference and data = cast('{}' as jsonb)
+                """)
+            .setParameter("caseReference", caseReference)
+            .executeUpdate();
+
+        if (deletedCount > 0) {
+            log.info("Successfully deleted case pointer for caseReference: {}", caseReference);
+        } else {
+            log.error("No case pointer found to delete for caseReference: {}", caseReference);
+        }
+    }
 }

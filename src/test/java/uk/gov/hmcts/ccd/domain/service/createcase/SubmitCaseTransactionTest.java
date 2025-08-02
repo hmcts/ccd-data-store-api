@@ -39,6 +39,8 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
 import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
+import feign.FeignException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +48,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -60,6 +64,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
@@ -539,6 +545,128 @@ class SubmitCaseTransactionTest {
             });
 
         return result;
+    }
+
+    @Test
+    @DisplayName("should rollback case pointer when ApiException has populated errors array")
+    void shouldRollbackCasePointerWhenApiExceptionHasErrors() {
+        // Setup for decentralised case
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        // Setup ApiException with errors
+        ApiException apiException = new ApiException("Validation failed")
+            .withErrors(Arrays.asList("Field is required", "Invalid value"));
+
+        // Mock the decentralised service to throw ApiException
+        doThrow(apiException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        // Execute and verify exception is thrown
+        assertThrows(ApiException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, IGNORE_WARNING, null));
+
+        // Verify case pointer was persisted then deleted
+        verify(casePointerRepository).persistCasePointer(caseDetails);
+        verify(casePointerRepository).deleteCasePointer(1234567890L);
+    }
+
+    @Test
+    @DisplayName("should rollback case pointer when FeignException has 4xx status code")
+    void shouldRollbackCasePointerWhenFeignExceptionIs4xx() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        FeignException feignException = FeignException.errorStatus("submitEvent",
+            feign.Response.builder()
+                .status(400)
+                .reason("Bad Request")
+                .headers(Collections.emptyMap())
+                .request(feign.Request.create(feign.Request.HttpMethod.POST, "/test",
+                    Collections.emptyMap(), null, null, null))
+                .build());
+
+        doThrow(feignException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        assertThrows(FeignException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, IGNORE_WARNING, null));
+
+        verify(casePointerRepository).persistCasePointer(caseDetails);
+        verify(casePointerRepository).deleteCasePointer(1234567890L);
+    }
+
+    @Test
+    @DisplayName("should not rollback case pointer when FeignException has 5xx status code")
+    void shouldNotRollbackCasePointerWhenFeignExceptionIs5xx() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        // Setup FeignException with 500 status code
+        FeignException feignException = FeignException.errorStatus("submitEvent",
+            feign.Response.builder()
+                .status(500)
+                .reason("Internal Server Error")
+                .headers(Collections.emptyMap())
+                .request(feign.Request.create(feign.Request.HttpMethod.POST, "/test",
+                    Collections.emptyMap(), null, null, null))
+                .build());
+
+        doThrow(feignException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        assertThrows(FeignException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, IGNORE_WARNING, null));
+
+        verify(casePointerRepository).persistCasePointer(caseDetails);
+        verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
+    }
+
+    @Test
+    @DisplayName("should not rollback case pointer when ApiException has no errors")
+    void shouldNotRollbackCasePointerWhenApiExceptionHasNoErrors() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        ApiException apiException = new ApiException("Some other error");
+
+        doThrow(apiException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        assertThrows(ApiException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, IGNORE_WARNING, null));
+
+        verify(casePointerRepository).persistCasePointer(caseDetails);
+        verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
+    }
+
+    @Test
+    @DisplayName("should not rollback case pointer when ApiException has empty errors list")
+    void shouldNotRollbackCasePointerWhenApiExceptionHasEmptyErrors() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        ApiException apiException = new ApiException("Some other error")
+            .withErrors(Collections.emptyList());
+
+        doThrow(apiException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        assertThrows(ApiException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, IGNORE_WARNING, null));
+
+        verify(casePointerRepository).persistCasePointer(caseDetails);
+        verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
     }
 
 }

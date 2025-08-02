@@ -6,6 +6,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import feign.FeignException;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
@@ -41,6 +43,9 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class SubmitCaseTransaction implements AccessControl {
 
@@ -155,10 +160,24 @@ public class SubmitCaseTransaction implements AccessControl {
         CaseDetails savedCaseDetails;
         if (resolver.isDecentralised(caseDetailsAfterCallbackWithoutHashes)) {
             this.casePointerRepository.persistCasePointer(caseDetailsAfterCallbackWithoutHashes);
-            savedCaseDetails = decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
-                caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.empty(),
-                Optional.ofNullable(onBehalfOfUser))
-                .getCaseDetails();
+            try {
+                savedCaseDetails = decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
+                    caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.empty(),
+                    Optional.ofNullable(onBehalfOfUser))
+                    .getCaseDetails();
+            } catch (ApiException apiException) {
+                // Rollback case pointer if downstream service returns errors
+                if (apiException.getCallbackErrors() != null && !apiException.getCallbackErrors().isEmpty()) {
+                    rollbackCasePointer(caseDetailsAfterCallbackWithoutHashes.getReference());
+                }
+                throw apiException;
+            } catch (FeignException feignException) {
+                // Rollback case pointer if downstream service returns 4xx error
+                if (feignException.status() >= 400 && feignException.status() < 500) {
+                    rollbackCasePointer(caseDetailsAfterCallbackWithoutHashes.getReference());
+                }
+                throw feignException;
+            }
         } else {
             savedCaseDetails = saveAuditEventForCaseDetails(
                 aboutToSubmitCallbackResponse,
@@ -234,6 +253,19 @@ public class SubmitCaseTransaction implements AccessControl {
             auditEvent.setProxiedBy(idamUser.getId());
             auditEvent.setProxiedByLastName(idamUser.getSurname());
             auditEvent.setProxiedByFirstName(idamUser.getForename());
+        }
+    }
+
+    private void rollbackCasePointer(Long caseReference) {
+        try {
+            log.info("Rolling back case pointer for case reference: {}", caseReference);
+            casePointerRepository.deleteCasePointer(caseReference);
+        } catch (Exception e) {
+            // Log the error but don't fail the original operation
+            // The client should receive the original error, not this rollback error
+            // This is a best-effort cleanup
+            log.error("Failed to rollback case pointer for case reference: {}. Error: {}", 
+                caseReference, e.getMessage(), e);
         }
     }
 
