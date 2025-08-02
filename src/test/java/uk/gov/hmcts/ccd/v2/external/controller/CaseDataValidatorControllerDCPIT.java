@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
@@ -59,7 +61,7 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
 
     private JdbcTemplate template;
 
-    //@Before
+    @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
@@ -72,7 +74,7 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
         template = new JdbcTemplate(db);
     }
 
-    //@Test
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_case_dcp.sql" })
     public void shouldValidateWithFormattedDCPValues() throws Exception {
         assertCaseDataResultSetSize();
@@ -121,7 +123,7 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
         );
     }
 
-    //@Test
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_case_dcp.sql" })
     public void shouldFail() throws Exception {
         assertCaseDataResultSetSize();
