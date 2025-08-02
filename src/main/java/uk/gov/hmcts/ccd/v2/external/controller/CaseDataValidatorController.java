@@ -88,20 +88,24 @@ public class CaseDataValidatorController {
     }
 
     private void validateDebug(final String caseTypeId, final String pageId, final CaseDataContent content) {
-        final String contentAsString = jclogger.printObjectToString(content);
-        final Map<String, JsonNode> eventData = content.getEventData();
-        jclogger.jclog("validateDebug() ----------");
-        jclogger.jclog("validateDebug() caseTypeId               = " + caseTypeId);
-        jclogger.jclog("validateDebug() pageId                   = " + pageId);
-        jclogger.jclog("validateDebug() contentAsString.length   = " + contentAsString.length());
-        jclogger.jclog("validateDebug() contentAsString.hashCode = " + contentAsString.hashCode());
-        jclogger.jclog("validateDebug() contentAsString          = " + contentAsString);
-        if (eventData != null && eventData.containsKey("adjournCasePanelMember3")) {
-            JsonNode adjournCasePanelMember3 = eventData.get("adjournCasePanelMember3");
-            jclogger.jclog("validateDebug() adjournCasePanelMember3  = "
-                + jclogger.printObjectToString(adjournCasePanelMember3));
-        } else {
-            jclogger.jclog("validateDebug() adjournCasePanelMember3 NOT PRESENT");
+        try {
+            final String contentAsString = jclogger.printObjectToString(content);
+            final Map<String, JsonNode> eventData = content.getEventData();
+            jclogger.jclog("validateDebug() ----------");
+            jclogger.jclog("validateDebug() caseTypeId               = " + caseTypeId);
+            jclogger.jclog("validateDebug() pageId                   = " + pageId);
+            jclogger.jclog("validateDebug() contentAsString.length   = " + contentAsString.length());
+            jclogger.jclog("validateDebug() contentAsString.hashCode = " + contentAsString.hashCode());
+            jclogger.jclog("validateDebug() contentAsString          = " + contentAsString);
+            if (eventData != null && eventData.containsKey("adjournCasePanelMember3")) {
+                JsonNode adjournCasePanelMember3 = eventData.get("adjournCasePanelMember3");
+                jclogger.jclog("validateDebug() adjournCasePanelMember3  = "
+                    + jclogger.printObjectToString(adjournCasePanelMember3));
+            } else {
+                jclogger.jclog("validateDebug() adjournCasePanelMember3 NOT PRESENT");
+            }
+        } catch (Exception ex) {
+            jclogger.jclog("validateDebug() EXCEPTION: " + ex.getMessage());
         }
     }
 }
