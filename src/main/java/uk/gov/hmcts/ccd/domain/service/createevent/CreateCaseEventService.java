@@ -101,7 +101,7 @@ public class CreateCaseEventService {
     private final ApplicationParams applicationParams;
     private final CaseAccessGroupUtils caseAccessGroupUtils;
     private final PersistenceStrategyResolver resolver;
-    private final SynchronisedCaseProcessor concurrentCaseUpdater;
+    private final SynchronisedCaseProcessor synchronisedCaseProcessor;
     private final CasePointerRepository pointerRepository;
 
     @Inject
@@ -140,7 +140,7 @@ public class CreateCaseEventService {
                                   final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
                                   final PersistenceStrategyResolver resolver,
                                   final CasePointerRepository pointerRepository,
-                                  final SynchronisedCaseProcessor concurrentCaseUpdater) {
+                                  final SynchronisedCaseProcessor synchronisedCaseProcessor) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -174,7 +174,7 @@ public class CreateCaseEventService {
         this.decentralisedCreateCaseEventService = decentralisedCreateCaseEventService;
         this.resolver = resolver;
         this.pointerRepository = pointerRepository;
-        this.concurrentCaseUpdater = concurrentCaseUpdater;
+        this.synchronisedCaseProcessor = synchronisedCaseProcessor;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -267,7 +267,7 @@ public class CreateCaseEventService {
                 Optional.of(caseDetailsInDatabase), onBehalfOfUser);
             finalCaseDetails = decentralisedCaseDetails.getCaseDetails();
 
-            concurrentCaseUpdater.applyConditionallyWithLock(decentralisedCaseDetails, freshDetails -> {
+            synchronisedCaseProcessor.applyConditionallyWithLock(decentralisedCaseDetails, freshDetails -> {
                 // A remaining mutable local column is resolvedTTL, which we continue to synchronise locally.
                 pointerRepository.updateResolvedTtl(freshDetails.getReference(), freshDetails.getResolvedTTL());
                 caseLinkService.updateCaseLinks(freshDetails, caseTypeDefinition.getCaseFieldDefinitions());
