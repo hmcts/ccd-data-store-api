@@ -35,7 +35,7 @@ public class SynchronisedCaseProcessorIT extends WireMockBaseTest {
     @Inject
     private JdbcTemplate jdbcTemplate;
 
-    private int initialVersion;
+    private long initialVersion;
 
     @Before
     public void setUp() {
@@ -103,10 +103,10 @@ public class SynchronisedCaseProcessorIT extends WireMockBaseTest {
         return decentralisedCaseDetails;
     }
 
-    private Integer getCurrentVersion(Long caseReference) {
+    private Long getCurrentVersion(Long caseReference) {
         return jdbcTemplate.queryForObject(
             "SELECT version FROM case_data WHERE reference = ?",
-            Integer.class,
+            Long.class,
             caseReference
         );
     }
