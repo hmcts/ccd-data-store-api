@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import javax.validation.constraints.NotNull;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +9,18 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
+import javax.validation.constraints.NotNull;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 /**
  * Determines whether a case's mutable data is handled by the
  * internal CCD database or delegated to an external, service implemented persistence handler.
+ * This implementation uses prefix-based matching for case types to support the preview environment.
  */
 @Service
 @Slf4j
@@ -28,9 +31,9 @@ public class PersistenceStrategyResolver {
     private final Cache<Long, String> caseTypeCache;
 
     /**
-     * A map where the key is lowercase(case-type-id) and the value is the base URL
+     * A map where the key is a lowercase(case-type-id-prefix) and the value is the base URL
      * of the owning service responsible for its persistence.
-     * e.g., 'MyCaseType': 'http://my-service-host:port'
+     * e.g., 'mycasetype': 'http://my-service-host:port' would match 'MyCaseType-1234'.
      *
      * <p>This can be set via application properties and environment variables.
      */
@@ -73,25 +76,59 @@ public class PersistenceStrategyResolver {
     public URI resolveUriOrThrow(Long caseReference) {
         var caseType = getCaseTypeByReference(caseReference);
 
-        return getCaseTypeServiceUrl(caseType).orElseThrow();
+        return getCaseTypeServiceUrl(caseType).orElseThrow(() -> {
+            String message = String.format(
+                "No decentralised persistence route configured for case type %s (from case reference %d)",
+                caseType,
+                caseReference
+            );
+            return new UnsupportedOperationException(message);
+        });
     }
 
 
     public URI resolveUriOrThrow(CaseDetails caseDetails) {
-        Optional<URI> url = getCaseTypeServiceUrl(caseDetails.getCaseTypeId());
-        if (url.isPresent()) {
-            return url.get();
-        }
-        String message = String.format(
-            "Operation failed: No decentralised persistence route configured for case type %s",
-            caseDetails.getCaseTypeId()
-        );
-        throw new UnsupportedOperationException(message);
+        return getCaseTypeServiceUrl(caseDetails.getCaseTypeId()).orElseThrow(() -> {
+            String message = String.format(
+                "Operation failed: No decentralised persistence route configured for case type %s",
+                caseDetails.getCaseTypeId()
+            );
+            return new UnsupportedOperationException(message);
+        });
     }
 
-
+    /**
+     * Finds the persistence service URL for a given case type ID using prefix matching.
+     *
+     * @param caseTypeId The full case type ID (e.g., "NFD").
+     * @return An {@link Optional} containing the {@link URI} if a single, unambiguous prefix match is found.
+     * @throws IllegalStateException if more than one configured case type matches the given caseTypeId.
+     */
     private Optional<URI> getCaseTypeServiceUrl(String caseTypeId) {
-        return Optional.ofNullable(caseTypeServiceUrls.get(caseTypeId.toLowerCase()));
+        if (caseTypeId == null || caseTypeId.isBlank()) {
+            return Optional.empty();
+        }
+
+        final String lowerCaseTypeId = caseTypeId.toLowerCase();
+
+        List<String> matchingPrefixes = caseTypeServiceUrls.keySet().stream()
+            .filter(lowerCaseTypeId::startsWith)
+            .collect(Collectors.toList());
+
+        if (matchingPrefixes.size() > 1) {
+            String conflictingPrefixes = String.join(", ", matchingPrefixes);
+            String message = String.format(
+                "Ambiguous configuration for case type '%s'. Multiple prefix matches found: [%s]",
+                caseTypeId,
+                conflictingPrefixes
+            );
+            log.error(message);
+            throw new IllegalStateException(message);
+        }
+
+        return matchingPrefixes.stream()
+            .findFirst()
+            .map(caseTypeServiceUrls::get);
     }
 
     private String getCaseTypeByReference(Long reference) {
