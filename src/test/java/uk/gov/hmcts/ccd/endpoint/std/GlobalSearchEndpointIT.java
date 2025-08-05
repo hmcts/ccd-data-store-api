@@ -308,7 +308,8 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
             .build();
 
         // Wrap in MultiSearch response
-        MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem = new MultiSearchResponseItem.Builder<ElasticSearchCaseDetailsDTO>()
+        MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem
+            = new MultiSearchResponseItem.Builder<ElasticSearchCaseDetailsDTO>()
             .result(r -> r
                 .took(123)
                 .timedOut(false)

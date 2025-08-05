@@ -1,12 +1,11 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import co.elastic.clients.elasticsearch.core.search.TotalHits;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -37,6 +36,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,17 +48,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("checkstyle:OperatorWrap")
 public class CaseSearchEndpointIT extends WireMockBaseTest {
 
+    private static final String POST_SEARCH_CASES = "/searchCases";
+
     @Inject
     private WebApplicationContext wac;
-
+    private MockMvc mockMvc;
     @MockitoBean
     private ElasticsearchClient elasticsearchClient;
 
     @MockitoSpyBean
     private AuditRepository auditRepository;
-
-    private static final String POST_SEARCH_CASES = "/searchCases";
-    private MockMvc mockMvc;
 
     @BeforeEach
     public void setUp() {
@@ -87,7 +87,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         List<CaseDetails> caseDetails = caseSearchResults.getCases();
         assertThat(caseDetails, hasSize(1));
-        //assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
         assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("PROBATE"))));
         assertThat(caseDetails, hasItem(hasProperty("caseTypeId", equalTo("TestAddressBookCase"))));
         assertThat(caseDetails, hasItem(hasProperty("lastModified",
@@ -122,8 +122,8 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         List<CaseDetails> caseDetails = caseSearchResults.getCases();
         assertThat(caseDetails, hasSize(2));
-        //assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
-        //assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607670L))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607670L))));
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
@@ -172,26 +172,24 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
     private String createCaseDetails(String reference) {
         return "{\n"
-            // + "\"reference\": " + reference + ",\n"
+            + "\"reference\": " + reference + ",\n"
             + "\"last_modified\": \"2018-08-28T09:58:11.643Z\",\n"
             + "\"state\": \"TODO\",\n"
-            + "\"version\": \"1\",\n"
+            + "\"@version\": \"1\",\n"
             + "\"data_classification\": {},\n"
             + "\"id\": 18,\n"
             + "\"security_classification\": \"PUBLIC\",\n"
             + "\"jurisdiction\": \"PROBATE\",\n"
-            //+ "\"timestamp\": \"2018-08-28T09:58:13.044Z\",\n"
-            //+ "\"data\": {},\n"
+            + "\"@timestamp\": \"2018-08-28T09:58:13.044Z\",\n"
+            + "\"data\": {},\n"
             + "\"created_date\": \"2018-08-28T09:58:11.627Z\",\n"
-            //+ "\"index_id\": \"probate_aat_cases\",\n"
+            + "\"index_id\": \"probate_aat_cases\",\n"
             + "\"case_type_id\": \"TestAddressBookCase\"\n"
             + "}";
     }
 
     private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic) throws IOException {
         // Parse the JSON string to a CaseDetails object
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
         CaseDetails caseDetails = objectMapper.readValue(
             objectMapper.readTree(caseDetailElastic).path("hits").path("hits").get(0).path("_source")
                 .toString(),
@@ -215,7 +213,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         when(searchResponse.hits()).thenReturn(hitsMetadata);
 
         // Stub the ElasticsearchClient
-        //when(elasticsearchClient.search(any(SearchRequest.class), eq(CaseDetails.class)))
-        //    .thenReturn(searchResponse);
+        when(elasticsearchClient.search(any(SearchRequest.class), eq(CaseDetails.class)))
+            .thenReturn(searchResponse);
     }
 }
