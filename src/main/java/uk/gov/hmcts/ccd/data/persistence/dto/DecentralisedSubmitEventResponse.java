@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.persistence;
+package uk.gov.hmcts.ccd.data.persistence.dto;
 
 import java.util.List;
 

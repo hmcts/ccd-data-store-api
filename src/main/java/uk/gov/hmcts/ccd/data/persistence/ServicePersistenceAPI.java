@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedAuditEvent;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseEvent;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedSubmitEventResponse;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedUpdateSupplementaryDataResponse;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 
 @FeignClient(name = "servicePersistenceAPI", configuration = ServicePersistenceAPIInterceptor.class)
@@ -41,8 +46,8 @@ interface ServicePersistenceAPI {
     @PostMapping(value = "/ccd-persistence/cases", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     DecentralisedSubmitEventResponse submitEvent(URI baseURI,
-                                         @RequestHeader("Idempotency-Key") String idempotencyKey,
-                                         @RequestBody DecentralisedCaseEvent caseEvent);
+                                                 @RequestHeader("Idempotency-Key") String idempotencyKey,
+                                                 @RequestBody DecentralisedCaseEvent caseEvent);
 
     @PostMapping(value = "/ccd-persistence/cases/{case-ref}/supplementary-data",
         consumes = MediaType.APPLICATION_JSON_VALUE,

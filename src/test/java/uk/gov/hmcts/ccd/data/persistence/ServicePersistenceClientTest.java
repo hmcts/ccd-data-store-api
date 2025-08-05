@@ -7,6 +7,11 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedAuditEvent;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseEvent;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedSubmitEventResponse;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedUpdateSupplementaryDataResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
@@ -266,7 +271,7 @@ public class ServicePersistenceClientTest {
     public void createEvent_shouldThrowServiceException_whenResponseHasMismatchedCaseDetails() {
         CaseDetails mismatchedCaseDetails = createCaseDetails();
         mismatchedCaseDetails.setReference(9999999999999999L);
-        
+
         DecentralisedCaseDetails mismatchedDecentralisedCaseDetails = new DecentralisedCaseDetails();
         mismatchedDecentralisedCaseDetails.setCaseDetails(mismatchedCaseDetails);
         mismatchedDecentralisedCaseDetails.setVersion(1L);

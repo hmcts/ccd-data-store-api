@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
@@ -113,7 +114,7 @@ class SubmitCaseTransactionTest {
     @Mock
     private CaseDetails savedCaseDetails;
 
-    private uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseDetails savedDecentralisedCaseDetails;
+    private DecentralisedCaseDetails savedDecentralisedCaseDetails;
 
     @Mock
     private UIDService uidService;
@@ -194,7 +195,7 @@ class SubmitCaseTransactionTest {
         doReturn(CASE_ID).when(savedCaseDetails).getId();
 
         // Setup DecentralisedCaseDetails mock
-        savedDecentralisedCaseDetails = new uk.gov.hmcts.ccd.data.persistence.DecentralisedCaseDetails();
+        savedDecentralisedCaseDetails = new DecentralisedCaseDetails();
         savedDecentralisedCaseDetails.setCaseDetails(savedCaseDetails);
         savedDecentralisedCaseDetails.setVersion(1L);
 
