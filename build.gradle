@@ -771,7 +771,7 @@ jacocoTestReport {
 test {
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    generateCucumberReports.enabled = false
+    generateCucumberReports.enabled = true
     systemProperty 'java.locale.providers', 'COMPAT'
 
     useJUnitPlatform()
