@@ -45,7 +45,7 @@ class MigrationEndpointTest {
 
     @Test
     void shouldRunNoCasesFound() {
-        Long caseDataId = 1L;
+        String caseDataId = "1L";
         Integer numRecords = 5;
 
         List<String> caseTypesAvailableToUser = new ArrayList<>();
@@ -74,7 +74,7 @@ class MigrationEndpointTest {
         doReturn(caseTypesAvailableToUser).when(elasticsearchQueryHelper).getCaseTypesAvailableToUser();
 
         String caseTypeId = "CaseTypeId1";
-        Long caseDataId = 1L;
+        String caseDataId = "1L";
         Integer numRecords = 5;
 
         MigrationParameters migrationParameters =
@@ -104,7 +104,7 @@ class MigrationEndpointTest {
         List<CaseDetails> cases = new ArrayList<>();
         cases.add(caseDetails);
 
-        Long caseDataId = 1L;
+        String caseDataId = "1L";
         Integer numRecords = 5;
 
         MigrationParameters migrationParameters =
@@ -135,7 +135,7 @@ class MigrationEndpointTest {
         cases.add(caseDetails1);
         cases.add(caseDetails2);
 
-        Long caseDataId = 1L;
+        String caseDataId = "1L";
         Integer numRecords = 5;
 
         MigrationParameters migrationParameters =

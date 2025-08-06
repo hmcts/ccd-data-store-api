@@ -70,13 +70,13 @@ class CaseAccessOperationTest {
     private static final String JURISDICTION = "CMC";
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final String CASE_TYPE_ID = "Application";
-    private static final Long CASE_REFERENCE = 1234123412341236L;
-    private static final Long CASE_REFERENCE_OTHER = 1111222233334444L;
+    private static final String CASE_REFERENCE = "1234123412341236L";
+    private static final String CASE_REFERENCE_OTHER = "1111222233334444L";
     private static final String USER_ID = "123";
     private static final String USER_ID_OTHER = "USER_ID_OTHER";
-    private static final Long CASE_ID = 456L;
-    private static final Long CASE_ID_OTHER = 1234L;
-    private static final Long CASE_NOT_FOUND = 9999999999999999L;
+    private static final String CASE_ID = "456L";
+    private static final String CASE_ID_OTHER = "1234L";
+    private static final String CASE_NOT_FOUND = "9999999999999999L";
     private static final String NOT_CASE_ROLE = "NotACaseRole";
     private static final String CASE_ROLE = "[DEFENDANT]";
     private static final String CASE_ROLE_OTHER = "[OTHER]";
@@ -340,7 +340,7 @@ class CaseAccessOperationTest {
                 CASE_ROLE_GRANTED));
 
             caseDetails = new CaseDetails();
-            caseDetails.setId(CASE_ID.toString());
+            caseDetails.setId(CASE_ID);
             caseDetails.setReference(CASE_REFERENCE);
             caseDetails.setCaseTypeId(CASE_TYPE_ID);
         }
@@ -631,7 +631,7 @@ class CaseAccessOperationTest {
     @DisplayName("findCasesUserIdHasAccessTo(userId)")
     class FindCasesUserIdHasAccessTo {
 
-        private final List<Long> ids = Collections.singletonList(1L);
+        private final List<String> ids = Collections.singletonList("1L");
 
         @Test
         @DisplayName("should return cases that the user has access to")
@@ -904,8 +904,8 @@ class CaseAccessOperationTest {
             mockExistingCaseUserRoles(new ArrayList<>());
 
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE)
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE, USER_ID, CASE_ROLE),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER, USER_ID, CASE_ROLE)
             );
 
             // ACT
@@ -934,8 +934,8 @@ class CaseAccessOperationTest {
             mockExistingCaseUserRolesForRA(new ArrayList<>());
 
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE)
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE, USER_ID, CASE_ROLE),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER, USER_ID, CASE_ROLE)
             );
 
             // ACT
@@ -958,7 +958,7 @@ class CaseAccessOperationTest {
                 () -> assertEquals(2, caseDetailsList.size()),
                 () -> assertEquals(2, rolesList.size())
             );
-            Map<Long, Integer> captorValueMap = new HashMap<>();
+            Map<String, Integer> captorValueMap = new HashMap<>();
             captorValueMap.put(caseDetailsList.get(0).getReference(), 0);
             captorValueMap.put(caseDetailsList.get(1).getReference(), 1);
 
@@ -1725,8 +1725,8 @@ class CaseAccessOperationTest {
                 CASE_REFERENCE_OTHER);
 
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE)
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE, USER_ID, CASE_ROLE),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER, USER_ID, CASE_ROLE)
             );
 
             // for an existing relation and then after removal
@@ -1765,16 +1765,16 @@ class CaseAccessOperationTest {
                 CASE_REFERENCE_OTHER);
 
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE)
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE, USER_ID, CASE_ROLE),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER, USER_ID, CASE_ROLE)
             );
 
             // for an existing relation and then after removal
             mockExistingCaseUserRolesForRA(
                 // before
                 List.of(
-                    new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
-                    new CaseAssignedUserRole(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE)
+                    new CaseAssignedUserRole(CASE_REFERENCE, USER_ID, CASE_ROLE),
+                    new CaseAssignedUserRole(CASE_REFERENCE_OTHER, USER_ID, CASE_ROLE)
                 ),
                 // after
                 new ArrayList<>()
@@ -2431,7 +2431,7 @@ class CaseAccessOperationTest {
                 createCaseUserEntity(CASE_ID, CASE_ROLE_CREATOR, USER_ID)
             ));
 
-            List<Long> caseReferences = Lists.newArrayList(CASE_REFERENCE);
+            List<String> caseReferences = Lists.newArrayList(CASE_REFERENCE);
             final List<String> userIds = Lists.newArrayList();
 
             // ACT
@@ -2454,8 +2454,8 @@ class CaseAccessOperationTest {
 
             // register existing case role
             mockExistingCaseUserRolesForRA(List.of(
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR)
+                new CaseAssignedUserRole(CASE_REFERENCE, USER_ID, CASE_ROLE),
+                new CaseAssignedUserRole(CASE_REFERENCE, USER_ID, CASE_ROLE_CREATOR)
             ));
 
             final var caseReferences = Lists.newArrayList(CASE_REFERENCE);
@@ -2478,7 +2478,7 @@ class CaseAccessOperationTest {
 
             // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
-            List<Long> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
+            List<String> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
 
             // ACT
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
@@ -2496,7 +2496,7 @@ class CaseAccessOperationTest {
             // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
-            List<Long> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
+            List<String> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
 
             // ACT
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
@@ -2528,7 +2528,7 @@ class CaseAccessOperationTest {
             .findByReference(WRONG_JURISDICTION, CASE_REFERENCE);
     }
 
-    private CaseUserEntity createCaseUserEntity(Long caseDataId, String caseRole, String userId) {
+    private CaseUserEntity createCaseUserEntity(String caseDataId, String caseRole, String userId) {
         CaseUserEntity.CasePrimaryKey primaryKey = new CaseUserEntity.CasePrimaryKey();
         primaryKey.setCaseDataId(caseDataId);
         primaryKey.setCaseRole(caseRole);
