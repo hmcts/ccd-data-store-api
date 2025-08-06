@@ -17,14 +17,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping(path = "/case-types")
 public class CaseDataValidatorController {
+
+    private final JcLogger jclogger = new JcLogger("CaseDataValidatorController", true);
+
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final MidEventCallback midEventCallback;
@@ -35,6 +41,7 @@ public class CaseDataValidatorController {
         MidEventCallback midEventCallback) {
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.midEventCallback = midEventCallback;
+        jclogger.jclog("Constructor");
     }
 
     @PostMapping(
@@ -71,14 +78,34 @@ public class CaseDataValidatorController {
     public ResponseEntity<CaseDataResource> validate(@PathVariable("caseTypeId") String caseTypeId,
                                                      @RequestParam(required = false) final String pageId,
                                                      @RequestBody final CaseDataContent content) {
-        validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
-            content);
+        validateDebug(caseTypeId, pageId, content);
+        validateCaseFieldsOperation.validateCaseDetails(caseTypeId, content);
 
-        final JsonNode data = midEventCallback.invoke(caseTypeId,
-            content,
-            pageId);
+        final JsonNode data = midEventCallback.invoke(caseTypeId, content, pageId);
 
         content.setData(JacksonUtils.convertValue(data));
         return ResponseEntity.ok(new CaseDataResource(content, caseTypeId, pageId));
+    }
+
+    private void validateDebug(final String caseTypeId, final String pageId, final CaseDataContent content) {
+        try {
+            final String contentAsString = jclogger.printObjectToString(content);
+            final Map<String, JsonNode> eventData = content.getEventData();
+            jclogger.jclog("validateDebug() ----------");
+            jclogger.jclog("validateDebug() caseTypeId               = " + caseTypeId);
+            jclogger.jclog("validateDebug() pageId                   = " + pageId);
+            jclogger.jclog("validateDebug() contentAsString.length   = " + contentAsString.length());
+            jclogger.jclog("validateDebug() contentAsString.hashCode = " + contentAsString.hashCode());
+            jclogger.jclog("validateDebug() contentAsString          = " + contentAsString);
+            if (eventData != null && eventData.containsKey("adjournCasePanelMember3")) {
+                final JsonNode adjournCasePanelMember3 = eventData.get("adjournCasePanelMember3");
+                jclogger.jclog("validateDebug() adjournCasePanelMember3  = "
+                    + jclogger.printObjectToString(adjournCasePanelMember3));
+            } else {
+                jclogger.jclog("validateDebug() adjournCasePanelMember3 NOT PRESENT");
+            }
+        } catch (Exception ex) {
+            jclogger.jclog("validateDebug() EXCEPTION: " + ex.getMessage());
+        }
     }
 }

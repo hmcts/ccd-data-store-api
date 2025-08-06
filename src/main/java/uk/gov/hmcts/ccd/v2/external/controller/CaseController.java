@@ -33,6 +33,7 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateReques
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalResults;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.GetLinkedCasesResponseCreator;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
@@ -65,6 +66,9 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 @RequestMapping(path = "/")
 @Validated
 public class CaseController {
+
+    private final JcLogger jclogger = new JcLogger("CaseController", true);
+
     private final GetCaseOperation getCaseOperation;
     private final CreateEventOperation createEventOperation;
     private final CreateCaseOperation createCaseOperation;
@@ -95,6 +99,7 @@ public class CaseController {
         this.requestValidator = requestValidator;
         this.caseLinkRetrievalService = caseLinkRetrievalService;
         this.getLinkedCasesResponseCreator = getLinkedCasesResponseCreator;
+        jclogger.jclog("constructor");
     }
 
     @GetMapping(
@@ -248,6 +253,7 @@ public class CaseController {
                                                         + "}"
                                                         + "\n```", required = true)
                                                     @RequestBody final CaseDataContent content) {
+        jclogger.jclog("createEvent() content = " +  jclogger.printObjectToString(content));
         return createCaseEvent(caseId, content);
     }
 

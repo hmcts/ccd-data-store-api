@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -30,6 +31,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 public class MidEventCallback {
+
+    private final JcLogger jclogger = new JcLogger("MidEventCallback", true);
 
     private final CallbackInvoker callbackInvoker;
     private final UIDefinitionRepository uiDefinitionRepository;
@@ -49,12 +52,16 @@ public class MidEventCallback {
         this.eventTriggerService = eventTriggerService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseService = caseService;
+        jclogger.jclog("constructor");
     }
 
     @Transactional
     public JsonNode invoke(String caseTypeId,
                            CaseDataContent content,
                            String pageId) {
+        jclogger.jclog("invoke(): CALL STACK = " + jclogger.getCallStackAsString());
+        jclogger.jclog("invoke(): content = " + jclogger.printObjectToString(content));
+        jclogger.jclog("invoke(): caseTypeId = " + caseTypeId + "  ,  pageId = " + pageId);
         if (!isBlank(pageId)) {
             Event event = content.getEvent();
             final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
@@ -100,6 +107,7 @@ public class MidEventCallback {
 
     private void removeNextPageFieldData(CaseDetails currentCaseDetails, Integer order,
                                          String caseTypeId, String eventId) {
+        jclogger.jclog("removeNextPageFieldData()");
         if (order != null) {
             Set<String> wizardPageFields = uiDefinitionRepository
                 .getWizardPageCollection(caseTypeId, eventId)
@@ -113,6 +121,7 @@ public class MidEventCallback {
     }
 
     private JsonNode dataJsonNode(Map<String, JsonNode> data) {
+        jclogger.jclog("dataJsonNode()");
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.set("data", mapper.valueToTree(data));
@@ -120,6 +129,7 @@ public class MidEventCallback {
     }
 
     private CaseTypeDefinition getCaseType(String caseTypeId) {
+        jclogger.jclog("getCaseType()");
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
@@ -128,6 +138,7 @@ public class MidEventCallback {
     }
 
     private CaseEventDefinition getCaseEvent(Event event, CaseTypeDefinition caseTypeDefinition) {
+        jclogger.jclog("getCaseEvent()");
         final CaseEventDefinition caseEventDefinition =
             eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
         if (caseEventDefinition == null) {
