@@ -103,6 +103,7 @@ ccd:
         DEFINITION_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
         DEFINITION_STORE_DB_OPTIONS: ""
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
+        DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_S2S_SECRET}
       secrets:
           DEFINITION_STORE_DB_PASSWORD:
             secretRef: "{{ .Values.global.postgresSecret }}"
