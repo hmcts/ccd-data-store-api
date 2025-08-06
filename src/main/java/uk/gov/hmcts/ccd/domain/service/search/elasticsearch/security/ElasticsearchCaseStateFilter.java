@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.STATE_FIELD_COL;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -30,11 +30,23 @@ public class ElasticsearchCaseStateFilter implements CaseSearchFilter {
     }
 
     @Override
-    public Optional<QueryBuilder> getFilter(String caseTypeId) {
+    public Optional<Query> getFilter(String caseTypeId) {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             return Optional.empty();
         }
-        return Optional.of(QueryBuilders.termsQuery(STATE_FIELD_COL, getCaseStateIdsForUserReadAccess(caseTypeId)));
+
+        List<String> caseStates = getCaseStateIdsForUserReadAccess(caseTypeId);
+
+        return Optional.of(Query.of(q -> q
+            .terms(t -> t
+                .field(STATE_FIELD_COL)
+                .terms(tf -> tf.value(
+                    caseStates.stream()
+                        .map(FieldValue::of)
+                        .collect(Collectors.toList())
+                ))
+            )
+        ));
     }
 
     private List<String> getCaseStateIdsForUserReadAccess(String caseTypeId) {
