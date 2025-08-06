@@ -56,6 +56,7 @@ def secrets = [
         secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
         secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
         secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
+        secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_S2S_SECRET'),
 
         secret('idam-data-store-system-user-username','ROLE_ASSIGNMENT_USER_EMAIL'),
         secret('idam-data-store-system-user-password','ROLE_ASSIGNMENT_USER_PASSWORD')
