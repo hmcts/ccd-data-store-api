@@ -66,7 +66,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
     @Test
     public void persistCasePointer_shouldCreateCasePointerWithEmptyData() {
         // When: Creating a case pointer
-        casePointerRepository.persistCasePointer(originalCaseDetails);
+        final var ptr = casePointerRepository.persistCasePointer(originalCaseDetails);
 
         // Original case details should not be modified
         assertThat(originalCaseDetails.getData().size(), is(1));
@@ -74,16 +74,13 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
         assertThat(originalCaseDetails.getLastModified(), is(notNullValue()));
         assertThat(originalCaseDetails.getSecurityClassification(), is(SecurityClassification.PUBLIC));
         assertThat(originalCaseDetails.getDataClassification(), is(notNullValue()));
-
-        // Then: Original case details should now have the database-generated ID
-        assertThat(originalCaseDetails.getId(), is(notNullValue()));
-        String generatedId = originalCaseDetails.getId();
+        assertThat(originalCaseDetails.getId(), nullValue());
 
         // And: The case pointer should be persisted in the database
-        CaseDetails pointer = caseDetailsRepository.findById(Long.valueOf(generatedId));
+        CaseDetails pointer = caseDetailsRepository.findById(Long.valueOf(ptr.getId()));
         assertThat("Case pointer should exist in database", pointer, is(notNullValue()));
         assertAll("Case pointer should have expected properties",
-            () -> assertThat(pointer.getId(), is(generatedId)),
+            () -> assertThat(pointer.getId(), is(ptr.getId())),
             () -> assertThat(pointer.getReference(), is(CASE_REFERENCE)),
             () -> assertThat(pointer.getJurisdiction(), is(JURISDICTION)),
             () -> assertThat(pointer.getCaseTypeId(), is(CASE_TYPE_DECENTRALIZED)),

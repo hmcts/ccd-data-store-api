@@ -58,6 +58,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doNothing;
@@ -193,11 +194,17 @@ class SubmitCaseTransactionTest {
         doReturn(savedCaseDetails).when(caseDetailsRepository).set(caseDetails);
 
         doReturn(CASE_ID).when(savedCaseDetails).getId();
+        doReturn("12345").when(savedCaseDetails).getReferenceAsString();
+        doReturn("TestType").when(savedCaseDetails).getCaseTypeId();
+        doReturn("TestJurisdiction").when(savedCaseDetails).getJurisdiction();
 
         // Setup DecentralisedCaseDetails mock
         savedDecentralisedCaseDetails = new DecentralisedCaseDetails();
         savedDecentralisedCaseDetails.setCaseDetails(savedCaseDetails);
         savedDecentralisedCaseDetails.setVersion(1L);
+
+        // Mock case pointer repository to return a case pointer
+        doReturn(savedCaseDetails).when(casePointerRepository).persistCasePointer(caseDetails);
 
         doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
                                                                              null,
@@ -378,7 +385,9 @@ class SubmitCaseTransactionTest {
                 event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.empty()),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
-            () -> verify(caseAuditEventRepository, never()).set(isNotNull())
+            () -> verify(caseAuditEventRepository, never()).set(isNotNull()),
+            () -> verify(caseDataAccessControl).grantAccess(savedCaseDetails, IDAM_ID),
+            () -> verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList())
         );
     }
 
@@ -406,7 +415,9 @@ class SubmitCaseTransactionTest {
                 event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.of(onBehalfOfUser)),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
-            () -> verify(caseAuditEventRepository, never()).set(isNotNull())
+            () -> verify(caseAuditEventRepository, never()).set(isNotNull()),
+            () -> verify(caseDataAccessControl).grantAccess(savedCaseDetails, IDAM_ID),
+            () -> verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList())
         );
     }
 
@@ -417,9 +428,6 @@ class SubmitCaseTransactionTest {
         doReturn(savedDecentralisedCaseDetails).when(decentralisedSubmitCaseTransaction)
             .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.empty());
-        doReturn("12345").when(caseDetails).getReferenceAsString();
-        doReturn("TestType").when(caseDetails).getCaseTypeId();
-        doReturn("TestJurisdiction").when(caseDetails).getJurisdiction();
 
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
@@ -431,7 +439,7 @@ class SubmitCaseTransactionTest {
 
         verify(caseDataAccessControl).grantAccess(savedCaseDetails, IDAM_ID);
         verify(caseDocumentService).attachCaseDocuments(
-            anyString(), anyString(), anyString(), anyList());
+            eq("12345"), eq("TestType"), eq("TestJurisdiction"), anyList());
     }
 
     private void assertAuditEventProxyByUser(final AuditEvent auditEvent) {

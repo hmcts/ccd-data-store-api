@@ -159,25 +159,10 @@ public class SubmitCaseTransaction implements AccessControl {
 
         CaseDetails savedCaseDetails;
         if (resolver.isDecentralised(caseDetailsAfterCallbackWithoutHashes)) {
-            this.casePointerRepository.persistCasePointer(caseDetailsAfterCallbackWithoutHashes);
-            try {
-                savedCaseDetails = decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
-                    caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.empty(),
-                    Optional.ofNullable(onBehalfOfUser))
-                    .getCaseDetails();
-            } catch (ApiException apiException) {
-                // Rollback case pointer if downstream service returns errors
-                if (apiException.getCallbackErrors() != null && !apiException.getCallbackErrors().isEmpty()) {
-                    rollbackCasePointer(caseDetailsAfterCallbackWithoutHashes.getReference());
-                }
-                throw apiException;
-            } catch (FeignException feignException) {
-                // Rollback case pointer if downstream service returns 4xx error
-                if (feignException.status() >= 400 && feignException.status() < 500) {
-                    rollbackCasePointer(caseDetailsAfterCallbackWithoutHashes.getReference());
-                }
-                throw feignException;
-            }
+            // Granting documents & attaching documents must be done once a case reference is allocated but before the
+            // decentralised submit call, to align with the behaviour of the centralised submit case transaction.
+            savedCaseDetails = submitDecentralisedCase(event, caseTypeDefinition, idamUser, caseEventDefinition,
+                onBehalfOfUser, caseDetailsAfterCallbackWithoutHashes, documentHashes);
         } else {
             savedCaseDetails = saveAuditEventForCaseDetails(
                 aboutToSubmitCallbackResponse,
@@ -188,18 +173,53 @@ public class SubmitCaseTransaction implements AccessControl {
                 caseDetailsAfterCallbackWithoutHashes,
                 onBehalfOfUser
             );
+            caseDataAccessControl.grantAccess(savedCaseDetails, idamUser.getId());
+
+            caseDocumentService.attachCaseDocuments(
+                caseDetails.getReferenceAsString(),
+                caseDetails.getCaseTypeId(),
+                caseDetails.getJurisdiction(),
+                documentHashes
+            );
         }
 
-        caseDataAccessControl.grantAccess(savedCaseDetails, idamUser.getId());
+
+        return savedCaseDetails;
+    }
+
+    private CaseDetails submitDecentralisedCase(Event event, CaseTypeDefinition caseTypeDefinition, IdamUser idamUser,
+                                       CaseEventDefinition caseEventDefinition, IdamUser onBehalfOfUser,
+                                       CaseDetails caseDetailsAfterCallbackWithoutHashes,
+                                       List<DocumentHashToken> documentHashes) {
+        var casePointer = this.casePointerRepository.persistCasePointer(caseDetailsAfterCallbackWithoutHashes);
+
+        caseDataAccessControl.grantAccess(casePointer, idamUser.getId());
 
         caseDocumentService.attachCaseDocuments(
-            caseDetails.getReferenceAsString(),
-            caseDetails.getCaseTypeId(),
-            caseDetails.getJurisdiction(),
+            casePointer.getReferenceAsString(),
+            casePointer.getCaseTypeId(),
+            casePointer.getJurisdiction(),
             documentHashes
         );
 
-        return savedCaseDetails;
+        try {
+            return decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
+                    caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.empty(),
+                Optional.ofNullable(onBehalfOfUser))
+                .getCaseDetails();
+        } catch (ApiException apiException) {
+            // Rollback case pointer if downstream service returns errors
+            if (apiException.getCallbackErrors() != null && !apiException.getCallbackErrors().isEmpty()) {
+                rollbackCasePointer(caseDetailsAfterCallbackWithoutHashes.getReference());
+            }
+            throw apiException;
+        } catch (FeignException feignException) {
+            // Rollback case pointer if downstream service returns 4xx error
+            if (feignException.status() >= 400 && feignException.status() < 500) {
+                rollbackCasePointer(caseDetailsAfterCallbackWithoutHashes.getReference());
+            }
+            throw feignException;
+        }
     }
 
     private CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response,
@@ -264,7 +284,7 @@ public class SubmitCaseTransaction implements AccessControl {
             // Log the error but don't fail the original operation
             // The client should receive the original error, not this rollback error
             // This is a best-effort cleanup
-            log.error("Failed to rollback case pointer for case reference: {}. Error: {}", 
+            log.error("Failed to rollback case pointer for case reference: {}. Error: {}",
                 caseReference, e.getMessage(), e);
         }
     }

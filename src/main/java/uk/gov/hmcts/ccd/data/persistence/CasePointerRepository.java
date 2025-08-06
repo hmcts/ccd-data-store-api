@@ -35,7 +35,7 @@ public class CasePointerRepository {
      * This transaction will commit immediately upon successful completion of this method.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void persistCasePointer(CaseDetails caseDetails) {
+    public CaseDetails persistCasePointer(CaseDetails caseDetails) {
         CaseDetails pointer = caseService.clone(caseDetails);
         pointer.setData(Map.of());
         pointer.setSecurityClassification(SecurityClassification.RESTRICTED);
@@ -43,9 +43,7 @@ public class CasePointerRepository {
         pointer.setVersion(null);
         pointer.setDataClassification(null);
         pointer.setState("");
-        var persisted = caseDetailsRepository.set(pointer);
-        // We need the ID that the database has allocated us.
-        caseDetails.setId(persisted.getId());
+        return caseDetailsRepository.set(pointer);
     }
 
     public String findCaseTypeByReference(Long caseReference) {
