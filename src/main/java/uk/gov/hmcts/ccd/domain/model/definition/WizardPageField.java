@@ -63,7 +63,7 @@ public class WizardPageField implements Serializable, Copyable<WizardPageField> 
         clonedField.setCaseFieldId(this.caseFieldId);
         clonedField.setOrder(this.order);
         clonedField.setPageColumnNumber(this.pageColumnNumber);
-        clonedField.setComplexFieldOverrides(createCopyList(this.complexFieldOverrides));
+        clonedField.setComplexFieldOverrides(createDeepCopyList(this.complexFieldOverrides));
 
         return clonedField;
     }
