@@ -2,7 +2,9 @@ package uk.gov.hmcts.ccd.auditlog;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -17,6 +19,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
+@Component
 public class AuditInterceptor extends HandlerInterceptorAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuditAspect.class);
@@ -31,7 +34,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
     private final AuditService auditService;
     private final ApplicationParams applicationParams;
 
-    public AuditInterceptor(AuditService auditService, ApplicationParams applicationParams) {
+    public AuditInterceptor(@Lazy AuditService auditService, ApplicationParams applicationParams) {
         this.auditService = auditService;
         this.applicationParams = applicationParams;
     }
