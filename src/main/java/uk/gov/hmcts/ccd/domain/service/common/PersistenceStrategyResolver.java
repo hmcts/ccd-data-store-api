@@ -62,6 +62,13 @@ public class PersistenceStrategyResolver {
         caseTypeServiceUrls.forEach((key, value) ->
             this.caseTypeServiceUrls.put(key.toLowerCase(), value)
         );
+        if (this.caseTypeServiceUrls.isEmpty()) {
+            log.info("No decentralised persistence URLs configured.");
+        } else {
+            log.info("Loaded {} decentralised case type route(s) for prefixes: {}",
+                this.caseTypeServiceUrls.size(),
+                this.caseTypeServiceUrls.keySet());
+        }
     }
 
     public boolean isDecentralised(CaseDetails details) {
@@ -106,6 +113,7 @@ public class PersistenceStrategyResolver {
      */
     private Optional<URI> getCaseTypeServiceUrl(String caseTypeId) {
         if (caseTypeId == null || caseTypeId.isBlank()) {
+            log.debug("Cannot resolve persistence strategy for null or blank case type ID.");
             return Optional.empty();
         }
 
@@ -126,12 +134,26 @@ public class PersistenceStrategyResolver {
             throw new IllegalStateException(message);
         }
 
-        return matchingPrefixes.stream()
-            .findFirst()
-            .map(caseTypeServiceUrls::get);
+        Optional<String> matchingPrefixOptional = matchingPrefixes.stream().findFirst();
+
+        if (matchingPrefixOptional.isPresent()) {
+            String prefix = matchingPrefixOptional.get();
+            URI url = caseTypeServiceUrls.get(prefix);
+            log.debug("Case type '{}' matches decentralised persistence rule with prefix '{}'. Routing to: {}",
+                caseTypeId,
+                prefix,
+                url);
+            return Optional.of(url);
+        } else {
+            log.debug("Case type '{}' is not configured for decentralised persistence. Using default.", caseTypeId);
+            return Optional.empty();
+        }
     }
 
     private String getCaseTypeByReference(Long reference) {
-        return caseTypeCache.get(reference, this.pointerRepository::findCaseTypeByReference);
+        return caseTypeCache.get(reference, ref -> {
+            log.debug("Cache miss for case reference: {}. Looking up case type from repository.", ref);
+            return this.pointerRepository.findCaseTypeByReference(ref);
+        });
     }
 }
