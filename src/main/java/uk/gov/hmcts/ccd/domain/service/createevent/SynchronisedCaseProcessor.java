@@ -30,7 +30,6 @@ import java.util.function.Consumer;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(propagation = Propagation.MANDATORY)
 public class SynchronisedCaseProcessor {
 
     @PersistenceContext
@@ -39,7 +38,10 @@ public class SynchronisedCaseProcessor {
     /**
      * Executes the provided operation if the case has a version greater than that which we last processed.
      * It uses a pessimistic lock on the case_data row to serialise these operations.
+     * Since we are applying an already-committed change from a decentralised service we use a new transaction
+     * independent of any outer transaction, which also minimises the time we hold the rowlock.
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void applyConditionallyWithLock(DecentralisedCaseDetails decentralisedCase,
                                            Consumer<CaseDetails> operation) {
         var caseDetails = decentralisedCase.getCaseDetails();
