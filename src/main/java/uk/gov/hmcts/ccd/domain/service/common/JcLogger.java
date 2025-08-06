@@ -5,14 +5,14 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 
-/**
- * Logging currently added to :-
- *     CaseDataValidatorController  (1 method)
- *     CaseController               (1 method)
- *     CallbackService              (1 method)
- *     CaseService                  (8 methods including populateCurrentCaseDetailsWithEventFields())
- *     MidEventCallback             (5 methods including invoke())
- *     CaseDataContent              (All methods)
+/*
+ * Logging currently added to:-
+ *     CaseDataValidatorController  (1 method).
+ *     CaseController               (1 method).
+ *     CallbackService              (1 method).
+ *     CaseService                  (8 methods including populateCurrentCaseDetailsWithEventFields()).
+ *     MidEventCallback             (5 methods including invoke()).
+ *     CaseDataContent              (All methods).
  */
 public class JcLogger {
 
