@@ -98,7 +98,7 @@ public class CaseDataValidatorController {
             jclogger.jclog("validateDebug() contentAsString.hashCode = " + contentAsString.hashCode());
             jclogger.jclog("validateDebug() contentAsString          = " + contentAsString);
             if (eventData != null && eventData.containsKey("adjournCasePanelMember3")) {
-                JsonNode adjournCasePanelMember3 = eventData.get("adjournCasePanelMember3");
+                final JsonNode adjournCasePanelMember3 = eventData.get("adjournCasePanelMember3");
                 jclogger.jclog("validateDebug() adjournCasePanelMember3  = "
                     + jclogger.printObjectToString(adjournCasePanelMember3));
             } else {

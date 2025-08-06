@@ -12,10 +12,7 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
  *     CallbackService              (1 method)
  *     CaseService                  (8 methods including populateCurrentCaseDetailsWithEventFields())
  *     MidEventCallback             (5 methods including invoke())
- * Questions :-
- *     1. Is invoke() called in scenario when Other Panel member name is REMOVED ?
- *     2. Is invoke() called in scenario when Other Panel member name is UPDATED (i.e. to another Panel member name) ?
- *     3. Call stack to invoke() ?
+ *     CaseDataContent              (All methods)
  */
 public class JcLogger {
 
