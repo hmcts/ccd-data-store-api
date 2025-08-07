@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch.core.MsearchResponse;
 import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -79,6 +80,9 @@ class ElasticsearchCaseSearchOperationTest {
 
     @Mock
     private ElasticsearchClient elasticsearchClient;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     private JsonpMapper realJsonpMapper;
 
@@ -322,7 +326,7 @@ class ElasticsearchCaseSearchOperationTest {
         realJsonpMapper = new JacksonJsonpMapper();
         searchOperation = new ElasticsearchCaseSearchOperation(
             elasticsearchClient,
-            null,
+            objectMapper,
             mapper,
             applicationParams,
             caseSearchRequestSecurity,
@@ -363,12 +367,12 @@ class ElasticsearchCaseSearchOperationTest {
             MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem = createSuccessItemWithNoHits(indexName);
             MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse = createMsearchResponse(List.of(responseItem));
 
-            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+            when(elasticsearchClient.msearch(any(MsearchRequest.class),
+                eq(ElasticSearchCaseDetailsDTO.class)))
                 .thenReturn(msearchResponse);
 
             // WHEN
-            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest,
-                true);
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest,true);
 
             // THEN
             assertAll(
@@ -413,8 +417,8 @@ class ElasticsearchCaseSearchOperationTest {
                 .took(1)
                 .build();
 
-            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
-                .thenReturn(msearchResponse);
+            when(elasticsearchClient.msearch(any(MsearchRequest.class),
+                eq(ElasticSearchCaseDetailsDTO.class))).thenReturn(msearchResponse);
 
             CaseSearchRequest securedRequest = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
 
@@ -459,7 +463,6 @@ class ElasticsearchCaseSearchOperationTest {
             when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
             when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
 
-            // Mock response with index that will NOT match the regex
             Hit<ElasticSearchCaseDetailsDTO> hit = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
                 .source(new ElasticSearchCaseDetailsDTO())
                 .index("some_index_that_wont_match") // Will not match the regex
@@ -472,10 +475,9 @@ class ElasticsearchCaseSearchOperationTest {
                 .took(1)
                 .build();
 
-            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
-                .thenReturn(msearchResponse);
+            when(elasticsearchClient.msearch(any(MsearchRequest.class),
+                eq(ElasticSearchCaseDetailsDTO.class))).thenReturn(msearchResponse);
 
-            // Secured request
             CaseSearchRequest securedRequest = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
                 .thenReturn(securedRequest);
@@ -485,7 +487,6 @@ class ElasticsearchCaseSearchOperationTest {
                 .withSearchRequest(elasticsearchRequest)
                 .build();
 
-            // Expect
             assertThrows(ServiceException.class,
                 () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
         }
@@ -493,7 +494,7 @@ class ElasticsearchCaseSearchOperationTest {
         @Test
         @DisplayName("should return ServiceError when ES index case type id capturing group is not specified")
         void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroupNotSpecified() throws IOException {
-            // GIVEN: A regex with no capturing group
+
             String regexWithNoCapturingGroup = "a_regex_with_no_capturing_group";
             when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn(regexWithNoCapturingGroup);
             when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1); // invalid since no group
@@ -505,8 +506,8 @@ class ElasticsearchCaseSearchOperationTest {
             MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
                 createMsearchResponse(List.of(responseItem));
 
-            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
-                .thenReturn(msearchResponse);
+            when(elasticsearchClient.msearch(any(MsearchRequest.class),
+                eq(ElasticSearchCaseDetailsDTO.class))).thenReturn(msearchResponse);
 
             ElasticsearchClient elasticsearchClient = mock(ElasticsearchClient.class);
             ElasticsearchTransport transport = mock(ElasticsearchTransport.class);
@@ -523,7 +524,6 @@ class ElasticsearchCaseSearchOperationTest {
                 .withSearchRequest(elasticsearchRequest)
                 .build();
 
-            // EXPECT: a ServiceException due to regex having no capturing group
             assertThrows(ServiceException.class,
                 () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
         }
@@ -538,7 +538,6 @@ class ElasticsearchCaseSearchOperationTest {
             when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
             when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
 
-            // This value will be extracted by regex, but not present in the provided caseTypeIds list ("aaa")
             String indexName = "unknown_cases-000001";
 
             Hit<ElasticSearchCaseDetailsDTO> hit = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
@@ -552,8 +551,8 @@ class ElasticsearchCaseSearchOperationTest {
             MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
                 createMsearchResponse(List.of(responseItem));
 
-            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
-                .thenReturn(msearchResponse);
+            when(elasticsearchClient.msearch(any(MsearchRequest.class),
+                eq(ElasticSearchCaseDetailsDTO.class))).thenReturn(msearchResponse);
 
             CaseSearchRequest securedRequest = new CaseSearchRequest("aaa", elasticsearchRequest);
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
@@ -564,7 +563,6 @@ class ElasticsearchCaseSearchOperationTest {
                 .withSearchRequest(elasticsearchRequest)
                 .build();
 
-            // THEN
             assertThrows(ServiceException.class, () ->
                 searchOperation.execute(crossCaseTypeSearchRequest, true)
             );
@@ -573,35 +571,30 @@ class ElasticsearchCaseSearchOperationTest {
         @Test
         @DisplayName("test complex ES index case type id capturing group scenario")
         void testComplexESIndexCapturingGroupScenario() throws IOException {
-            // TODO: com,pare with old test - json block!
 
+            // TODO: compare with old test - json block!
             when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
             when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
 
             String complexIndexName = "casetypeid1_cases_cases-000001";
 
-            // The caseTypeId list includes the full prefix as it should match what the system recognizes
             List<String> caseTypeIds = List.of("casetypeid1_cases");
 
-            // Build a dummy hit with that complex index
             Hit<ElasticSearchCaseDetailsDTO> hit = createHit(complexIndexName);
 
-            // Wrap in a MultiSearchResponseItem
             MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem =
                 createSuccessItem(complexIndexName);
 
-            // Wrap in the final MsearchResponse
             MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
                 new MsearchResponse.Builder<ElasticSearchCaseDetailsDTO>()
                     .responses(List.of(responseItem))
                     .took(1)
                     .build();
 
-            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
-                .thenReturn(msearchResponse);
+            when(elasticsearchClient.msearch(any(MsearchRequest.class),
+                eq(ElasticSearchCaseDetailsDTO.class))).thenReturn(msearchResponse);
 
-            // Setup secured request
             CaseSearchRequest securedRequest = new CaseSearchRequest("casetypeid1_cases",
                 elasticsearchRequest);
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
@@ -612,10 +605,8 @@ class ElasticsearchCaseSearchOperationTest {
                 .withSearchRequest(elasticsearchRequest)
                 .build();
 
-            // WHEN
             CaseSearchResult result = searchOperation.execute(crossCaseTypeSearchRequest, true);
 
-            // THEN
             assertAll(
                 () -> assertThat(result.getCaseTypesResults()).hasSize(1),
                 () -> assertThat(result.getCaseTypesResults().getFirst().getCaseTypeId())
@@ -632,7 +623,7 @@ class ElasticsearchCaseSearchOperationTest {
         @Test
         @DisplayName("should execute search on Elasticsearch for multiple case types and return results")
         void searchShouldMapElasticSearchResultToSearchResult() throws IOException {
-            // GIVEN
+
             when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
@@ -644,7 +635,6 @@ class ElasticsearchCaseSearchOperationTest {
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
                 .thenReturn(request1, request2);
 
-            // Mock DTOs and mapped CaseDetails
             ElasticSearchCaseDetailsDTO dto = new ElasticSearchCaseDetailsDTO();
             CaseDetails caseDetails1 = mock(CaseDetails.class);
             CaseDetails caseDetails2 = mock(CaseDetails.class);
@@ -653,7 +643,6 @@ class ElasticsearchCaseSearchOperationTest {
             //    .thenReturn(List.of(caseDetails1))
             //    .thenReturn(List.of(caseDetails2));
 
-            // Simulate ES hits
             Hit<ElasticSearchCaseDetailsDTO> hit1 = createHit("casetypeid1_cases-000001");
             MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> response1 =
                 createSuccessItem(hit1, createTotalHits(1L));
@@ -665,19 +654,16 @@ class ElasticsearchCaseSearchOperationTest {
             MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse = createMsearchResponse(
                 List.of(response1, response2));
 
-            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
-                .thenReturn(msearchResponse);
+            when(elasticsearchClient.msearch(any(MsearchRequest.class),
+                eq(ElasticSearchCaseDetailsDTO.class))).thenReturn(msearchResponse);
 
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(List.of(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
 
-            // WHEN
-            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest,
-                true);
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest,true);
 
-            // THEN
             assertAll(
                 //() -> assertThat(caseSearchResult.getCases()).containsExactly(caseDetails1, caseDetails2),
                 () -> assertThat(caseSearchResult.getTotal()).isEqualTo(4L),
@@ -703,13 +689,12 @@ class ElasticsearchCaseSearchOperationTest {
         @Test
         @DisplayName("should execute search on Elasticsearch for multiple case types and return results")
         void searchShouldMapElasticSearchResultToSearchResult() throws IOException {
-            // GIVEN
+
             when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
             when(applicationParams.getCasesIndexType()).thenReturn("_doc");
 
-            // Create search request for two case types
             CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
             CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, elasticsearchRequest);
 
@@ -721,12 +706,10 @@ class ElasticsearchCaseSearchOperationTest {
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
                 .thenReturn(request1, request2);
 
-            // Setup DTOs and mapped CaseDetails
             ElasticSearchCaseDetailsDTO dto = new ElasticSearchCaseDetailsDTO();
             CaseDetails mappedCaseDetails = mock(CaseDetails.class);
             when(mapper.dtosToCaseDetailsList(any())).thenReturn(List.of(mappedCaseDetails));
 
-            // Create ES hits for both case types
             Hit<ElasticSearchCaseDetailsDTO> hit1 = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
                 .index("casetypeid1_cases-000001")
                 .source(dto)
@@ -746,14 +729,12 @@ class ElasticsearchCaseSearchOperationTest {
             MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
                 createMsearchResponse(List.of(item1, item2));
 
-            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
-                .thenReturn(msearchResponse);
+            when(elasticsearchClient.msearch(any(MsearchRequest.class),
+                eq(ElasticSearchCaseDetailsDTO.class))).thenReturn(msearchResponse);
 
-            // WHEN
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest,
                 true);
 
-            // THEN
             assertAll(
                 () -> assertThat(caseSearchResult.getCases()).containsExactly(mappedCaseDetails, mappedCaseDetails),
                 () -> assertThat(caseSearchResult.getTotal()).isEqualTo(6L),
@@ -779,12 +760,11 @@ class ElasticsearchCaseSearchOperationTest {
         @Test
         @DisplayName("should throw exception when Elasticsearch search does not succeed")
         void searchShouldReturnBadSearchRequestOnFailure() throws IOException {
-            // GIVEN
+
             when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
 
-            // Simulate an Elasticsearch error response using JsonData
             Map<String, Object> errorMap = Map.of(
                 "error", "Failed to search",
                 "status", 500);
@@ -794,8 +774,8 @@ class ElasticsearchCaseSearchOperationTest {
             MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
                 createMsearchResponse(List.of(errorItem));
 
-            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
-                .thenReturn(msearchResponse);
+            when(elasticsearchClient.msearch(any(MsearchRequest.class),
+                eq(ElasticSearchCaseDetailsDTO.class))).thenReturn(msearchResponse);
 
             CaseSearchRequest securedRequest = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
@@ -806,7 +786,6 @@ class ElasticsearchCaseSearchOperationTest {
                 .withSearchRequest(elasticsearchRequest)
                 .build();
 
-            // THEN
             assertThrows(BadSearchRequest.class, () ->
                 searchOperation.execute(crossCaseTypeSearchRequest, true)
             );
@@ -815,7 +794,7 @@ class ElasticsearchCaseSearchOperationTest {
         @Test
         @DisplayName("should throw exception when Elasticsearch multi-search response returns error")
         void searchShouldReturnBadSearchRequestOnResponseError() throws IOException {
-            // GIVEN
+
             when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
@@ -829,8 +808,8 @@ class ElasticsearchCaseSearchOperationTest {
             MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse =
                 createMsearchResponse(List.of(failedItem));
 
-            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
-                .thenReturn(msearchResponse);
+            when(elasticsearchClient.msearch(any(MsearchRequest.class),
+                eq(ElasticSearchCaseDetailsDTO.class))).thenReturn(msearchResponse);
 
             CaseSearchRequest securedRequest = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
@@ -841,7 +820,6 @@ class ElasticsearchCaseSearchOperationTest {
                 .withSearchRequest(elasticsearchRequest)
                 .build();
 
-            // THEN
             assertThrows(BadSearchRequest.class, () ->
                 searchOperation.execute(crossCaseTypeSearchRequest, true)
             );

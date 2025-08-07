@@ -10,13 +10,14 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHost;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.elasticsearch.client.Node;
 import org.elasticsearch.client.NodeSelector;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 
-import org.apache.http.impl.nio.reactor.IOReactorConfig;
-import org.apache.http.HttpHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -38,12 +39,6 @@ public class ElasticSearchConfiguration {
         this.applicationParams = applicationParams;
     }
 
-    @Bean
-    @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-    public JacksonJsonpMapper jsonpMapper(ObjectMapper objectMapper) {
-        return new JacksonJsonpMapper(objectMapper);
-    }
-
     @Bean(name = "DefaultObjectMapper")
     @Scope(BeanDefinition.SCOPE_PROTOTYPE)
     public ObjectMapper objectMapper() {
@@ -58,10 +53,18 @@ public class ElasticSearchConfiguration {
 
     @Bean
     @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-    protected RestClientBuilder elasticsearchRestClientBuilder() {
-        return RestClient.builder(
-            new HttpHost(applicationParams.getElasticSearchHosts().getFirst(),
-                9200, HttpHost.DEFAULT_SCHEME_NAME))
+    public JacksonJsonpMapper jsonpMapper(ObjectMapper objectMapper) {
+        return new JacksonJsonpMapper(objectMapper);
+    }
+
+    @Bean
+    public ElasticsearchClient elasticsearchClient(ObjectMapper objectMapper) {
+
+        RestClientBuilder builder = RestClient.builder(
+                new HttpHost(
+                    //applicationParams.getElasticSearchHosts().getFirst(),
+                    "locahost",
+                    9200, HttpHost.DEFAULT_SCHEME_NAME))
             .setFailureListener(new RestClient.FailureListener() {
                 @Override
                 public void onFailure(Node node) {
@@ -74,20 +77,24 @@ public class ElasticSearchConfiguration {
                     .setConnectTimeout(5000)
                     .setSocketTimeout(60000)
             )
-            .setHttpClientConfigCallback(httpClientBuilder ->
-                httpClientBuilder.setDefaultIOReactorConfig(
-                    IOReactorConfig.custom()
-                        .setSoKeepAlive(true)
-                        .build()
-                )
-            );
-    }
+            .setHttpClientConfigCallback(this::customizeHttpClient);
 
-    @Bean
-    public ElasticsearchClient elasticsearchClient(RestClientBuilder elasticsearchRestClientBuilder) {
-        RestClient restClient = elasticsearchRestClientBuilder.build();
-        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        RestClient restClient = builder.build();
+
+        ElasticsearchTransport transport = new RestClientTransport(
+            restClient,
+            new JacksonJsonpMapper(objectMapper)
+        );
+
         return new ElasticsearchClient(transport);
     }
 
+    private HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+        return httpClientBuilder
+            .setDefaultIOReactorConfig(
+                IOReactorConfig.custom()
+                    .setSoTimeout(applicationParams.getElasticSearchRequestTimeout())
+                    .build()
+            );
+    }
 }

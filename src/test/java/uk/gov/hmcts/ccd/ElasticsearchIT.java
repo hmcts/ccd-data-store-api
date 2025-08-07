@@ -7,7 +7,6 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,11 +19,12 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -194,17 +194,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
     private MockMvc mockMvc;
 
-    @BeforeAll
-    public static void initElastic(@Value("${search.elastic.version}") final String elasticVersion,
-                                   @Value("${search.elastic.port}") final int httpPortValue)
-        throws IOException, InterruptedException {
-
-        log.info("Starting Elastic search...");
+    static {
+        String elasticVersion = System.getProperty("search.elastic.version", "9.0.4");
         container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:" + elasticVersion)
             .withEnv("discovery.type", "single-node")
             .withExposedPorts(9200)
             .withEnv("xpack.security.enabled", "false")
-            .withEnv("xpack.security.http.ssl.enabled", "false")
             .withEnv("xpack.security.transport.ssl.enabled", "false")
             .withEnv("ES_JAVA_OPTS", "-Xms1g -Xmx1g");
 
@@ -217,12 +212,23 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         container.start();
         int mappedPort = container.getMappedPort(9200);
         log.info("Elastic search started on port {}", mappedPort);
-        ElasticsearchITSetup configurer = new ElasticsearchITSetup(mappedPort);
 
+        ElasticsearchITSetup configurer = new ElasticsearchITSetup(mappedPort);
         log.info("Elastic search adding indexes.");
-        configurer.initIndexes();
-        log.info("Elastic search adding data.");
-        configurer.initData();
+        try {
+            configurer.initIndexes();
+            log.info("Elastic search adding data.");
+            configurer.initData();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to initialize Elasticsearch test data", e);
+        }
+    }
+
+
+    @DynamicPropertySource
+    static void elasticsearchProperties(DynamicPropertyRegistry registry) {
+        registry.add("elasticsearch.host", () -> container.getHost());
+        registry.add("elasticsearch.port", () -> container.getMappedPort(9200));
     }
 
     @AfterAll
@@ -244,7 +250,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     }
 
     @Nested
-    class UICaseSearchControllerIT {
+    public class UICaseSearchControllerIT {
 
         private static final String POST_SEARCH_CASES = "/internal/searchCases";
         private static final String CASE_FIELD_ID = "caseFieldId";

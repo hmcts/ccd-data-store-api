@@ -32,8 +32,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static java.lang.String.format;
-
 @Service
 @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER)
 @Slf4j
@@ -74,7 +72,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private MsearchResponse<ElasticSearchCaseDetailsDTO> search(CrossCaseTypeSearchRequest request) {
         try {
             List<RequestItem> searches = request.getSearchIndex()
-                .map(index -> List.of(createSearchItem(index.getIndexName(), request)))
+                .map(item -> List.of(createSearchItem(item.getIndexName(), request)))
                 .orElseGet(() -> buildSearchItemsByCaseType(request));
 
             MsearchRequest msearchRequest = new MsearchRequest.Builder()
@@ -90,7 +88,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private List<RequestItem> buildSearchItemsByCaseType(CrossCaseTypeSearchRequest request) {
         return request.getCaseTypeIds()
             .stream()
-            .map(caseTypeId -> createSearchItem(getCaseIndexName(caseTypeId), request))
+            .map(caseTypeId -> createSearchItem(caseTypeId, request))
             .collect(Collectors.toList());
     }
 
@@ -184,7 +182,4 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         throw new ServiceException("Cannot extract case type id from ES index name");
     }
 
-    private String getCaseIndexName(String caseTypeId) {
-        return format(applicationParams.getCasesIndexNameFormat(), caseTypeId.toLowerCase());
-    }
 }
