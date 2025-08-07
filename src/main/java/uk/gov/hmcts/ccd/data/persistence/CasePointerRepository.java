@@ -38,10 +38,10 @@ public class CasePointerRepository {
     public CaseDetails persistCasePointer(CaseDetails caseDetails) {
         CaseDetails pointer = caseService.clone(caseDetails);
         pointer.setData(Map.of());
+        pointer.setDataClassification(Map.of());
         pointer.setSecurityClassification(SecurityClassification.RESTRICTED);
         pointer.setLastModified(null);
         pointer.setVersion(null);
-        pointer.setDataClassification(null);
         pointer.setState("");
         return caseDetailsRepository.set(pointer);
     }

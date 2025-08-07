@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.data.persistence;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -37,12 +36,10 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
 
-    private JdbcTemplate template;
     private CaseDetails originalCaseDetails;
 
     @Before
     public void setUp() {
-        template = new JdbcTemplate(db);
         originalCaseDetails = createOriginalCaseDetails();
     }
 
@@ -89,7 +86,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
             () -> assertThat(pointer.getData().isEmpty(), is(true)),
             () -> assertThat(pointer.getState(), is("")),
             () -> assertThat(pointer.getSecurityClassification(), is(SecurityClassification.RESTRICTED)),
-            () -> assertThat(pointer.getDataClassification(), is(nullValue())),
+            () -> assertThat(pointer.getDataClassification().isEmpty(), is(true)),
 
             // Database-managed fields: version is set by DB, lastModified is updated on save
             () -> assertThat(pointer.getVersion(), is(notNullValue())),
