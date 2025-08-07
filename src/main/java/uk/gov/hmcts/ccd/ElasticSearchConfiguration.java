@@ -63,8 +63,9 @@ public class ElasticSearchConfiguration {
         RestClientBuilder builder = RestClient.builder(
                 new HttpHost(
                     //applicationParams.getElasticSearchHosts().getFirst(),
-                    "locahost",
-                    9200, HttpHost.DEFAULT_SCHEME_NAME))
+                    "localhost",
+                    applicationParams.getElasticSearchPort(),
+                    HttpHost.DEFAULT_SCHEME_NAME))
             .setFailureListener(new RestClient.FailureListener() {
                 @Override
                 public void onFailure(Node node) {

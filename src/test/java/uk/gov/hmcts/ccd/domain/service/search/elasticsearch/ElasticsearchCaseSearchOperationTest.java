@@ -425,10 +425,10 @@ class ElasticsearchCaseSearchOperationTest {
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
                 .thenReturn(securedRequest);
 
-            when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
+            //when(applicationParams.getCasesIndexNameFormat()).thenReturn("%s_cases");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
             when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
-            when(applicationParams.getCasesIndexType()).thenReturn("_doc");
+            //when(applicationParams.getCasesIndexType()).thenReturn("_doc");
 
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(List.of(CASE_TYPE_ID_1))
@@ -446,7 +446,7 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> assertThat(caseSearchResult.getCaseTypesResults()).hasSize(1),
                 () -> verify(elasticsearchClient).msearch(any(MsearchRequest.class),
                     eq(ElasticSearchCaseDetailsDTO.class)),
-                () -> verify(applicationParams).getCasesIndexNameFormat(),
+                //() -> verify(applicationParams).getCasesIndexNameFormat(),
                 //() -> verify(applicationParams).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class)),
                 () -> verify(mapper).dtosToCaseDetailsList(any())

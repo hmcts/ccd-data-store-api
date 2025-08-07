@@ -123,7 +123,7 @@ public class ElasticsearchITSetup {
                 resourceResolver.getResources(String.format("classpath:%s/%s/*.json", DATA_DIR, idx));
             for (Resource resource : resources) {
                 String caseString = IOUtils.toString(resource.getInputStream(), UTF_8);
-                doIndex(idx, null, caseString);
+                doIndex(idx, INDEX_TYPE, caseString);
             }
         }
     }

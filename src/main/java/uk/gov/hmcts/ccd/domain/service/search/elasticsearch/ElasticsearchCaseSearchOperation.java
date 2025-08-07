@@ -74,12 +74,19 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             List<RequestItem> searches = request.getSearchIndex()
                 .map(item -> List.of(createSearchItem(item.getIndexName(), request)))
                 .orElseGet(() -> buildSearchItemsByCaseType(request));
+            for (RequestItem requestItem :  searches) {
+                log.info("RequestItem: {}", requestItem);
+            }
 
             MsearchRequest msearchRequest = new MsearchRequest.Builder()
                 .searches(searches)
                 .build();
+            log.info("MsearchRequest: {}", msearchRequest);
 
-            return elasticsearchClient.msearch(msearchRequest, ElasticSearchCaseDetailsDTO.class);
+            MsearchResponse<ElasticSearchCaseDetailsDTO> response = elasticsearchClient.msearch(msearchRequest,
+                ElasticSearchCaseDetailsDTO.class);
+            log.info("Msearch response: {}", response);
+            return response;
         } catch (IOException e) {
             throw new ServiceException("Exception executing Elasticsearch search: " + e.getMessage(), e);
         }
@@ -98,7 +105,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         );
 
         log.info("Executing search request:- index:<{}> query:{}", indexName,
-            securedSearchRequest.toElasticsearchJsonParser(jsonpMapper));
+            securedSearchRequest.getQueryValue());
 
         try {
             RequestItem requestItem = RequestItem.of(r -> r
@@ -106,6 +113,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 .body(b -> b.query(q -> q.withJson(
                     securedSearchRequest.toElasticsearchJsonParser(jsonpMapper), jsonpMapper)))
             );
+            log.info("RequestItem: {}", requestItem);
             return requestItem;
         } catch (BadSearchRequest e) {
             // If it was a validation issue, rethrow it
@@ -134,6 +142,10 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             }
 
             var result = response.result();
+            if (result == null || result.hits() == null || result.hits().hits() == null) {
+                log.warn("No hits found for index: {}", "");
+                continue;
+            }
             List<Hit<ElasticSearchCaseDetailsDTO>> hits = result.hits().hits();
             if (!hits.isEmpty()) {
                 String index = hits.get(0).index();

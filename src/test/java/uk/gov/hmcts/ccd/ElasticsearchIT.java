@@ -224,11 +224,10 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
     }
 
-
     @DynamicPropertySource
     static void elasticsearchProperties(DynamicPropertyRegistry registry) {
-        registry.add("elasticsearch.host", () -> container.getHost());
-        registry.add("elasticsearch.port", () -> container.getMappedPort(9200));
+        registry.add("search.elastic.hosts", () -> container.getHost());
+        registry.add("search.elastic.port", () -> container.getMappedPort(9200));
     }
 
     @AfterAll
