@@ -19,6 +19,8 @@ import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import java.util.UUID;
+
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
@@ -67,6 +69,11 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
                                              final String categoryId) {
         Event event = createDocumentUpdatedEvent();
         eventValidator.validate(event);
+
+        /**
+         * System events have no idempotency key; 'last write wins'.
+         */
+        keyHolder.computeAndSetKeyToRequestContext(UUID.randomUUID().toString());
 
         final CreateCaseEventResult caseEventResult = createEventService
             .createCaseSystemEvent(caseReference, attributePath, categoryId, event);

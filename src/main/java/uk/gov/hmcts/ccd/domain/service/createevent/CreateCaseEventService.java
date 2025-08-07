@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.DelegatingCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -72,7 +72,7 @@ public class CreateCaseEventService {
 
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
-    private final CaseDetailsRepository defaultCaseDetailsRepository;
+    private final CaseDetailsRepository delegatingCaseDetailsRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final EventTriggerService eventTriggerService;
@@ -108,8 +108,8 @@ public class CreateCaseEventService {
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                   final CaseDetailsRepository caseDetailsRepository,
-                                  @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
-                                  final CaseDetailsRepository defaultCaseDetailsRepository,
+                                  @Qualifier(DelegatingCaseDetailsRepository.QUALIFIER)
+                                  final CaseDetailsRepository delegatingCasedetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                   final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
@@ -167,7 +167,7 @@ public class CreateCaseEventService {
         this.caseDetailsJsonParser = jsonPathParser;
         this.timeToLiveService = timeToLiveService;
         this.caseLinkService = caseLinkService;
-        this.defaultCaseDetailsRepository = defaultCaseDetailsRepository;
+        this.delegatingCaseDetailsRepository = delegatingCasedetailsRepository;
         this.applicationParams = applicationParams;
         this.caseAccessGroupUtils = caseAccessGroupUtils;
         this.caseDocumentTimestampService = caseDocumentTimestampService;
@@ -315,7 +315,7 @@ public class CreateCaseEventService {
                                                        final String attributePath,
                                                        final String categoryId,
                                                        Event event) {
-        final CaseDetails caseDetails = defaultCaseDetailsRepository.findByReference(caseReference)
+        final CaseDetails caseDetails = delegatingCaseDetailsRepository.findByReference(caseReference)
             .orElseThrow(() ->
             new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
 
