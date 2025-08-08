@@ -33,6 +33,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Service
 @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER)
 @Slf4j
@@ -78,28 +80,23 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     private MsearchRequest secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
         List<RequestItem> searches = request.getSearchIndex()
-            .map(item -> List.of(buildTypedRequestItem(item.getIndexName(), request)))
+            .map(searchIndex -> List.of(buildTypedRequestItem(searchIndex.getIndexName(), request)))
             .orElseGet(() -> buildSearchItemsByCaseType(request));
 
         searches.forEach(req -> log.info("RequestItem: {}", req));
 
         return new MsearchRequest.Builder()
+            .index(getCaseIndexName(request.getCaseTypeIds().getFirst()))
             .searches(searches)
             .build();
     }
 
-    private List<RequestItem> buildSearchItemsByCaseType(CrossCaseTypeSearchRequest request) {
-        return request.getCaseTypeIds().stream()
-            .map(caseTypeId -> buildTypedRequestItem(caseTypeId, request))
-            .collect(Collectors.toList());
-    }
-
-    private RequestItem buildTypedRequestItem(String indexName, CrossCaseTypeSearchRequest request) {
+    private RequestItem buildTypedRequestItem(String caseTypeId, CrossCaseTypeSearchRequest request) {
         CaseSearchRequest secured = caseSearchRequestSecurity.createSecuredSearchRequest(
-            new CaseSearchRequest(indexName, request.getElasticSearchRequest())
+            new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest())
         );
 
-        log.info("Executing search request for index {} with query: {}", indexName, secured.getQueryValue());
+        log.info("Executing search request for caseTypeId {} with query: {}", caseTypeId, secured.getQueryValue());
 
         try {
             // Parse JSON and base64 encode the inner structure
@@ -107,7 +104,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             String base64Encoded = Base64.getEncoder().encodeToString(rawJsonQuery.getBytes(StandardCharsets.UTF_8));
 
             return RequestItem.of(r -> r
-                .header(h -> h.index(indexName))
+                //.header(h -> h.index(getCaseIndexName(caseTypeId)))
+                .header(h -> h.index(caseTypeId))
                 .body(b -> b
                     .query(q -> q.wrapper(w -> w.query(base64Encoded)))
                     .sort(s -> s.field(f -> f.field("created_date")))
@@ -130,6 +128,13 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             throw new ServiceException("Failed to build RequestItem from DSL", e);
         }
     }
+
+    private List<RequestItem> buildSearchItemsByCaseType(CrossCaseTypeSearchRequest request) {
+        return request.getCaseTypeIds().stream()
+            .map(caseTypeId -> buildTypedRequestItem(caseTypeId, request))
+            .collect(Collectors.toList());
+    }
+
 
     private CaseSearchResult toCaseDetailsSearchResult(MsearchResponse<ElasticSearchCaseDetailsDTO> multiSearchResult,
                                                        CrossCaseTypeSearchRequest request) {
@@ -199,4 +204,11 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         throw new ServiceException("Cannot extract case type id from ES index name");
     }
 
+    private String getCaseIndexName(String caseTypeId) {
+        return format(applicationParams.getCasesIndexNameFormat(), caseTypeId.toLowerCase());
+    }
+
+    private String getCaseIndexType() {
+        return applicationParams.getCasesIndexType();
+    }
 }

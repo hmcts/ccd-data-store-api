@@ -2167,7 +2167,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         return sortCriteria;
     }
 
-
     private void stubCaseTypeRoleAssignments(String... caseTypes) {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             String userId = "123";
