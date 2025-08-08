@@ -23,8 +23,9 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchR
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,11 +40,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     public static final String QUALIFIER = "ElasticsearchCaseSearchOperation";
     static final String MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE = "root_cause";
-    private static final String HITS = "hits";
 
     private final ElasticsearchClient elasticsearchClient;
-    private final JsonpMapper jsonpMapper;
-    private final ObjectMapper objectMapper;
     private final CaseDetailsMapper caseDetailsMapper;
     private final ApplicationParams applicationParams;
     private final CaseSearchRequestSecurity caseSearchRequestSecurity;
@@ -56,11 +54,9 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                                             CaseSearchRequestSecurity caseSearchRequestSecurity,
                                             JsonpMapper jsonpMapper) {
         this.elasticsearchClient = elasticsearchClient;
-        this.objectMapper = objectMapper;
         this.caseDetailsMapper = caseDetailsMapper;
         this.applicationParams = applicationParams;
         this.caseSearchRequestSecurity = caseSearchRequestSecurity;
-        this.jsonpMapper = jsonpMapper;
     }
 
     @Override
@@ -70,64 +66,73 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private MsearchResponse<ElasticSearchCaseDetailsDTO> search(CrossCaseTypeSearchRequest request) {
+        MsearchRequest msearchRequest = secureAndTransformSearchRequest(request);
         try {
-            List<RequestItem> searches = request.getSearchIndex()
-                .map(item -> List.of(createSearchItem(item.getIndexName(), request)))
-                .orElseGet(() -> buildSearchItemsByCaseType(request));
-            for (RequestItem requestItem :  searches) {
-                log.info("RequestItem: {}", requestItem);
-            }
-
-            MsearchRequest msearchRequest = new MsearchRequest.Builder()
-                .searches(searches)
-                .build();
-            log.info("MsearchRequest: {}", msearchRequest);
-
-            MsearchResponse<ElasticSearchCaseDetailsDTO> response = elasticsearchClient.msearch(msearchRequest,
-                ElasticSearchCaseDetailsDTO.class);
-            log.info("Msearch response: {}", response);
+            MsearchResponse<ElasticSearchCaseDetailsDTO> response = elasticsearchClient.msearch(msearchRequest, ElasticSearchCaseDetailsDTO.class);
+            log.info("MsearchResponse: {}", response);
             return response;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new ServiceException("Exception executing Elasticsearch search: " + e.getMessage(), e);
         }
     }
 
+    private MsearchRequest secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
+        List<RequestItem> searches = request.getSearchIndex()
+            .map(item -> List.of(buildTypedRequestItem(item.getIndexName(), request)))
+            .orElseGet(() -> buildSearchItemsByCaseType(request));
+
+        searches.forEach(req -> log.info("RequestItem: {}", req));
+
+        return new MsearchRequest.Builder()
+            .searches(searches)
+            .build();
+    }
+
     private List<RequestItem> buildSearchItemsByCaseType(CrossCaseTypeSearchRequest request) {
-        return request.getCaseTypeIds()
-            .stream()
-            .map(caseTypeId -> createSearchItem(caseTypeId, request))
+        return request.getCaseTypeIds().stream()
+            .map(caseTypeId -> buildTypedRequestItem(caseTypeId, request))
             .collect(Collectors.toList());
     }
 
-    private RequestItem createSearchItem(String indexName, CrossCaseTypeSearchRequest request) {
-        CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(
+    private RequestItem buildTypedRequestItem(String indexName, CrossCaseTypeSearchRequest request) {
+        CaseSearchRequest secured = caseSearchRequestSecurity.createSecuredSearchRequest(
             new CaseSearchRequest(indexName, request.getElasticSearchRequest())
         );
 
-        log.info("Executing search request:- index:<{}> query:{}", indexName,
-            securedSearchRequest.getQueryValue());
+        log.info("Executing search request for index {} with query: {}", indexName, secured.getQueryValue());
 
         try {
-            RequestItem requestItem = RequestItem.of(r -> r
+            // Parse JSON and base64 encode the inner structure
+            String rawJsonQuery = secured.getQueryValue();  // This is likely a JSON string
+            String base64Encoded = Base64.getEncoder().encodeToString(rawJsonQuery.getBytes(StandardCharsets.UTF_8));
+
+            return RequestItem.of(r -> r
                 .header(h -> h.index(indexName))
-                .body(b -> b.query(q -> q.withJson(
-                    securedSearchRequest.toElasticsearchJsonParser(jsonpMapper), jsonpMapper)))
+                .body(b -> b
+                    .query(q -> q.wrapper(w -> w.query(base64Encoded)))
+                    .sort(s -> s.field(f -> f.field("created_date")))
+                    .source(src -> src.filter(f -> f.includes(
+                        "jurisdiction",
+                        "case_type_id",
+                        "state",
+                        "reference",
+                        "created_date",
+                        "last_modified",
+                        "last_state_modified_date",
+                        "security_classification",
+                        "data_classification",
+                        "data",
+                        "supplementary_data.*"
+                    )))
+                )
             );
-            log.info("RequestItem: {}", requestItem);
-            return requestItem;
-        } catch (BadSearchRequest e) {
-            // If it was a validation issue, rethrow it
-            throw e;
         } catch (Exception e) {
-            // For all other unexpected errors (like parser failures), wrap in ServiceException
-            throw new ServiceException("Failed to build request item from JSON", e);
+            throw new ServiceException("Failed to build RequestItem from DSL", e);
         }
     }
 
-    private CaseSearchResult toCaseDetailsSearchResult(
-        MsearchResponse<ElasticSearchCaseDetailsDTO> multiSearchResult,
-        CrossCaseTypeSearchRequest request
-    ) {
+    private CaseSearchResult toCaseDetailsSearchResult(MsearchResponse<ElasticSearchCaseDetailsDTO> multiSearchResult,
+                                                       CrossCaseTypeSearchRequest request) {
         List<CaseDetails> allCaseDetails = new ArrayList<>();
         List<CaseTypeResults> caseTypeResults = new ArrayList<>();
         long total = 0;
