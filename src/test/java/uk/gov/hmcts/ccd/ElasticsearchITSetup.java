@@ -99,7 +99,7 @@ public class ElasticsearchITSetup {
                         responseBody = ElasticsearchIndexSettings.unwrapIO(response.getEntity().getContent());
                     } catch (IOException e) {
                         log.error("Error during reading response body", e);
-                        responseBody = "!! Failed to get the response boy !!";
+                        responseBody = "!! Failed to get the response body !!";
                     }
                     throw new RuntimeException("Call to elasticsearch resulted in error:\n" + responseBody);
                 }
