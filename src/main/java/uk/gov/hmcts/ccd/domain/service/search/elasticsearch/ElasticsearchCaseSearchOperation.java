@@ -70,7 +70,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private MsearchResponse<ElasticSearchCaseDetailsDTO> search(CrossCaseTypeSearchRequest request) {
         MsearchRequest msearchRequest = secureAndTransformSearchRequest(request);
         try {
-            MsearchResponse<ElasticSearchCaseDetailsDTO> response = elasticsearchClient.msearch(msearchRequest, ElasticSearchCaseDetailsDTO.class);
+            MsearchResponse<ElasticSearchCaseDetailsDTO> response = elasticsearchClient.msearch(msearchRequest,
+                ElasticSearchCaseDetailsDTO.class);
             log.info("MsearchResponse: {}", response);
             return response;
         } catch (Exception e) {
@@ -104,8 +105,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             String base64Encoded = Base64.getEncoder().encodeToString(rawJsonQuery.getBytes(StandardCharsets.UTF_8));
 
             return RequestItem.of(r -> r
-                //.header(h -> h.index(getCaseIndexName(caseTypeId)))
-                .header(h -> h.index(caseTypeId))
+                .header(h -> h.index(getCaseIndexName(caseTypeId)))
                 .body(b -> b
                     .query(q -> q.wrapper(w -> w.query(base64Encoded)))
                     .sort(s -> s.field(f -> f.field("created_date")))
@@ -158,9 +158,9 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             }
             List<Hit<ElasticSearchCaseDetailsDTO>> hits = result.hits().hits();
             if (!hits.isEmpty()) {
-                String index = hits.get(0).index();
+                String indexName = hits.get(0).index();
                 String caseTypeId = request.getSearchIndex().isEmpty()
-                    ? getCaseTypeIDFromIndex(index, request.getCaseTypeIds())
+                    ? getCaseTypeIDFromIndex(indexName, request.getCaseTypeIds())
                     : null;
 
                 List<ElasticSearchCaseDetailsDTO> dtos = hits.stream()
@@ -208,7 +208,4 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         return format(applicationParams.getCasesIndexNameFormat(), caseTypeId.toLowerCase());
     }
 
-    private String getCaseIndexType() {
-        return applicationParams.getCasesIndexType();
-    }
 }

@@ -190,13 +190,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     @Inject
     private ApplicationParams applicationParams;
 
+    private static ElasticsearchITSetup configurer;
+
     private static ElasticsearchContainer container;
 
     private MockMvc mockMvc;
 
     static {
         String elasticVersion = System.getProperty("search.elastic.version", "9.0.4");
-        container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:" + elasticVersion)
+        container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:"
+            + elasticVersion)
             .withEnv("discovery.type", "single-node")
             .withExposedPorts(9200)
             .withEnv("xpack.security.enabled", "false")
@@ -213,7 +216,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         int mappedPort = container.getMappedPort(9200);
         log.info("Elastic search started on port {}", mappedPort);
 
-        ElasticsearchITSetup configurer = new ElasticsearchITSetup(mappedPort);
+        configurer = new ElasticsearchITSetup(mappedPort);
+
+        initialiseContainer();
+    }
+
+    private static void initialiseContainer() {
         log.info("Elastic search adding indexes.");
         try {
             configurer.initIndexes();
@@ -240,6 +248,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     @BeforeEach
     public void prepare() {
         wireMockServer.resetAll();
+
+        initialiseContainer();
 
         final String buildings = fromFileAsString("tests/refdata/get_building_locations.json");
         final String orgServices = fromFileAsString("tests/refdata/get_org_services.json");

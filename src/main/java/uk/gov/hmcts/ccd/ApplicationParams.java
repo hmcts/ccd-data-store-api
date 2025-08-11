@@ -130,7 +130,7 @@ public class ApplicationParams {
     @Value("#{'${search.elastic.data.hosts}'.split(',')}")
     private List<String> elasticSearchDataHosts;
 
-    @Value("${search.elastic.port}")
+    @Value("${search.elastic.port:9200}")
     private int elasticSearchPort;
 
     @Value("${search.elastic.request.timeout}")
