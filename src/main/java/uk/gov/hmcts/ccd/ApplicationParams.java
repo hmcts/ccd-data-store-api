@@ -76,6 +76,9 @@ public class ApplicationParams {
     @Value("${case_document_am.url}")
     private String caseDocumentAmUrl;
 
+    @Value("${document.sanitiser.case-document-am-api.enabled}")
+    private boolean documentSanitiserCaseDocumentAMEnabled;
+
     @Value("${ccd.document.url.pattern}")
     private String documentURLPattern;
 
@@ -390,6 +393,10 @@ public class ApplicationParams {
 
     public String getCaseDocumentAmUrl() {
         return caseDocumentAmUrl;
+    }
+
+    public boolean isDocumentSanitiserCaseDocAMEnable() {
+        return documentSanitiserCaseDocumentAMEnabled;
     }
 
     public String getDocumentURLPattern() {

@@ -7,10 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -29,8 +27,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,8 +56,8 @@ class DocumentSanitiserTest {
     private static final String DOCUMENT_HASH = "document_hash";
     private static final String DOCUMENT_HASH_VALUE = "document_hash_value";
 
-    private ObjectNode documentValueInitial = JSON_FACTORY.objectNode();
-    private ObjectNode documentValueSanitised = JSON_FACTORY.objectNode();
+    private final ObjectNode documentValueInitial = JSON_FACTORY.objectNode();
+    private final ObjectNode documentValueSanitised = JSON_FACTORY.objectNode();
 
     static {
         DOCUMENT_FIELD_TYPE.setId(TYPE_DOCUMENT);
@@ -73,15 +71,17 @@ class DocumentSanitiserTest {
     @Mock
     private DocumentManagementRestClient documentManagementRestClient;
 
-    @InjectMocks
+    @Mock
+    private ApplicationParams applicationParams;
+
     private DocumentSanitiser documentSanitiser;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        ApplicationParams applicationParams = new ApplicationParams();
-        ReflectionTestUtils.setField(applicationParams, "caseDocumentAmUrl", "");
+        when(applicationParams.isDocumentSanitiserCaseDocAMEnable()).thenReturn(true);
+        when(applicationParams.getCaseDocumentAmUrl()).thenReturn("");
 
         documentSanitiser = new DocumentSanitiser(documentManagementRestClient, applicationParams);
         documentValueInitial.put("document_url", DOCUMENT_URL_VALUE);
@@ -162,6 +162,21 @@ class DocumentSanitiserTest {
     }
 
     @Test
+    @DisplayName("should use dm-store when feature flag is disabled")
+    void shouldUseDmStoreWhenFeatureFlagIsDisabled() {
+        Document inputDocument = buildDocument(BINARY_URL);
+        inputDocument.setOriginalDocumentName(FILENAME);
+
+        when(applicationParams.isDocumentSanitiserCaseDocAMEnable()).thenReturn(false);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE))
+            .thenReturn(inputDocument);
+
+        JsonNode result = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
+
+        assertThat(result, is(documentValueSanitised));
+    }
+
+    @Test
     @DisplayName("should sanitise and keep same value when hashToken is NullNode")
     void shouldSanitizeIfDocumentRetrievedButNullHashToken() {
         final Document document = buildDocument(BINARY_URL);
@@ -189,7 +204,7 @@ class DocumentSanitiserTest {
 
         assertAll(
             () -> verify(documentManagementRestClient, never()).getDocument(any(FieldTypeDefinition.class),
-                    anyString()),
+                anyString()),
             () -> assertThat(sanitisedDocument, is(documentValue))
         );
     }

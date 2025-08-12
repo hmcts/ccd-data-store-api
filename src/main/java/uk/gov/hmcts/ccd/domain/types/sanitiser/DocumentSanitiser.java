@@ -62,17 +62,7 @@ public class DocumentSanitiser implements Sanitiser {
             final String documentUrl = fieldData.get(DOCUMENT_URL).textValue();
 
             sanitisedData.put(DOCUMENT_URL, documentUrl);
-
-            String caseDocumentAmEndpoint;
-            try {
-                URI uri = new URI(documentUrl);
-                String documentUrlPath = uri.getPath();
-                caseDocumentAmEndpoint = applicationParams.getCaseDocumentAmUrl() + "/cases" + documentUrlPath;
-            } catch (URISyntaxException | NullPointerException e) {
-                throw new ServiceException("invalid documentUrl", e);
-            }
-
-            Document document = documentManagementRestClient.getDocument(fieldTypeDefinition, caseDocumentAmEndpoint);
+            Document document = retrieveDocument(fieldTypeDefinition, documentUrl);
 
             Binary binary = document.get_links().getBinary();
             validateBinaryLink(fieldTypeDefinition, binary);
@@ -94,6 +84,27 @@ public class DocumentSanitiser implements Sanitiser {
             validateDocumentFilename(fieldTypeDefinition, document);
             sanitisedData.put(DOCUMENT_FILENAME, document.getOriginalDocumentName());
             return sanitisedData;
+        }
+    }
+
+    private Document retrieveDocument(FieldTypeDefinition fieldTypeDefinition, String documentUrl) {
+        // TODO: Remove this feature flag once all services have migrated to CDAM.
+        // At that point, dm-store will only allow CDAM to call its APIs directly,
+        // and data-store should always go through case-doc-am-api.
+        if (applicationParams.isDocumentSanitiserCaseDocAMEnable()) {
+            return retrieveDocumentFromCaseDocAM(fieldTypeDefinition, documentUrl);
+        }
+        return documentManagementRestClient.getDocument(fieldTypeDefinition, documentUrl);
+    }
+
+    private Document retrieveDocumentFromCaseDocAM(FieldTypeDefinition fieldTypeDefinition, String documentUrl) {
+        try {
+            final URI uri = new URI(documentUrl);
+            final String documentUrlPath = uri.getPath();
+            final String caseDocumentAmEndpoint = applicationParams.getCaseDocumentAmUrl() + "/cases" + documentUrlPath;
+            return documentManagementRestClient.getDocument(fieldTypeDefinition, caseDocumentAmEndpoint);
+        } catch (URISyntaxException | NullPointerException e) {
+            throw new ServiceException("Invalid document URL format: " + documentUrl, e);
         }
     }
 
