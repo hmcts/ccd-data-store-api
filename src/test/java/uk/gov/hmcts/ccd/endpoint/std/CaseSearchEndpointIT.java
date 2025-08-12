@@ -73,7 +73,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void testSearchCaseDetails() throws Exception {
+    void testSearchCaseDetails() throws Exception {
 
         final long referenceId = 1535450291607660L;
         String caseDetailElastic = create1CaseDetailsElastic(referenceId);
@@ -107,7 +107,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldAuditLogSearchCases() throws Exception {
+    void shouldAuditLogSearchCases() throws Exception {
 
         final long reference1 = 1535450291607660L;
         final long reference2 = 1535450291607670L;
