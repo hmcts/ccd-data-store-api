@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 class PrintableDocumentListOperationTest {
     private static final String JURISDICTION_ID = "TEST_JURISDICTION";
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
-    private static final String CASE_REFERENCE = "1111222233334444L";
+    private static final String CASE_REFERENCE = "1111222233334444";
     private static final String PRINT_URL =
         "http://localhost:9999/jurisdictions/:jid/case-types/:ctid/cases/:cid/documents";
     private static final String EXPECTED_PRINT_URL =

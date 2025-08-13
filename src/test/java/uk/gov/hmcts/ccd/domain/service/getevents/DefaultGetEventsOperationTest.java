@@ -27,11 +27,11 @@ import static org.mockito.Mockito.verify;
 
 class DefaultGetEventsOperationTest {
 
-    private static final Long CASE_ID = 123L;
+    private static final String CASE_ID = "123";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "CaseTypeId";
     private static final String CASE_REFERENCE = "999999";
-    private static final Long EVENT_ID = 100L;
+    private static final String EVENT_ID = "100";
     private static final List<AuditEvent> EVENTS = new ArrayList<>();
     @Mock
     private CaseAuditEventRepository auditEventRepository;

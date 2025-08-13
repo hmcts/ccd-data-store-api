@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class MessageQueueCandidate {
 
     @Id
-    private Long id;
+    private String id;
     @JsonProperty("message_type")
     private String messageType;
     @JsonProperty("time_stamp")

@@ -86,7 +86,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         List<CaseDetails> caseDetails = caseSearchResults.getCases();
         assertThat(caseDetails, hasSize(1));
-        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo("1535450291607660"))));
         assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("PROBATE"))));
         assertThat(caseDetails, hasItem(hasProperty("caseTypeId", equalTo("TestAddressBookCase"))));
         assertThat(caseDetails, hasItem(hasProperty("lastModified",
@@ -121,8 +121,8 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         List<CaseDetails> caseDetails = caseSearchResults.getCases();
         assertThat(caseDetails, hasSize(2));
-        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
-        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607670L))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo("1535450291607660"))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo("1535450291607670"))));
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());

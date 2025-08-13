@@ -48,7 +48,7 @@ class DefaultGetCaseHistoryViewOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1111222233334444";
-    private static final Long EVENT_ID = 100L;
+    private static final String EVENT_ID = "100";
     private static final String EVENT_SUMMARY_1 = "some summary";
     private static final String EVENT_SUMMARY_2 = "Another summary";
     private static final String STATE = "Plop";

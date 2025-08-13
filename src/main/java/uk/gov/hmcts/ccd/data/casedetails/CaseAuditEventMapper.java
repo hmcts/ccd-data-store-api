@@ -61,7 +61,7 @@ public class CaseAuditEventMapper {
         final SignificantItemEntity significantItemEntity = new SignificantItemEntity();
 
         newCaseAuditEventEntity.setId(auditEvent.getId());
-        newCaseAuditEventEntity.setCaseDataId(Long.valueOf(auditEvent.getCaseDataId()));
+        newCaseAuditEventEntity.setCaseDataId(auditEvent.getCaseDataId());
         newCaseAuditEventEntity.setCaseTypeId(auditEvent.getCaseTypeId());
         newCaseAuditEventEntity.setCaseTypeVersion(auditEvent.getCaseTypeVersion());
         newCaseAuditEventEntity.setCreatedDate(auditEvent.getCreatedDate());

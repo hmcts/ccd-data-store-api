@@ -23,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CaseDataIssueLoggerTest {
 
-    private static final String CASE_ID = "123456L";
-    private static final String CASE_REFERENCE = "987654L";
+    private static final String CASE_ID = "123456";
+    private static final String CASE_REFERENCE = "987654";
     private static final String JURISDICTION_ID = "EMPLOYMENT";
     private static final String CASE_TYPE_ID = "TestCaseType";
 

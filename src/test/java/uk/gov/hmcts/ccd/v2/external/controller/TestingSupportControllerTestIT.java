@@ -78,7 +78,7 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
 
         assertEquals(1, caseLinksResource.getCaseLinks().size());
         assertEquals(
-            Long.parseLong(CASE_03_REFERENCE), // pre-existing case link (see classpath:sql/insert_cases.sql)
+            CASE_03_REFERENCE, // pre-existing case link (see classpath:sql/insert_cases.sql)
             caseLinksResource.getCaseLinks().get(0).getLinkedCaseReference()
         );
     }

@@ -118,7 +118,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     void testSaveFailsIfCaseIdDoesNotExist() {
 
         // WHEN
-        caseLinkEntity = new CaseLinkEntity("1003L", CASE_01_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
+        caseLinkEntity = new CaseLinkEntity("1003", CASE_01_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
 
         // THEN
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
@@ -129,7 +129,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     void testSaveFailsIfLinkedCaseIdDoesNotExist() {
 
         // WHEN
-        caseLinkEntity = new CaseLinkEntity(CASE_01_ID, "999L", TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
+        caseLinkEntity = new CaseLinkEntity(CASE_01_ID, "999", TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
 
         // THEN
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));

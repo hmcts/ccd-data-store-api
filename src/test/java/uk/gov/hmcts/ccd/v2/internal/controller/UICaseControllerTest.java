@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("UICaseController")
 class UICaseControllerTest {
     private static final String CASE_REFERENCE = "1234123412341238";
-    private static final Long EVENT_ID = 100L;
+    private static final String EVENT_ID = "100";
 
     @Mock
     private GetCaseViewOperation getCaseViewOperation;

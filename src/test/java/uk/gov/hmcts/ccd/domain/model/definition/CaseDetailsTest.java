@@ -99,7 +99,7 @@ class CaseDetailsTest {
         caseDetails.setJurisdiction("jurisdiction");
         caseDetails.setCaseTypeId("caseType");
         caseDetails.setState("state");
-        caseDetails.setReference("1234567L");
+        caseDetails.setReference("1234567");
         caseDetails.setCreatedDate(now);
         caseDetails.setLastModified(now);
         caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);

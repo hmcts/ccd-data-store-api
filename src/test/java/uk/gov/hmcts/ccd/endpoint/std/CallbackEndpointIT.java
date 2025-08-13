@@ -49,7 +49,7 @@ public class CallbackEndpointIT extends WireMockBaseTest {
     @Test
     public void getPrintableDocumentsShouldLogAudit() throws Exception {
 
-        CaseDetails caseDetails = CaseDetailsBuilder.newCaseDetails().withReference("1535450291607660L").build();
+        CaseDetails caseDetails = CaseDetailsBuilder.newCaseDetails().withReference("1535450291607660").build();
         String url = "/callback/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/documents";
 
         MvcResult result = mockMvc.perform(post(url)

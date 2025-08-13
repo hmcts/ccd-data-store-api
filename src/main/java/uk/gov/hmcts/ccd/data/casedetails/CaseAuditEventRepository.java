@@ -43,7 +43,7 @@ public class CaseAuditEventRepository {
 
     public List<AuditEvent> findByCase(final CaseDetails caseDetails) {
         final List<CaseAuditEventEntity> resultList = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_CASE)
-            .setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()))
+            .setParameter(CaseAuditEventEntity.CASE_DATA_ID, caseDetails.getId())
             .unwrap(org.hibernate.query.Query.class)
             .setResultTransformer(Transformers.aliasToBean(CaseAuditEventEntity.class))
             .getResultList();
@@ -54,7 +54,7 @@ public class CaseAuditEventRepository {
     public Optional<AuditEvent> getCreateEvent(CaseDetails caseDetails) {
         final Query query = em.createNamedQuery(CaseAuditEventEntity.FIND_CREATE_EVENT);
 
-        query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()));
+        query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, caseDetails.getId());
         List<CaseAuditEventEntity> auditEvents = query.getResultList();
 
         return (auditEvents == null || auditEvents.size() == 0)
@@ -62,7 +62,7 @@ public class CaseAuditEventRepository {
               : Optional.of(caseAuditEventMapper.entityToModel(auditEvents.get(0)));
     }
 
-    public Optional<AuditEvent> findByEventId(Long eventId) {
+    public Optional<AuditEvent> findByEventId(String eventId) {
         Query query = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_ID);
 
         query.setParameter(CaseAuditEventEntity.EVENT_ID, eventId);

@@ -34,7 +34,7 @@ class ClassifiedGetEventsOperationTest {
     private static final String CASE_REFERENCE = "999999";
     private static final String CASE_REFERENCE_INVALID = "9999991";
     private static final String CASE_REFERENCE_INVALID_NULL = "9999992";
-    private static final Long EVENT_ID = 100L;
+    private static final String EVENT_ID = "100";
 
     @Mock
     private GetEventsOperation getEventsOperation;

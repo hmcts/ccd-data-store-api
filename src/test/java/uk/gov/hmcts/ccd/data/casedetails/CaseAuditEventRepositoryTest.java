@@ -34,7 +34,7 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
     @Inject
     protected DataSource db;
 
-    private static final Long CASE_DATA_ID = 69L;
+    private static final String CASE_DATA_ID = "69";
 
     @Test
     @DisplayName("should return the earliest event as the 'create event'")
@@ -49,7 +49,7 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
         setUpCaseEvent(CASE_DATA_ID, "Second Event after Create Event", "2017-09-28 08:46:16.260");
 
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(String.valueOf(CASE_DATA_ID));
+        caseDetails.setId(CASE_DATA_ID);
 
         Optional<AuditEvent> createEventOptional = classUnderTest.getCreateEvent(caseDetails);
 
@@ -62,7 +62,7 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
     public void databaseContainsNoEventsForCaseDetails_getCreateEventCalled_EmptyOptionalReturned() {
 
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(String.valueOf(CASE_DATA_ID));
+        caseDetails.setId(CASE_DATA_ID);
 
         assertFalse(classUnderTest.getCreateEvent(caseDetails).isPresent());
     }
@@ -72,8 +72,8 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
     public void shouldReturnAuditEventForEventId() {
         String createEventSummary = "The Create Event";
 
-        setUpCaseData(100L);
-        Long eventId = setUpCaseEvent(100L, "The Create Event", "2017-09-28 08:46:16.258");
+        setUpCaseData("100");
+        String eventId = String.valueOf(setUpCaseEvent("100", "The Create Event", "2017-09-28 08:46:16.258"));
 
         Optional<AuditEvent> createEventOptional = classUnderTest.findByEventId(eventId);
 
@@ -84,7 +84,7 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
     @Test
     @DisplayName("should throw exception when audit event is not found")
     public void shouldThrowExceptionWhenAuditEventNotFound() {
-        assertThrows(ResourceNotFoundException.class, () -> classUnderTest.findByEventId(10000L));
+        assertThrows(ResourceNotFoundException.class, () -> classUnderTest.findByEventId("10000"));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
         );
     }
 
-    private void setUpCaseData(Long caseDataId) {
+    private void setUpCaseData(String caseDataId) {
         new JdbcTemplate(db).update(
             String.format(
                 "INSERT INTO CASE_DATA "
@@ -124,7 +124,7 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
         );
     }
 
-    private Long setUpCaseEvent(Long caseDataId, String summary, String timestamp) {
+    private Long setUpCaseEvent(String caseDataId, String summary, String timestamp) {
         Map<String, Object> params = new HashMap<>();
         params.put("EVENT_ID", "EVENT_ID");
         params.put("CREATED_DATE", timestamp);

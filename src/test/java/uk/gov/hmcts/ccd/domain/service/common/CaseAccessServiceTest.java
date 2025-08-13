@@ -54,8 +54,8 @@ class CaseAccessServiceTest {
     private static final String CASE_GRANTED_2_ID = "456";
     private static final String CASE_REVOKED_ID = "789";
 
-    private static final String CASE_REFERENCE1 = "1614249749110028L";
-    private static final String CASE_REFERENCE2 = "1621941815540762L";
+    private static final String CASE_REFERENCE1 = "1614249749110028";
+    private static final String CASE_REFERENCE2 = "1621941815540762";
 
     private static final List<String> CASES_GRANTED =
         asList(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID);

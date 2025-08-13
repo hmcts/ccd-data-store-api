@@ -115,7 +115,7 @@ public class CasesProviderTest {
 
     private CaseDetails mockCaseDetails() throws JsonProcessingException {
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setReference("1L");
+        caseDetails.setReference("1");
         caseDetails.setCaseTypeId("ET_EnglandWales");
         caseDetails.setJurisdiction("EMPLOYMENT");
         caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);

@@ -80,14 +80,14 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleToAccessProfileDef
 @Transactional
 public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
-    private static final String CASE_REFERENCE = "999999L";
+    private static final String CASE_REFERENCE = "999999";
     private static final String JURISDICTION_ID = "JeyOne";
     private static final String CASE_TYPE_ID = "CaseTypeOne";
     private static final String WRONG_CASE_TYPE_ID = "CaseTypeWrong";
     private static final String JURISDICTION = "PROBATE";
     private static final String WRONG_JURISDICTION = "DIVORCE";
-    private static final Long REFERENCE = 1504259907353529L;
-    private static final Long WRONG_REFERENCE = 9999999999999999L;
+    private static final String REFERENCE = "1504259907353529";
+    private static final String WRONG_REFERENCE = "9999999999999999";
     private static final LocalDate RESOLVED_TTL = LocalDate.now();
 
     private JdbcTemplate template;
@@ -147,10 +147,10 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         emField.set(defaultCaseDetailsRepository, emMock);
 
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setReference("1L");
+        caseDetails.setReference("1");
 
         CaseDetailsEntity caseDetailsEntity = new CaseDetailsEntity();
-        caseDetailsEntity.setReference("1L");
+        caseDetailsEntity.setReference("1");
         caseDetailsEntity.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
         caseDetailsEntity.setVersion(1);
 
@@ -197,14 +197,14 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     public void findByIdShouldReturnCorrectSingleRecord() {
         assumeDataInitialised();
 
-        final CaseDetails byId = caseDetailsRepository.findById("1L");
+        final CaseDetails byId = caseDetailsRepository.findById("1");
         assertAll(
             () -> assertThat(byId.getId(), is("1")),
             () -> assertThat(byId.getJurisdiction(), is("PROBATE")),
             () -> assertThat(byId.getState(), is("CaseCreated")),
             () -> assertThat(byId.getCaseTypeId(), is("TestAddressBookCase")),
             () -> assertThat(byId.getSecurityClassification(), is(SecurityClassification.PUBLIC)),
-            () -> assertThat(byId.getReference(), is(1504259907353529L)),
+            () -> assertThat(byId.getReference(), is("1504259907353529")),
             () -> assertThat(byId.getData().get("PersonFirstName").asText(), is("Janet")),
             () -> assertThat(byId.getData().get("PersonLastName").asText(), is("Parker")),
             () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine1").asText(), is("123")),
@@ -225,7 +225,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             () -> assertThat(byReference.getState(), is("CaseCreated")),
             () -> assertThat(byReference.getCaseTypeId(), is("TestAddressBookCase")),
             () -> assertThat(byReference.getSecurityClassification(), is(SecurityClassification.PUBLIC)),
-            () -> assertThat(byReference.getReference(), is(1504259907353529L)),
+            () -> assertThat(byReference.getReference(), is("1504259907353529")),
             () -> assertThat(byReference.getData().get("PersonFirstName").asText(), is("Janet")),
             () -> assertThat(byReference.getData().get("PersonLastName").asText(), is("Parker")),
             () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine1").asText(), is("123")),
@@ -525,7 +525,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             () -> assertThat(byMetaDataAndFieldData.get(0).getCaseTypeId(), is("TestAddressBookCase")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getSecurityClassification(),
                 is(SecurityClassification.PUBLIC)),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getReference(), is(1504259907353529L)),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getReference(), is("1504259907353529")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonFirstName").asText(), is("Janet")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonLastName").asText(), is("Parker")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine1").asText(),
@@ -613,11 +613,11 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             () -> assertThat(results, hasSize(2)),
             () -> assertThat(results, hasItem(allOf(
                 hasProperty("id", equalTo("1")),
-                hasProperty("reference", equalTo(1504259907353529L))
+                hasProperty("reference", equalTo("1504259907353529"))
             ))),
             () -> assertThat(results, hasItem(allOf(
                 hasProperty("id", equalTo("16")),
-                hasProperty("reference", equalTo(1504254784737847L))
+                hasProperty("reference", equalTo("1504254784737847"))
             )))
         );
     }
@@ -667,7 +667,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             () -> assertThat(results, hasSize(1)),
             () -> assertThat(results, hasItem(allOf(
                 hasProperty("id", equalTo("16")),
-                hasProperty("reference", equalTo(1504254784737847L))
+                hasProperty("reference", equalTo("1504254784737847"))
             )))
         );
 
@@ -705,7 +705,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
 
         assertThat(results.size(), is(1));
-        assertThat(results.get(0).getReference(), is(1504254784737848L));
+        assertThat(results.get(0).getReference(), is("1504254784737848"));
     }
 
     @Test
@@ -772,7 +772,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // THEN
         assertEquals(1, results.size());
-        assertCaseDetails(results.get(0), CASE_01_ID.toString(), JURISDICTION, Long.parseLong(CASE_01_REFERENCE));
+        assertCaseDetails(results.get(0), CASE_01_ID.toString(), JURISDICTION, CASE_01_REFERENCE);
     }
 
     @Test
@@ -811,7 +811,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // THEN
         assertEquals(1, results.size());
-        assertCaseDetails(results.get(0), CASE_03_ID.toString(), JURISDICTION, Long.parseLong(CASE_03_REFERENCE));
+        assertCaseDetails(results.get(0), CASE_03_ID.toString(), JURISDICTION, CASE_03_REFERENCE);
     }
 
     @Test
@@ -852,7 +852,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         assertEquals(0, results.size());
     }
 
-    private void assertCaseDetails(CaseDetails caseDetails, String id, String jurisdictionId, Long caseReference) {
+    private void assertCaseDetails(CaseDetails caseDetails, String id, String jurisdictionId, String caseReference) {
         assertThat(caseDetails.getId(), equalTo(id));
         assertThat(caseDetails.getJurisdiction(), equalTo(jurisdictionId));
         assertThat(caseDetails.getReference(), equalTo(caseReference));

@@ -229,7 +229,7 @@ public abstract class AbstractBaseIntegrationTest {
 
     protected CaseDetails mapCaseData(ResultSet resultSet, Integer i) throws SQLException {
         final CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(String.valueOf(resultSet.getLong("id")));
+        caseDetails.setId(resultSet.getString("id"));
         caseDetails.setReference(resultSet.getString("reference"));
         caseDetails.setState(resultSet.getString("state"));
         caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet
@@ -276,7 +276,7 @@ public abstract class AbstractBaseIntegrationTest {
 
     protected MessageQueueCandidate mapMessageCandidate(ResultSet resultSet, Integer i) throws SQLException {
         final MessageQueueCandidate messageQueueCandidate = new MessageQueueCandidate();
-        messageQueueCandidate.setId(resultSet.getLong("id"));
+        messageQueueCandidate.setId(resultSet.getString("id"));
         messageQueueCandidate.setMessageType(resultSet.getString("message_type"));
         final Timestamp createdAt = resultSet.getTimestamp("time_stamp");
         if (null != createdAt) {
@@ -298,11 +298,11 @@ public abstract class AbstractBaseIntegrationTest {
 
     protected AuditEvent mapAuditEvent(ResultSet resultSet, Integer i) throws SQLException {
         final AuditEvent auditEvent = new AuditEvent();
-        auditEvent.setId(resultSet.getLong("id"));
+        auditEvent.setId(resultSet.getString("id"));
         auditEvent.setUserId(resultSet.getString("user_id"));
         auditEvent.setUserFirstName(resultSet.getString("user_first_name"));
         auditEvent.setUserLastName(resultSet.getString("user_last_name"));
-        auditEvent.setCaseDataId(String.valueOf(resultSet.getLong("case_data_id")));
+        auditEvent.setCaseDataId(String.valueOf(resultSet.getString("case_data_id")));
         final Timestamp createdAt = resultSet.getTimestamp("created_date");
         if (null != createdAt) {
             auditEvent.setCreatedDate(createdAt.toLocalDateTime());
@@ -336,13 +336,9 @@ public abstract class AbstractBaseIntegrationTest {
         return auditEvent;
     }
 
-    protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
-                                        String caseReference, String eventId) {
-        return generateEventToken(template, userId, jurisdictionId, caseTypeId, Long.valueOf(caseReference), eventId);
-    }
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
-                                        Long caseReference, String eventId) {
+                                        String caseReference, String eventId) {
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId(jurisdictionId);
 
@@ -371,10 +367,6 @@ public abstract class AbstractBaseIntegrationTest {
     }
 
     protected CaseDetails getCase(JdbcTemplate template, String caseReference) {
-        return getCase(template, Long.valueOf(caseReference));
-    }
-
-    protected CaseDetails getCase(JdbcTemplate template, Long caseReference) {
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         return caseDetailsList.stream()
             .filter(caseDetails -> caseReference.equals(caseDetails.getReference()))

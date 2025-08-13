@@ -32,7 +32,7 @@ class RoleBasedCaseDataAccessControlTest {
     private static final String IDAM_ID = "23";
     private static final String CASE_ID = "45677";
     private final List<String> caseRoles = asList("[CASE_ROLE_1]", "[CASE_ROLE_2]");
-    private static final String CASE_REFERENCE = "1234123412341234L";
+    private static final String CASE_REFERENCE = "1234123412341234";
 
 
     @Mock

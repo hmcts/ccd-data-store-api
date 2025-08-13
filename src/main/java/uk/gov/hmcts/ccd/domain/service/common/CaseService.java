@@ -102,7 +102,7 @@ public class CaseService {
             throw new BadRequestException("Case reference is not valid");
         }
         final Optional<CaseDetails> caseDetails =
-            caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
+            caseDetailsRepository.findByReference(jurisdictionId, caseReference);
         return caseDetails.orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
     }
 

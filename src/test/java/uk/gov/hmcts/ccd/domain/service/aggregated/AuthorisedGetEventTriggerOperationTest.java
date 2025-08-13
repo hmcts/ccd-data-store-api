@@ -66,7 +66,7 @@ class AuthorisedGetEventTriggerOperationTest {
     private static final String EVENT_TRIGGER_ID = "testEventTriggerId";
     private static final String CASE_REFERENCE = "1234567891012345";
     private static final String CASE_ID = "26";
-    private static final String CASE_REFERENCE_STRING = "1234567891012345L";
+    private static final String CASE_REFERENCE_STRING = "1234567891012345";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String STATE = "CaseCreated";
     private static final Boolean IGNORE = Boolean.TRUE;
@@ -325,7 +325,7 @@ class AuthorisedGetEventTriggerOperationTest {
             doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                                      EVENT_TRIGGER_ID,
                                                                                      IGNORE);
-            doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE_STRING);
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE_STRING);
             doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
                 accessProfiles,
                                                                                     CAN_READ);

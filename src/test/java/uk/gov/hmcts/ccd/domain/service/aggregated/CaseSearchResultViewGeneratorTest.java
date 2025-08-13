@@ -163,7 +163,7 @@ class CaseSearchResultViewGeneratorTest {
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
             .thenReturn(ACCESS_PROFILES);
 
-        CaseDetails caseDetails1 = caseDetails().withReference("999L")
+        CaseDetails caseDetails1 = caseDetails().withReference("999")
             .withData(dataMap)
             .withCaseTypeId(CASE_TYPE_ID_1)
             .withJurisdiction(JURISDICTION)
@@ -174,7 +174,7 @@ class CaseSearchResultViewGeneratorTest {
             .withSupplementaryData(supplementaryDataMap)
             .build();
         CaseDetails caseDetails2 = caseDetails()
-            .withReference("1000L")
+            .withReference("1000")
             .withData(dataMap)
             .withCaseTypeId(CASE_TYPE_ID_1)
             .withJurisdiction(JURISDICTION)
@@ -182,7 +182,7 @@ class CaseSearchResultViewGeneratorTest {
             .withSecurityClassification(SECURITY_CLASSIFICATION)
             .build();
         CaseDetails caseDetails3 = caseDetails()
-            .withReference("1001L")
+            .withReference("1001")
             .withData(dataMap)
             .withCaseTypeId(CASE_TYPE_ID_2)
             .withJurisdiction(JURISDICTION)

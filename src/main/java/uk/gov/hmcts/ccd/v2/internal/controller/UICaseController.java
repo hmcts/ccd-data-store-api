@@ -122,7 +122,7 @@ public class UICaseController {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
 
-        final CaseHistoryView caseHistoryView = getCaseHistoryViewOperation.execute(caseId, Long.valueOf(eventId));
+        final CaseHistoryView caseHistoryView = getCaseHistoryViewOperation.execute(caseId, eventId);
 
         return ResponseEntity.ok(new CaseHistoryViewResource(caseHistoryView, caseId));
     }

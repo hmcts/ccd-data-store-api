@@ -70,13 +70,13 @@ class CaseAccessOperationTest {
     private static final String JURISDICTION = "CMC";
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final String CASE_TYPE_ID = "Application";
-    private static final String CASE_REFERENCE = "1234123412341236L";
-    private static final String CASE_REFERENCE_OTHER = "1111222233334444L";
+    private static final String CASE_REFERENCE = "1234123412341236";
+    private static final String CASE_REFERENCE_OTHER = "1111222233334444";
     private static final String USER_ID = "123";
     private static final String USER_ID_OTHER = "USER_ID_OTHER";
-    private static final String CASE_ID = "456L";
-    private static final String CASE_ID_OTHER = "1234L";
-    private static final String CASE_NOT_FOUND = "9999999999999999L";
+    private static final String CASE_ID = "456";
+    private static final String CASE_ID_OTHER = "1234";
+    private static final String CASE_NOT_FOUND = "9999999999999999";
     private static final String NOT_CASE_ROLE = "NotACaseRole";
     private static final String CASE_ROLE = "[DEFENDANT]";
     private static final String CASE_ROLE_OTHER = "[OTHER]";
@@ -631,7 +631,7 @@ class CaseAccessOperationTest {
     @DisplayName("findCasesUserIdHasAccessTo(userId)")
     class FindCasesUserIdHasAccessTo {
 
-        private final List<String> ids = Collections.singletonList("1L");
+        private final List<String> ids = Collections.singletonList("1");
 
         @Test
         @DisplayName("should return cases that the user has access to")
@@ -1527,7 +1527,7 @@ class CaseAccessOperationTest {
                 .incrementSupplementaryData(
                     eq(CASE_REFERENCE_OTHER.toString()),
                     eq(getOrgUserCountSupDataKey(ORGANISATION_OTHER)),
-                    anyLong()
+                    anyString()
                 );
         }
 

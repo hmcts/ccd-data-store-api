@@ -99,7 +99,7 @@ class CaseDocumentTimestampServiceTest {
         JsonNode resultOriginal = generateTestNode(jsonStringOriginal);
         dataMapOriginal.put("testNode", resultOriginal);
         CaseDetails caseDetailsDb = new CaseDetails();
-        caseDetailsDb.setReference("1L");
+        caseDetailsDb.setReference("1");
         caseDetailsDb.setData(dataMapOriginal);
 
         Map<String, JsonNode> dataMap = new HashMap<>();

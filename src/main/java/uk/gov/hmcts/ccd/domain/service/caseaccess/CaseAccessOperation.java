@@ -68,7 +68,7 @@ public class CaseAccessOperation {
     @Transactional
     public void grantAccess(final String jurisdictionId, final String caseReference, final String userId) {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
-            Long.valueOf(caseReference));
+            caseReference);
 
         final var caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
 
@@ -89,7 +89,7 @@ public class CaseAccessOperation {
     @Transactional
     public void revokeAccess(final String jurisdictionId, final String caseReference, final String userId) {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
-            Long.valueOf(caseReference));
+            caseReference);
         final var caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
 
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
@@ -339,9 +339,8 @@ public class CaseAccessOperation {
 
         // merge both maps to check we have found all cases
         cauRolesByCaseReference.forEach((key, roles) -> {
-            final Long caseReference = Long.parseLong(key);
-            if (caseDetailsByReferences.containsKey(caseReference)) {
-                cauRolesByCaseCaseDetails.put(caseDetailsByReferences.get(caseReference), roles);
+            if (caseDetailsByReferences.containsKey(key)) {
+                cauRolesByCaseCaseDetails.put(caseDetailsByReferences.get(key), roles);
             } else {
                 throw new CaseNotFoundException(key);
             }

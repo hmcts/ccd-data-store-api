@@ -29,9 +29,9 @@ import static uk.gov.hmcts.ccd.WireMockBaseTest.CASE_04_REFERENCE;
 
 public abstract class CaseLinkTestFixtures {
 
-    protected static final String CASE_DATA_ID = "4321L";
-    protected static final String CASE_REFERENCE = "4444333322221111L";
-    protected static final String CASE_REFERENCE_02 = "1111222233334444L";
+    protected static final String CASE_DATA_ID = "4321";
+    protected static final String CASE_REFERENCE = "4444333322221111";
+    protected static final String CASE_REFERENCE_02 = "1111222233334444";
     protected static final String CASE_TYPE_ID = "Test";
     protected static final String CASE_TYPE_ID_02 = "Test-02";
 

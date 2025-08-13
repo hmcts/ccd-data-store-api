@@ -60,7 +60,7 @@ class AuthorisedCaseSearchOperationTest {
 
     private static final String CASE_TYPE_ID_1 = "caseType1";
     private static final String CASE_TYPE_ID_2 = "caseType2";
-    private static final String CASE_REFERENCE = "123456L";
+    private static final String CASE_REFERENCE = "123456";
 
     @Mock
     private CaseSearchOperation caseSearchOperation;
@@ -137,7 +137,7 @@ class AuthorisedCaseSearchOperationTest {
             assertAll(
                 () -> assertThat(result, is(searchResult)),
                 () -> assertThat(caseDetails.getData(), Matchers.is(filteredData)),
-                () -> assertThat(result.getTotal(), is(1L)),
+                () -> assertThat(result.getTotal(), is("1")),
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class), anyBoolean()),
                 () -> verify(caseDataAccessControl).generateAccessProfilesByCaseDetails(any(CaseDetails.class)),
@@ -162,7 +162,7 @@ class AuthorisedCaseSearchOperationTest {
 
             assertAll(
                 () -> assertThat(result.getCases(), hasSize(0)),
-                () -> assertThat(result.getTotal(), is(0L)),
+                () -> assertThat(result.getTotal(), is("0")),
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
                 () -> verifyZeroInteractions(caseSearchOperation),
                 () -> verifyZeroInteractions(accessControlService),
@@ -296,7 +296,7 @@ class AuthorisedCaseSearchOperationTest {
             assertAll(
                 () -> assertThat(result, is(searchResult)),
                 () -> assertThat(caseDetails.getData(), Matchers.is(transformedData)),
-                () -> assertThat(result.getTotal(), is(1L)),
+                () -> assertThat(result.getTotal(), is("L")),
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ),
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class), anyBoolean()),

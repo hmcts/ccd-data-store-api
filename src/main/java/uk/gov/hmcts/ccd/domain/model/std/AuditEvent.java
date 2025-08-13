@@ -19,7 +19,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class AuditEvent extends Event {
     @JsonIgnore
-    private Long id;
+    private String id;
     @JsonProperty("user_id")
     private String userId;
     @JsonProperty("user_last_name")

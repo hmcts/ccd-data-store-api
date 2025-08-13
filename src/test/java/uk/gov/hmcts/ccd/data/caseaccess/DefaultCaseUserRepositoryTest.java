@@ -31,9 +31,9 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
     private static final String COUNT_CASE_USERS =
         "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
 
-    private static final String CASE_ID = "1L";
-    private static final String CASE_ID_GRANTED = "2L";
-    private static final String CASE_ID_3 = "3L";
+    private static final String CASE_ID = "1";
+    private static final String CASE_ID_GRANTED = "2";
+    private static final String CASE_ID_3 = "3";
     private static final String USER_ID = "89000";
     private static final String USER_ID_GRANTED = "89001";
     private static final String USER_ID_CLAIMANT = "89002";

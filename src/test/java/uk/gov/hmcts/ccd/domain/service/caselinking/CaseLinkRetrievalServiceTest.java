@@ -37,8 +37,8 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
     @InjectMocks
     private CaseLinkRetrievalService caseLinkRetrievalService;
 
-    private static final String LINKED_CASE_REFERENCE_05 = "8915783755360086L";
-    private static final String LINKED_CASE_REFERENCE_06 = "2838768175385992L";
+    private static final String LINKED_CASE_REFERENCE_05 = "8915783755360086";
+    private static final String LINKED_CASE_REFERENCE_06 = "2838768175385992";
 
     @Test
     void testGetStandardLinkedCasesNoPagination() {

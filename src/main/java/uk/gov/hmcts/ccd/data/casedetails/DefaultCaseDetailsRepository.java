@@ -172,7 +172,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         final Query query = em.createNamedQuery("CaseDataEntity_FIND_CASE_WITH_LIMITS");
         query.setParameter("jurisdictionId", migrationParameters.getJurisdictionId());
         query.setParameter("caseTypeId", migrationParameters.getCaseTypeId());
-        query.setParameter("caseDataId", migrationParameters.getCaseDataId());
+        query.setParameter("caseDataId", Long.valueOf(migrationParameters.getCaseDataId()));
 
         paginateSetLimit(query, migrationParameters.getNumRecords());
         return caseDetailsMapper.entityToModel(query.getResultList());

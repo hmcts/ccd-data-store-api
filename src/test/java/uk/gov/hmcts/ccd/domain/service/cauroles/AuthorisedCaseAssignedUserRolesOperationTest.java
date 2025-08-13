@@ -55,7 +55,7 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
     @Test
     void shouldReturnCaseAssignedUserRoles() {
         // ARRANGE
-        List<String> caseIds = Lists.newArrayList("123456L");
+        List<String> caseIds = Lists.newArrayList("123456");
         List<String> userIds = Lists.newArrayList("234567");
         when(caseAssignedUserRoleValidator.canAccessUserCaseRoles(anyList())).thenReturn(true);
 
@@ -70,7 +70,7 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
     @Test
     void shouldThrowExceptionWhenUserHasNotPermissions() {
         // ARRANGE
-        List<String> caseIds = Lists.newArrayList("123456L");
+        List<String> caseIds = Lists.newArrayList("123456");
         List<String> userIds = Lists.newArrayList("234567");
         when(caseAssignedUserRoleValidator.canAccessUserCaseRoles(anyList())).thenReturn(false);
 

@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 @Data
 @NoArgsConstructor
 public class CaseViewEvent {
-    private Long id;
+    private String id;
 
     private LocalDateTime timestamp;
 

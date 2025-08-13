@@ -46,7 +46,7 @@ class DefaultSearchOperationTest {
         metaData = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
 
-        migrationParameters = new MigrationParameters(CASE_TYPE_ID, JURISDICTION_ID, "1L", 10);
+        migrationParameters = new MigrationParameters(CASE_TYPE_ID, JURISDICTION_ID, "1", 10);
     }
 
     @Test

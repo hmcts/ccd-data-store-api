@@ -38,7 +38,7 @@ class CaseDetailsQueryBuilderTest {
 
     private SelectCaseDetailsQueryBuilder caseDetailsQueryBuilder;
 
-    private final List<String> caseReferences = Arrays.asList(new String[]{"5353535L"});
+    private final List<String> caseReferences = Arrays.asList(new String[]{"5353535"});
 
     @BeforeEach
     void setUp() {

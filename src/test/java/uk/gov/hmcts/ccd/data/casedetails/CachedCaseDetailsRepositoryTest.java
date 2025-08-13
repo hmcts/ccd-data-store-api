@@ -31,8 +31,8 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 
 class CachedCaseDetailsRepositoryTest {
 
-    private static final String CASE_ID = "100000L";
-    private static final String CASE_REFERENCE = "999999L";
+    private static final String CASE_ID = "100000";
+    private static final String CASE_REFERENCE = "999999";
     private static final String CASE_REFERENCE_STR = "1234123412341236";
     private static final String JURISDICTION_ID = "JeyOne";
     private static final String CASE_TYPE_ID = "CaseTypeOne";

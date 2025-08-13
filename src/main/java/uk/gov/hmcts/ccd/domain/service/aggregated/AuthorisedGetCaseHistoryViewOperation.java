@@ -41,7 +41,7 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
     }
 
     @Override
-    public CaseHistoryView execute(String caseReference, Long eventId) {
+    public CaseHistoryView execute(String caseReference, String eventId) {
         CaseDetails caseDetails = getCase(caseReference);
         CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getCaseTypeId());
         Set<AccessProfile> accessProfiles = getAccessProfiles(caseDetails.getReferenceAsString());
