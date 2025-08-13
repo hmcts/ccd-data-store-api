@@ -205,7 +205,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         aboutToSubmitCallbackResponse.setState(Optional.empty());
 
         caseDetails = new CaseDetails();
-        caseDetails.setReference(Long.parseLong(CASE_REFERENCE));
+        caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
         caseDetails.setLastModified(LAST_MODIFIED);

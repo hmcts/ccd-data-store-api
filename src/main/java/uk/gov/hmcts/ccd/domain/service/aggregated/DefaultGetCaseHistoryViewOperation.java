@@ -52,7 +52,7 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
     }
 
     @Override
-    public CaseHistoryView execute(String caseReference, Long eventId) {
+    public CaseHistoryView execute(String caseReference, String eventId) {
         validateCaseReference(caseReference);
 
         CaseDetails caseDetails = getCaseDetails(caseReference);
