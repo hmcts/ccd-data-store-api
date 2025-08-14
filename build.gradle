@@ -397,7 +397,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:32.1.2-jre'
 
         // CVE-2023-41080
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.108') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
