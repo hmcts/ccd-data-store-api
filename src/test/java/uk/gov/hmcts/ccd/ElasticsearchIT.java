@@ -2,10 +2,17 @@ package uk.gov.hmcts.ccd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,6 +25,7 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -28,6 +36,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -45,7 +55,8 @@ import uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint;
 import uk.gov.hmcts.ccd.test.ElasticsearchTestHelper;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
-import jakarta.inject.Inject;
+import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -183,7 +194,44 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     @Inject
     private ApplicationParams applicationParams;
 
+    private static ElasticsearchContainer container;
+
     private MockMvc mockMvc;
+
+    @BeforeAll
+    public static void initElastic(@Value("${search.elastic.version}") final String elasticVersion,
+                                   @Value("${search.elastic.port}") final int httpPortValue)
+        throws IOException, InterruptedException {
+
+        log.info("Starting Elastic search...");
+        container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:" + elasticVersion)
+            .withEnv("discovery.type", "single-node")
+            .withExposedPorts(9200)
+            .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
+                new HostConfig().withPortBindings(
+                    new PortBinding(Ports.Binding.bindPort(httpPortValue), new ExposedPort(9200))
+                )
+            ))
+            .withEnv("xpack.security.enabled", "false")
+            .waitingFor(Wait.forHttp("/_cluster/health")
+                .forStatusCode(200)
+                .withStartupTimeout(Duration.ofMinutes(1)));
+
+        container.start();
+        log.info("Elastic search started.");
+        ElasticsearchITSetup configurer = new ElasticsearchITSetup(httpPortValue);
+        log.info("Elastic search adding indexes.");
+        configurer.initIndexes();
+        log.info("Elastic search adding data.");
+        configurer.initData();
+    }
+
+    @AfterAll
+    public static void tearDownElastic() {
+        log.info("Stopping Elastic search");
+        container.stop();
+        log.info("Elastic search stopped.");
+    }
 
     @BeforeEach
     public void prepare() {
