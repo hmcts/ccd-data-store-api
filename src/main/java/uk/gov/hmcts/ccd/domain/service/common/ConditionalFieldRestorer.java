@@ -114,9 +114,9 @@ public class ConditionalFieldRestorer {
 
             //temporary change of || sanitizedSubField.equals("null") until
             // figure out why it does come back with null instead of null string
-            if (sanitizedSubField == null ||
-                sanitizedSubField.isNull() ||
-                "null".equals(sanitizedSubField)) {
+            if (sanitizedSubField == null
+                || sanitizedSubField.isNull()
+                || "null".equals(sanitizedSubField)) {
                 log.debug("Missing field '{}' under '{}'.", fieldName, parentFieldDefinition.getId());
 
                 if (isCreateWithoutReadAllowed(subFieldDefinition.getAccessControlLists(), accessProfileNames)) {
