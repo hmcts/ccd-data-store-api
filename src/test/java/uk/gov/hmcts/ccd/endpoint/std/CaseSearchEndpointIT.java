@@ -1,16 +1,19 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import io.searchbox.client.JestClient;
-import io.searchbox.core.MultiSearchResult;
-import io.searchbox.core.SearchResult;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.MsearchRequest;
+import co.elastic.clients.elasticsearch.core.MsearchResponse;
+import co.elastic.clients.elasticsearch.core.msearch.MultiSearchItem;
+import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
+import co.elastic.clients.elasticsearch.core.search.TotalHits;
+import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -23,8 +26,11 @@ import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 
 import jakarta.inject.Inject;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -35,8 +41,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,8 +58,9 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     @Inject
     private WebApplicationContext wac;
     private MockMvc mockMvc;
+
     @MockitoBean
-    private JestClient jestClient;
+    private ElasticsearchClient elasticsearchClient;
 
     @MockitoSpyBean
     private AuditRepository auditRepository;
@@ -66,10 +73,10 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void testSearchCaseDetails() throws Exception {
+    void testSearchCaseDetails() throws Exception {
 
-        String caseDetailElastic = create1CaseDetailsElastic("1535450291607660");
-
+        final long referenceId = 1535450291607660L;
+        String caseDetailElastic = create1CaseDetailsElastic(referenceId);
         stubElasticSearchSearchRequestWillReturn(caseDetailElastic);
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
@@ -86,9 +93,10 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         List<CaseDetails> caseDetails = caseSearchResults.getCases();
         assertThat(caseDetails, hasSize(1));
-        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(referenceId))));
         assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("PROBATE"))));
-        assertThat(caseDetails, hasItem(hasProperty("caseTypeId", equalTo("TestAddressBookCase"))));
+        assertThat(caseDetails, hasItem(hasProperty("caseTypeId",
+            equalTo("TestAddressBookCase"))));
         assertThat(caseDetails, hasItem(hasProperty("lastModified",
                                                     equalTo(LocalDateTime.parse("2018-08-28T09:58:11.643")))));
         assertThat(caseDetails, hasItem(hasProperty("createdDate",
@@ -99,10 +107,10 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldAuditLogSearchCases() throws Exception {
+    void shouldAuditLogSearchCases() throws Exception {
 
-        String reference1 = "1535450291607660";
-        String reference2 = "1535450291607670";
+        final long reference1 = 1535450291607660L;
+        final long reference2 = 1535450291607670L;
         String caseDetailElastic1 = create2CaseDetailsElastic(reference1, reference2);
 
         stubElasticSearchSearchRequestWillReturn(caseDetailElastic1);
@@ -135,7 +143,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getListOfCaseTypes(), is("TestAddressBookCase,TestAddressBookCase4"));
     }
 
-    private String create1CaseDetailsElastic(String reference) {
+    private String create1CaseDetailsElastic(Long reference) {
         return "{\n" +
             "   \"took\":177,\n" +
             "   \"hits\":{\n" +
@@ -150,7 +158,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             "}";
     }
 
-    private String create2CaseDetailsElastic(String reference1,String reference2) {
+    private String create2CaseDetailsElastic(Long reference1,Long reference2) {
         return "{\n" +
             "   \"took\":177,\n" +
             "   \"hits\":{\n" +
@@ -169,7 +177,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             "}";
     }
 
-    private String createCaseDetails(String reference) {
+    private String createCaseDetails(Long reference) {
         return "{\n"
             + "\"reference\": " + reference + ",\n"
             + "\"last_modified\": \"2018-08-28T09:58:11.643Z\",\n"
@@ -187,21 +195,36 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             + "}";
     }
 
-    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic) throws java.io.IOException {
-        Gson gson = new Gson();
-        JsonObject convertedObject = gson.fromJson(caseDetailElastic, JsonObject.class);
-        MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-        when(multiSearchResult.isSucceeded()).thenReturn(true);
-        SearchResult searchResult = new SearchResult(gson);
-        searchResult.setSucceeded(true);
-        searchResult.setJsonObject(convertedObject);
-        searchResult.setJsonString(convertedObject.toString());
-        searchResult.setPathToResult("hits/hits/_source");
+    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic) throws IOException {
 
-        MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
-        when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-        ReflectionTestUtils.setField(response, "searchResult", searchResult, SearchResult.class);
+        ElasticSearchCaseDetailsDTO caseDetails = objectMapper.readValue(
+            objectMapper.readTree(caseDetailElastic).path("hits").path("hits")
+                .get(0).path("_source")
+                .toString(),
+            ElasticSearchCaseDetailsDTO.class
+        );
 
-        given(jestClient.execute(any())).willReturn(multiSearchResult);
+        Hit<ElasticSearchCaseDetailsDTO> hit = mock(Hit.class);
+        when(hit.source()).thenReturn(caseDetails);
+        when(hit.index()).thenReturn("TestAddressBookCase_cases-000001");
+
+        HitsMetadata<CaseDetails> hitsMetadata = mock(HitsMetadata.class);
+        //when(hitsMetadata.hits()).thenReturn(List.of(hit));
+        when(hitsMetadata.total()).thenReturn(new TotalHits.Builder()
+            .value(1L)
+            .relation(TotalHitsRelation.Eq)
+            .build());
+
+        MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse = mock(MsearchResponse.class);
+        MultiSearchResponseItem multiSearchResponseItem = mock(MultiSearchResponseItem.class);
+        when(msearchResponse.responses()).thenReturn(Collections.singletonList(multiSearchResponseItem));
+        MultiSearchItem multiSearchItem = mock(MultiSearchItem.class);
+        when(multiSearchResponseItem.result()).thenReturn(multiSearchItem);
+        when(multiSearchItem.hits()).thenReturn((hitsMetadata));
+        when(multiSearchItem.hits().hits()).thenReturn(List.of(hit));
+
+        when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+            .thenReturn(msearchResponse);
+
     }
 }
