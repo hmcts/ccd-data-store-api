@@ -112,7 +112,9 @@ public class ConditionalFieldRestorer {
             CaseFieldDefinition subFieldDefinition = parentFieldDefinition.getSubfieldDefinition(fieldName)
                 .orElse(parentFieldDefinition);
 
-            if (sanitizedSubField == null) {
+            //temporary change of || sanitizedSubField.equals("null") until
+            // figure out why it does ot come back with null instead of null string
+            if (sanitizedSubField == null || sanitizedSubField.equals("null")) {
                 log.debug("Missing field '{}' under '{}'.", fieldName, parentFieldDefinition.getId());
 
                 if (isCreateWithoutReadAllowed(subFieldDefinition.getAccessControlLists(), accessProfileNames)) {
