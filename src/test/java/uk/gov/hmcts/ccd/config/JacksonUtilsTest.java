@@ -377,6 +377,19 @@ class JacksonUtilsTest {
         return result;
     }
 
+    static Map<String, JsonNode> EmptyValue()
+        throws JsonProcessingException {
+
+        JsonNode data = MAPPER.readTree(""
+            + "{"
+
+            + "}");
+
+        Map<String, JsonNode> result = new HashMap<>();
+        result.put("CollectionComplexField", data);
+        return result;
+    }
+
     static Map<String, JsonNode> organisationPolicyCaseData(String role)
         throws JsonProcessingException {
 
@@ -424,8 +437,9 @@ class JacksonUtilsTest {
         assertEquals(42, dataNode.get("data2").asInt());
     }
 
-    void testConvertValueInDataFieldFromMapNull() {
-        Map<String, JsonNode> inputMap = new HashMap<>();
+    @Test
+    void testConvertValueInDataFieldFromMapNull() throws JsonProcessingException {
+        Map<String, JsonNode> inputMap = null;
 
         Map<String, JsonNode> result = JacksonUtils.convertValueInDataField(inputMap);
 
