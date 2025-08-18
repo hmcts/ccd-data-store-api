@@ -1,15 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.search.TotalHits;
-import co.elastic.clients.json.JsonpMapper;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.elasticsearch.core.MsearchRequest;
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
 import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.TotalHits;
 import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
+import co.elastic.clients.json.JsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -83,8 +82,6 @@ class ElasticsearchCaseSearchOperationTest {
 
     @Mock
     private ObjectMapper objectMapper;
-
-    private JsonpMapper realJsonpMapper;
 
     @Mock
     private CaseDetailsMapper mapper;
@@ -323,14 +320,12 @@ class ElasticsearchCaseSearchOperationTest {
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
         searchRequestJsonNode.set(QUERY, new TextNode("queryVal"));
 
-        realJsonpMapper = new JacksonJsonpMapper();
         searchOperation = new ElasticsearchCaseSearchOperation(
             elasticsearchClient,
             objectMapper,
             mapper,
             applicationParams,
-            caseSearchRequestSecurity,
-            realJsonpMapper
+            caseSearchRequestSecurity
         );
     }
 

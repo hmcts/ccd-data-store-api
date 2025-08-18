@@ -134,21 +134,16 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         CrossCaseTypeSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
 
         // THEN
-        String expectedFinalQueryBody = "{\"query\":{\"bool\":{\"must\":[{\"wrapper\":"
-            + "{\"query\":\"eyJtYXRjaCI6eyJyZWZlcmVuY2UiOjE2MzA1OTYyNjc4OTk1Mjd9fQ==\"}}],\"should\":["
-            + "{\"bool\":{\"must\":[{\"term\":{\"filterTermValue\":{\"value\":\"filterType1\",\"boost\":1.0}}},"
-            + "{\"term\":{\"case_type_id\":{\"value\":\"casetype\",\"boost\":1.0}}}],\"adjust_pure_negative\":true,"
-            + "\"boost\":1.0}},{\"bool\":{\"must\":[{\"term\":{\"filterTermValue\":{\"value\":\"filterType2\","
-            + "\"boost\":1.0}}},{\"term\":{\"case_type_id\":{\"value\":\"casetype2\",\"boost\":1.0}}}],"
-            + "\"adjust_pure_negative\":true,\"boost\":1.0}}],\"adjust_pure_negative\":true,"
-            + "\"minimum_should_match\":\"1\",\"boost\":1.0}}}";
+        String expectedFinalQueryBody = """
+            {"query":{"bool":{"must":[{"wrapper":{"query":"eyJtYXRjaCI6eyJyZWZlcmVuY2UiOjE2MzA1OTYyNjc4OTk1Mjd9fQ=="}}],"should":[{"bool":{"must":[{"term":{"filterTermValue":{"value":"filterType1"}}},{"term":{"case_type_id":{"value":"casetype"}}}],"boost":1.0}},{"bool":{"must":[{"term":{"filterTermValue":{"value":"filterType2"}}},{"term":{"case_type_id":{"value":"casetype2"}}}],"boost":1.0}}],"minimum_should_match":"1","boost":1.0}}}
+            """;
 
         JsonNode returnedFinalQueryBody = securedSearchRequest.getSearchRequestJsonNode();
         String decodedQuery = getDecodedQuery(returnedFinalQueryBody);
 
-        assertThat(securedSearchRequest.getCaseTypeIds()).isEqualTo(CASE_TYPE_IDS);
-        assertThat(decodedQuery).isEqualTo(expectedFinalQueryBody);
-        assertThat(returnedFinalQueryBody.toString()).isEqualTo(expectedFinalQueryBody);
+        assertEquals(CASE_TYPE_IDS, securedSearchRequest.getCaseTypeIds());
+        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
+        assertThat(returnedFinalQueryBody.toString()).isEqualTo(expectedFinalQueryBody.trim());
     }
 
     @Test
