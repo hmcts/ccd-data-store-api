@@ -425,13 +425,13 @@ class JacksonUtilsTest {
     }
 
     @Test
-    void testConvertValueInDataFieldFromMapNull() throws JsonProcessingException {
+    void testConvertValueInDataFieldFromMapNull() {
         Map<String, JsonNode> inputMap = null;
 
         Map<String, JsonNode> result = JacksonUtils.convertValueInDataField(inputMap);
 
-        assertNull(result.get(DATA));
-
         JsonNode dataNode = result.get(DATA);
+        assertNull(dataNode);
+
     }
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
@@ -152,19 +153,22 @@ class ClassifiedValidateCaseFieldsOperationTest {
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
-        assertThrows(ValidationException.class,
-            () -> classifiedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+        Executable validateCaseDetails = () -> classifiedValidateCaseFieldsOperation
+            .validateCaseDetails(operationContext);
+
+        assertThrows(ValidationException.class, validateCaseDetails);
+
     }
 
     @Test
     void shouldValidateData() {
         Map<String, JsonNode> data = new HashMap<>();
-        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        CaseTypeDefinition localCaseTypeDefinition = new CaseTypeDefinition();
         CaseDataContent content = new CaseDataContent();
 
-        classifiedValidateCaseFieldsOperation.validateData(data, caseTypeDefinition, content);
+        classifiedValidateCaseFieldsOperation.validateData(data, localCaseTypeDefinition, content);
 
-        verify(validateCaseFieldsOperation).validateData(data, caseTypeDefinition, content);
+        verify(validateCaseFieldsOperation).validateData(data, localCaseTypeDefinition, content);
     }
 
     @Test
@@ -175,9 +179,12 @@ class ClassifiedValidateCaseFieldsOperationTest {
         doThrow(new ValidationException("Validation failed")).when(validateCaseFieldsOperation)
             .validateData(any(), any(), any());
 
-        ValidationException exception = assertThrows(ValidationException.class, () ->
-            classifiedValidateCaseFieldsOperation.validateData(data, caseTypeDefinition, content));
+        Executable validateData = () -> classifiedValidateCaseFieldsOperation.validateData(data, caseTypeDefinition,
+            content);
+
+        ValidationException exception = assertThrows(ValidationException.class, validateData);
         assertEquals("Validation failed", exception.getMessage());
+
     }
 
     private static @NotNull CaseTypeDefinition getCaseTypeDefinition() {

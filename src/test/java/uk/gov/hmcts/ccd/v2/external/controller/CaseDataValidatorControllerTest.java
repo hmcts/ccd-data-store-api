@@ -42,7 +42,6 @@ class CaseDataValidatorControllerTest {
     private static final Map<String, JsonNode> DATA = newCaseData()
         .withPair("data", JSON_NODE_FACTORY.objectNode().set("aField", JSON_NODE_FACTORY.textNode("aValue")))
         .build();
-    private static final JsonNode DATA_NODE = JacksonUtils.convertValueJsonNode(DATA);
     public static final Map<String, JsonNode> UNWRAPPED_DATA = newCaseData()
         .withPair("aField", JSON_NODE_FACTORY.textNode("aValue"))
         .build();
