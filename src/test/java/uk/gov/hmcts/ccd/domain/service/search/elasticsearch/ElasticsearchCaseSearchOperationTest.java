@@ -376,7 +376,7 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> verify(elasticsearchClient).msearch(any(MsearchRequest.class),
                     eq(ElasticSearchCaseDetailsDTO.class)),
                 () -> verify(caseSearchRequestSecurity)
-                    .createSecuredSearchRequest(any(CaseSearchRequest.class))
+                    .createSecuredSearchRequest(any(CrossCaseTypeSearchRequest.class))
             );
         }
     }

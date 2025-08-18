@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -71,7 +70,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.initMocks(this);
         searchRequestNode = objectMapperService.convertStringToObject(SEARCH_QUERY, JsonNode.class);
         elasticsearchRequest = new ElasticsearchRequest(searchRequestNode);
         underTest =
@@ -121,6 +120,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
 
     @Test
     @DisplayName("should parse and secure request with filters and multiple case types and verify complete query")
+    @SuppressWarnings("checkstyle:LineLength")
     void shouldSecureCrossCaseTypeRequestWithFiltersVerifyQuery() {
         // GIVEN
         when(caseSearchFilter.getFilter(CASE_TYPE_ID_2)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_2)));
@@ -135,15 +135,14 @@ class ElasticsearchCaseSearchRequestSecurityTest {
 
         // THEN
         String expectedFinalQueryBody = """
-            {"query":{"bool":{"must":[{"wrapper":{"query":"eyJtYXRjaCI6eyJyZWZlcmVuY2UiOjE2MzA1OTYyNjc4OTk1Mjd9fQ=="}}],"should":[{"bool":{"must":[{"term":{"filterTermValue":{"value":"filterType1"}}},{"term":{"case_type_id":{"value":"casetype"}}}],"boost":1.0}},{"bool":{"must":[{"term":{"filterTermValue":{"value":"filterType2"}}},{"term":{"case_type_id":{"value":"casetype2"}}}],"boost":1.0}}],"minimum_should_match":"1","boost":1.0}}}
-            """;
+            {"query":{"bool":{"must":[{"wrapper":{"query":"eyJtYXRjaCI6eyJyZWZlcmVuY2UiOjE2MzA1OTYyNjc4OTk1Mjd9fQ=="}}],"should":[{"bool":{"must":[{"term":{"filterTermValue":{"value":"filterType1"}}},{"term":{"case_type_id":{"value":"casetype"}}}],"boost":1.0}},{"bool":{"must":[{"term":{"filterTermValue":{"value":"filterType2"}}},{"term":{"case_type_id":{"value":"casetype2"}}}],"boost":1.0}}],"minimum_should_match":"1","boost":1.0}}}""";
 
         JsonNode returnedFinalQueryBody = securedSearchRequest.getSearchRequestJsonNode();
         String decodedQuery = getDecodedQuery(returnedFinalQueryBody);
 
         assertEquals(CASE_TYPE_IDS, securedSearchRequest.getCaseTypeIds());
         assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
-        assertThat(returnedFinalQueryBody.toString()).isEqualTo(expectedFinalQueryBody.trim());
+        assertEquals(expectedFinalQueryBody, returnedFinalQueryBody.toString());
     }
 
     @Test
