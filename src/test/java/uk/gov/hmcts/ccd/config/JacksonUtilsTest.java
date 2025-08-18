@@ -377,19 +377,6 @@ class JacksonUtilsTest {
         return result;
     }
 
-    static Map<String, JsonNode> EmptyValue()
-        throws JsonProcessingException {
-
-        JsonNode data = MAPPER.readTree(""
-            + "{"
-
-            + "}");
-
-        Map<String, JsonNode> result = new HashMap<>();
-        result.put("CollectionComplexField", data);
-        return result;
-    }
-
     static Map<String, JsonNode> organisationPolicyCaseData(String role)
         throws JsonProcessingException {
 
