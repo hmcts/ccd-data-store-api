@@ -117,11 +117,10 @@ public class ConditionalFieldRestorer {
                 // Handle all null-like cases here
                 log.debug("Missing field '{}' under '{}'.", fieldName, parentFieldDefinition.getId());
 
-                // TEMPORARY CHANGE TO FORCE ADDING regardless of permissions
-                // if (isCreateWithoutReadAllowed(subFieldDefinition.getAccessControlLists(), accessProfileNames)) {
-                log.info("Adding missing field '{}' under '{}'.", fieldName, parentFieldDefinition.getId());
-                sanitizedObjectNode.set(fieldName, existingSubField);
-                //}
+                if (isCreateWithoutReadAllowed(subFieldDefinition.getAccessControlLists(), accessProfileNames)) {
+                    log.info("Adding missing field '{}' under '{}'.", fieldName, parentFieldDefinition.getId());
+                    sanitizedObjectNode.set(fieldName, existingSubField);
+                }
             } else {
                 sanitizedObjectNode.set(fieldName, processSubFieldsRecursively(
                     subFieldDefinition,
@@ -138,6 +137,7 @@ public class ConditionalFieldRestorer {
         return sanitizedNode != null && sanitizedNode.isObject()
             ? (ObjectNode) sanitizedNode.deepCopy()
             : JsonNodeFactory.instance.objectNode();
+
     }
 
     private JsonNode processCollectionFields(CaseFieldDefinition subFieldDefinition,
