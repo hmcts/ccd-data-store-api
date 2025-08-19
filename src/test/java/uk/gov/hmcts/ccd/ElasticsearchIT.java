@@ -8,6 +8,7 @@ import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
@@ -35,7 +36,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -54,7 +55,6 @@ import uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint;
 import uk.gov.hmcts.ccd.test.ElasticsearchTestHelper;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
-import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -211,12 +211,11 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 new HostConfig().withPortBindings(
                     new PortBinding(Ports.Binding.bindPort(httpPortValue), new ExposedPort(9200))
                 )
-            ));
-
-        String regex = ".*(\"message\":\\s?\"started\".*|] started\n$)";
-        container.setWaitStrategy((new LogMessageWaitStrategy())
-            .withRegEx(regex)
-            .withStartupTimeout(Duration.ofMinutes(3)));
+            ))
+            .withEnv("xpack.security.enabled", "false")
+            .waitingFor(Wait.forHttp("/_cluster/health")
+                .forStatusCode(200)
+                .withStartupTimeout(Duration.ofMinutes(1)));
 
         container.start();
         log.info("Elastic search started.");
@@ -282,7 +281,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
                 null);
 
-            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
                 () -> assertThat(caseSearchResultViewResource.getCases().size(), is(1)),
@@ -308,7 +307,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
                 null);
 
-            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
                 () -> assertThat(caseSearchResultViewResource.getCases().size(), is(1)),
@@ -355,7 +354,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
                 null);
 
-            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
                 () -> assertThat(caseSearchResultViewResource.getCases().size(), is(1)),
@@ -384,7 +383,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
                 "TEST");
-            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
                 () -> assertUseCaseHeadersUserRole(caseSearchResultViewResource.getHeaders()),
@@ -399,21 +398,21 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             CaseSearchResultViewResource caseSearchResultViewResource =
                 executeRequest(searchRequest, CASE_TYPE_A, "RDM-8782");
-            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
 
             List<String> expectedFields = Collections.singletonList(EMAIL_FIELD);
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().size(), is(1)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getJurisdiction(),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getMetadata().getJurisdiction(),
                     is(AUTOTEST_1)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getCaseTypeId(),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getMetadata().getCaseTypeId(),
                     is(CASE_TYPE_A)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().size(), is(1)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getCases().size(), is(1)),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getCases().getFirst(),
                     is(DEFAULT_CASE_REFERENCE)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(1)),
-                () -> expectedFields.forEach(f -> assertThat(caseSearchResultViewResource.getHeaders().get(0)
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getFields().size(), is(1)),
+                () -> expectedFields.forEach(f -> assertThat(caseSearchResultViewResource.getHeaders().getFirst()
                     .getFields(), hasItem(hasProperty(CASE_FIELD_ID, is(f))))),
 
                 () -> assertThat(caseDetails.getFields().get(EMAIL_FIELD), is(EMAIL_VALUE)),
@@ -428,18 +427,18 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
                 "RDM-8782NOACCESS");
-            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getHeaders().size(), is(1)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getJurisdiction(),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getMetadata().getJurisdiction(),
                     is(AUTOTEST_1)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getCaseTypeId(),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getMetadata().getCaseTypeId(),
                     is(CASE_TYPE_A)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().size(), is(1)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getCases().size(), is(1)),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getCases().getFirst(),
                     is(DEFAULT_CASE_REFERENCE)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getFields().size(), is(0)),
                 () -> assertThat(caseDetails.getFields().size(), is(8)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
             );
@@ -465,7 +464,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
                 "ORGCASES");
 
-            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
                 () -> assertThat(caseSearchResultViewResource.getCases().size(), is(1)),
@@ -490,16 +489,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
                 null);
 
-            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(3)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(0).getCaseFieldId(),
-                    is(TEXT_FIELD)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(1).getCaseFieldId(),
-                    is(nestedFieldId)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
-                    is(MetaData.CaseField.CASE_REFERENCE.getReference())),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getFields().size(), is(3)),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getFields().getFirst()
+                        .getCaseFieldId(), is(TEXT_FIELD)),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getFields().get(1)
+                        .getCaseFieldId(), is(nestedFieldId)),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getFields().get(2)
+                        .getCaseFieldId(), is(MetaData.CaseField.CASE_REFERENCE.getReference())),
                 () -> assertThat(caseDetails.getFields().size(), is(11)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
                 () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
@@ -527,16 +526,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
                 "SEARCH");
 
-            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(3)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(0).getCaseFieldId(),
-                    is(TEXT_FIELD)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(1).getCaseFieldId(),
-                    is(nestedFieldId)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
-                    is(MetaData.CaseField.CASE_REFERENCE.getReference())),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getFields().size(), is(3)),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getFields().getFirst()
+                        .getCaseFieldId(), is(TEXT_FIELD)),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getFields().get(1)
+                        .getCaseFieldId(), is(nestedFieldId)),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getFields().get(2)
+                        .getCaseFieldId(), is(MetaData.CaseField.CASE_REFERENCE.getReference())),
                 () -> assertThat(caseDetails.getFields().size(), is(11)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
                 () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
@@ -562,14 +561,14 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-                () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(10)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(16)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(),
+                () -> assertThat(caseSearchResultViewResource.getHeaders().getFirst().getFields().size(), is(10)),
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getFields().size(), is(16)),
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData().size(),
                     is(2)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
-                    .asText(), is("SDField2Value")),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3")
-                    .asText(), is("SDField3Value"))
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
+                    .get("SDField2").asText(), is("SDField2Value")),
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
+                    .get("SDField3").asText(), is("SDField3Value"))
             );
         }
 
@@ -585,14 +584,14 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(),
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData().size(),
                     is(3)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1")
-                    .asText(), is("SDField1Value")),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
-                    .asText(), is("SDField2Value")),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3")
-                    .asText(), is("SDField3Value"))
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
+                    .get("SDField1").asText(), is("SDField1Value")),
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
+                    .get("SDField2").asText(), is("SDField2Value")),
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
+                    .get("SDField3").asText(), is("SDField3Value"))
             );
         }
 
@@ -607,7 +606,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData(), is(nullValue()))
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData(),
+                    is(nullValue()))
             );
         }
 
@@ -622,14 +622,14 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(),
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData().size(),
                     is(3)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1")
-                    .asText(), is("SDField1Value")),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
-                    .asText(), is("SDField2Value")),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3")
-                    .asText(), is("SDField3Value"))
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
+                    .get("SDField1").asText(), is("SDField1Value")),
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
+                    .get("SDField2").asText(), is("SDField2Value")),
+                () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
+                    .get("SDField3").asText(), is("SDField3Value"))
             );
         }
 
@@ -666,7 +666,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .sort("invalid.keyword")
                 .build();
 
-            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, null, 400);
+            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, null,
+                400);
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
@@ -708,14 +709,13 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(headers.size(), is(1)),
-                () -> assertThat(headers.get(0).getMetadata().getJurisdiction(), is(AUTOTEST_1)),
-                () -> assertThat(headers.get(0).getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
-                () -> assertThat(headers.get(0).getCases().size(), is(1)),
-                () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
-                () -> assertThat(headers.get(0).getFields().size(), is(24)),
-                () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(),
-                    hasItem(hasProperty(CASE_FIELD_ID,
-                        is(f)))))
+                () -> assertThat(headers.getFirst().getMetadata().getJurisdiction(), is(AUTOTEST_1)),
+                () -> assertThat(headers.getFirst().getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
+                () -> assertThat(headers.getFirst().getCases().size(), is(1)),
+                () -> assertThat(headers.getFirst().getCases().getFirst(), is(DEFAULT_CASE_REFERENCE)),
+                () -> assertThat(headers.getFirst().getFields().size(), is(24)),
+                () -> expectedFields.forEach(f -> assertThat(headers.getFirst().getFields(),
+                    hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
             );
         }
 
@@ -725,14 +725,13 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(headers.size(), is(1)),
-                () -> assertThat(headers.get(0).getMetadata().getJurisdiction(), is(AUTOTEST_1)),
-                () -> assertThat(headers.get(0).getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
-                () -> assertThat(headers.get(0).getCases().size(), is(1)),
-                () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
-                () -> assertThat(headers.get(0).getFields().size(), is(5)),
-                () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(),
-                    hasItem(hasProperty(CASE_FIELD_ID,
-                        is(f)))))
+                () -> assertThat(headers.getFirst().getMetadata().getJurisdiction(), is(AUTOTEST_1)),
+                () -> assertThat(headers.getFirst().getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
+                () -> assertThat(headers.getFirst().getCases().size(), is(1)),
+                () -> assertThat(headers.getFirst().getCases().getFirst(), is(DEFAULT_CASE_REFERENCE)),
+                () -> assertThat(headers.getFirst().getFields().size(), is(5)),
+                () -> expectedFields.forEach(f -> assertThat(headers.getFirst().getFields(),
+                    hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
             );
         }
 
@@ -744,20 +743,19 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(headers.size(), is(1)),
-                () -> assertThat(headers.get(0).getMetadata().getJurisdiction(), is(AUTOTEST_1)),
-                () -> assertThat(headers.get(0).getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
-                () -> assertThat(headers.get(0).getCases().size(), is(1)),
-                () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
-                () -> assertThat(headers.get(0).getFields().size(), is(10)),
-                () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(),
-                    hasItem(hasProperty(CASE_FIELD_ID,
-                        is(f)))))
+                () -> assertThat(headers.getFirst().getMetadata().getJurisdiction(), is(AUTOTEST_1)),
+                () -> assertThat(headers.getFirst().getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
+                () -> assertThat(headers.getFirst().getCases().size(), is(1)),
+                () -> assertThat(headers.getFirst().getCases().getFirst(), is(DEFAULT_CASE_REFERENCE)),
+                () -> assertThat(headers.getFirst().getFields().size(), is(10)),
+                () -> expectedFields.forEach(f -> assertThat(headers.getFirst().getFields(),
+                    hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
             );
         }
 
         private void assertExampleCaseData(Map<String, Object> data, boolean formatted) {
             assertAll(
-                () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(0).get(VALUE), is(COLLECTION_VALUE)),
+                () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).getFirst().get(VALUE), is(COLLECTION_VALUE)),
                 () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE),
                     is("CollectionTextValue1")),
                 () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_FIXED_LIST_FIELD), is("VALUE3")),
@@ -765,7 +763,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     .get(NESTED_NUMBER_FIELD), is(NESTED_NUMBER_FIELD_VALUE)),
                 () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_TEXT_FIELD), is(COMPLEX_TEXT_VALUE)),
                 () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
-                    .get(NESTED_COLLECTION_TEXT_FIELD)).get(0).get(VALUE), is("NestedCollectionTextValue1")),
+                    .get(NESTED_COLLECTION_TEXT_FIELD)).getFirst().get(VALUE), is("NestedCollectionTextValue1")),
                 () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
                     .get(NESTED_COLLECTION_TEXT_FIELD)).get(1).get(VALUE), is("NestedCollectionTextValue2")),
                 () -> assertThat(data.get(DATE_FIELD), is(formatted ? "12/2007" : DATE_VALUE)),
@@ -783,7 +781,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(data.get(EMAIL_FIELD), is(EMAIL_VALUE)),
                 () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),
                 () -> assertThat(data.get(TEXT_FIELD), is(TEXT_VALUE)),
-                () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(0).get(VALUE), is(COLLECTION_VALUE)),
+                () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).getFirst().get(VALUE), is(COLLECTION_VALUE)),
                 () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE),
                     is("CollectionTextValue1"))
             );
@@ -911,7 +909,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getReference(), is(1589460099608690L))
+                    () -> assertThat(caseSearchResult.getCases().getFirst().getReference(), is(1589460099608690L))
                 );
             }
 
@@ -1249,7 +1247,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getCaseTypeId(), is(CASE_TYPE_B))
+                    () -> assertThat(caseSearchResult.getCases().getFirst().getCaseTypeId(), is(CASE_TYPE_B))
                 );
             }
 
@@ -1294,10 +1292,10 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             void shouldMergePermissionsOfMultipleRolesForCases() throws Exception {
                 if (applicationParams.getEnableAttributeBasedAccessControl()) {
                     String roleAssignmentResponseJson = roleAssignmentResponseJson(
-                        securityCTSpecificPublicUserRoleAssignmentJson("123","idam:caseworker-autotest1-solicitor",
-                            "1588870615652827"),
-                        securityCTSpecificPublicUserRoleAssignmentJson("123","idam:caseworker-autotest1-solicitor",
-                            "1589460125872336")
+                        securityCTSpecificPublicUserRoleAssignmentJson("123",
+                            "idam:caseworker-autotest1-solicitor","1588870615652827"),
+                        securityCTSpecificPublicUserRoleAssignmentJson("123",
+                            "idam:caseworker-autotest1-solicitor","1589460125872336")
                     );
 
                     stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
@@ -1338,8 +1336,10 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         void shouldOnlyReturnCasesSolicitorHasBeenGrantedAccessTo() throws Exception {
             if (applicationParams.getEnableAttributeBasedAccessControl()) {
                 String roleAssignmentResponseJson = roleAssignmentResponseJson(
-                    securityCTSpecificPublicUserRoleAssignmentJson("123","[CREATOR]", "1589460125872336"),
-                    securityCTSpecificPublicUserRoleAssignmentJson("123","[DEFENDANT]", "1589460099608691")
+                    securityCTSpecificPublicUserRoleAssignmentJson("123","[CREATOR]",
+                        "1589460125872336"),
+                    securityCTSpecificPublicUserRoleAssignmentJson("123","[DEFENDANT]",
+                        "1589460099608691")
                 );
 
                 stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
@@ -1387,7 +1387,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         private Map<String, JsonNode> getFirstCaseData(CaseSearchResult caseSearchResult) {
-            return caseSearchResult.getCases().get(0).getData();
+            return caseSearchResult.getCases().getFirst().getData();
         }
 
         private CaseDetails getCase(CaseSearchResult caseSearchResult, Long reference) {
@@ -1434,7 +1434,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     () -> assertThat(caseSearchResult.getTotal(), is(3L)),
                     () -> assertThat(caseSearchResult.getCaseReferences(CASE_TYPE_A).size(), is(2)),
                     () -> assertThat(caseSearchResult.getCaseReferences(CASE_TYPE_B).size(), is(1)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getData().size(), is(0)),
+                    () -> assertThat(caseSearchResult.getCases().getFirst().getData().size(), is(0)),
                     () -> assertThat(caseSearchResult.getCases().get(1).getData().size(), is(0)),
                     () -> assertThat(caseSearchResult.getCases().get(2).getData().size(), is(0))
                 );
@@ -1453,13 +1453,13 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(3L)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getData().get(TEXT_ALIAS).asText(),
+                    () -> assertThat(caseSearchResult.getCases().getFirst().getData().get(TEXT_ALIAS).asText(),
                         is(TEXT_VALUE)),
                     () -> assertThat(caseSearchResult.getCases().get(1).getData().get(TEXT_ALIAS).asText(),
                         is("CCC TextValue")),
                     () -> assertThat(caseSearchResult.getCases().get(2).getData().get(TEXT_ALIAS).asText(),
                         is("BBB TextValue")),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getData().size(), is(1)),
+                    () -> assertThat(caseSearchResult.getCases().getFirst().getData().size(), is(1)),
                     () -> assertThat(caseSearchResult.getCases().get(1).getData().size(), is(1)),
                     () -> assertThat(caseSearchResult.getCases().get(2).getData().size(), is(1))
                 );
@@ -1519,7 +1519,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_A);
 
-                CaseDetails caseDetails = caseSearchResult.getCases().get(0);
+                CaseDetails caseDetails = caseSearchResult.getCases().getFirst();
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertExampleCaseMetadata(caseDetails),
@@ -1543,7 +1543,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_A);
 
-                CaseDetails caseDetails = caseSearchResult.getCases().get(0);
+                CaseDetails caseDetails = caseSearchResult.getCases().getFirst();
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertExampleCaseMetadata(caseDetails),
@@ -1565,7 +1565,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_A);
 
-                CaseDetails caseDetails = caseSearchResult.getCases().get(0);
+                CaseDetails caseDetails = caseSearchResult.getCases().getFirst();
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertExampleCaseMetadata(caseDetails),
@@ -1715,7 +1715,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
                 () -> assertThat(result.getResults().size(), is(1))
             );
-            GlobalSearchResponsePayload.Result result1 = result.getResults().get(0);
+            GlobalSearchResponsePayload.Result result1 = result.getResults().getFirst();
             assertAll(
                 // verify case data from: `/resources/elasticsearch/data/global_search/global-search-01.json`
                 () -> assertThat(result1.getStateId(), is(STATE_GLOBAL_SEARCH)),
@@ -1724,7 +1724,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(result1.getCaseManagementCategoryName(), is("Category label Order-02")),
                 () -> assertThat(result1.getCaseNameHmctsInternal(), is("Name Internal 01")),
                 () -> assertThat(result1.getOtherReferences().size(), is(1)),
-                () -> assertThat(result1.getOtherReferences().get(0), is(OTHER_REFERENCE_GLOBAL_SEARCH)),
+                () -> assertThat(result1.getOtherReferences().getFirst(), is(OTHER_REFERENCE_GLOBAL_SEARCH)),
                 // verify ref-data from: `/resources/mappings/refdata/get_building_locations.json`
                 () -> assertThat(result1.getBaseLocationId(), is(CASE_MANAGEMENT_BASE_LOCATION_GLOBAL_SEARCH)),
                 () -> assertThat(result1.getBaseLocationName(), is("54 TEST ROAD")),
@@ -1774,7 +1774,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
                 () -> assertThat(result.getResults().size(), is(1))
             );
-            assertThat(result.getResults().get(0).getCaseReference(), is(REFERENCE_GLOBAL_SEARCH_02));
+            assertThat(result.getResults().getFirst().getCaseReference(), is(REFERENCE_GLOBAL_SEARCH_02));
         }
 
         @DisplayName("ES Filters: should not return cases filtered by pre security filters")
@@ -1802,7 +1802,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
                 () -> assertThat(result.getResults().size(), is(1))
             );
-            assertThat(result.getResults().get(0).getCaseReference(), is(REFERENCE_GLOBAL_SEARCH_01));
+            assertThat(result.getResults().getFirst().getCaseReference(), is(REFERENCE_GLOBAL_SEARCH_01));
         }
 
         @DisplayName("ES Filters: should not return case fields filtered by post filtering authorisation rules")
@@ -1830,7 +1830,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
                 () -> assertThat(result.getResults().size(), is(1))
             );
-            GlobalSearchResponsePayload.Result result1 = result.getResults().get(0);
+            GlobalSearchResponsePayload.Result result1 = result.getResults().getFirst();
             assertAll(
                 () -> assertThat(result1.getCaseReference(), is(REFERENCE_GLOBAL_SEARCH_01)),
 
@@ -2164,7 +2164,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         return sortCriteria;
     }
-    
 
     private void stubCaseTypeRoleAssignments(String... caseTypes) {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
@@ -2186,15 +2185,15 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             if (Arrays.asList(caseTypes).contains("AAT")) {
-                roleAssignments.add(aatCTSpecificPublicUserRoleAssignmentJson(userId, "idam:caseworker-autotest1",
-                    "1588866820969121"));
-                roleAssignments.add(aatCTSpecificPublicUserRoleAssignmentJson(userId, "idam:caseworker-autotest1",
-                    "1589460056217857"));
+                roleAssignments.add(aatCTSpecificPublicUserRoleAssignmentJson(userId,
+                    "idam:caseworker-autotest1", "1588866820969121"));
+                roleAssignments.add(aatCTSpecificPublicUserRoleAssignmentJson(userId,
+                    "idam:caseworker-autotest1","1589460056217857"));
             }
 
             if (Arrays.asList(caseTypes).contains("MAPPER")) {
-                roleAssignments.add(mapperCTSpecificPublicUserRoleAssignmentJson(userId, "idam:caseworker-autotest1",
-                    "1588870615652827"));
+                roleAssignments.add(mapperCTSpecificPublicUserRoleAssignmentJson(userId,
+                    "idam:caseworker-autotest1","1588870615652827"));
             }
 
             if (Arrays.asList(caseTypes).contains("RESTRICTED_SECURITY")) {
