@@ -117,10 +117,11 @@ public class ConditionalFieldRestorer {
                 // Handle all null-like cases here
                 log.debug("Missing field '{}' under '{}'.", fieldName, parentFieldDefinition.getId());
 
-                if (isCreateWithoutReadAllowed(subFieldDefinition.getAccessControlLists(), accessProfileNames)) {
+                //TEMPORARY CHANGE TO FORCE ADDING
+                // if (isCreateWithoutReadAllowed(subFieldDefinition.getAccessControlLists(), accessProfileNames)) {
                     log.info("Adding missing field '{}' under '{}'.", fieldName, parentFieldDefinition.getId());
                     sanitizedObjectNode.set(fieldName, existingSubField);
-                }
+                //}
             } else {
                 sanitizedObjectNode.set(fieldName, processSubFieldsRecursively(
                     subFieldDefinition,
