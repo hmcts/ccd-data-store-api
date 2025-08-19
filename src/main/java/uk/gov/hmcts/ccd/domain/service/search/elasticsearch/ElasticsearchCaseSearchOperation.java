@@ -135,6 +135,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 log.warn("No hits found for index: {}", "");
                 continue;
             }
+            total += result.hits().total().value();
             List<Hit<ElasticSearchCaseDetailsDTO>> hits = result.hits().hits();
             if (!hits.isEmpty()) {
                 String indexName = hits.get(0).index();
@@ -155,7 +156,6 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                     .orElse((long) mapped.size());
 
                 caseTypeResults.add(new CaseTypeResults(caseTypeId, count));
-                total += count;
             }
         }
 

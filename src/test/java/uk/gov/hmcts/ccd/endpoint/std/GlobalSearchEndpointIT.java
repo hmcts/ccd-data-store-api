@@ -5,6 +5,8 @@ import co.elastic.clients.elasticsearch.core.MsearchRequest;
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
 import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
+import co.elastic.clients.elasticsearch.core.search.TotalHits;
 import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
@@ -88,6 +91,7 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
 
     @BeforeEach
     void setup(WebApplicationContext wac) {
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
         validFields = List.of("ValidEntry", "ValidEntryTwo");
@@ -141,6 +145,9 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
 
     @Test
     void shouldReturn200WhenEmptyFieldsHaveDefaultValues() throws Exception {
+        when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+            .thenReturn(mockMultiSearchResponse());
+
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
         SearchCriteria searchCriteria = new SearchCriteria();
         // NB: one of Jurisdiction or CaseType must be supplied
@@ -241,6 +248,10 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
 
     @Test
     void shouldReturn200WhenOneValidFieldInSearchCriteria_CaseType() throws Exception {
+
+        when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+            .thenReturn(mockMultiSearchResponse());
+
         SearchCriteria criteria = new SearchCriteria();
         criteria.setCcdCaseTypeIds(List.of(CASE_TYPE));
         List<String> emptyList = new ArrayList<>();
@@ -257,6 +268,9 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
 
     @Test
     void shouldReturn200WhenOneValidFieldInSearchCriteria_Jurisdiction() throws Exception {
+        when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+            .thenReturn(mockMultiSearchResponse());
+
         SearchCriteria criteria = new SearchCriteria();
         criteria.setCcdCaseTypeIds(null);
         criteria.setCcdJurisdictionIds(List.of(JURISDICTION));
@@ -293,6 +307,13 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
             .source(dto2)
             .build();
 
+        HitsMetadata<ElasticSearchCaseDetailsDTO> hitsMetadata = new HitsMetadata.Builder<ElasticSearchCaseDetailsDTO>()
+            .hits(List.of(hit1, hit2))
+            .total(new TotalHits.Builder()
+                .relation(TotalHitsRelation.Eq)
+                .value(30).build())
+            .build();
+
         // Wrap in MultiSearch response
         MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem
             = new MultiSearchResponseItem.Builder<ElasticSearchCaseDetailsDTO>()
@@ -300,10 +321,7 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
                 .took(123)
                 .timedOut(false)
                 .shards(s -> s.total(1).successful(1).skipped(0).failed(0))
-                .hits(h -> h
-                    .hits(List.of(hit1, hit2))
-                    .total(t -> t.value(2L).relation(TotalHitsRelation.Eq))
-                )
+                .hits(hitsMetadata)
             ).build();
 
         return new MsearchResponse.Builder<ElasticSearchCaseDetailsDTO>()
