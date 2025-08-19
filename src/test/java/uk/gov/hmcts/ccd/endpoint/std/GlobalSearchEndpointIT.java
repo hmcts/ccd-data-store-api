@@ -41,10 +41,9 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,12 +57,6 @@ import static uk.gov.hmcts.ccd.data.ReferenceDataTestFixtures.SERVICES_STUB_ID;
 import static uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint.GLOBAL_SEARCH_PATH;
 
 class GlobalSearchEndpointIT extends WireMockBaseTest {
-
-    private static final String ADDRESS_LINE_1 = "address";
-    private static final String NAME = "name";
-    private static final String DOB  = "1999-01-01";
-    private static final String POSTCODE = "EC3M 8AF";
-    private static final String EMAIL_ADDRESS = "someone@cgi.com";
 
     private static final String REFERENCE_1 = "4444333322221111";
     private static final String REFERENCE_2 = "1111222233334444";
@@ -147,8 +140,6 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
 
     @Test
     void shouldReturn200WhenEmptyFieldsHaveDefaultValues() throws Exception {
-        //stubElasticSearchSearchRequestWillReturn();
-
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
         SearchCriteria searchCriteria = new SearchCriteria();
         // NB: one of Jurisdiction or CaseType must be supplied
@@ -249,9 +240,6 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
 
     @Test
     void shouldReturn200WhenOneValidFieldInSearchCriteria_CaseType() throws Exception {
-
-        //stubElasticSearchSearchRequestWillReturn();
-
         SearchCriteria criteria = new SearchCriteria();
         criteria.setCcdCaseTypeIds(List.of(CASE_TYPE));
         List<String> emptyList = new ArrayList<>();
@@ -268,9 +256,6 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
 
     @Test
     void shouldReturn200WhenOneValidFieldInSearchCriteria_Jurisdiction() throws Exception {
-
-        //stubElasticSearchSearchRequestWillReturn();
-
         SearchCriteria criteria = new SearchCriteria();
         criteria.setCcdCaseTypeIds(null);
         criteria.setCcdJurisdictionIds(List.of(JURISDICTION));

@@ -8,7 +8,9 @@ import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import co.elastic.clients.elasticsearch.core.search.TotalHits;
-import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,10 +30,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 
-import jakarta.inject.Inject;
-
-import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,8 +41,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -195,25 +195,23 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             + "}";
     }
 
-    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic) throws IOException {
+    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic) throws Exception {
 
-        ElasticSearchCaseDetailsDTO caseDetails = objectMapper.readValue(
-            objectMapper.readTree(caseDetailElastic).path("hits").path("hits")
-                .get(0).path("_source")
-                .toString(),
-            ElasticSearchCaseDetailsDTO.class
-        );
+        List<ElasticSearchCaseDetailsDTO> caseDetailsList = parseSources(caseDetailElastic);
 
-        Hit<ElasticSearchCaseDetailsDTO> hit = mock(Hit.class);
-        when(hit.source()).thenReturn(caseDetails);
-        when(hit.index()).thenReturn("TestAddressBookCase_cases-000001");
+        List<Hit<ElasticSearchCaseDetailsDTO>> hits = new ArrayList<>();
+        for (ElasticSearchCaseDetailsDTO caseDetails : caseDetailsList) {
+            Hit<ElasticSearchCaseDetailsDTO> hit = mock(Hit.class);
+            when(hit.source()).thenReturn(caseDetails);
+            when(hit.index()).thenReturn("TestAddressBookCase_cases-000001");
+            hits.add(hit);
+        }
 
-        HitsMetadata<CaseDetails> hitsMetadata = mock(HitsMetadata.class);
-        //when(hitsMetadata.hits()).thenReturn(List.of(hit));
-        when(hitsMetadata.total()).thenReturn(new TotalHits.Builder()
-            .value(1L)
-            .relation(TotalHitsRelation.Eq)
-            .build());
+        HitsMetadata<ElasticSearchCaseDetailsDTO> hitsMetadata = mock(HitsMetadata.class);
+        when(hitsMetadata.hits()).thenReturn(hits);
+        TotalHits totalHits = mock(TotalHits.class);
+        when(totalHits.value()).thenReturn(Long.valueOf(caseDetailsList.size()));
+        when(hitsMetadata.total()).thenReturn(totalHits);
 
         MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse = mock(MsearchResponse.class);
         MultiSearchResponseItem multiSearchResponseItem = mock(MultiSearchResponseItem.class);
@@ -221,10 +219,23 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         MultiSearchItem multiSearchItem = mock(MultiSearchItem.class);
         when(multiSearchResponseItem.result()).thenReturn(multiSearchItem);
         when(multiSearchItem.hits()).thenReturn((hitsMetadata));
-        when(multiSearchItem.hits().hits()).thenReturn(List.of(hit));
+        when(multiSearchItem.hits().hits()).thenReturn(hits);
 
         when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
             .thenReturn(msearchResponse);
 
+    }
+
+    public static List<ElasticSearchCaseDetailsDTO> parseSources(String json) throws Exception {
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        JsonNode root = mapper.readTree(json);
+        List<ElasticSearchCaseDetailsDTO> caseDetailsList = new ArrayList<>();
+        JsonNode hitsArray = root.path("hits").path("hits");
+        for (JsonNode hit : hitsArray) {
+            JsonNode sourceNode = hit.path("_source");
+            ElasticSearchCaseDetailsDTO detailsDTO = mapper.treeToValue(sourceNode, ElasticSearchCaseDetailsDTO.class);
+            caseDetailsList.add(detailsDTO);
+        }
+        return caseDetailsList;
     }
 }

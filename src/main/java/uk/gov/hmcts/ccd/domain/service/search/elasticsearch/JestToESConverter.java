@@ -65,6 +65,7 @@ public class JestToESConverter {
             return SearchRequestBody.of(b -> b
                 .query(requestBody.query())
                 .sort(requestBody.sort())
+                .from(requestBody.from())
                 .size(requestBody.size())
                 .source(sourceConfig));
         } catch (Exception e) {
