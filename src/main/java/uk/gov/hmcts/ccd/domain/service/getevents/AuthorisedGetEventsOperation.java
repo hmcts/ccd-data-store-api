@@ -59,7 +59,7 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     }
 
     @Override
-    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
+    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, String eventId) {
         return getEventsOperation.getEvent(caseDetails, caseTypeId, eventId).flatMap(
             event -> secureEvent(caseTypeId, event));
     }
