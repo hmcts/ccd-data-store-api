@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
@@ -136,6 +137,9 @@ class CallbackInvokerTest {
 
     @Mock
     private AppInsights appinsights;
+
+    @Mock
+    private PersistenceStrategyResolver persistenceStrategyResolver;
 
     @InjectMocks
     private CallbackInvoker callbackInvoker;

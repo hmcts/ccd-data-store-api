@@ -225,6 +225,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return qb.getSingleResult().map(this.caseDetailsMapper::entityToModel);
     }
 
+
     private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id,
                                                              String reference,
                                                              CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
