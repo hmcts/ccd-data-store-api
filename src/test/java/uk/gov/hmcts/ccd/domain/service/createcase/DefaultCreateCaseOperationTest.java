@@ -48,6 +48,7 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -133,6 +134,9 @@ class DefaultCreateCaseOperationTest {
     @Mock
     private ApplicationParams applicationParams;
 
+    @Mock
+    private IdempotencyKeyHolder keyHolder;
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private TimeToLiveService timeToLiveService;
@@ -177,7 +181,8 @@ class DefaultCreateCaseOperationTest {
                                                                     supplementaryDataUpdateOperation,
                                                                     supplementaryDataValidator,
                                                                     caseLinkService,
-                                                                    timeToLiveService);
+                                                                    timeToLiveService,
+                                                                    keyHolder);
         data = buildJsonNodeData();
         objectMapper.registerModule(new JavaTimeModule());
         given(userRepository.getUser()).willReturn(IDAM_USER);

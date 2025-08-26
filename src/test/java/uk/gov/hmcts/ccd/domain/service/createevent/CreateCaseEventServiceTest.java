@@ -39,6 +39,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -53,6 +54,7 @@ import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import javax.servlet.http.HttpServletRequest;
@@ -160,6 +162,10 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private UIDService uidService;
     @Mock
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    @Mock
+    private PersistenceStrategyResolver resolver;
+    @Mock
+    private IdempotencyKeyHolder keyHolder;
 
     @Spy
     private CaseDocumentTimestampService caseDocumentTimestampService =
