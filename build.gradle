@@ -19,6 +19,9 @@ plugins {
 
 apply from: './gradle/suppress.gradle'
 
+def versions = [
+        pact_version    : '4.3.4',
+]
 
 ext {
     set('springCloudVersion', '2024.0.0')
@@ -63,8 +66,15 @@ dependencyUpdates.resolutionStrategy = {
     }
 }
 
+apply from: './gradle/suppress.gradle'
 dependencyCheck {
     suppressionFile = 'dependency-check-suppressions.xml'
+}
+
+tasks.register("printSuppressionFile") {
+    doLast {
+        println "SUPPRESSION_FILE=${dependencyCheck.suppressionFile}"
+    }
 }
 
 application {
@@ -642,8 +652,8 @@ jacocoTestReport {
 test {
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    generateCucumberReports.enabled = false
-    systemProperty 'java.locale.providers', 'CLDR'
+    generateCucumberReports.enabled = true
+    systemProperty 'java.locale.providers', 'COMPAT'
 
     useJUnitPlatform()
 
