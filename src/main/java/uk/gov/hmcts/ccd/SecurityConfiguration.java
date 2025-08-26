@@ -3,10 +3,10 @@ package uk.gov.hmcts.ccd;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -16,7 +16,8 @@ import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
 import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
@@ -25,8 +26,8 @@ import uk.gov.hmcts.ccd.security.filters.SecurityLoggingFilter;
 import uk.gov.hmcts.ccd.security.filters.V1EndpointsPathParamSecurityFilter;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
@@ -35,7 +36,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration {
 
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
     private String issuerUri;
@@ -52,6 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private ApplicationParams applicationParams;
 
     private static final String[] AUTH_WHITELIST = {
+        "/v3/api-docs",
         "/v2/**",
         "/health/liveness",
         "/health/readiness",
@@ -84,36 +86,31 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
     }
 
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring().antMatchers(AUTH_WHITELIST);
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers(AUTH_WHITELIST);
     }
 
-    @Override
-    protected void configure(final HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .addFilterBefore(customHeadersFilter, BearerTokenAuthenticationFilter.class)
             .addFilterBefore(exceptionHandlingFilter, BearerTokenAuthenticationFilter.class)
             .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
             .addFilterAfter(securityLoggingFilter, BearerTokenAuthenticationFilter.class)
             .addFilterAfter(v1EndpointsPathParamSecurityFilter, SecurityLoggingFilter.class)
-            .sessionManagement().sessionCreationPolicy(STATELESS).and()
-            .csrf().disable()
-            .formLogin().disable()
-            .logout().disable()
-            .authorizeRequests()
-            // To preserve v1EndpointsPathParamSecurityFilter 403 response
-            .antMatchers("/error").permitAll()
-            .anyRequest()
-            .authenticated()
-            .and()
-            .oauth2ResourceServer()
-            .jwt()
-            .jwtAuthenticationConverter(jwtAuthenticationConverter)
-            .and()
-            .and()
-            .oauth2Client();
-
+            .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
+            .csrf(csrf -> csrf.disable()) // NOSONAR - CSRF is disabled purposely
+            .formLogin(fl -> fl.disable())
+            .logout(logout -> logout.disable())
+            .authorizeHttpRequests(auth -> 
+                auth.requestMatchers("/error")
+                .permitAll()
+                .anyRequest()
+                .authenticated())
+            .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
+            .oauth2Client(Customizer.withDefaults());
+        return http.build();
     }
 
     @Bean
