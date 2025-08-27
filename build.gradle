@@ -25,8 +25,6 @@ plugins {
     id "org.jsonschema2pojo" version "1.2.1"
 }
 
-apply from: './gradle/suppress.gradle'
-
 def versions = [
         pact_version    : '4.3.4',
 ]
@@ -35,7 +33,7 @@ ext['spring-security.version'] = '5.7.11'
 ext['spring-framework.version'] = '5.3.27'
 ext['jackson.version'] = '2.16.0'
 //overriding for easy access to the version for FT testing
-ext['beftaFwVersion'] = '9.2.3'
+ext['beftaFwVersion'] = '9.2.4'
 ext['ccdTestDefinitionVersion'] = '7.25.4'
 
 configurations {
@@ -58,8 +56,15 @@ dependencyUpdates.resolutionStrategy = {
     }
 }
 
+apply from: './gradle/suppress.gradle'
 dependencyCheck {
     suppressionFile = 'dependency-check-suppressions.xml'
+}
+
+tasks.register("printSuppressionFile") {
+    doLast {
+        println "SUPPRESSION_FILE=${dependencyCheck.suppressionFile}"
+    }
 }
 
 application {
@@ -234,7 +239,7 @@ dependencies {
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
@@ -339,7 +344,7 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     implementation 'org.jooq:jool-java-8:0.9.14'
-    implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
+    implementation 'com.github.hmcts:ccd-case-document-am-client:1.59.2'
 
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version:  ccdTestDefinitionVersion
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
@@ -401,6 +406,9 @@ dependencyManagement {
         dependencySet(group: 'commons-beanutils', version: '1.9.4') {
             entry 'commons-beanutils'
         }
+        // CVE-2023-3635
+        dependency 'com.squareup.okio:okio:3.5.0'
+        dependency 'com.squareup.okhttp3:okhttp:4.11.0'
 
         // Required for Embedded ES with Java 11
         dependency 'org.rauschig:jarchivelib:1.0.0'
@@ -768,7 +776,7 @@ jacocoTestReport {
 test {
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    generateCucumberReports.enabled = false
+    generateCucumberReports.enabled = true
     systemProperty 'java.locale.providers', 'COMPAT'
 
     useJUnitPlatform()
