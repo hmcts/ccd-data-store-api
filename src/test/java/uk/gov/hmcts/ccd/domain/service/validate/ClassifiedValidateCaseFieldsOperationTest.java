@@ -96,7 +96,7 @@ class ClassifiedValidateCaseFieldsOperationTest {
         when(caseDataService.getDefaultSecurityClassifications(any(), anyMap(), anyMap()))
             .thenReturn(emptyMap());
         when(classificationService.applyClassification(any(), anyBoolean())).thenReturn(Optional.empty());
-
+        when(caseService.clone(any())).thenReturn(EMPTY_CASE_DETAILS);
         Map<String, JsonNode> result = classifiedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
 
         assertAll(
@@ -127,6 +127,7 @@ class ClassifiedValidateCaseFieldsOperationTest {
         when(caseDataService.getDefaultSecurityClassifications(any(), anyMap(), anyMap()))
             .thenReturn(emptyMap());
         when(classificationService.applyClassification(any(), anyBoolean())).thenReturn(Optional.empty());
+        when(caseService.clone(any())).thenReturn(caseDetails);
 
         Map<String, JsonNode> result = classifiedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
 
