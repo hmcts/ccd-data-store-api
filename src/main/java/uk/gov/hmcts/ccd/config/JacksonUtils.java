@@ -203,11 +203,7 @@ public final class JacksonUtils {
 
     public static Map<String, JsonNode> convertValueInDataField(Map<String, JsonNode> from) {
         Map<String, JsonNode> dataNode = new HashMap<>();
-        if (from != null) {
-            dataNode.put(DATA, MAPPER.valueToTree(from));
-        } else {
-            dataNode.put(DATA, null);
-        }
+        dataNode.put(DATA, MAPPER.valueToTree(from));
         return dataNode;
     }
 }
