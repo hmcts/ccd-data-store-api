@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
@@ -45,6 +48,10 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
+
+    protected final ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     // data values as per: classpath:sql/insert_cases.sql
     public static final String CASE_01_REFERENCE = "1504259907353529";
