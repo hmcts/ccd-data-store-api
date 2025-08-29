@@ -104,6 +104,16 @@ env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 
 withNightlyPipeline(type, product, component) {
+
+    stage('Wait for ccd-definition-store-api job') {
+        steps {
+            script {
+                echo "Waiting for upstream ccd-definition-store-api job to complete..."
+                build job: 'HMCTS_a_to_c_Nightly/ccd-definition-store-api/master', wait: true, propagate: false
+            }
+        }
+    }
+
     overrideVaultEnvironments(vaultOverrides)
     disableLegacyDeploymentOnAAT()
     loadVaultSecrets(secrets)
