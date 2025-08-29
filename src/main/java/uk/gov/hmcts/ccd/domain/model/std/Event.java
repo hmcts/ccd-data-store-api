@@ -16,17 +16,17 @@ public class Event {
     private String description;
 
     private void jcdebug(final String method, final String value) {
-        jclogger.jclog(method + " " + value);
-        jclogger.jclog(method + " " + jclogger.getCallStackAsString());
+        if (value != null && value.length() > 0) {
+            jclogger.jclog(method + " eventId = " + eventId + " , value = " + value);
+            jclogger.jclog(method + " " + jclogger.getCallStackAsString());
+        }
     }
 
     public String getEventId() {
-        jcdebug("getEventId()", eventId);
         return eventId;
     }
 
     public void setEventId(String eventId) {
-        jcdebug("setEventId()", eventId);
         this.eventId = eventId;
     }
 

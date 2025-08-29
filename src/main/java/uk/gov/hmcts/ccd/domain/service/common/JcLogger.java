@@ -37,7 +37,7 @@ public class JcLogger {
         final StringBuilder sb = new StringBuilder();
         final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         // Skip the first two elements to exclude getStackTrace() and getCallStackAsString()
-        for (int i = 2; i < stackTrace.length; i++) {
+        for (int i = 3; i < stackTrace.length; i++) {
             sb.append(stackTrace[i].toString()).append("\t");
         }
         return sb.toString();
