@@ -31,6 +31,7 @@ public class CachedUserRepository implements UserRepository {
     private final Map<String, Set<String>> userRoles = newHashMap();
     private final Map<String, SecurityClassification> userHighestSecurityClassification = newHashMap();
     private Optional<String> userName = Optional.empty();
+    private final Map<String, IdamUser> userDetailsById = newHashMap();
 
     @Autowired
     public CachedUserRepository(@Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository) {
@@ -80,6 +81,11 @@ public class CachedUserRepository implements UserRepository {
             userName = Optional.of(userRepository.getUserId());
             return userName.get();
         });
+    }
+
+    @Override
+    public IdamUser getUserByUserId(String userId) {
+        return userDetailsById.computeIfAbsent(userId, u -> userRepository.getUserByUserId(userId));
     }
 
     @Override

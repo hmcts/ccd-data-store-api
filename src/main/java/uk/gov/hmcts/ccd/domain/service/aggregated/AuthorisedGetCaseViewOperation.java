@@ -12,7 +12,6 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -32,7 +31,6 @@ import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMeta
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED_LABEL;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS_LABEL;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
 @Service
@@ -110,17 +108,6 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         caseViewField.setFieldTypeDefinition(fieldTypeDefinition);
         caseViewField.setMetadata(true);
         return caseViewField;
-    }
-
-    private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<AccessProfile> accessProfiles) {
-        caseView.setTabs(Arrays.stream(caseView.getTabs()).map(
-            caseViewTab -> {
-                caseViewTab.setFields(Arrays.stream(caseViewTab.getFields())
-                    .filter(caseViewField -> getAccessControlService()
-                        .canAccessCaseViewFieldWithCriteria(caseViewField, accessProfiles, CAN_READ))
-                    .toArray(CaseViewField[]::new));
-                return caseViewTab;
-            }).toArray(CaseViewTab[]::new));
     }
 
     private CaseView filterUpsertAccess(String caseReference,

@@ -1,0 +1,50 @@
+{
+  "title": "must return list of audit events successfully for a case",
+  "_guid_": "S-1021.1",
+  "_extends_": "F-1021_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "uses the case-reference of the case just created",
+    "contains the Id of the case just created",
+    "Retrieve audit events by case ID",
+    "contains all audit event details under the case"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1021_Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "auditEvents": [
+        {
+          "id" : "CREATE",
+          "summary" : "",
+          "description" : "",
+          "user_id" : "[[ANYTHING_PRESENT]]",
+          "user_last_name" : "[[ANYTHING_PRESENT]]",
+          "user_first_name" : "[[ANYTHING_PRESENT]]",
+          "event_name" : "Create a new case",
+          "created_date" : "[[ANYTHING_PRESENT]]",
+          "case_type_id" : "AAT_AUTH_15",
+          "case_type_version" : "[[ANYTHING_PRESENT]]",
+          "state_id" : "TODO",
+          "state_name" : "To do",
+          "data" : null,
+          "data_classification" : null,
+          "security_classification" : "PUBLIC",
+          "significant_item" : null,
+          "proxied_by" : "[[ANYTHING_PRESENT]]",
+          "proxied_by_last_name" : "[[ANYTHING_PRESENT]]",
+          "proxied_by_first_name" : "[[ANYTHING_PRESENT]]"
+        }
+      ],
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+  }
+}

@@ -53,7 +53,8 @@
         "DocumentField4": {
           "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_3][customValues][documentIdInTheResponse]}",
           "document_filename": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_3][testData][actualResponse][body][documents][0][originalDocumentName]}",
-          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_3][customValues][documentIdInTheResponse]}/binary"
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_3][customValues][documentIdInTheResponse]}/binary",
+          "upload_timestamp": "[[ANYTHING_PRESENT]]"
         }
       },
       "data_classification": {

@@ -81,6 +81,8 @@ def vaultOverrides = [
 // vars needed for functional tests
 // Assume a feature build branched off 'develop', with dependencies develop-to-develop.
 env.TEST_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+// Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
+env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
 
 // Other env variables needed for BEFTA.
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
@@ -95,6 +97,11 @@ env.ELASTIC_SEARCH_FTA_ENABLED = "true"
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
+// BEFTA retry env variables
+env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
+env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
+env.BEFTA_RETRY_MAX_DELAY = "1000"
+env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 
 withNightlyPipeline(type, product, component) {
     overrideVaultEnvironments(vaultOverrides)
@@ -108,6 +115,149 @@ withNightlyPipeline(type, product, component) {
     afterAlways('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     }
+
+    afterAlways('fortify-scan') {
+
+        stage('Suppress and Send Slack Notification') {
+
+            script {
+                if (env.CHANGE_ID) {
+                    echo "This is a PR: #${env.CHANGE_ID}"
+                    echo "Source branch: ${env.CHANGE_BRANCH}"
+                    echo "Target branch: ${env.CHANGE_TARGET}"
+                } else {
+                    echo "Not a pull request — branch: ${env.BRANCH_NAME}"
+                }
+            }
+
+            def suppressionFile = ''
+            script {
+                suppressionFile = sh(
+                    script: './gradlew printSuppressionFile -q',
+                    returnStdout: true
+                ).trim().split("=")[1]
+
+                echo "Suppression file and path: ${suppressionFile}"
+
+                sh """
+                  echo 'Current contents of ${suppressionFile}:'
+                  cat '${suppressionFile}'
+                """
+            }
+
+            def slackNotificationChannel = '#nightly_cve_suppressions'
+            def branch = env.BRANCH_NAME
+
+            if (env.CHANGE_ID) {
+                // If this is a PR, push changes to the PR branch
+                branch = env.CHANGE_BRANCH
+            }
+
+            sh './gradlew suppressCves'
+
+            // Store the list of changed files
+            def changedFiles = ''
+
+            // Store the changes in the suppression file
+            def changes = ''
+
+            script {
+                // Stage all modified tracked files
+                sh 'git add -u'
+
+                changedFiles = sh(
+                    script: 'git diff --cached --name-only',
+                    returnStdout: true
+                ).trim().split("\n").findAll { it?.trim() } as List
+
+                echo "List of changed files: ${changedFiles}"
+
+                if (changedFiles.isEmpty()) {
+                    echo "No changed files to extract."
+                } else {
+                    def fileName = sh(
+                        script: """
+                            echo '${changedFiles}' | tr -d '[]' | xargs basename
+                        """,
+                        returnStdout: true
+                    ).trim()
+
+                    echo "Extracted file name: ${fileName}"
+                }
+
+                if (changedFiles.size() == 1 && changedFiles[0] == suppressionFile) {
+                    echo "✅ Only suppression file changed. Proceeding..."
+
+                    // Verify it includes CVE-related changes
+                    changes = sh(
+                        script: """
+                          git diff --cached ${suppressionFile} | grep '^+' | grep '<cve>' || true
+                        """,
+                        returnStdout: true
+                    ).trim()
+
+                    if (changes) {
+                        echo "✅ CVE-related changes found in suppression file."
+                    } else {
+                        echo "⚠️ No CVE-related changes detected."
+                    }
+
+                } else {
+                    echo "✅ Suppression file not changed — marking step as successfull"
+                }
+            }
+
+            if (changes) {
+
+                // Clean and format CVE lines
+                def simplifiedChanges = changes
+                    .readLines()
+                    .collect { it.replaceFirst(/\+/, '').trim() }                // Remove leading '+'
+                    .collect { it.replaceAll(/<\/?[^>]+>/, '') }                 // Strip XML/HTML tags
+                //.collect { it.replace('[Ticket]', '<https://yourtracker.example/TICKET-ID|Ticket>') } // Optional link
+                    .join('\n')
+
+                def message = """
+                                📦 *CVE Suppression File Updated*
+
+                                *Detected CVE changes (Please create Jira backlog ticket):*
+
+                                ${simplifiedChanges}
+
+                                *Build Info:*
+                                • *Job*: ${env.JOB_NAME}
+                                • *Build*: #${env.BUILD_NUMBER}
+                                • *URL*: ${env.BUILD_URL}
+                               """.stripIndent().trim()
+
+                slackSend(
+                    channel: slackNotificationChannel,
+                    color: '#439FE0',
+                    message: message
+                )
+
+                echo "Staged files: ${changedFiles}"
+                echo "Changes: ${changes}"
+
+                echo "Commiting changes into branch ${branch}"
+                sh 'git commit -m "Suppressing CVE - Actions"'
+                echo "Pushing changes"
+
+                def credentialsId = env.GIT_CREDENTIALS_ID
+
+                withCredentials([
+                    gitUsernamePassword(credentialsId: credentialsId, gitToolName: 'Default')
+                ]) {
+                    sh """
+                        git push origin HEAD:${branch}
+                    """
+                }
+            } else {
+                echo "✅ Suppression file not changed — skipping Slack notification"
+            }
+        }
+    }
+
     afterAlways('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'

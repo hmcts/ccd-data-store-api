@@ -13,7 +13,7 @@ import java.util.List;
 
 @ToString
 @ApiModel(description = "")
-public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
+public class CaseEventFieldDefinition implements Serializable, CommonDCPModel, Copyable<CaseEventFieldDefinition> {
 
     private String caseFieldId = null;
     private String displayContext = null;
@@ -28,6 +28,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     private String publishAs;
     private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
     private String defaultValue;
+    private Boolean nullifyByDefault;
 
     @ApiModelProperty(required = true, value = "Foreign key to CaseField.id")
     @JsonProperty("case_field_id")
@@ -170,5 +171,37 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    @ApiModelProperty(value = "Nullify By Default value for the case field")
+    @JsonProperty("nullify_by_default")
+    public Boolean getNullifyByDefault() {
+        return nullifyByDefault;
+    }
+
+    public void setNullifyByDefault(Boolean nullifyByDefault) {
+        this.nullifyByDefault = nullifyByDefault;
+    }
+
+    @JsonIgnore
+    @Override
+    public CaseEventFieldDefinition createCopy() {
+        CaseEventFieldDefinition copy = new CaseEventFieldDefinition();
+        copy.setCaseFieldId(this.getCaseFieldId());
+        copy.setDisplayContext(this.getDisplayContext());
+        copy.setDisplayContextParameter(this.getDisplayContextParameter());
+        copy.setShowCondition(this.getShowCondition());
+        copy.setShowSummaryChangeOption(this.getShowSummaryChangeOption());
+        copy.setShowSummaryContentOption(this.getShowSummaryContentOption());
+        copy.setLabel(this.getLabel());
+        copy.setHintText(this.getHintText());
+        copy.setRetainHiddenValue(this.getRetainHiddenValue());
+        copy.setPublish(this.getPublish());
+        copy.setPublishAs(this.getPublishAs());
+        copy.setCaseEventFieldComplexDefinitions(createCopyList(this.getCaseEventFieldComplexDefinitions()));
+        copy.setDefaultValue(this.getDefaultValue());
+        copy.setNullifyByDefault(this.getNullifyByDefault());
+
+        return copy;
     }
 }

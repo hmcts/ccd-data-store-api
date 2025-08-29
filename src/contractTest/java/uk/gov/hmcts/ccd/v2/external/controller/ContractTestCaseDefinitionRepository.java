@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.DefinitionStoreClient;
 
 @Service
 @Primary
@@ -15,8 +15,14 @@ import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 @Profile("SECURITY_MOCK")
 public class ContractTestCaseDefinitionRepository extends DefaultCaseDefinitionRepository {
     public ContractTestCaseDefinitionRepository(ApplicationParams applicationParams,
-                                                SecurityUtils securityUtils,
-                                                RestTemplate restTemplate) {
-        super(applicationParams, securityUtils, restTemplate);
+                                                DefinitionStoreClient definitionStoreClient) {
+        super(applicationParams, definitionStoreClient);
     }
+
+    public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
+        CaseTypeDefinitionVersion definitionVersion = new CaseTypeDefinitionVersion();
+        definitionVersion.setVersion(0);
+        return definitionVersion;
+    }
+
 }

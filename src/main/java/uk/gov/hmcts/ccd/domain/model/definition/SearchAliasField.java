@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 
-public class SearchAliasField implements Serializable {
+public class SearchAliasField implements Serializable, Copyable<SearchAliasField> {
 
     private static final long serialVersionUID = -9131437463329052815L;
 
@@ -41,5 +43,16 @@ public class SearchAliasField implements Serializable {
 
     public void setFieldTypeDefinition(FieldTypeDefinition fieldTypeDefinition) {
         this.fieldTypeDefinition = fieldTypeDefinition;
+    }
+
+    @JsonIgnore
+    @Override
+    public SearchAliasField createCopy() {
+        SearchAliasField copy = new SearchAliasField();
+        copy.setId(this.id);
+        copy.setCaseTypeId(this.caseTypeId);
+        copy.setCaseFieldPath(this.caseFieldPath);
+        copy.setFieldTypeDefinition(this.fieldTypeDefinition != null ? this.fieldTypeDefinition.createCopy() : null);
+        return copy;
     }
 }

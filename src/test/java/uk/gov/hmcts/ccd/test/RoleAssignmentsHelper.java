@@ -92,6 +92,10 @@ public class RoleAssignmentsHelper {
         return userRoleAssignmentJson(actorId, roleName, caseId, Classification.PUBLIC);
     }
 
+    public static String userRoleAssignmentJson(String actorId, String roleName, String caseId, String caseType) {
+        return userRoleAssignmentJson(actorId, roleName, caseId, caseType, Classification.PUBLIC);
+    }
+
     public static String userRoleAssignmentJson(String actorId, String roleName, String caseId,
                                                 Classification classification) {
         return "        {"
@@ -114,6 +118,30 @@ public class RoleAssignmentsHelper {
                + "          },"
                + "          \"authorisations\": []"
                + "        }";
+    }
+
+    public static String userRoleAssignmentJson(String actorId, String roleName, String caseId,
+                                                String caseType, Classification classification) {
+        return "        {"
+            + "          \"id\": \"e6fc5ebb-63e3-4613-9cfc-b3f9b1559571\","
+            + "          \"actorIdType\": \"IDAM\","
+            + "          \"actorId\": \"" + actorId + "\","
+            + "          \"roleType\": \"CASE\","
+            + "          \"roleName\": \"" + roleName + "\","
+            + "          \"classification\": \"" + classification.name() + "\","
+            + "          \"grantType\": \"STANDARD\","
+            + "          \"roleCategory\": \"JUDICIAL\","
+            + "          \"readOnly\": false,"
+            + "          \"beginTime\": \"2021-02-01T00:00:00Z\","
+            + "          \"endTime\": \"2122-01-01T00:00:00Z\","
+            + "          \"created\": \"2020-12-23T06:37:58.096065Z\","
+            + "          \"attributes\": {"
+            + "            \"jurisdiction\": \"PROBATE\","
+            + "            \"caseType\": \"" + caseType + "\","
+            + "            \"caseId\": \"" + caseId + "\""
+            + "          },"
+            + "          \"authorisations\": []"
+            + "        }";
     }
 
     public static String caseTypeRoleAssignmentJson(String actorId, String roleName, String caseId, String jurisdiction,
@@ -217,7 +245,7 @@ public class RoleAssignmentsHelper {
             .endTime(END_TIME)
             .created(CREATED)
             .authorisations(Collections.emptyList())
-            .attributes(createRoleAssignmentRecordAttribute(caseId, caseType, jurisdiction, localised))
+            .attributes(createRoleAssignmentRecordAttribute(caseId, caseType, jurisdiction, localised, null))
             .build();
     }
 
@@ -236,7 +264,26 @@ public class RoleAssignmentsHelper {
             .endTime(END_TIME)
             .created(CREATED)
             .authorisations(Collections.emptyList())
-            .attributes(createRoleAssignmentRecordAttribute(caseId, null, null, true))
+            .attributes(createRoleAssignmentRecordAttribute(caseId, null, null, true, null))
+            .build();
+    }
+
+    public static RoleAssignmentResource createRoleAssignmentRecord(String id, String caseId, String caseGroupId) {
+        return RoleAssignmentResource.builder()
+            .id(id)
+            .actorIdType(ActorIdType.IDAM.name())
+            .actorId("aecfec12-1f9a-40cb-bd8c-7a9f3506e67c")
+            .roleType(RoleType.CASE.name())
+            .roleName("judiciary")
+            .classification(Classification.PUBLIC.name())
+            .grantType(GrantType.STANDARD.name())
+            .roleCategory(RoleCategory.JUDICIAL.name())
+            .readOnly(false)
+            .beginTime(BEGIN_TIME)
+            .endTime(END_TIME)
+            .created(CREATED)
+            .authorisations(Collections.emptyList())
+            .attributes(createRoleAssignmentRecordAttribute(caseId, null, null, true, caseGroupId))
             .build();
     }
 
@@ -265,7 +312,8 @@ public class RoleAssignmentsHelper {
     private static RoleAssignmentAttributesResource createRoleAssignmentRecordAttribute(String caseId,
                                                                                         String caseType,
                                                                                         String jurisdiction,
-                                                                                        boolean localised) {
+                                                                                        boolean localised,
+                                                                                        String caseGroupId) {
         if (localised) {
             return RoleAssignmentAttributesResource.builder()
                 .jurisdiction(Optional.of(jurisdiction == null ? "DIVORCE" : jurisdiction))
@@ -274,6 +322,7 @@ public class RoleAssignmentsHelper {
                 .region(Optional.of("Hampshire"))
                 .location(Optional.of("Southampton"))
                 .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
+                .caseAccessGroupId(Optional.ofNullable(caseGroupId))
                 .build();
         } else {
             return RoleAssignmentAttributesResource.builder()
@@ -283,6 +332,7 @@ public class RoleAssignmentsHelper {
                 .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
                 .region(Optional.empty())
                 .location(Optional.empty())
+                .caseAccessGroupId(Optional.ofNullable(caseGroupId))
                 .build();
         }
     }

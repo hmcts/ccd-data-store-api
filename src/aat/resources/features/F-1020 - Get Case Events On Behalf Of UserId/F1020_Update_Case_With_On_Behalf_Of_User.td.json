@@ -1,0 +1,127 @@
+{
+	"_guid_": "F1020_Update_Case_With_On_Behalf_Of_User",
+  "productName": "CCD Data Store api",
+  "operationName": "Post Event Data",
+	"method": "POST",
+	"uri": "/cases/{cid}/events",
+
+  "specs": [
+    "using on_behalf_of user"
+  ],
+
+  "users": {
+    "solicitor3": {
+      "_extends_": "BeftaCaseworker2Solicitor3"
+    },
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker2Solicitor1"
+    }
+  },
+
+	"request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+      "experimental": true
+    },
+		"pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F1020_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+		},
+		"body": {
+			"event": {
+				"id": "UPDATE",
+				"summary": "",
+				"description": ""
+			},
+			"event_token": "${[scenarioContext][siblingContexts][F1020_Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}",
+			"ignore_warning": false,
+      "on_behalf_of_id": "${[scenarioContext][testData][users][solicitor3][id]}"
+		}
+	},
+
+	"expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_JURISDICTION_2",
+      "case_type" : "BEFTA_CASETYPE_2_1",
+      "created_on" :"[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
+      "state" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "PUBLIC",
+      "data" : {
+        "MoneyGBPField" : "[[ANYTHING_PRESENT]]",
+        "FixedListField" : "[[ANYTHING_PRESENT]]",
+        "AddressUKField" : {
+          "County" : null,
+          "Country" : null,
+          "PostCode" : null,
+          "PostTown" : null,
+          "AddressLine1" : null,
+          "AddressLine2" : null,
+          "AddressLine3" : null
+        },
+        "ComplexField" : {
+          "ComplexTextField" : null,
+          "ComplexNestedField" : {
+            "NestedNumberField" : null,
+            "NestedCollectionTextField" : [ ]
+          },
+          "ComplexFixedListField" : null
+        },
+        "FixedRadioListField" : "[[ANYTHING_PRESENT]]",
+        "DateTimeField" : null,
+        "PhoneUKField" : null,
+        "NumberField" : "111111222222",
+        "MultiSelectListField" : [ "OPTION5", "OPTION4", "OPTION3" ],
+        "YesOrNoField" : "Yes",
+        "EmailField" : "testemail@gmail.com",
+        "TextField" : "sometextfield",
+        "DateField" : "2222-01-02",
+        "TextAreaField" : "textarea",
+        "CollectionField" : [ ]
+      },
+      "data_classification" : {
+        "MoneyGBPField" : "PUBLIC",
+        "FixedListField" : "PUBLIC",
+        "AddressUKField" : {
+          "value" : {
+            "County" : "PUBLIC",
+            "Country" : "PUBLIC",
+            "PostCode" : "PUBLIC",
+            "PostTown" : "PUBLIC",
+            "AddressLine1" : "PUBLIC",
+            "AddressLine2" : "PUBLIC",
+            "AddressLine3" : "PUBLIC"
+          },
+          "classification" : "PUBLIC"
+        },
+        "FixedRadioListField" : "PUBLIC",
+        "DateTimeField" : "PUBLIC",
+        "PhoneUKField" : "PUBLIC",
+        "NumberField" : "PUBLIC",
+        "MultiSelectListField" : "PUBLIC",
+        "YesOrNoField" : "PUBLIC",
+        "EmailField" : "PUBLIC",
+        "TextField" : "PUBLIC",
+        "DateField" : "PUBLIC",
+        "TextAreaField" : "PUBLIC",
+        "CollectionField" : {
+          "value" : [ ],
+          "classification" : "PUBLIC"
+        }
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+	}
+}

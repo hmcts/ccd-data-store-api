@@ -40,6 +40,8 @@
               "searchCriterias" : [],
               "categories" : [],
               "roleToAccessProfiles": [],
+              "accessTypes": [],
+              "accessTypeRoles": [],
 							"security_classification": null,
 							"case_fields": [],
 							"printable_document_url": null,
@@ -58,6 +60,33 @@
               "callback_get_case_url": null,
               "retries_get_case_url": []
 						},
+            {
+              "id" : "BEFTA_CASETYPE_NO_READ",
+              "description" : "Create a case of type BEFTA_CASETYPE_NO_READ",
+              "version" : null,
+              "name" : "BEFTA Case Type No Read",
+              "jurisdiction": null,
+              "events": "[[ANYTHING_PRESENT]]",
+              "states": "[[ANYTHING_PRESENT]]",
+              "searchAliasFields": [],
+              "searchParties" : [],
+              "categories" : [],
+              "searchCriterias" : [],
+              "categories" : [],
+              "roleToAccessProfiles": [],
+              "accessTypes": [],
+              "accessTypeRoles": [],
+              "security_classification": null,
+              "case_fields": [],
+              "printable_document_url": null,
+              "acls": [
+                {
+                  "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+                }
+              ],
+              "callback_get_case_url": null,
+              "retries_get_case_url": []
+            },
 						{
 							"id": "CASE_TYPE_WITH_NO_CASES",
 							"description": "Create a case of type CASE_TYPE_WITH_NO_CASES",
@@ -72,6 +101,8 @@
               "searchCriterias" : [],
               "categories" : [],
               "roleToAccessProfiles": [],
+              "accessTypes": [],
+              "accessTypeRoles": [],
 							"security_classification": null,
 							"case_fields": [],
 							"printable_document_url": null,
@@ -82,7 +113,34 @@
 							],
               "callback_get_case_url": null,
               "retries_get_case_url": []
-						}
+						},
+            {
+              "id" : "CaseAccessGroups_Casetype",
+              "description" : "For testing Case Access Group",
+              "version" : null,
+              "name" : "CaseAccessGroups_Casetype",
+              "jurisdiction": null,
+              "events": "[[ANYTHING_PRESENT]]",
+              "states": "[[ANYTHING_PRESENT]]",
+              "searchAliasFields": [],
+              "searchParties" : [],
+              "categories" : [],
+              "searchCriterias" : [],
+              "categories" : [],
+              "roleToAccessProfiles": [],
+              "accessTypes": [],
+              "accessTypeRoles": [],
+              "security_classification": null,
+              "case_fields": [],
+              "printable_document_url": null,
+              "acls": [
+                {
+                  "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+                }
+              ],
+              "callback_get_case_url": null,
+              "retries_get_case_url": []
+            }
 					]
 				}
 			]

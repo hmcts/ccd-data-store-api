@@ -20,6 +20,8 @@ public class SearchRoleAssignment {
     private String region;
     private String location;
     private String securityClassification;
+
+    private String caseAccessGroupId;
     @EqualsAndHashCode.Exclude
     private RoleAssignment roleAssignment;
 
@@ -31,6 +33,7 @@ public class SearchRoleAssignment {
         setLocation(defaultOptional(roleAssignment.getAttributes().getLocation()));
         setCaseReference(defaultOptional(roleAssignment.getAttributes().getCaseId()));
         setSecurityClassification(roleAssignment.getClassification());
+        setCaseAccessGroupId(defaultOptional(roleAssignment.getAttributes().getCaseAccessGroupId()));
         setRoleAssignment(roleAssignment);
     }
 

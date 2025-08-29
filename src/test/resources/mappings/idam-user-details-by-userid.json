@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/v1/users/53b53d81-3026-4e29-863a-ba1c7787f014"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "53b53d81-3026-4e29-863a-ba1c7787f014",
+      "email": "Cloud.Strife@test.com",
+      "forename": "Cloud",
+      "surname": "Strife",
+      "roles": [ "caseworker", "caseworker-test", "caseworker-probate-public", "caseworker-probate", "caseworker-divorce", "caseworker-sscs" ]
+    }
+  }
+}
