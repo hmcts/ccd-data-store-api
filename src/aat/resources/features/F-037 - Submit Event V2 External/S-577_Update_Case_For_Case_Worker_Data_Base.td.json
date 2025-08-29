@@ -26,8 +26,9 @@
 				"DocumentField2": {
 					"document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
 					"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-					"document_filename": "Elastic Search test Case.png"
-				}
+					"document_filename": "Elastic Search test Case.png",
+          "upload_timestamp": "2000-02-29T00:00:00.000000000"
+        }
 			},
 			"event": {
 				"id": "UPDATE",

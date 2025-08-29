@@ -1,0 +1,438 @@
+{
+  "case_type_id": "FT_MasterCaseType",
+  "event_id": "createCase",
+  "wizard_pages": [
+    {
+      "id": "createCaseSingleFormPage",
+      "label": "Data Field Types Page",
+      "order": 1,
+      "wizard_page_fields": [
+        {
+          "case_field_id": "CollectionField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "caseNameHmctsInternal",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "AddressUKField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "DocumentField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "CaseLinkField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "TextField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "EmailField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "MoneyField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "OrganisationPolicyField1",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": [
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.OrgPolicyReference",
+              "display_context": "OPTIONAL",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.OrgPolicyCaseAssignedRole",
+              "display_context": "OPTIONAL",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": "[Claimant]",
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.Organisation.OrganisationName",
+              "display_context": "OPTIONAL",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.Organisation.OrganisationID",
+              "display_context": "OPTIONAL",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.PreviousOrganisations.FromTimestamp",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.PreviousOrganisations.OrganisationAddress.County",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.PreviousOrganisations.OrganisationName",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.PreviousOrganisations.OrganisationAddress.PostCode",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.PrepopulateToUsersOrganisation",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.PreviousOrganisations.OrganisationAddress.PostTown",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.PreviousOrganisations.ToTimestamp",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.LastNoCRequestedBy",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.PreviousOrganisations.OrganisationAddress.AddressLine1",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.PreviousOrganisations.OrganisationAddress.AddressLine2",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.PreviousOrganisations.OrganisationAddress.Country",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField1.PreviousOrganisations.OrganisationAddress.AddressLine3",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            }
+          ]
+        },
+        {
+          "case_field_id": "NumberField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "MultiSelectField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "YesNoField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "PhoneField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "DynamicList",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "CaseLinkCollection",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "caseLinks",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "AddressField",
+          "order": 2,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "MarritalStatus",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "OrganisationPolicyField2",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": [
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.OrgPolicyReference",
+              "display_context": "OPTIONAL",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.OrgPolicyCaseAssignedRole",
+              "display_context": "OPTIONAL",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": "[Defendant]",
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.Organisation.OrganisationName",
+              "display_context": "OPTIONAL",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.Organisation.OrganisationID",
+              "display_context": "OPTIONAL",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.PreviousOrganisations.OrganisationAddress.PostCode",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.PreviousOrganisations.OrganisationAddress.PostTown",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.LastNoCRequestedBy",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.PreviousOrganisations.ToTimestamp",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.PreviousOrganisations.OrganisationAddress.County",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.PrepopulateToUsersOrganisation",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.PreviousOrganisations.OrganisationName",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.PreviousOrganisations.FromTimestamp",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.PreviousOrganisations.OrganisationAddress.AddressLine2",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.PreviousOrganisations.OrganisationAddress.AddressLine3",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.PreviousOrganisations.OrganisationAddress.Country",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            },
+            {
+              "complex_field_element_id": "OrganisationPolicyField2.PreviousOrganisations.OrganisationAddress.AddressLine1",
+              "display_context": "HIDDEN",
+              "label": null,
+              "hint_text": null,
+              "show_condition": null,
+              "default_value": null,
+              "retain_hidden_value": null
+            }
+          ]
+        },
+        {
+          "case_field_id": "TextAreaField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "CollectionFieldMan",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        },
+        {
+          "case_field_id": "DateField",
+          "order": 1,
+          "page_column_no": null,
+          "complex_field_overrides": []
+        }
+      ],
+      "show_condition": null,
+      "callback_url_mid_event": null,
+      "retries_timeout_mid_event": []
+    }
+  ]
+}

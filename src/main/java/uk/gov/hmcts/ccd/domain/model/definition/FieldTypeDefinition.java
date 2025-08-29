@@ -14,29 +14,21 @@ import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 
-public class FieldTypeDefinition implements Serializable {
+public class FieldTypeDefinition implements Serializable, Copyable<FieldTypeDefinition> {
 
     public static final String COLLECTION = "Collection";
     public static final String COMPLEX = "Complex";
     public static final String MULTI_SELECT_LIST = "MultiSelectList";
-    public static final String FIXED_LIST = "FixedList";
-    public static final String DYNAMIC_FIXED_LIST = "DynamicFixedList";
     public static final String NUMBER = "Number";
     public static final String MONEY_GBP = "MoneyGBP";
     public static final String YES_OR_NO = "YesOrNo";
-    public static final String FIXED_RADIO_LIST = "FixedRadioList";
     public static final String DYNAMIC_LIST = "DynamicList";
     public static final String DYNAMIC_RADIO_LIST = "DynamicRadioList";
     public static final String DYNAMIC_MULTI_SELECT_LIST = "DynamicMultiSelectList";
     public static final String LABEL = "Label";
     public static final String CASE_PAYMENT_HISTORY_VIEWER = "CasePaymentHistoryViewer";
     public static final String CASE_HISTORY_VIEWER = "CaseHistoryViewer";
-    public static final String PREDEFINED_COMPLEX_ADDRESS_GLOBAL = "AddressGlobal";
-    public static final String PREDEFINED_COMPLEX_ORGANISATION_POLICY = "OrganisationPolicy";
-    public static final String PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST = "ChangeOrganisationRequest";
-    public static final String PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK = "AddressGlobalUK";
     public static final String PREDEFINED_COMPLEX_ADDRESS_UK = "AddressUK";
-    public static final String PREDEFINED_COMPLEX_ORDER_SUMMARY = "OrderSummary";
     public static final String PREDEFINED_COMPLEX_CASELINK = "CaseLink";
     public static final String DATETIME = "DateTime";
     public static final String DATE = "Date";
@@ -170,5 +162,21 @@ public class FieldTypeDefinition implements Serializable {
     @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
+    }
+
+    @JsonIgnore
+    @Override
+    public FieldTypeDefinition createCopy() {
+        FieldTypeDefinition copy = new FieldTypeDefinition();
+        copy.setId(this.id);
+        copy.setType(this.type);
+        copy.setMin(this.min);
+        copy.setMax(this.max);
+        copy.setRegularExpression(this.regularExpression);
+        copy.setFixedListItemDefinitions(createCopyList(this.fixedListItemDefinitions));
+        copy.setComplexFields(createCopyList(this.complexFields));
+        copy.setCollectionFieldTypeDefinition(this.collectionFieldTypeDefinition != null
+                ? this.collectionFieldTypeDefinition.createCopy() : null);
+        return copy;
     }
 }

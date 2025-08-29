@@ -84,7 +84,7 @@ public class UICaseSearchController {
             code = 200,
             message = "Success.",
             response = CaseSearchResultViewResource.class
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = "Request is invalid. For some other types HTTP code 500 is returned instead.\n"
@@ -95,29 +95,29 @@ public class UICaseSearchController {
                       + "- Query includes blacklisted type.\n"
                       + "- Query has failed in ElasticSearch - for example, a sort is attempted on an unknown/unmapped field.\n"
                       + "- Query includes supplementary_data which is NOT an array of text values.\n"
-        ),
+            ),
         @ApiResponse(
             code = 401,
             message = "Request doesn't include a valid `Authorization` header. "
                       + "This applies to all missing, malformed & expired tokens."
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = "Request doesn't include a valid `ServiceAuthorization` header. "
                       + "This applies to all missing, malformed & expired tokens.\n"
                       + "A valid S2S token issued to the name of a non-permitted API Client will also return the same."
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = "Case type specified in `ctid` query parameter could not be found."
-        ),
+            ),
         @ApiResponse(
             code = 500,
             message = "An unexpected situation that is not attributable to the user or API Client; "
                       + "or request is invalid. For some other types HTTP code 400 is returned instead.\n"
                       + "Invalid request examples include:\n"
                       + "- Malformed JSON request."
-        )
+            )
     })
     @SuppressWarnings("checkstyle:LineLength") // don't want to break message
     @ApiImplicitParams(

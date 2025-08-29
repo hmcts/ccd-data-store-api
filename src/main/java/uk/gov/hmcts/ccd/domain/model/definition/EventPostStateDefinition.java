@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @ApiModel(description = "")
 @NoArgsConstructor
-public class EventPostStateDefinition implements Serializable {
+public class EventPostStateDefinition implements Serializable, Copyable<EventPostStateDefinition> {
 
     @JsonProperty("enabling_condition")
     private String enablingCondition;
@@ -48,5 +48,15 @@ public class EventPostStateDefinition implements Serializable {
     @JsonIgnore
     public boolean isDefault() {
         return enablingCondition == null;
+    }
+
+    @JsonIgnore
+    @Override
+    public EventPostStateDefinition createCopy() {
+        EventPostStateDefinition copy = new EventPostStateDefinition();
+        copy.setEnablingCondition(this.enablingCondition);
+        copy.setPriority(this.priority);
+        copy.setPostStateReference(this.postStateReference);
+        return copy;
     }
 }

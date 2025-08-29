@@ -1,0 +1,32 @@
+{
+  "_guid_": "F-1024_CreateCasePreRequisiteCaseworker_MidEvent",
+  "_extends_": "F-1024_CreateCasePreRequisiteCaseworker_MidEvent_Null",
+
+  "request": {
+    "body": {
+      "data": {
+        "_extends_": "TTL_Case_Data_NBD_Empty"
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications_NBD_Empty"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "_extends_": "TTL_Case_Data_NBD_Empty",
+        "SearchCriteria" : { }
+      },
+      "data_classification": {
+        "_extends_": "TTL_Classifications_NBD_Empty",
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        }
+      }
+    }
+  }
+}
+

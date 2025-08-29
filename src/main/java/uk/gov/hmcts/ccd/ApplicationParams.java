@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import com.hazelcast.config.EvictionPolicy;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -8,11 +7,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 @Named
 @Singleton
@@ -75,6 +73,12 @@ public class ApplicationParams {
     @Value("${ccd.user-profile.host}")
     private String userProfileHost;
 
+    @Value("${case_document_am.url}")
+    private String caseDocumentAmUrl;
+
+    @Value("${document.sanitiser.case-document-am-api.enabled}")
+    private boolean documentSanitiserCaseDocumentAMEnabled;
+
     @Value("${ccd.document.url.pattern}")
     private String documentURLPattern;
 
@@ -114,11 +118,11 @@ public class ApplicationParams {
     @Value("${user.cache.ttl.secs}")
     private Integer userCacheTTLSecs;
 
+    @Value("${user.role.cache.ttl.secs}")
+    private Integer userRoleCacheTTLSecs;
+
     @Value("${default.cache.max.size}")
     private Integer defaultCacheMaxSize;
-
-    @Value("${default.cache.eviction.policy}")
-    private EvictionPolicy defaultCacheEvictionPolicy;
 
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
@@ -183,6 +187,9 @@ public class ApplicationParams {
     @Value("${enable-case-users-db-sync}")
     private boolean enableCaseUsersDbSync;
 
+    @Value("#{'${ccd.upload-timestamp-featured-case-types}'.split(',')}")
+    private List<String> uploadTimestampFeaturedCaseTypes;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
@@ -225,6 +232,15 @@ public class ApplicationParams {
     @Value("${system.user.token.cache.ttl.secs}")
     private Integer systemUserTokenCacheTTLSecs;
 
+    @Value("${search.internal.case-access-metadata.enabled}")
+    private boolean internalSearchCaseAccessMetadataEnabled;
+
+    @Value("${enable-case-group-access-filtering}")
+    private boolean enableCaseGroupAccessFiltering;
+
+    @Value("#{'${ccd.callback.passthru-header-contexts}'.split(',')}")
+    private List<String> callbackPassthruHeaderContexts;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -234,11 +250,7 @@ public class ApplicationParams {
     }
 
     public static String encodeBase64(final String stringToEncode) {
-        try {
-            return Base64.getEncoder().encodeToString(stringToEncode.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            throw new ServiceException(e.getMessage());
-        }
+        return Base64.getEncoder().encodeToString(stringToEncode.getBytes(StandardCharsets.UTF_8));
     }
 
     public List<String> getAuthorisedServicesForCaseUserRoles() {
@@ -379,6 +391,14 @@ public class ApplicationParams {
         return callbackRetries;
     }
 
+    public String getCaseDocumentAmUrl() {
+        return caseDocumentAmUrl;
+    }
+
+    public boolean isDocumentSanitiserCaseDocAMEnable() {
+        return documentSanitiserCaseDocumentAMEnabled;
+    }
+
     public String getDocumentURLPattern() {
         return documentURLPattern;
     }
@@ -419,12 +439,12 @@ public class ApplicationParams {
         return userCacheTTLSecs;
     }
 
-    public int getDefaultCacheMaxSize() {
-        return defaultCacheMaxSize;
+    public Integer getUserRoleCacheTTLSecs() {
+        return userRoleCacheTTLSecs;
     }
 
-    public EvictionPolicy getDefaultCacheEvictionPolicy() {
-        return defaultCacheEvictionPolicy;
+    public int getDefaultCacheMaxSize() {
+        return defaultCacheMaxSize;
     }
 
     public List<String> getSearchBlackList() {
@@ -444,7 +464,8 @@ public class ApplicationParams {
     }
 
     public List<String> getElasticSearchDataHosts() {
-        return elasticSearchDataHosts.stream().map(quotedHost -> quotedHost.replace("\"", "")).collect(toList());
+        return elasticSearchDataHosts.stream().map(quotedHost ->
+            quotedHost.replace("\"", "")).toList();
     }
 
     public Boolean isElasticsearchNodeDiscoveryEnabled() {
@@ -599,15 +620,27 @@ public class ApplicationParams {
         return requestScopeCachedCaseTypes;
     }
 
-    public Integer getRequestScopeCachedCaseTypesFromHour() {
-        return requestScopeCachedCaseTypesFromHour;
-    }
-
-    public Integer getRequestScopeCachedCaseTypesTillHour() {
-        return requestScopeCachedCaseTypesTillHour;
-    }
-
     public Integer getSystemUserTokenCacheTTLSecs() {
         return systemUserTokenCacheTTLSecs;
+    }
+
+    public boolean getInternalSearchCaseAccessMetadataEnabled() {
+        return internalSearchCaseAccessMetadataEnabled;
+    }
+
+    public boolean getCaseGroupAccessFilteringEnabled() {
+        return this.enableCaseGroupAccessFiltering;
+    }
+
+    public void setCaseGroupAccessFilteringEnabled(boolean enableCaseGroupAccessFiltering) {
+        this.enableCaseGroupAccessFiltering = enableCaseGroupAccessFiltering;
+    }
+
+    public List<String> getCallbackPassthruHeaderContexts() {
+        return callbackPassthruHeaderContexts;
+    }
+
+    public List<String> getUploadTimestampFeaturedCaseTypes() {
+        return uploadTimestampFeaturedCaseTypes;
     }
 }

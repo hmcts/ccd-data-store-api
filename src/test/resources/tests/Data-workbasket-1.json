@@ -1,0 +1,93 @@
+{
+  "case_type_id": "Data_1",
+  "fields": [
+    {
+      "metadata": true,
+      "case_field_id": "[CASE_REFERENCE]",
+      "case_field_element_path": null,
+      "label": "CCD Case Number",
+      "order": 1,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_1"
+    },
+    {
+      "metadata": true,
+      "case_field_id": "[STATE]",
+      "case_field_element_path": null,
+      "label": "State",
+      "order": 2,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_1"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "legacyCaseReference",
+      "case_field_element_path": null,
+      "label": "CaseMan reference number",
+      "order": 3,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_1"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "issueDate",
+      "case_field_element_path": null,
+      "label": "Date claim issued",
+      "order": 4,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_1"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "solicitorReferences",
+      "case_field_element_path": "applicantSolicitor1Reference",
+      "label": "Claimant Reference",
+      "order": 5,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_1"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "caseListDisplayDefendantSolicitorReferences",
+      "case_field_element_path": null,
+      "label": "Defendant Reference(s)",
+      "order": 6,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_1"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "allPartyNames",
+      "case_field_element_path": null,
+      "label": "Party Names",
+      "order": 7,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_1"
+    },
+    {
+      "metadata": false,
+      "case_field_id": "nextDeadline",
+      "case_field_element_path": null,
+      "label": "Next Deadline",
+      "order": 8,
+      "role": null,
+      "sort_order": null,
+      "display_context_parameter": null,
+      "case_type_id": "Data_1"
+    }
+  ]
+}

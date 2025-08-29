@@ -17,7 +17,8 @@
           "document_url": "{{DM_STORE_BASE_URL}}/documents/00000000-0000-0000-0000-000000000000",
           "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/00000000-0000-0000-0000-000000000000/binary",
-          "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
+          "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}",
+          "upload_timestamp": "2000-02-29T00:00:00.000000000"
         }
       },
       "event_token": "${[scenarioContext][childContexts][S-1015-Update_Event_Token_Creation][testData][actualResponse][body][token]}"

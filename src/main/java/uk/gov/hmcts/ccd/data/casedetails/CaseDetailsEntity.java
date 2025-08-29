@@ -27,31 +27,31 @@ import java.time.LocalDateTime;
         "AND UPPER(cd.caseType) LIKE UPPER(:" + CaseDetailsEntity.CASE_TYPE_PARAM + ") " +
         "AND UPPER(cd.state) LIKE UPPER(:" + CaseDetailsEntity.STATE_PARAM + ") " +
         "ORDER BY cd.createdDate ASC "
-    ),
+        ),
 
     @NamedQuery(name = CaseDetailsEntity.FIND_CASE, query =
         "SELECT cd FROM CaseDetailsEntity cd " +
         "WHERE UPPER(cd.jurisdiction) = UPPER(:" + CaseDetailsEntity.JURISDICTION_ID_PARAM + ") " +
         "AND UPPER(cd.caseType) = UPPER(:" + CaseDetailsEntity.CASE_TYPE_PARAM + ") " +
         "AND cd.reference = :" + CaseDetailsEntity.CASE_REFERENCE_PARAM
-    ),
+        ),
 
     @NamedQuery(name = CaseDetailsEntity.FIND_BY_REFERENCE, query =
         "SELECT cd FROM CaseDetailsEntity cd " +
         "WHERE cd.reference = :" + CaseDetailsEntity.CASE_REFERENCE_PARAM
-    ),
+        ),
 
     @NamedQuery(
         name = CaseDetailsEntity.FIND_BY_REF_AND_JURISDICTION,
         query = "SELECT cd FROM CaseDetailsEntity cd" +
             " WHERE cd.jurisdiction = :" + CaseDetailsEntity.JURISDICTION_ID_PARAM +
             " AND cd.reference = :" + CaseDetailsEntity.CASE_REFERENCE_PARAM
-    ),
+        ),
 
     @NamedQuery(
         name = CaseDetailsEntity.CASES_COUNT_BY_CASE_TYPE,
         query = "SELECT cd.caseType, COUNT(cd) FROM CaseDetailsEntity cd GROUP BY cd.caseType"
-    ),
+        ),
 
     @NamedQuery(
         name = CaseDetailsEntity.FIND_CASE_WITH_LIMITS,
@@ -60,7 +60,7 @@ import java.time.LocalDateTime;
             "AND UPPER(cd.caseType) LIKE UPPER(:caseTypeId) " +
             "AND cd.id >= :caseDataId " +
             "ORDER BY cd.createdDate ASC "
-    )
+        )
 })
 @Table(name = "case_data")
 @Entity
@@ -79,6 +79,7 @@ public class CaseDetailsEntity {
     public static final String ID_FIELD_COL = "id";
     public static final String STATE_FIELD_COL = "state";
     public static final String JURISDICTION_FIELD_COL = "jurisdiction";
+    public static final String CASE_ACCESS_GROUP_ID_FIELD_COL = "data.CaseAccessGroups.value.caseAccessGroupId";
     public static final String JURISDICTION_FIELD_KEYWORD_COL = "jurisdiction.keyword";
     public static final String CASE_TYPE_ID_FIELD_COL = "case_type_id";
     public static final String REFERENCE_FIELD_COL = "reference";

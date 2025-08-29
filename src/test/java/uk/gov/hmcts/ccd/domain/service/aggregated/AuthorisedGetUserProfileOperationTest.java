@@ -117,8 +117,8 @@ class AuthorisedGetUserProfileOperationTest {
         UserProfile userProfile = classUnderTest.execute(CAN_READ);
 
         assertAll(
-            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().size(), is(1)),
-            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions().size(), is(2)),
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().size(), is(2)),
+            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions().size(), is(3)),
             () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions(), everyItem(not(isIn(Arrays
                 .asList(notAllowedCaseTypeDefinition))))),
             () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions(), everyItem(not(isIn(Arrays
@@ -144,8 +144,8 @@ class AuthorisedGetUserProfileOperationTest {
         UserProfile userProfile = classUnderTest.execute(CAN_CREATE);
 
         assertAll(
-            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().size(), is(1)),
-            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions().size(), is(2)),
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().size(), is(2)),
+            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions().size(), is(3)),
             () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions(), everyItem(not(isIn(Arrays
                 .asList(notAllowedCaseTypeDefinition))))),
             () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions(), everyItem(not(isIn(Arrays

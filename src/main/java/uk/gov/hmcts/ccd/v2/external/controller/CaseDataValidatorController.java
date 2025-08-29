@@ -58,15 +58,15 @@ public class CaseDataValidatorController {
             code = 200,
             message = "Success",
             response = CaseDataResource.class
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = "Case type not found"
-        ),
+            ),
         @ApiResponse(
             code = 422,
             message = "One of: Event trigger not provided, case type does not exist or case data validation failed"
-        )
+            )
     })
     public ResponseEntity<CaseDataResource> validate(@PathVariable("caseTypeId") String caseTypeId,
                                                      @RequestParam(required = false) final String pageId,

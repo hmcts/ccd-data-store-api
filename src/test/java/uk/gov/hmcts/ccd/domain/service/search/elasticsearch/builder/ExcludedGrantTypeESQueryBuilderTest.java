@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -25,13 +26,16 @@ class ExcludedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
     private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
+    private ApplicationParams applicationParams;
+
+    @Mock
     private CaseTypeDefinition caseTypeDefinition;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         excludedGrantTypeESQueryBuilder =
-            new ExcludedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl);
+            new ExcludedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl, applicationParams);
     }
 
     @Test

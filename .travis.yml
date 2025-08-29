@@ -1,6 +1,6 @@
 language: java
 jdk:
-  - openjdk11
+  - openjdk21
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -20,7 +20,7 @@ env:
     - MAX_NUM_PARALLEL_THREADS=2
 
 before_install:
-  - curl https://raw.githubusercontent.com/hmcts/reform-api-docs/master/bin/publish-swagger-group-docs.sh > publish-swagger-group-docs.sh
+  - curl https://raw.githubusercontent.com/hmcts/cnp-api-docs/master/bin/publish-swagger-group-docs.sh > publish-swagger-group-docs.sh
 
 after_success:
   - 'bash <(curl -s https://codecov.io/bash) || echo "Codecov failed to upload"'

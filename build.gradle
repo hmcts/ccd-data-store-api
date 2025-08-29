@@ -1,12 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.6.10'
-    }
-    dependencies {
-        classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:1.1.1'
-    }
-    dependencies {
-        classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2'
+        springBootVersion = '2.7.18'
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -15,45 +9,41 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'com.github.ben-manes.versions' version '0.20.0'
-    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
-    id 'org.sonarqube' version '2.6.2'
     id 'jacoco'
+    id 'idea'
+    id 'eclipse'
+    id 'org.springframework.boot' version '2.7.18'
+    id 'com.github.ben-manes.versions' version '0.51.0'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.sonarqube' version '5.0.0.4638'
     id 'com.github.kt3k.coveralls' version '2.8.2'
-    id 'se.patrikerdes.use-latest-versions' version '0.2.7'
-    id 'net.ltgt.apt' version '0.21'
-    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.23'
-    id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
-    id "info.solidsoft.pitest" version '1.4.0'
-    id "io.freefair.lombok" version "5.3.0"
-    id 'uk.gov.hmcts.java' version '0.12.40'
-    id 'au.com.dius.pact' version '4.1.0'
+    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '0.7'
+    id 'info.solidsoft.pitest' version '1.15.0'
+    id 'uk.gov.hmcts.java' version '0.12.57'
+    id 'au.com.dius.pact' version '4.3.12'
+    id "org.jsonschema2pojo" version "1.2.1"
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'net.ltgt.apt-idea'
-apply plugin: 'application'
-apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'org.sonarqube'
-apply plugin: 'jsonschema2pojo'
-apply plugin: 'jacoco'
-apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: 'se.patrikerdes.use-latest-versions'
-
-apply from: './gradle/suppress.gradle'
-
 def versions = [
-        pact_version    : '4.1.7',
+        pact_version    : '4.3.4',
 ]
-ext['spring-security.version'] = '5.6.9'
-ext['spring-framework.version'] = '5.3.20'
-ext['jackson.version'] = '2.14.1'
 
+ext['spring-security.version'] = '5.7.11'
+ext['spring-framework.version'] = '5.3.27'
+ext['jackson.version'] = '2.16.0'
+//overriding for easy access to the version for FT testing
+ext['beftaFwVersion'] = '9.2.4'
+ext['ccdTestDefinitionVersion'] = '7.25.4'
+
+configurations {
+    compileClasspath {
+        resolutionStrategy.force 'org.springframework.cloud:spring-cloud-starter:4.0.5'
+    }
+}
 
 dependencyUpdates.resolutionStrategy = {
+
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
             boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
@@ -66,31 +56,63 @@ dependencyUpdates.resolutionStrategy = {
     }
 }
 
+apply from: './gradle/suppress.gradle'
 dependencyCheck {
     suppressionFile = 'dependency-check-suppressions.xml'
 }
 
-mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
+tasks.register("printSuppressionFile") {
+    doLast {
+        println "SUPPRESSION_FILE=${dependencyCheck.suppressionFile}"
+    }
+}
+
+application {
+    mainClass = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
+}
+
+sourceSets {
+    aat {
+        java {
+            srcDir('src/aat/java')
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+        resources {
+            srcDir('src/aat/resources')
+        }
+    }
+
+    contractTest {
+        java {
+            srcDir('src/contractTest/java')
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+        resources {
+            srcDir('src/contractTest/resources')
+        }
+    }
+}
 
 // tag::repositories[]
 repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url 'https://jitpack.io'
+        name = "AzureArtifacts"
+        url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
     }
 }
-// end::repositories[]
 
 ext {
     junitJupiterVersion = '5.8.2'
     junitVintageVersion = '5.8.2'
     powermockVersion = '2.0.7'
-    reformLogging = '5.1.9'
+    reformLogging = '6.0.1'
     appInsightsVersion = '2.4.1'
     swagger2Version = '3.0.0'
     hibernateVersion = '5.6.10.Final'
-    hazelcastVersion = '5.2.1'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -102,30 +124,33 @@ ext {
     springCloudVersion = '2021.0.3'
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 group 'uk.gov.hmcts.ccd'
 
 bootJar {
-    baseName = 'core-case-data'
+    archiveFileName = 'core-case-data'
     manifest {
         attributes 'Implementation-Title': project.name,
                 'Implementation-Version': project.version
     }
-    archiveName = 'core-case-data.jar'
+    archiveFileName = 'core-case-data.jar'
 }
-
-// tag::dependencies[]
-sourceCompatibility = 11
-targetCompatibility = 11
 
 configurations {
     providedRuntime
     annotationProcessor
-//    runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
 
-    aatCompile.extendsFrom(testCompile)
-    aatRuntime.extendsFrom(testRuntime)
-    contractTestCompile.extendsFrom(testCompile)
-    contractTestRuntime.extendsFrom(testRuntime)
+    aatImplementation.extendsFrom(testImplementation)
+    aatRuntimeOnly.extendsFrom(testRuntimeOnly)
+    aatAnnotationProcessor.extendsFrom(annotationProcessor)
+    contractTestImplementation.extendsFrom(testImplementation)
+    contractTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    contractTestAnnotationProcessor.extendsFrom(annotationProcessor)
     cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
@@ -136,27 +161,74 @@ tasks.withType(Checkstyle) {
 
 tasks.withType(Test) {
     maxParallelForks = System.getenv('MAX_NUM_PARALLEL_THREADS') ?: 6 as int
+
+    useJUnitPlatform()
+
+    testLogging {
+        exceptionFormat = 'full'
+    }
 }
 
 dependencies {
+
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
+    implementation('org.springframework.cloud:spring-cloud-starter-bootstrap') {
+        version {
+            strictly '4.0.5'
+        }
+    }
+
+    implementation('org.springframework.cloud:spring-cloud-starter') {
+        version {
+            strictly '4.0.5'
+        }
+    }
+
+    implementation('org.springframework.boot:spring-boot-starter') {
+        version {
+            strictly '3.1.8'
+        }
+    }
+
+    implementation('org.springframework.security:spring-security-rsa'){
+        version {
+            strictly '1.0.12.RELEASE'
+        }
+    }
+
+    implementation('org.bouncycastle:bcprov-jdk18on') {
+        version {
+            strictly '1.77'
+        }
+    }
+
+    implementation('commons-io:commons-io') {
+        version {
+            strictly '2.16.1'
+        }
+    }
+
+
     implementation 'com.google.code.gson:gson:2.8.9'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.3'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.3'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.9'
 
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
-    implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLogging
-
-    implementation 'com.github.hmcts:properties-volume-spring-boot-starter:0.0.4'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
 
     implementation 'org.mapstruct:mapstruct-jdk8:1.3.1.Final'
-    implementation 'org.projectlombok:lombok:1.18.16'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final', 'org.projectlombok:lombok:1.18.16', 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final', 'org.projectlombok:lombok:1.18.16', 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final', 'org.projectlombok:lombok:1.18.34', 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final', 'org.projectlombok:lombok:1.18.34', 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 
     implementation('org.springframework.boot:spring-boot-starter-actuator')
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation('org.springframework.boot:spring-boot-starter-hateoas')
+    implementation('org.springframework.hateoas:spring-hateoas:1.5.5')
+
     implementation group: 'org.springframework.plugin', name: 'spring-plugin-core'
     implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
         exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
@@ -164,36 +236,35 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.retry:spring-retry')
     implementation('org.springframework.boot:spring-boot-starter-cache')
-    implementation group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
-    implementation group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
-    compile "org.flywaydb:flyway-core:6.5.7"
-    compile group: 'org.yaml', name: 'snakeyaml', version: '1.32'
-    compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
-    compile group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
-    compile group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
-    compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
+    implementation "org.flywaydb:flyway-core:8.5.13"
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.2'
+    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
+    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.77'
 
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.5.14'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.7.18'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
 
     implementation "io.github.openfeign:feign-httpclient:11.0"
 
-    implementation group: 'net.minidev', name: 'json-smart', version: '2.4.7'
+    implementation group: 'net.minidev', name: 'json-smart', version: '2.4.11'
 
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.21'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.2'
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
 
-    testCompile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
+    testImplementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
 
     implementation group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
@@ -207,8 +278,8 @@ dependencies {
     // CVE-2021-28170
     implementation "org.glassfish:jakarta.el:4.0.1"
 
-    // CVE-2021-29425
-    implementation group: 'commons-io', name: 'commons-io', version: '2.8.0'
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
 
     // use the latest org.springframework.security
     implementation group: 'org.springframework.security', name: 'spring-security-core'
@@ -221,9 +292,9 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
     implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.1.3'
 
-    // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
+//    FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
-    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.5.1'
+    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.5.5'
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '4.0.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -233,36 +304,37 @@ dependencies {
     }
     testImplementation group: 'org.json', name: 'json', version: '20211205'
 
+    testImplementation "org.flywaydb:flyway-core:8.5.13"
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
-    testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
+    testImplementation ('com.opentable.components:otj-pg-embedded:0.12.0')
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.22.0'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.2'
-    testImplementation("org.testcontainers:postgresql:1.15.2")
-    testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
-    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE')
+    testImplementation("org.testcontainers:postgresql:1.20.2")
+    testImplementation ('com.github.tomakehurst:wiremock-jre8:2.25.1')
+    testImplementation ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
-    testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
-    testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
-    testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
-    testRuntime "org.junit.platform:junit-platform-commons:1.8.1"
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
-    testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'3.6.0'
-    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
-    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
-    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
-    testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
-    testCompile 'io.github.openfeign:feign-jackson:9.7.0'
-    testCompile 'pl.allegro.tech:embedded-elasticsearch:2.7.0'
-    testCompile 'com.github.hmcts:fortify-client:1.3.0:all'
+    testImplementation 'org.apiguardian:apiguardian-api:1.0.0'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
+    testRuntimeOnly "org.junit.platform:junit-platform-commons:1.8.1"
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
+    testImplementation group:'org.mockito', name: 'mockito-junit-jupiter', version:'3.6.0'
+    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
+    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
+    testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
+    testImplementation 'io.github.openfeign:feign-jackson:9.7.0'
+    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.20.2'
+    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.20.2'
+    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.9', classifier: 'all'
     testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
     // for sonar analysis
-    testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
+    testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
     //excluding log4j-core which causes a vulnerability issue
     implementation(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
@@ -272,42 +344,46 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     implementation 'org.jooq:jool-java-8:0.9.14'
-    implementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
+    implementation 'com.github.hmcts:ccd-case-document-am-client:1.59.2'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.11'
+    testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version:  ccdTestDefinitionVersion
+    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
 
-    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.10'
-
-    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
-    contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
-    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
-    contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
-    contractTestCompile group: 'io.vavr', name: 'vavr', version: '0.10.4'
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-client'
-    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core'
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
-    contractTestCompile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.6.1'
-    contractTestCompile group: 'javax.inject', name: 'javax.inject', version: '1'
-    contractTestCompile group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
-    contractTestCompile group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
-    contractTestCompile group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
-    contractTestCompile('org.springframework.boot:spring-boot-starter-hateoas')
-    contractTestCompile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
+    contractTestImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    contractTestImplementation "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
+    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
+    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
+    contractTestRuntimeOnly group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
+    contractTestImplementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
+    contractTestImplementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
+    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
+    contractTestImplementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
+    contractTestImplementation group: 'org.springframework.security', name: 'spring-security-oauth2-core'
+    contractTestImplementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
+    contractTestImplementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.6.1'
+    contractTestImplementation group: 'javax.inject', name: 'javax.inject', version: '1'
+    contractTestImplementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
+    contractTestImplementation('org.springframework.hateoas:spring-hateoas:1.5.5')
+    contractTestImplementation(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
-    contractTestCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
+    contractTestImplementation(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
         exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
     }
-    contractTestCompile("org.springframework.boot:spring-boot-starter-data-jpa")
-    contractTestCompile group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
-    contractTestCompile(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2') {
+    contractTestImplementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    contractTestImplementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
+    contractTestImplementation(group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
-    contractTestCompile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
-
-    aatCompile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    contractTestImplementation 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
+    contractTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
+    contractTestImplementation 'org.springframework.boot:spring-boot-starter-cache'
+    contractTestImplementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+    aatImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    aatImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
+    aatImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
+    aatAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
 }
 // end::dependencies[]
 
@@ -318,9 +394,10 @@ dependencyManagement {
 
     dependencies {
         // Versions prior to 30.0 vulnerable to CVE-2020-8908
-        dependency 'com.google.guava:guava:30.1-jre'
+        dependency 'com.google.guava:guava:32.1.2-jre'
 
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.69') {
+        // CVE-2023-41080
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -329,6 +406,9 @@ dependencyManagement {
         dependencySet(group: 'commons-beanutils', version: '1.9.4') {
             entry 'commons-beanutils'
         }
+        // CVE-2023-3635
+        dependency 'com.squareup.okio:okio:3.5.0'
+        dependency 'com.squareup.okhttp3:okhttp:4.11.0'
 
         // Required for Embedded ES with Java 11
         dependency 'org.rauschig:jarchivelib:1.0.0'
@@ -396,12 +476,13 @@ pitest {
                    'uk.gov.hmcts.ccd.v2.internal.resource.*'
     ]
     excludedClasses = ['uk.gov.hmcts.ccd.CoreCaseDataApplication',
-                       'uk.gov.hmcts.ccd.PersistenceIT'
+                       'uk.gov.hmcts.ccd.PersistenceIT',
+                       'uk.gov.hmcts.ccd.v2.external.controller.TestingSupportController'
     ]
 
     enableDefaultIncrementalAnalysis = true
-    historyInputLocation = ['build/reports/pitest/fastermutationtesting']
-    historyOutputLocation = ['build/reports/pitest/fastermutationtestingoutput']
+    historyInputLocation = 'build/reports/pitest/fastermutationtesting'
+    historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
     threads = 15
     testSourceSets = [sourceSets.test]
     mainSourceSets = [sourceSets.main]
@@ -409,7 +490,7 @@ pitest {
     outputFormats = ['XML', 'HTML','CSV']
     mutationThreshold = 4
     coverageThreshold = 4
-    maxMutationsPerClass = 15
+    features = ["+CLASSLIMIT(limit[15])"]
     jvmArgs = ['-Xms1G','-Xmx3G']
     timestampedReports = false
     failWhenNoMutations = false
@@ -423,24 +504,6 @@ task projectVersion {
     description 'Prints the version of this project; used for publishing JAR file'
     doLast {
         print project.version
-    }
-}
-
-idea {
-    project {
-        // experimental: whether annotation processing will be configured in the IDE; only actually used with the 'idea' task.
-        configureAnnotationProcessing = true
-    }
-    module {
-        apt {
-            // whether generated sources dirs are added as generated sources root
-            addGeneratedSourcesDirs = true
-            // whether the annotationProcessor/apt and testAnnotationProcessor/testApt dependencies are added as module dependencies
-            addAptDependencies = true
-
-            // the dependency scope used for apt and/or compileOnly dependencies (when enabled above)
-            mainDependenciesScope = "PROVIDED" // defaults to "COMPILE" when using the Gradle integration in IntelliJ IDEA
-        }
     }
 }
 
@@ -609,10 +672,12 @@ jsonSchema2Pojo {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java," +
+            "**/AppInsightsConfiguration.java," +
+            "**/TestingSupportController.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"
     }
 }
 
@@ -648,7 +713,7 @@ jacocoTestReport {
     reports {
         // XML required by coveralls and for the below coverage checks
         // and html are generated by default
-        xml.enabled true
+        xml.required = true
     }
 
     afterEvaluate {
@@ -661,7 +726,7 @@ jacocoTestReport {
     }
 
     doLast {
-        def report = file("${jacoco.reportsDir}/test/jacocoTestReport.xml")
+        def report = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
         logger.lifecycle("Checking coverage results: ${report}")
 
         def parser = new XmlParser()
@@ -711,7 +776,7 @@ jacocoTestReport {
 test {
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    generateCucumberReports.enabled = false
+    generateCucumberReports.enabled = true
     systemProperty 'java.locale.providers', 'COMPAT'
 
     useJUnitPlatform()
@@ -733,7 +798,8 @@ test {
     }
 
     reports {
-        html.enabled = true
+        html.required = true
+        html.outputLocation = file("${buildDir}/reports/jacoco/html")
     }
 
     jvmArgs = [
@@ -749,36 +815,10 @@ test {
 
 check.dependsOn jacocoTestReport
 
-sourceSets {
-    aat {
-        java {
-            srcDir('src/aat/java')
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-        }
-        resources {
-            srcDir('src/aat/resources')
-        }
-    }
-
-    contractTest {
-        java {
-            srcDir('src/contractTest/java')
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-        }
-        resources {
-            srcDir('src/contractTest/resources')
-        }
-    }
-}
-
 task fortifyScan(type: JavaExec)  {
-    main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+    mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
-    // The line below prevents the build from failing if the Fortify scan detects issues
-    ignoreExitValue = true
 }
 
 idea {
@@ -794,7 +834,7 @@ idea {
 task highLevelDataSetup(type: JavaExec) {
     dependsOn aatClasses
 
-    main = "uk.gov.hmcts.ccd.datastore.befta.HighLevelDataSetupApp"
+    mainClass = "uk.gov.hmcts.ccd.datastore.befta.HighLevelDataSetupApp"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
@@ -812,7 +852,7 @@ task smoke() {
     doLast {
         generateCucumberReports.enabled = true
         javaexec {
-            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
+            mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
             args = ['--plugin', "json:${rootDir}/target/cucumber.json",
                     '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
@@ -837,34 +877,32 @@ task smoke() {
     outputs.upToDateWhen { false }
 }
 
-task functional() {
-    description = 'Executes functional tests against an the CCD Data Store API instance just deployed'
+def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
+
+task functional(type: JavaExec) {
+    description = "Executes functional tests against an the CCD Data Store API instance just deployed"
+    group = "Verification"
     dependsOn aatClasses
-    new File("$buildDir/test-results/test").mkdirs()
-    copy {
-        from "src/aat/resources/DummyTest.xml"
-        into "$buildDir/test-results/test"
-    }
 
-    doFirst {
-        generateCucumberReports.enabled = true
-        javaexec {
-            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
-            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = [
-                    '--threads', '1',
-                    '--plugin', "json:${rootDir}/target/cucumber.json",
-                    '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-                    '--tags', 'not @Ignore',
-                    '--glue', 'uk.gov.hmcts.befta.player',
-                    '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
-            ]
-            jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
-        }
+    group = "Verification"
 
-    }
+    generateCucumberReports.enabled = false
+    mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
+    classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+    args = [
+        '--threads', '1',
+        '--plugin', "json:${rootDir}/target/cucumber.json",
+        '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
+        '--tags',"${tags}",
+        '--glue', 'uk.gov.hmcts.befta.player',
+        '--glue', 'uk.gov.hmcts.ccd.datastore.befta',
+        'src/aat/resources/features'
+    ]
+    // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
+    jvmArgs '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED'
 
     finalizedBy {
+        generateCucumberReports.enabled = true
         generateCucumberReports {
             doLast{
                 delete "${rootDir}/BEFTA Report for Functional Tests/"
@@ -886,17 +924,20 @@ def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-task runProviderPactVerification(type:Test) {
-    logger.lifecycle("Runs provider pact Tests")
-    useJUnitPlatform()
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-    systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
-    systemProperty 'pact.provider.version', project.pactVersion
-    include "uk/gov/hmcts/ccd/v2/external/controller/**"
-}
+//task runProviderPactVerification(type:Test) {
+//    logger.lifecycle("Runs provider pact Tests")
+//    useJUnitPlatform()
+//    testClassesDirs = sourceSets.contractTest.output.classesDirs
+//    classpath = sourceSets.contractTest.runtimeClasspath
+//    if (project.hasProperty('pact.verifier.publishResults')) {
+//        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+//    }
+//    systemProperty 'pact.provider.version', project.pactVersion
+//    include "uk/gov/hmcts/reform/**"
+//    include "uk/gov/hmcts/ccd/**"
+//}
 
-runProviderPactVerification.finalizedBy pactVerify
+//runProviderPactVerification.finalizedBy pactVerify
 
 def timestamp() {
     def date = new Date()
@@ -928,7 +969,7 @@ void reloadEnvSecrets(String env) {
 }
 
 task runRemoteDemo(type: JavaExec) {
-    main = mainClassName
+    mainClass = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {
         configRemoteRunTask(it, 'demo')
@@ -936,11 +977,19 @@ task runRemoteDemo(type: JavaExec) {
 }
 
 task runRemoteAAT(type: JavaExec) {
-    main = mainClassName
+    mainClass = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {
         configRemoteRunTask(it, 'aat')
     }
+}
+
+rootProject.tasks.named("processAatResources") {
+    duplicatesStrategy = 'include'
+}
+
+rootProject.tasks.named("processContractTestResources") {
+    duplicatesStrategy = 'include'
 }
 
 void configRemoteRunTask(Task execTask, String env) {

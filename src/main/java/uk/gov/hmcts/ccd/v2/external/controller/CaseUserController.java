@@ -56,27 +56,27 @@ public class CaseUserController {
         @ApiResponse(
             code = 204,
             message = "Access granted"
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.CASE_ID_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.CASE_ROLE_REQUIRED
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = V2.Error.CASE_ROLE_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = V2.Error.GRANT_FORBIDDEN
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = V2.Error.CASE_NOT_FOUND
-        )
+            )
     })
     @LogAudit(operationType = AuditOperationType.UPDATE_CASE_ACCESS, caseId = "#caseReference",
         targetIdamId = "#userId",

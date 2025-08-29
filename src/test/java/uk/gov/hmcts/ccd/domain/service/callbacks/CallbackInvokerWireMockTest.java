@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @TestPropertySource(properties =
     {
-        "http.client.read.timeout=500"
+    "http.client.read.timeout=500"
     })
 public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
@@ -75,7 +75,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .inScenario("CallbackRetry")
             .whenScenarioStateIs("SecondFailedAttempt")
-            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(490))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200))
             .willSetStateTo("SuccessfulAttempt"));
 
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false);

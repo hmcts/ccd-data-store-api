@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @ApiModel(description = "")
-public class WizardPage implements Serializable {
+public class WizardPage implements Serializable, Copyable<WizardPage> {
 
     private String id = null;
     private String label = null;
@@ -106,5 +106,20 @@ public class WizardPage implements Serializable {
             .collect(Collectors.toSet());
         wizardPageFields.addAll(complexFieldOverRides);
         return wizardPageFields;
+    }
+
+    @Override
+    public WizardPage createCopy() {
+        WizardPage clonedPage = new WizardPage();
+        clonedPage.setId(this.id);
+        clonedPage.setLabel(this.label);
+        clonedPage.setOrder(this.order);
+        clonedPage.setShowCondition(this.showCondition);
+        clonedPage.setCallBackURLMidEvent(this.callBackURLMidEvent);
+        clonedPage.setRetriesTimeoutMidEvent(this.retriesTimeoutMidEvent != null
+            ? new ArrayList<>(this.retriesTimeoutMidEvent) : null);
+        clonedPage.setWizardPageFields(createCopyList(this.wizardPageFields));
+
+        return clonedPage;
     }
 }

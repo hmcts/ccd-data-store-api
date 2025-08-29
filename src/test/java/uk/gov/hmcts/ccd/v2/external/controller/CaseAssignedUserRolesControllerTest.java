@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.ADD_SUCCESS_MESSAGE;
 import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.REMOVE_SUCCESS_MESSAGE;
 
+@SuppressWarnings("removal")
 class CaseAssignedUserRolesControllerTest {
 
     private static final String CASE_ID_GOOD = "4444333322221111";
@@ -344,6 +345,7 @@ class CaseAssignedUserRolesControllerTest {
     }
 
     @Nested
+    @SuppressWarnings("deprecations")
     @DisplayName("GET /case-users")
     class GetCaseUserRoles {
 

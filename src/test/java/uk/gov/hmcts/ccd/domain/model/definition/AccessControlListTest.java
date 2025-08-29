@@ -65,7 +65,7 @@ class AccessControlListTest {
         accessControlList.setCreate(true);
         accessControlList.setAccessProfile("test");
 
-        AccessControlList duplicate  = accessControlList.duplicate();
+        AccessControlList duplicate  = accessControlList.createCopy();
 
         assertNotNull(duplicate);
         assertEquals(duplicate.getAccessProfile(), accessControlList.getAccessProfile());
