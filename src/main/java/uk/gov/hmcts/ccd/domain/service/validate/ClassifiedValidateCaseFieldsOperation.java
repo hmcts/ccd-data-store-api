@@ -99,10 +99,11 @@ public class ClassifiedValidateCaseFieldsOperation implements ValidateCaseFields
             caseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
         }
 
-        caseDetails.setData(callbackData);
-        deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
+        CaseDetails caseDetailsClone = caseService.clone(caseDetails);
+        caseDetailsClone.setData(callbackData);
+        deduceDataClassificationForNewFields(caseTypeDefinition, caseDetailsClone);
 
-        return new CaseGenerationResult(caseDetails, isCreate);
+        return new CaseGenerationResult(caseDetailsClone, isCreate);
     }
 
     private CaseTypeDefinition getCaseDefinitionType(String caseTypeId) {
