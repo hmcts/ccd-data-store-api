@@ -27,6 +27,7 @@ ext {
     set('log4j2.version', '2.24.3')
     set('jacksonVersion', '2.19.2')
     set('snakeyaml.version', '2.2')
+    elasticsearchVersion = '9.1.2'
     junit = '5.11.4'
     junitPlatform = '1.11.4'
     appInsightsVersion = '2.6.4'
@@ -34,7 +35,6 @@ ext {
     lombokVersion = '1.18.36'
     lombokBindingVersion = '0.2.0'
     mockito = '5.15.2'
-    elasticVersion = '9.0.4'
     testContainersVersion = '1.20.4'
     cucumber = '6.6.1'
     beftaFwVersion = '9.2.4'
@@ -251,14 +251,14 @@ dependencies {
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.4.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
 
-    implementation (group: 'org.elasticsearch', name: 'elasticsearch', version: elasticVersion) {
+    implementation (group: 'org.elasticsearch', name: 'elasticsearch', version: elasticsearchVersion) {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
-    implementation (group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticVersion) {
+    implementation (group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticsearchVersion) {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
-    implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticVersion
-    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: elasticVersion
+    implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticsearchVersion
+    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: elasticsearchVersion
     implementation group: 'org.glassfish', name: 'jakarta.json', version: '2.0.1'
 
     implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"

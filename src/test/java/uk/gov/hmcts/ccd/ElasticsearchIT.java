@@ -218,7 +218,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .withStartupTimeout(Duration.ofMinutes(1)));
 
         container.start();
-        log.info("Elastic search started.");
+        log.info("Elastic search {} started.", elasticVersion);
         ElasticsearchITSetup configurer = new ElasticsearchITSetup(httpPortValue);
         log.info("Elastic search adding indexes.");
         configurer.initIndexes();

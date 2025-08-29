@@ -62,8 +62,7 @@ public class ElasticSearchConfiguration {
 
         RestClientBuilder builder = RestClient.builder(
                 new HttpHost(
-                    //applicationParams.getElasticSearchHosts().getFirst(),
-                    "localhost",
+                    getElasticsearchHost(),
                     applicationParams.getElasticSearchPort(),
                     HttpHost.DEFAULT_SCHEME_NAME))
             .setFailureListener(new RestClient.FailureListener() {
@@ -98,4 +97,17 @@ public class ElasticSearchConfiguration {
                     .build()
             );
     }
+
+    private String getElasticsearchHost() {
+        String esHost = stripProtocolAndPort(applicationParams.getElasticSearchHosts().getFirst());
+        log.info("esHost: {}", esHost);
+        return esHost;
+    }
+
+    public String stripProtocolAndPort(String url) {
+        String noProtocol = url.replaceFirst("^https?://", "");
+        // Remove port (e.g., :9200)
+        return noProtocol.replaceFirst(":\\d+$", "");
+    }
+
 }
