@@ -122,6 +122,18 @@ public class CaseDetails implements Cloneable {
     @JsonIgnore
     private LocalDate resolvedTTL;
 
+    private void jcdebug(final String method) {
+        try {
+            final String thisAsString = jclogger.printObjectToString(this);
+            if (thisAsString.contains("Confidential or sensitive information")) {
+                jclogger.jclog(method + " " + thisAsString);
+                jclogger.jclog(method + " CALL STACK = " + jclogger.getCallStackAsString());
+            }
+        } catch (Exception e) {
+            // Do nothing
+        }
+    }
+
     public String getId() {
         return id;
     }
