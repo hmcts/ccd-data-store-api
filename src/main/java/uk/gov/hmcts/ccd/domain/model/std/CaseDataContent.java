@@ -6,9 +6,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 
 @ToString
 public class CaseDataContent {
+    private final JcLogger jclogger = new JcLogger("CaseDataContent", true);
+
     private Event event;
     private Map<String, JsonNode> data;
 

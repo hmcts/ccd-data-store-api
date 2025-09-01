@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,6 +40,8 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.WAYS_
 // partial javadoc attributes added prior to checkstyle implementation in module
 @SuppressWarnings("checkstyle:SummaryJavadoc")
 public class CaseDetails implements Cloneable {
+    private final JcLogger jclogger = new JcLogger("CaseDetails", true);
+
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     public static final String DRAFT_ID = "DRAFT%s";
 
