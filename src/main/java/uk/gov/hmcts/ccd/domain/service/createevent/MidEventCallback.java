@@ -70,6 +70,7 @@ public class MidEventCallback {
                 if (StringUtils.isNotEmpty(content.getCaseReference())) {
                     CaseDetails caseDetails =
                         caseService.getCaseDetails(caseTypeDefinition.getJurisdictionId(), content.getCaseReference());
+                    caseDetails = caseService.clone(caseDetails);
                     caseDetailsBefore = caseService.clone(caseDetails);
                     currentOrNewCaseDetails =
                         caseService.populateCurrentCaseDetailsWithEventFields(content, caseDetails);
