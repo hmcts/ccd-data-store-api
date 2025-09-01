@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Store/search cases and provide workbaskets.
-
+   
 ### Prerequisites
 
 - [Open JDK 21](https://openjdk.java.net/)
