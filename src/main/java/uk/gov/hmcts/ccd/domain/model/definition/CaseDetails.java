@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,6 +40,8 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.WAYS_
 // partial javadoc attributes added prior to checkstyle implementation in module
 @SuppressWarnings("checkstyle:SummaryJavadoc")
 public class CaseDetails implements Cloneable {
+    private final JcLogger jclogger = new JcLogger("CaseDetails", true);
+
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     public static final String DRAFT_ID = "DRAFT%s";
 
@@ -119,140 +122,185 @@ public class CaseDetails implements Cloneable {
     @JsonIgnore
     private LocalDate resolvedTTL;
 
+    private void jcdebug(final String method) {
+        try {
+            final String thisAsString = jclogger.printObjectToString(this);
+            if (thisAsString.contains("Confidential or sensitive information")) {
+                jclogger.jclog(method + " " + thisAsString);
+                jclogger.jclog(method + " CALL STACK = " + jclogger.getCallStackAsString());
+            }
+        } catch (Exception e) {
+            // Do nothing
+        }
+    }
+
     public String getId() {
+        jcdebug("getId()");
         return id;
     }
 
     public void setId(String id) {
+        jcdebug("setId()");
         this.id = id;
     }
 
     @JsonGetter("id")
     public Long getReference() {
+        jcdebug("getReference()");
         return reference;
     }
 
     @JsonIgnore
     public String getReferenceAsString() {
+        jcdebug("getReferenceAsString()");
         return reference != null ? reference.toString() : null;
     }
 
     @JsonSetter("id")
     public void setReference(Long reference) {
+        jcdebug("setReference()");
         this.reference = reference;
     }
 
     public Integer getVersion() {
+        jcdebug("getVersion()");
         return version;
     }
 
     public void setVersion(final Integer version) {
+        jcdebug("setVersion()");
         this.version = version;
     }
 
     public String getCaseTypeId() {
+        jcdebug("getCaseTypeId()");
         return caseTypeId;
     }
 
     public void setCaseTypeId(String caseTypeId) {
+        jcdebug("setCaseTypeId()");
         this.caseTypeId = caseTypeId;
     }
 
     public String getJurisdiction() {
+        jcdebug("getJurisdiction()");
         return jurisdiction;
     }
 
     public void setJurisdiction(String jurisdiction) {
+        jcdebug("setJurisdiction()");
         this.jurisdiction = jurisdiction;
     }
 
     public LocalDateTime getCreatedDate() {
+        jcdebug("getCreatedDate()");
         return createdDate;
     }
 
     public void setCreatedDate(LocalDateTime createdDate) {
+        jcdebug("setCreatedDate()");
         this.createdDate = createdDate;
     }
 
     public LocalDateTime getLastModified() {
+        jcdebug("getLastModified()");
         return lastModified;
     }
 
     public void setLastModified(LocalDateTime lastModified) {
+        jcdebug("setLastModified()");
         this.lastModified = lastModified;
     }
 
     public String getState() {
+        jcdebug("getState()");
         return state;
     }
 
     public void setState(String state) {
+        jcdebug("setState()");
         this.state = state;
     }
 
     public SecurityClassification getSecurityClassification() {
+        jcdebug("getSecurityClassification()");
         return securityClassification;
     }
 
     public void setSecurityClassification(SecurityClassification securityClassification) {
+        jcdebug("setSecurityClassification()");
         this.securityClassification = securityClassification;
     }
 
     public Map<String, JsonNode> getData() {
+        jcdebug("getData()");
         return data;
     }
 
     public void setData(Map<String, JsonNode> data) {
+        jcdebug("setData()");
         this.data = data;
     }
 
     public Integer getCallbackResponseStatusCode() {
+        jcdebug("getCallbackResponseStatusCode()");
         return callbackResponseStatusCode;
     }
 
     public String getCallbackResponseStatus() {
+        jcdebug("getCallbackResponseStatus()");
         return callbackResponseStatus;
     }
 
     public LocalDateTime getLastStateModifiedDate() {
+        jcdebug("getLastStateModifiedDate()");
         return lastStateModifiedDate;
     }
 
     public void setLastStateModifiedDate(LocalDateTime lastStateModifiedDate) {
+        jcdebug("setLastStateModifiedDate()");
         this.lastStateModifiedDate = lastStateModifiedDate;
     }
 
     public Map<String, JsonNode> getDataClassification() {
+        jcdebug("getDataClassification()");
         return dataClassification;
     }
 
     public void setDataClassification(Map<String, JsonNode> dataClassification) {
+        jcdebug("setDataClassification()");
         this.dataClassification = dataClassification;
     }
 
     public Map<String, JsonNode> getSupplementaryData() {
+        jcdebug("getSupplementaryData()");
         return supplementaryData;
     }
 
     public void setSupplementaryData(Map<String, JsonNode> supplementaryData) {
+        jcdebug("setSupplementaryData()");
         this.supplementaryData = supplementaryData;
     }
 
     public AfterSubmitCallbackResponse getAfterSubmitCallbackResponse() {
+        jcdebug("getAfterSubmitCallbackResponse()");
         return afterSubmitCallbackResponse;
     }
 
     public void setIncompleteCallbackResponse() {
+        jcdebug("setIncompleteCallbackResponse()");
         this.callbackResponseStatusCode = SC_OK;  // Front end cannot handle anything other than status 200
         this.callbackResponseStatus = "INCOMPLETE_CALLBACK";
     }
 
     public void setIncompleteDeleteDraftResponse() {
+        jcdebug("setIncompleteDeleteDraftResponse()");
         this.deleteDraftResponseStatusCode = SC_OK;  // Front end cannot handle anything other than status 200
         this.deleteDraftResponseStatus = "INCOMPLETE_DELETE_DRAFT";
     }
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
+        jcdebug("existsInData()");
         return isFieldWithNoValue(caseTypeTabField)
             || hasDataForTabField(caseTypeTabField)
             || getMetadata().containsKey(caseTypeTabField.getCaseFieldDefinition().getId());
@@ -275,12 +323,14 @@ public class CaseDetails implements Cloneable {
 
     @JsonIgnore
     public CaseDetails shallowClone() throws CloneNotSupportedException {
+        jcdebug("shallowClone()");
         return (CaseDetails) super.clone();
     }
 
     @JsonIgnore
     public void setDeleteDraftResponseEntity(final String draftId, final ResponseEntity<Void>
                                                          draftResponse) {
+        jcdebug("setDeleteDraftResponseEntity()");
         if (SC_OK == draftResponse.getStatusCodeValue()) {
             setDeleteDraftResponseEntity();
         } else {
@@ -300,6 +350,7 @@ public class CaseDetails implements Cloneable {
     @SuppressWarnings("java:S2259")
     public void setAfterSubmitCallbackResponseEntity(final ResponseEntity<AfterSubmitCallbackResponse>
                                                          callBackResponse) {
+        jcdebug("setAfterSubmitCallbackResponseEntity()");
         if (SC_OK == callBackResponse.getStatusCodeValue()) {
             setAfterSubmitCallbackResponseEntity(callBackResponse.getBody());
         } else {
@@ -320,6 +371,7 @@ public class CaseDetails implements Cloneable {
 
     @JsonIgnore
     public Map<String, Object> getMetadata() {
+        jcdebug("getMetadata()");
         if (metadata.isEmpty()) {
             metadata.put(JURISDICTION.getReference(), getJurisdiction());
             metadata.put(CASE_TYPE.getReference(), getCaseTypeId());
@@ -334,15 +386,18 @@ public class CaseDetails implements Cloneable {
     }
 
     public Integer getDeleteDraftResponseStatusCode() {
+        jcdebug("getDeleteDraftResponseStatusCode()");
         return deleteDraftResponseStatusCode;
     }
 
     public String getDeleteDraftResponseStatus() {
+        jcdebug("getDeleteDraftResponseStatusStatus()");
         return deleteDraftResponseStatus;
     }
 
     @JsonIgnore
     public Map<String, Object> getCaseDataAndMetadata() {
+        jcdebug("getCaseDataAndMetadata()");
         Map<String, Object> allData = new HashMap<>(getMetadata());
         ofNullable(getData()).ifPresent(allData::putAll);
         return allData;
@@ -351,16 +406,19 @@ public class CaseDetails implements Cloneable {
     @JsonIgnore
     @Override
     public String toString() {
+        jcdebug("toString()");
         return ReflectionToStringBuilder.toString(this);
     }
 
     @JsonIgnore
     public boolean hasCaseReference() {
+        jcdebug("hasCaseReference()");
         return getReference() != null;
     }
 
     @JsonIgnore
     public Map<String, JsonNode> getCaseEventData(Set<String> caseFieldIds) {
+        jcdebug("getCaseEventData()");
         Map<String, JsonNode> caseEventData = new HashMap<>();
         if (this.data != null) {
             for (String caseFieldId : caseFieldIds) {
@@ -374,10 +432,12 @@ public class CaseDetails implements Cloneable {
     }
 
     public void setResolvedTTL(LocalDate resolvedTTL) {
+        jcdebug("setResolvedTTL()");
         this.resolvedTTL = resolvedTTL;
     }
 
     public LocalDate getResolvedTTL() {
+        jcdebug("getResolvedTTL()");
         return resolvedTTL;
     }
 }
