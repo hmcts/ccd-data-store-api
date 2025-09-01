@@ -423,15 +423,4 @@ class JacksonUtilsTest {
         assertEquals("Name_1", dataNode.get("data1").asText());
         assertEquals(42, dataNode.get("data2").asInt());
     }
-
-    @Test
-    void testConvertValueInDataFieldFromMapNull() {
-        Map<String, JsonNode> inputMap = null;
-
-        Map<String, JsonNode> result = JacksonUtils.convertValueInDataField(inputMap);
-
-        JsonNode dataNode = result.get(DATA);
-        assertNull(dataNode);
-
-    }
 }

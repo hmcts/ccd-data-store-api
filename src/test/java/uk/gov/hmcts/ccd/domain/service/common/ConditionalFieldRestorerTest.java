@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -703,10 +702,7 @@ class ConditionalFieldRestorerTest {
         );
     }
 
-    // Temoporary test Ignore as it is failing due to changes in sanitize field check in
-    //CosditionalFieldRestorer:processSubFieldsRecursively lines 115-116
-    @Ignore
-    //@Test
+    @Test
     void shouldKeepNullValueSubFieldsToComplexTypeWhenCreateWithoutReadPermission() {
         final String newDataString = """
             {
@@ -841,10 +837,7 @@ class ConditionalFieldRestorerTest {
         );
     }
 
-    // Temoporary test Ignore as it is failing due to changes in sanitize field check in
-    //CosditionalFieldRestorer:processSubFieldsRecursively lines 115-116
-    @Ignore
-    //@Test
+    @Test
     void shouldKeepNullForNullValueWhenWithoutCreateAndReadPermission() {
         final String newDataString = """
             {
@@ -991,10 +984,7 @@ class ConditionalFieldRestorerTest {
         );
     }
 
-    // Temoporary test Ignore as it is failing due to changes in sanitize field check in
-    //CosditionalFieldRestorer:processSubFieldsRecursively lines 115-116
-    @Ignore
-    //@Test
+    @Test
     void shouldDoNothingWhenCategoryFieldSetToNullWhenWithCreateWithoutReadPermission() {
         final String newDataString = """
             {
@@ -2895,10 +2885,7 @@ class ConditionalFieldRestorerTest {
 
     }
 
-    // Temoporary test Ignore as it is failing due to changes in sanitize field check in
-    //CosditionalFieldRestorer:processSubFieldsRecursively lines 115-116
-    @Ignore
-    //@Test
+    @Test
     void shouldDoNothingWhenSubFieldIsNullInInnerComplexNestedObjectWithCreateAndWithoutReadPermission() {
         final String newDataString = """
              {
@@ -2938,10 +2925,7 @@ class ConditionalFieldRestorerTest {
         assertEquals(newDataNode, filteredFields);
     }
 
-    // Temoporary test Ignore as it is failing due to changes in sanitize field check in
-    //CosditionalFieldRestorer:processSubFieldsRecursively lines 115-116
-    @Ignore
-    //@Test
+    @Test
     void shouldKeepNullSubFieldsOfNullComplexFieldInInnerComplexNestedObjectWithCreateAndWithoutReadPermission() {
         final String newDataString = """
              {
@@ -3095,10 +3079,7 @@ class ConditionalFieldRestorerTest {
         );
     }
 
-    // Temoporary test Ignore as it is failing due to changes in sanitize field check in
-    //CosditionalFieldRestorer:processSubFieldsRecursively lines 115-116
-    @Ignore
-    //@Test
+    @Test
     void shouldKeepNullParentComplexFieldWithCreateAndWithoutReadPermission() {
         final String newDataString = """
               {
@@ -3436,10 +3417,7 @@ class ConditionalFieldRestorerTest {
         assertEquals(newDataNode, filteredFields);
     }
 
-    // Temoporary test Ignore as it is failing due to changes in sanitize field check in
-    //CosditionalFieldRestorer:processSubFieldsRecursively lines 115-116
-    @Ignore
-    //@Test
+    @Test
     void shouldKeepNullWhenComplexFieldIsNullInInnerComplexNestedObjectWithoutCreateAndReadPermission() {
         final String newDataString = """
              {
@@ -3541,10 +3519,7 @@ class ConditionalFieldRestorerTest {
         );
     }
 
-    // Temoporary test Ignore as it is failing due to changes in sanitize field check in
-    //CosditionalFieldRestorer:processSubFieldsRecursively lines 115-116
-    @Ignore
-    //@Test
+    @Test
     void shouldKeepNullWhenParentComplexFieldIsNullInObjectWithoutCreateAndReadPermission() {
         final String newDataString = """
               {
