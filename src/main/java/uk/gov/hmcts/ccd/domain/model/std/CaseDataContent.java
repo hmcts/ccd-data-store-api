@@ -6,12 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
-import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 
 @ToString
 public class CaseDataContent {
-    private final JcLogger jclogger = new JcLogger("CaseDataContent", true);
-
     private Event event;
     private Map<String, JsonNode> data;
 
@@ -46,20 +43,7 @@ public class CaseDataContent {
     @JsonProperty("supplementary_data_request")
     private Map<String, Map<String, Object>> supplementaryDataRequest;
 
-    private void jcdebug(final String method) {
-        try {
-            final String thisAsString = jclogger.printObjectToString(this);
-            if (thisAsString.contains("Confidential or sensitive information")) {
-                jclogger.jclog(method + " " + thisAsString);
-                jclogger.jclog(method + " CALL STACK = " + jclogger.getCallStackAsString());
-            }
-        } catch (Exception e) {
-            // Do nothing
-        }
-    }
-
     public Event getEvent() {
-        jcdebug("getEvent()");
         return event;
     }
 
