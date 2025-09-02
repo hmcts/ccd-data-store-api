@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
@@ -218,10 +219,11 @@ class DefaultValidateCaseFieldsOperationTest {
             buildJsonNodeDataWithOrganisationPolicyRole(null);
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
+        Executable validateCaseDetails = () -> validateCaseFieldsOperation.validateCaseDetails(
+            new OperationContext(CASE_TYPE_ID, caseDataContent));
+
         CaseValidationException caseValidationExceptionResult =
-            assertThrows(CaseValidationException.class,
-                () -> validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID,
-                    caseDataContent)));
+            assertThrows(CaseValidationException.class, validateCaseDetails);
 
         assertThat(caseValidationExceptionResult.getMessage(),
             containsString("Case data validation failed"));
@@ -242,11 +244,11 @@ class DefaultValidateCaseFieldsOperationTest {
             buildJsonNodeDataWithOrganisationPolicyRole("incorrect_role");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        CaseValidationException caseValidationExceptionResult =
-            assertThrows(CaseValidationException.class,
-                () -> validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID,
-                    caseDataContent)));
+        Executable validateCaseDetails = () -> validateCaseFieldsOperation.validateCaseDetails(
+            new OperationContext(CASE_TYPE_ID, caseDataContent));
 
+        CaseValidationException caseValidationExceptionResult =
+            assertThrows(CaseValidationException.class, validateCaseDetails);
 
         assertThat(caseValidationExceptionResult.getMessage(),
             containsString("Case data validation failed"));
@@ -278,11 +280,11 @@ class DefaultValidateCaseFieldsOperationTest {
         final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole(null);
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        CaseValidationException caseValidationExceptionResult =
-            assertThrows(CaseValidationException.class,
-                () -> validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID,
-                    caseDataContent)));
+        Executable validateCaseDetails = () -> validateCaseFieldsOperation.validateCaseDetails(
+            new OperationContext(CASE_TYPE_ID, caseDataContent));
 
+        CaseValidationException caseValidationExceptionResult =
+            assertThrows(CaseValidationException.class, validateCaseDetails);
 
         assertThat(caseValidationExceptionResult.getMessage(),
             containsString("Case data validation failed"));
@@ -302,10 +304,11 @@ class DefaultValidateCaseFieldsOperationTest {
             buildJsonNodeDataWithOrganisationPolicyRole("incorrect_role");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
+        Executable validateCaseDetails = () -> validateCaseFieldsOperation.validateCaseDetails(
+            new OperationContext(CASE_TYPE_ID, caseDataContent));
+
         CaseValidationException caseValidationExceptionResult =
-            assertThrows(CaseValidationException.class,
-                () -> validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID,
-                    caseDataContent)));
+            assertThrows(CaseValidationException.class, validateCaseDetails);
 
         assertThat(caseValidationExceptionResult.getMessage(),
             containsString("Case data validation failed"));
@@ -325,10 +328,14 @@ class DefaultValidateCaseFieldsOperationTest {
 
     @Test
     void shouldFailValidationIfNoContent() {
-        ValidationException exception =
-            assertThrows(ValidationException.class,
-                () -> validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID,null)));
-        assertThat(exception.getMessage(),
+
+        Executable validateCaseDetails = () -> validateCaseFieldsOperation.validateCaseDetails(
+            new OperationContext(CASE_TYPE_ID, null));
+
+        ValidationException validationExceptionResult =
+            assertThrows(ValidationException.class, validateCaseDetails);
+
+        assertThat(validationExceptionResult.getMessage(),
             startsWith("Cannot validate case field because of event is not specified"));
         verify(caseDefinitionRepository, never()).getCaseType(any());
         verify(caseTypeService, never()).validateData(anyMap(), any());
@@ -338,11 +345,13 @@ class DefaultValidateCaseFieldsOperationTest {
     void shouldFailValidationIfNoEventInContent() {
         doReturn(null).when(caseDataContent).getEvent();
 
-        ValidationException exception =
-            assertThrows(ValidationException.class,
-                () -> validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID,
-                caseDataContent)));
-        assertThat(exception.getMessage(),
+        Executable validateCaseDetails = () -> validateCaseFieldsOperation.validateCaseDetails(
+            new OperationContext(CASE_TYPE_ID, caseDataContent));
+
+        ValidationException validationExceptionResult =
+            assertThrows(ValidationException.class, validateCaseDetails);
+
+        assertThat(validationExceptionResult.getMessage(),
             startsWith("Cannot validate case field because of event is not specified"));
         verify(caseDefinitionRepository, never()).getCaseType(any());
         verify(caseTypeService, never()).validateData(anyMap(), any());
@@ -352,11 +361,13 @@ class DefaultValidateCaseFieldsOperationTest {
     void shouldFailValidationIfNoEventIdInContent() {
         doReturn(null).when(caseDataContent).getEventId();
 
-        ValidationException exception =
-            assertThrows(ValidationException.class,
-                () -> validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID,
-                caseDataContent)));
-        assertThat(exception.getMessage(),
+        Executable validateCaseDetails = () -> validateCaseFieldsOperation.validateCaseDetails(
+            new OperationContext(CASE_TYPE_ID, caseDataContent));
+
+        ValidationException validationExceptionResult =
+            assertThrows(ValidationException.class, validateCaseDetails);
+
+        assertThat(validationExceptionResult.getMessage(),
             startsWith("Cannot validate case field because of event is not specified"));
         verify(caseDefinitionRepository, never()).getCaseType(any());
         verify(caseTypeService, never()).validateData(anyMap(), any());
@@ -366,11 +377,13 @@ class DefaultValidateCaseFieldsOperationTest {
     void shouldFailValidationIfNoCaseType() {
         doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
-        ValidationException exception =
-            assertThrows(ValidationException.class,
-                () -> validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID,
-                caseDataContent)));
-        assertThat(exception.getMessage(),
+        Executable validateCaseDetails = () -> validateCaseFieldsOperation.validateCaseDetails(
+            new OperationContext(CASE_TYPE_ID, caseDataContent));
+
+        ValidationException validationExceptionResult =
+            assertThrows(ValidationException.class, validateCaseDetails);
+
+        assertThat(validationExceptionResult.getMessage(),
             startsWith("Cannot find case type definition for " + CASE_TYPE_ID));
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         verify(caseTypeService, never()).validateData(anyMap(), any());
@@ -380,11 +393,13 @@ class DefaultValidateCaseFieldsOperationTest {
     void shouldFailValidationIfEventIdNotFoundInCaseType() {
         doReturn("otherEvent").when(caseDataContent).getEventId();
 
-        ValidationException exception =
-            assertThrows(ValidationException.class,
-                () -> validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID,
-                caseDataContent)));
-        assertThat(exception.getMessage(),
+        Executable validateCaseDetails = () -> validateCaseFieldsOperation.validateCaseDetails(
+            new OperationContext(CASE_TYPE_ID, caseDataContent));
+
+        ValidationException validationExceptionResult =
+            assertThrows(ValidationException.class, validateCaseDetails);
+
+        assertThat(validationExceptionResult.getMessage(),
             startsWith("Cannot validate case field because of event otherEvent is not found in case type definition"));
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         verify(caseTypeService, never()).validateData(anyMap(), any());
