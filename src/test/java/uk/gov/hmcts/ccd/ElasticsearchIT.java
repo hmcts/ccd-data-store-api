@@ -666,8 +666,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .sort("invalid.keyword")
                 .build();
 
-            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, null,
-                400);
+            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, null, 400);
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),

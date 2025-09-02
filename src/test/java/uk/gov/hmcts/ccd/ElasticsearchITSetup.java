@@ -163,7 +163,7 @@ public class ElasticsearchITSetup {
         HttpPost request = new HttpPost(requestUrl);
         request.setHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
         request.setEntity(new StringEntity(bulkRequestBody, UTF_8));
-        log.info("Bulk request body:\n{}", bulkRequestBody);
+        log.debug("Bulk request body:\n{}", bulkRequestBody);
         httpClient.execute(request, response -> {
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode != 200) {
