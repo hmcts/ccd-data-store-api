@@ -49,7 +49,7 @@ public class JcLogger {
     public String printObjectToString(final Object object) {
         try {
             return MAPPER.writeValueAsString(object);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return "ERROR_WRITING_OBJECT";
         }
     }
