@@ -150,7 +150,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
     private static final String GET_CASE_HISTORY_FOR_EVENT =
         "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/"
-            + "events/%d/case-history";
+            + "events/%s/case-history";
 
     private static final String GET_CASE_EVENT_ENABLING_CONDITION = "/aggregated/caseworkers"
         + "/0/jurisdictions/PROBATE/case-types/"

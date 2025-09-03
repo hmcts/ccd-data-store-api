@@ -100,9 +100,9 @@ public class CallbackTest extends WireMockBaseTest {
     private static final String INVALID_CASE_TYPE_ID = "InvalidCallbackCase";
     private static final String JURISDICTION_ID = "TEST";
     private static final Integer USER_ID = 123;
-    private static final Long CASE_REFERENCE = 1504259907353545L;
-    private static final Long NON_EXISTENT_CASE_REFERENCE = 9999999999999995L;
-    private static final Long INVALID_CASE_REFERENCE = 1504259907L;
+    private static final String CASE_REFERENCE = "1504259907353545";
+    private static final String NON_EXISTENT_CASE_REFERENCE = "9999999999999995";
+    private static final String INVALID_CASE_REFERENCE = "1504259907";
 
     private static final String REFERENCE = "1504259907353529";
 
