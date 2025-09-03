@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.std;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
+import uk.gov.hmcts.ccd.util.EventDescriptionRedactor;
 
 @ToString
 public class Event {
@@ -15,10 +16,13 @@ public class Event {
     @JsonProperty("description")
     private String description;
 
+    private final EventDescriptionRedactor redactor = new EventDescriptionRedactor();
+
+    // eventId is "caseworker-add-note" in the scenario.
     private void jcdebug(final String method, final String value) {
         if (value != null && value.length() > 0) {
             jclogger.jclog(method + " eventId = " + eventId + " , value = " + value);
-            jclogger.jclog(method + " " + jclogger.getCallStackAsString());
+            jclogger.jclog(method + " eventId = " + eventId + " , CALL STACK = " + jclogger.getCallStackAsString());
         }
     }
 
@@ -42,7 +46,7 @@ public class Event {
 
     public String getDescription() {
         jcdebug("getDescription()", description);
-        return description;
+        return redactor.redact(description);
     }
 
     public void setDescription(String description) {
