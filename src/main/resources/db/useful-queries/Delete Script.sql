@@ -46,6 +46,14 @@ CREATE TEMP TABLE tmp_case_data_ids ON COMMIT DROP AS
         select id from tmp_case_data_ids
     );
 
+    DELETE FROM case_link WHERE case_id IN (
+	select id from tmp_case_data_ids
+    );
+
+    DELETE FROM case_link WHERE linked_case_id IN (
+	select id from tmp_case_data_ids
+    );
+
     DELETE FROM case_data WHERE id in (select id from tmp_case_data_ids);
 
 END $$;
