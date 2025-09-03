@@ -46,9 +46,26 @@ public class CaseDataContent {
     @JsonProperty("supplementary_data_request")
     private Map<String, Map<String, Object>> supplementaryDataRequest;
 
+    private String[] getStringArray() {
+        return new String[] {
+            event.toString(),
+            data.toString(),
+            eventData.toString(),
+            securityClassification,
+            dataClassification.toString(),
+            token,
+            ignoreWarning.toString(),
+            draftId,
+            caseReference,
+            onBehalfOfUserToken,
+            onBehalfOfId,
+            supplementaryDataRequest.toString()
+        };
+    }
+
     private void jcdebug(final String method) {
         try {
-            final String thisAsString = jclogger.printObjectToString(this);
+            final String thisAsString = jclogger.printObjectToString(getStringArray());
             if (thisAsString.contains("Confidential or sensitive information")) {
                 jclogger.jclog(method + " " + thisAsString);
                 jclogger.jclog(method + " CALL STACK = " + jclogger.getCallStackAsString());
