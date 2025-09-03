@@ -59,103 +59,128 @@ public class CaseDataContent {
     }
 
     public Event getEvent() {
+        jcdebug("getEvent()");
         return event;
     }
 
     @JsonIgnore
     public String getEventId() {
+        jcdebug("getEventId()");
         return event.getEventId();
     }
 
     public void setEvent(Event event) {
+        jcdebug("setEvent()");
         this.event = event;
     }
 
     public Map<String, JsonNode> getData() {
+        jcdebug("getData()");
         return data;
     }
 
     public void setData(Map<String, JsonNode> data) {
+        jcdebug("setData()");
         this.data = data;
     }
 
     public Map<String, JsonNode> getEventData() {
+        jcdebug("getEventData()");
         return eventData;
     }
 
     public void setEventData(Map<String, JsonNode> eventData) {
+        jcdebug("setEventData()");
         this.eventData = eventData;
     }
 
     public String getSecurityClassification() {
+        jcdebug("getSecurityClassification()");
         return securityClassification;
     }
 
     public void setSecurityClassification(String securityClassification) {
+        jcdebug("setSecurityClassification()");
         this.securityClassification = securityClassification;
     }
 
     public Map<String, JsonNode> getDataClassification() {
+        jcdebug("getDataClassification()");
         return dataClassification;
     }
 
     public void setDataClassification(Map<String, JsonNode> dataClassification) {
+        jcdebug("setDataClassification()");
         this.dataClassification = dataClassification;
     }
 
     public String getToken() {
+        jcdebug("getToken()");
         return token;
     }
 
     public void setToken(String token) {
+        jcdebug("setToken()");
         this.token = token;
     }
 
     public Boolean getIgnoreWarning() {
+        jcdebug("getIgnoreWarning()");
         return ignoreWarning == null ? Boolean.FALSE : ignoreWarning;
     }
 
     public void setIgnoreWarning(Boolean ignoreWarning) {
+        jcdebug("setIgnoreWarning()");
         this.ignoreWarning = ignoreWarning;
     }
 
     public String getDraftId() {
+        jcdebug("getDraftId()");
         return draftId;
     }
 
     public void setDraftId(String draftId) {
+        jcdebug("setDraftId()");
         this.draftId = draftId;
     }
 
     public String getCaseReference() {
+        jcdebug("getCaseReference()");
         return caseReference;
     }
 
     public void setCaseReference(String caseReference) {
+        jcdebug("setCaseReference()");
         this.caseReference = caseReference;
     }
 
     public String getOnBehalfOfUserToken() {
+        jcdebug("getOnBehalfOfUserToken()");
         return onBehalfOfUserToken;
     }
 
     public void setOnBehalfOfUserToken(String onBehalfOfUserToken) {
+        jcdebug("setOnBehalfOfUserToken()");
         this.onBehalfOfUserToken = onBehalfOfUserToken;
     }
 
     public String getOnBehalfOfId() {
+        jcdebug("getOnBehalfOfId()");
         return onBehalfOfId;
     }
 
     public void setOnBehalfOfId(String onBehalfOfId) {
+        jcdebug("setOnBehalfOfId()");
         this.onBehalfOfId = onBehalfOfId;
     }
 
     public Map<String, Map<String, Object>> getSupplementaryDataRequest() {
+        jcdebug("getSupplementaryDataRequest()");
         return supplementaryDataRequest;
     }
 
     public void setSupplementaryDataRequest(Map<String, Map<String, Object>> supplementaryDataRequest) {
+        jcdebug("setSupplementaryDataRequest()");
         this.supplementaryDataRequest = supplementaryDataRequest;
     }
 }
