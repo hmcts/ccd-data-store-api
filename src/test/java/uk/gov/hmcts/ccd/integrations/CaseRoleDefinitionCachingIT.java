@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -26,6 +27,7 @@ import static java.util.Collections.singletonList;
 @SpringBootTest
 @AutoConfigureWireMock(port = 0)
 @TestPropertySource(locations = "classpath:test.properties")
+@DirtiesContext
 public class CaseRoleDefinitionCachingIT {
 
     @Autowired
