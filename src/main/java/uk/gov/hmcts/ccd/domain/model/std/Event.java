@@ -3,7 +3,13 @@ package uk.gov.hmcts.ccd.domain.model.std;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
-import uk.gov.hmcts.ccd.util.EventDescriptionRedactor;
+import uk.gov.hmcts.ccd.domain.types.EventDescriptionRedactor;
+
+/*
+ * Updates :-
+ * 1. Have added logging to EmailValidator, to check how CaseFieldDefinition is passed to EmailValidator.
+ * 2. Have added logging to EventDescriptionRedactor , to check access to emailBaseType.getRegularExpression().
+ */
 
 @ToString
 public class Event {
