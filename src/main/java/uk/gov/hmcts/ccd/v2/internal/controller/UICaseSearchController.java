@@ -1,15 +1,14 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import com.google.common.base.Strings;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.SwaggerDefinition;
-import io.swagger.annotations.Tag;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -47,11 +46,8 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 @RestController
 @RequestMapping(path = "/internal/searchCases", consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(tags = {"Elastic Based Search API"})
-@SwaggerDefinition(tags = {
-    @Tag(name = "Elastic Based Search API", description = "Internal ElasticSearch based case search API, "
+@Tag(name = "Elastic Based Search API", description = "Internal ElasticSearch based case search API, "
         + "returning extra information required by the UI for display purposes on a UI.")
-})
 @Slf4j
 public class UICaseSearchController {
 
@@ -75,55 +71,53 @@ public class UICaseSearchController {
     }
 
     @PostMapping(path = "")
-    @ApiOperation(
-        value = "Search cases according to the provided ElasticSearch query. Supports searching a single case type and"
-            + " a use case."
+    @Operation(
+        description = "Search cases according to the provided ElasticSearch query. Supports searching a single"
+        + " case type and a use case."
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success.",
-            response = CaseSearchResultViewResource.class
-            ),
-        @ApiResponse(
-            code = 400,
-            message = "Request is invalid. For some other types HTTP code 500 is returned instead.\n"
-                      + "Examples include:\n"
-                      + "- Unsupported use case specified in `usecase` query parameter.\n"
-                      + "- No case type query parameter `ctid` provided.\n"
-                      + "- Query is missing required `query` field.\n"
-                      + "- Query includes blacklisted type.\n"
-                      + "- Query has failed in ElasticSearch - for example, a sort is attempted on an unknown/unmapped field.\n"
-                      + "- Query includes supplementary_data which is NOT an array of text values.\n"
-            ),
-        @ApiResponse(
-            code = 401,
-            message = "Request doesn't include a valid `Authorization` header. "
-                      + "This applies to all missing, malformed & expired tokens."
-            ),
-        @ApiResponse(
-            code = 403,
-            message = "Request doesn't include a valid `ServiceAuthorization` header. "
-                      + "This applies to all missing, malformed & expired tokens.\n"
-                      + "A valid S2S token issued to the name of a non-permitted API Client will also return the same."
-            ),
-        @ApiResponse(
-            code = 404,
-            message = "Case type specified in `ctid` query parameter could not be found."
-            ),
-        @ApiResponse(
-            code = 500,
-            message = "An unexpected situation that is not attributable to the user or API Client; "
-                      + "or request is invalid. For some other types HTTP code 400 is returned instead.\n"
-                      + "Invalid request examples include:\n"
-                      + "- Malformed JSON request."
-            )
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success.",
+        content = @Content(schema = @Schema(implementation = CaseSearchResultViewResource.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Request is invalid. For some other types HTTP code 500 is returned instead.\n"
+                  + "Examples include:\n"
+                  + "- Unsupported use case specified in `usecase` query parameter.\n"
+                  + "- No case type query parameter `ctid` provided.\n"
+                  + "- Query is missing required `query` field.\n"
+                  + "- Query includes blacklisted type.\n"
+                  + "- Query has failed in ElasticSearch - for example, a sort is attempted on an unknown/unmapped field.\n"
+                  + "- Query includes supplementary_data which is NOT an array of text values.\n"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Request doesn't include a valid `Authorization` header. "
+                  + "This applies to all missing, malformed & expired tokens."
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Request doesn't include a valid `ServiceAuthorization` header. "
+                  + "This applies to all missing, malformed & expired tokens.\n"
+                  + "A valid S2S token issued to the name of a non-permitted API Client will also return the same."
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Case type specified in `ctid` query parameter could not be found."
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "An unexpected situation that is not attributable to the user or API Client; "
+                  + "or request is invalid. For some other types HTTP code 400 is returned instead.\n"
+                  + "Invalid request examples include:\n"
+                  + "- Malformed JSON request."
+    )
     @SuppressWarnings("checkstyle:LineLength") // don't want to break message
-    @ApiImplicitParams(
-        @ApiImplicitParam(
+    @Parameters(
+        @Parameter(
             name = "jsonSearchRequest",
-            value = "A wrapped native ElasticSearch Search API request as a JSON string. "
+            description = "A wrapped native ElasticSearch Search API request as a JSON string. "
                     + "Please refer to the following for further information:\n"
                     + "- [Official ElasticSearch Documentation - Search APIs]"
                     + "(https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html)\n"
@@ -142,9 +136,9 @@ public class UICaseSearchController {
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, caseTypeIds = "#caseTypeIds",
         caseId = "T(uk.gov.hmcts.ccd.v2.internal.controller.UICaseSearchController).buildCaseIds(#result)")
     public ResponseEntity<CaseSearchResultViewResource> searchCases(
-                                     @ApiParam(value = "Case type ID for search.", required = true)
+                                     @Parameter(name = "Case type ID for search.", required = true)
                                      @RequestParam(value = "ctid") String caseTypeId,
-                                     @ApiParam(value = "Use case for search. Examples include `WORKBASKET`, `SEARCH` "
+                                     @Parameter(name = "Use case for search. Examples include `WORKBASKET`, `SEARCH` "
                                          + "or `orgCases`. Used when the list of fields to return is configured in the "
                                          + "CCD definition.\nIf omitted, all case fields are returned.")
                                      @RequestParam(value = "use_case", required = false) final String useCase,
