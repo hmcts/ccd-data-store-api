@@ -53,12 +53,4 @@ public class JcLogger {
             return "ERROR_WRITING_OBJECT";
         }
     }
-
-    public String printStringArray(final String[] stringArray) {
-        final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < stringArray.length; i++) {
-            sb.append(stringArray[i]).append("\t");
-        }
-        return sb.toString();
-    }
 }

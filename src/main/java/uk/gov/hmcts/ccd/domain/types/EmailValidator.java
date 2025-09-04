@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -17,6 +18,8 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 @Named
 @Singleton
 public class EmailValidator implements BaseTypeValidator {
+    private final JcLogger jclogger = new JcLogger("EmailValidator", true);
+
     static final String TYPE_ID = "Email";
 
     @Override
@@ -28,6 +31,8 @@ public class EmailValidator implements BaseTypeValidator {
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
+        // Add logging here to check how CaseFieldDefinition is passed to EmailValidator.
+        jclogger.jclog("validate() CALL STACK = " + jclogger.getCallStackAsString());
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
