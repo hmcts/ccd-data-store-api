@@ -35,12 +35,10 @@ public class Event {
     }
 
     public String getSummary() {
-        jcdebug("getSummary()", summary);
         return summary;
     }
 
     public void setSummary(String summary) {
-        jcdebug("setSummary()", summary);
         this.summary = summary;
     }
 
