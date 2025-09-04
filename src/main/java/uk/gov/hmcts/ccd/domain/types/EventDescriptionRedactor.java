@@ -12,7 +12,7 @@ public class EventDescriptionRedactor {
     private final BaseType emailBaseType = BaseType.get("Email");
 
     public String redact(final String description) {
-        if (emailBaseType == null) {
+        if (emailBaseType == null || emailBaseType.getRegularExpression() == null) {
             jclogger.jclog("redact() emailBaseType == null");
         } else {
             jclogger.jclog("redact() " + emailBaseType.getRegularExpression());
