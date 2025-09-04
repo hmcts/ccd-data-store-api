@@ -7,6 +7,9 @@ public enum DataType {
     COLLECTION("collection"),
     COMPLEX("complex");
 
+    private final String dataType;
+
     DataType(String dataType) {
+        this.dataType = dataType;
     }
 }
