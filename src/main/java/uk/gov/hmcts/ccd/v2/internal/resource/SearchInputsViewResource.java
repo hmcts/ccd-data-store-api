@@ -7,8 +7,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
+import uk.gov.hmcts.ccd.domain.model.search.DataType;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
+import uk.gov.hmcts.ccd.util.FieldTypeUtil;
 import uk.gov.hmcts.ccd.v2.internal.controller.UIDefinitionController;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -27,6 +29,7 @@ public class SearchInputsViewResource extends RepresentationModel {
         private String label;
         private int order;
         private Field field;
+        private DataType dataType;
         @JsonProperty("display_context_parameter")
         private String displayContextParameter;
     }
@@ -48,6 +51,7 @@ public class SearchInputsViewResource extends RepresentationModel {
         searchInputView.setField(searchInput.getField());
         searchInputView.setLabel(searchInput.getLabel());
         searchInputView.setOrder(searchInput.getOrder());
+        searchInputView.setDataType(FieldTypeUtil.getDataTypeFromField(searchInput.getField()));
         searchInputView.setDisplayContextParameter(searchInput.getDisplayContextParameter());
         return searchInputView;
     }
