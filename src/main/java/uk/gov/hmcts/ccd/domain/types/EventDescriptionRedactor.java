@@ -9,9 +9,8 @@ public class EventDescriptionRedactor {
     //       See EmailValidator , EmailValidatorTest , BaseType.
     private static final String EMAIL_PATTERN = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
 
-    private final BaseType emailBaseType = BaseType.get("Email");
-
     public String redact(final String description) {
+        final BaseType emailBaseType = getEmailBaseType();
         if (emailBaseType == null || emailBaseType.getRegularExpression() == null) {
             jclogger.jclog("redact() emailBaseType == null");
         } else {
@@ -22,6 +21,15 @@ public class EventDescriptionRedactor {
             return null;
         } else {
             return description.replaceAll(EMAIL_PATTERN, "[REDACTED EMAIL]");
+        }
+    }
+
+    private BaseType getEmailBaseType() {
+        try {
+            return BaseType.get("Email");
+        } catch (Exception e) {
+            jclogger.jclog("getEmailBaseType() emailBaseType == null");
+            return null;
         }
     }
 
