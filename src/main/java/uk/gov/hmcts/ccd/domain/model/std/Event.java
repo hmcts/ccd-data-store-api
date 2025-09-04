@@ -13,7 +13,7 @@ public class Event {
     private String eventId;
     @JsonProperty("summary")
     private String summary;
-    @JsonProperty("description")
+
     private String description;
 
     private final EventDescriptionRedactor redactor = new EventDescriptionRedactor();
@@ -44,11 +44,13 @@ public class Event {
         this.summary = summary;
     }
 
+    @JsonProperty("description")
     public String getDescription() {
         jcdebug("getDescription()", description);
         return redactor.redact(description);
     }
 
+    @JsonProperty("description")
     public void setDescription(String description) {
         jcdebug("setDescription()", description);
         this.description = description;
