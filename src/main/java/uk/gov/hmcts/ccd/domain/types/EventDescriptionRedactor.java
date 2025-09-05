@@ -12,13 +12,20 @@ public class EventDescriptionRedactor {
 
     // TODO: Resolve compliance with S5852 (polynomial runtime regex).
     //       See EmailValidator , EmailValidatorTest , BaseType.
-    private static final String EMAIL_PATTERN = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
+
+    // Original EMAIL_PATTERN
+    private static final String EMAIL_PATTERN1 = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
+    // Improved, S5852-compliant version
+    private static final String EMAIL_PATTERN2 = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,10}";
+    // Optional (with atomic groups for extra safety, if Java 9+)
+    private static final String EMAIL_PATTERN3 = "(?>[a-zA-Z0-9._%+-]+)@(?>[a-zA-Z0-9.-]+)\\.[a-zA-Z]{2,10}";
 
     @Autowired
     @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
     DefaultCaseDefinitionRepository defaultCaseDefinitionRepository;
 
     public String redact(final String description) {
+        // The result of below is "emailBaseType.getRegularExpression() == null"
         BaseType emailBaseType = getEmailBaseType1();
         if (emailBaseType == null) {
             jclogger.jclog("redact() #1","emailBaseType == null");
@@ -28,6 +35,7 @@ public class EventDescriptionRedactor {
             jclogger.jclog("redact() #1", emailBaseType.getRegularExpression());
         }
 
+        // The result of below is "emailBaseType == null"
         emailBaseType = getEmailBaseType2();
         if (emailBaseType == null) {
             jclogger.jclog("redact() #2","emailBaseType == null");
@@ -40,10 +48,11 @@ public class EventDescriptionRedactor {
         if (description == null) {
             return null;
         } else {
-            return description.replaceAll(EMAIL_PATTERN, "[REDACTED EMAIL]");
+            return description.replaceAll(EMAIL_PATTERN3, "[REDACTED EMAIL]");
         }
     }
 
+    // Does return an emailBaseType , but
     private BaseType getEmailBaseType1() {
         try {
             final BaseType emailBaseType = BaseType.get("Email");
@@ -55,10 +64,11 @@ public class EventDescriptionRedactor {
         }
     }
 
+    // Suspect Autowired defaultCaseDefinitionRepository == null , but to be confirmed.
     private BaseType getEmailBaseType2() {
         try {
             jclogger.jclog("getEmailBaseType2()","defaultCaseDefinitionRepository = "
-                + defaultCaseDefinitionRepository.toString());
+                + (defaultCaseDefinitionRepository == null ? "" : defaultCaseDefinitionRepository.toString()));
             BaseType.setCaseDefinitionRepository(defaultCaseDefinitionRepository);
             final BaseType emailBaseType = BaseType.get("Email");
             jclogger.jclog("getEmailBaseType2()","emailBaseType = " + emailBaseType.toString());
