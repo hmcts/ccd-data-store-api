@@ -8,8 +8,15 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
+import static uk.gov.hmcts.ccd.util.FieldTestUtil.field;
+import static uk.gov.hmcts.ccd.util.FieldTestUtil.simpleField;
 
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 
 import java.util.List;
@@ -19,6 +26,8 @@ import org.springframework.hateoas.Link;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
+import uk.gov.hmcts.ccd.util.FieldTestUtil;
 import uk.gov.hmcts.ccd.util.PathFromUrlUtil;
 
 class WorkbasketInputsViewResourceTest {
@@ -50,6 +59,45 @@ class WorkbasketInputsViewResourceTest {
         Optional<Link> self = resource.getLink("self");
 
         assertThat(PathFromUrlUtil.getActualPath(self.get().getHref()), equalTo(LINK_SELF));
+    }
+
+    @Test
+    @DisplayName("should workbasket inputs with complex and Collection field")
+    void shouldWorkbasketInputsWithComplexCollectionField() {
+
+        TestBuildersUtil.FieldTypeBuilder fieldTypeBuilder = aFieldType();
+        fieldTypeBuilder.withType(COLLECTION);
+        fieldTypeBuilder.withComplexField(simpleField("Three", 1));
+        fieldTypeBuilder.withComplexField(simpleField("One", 2));
+        fieldTypeBuilder.withComplexField(simpleField("Two", 3));
+        FieldTypeDefinition collectionComplexFieldTypeDefinition = fieldTypeBuilder
+            .build();
+
+        Field field = field(FieldTestUtil.COLLECTION_FIELD, aFieldType()
+            .withType(COLLECTION)
+            .withCollectionFieldType(collectionComplexFieldTypeDefinition)
+            .build());
+        WorkbasketInput workbasketInput3 = aWorkbasketInput().withField(field).build();
+
+        Field field1 = field(FieldTestUtil.COMPLEX_FIELD, aFieldType().withId(FieldTestUtil.COMPLEX_FIELD)
+            .withType(FieldTypeDefinition.COMPLEX).withComplexField(
+                newCaseField().withId("OtherNestedField")
+                    .withFieldType(FieldTestUtil.fieldType("Date")).build()).build());
+        WorkbasketInput workbasketInput4 = aWorkbasketInput().withField(field1).build();
+
+        WorkbasketInput[] workbasketInputs1 = new WorkbasketInput[]{
+            workbasketInput3, workbasketInput4
+        };
+        final WorkbasketInputsViewResource resource = new WorkbasketInputsViewResource(workbasketInputs1, CASE_TYPE_ID);
+
+        List<WorkbasketInputsViewResource.WorkbasketInputView> workbasketInputs =
+            Lists.newArrayList(resource.getWorkbasketInputs());
+        assertAll(
+            () -> assertThat(resource.getWorkbasketInputs(), not(sameInstance(this.workbasketInputs))),
+            () -> assertThat(workbasketInputs, hasItems(hasProperty("field",
+                    hasProperty("id", is(FieldTestUtil.COLLECTION_FIELD))),
+                hasProperty("field", hasProperty("id", is(FieldTestUtil.COMPLEX_FIELD)))))
+        );
     }
 
 }
