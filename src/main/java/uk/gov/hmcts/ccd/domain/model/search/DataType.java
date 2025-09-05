@@ -12,4 +12,9 @@ public enum DataType {
     DataType(String fieldType) {
         this.fieldType = fieldType;
     }
+
+    @Override
+    public String toString() {
+        return this.fieldType;
+    }
 }

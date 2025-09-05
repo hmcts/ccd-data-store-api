@@ -11,16 +11,16 @@ public class FieldTypeUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldTypeUtil.class);
 
-    public static DataType getDataTypeFromField(final Field field) {
+    public static String getDataTypeFromField(final Field field) {
         if (field != null && field.getType() != null) {
             LOG.info("Field Type : {}", field.getType());
             if (field.getType().getCollectionFieldTypeDefinition() != null
                 && field.getType().getCollectionFieldTypeDefinition().isCollectionFieldType()) {
-                return DataType.COLLECTION;
+                return DataType.COLLECTION.toString();
             } else {
-                if (field.getType().getCollectionFieldTypeDefinition() != null
+                if (field.getType().getComplexFields() != null
                     && field.getType() != null && field.getType().isComplexFieldType()) {
-                    return DataType.COMPLEX;
+                    return DataType.COMPLEX.toString();
                 }
             }
         }

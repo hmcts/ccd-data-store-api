@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
-import uk.gov.hmcts.ccd.domain.model.search.DataType;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.util.FieldTypeUtil;
@@ -27,7 +26,7 @@ public class WorkbasketInputsViewResource extends RepresentationModel {
         private String label;
         private int order;
         private Field field;
-        private DataType dataType;
+        private String dataType;
         @JsonProperty("display_context_parameter")
         private String displayContextParameter;
     }
