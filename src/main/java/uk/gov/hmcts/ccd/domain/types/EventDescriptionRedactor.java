@@ -57,8 +57,8 @@ public class EventDescriptionRedactor {
 
     private BaseType getEmailBaseType2() {
         try {
-            jclogger.jclog("getEmailBaseType2()","defaultCaseDefinitionRepository = " +
-                defaultCaseDefinitionRepository.toString());
+            jclogger.jclog("getEmailBaseType2()","defaultCaseDefinitionRepository = "
+                + defaultCaseDefinitionRepository.toString());
             BaseType.setCaseDefinitionRepository(defaultCaseDefinitionRepository);
             final BaseType emailBaseType = BaseType.get("Email");
             jclogger.jclog("getEmailBaseType2()","emailBaseType = " + emailBaseType.toString());
