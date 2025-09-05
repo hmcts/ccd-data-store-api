@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
+import uk.gov.hmcts.ccd.util.EventDescriptionRedactor;
 
 @ToString
 public class Event {
@@ -9,8 +10,10 @@ public class Event {
     private String eventId;
     @JsonProperty("summary")
     private String summary;
-    @JsonProperty("description")
+
     private String description;
+
+    private final EventDescriptionRedactor redactor = new EventDescriptionRedactor();
 
     public String getEventId() {
         return eventId;
@@ -28,10 +31,12 @@ public class Event {
         this.summary = summary;
     }
 
+    @JsonProperty("description")
     public String getDescription() {
-        return description;
+        return redactor.redact(description);
     }
 
+    @JsonProperty("description")
     public void setDescription(String description) {
         this.description = description;
     }
