@@ -13,6 +13,7 @@ public class FieldTypeUtil {
 
     public static DataType getDataTypeFromField(final Field field) {
         if (field != null && field.getType() != null) {
+            LOG.info("Field Type : {}", field.getType());
             if (field.getType().getCollectionFieldTypeDefinition() != null
                 && field.getType().getCollectionFieldTypeDefinition().isCollectionFieldType()) {
                 return DataType.COLLECTION;
