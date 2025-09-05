@@ -4,11 +4,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BaseType {
+    private static final JcLogger jclogger = new JcLogger("BaseType", true);
+
     private static final Map<String, BaseType> BASE_TYPES = new HashMap<>();
     private static CaseDefinitionRepository caseDefinitionRepository;
     private static Boolean initialised = Boolean.FALSE;
@@ -34,6 +37,7 @@ public class BaseType {
             BaseType.caseDefinitionRepository.getBaseTypes()
                 .forEach(fieldType -> BaseType.register(new BaseType(fieldType)));
             BaseType.initialised = Boolean.TRUE;
+            jclogger.jclog("initialise()", BASE_TYPES.size() + " " + BASE_TYPES.toString());
         }
     }
 

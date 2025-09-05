@@ -32,7 +32,7 @@ public class EmailValidator implements BaseTypeValidator {
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
         // Add logging here to check how CaseFieldDefinition is passed to EmailValidator.
-        jclogger.jclog("validate() CALL STACK = " + jclogger.getCallStackAsString());
+        jclogger.jclog("validate()","CALL STACK = " + jclogger.getCallStackAsString());
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }

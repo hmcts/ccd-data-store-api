@@ -11,10 +11,12 @@ public class EventDescriptionRedactor {
 
     public String redact(final String description) {
         final BaseType emailBaseType = getEmailBaseType();
-        if (emailBaseType == null || emailBaseType.getRegularExpression() == null) {
-            jclogger.jclog("redact() emailBaseType == null");
+        if (emailBaseType == null) {
+            jclogger.jclog("redact()","emailBaseType == null");
+        } else if (emailBaseType.getRegularExpression() == null) {
+            jclogger.jclog("redact()", "emailBaseType.getRegularExpression() == null");
         } else {
-            jclogger.jclog("redact() " + emailBaseType.getRegularExpression());
+            jclogger.jclog("redact()", emailBaseType.getRegularExpression());
         }
 
         if (description == null) {
@@ -26,11 +28,12 @@ public class EventDescriptionRedactor {
 
     private BaseType getEmailBaseType() {
         try {
-            return BaseType.get("Email");
+            final BaseType emailBaseType = BaseType.get("Email");
+            jclogger.jclog("getEmailBaseType()","emailBaseType = " + emailBaseType.toString());
+            return emailBaseType;
         } catch (Exception e) {
-            jclogger.jclog("getEmailBaseType() emailBaseType == null");
+            jclogger.jclog("getEmailBaseType()","emailBaseType == null");
             return null;
         }
     }
-
 }

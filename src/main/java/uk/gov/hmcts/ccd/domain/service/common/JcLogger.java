@@ -5,6 +5,14 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 
+/*
+ * Logging enabled in classes :-
+ * BaseType                  initialise()
+ * EmailValidator            validate()
+ * Event                     getDescription() , setDescription()
+ * EventDescriptionRedactor  getEmailBaseType() , redact()
+ */
+
 public class JcLogger {
 
     private static final Logger LOG = LoggerFactory.getLogger(JcLogger.class);
@@ -21,9 +29,9 @@ public class JcLogger {
     /**
      * Log message.
      */
-    public void jclog(String message) {
+    public void jclog(String method, String message) {
         if (logEnabled) {
-            LOG.info("| JCDEBUG: Info: {}: {}", className, message);
+            LOG.info("| JCDEBUG: Info: {}: {} {}", className, method, message);
             // LOG.warn("| JCDEBUG: Warn: {}: {}", className, message);
             // LOG.error("| JCDEBUG: Error: {}: {}", className, message);
             // LOG.debug("| JCDEBUG: Debug: {}: {}", className, message);

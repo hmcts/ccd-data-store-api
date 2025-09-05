@@ -6,9 +6,9 @@ import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.domain.types.EventDescriptionRedactor;
 
 /*
- * Updates :-
- * 1. Have added logging to EmailValidator, to check how CaseFieldDefinition is passed to EmailValidator.
- * 2. Have added logging to EventDescriptionRedactor , to check access to emailBaseType.getRegularExpression().
+ * QUESTIONS :-
+ * 1. EventDescriptionRedactor  --  Does it have access to emailBaseType.getRegularExpression() ?  Looks like NO.
+ * 2. EmailValidator  --  How is CaseFieldDefinition passed to EmailValidator ?
  */
 
 @ToString
@@ -27,8 +27,8 @@ public class Event {
     // eventId is "caseworker-add-note" in the scenario.
     private void jcdebug(final String method, final String value) {
         if (value != null && value.length() > 0) {
-            jclogger.jclog(method + " eventId = " + eventId + " , value = " + value);
-            jclogger.jclog(method + " eventId = " + eventId + " , CALL STACK = " + jclogger.getCallStackAsString());
+            jclogger.jclog(method, " eventId = " + eventId + " , value = " + value);
+            jclogger.jclog(method, " eventId = " + eventId + " , CALL STACK = " + jclogger.getCallStackAsString());
         }
     }
 
