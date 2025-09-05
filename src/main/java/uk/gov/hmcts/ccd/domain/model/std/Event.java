@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.domain.types.EventDescriptionRedactor;
 /*
  * QUESTIONS :-
  * 1. EventDescriptionRedactor  --  Does it have access to emailBaseType.getRegularExpression() ?  Looks like NO.
- * 2. EmailValidator  --  How is CaseFieldDefinition passed to EmailValidator ?
+ * 2. EmailValidator  --  How is CaseFieldDefinition passed to EmailValidator ?  See CaseDataValidator line 40.
  */
 
 @ToString

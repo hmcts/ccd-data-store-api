@@ -34,6 +34,8 @@ public class BaseType {
      */
     public static synchronized void initialise() {
         if (!BaseType.initialised) {
+            jclogger.jclog("initialise()", BaseType.caseDefinitionRepository == null ? "NULL" :
+                BaseType.caseDefinitionRepository.toString());
             BaseType.caseDefinitionRepository.getBaseTypes()
                 .forEach(fieldType -> BaseType.register(new BaseType(fieldType)));
             BaseType.initialised = Boolean.TRUE;
