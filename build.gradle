@@ -254,12 +254,8 @@ dependencies {
     implementation (group: 'org.elasticsearch', name: 'elasticsearch', version: elasticsearchVersion) {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
-    implementation (group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticsearchVersion) {
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
-    }
     implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticsearchVersion
     implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: elasticsearchVersion
-    implementation group: 'org.glassfish', name: 'jakarta.json', version: '2.0.1'
 
     implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
     implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
