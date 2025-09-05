@@ -6,7 +6,6 @@ import uk.gov.hmcts.ccd.util.EventDescriptionRedactor;
 
 @ToString
 public class Event {
-
     @JsonProperty("id")
     private String eventId;
     @JsonProperty("summary")

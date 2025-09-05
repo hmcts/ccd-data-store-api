@@ -17,7 +17,6 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 @Named
 @Singleton
 public class EmailValidator implements BaseTypeValidator {
-
     static final String TYPE_ID = "Email";
 
     @Override
