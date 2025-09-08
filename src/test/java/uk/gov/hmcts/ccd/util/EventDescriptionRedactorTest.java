@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.util;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -14,24 +16,13 @@ class EventDescriptionRedactorTest {
         assertNull(redactor.redact(null));
     }
 
-    @Test
-    void shouldNotRedactPlainText() {
-        String input = "Plain text.";
-        String expected = "Plain text.";
-        assertEquals(expected, redactor.redact(input));
-    }
-
-    @Test
-    void shouldRedactSingleEmail() {
-        String input = "Contact me at john.doe@example.com for details.";
-        String expected = "Contact me at [REDACTED EMAIL] for details.";
-        assertEquals(expected, redactor.redact(input));
-    }
-
-    @Test
-    void shouldRedactMultipleEmails() {
-        String input = "Emails: alice@example.com, bob.smith@domain.co.uk";
-        String expected = "Emails: [REDACTED EMAIL], [REDACTED EMAIL]";
+    @ParameterizedTest
+    @CsvSource({
+        "Plain text, Plain text",
+        "Contact me at john.doe@example.com for details, Contact me at [REDACTED EMAIL] for details",
+        "Emails: alice@example.com; bob.smith@domain.co.uk, Emails: [REDACTED EMAIL]; [REDACTED EMAIL]"
+    })
+    void testRedactor(String input, String expected) {
         assertEquals(expected, redactor.redact(input));
     }
 }
