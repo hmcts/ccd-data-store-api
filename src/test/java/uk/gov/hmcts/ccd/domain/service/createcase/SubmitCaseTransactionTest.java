@@ -198,13 +198,16 @@ class SubmitCaseTransactionTest {
         doReturn("TestType").when(savedCaseDetails).getCaseTypeId();
         doReturn("TestJurisdiction").when(savedCaseDetails).getJurisdiction();
 
+        doReturn("12345").when(caseDetails).getReferenceAsString();
+        doReturn("TestType").when(caseDetails).getCaseTypeId();
+        doReturn("TestJurisdiction").when(caseDetails).getJurisdiction();
+
         // Setup DecentralisedCaseDetails mock
         savedDecentralisedCaseDetails = new DecentralisedCaseDetails();
         savedDecentralisedCaseDetails.setCaseDetails(savedCaseDetails);
         savedDecentralisedCaseDetails.setVersion(1L);
 
-        // Mock case pointer repository to return a case pointer
-        doReturn(savedCaseDetails).when(casePointerRepository).persistCasePointer(caseDetails);
+        doNothing().when(casePointerRepository).persistCasePointerAndInitId(caseDetails);
 
         doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
                                                                              null,
@@ -380,13 +383,13 @@ class SubmitCaseTransactionTest {
 
         assertAll(
             () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
-            () -> verify(casePointerRepository).persistCasePointer(caseDetails),
+            () -> verify(casePointerRepository).persistCasePointerAndInitId(caseDetails),
             () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
                 event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.empty()),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
             () -> verify(caseAuditEventRepository, never()).set(isNotNull()),
-            () -> verify(caseDataAccessControl).grantAccess(savedCaseDetails, IDAM_ID),
+            () -> verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID),
             () -> verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList())
         );
     }
@@ -410,13 +413,13 @@ class SubmitCaseTransactionTest {
 
         assertAll(
             () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
-            () -> verify(casePointerRepository).persistCasePointer(caseDetails),
+            () -> verify(casePointerRepository).persistCasePointerAndInitId(caseDetails),
             () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
                 event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.of(onBehalfOfUser)),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
             () -> verify(caseAuditEventRepository, never()).set(isNotNull()),
-            () -> verify(caseDataAccessControl).grantAccess(savedCaseDetails, IDAM_ID),
+            () -> verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID),
             () -> verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList())
         );
     }
@@ -437,7 +440,7 @@ class SubmitCaseTransactionTest {
             IGNORE_WARNING,
             null);
 
-        verify(caseDataAccessControl).grantAccess(savedCaseDetails, IDAM_ID);
+        verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID);
         verify(caseDocumentService).attachCaseDocuments(
             eq("12345"), eq("TestType"), eq("TestJurisdiction"), anyList());
     }
@@ -578,7 +581,7 @@ class SubmitCaseTransactionTest {
                 caseEventDefinition, caseDetails, IGNORE_WARNING, null));
 
         // Verify case pointer was persisted then deleted
-        verify(casePointerRepository).persistCasePointer(caseDetails);
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
         verify(casePointerRepository).deleteCasePointer(1234567890L);
     }
 
@@ -605,7 +608,7 @@ class SubmitCaseTransactionTest {
             submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
                 caseEventDefinition, caseDetails, IGNORE_WARNING, null));
 
-        verify(casePointerRepository).persistCasePointer(caseDetails);
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
         verify(casePointerRepository).deleteCasePointer(1234567890L);
     }
 
@@ -633,7 +636,7 @@ class SubmitCaseTransactionTest {
             submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
                 caseEventDefinition, caseDetails, IGNORE_WARNING, null));
 
-        verify(casePointerRepository).persistCasePointer(caseDetails);
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
         verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
     }
 
@@ -653,7 +656,7 @@ class SubmitCaseTransactionTest {
             submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
                 caseEventDefinition, caseDetails, IGNORE_WARNING, null));
 
-        verify(casePointerRepository).persistCasePointer(caseDetails);
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
         verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
     }
 
@@ -674,7 +677,7 @@ class SubmitCaseTransactionTest {
             submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
                 caseEventDefinition, caseDetails, IGNORE_WARNING, null));
 
-        verify(casePointerRepository).persistCasePointer(caseDetails);
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
         verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
     }
 
