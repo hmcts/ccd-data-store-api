@@ -89,11 +89,11 @@ class SearchInputsViewResourceTest {
         };
         final SearchInputsViewResource resource = new SearchInputsViewResource(searchInputs1, CASE_TYPE_ID);
 
-        List<SearchInputsViewResource.SearchInputView> searchInputs =
+        List<SearchInputsViewResource.SearchInputView> searchInputsResult =
             Lists.newArrayList(resource.getSearchInputs());
         assertAll(
             () -> assertThat(resource.getSearchInputs(), not(sameInstance(this.searchInputs))),
-            () -> assertThat(searchInputs, hasItems(hasProperty("field",
+            () -> assertThat(searchInputsResult, hasItems(hasProperty("field",
                     hasProperty("id", is(FieldTestUtil.COLLECTION_FIELD))),
                 hasProperty("field", hasProperty("id", is(FieldTestUtil.COMPLEX_FIELD)))))
         );

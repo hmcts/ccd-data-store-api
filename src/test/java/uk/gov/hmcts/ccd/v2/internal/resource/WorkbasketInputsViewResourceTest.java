@@ -90,11 +90,11 @@ class WorkbasketInputsViewResourceTest {
         };
         final WorkbasketInputsViewResource resource = new WorkbasketInputsViewResource(workbasketInputs1, CASE_TYPE_ID);
 
-        List<WorkbasketInputsViewResource.WorkbasketInputView> workbasketInputs =
+        List<WorkbasketInputsViewResource.WorkbasketInputView> workbasketInputsResult =
             Lists.newArrayList(resource.getWorkbasketInputs());
         assertAll(
             () -> assertThat(resource.getWorkbasketInputs(), not(sameInstance(this.workbasketInputs))),
-            () -> assertThat(workbasketInputs, hasItems(hasProperty("field",
+            () -> assertThat(workbasketInputsResult, hasItems(hasProperty("field",
                     hasProperty("id", is(FieldTestUtil.COLLECTION_FIELD))),
                 hasProperty("field", hasProperty("id", is(FieldTestUtil.COMPLEX_FIELD)))))
         );

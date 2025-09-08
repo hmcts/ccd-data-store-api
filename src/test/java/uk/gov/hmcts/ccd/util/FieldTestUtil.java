@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.util;
 
+import lombok.experimental.UtilityClass;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
@@ -10,6 +11,7 @@ import java.util.List;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
+@UtilityClass
 public class FieldTestUtil {
 
     public static final String COMPLEX_FIELD = "ComplexField";
