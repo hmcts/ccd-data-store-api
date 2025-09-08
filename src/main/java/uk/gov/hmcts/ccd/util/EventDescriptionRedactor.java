@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.util;
 
+@SuppressWarnings("squid:S5852")
 public class EventDescriptionRedactor {
     private static final String EMAIL_PATTERN = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,10}";
 
