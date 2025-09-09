@@ -106,3 +106,17 @@ Scenario: should retrieve search inputs for dynamic display that includes LAST_S
   And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  @S-063.1 #CCD-6146 test to check search input that includes COMPLEX,COLLECTION Scenario 1 AND 2  - DataType is COMPLEX / COLLECTION
+  Scenario: should retrieve search inputs for dynamic display that includes COMPLEX,COLLECTION
+
+    Given a user with [an active profile in CCD]
+
+    When a request is prepared with appropriate values
+    And the request [contains a valid case type]
+    And it is submitted to call the [Retrieve search input details for dynamic display] operation of [CCD Data Store]
+
+    Then a positive response is received
+    And the response [contains the correct search inputs for the given case type, along with an HTTP 200 OK]
+    And the response [body has dataType of complex and collection as one of the items]
+    And the response has all other details as expected
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

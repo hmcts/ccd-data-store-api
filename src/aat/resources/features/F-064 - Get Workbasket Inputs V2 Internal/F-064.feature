@@ -98,3 +98,17 @@ Scenario: must retrieve workbasket input details for dynamic display successfull
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  @S-064.1 #and CCD-6146 Scenario 1 and 2 - DataType is Compex / Collection
+  Scenario: must retrieve workbasket input details for dynamic display successfully
+
+    Given a user with [an active profile in CCD],
+
+    When a request is prepared with appropriate values,
+    And it is submitted to call the [retrieve workbasket input details for dynamic display] operation of [CCD Data Store],
+
+    Then a positive response is received,
+    And the response [code is HTTP-200 OK],
+    And the response [body contains Collection and Complex field as one of input fields],
+    And the response has all other details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
