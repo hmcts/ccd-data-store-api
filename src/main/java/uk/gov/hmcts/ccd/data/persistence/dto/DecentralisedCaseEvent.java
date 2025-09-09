@@ -18,5 +18,10 @@ public class DecentralisedCaseEvent {
     private CaseDetails caseDetailsBefore;
     private CaseDetails caseDetails;
     private DecentralisedEventDetails eventDetails;
+    /**
+     * The case_data.id column is needed for decentralised services to perform ElasticSearch indexing since it serves
+     * as the unique identifier on ES indexes.
+     * We provide it here since the existing CaseDetails type by design omits it.
+     */
     private Long internalCaseId;
 }
