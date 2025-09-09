@@ -7,7 +7,7 @@ Background:
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-215
+@S-215 #and CCD-6146 Scenario 3 - DataType is Null/empty
 Scenario: should retrieve search inputs for dynamic display
 
     Given a user with [an active profile in CCD],
@@ -63,7 +63,7 @@ Scenario: must return 404 when case type does not exist
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-595  # test to check search input that includes LAST_STATE_MODIFIED_DATE
+@S-595  # test to check search input that includes LAST_STATE_MODIFIED_DATE,CCD-6146 Scenario 3 - DataType is Null/empty
 Scenario: should retrieve search inputs for dynamic display that includes LAST_STATE_MODIFIED_DATE
 
     Given a user with [an active profile in CCD]
@@ -92,7 +92,7 @@ Scenario: should retrieve search inputs for dynamic display that includes LAST_S
   And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- @S-220
+ @S-220 #and CCD-6146 Scenario 3 - DataType is Null/empty
  Scenario: Private_User should retrieve search inputs for Private_CaseType's dynamic display
 
   Given a user with [an active Private profile in CCD],

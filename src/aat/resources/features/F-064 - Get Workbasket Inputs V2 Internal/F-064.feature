@@ -7,7 +7,7 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-558
+@S-558 #and CCD-6146 Scenario 3 - DataType is Null/empty
 Scenario: must retrieve workbasket input details for dynamic display successfully
 
     Given a user with [an active profile in CCD],
@@ -84,7 +84,7 @@ Scenario: must return a negative response when request contains a malformed case
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-596
+@S-596 #and CCD-6146 Scenario 3 - DataType is Null/empty
 Scenario: must retrieve workbasket input details for dynamic display successfully
 
     Given a user with [an active profile in CCD],
