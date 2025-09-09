@@ -19,7 +19,7 @@ public class FieldTypeUtil {
                 return DataType.COLLECTION.toString();
             } else {
                 if (field.getType().getComplexFields() != null
-                    && field.getType() != null && field.getType().isComplexFieldType()) {
+                    && field.getType().isComplexFieldType()) {
                     return DataType.COMPLEX.toString();
                 }
             }
